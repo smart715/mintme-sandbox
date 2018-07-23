@@ -1,0 +1,3 @@
+# Business configuration variables will go here
+parameters:
+    locale: 'en'

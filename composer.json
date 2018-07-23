@@ -7,6 +7,7 @@
         "php": "^7.2.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "incenteev/composer-parameter-handler": "^2.1",
         "symfony/console": "^4.1",
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.1",
@@ -44,14 +45,19 @@
         "symfony/polyfill-php56": "*"
     },
     "scripts": {
+        "symfony-scripts": [
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+        ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
+            "@symfony-scripts",
             "@auto-scripts"
         ],
         "post-update-cmd": [
+            "@symfony-scripts",
             "@auto-scripts"
         ]
     },
@@ -61,6 +67,9 @@
     "extra": {
         "symfony": {
             "allow-contrib": false
+        },
+        "incenteev-parameters": {
+            "file": "config/parameters.yaml"
         }
     }
 }
