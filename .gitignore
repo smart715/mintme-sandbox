@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env
 /public/bundles/
@@ -15,3 +14,5 @@
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 config/parameters.yaml
+node_modules
+public/build

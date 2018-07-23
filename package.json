@@ -1,0 +1,40 @@
+{
+  "name": "mintme",
+  "version": "1.0.0",
+  "description": "Mintme panel, exchange platform that allow users to create and exchange their own tokens built on Webchain.",
+  "main": "main.js",
+  "directories": {},
+  "dependencies": {
+    "bootstrap": "^4.1.2"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.20.1",
+    "autoprefixer": "^9.0.1",
+    "node-sass": "^4.9.2",
+    "postcss-loader": "^2.1.6",
+    "sass-loader": "^7.0.3",
+    "stylelint": "^9.3.0",
+    "stylelint-config-recommended-scss": "^3.2.0",
+    "stylelint-scss": "^3.2.0",
+    "vue": "^2.5.16",
+    "vue-loader": "^14.2.3",
+    "vue-template-compiler": "^2.5.16"
+  },
+  "scripts": {
+    "dev": "./node_modules/.bin/encore dev",
+    "watch": "./node_modules/.bin/encore dev --watch",
+    "prod": "./node_modules/.bin/encore production",
+    "stylelint": "./node_modules/stylelint/bin/stylelint.js \"assets/scss/**/*.scss assets/components/**/*.vue\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/panel"
+  },
+  "author": "ABC Hosting Ltd.",
+  "license": "ISC",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
