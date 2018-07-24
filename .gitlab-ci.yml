@@ -1,0 +1,30 @@
+stages:
+  - syntax
+  - tests
+
+syntax_php:
+  stage: syntax
+  script:
+    - export $(grep -v '^#' .env.dist | xargs)
+    - composer install
+    - php bin/console cache:warmup
+    - make syntax_check
+
+syntax_assets:
+  stage: syntax
+  script:
+    - npm install
+    - npm run stylelint
+    - npm run eslint
+
+tests_php:
+  stage: tests
+  script:
+    - composer install
+    - make phpunit
+
+tests_js:
+  stage: tests
+  script:
+    - npm install
+    - npm run unit
