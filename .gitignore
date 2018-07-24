@@ -16,3 +16,5 @@
 config/parameters.yaml
 node_modules
 public/build
+
+/.idea
