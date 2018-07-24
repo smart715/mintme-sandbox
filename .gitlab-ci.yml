@@ -9,6 +9,8 @@ syntax_php:
     - composer install
     - php bin/console cache:warmup
     - make syntax_check
+  tags:
+    - mintme
 
 syntax_assets:
   stage: syntax
@@ -16,15 +18,21 @@ syntax_assets:
     - npm install
     - npm run stylelint
     - npm run eslint
+  tags:
+    - mintme
 
 tests_php:
   stage: tests
   script:
     - composer install
     - make phpunit
+  tags:
+    - mintme
 
 tests_js:
   stage: tests
   script:
     - npm install
     - npm run unit
+  tags:
+    - mintme
