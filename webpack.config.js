@@ -11,9 +11,9 @@ Encore
 
     .enableSourceMaps(!Encore.isProduction())
 
-    .cleanupOutputBeforeBuild()
+    .enableVersioning(Encore.isProduction())
 
-    .enableVersioning()
+    .cleanupOutputBeforeBuild()
 
     .enableSassLoader()
 

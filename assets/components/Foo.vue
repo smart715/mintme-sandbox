@@ -3,9 +3,17 @@
 </template>
 
 <script>
-    export default {
-        name: 'Foo',
-    };
+export default {
+    name: 'Foo',
+    created () {
+        this.message = 'bye!'
+    },
+    data () {
+        return {
+            message: 'hello!'
+        }
+    },
+};
 </script>
 
 <style scoped>
