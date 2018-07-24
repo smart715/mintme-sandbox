@@ -2,19 +2,23 @@
 
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
          backupGlobals="false"
          colors="true"
+         defaultTestSuite="unit"
          bootstrap="vendor/autoload.php"
 >
     <php>
         <ini name="error_reporting" value="-1" />
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <env name="APP_ENV" value="test"/>
+        <env name="APP_DEBUG" value="1"/>
+        <env name="APP_SECRET" value="632318237b6d7a41e40c6ee83f8e6385"/>
         <env name="KERNEL_CLASS" value="App\Kernel" />
-        <env name="APP_ENV" value="test" />
-        <env name="APP_DEBUG" value="1" />
-        <env name="APP_SECRET" value="s$cretf0rt3st" />
-        <env name="SHELL_VERBOSITY" value="-1" />
-        <!-- define your env variables for the test env here -->
+        <!-- env name="TRUSTED_PROXIES" value="127.0.0.1,127.0.0.2" -->
+        <!-- env name="TRUSTED_HOSTS" value="localhost,example.com" -->
+        <!-- ###- symfony/framework-bundle ### -->
 
         <!-- ###+ doctrine/doctrine-bundle ### -->
         <!-- Format described at http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url -->
@@ -27,22 +31,29 @@
         <!-- For Gmail as a transport, use: "gmail://username:password@localhost" -->
         <!-- For a generic SMTP server, use: "smtp://localhost:25?encryption=&auth_mode=" -->
         <!-- Delivery is disabled by default via "null://localhost" -->
-        <env name="MAILER_TRANSPORT" value="null"/>
-        <env name="MAILER_HOST" value="localhost"/>
-        <env name="MAILER_USER" value="email"/>
-        <env name="MAILER_PASSWORD" value="password"/>
+        <env name="MAILER_URL" value="null://localhost"/>
         <!-- ###- symfony/swiftmailer-bundle ### -->
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>tests/</directory>
+        <testsuite name="unit">
+            <directory>tests</directory>
+            <exclude>tests/Controller</exclude>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>tests/Controller</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>./src/</directory>
+            <directory>src</directory>
+            <exclude>
+                <directory>src/*Bundle/Resources</directory>
+                <directory>src/*/*Bundle/Resources</directory>
+                <directory>src/*/Bundle/*Bundle/Resources</directory>
+            </exclude>
         </whitelist>
     </filter>
 

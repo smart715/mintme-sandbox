@@ -3,8 +3,7 @@ init_dev:
 	php bin/console doctrine:migrations:migrate --allow-no-migration -n
 
 phpunit:
-	./vendor/bin/phpunit
-	./vendor/bin/phpunit --testsuite=integration
+	./vendor/bin/simple-phpunit
 
 syntax_check:
 	./vendor/bin/phplint

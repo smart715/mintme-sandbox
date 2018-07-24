@@ -1,7 +1,7 @@
 includes:
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-doctrine/extension.neon
-    #- vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
 
@@ -17,6 +17,9 @@ parameters:
     excludes_analyse:
         - "%rootDir%/../../../src/Migrations/*"
         - "%rootDir%/../../../src/Validator/Constraints/*"
+
+    autoload_files:
+        - vendor/bin/.phpunit/phpunit-6.5/vendor/autoload.php
 
     ignoreErrors:
 #        - '#Method (.*) should return (.*)Repository but returns Doctrine\\Common\\Persistence\\ObjectRepository.#'
