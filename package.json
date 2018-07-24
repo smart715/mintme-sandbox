@@ -10,6 +10,9 @@
   "devDependencies": {
     "@symfony/webpack-encore": "^0.20.1",
     "autoprefixer": "^9.0.1",
+    "eslint": "^5.2.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-vue": "^4.7.0",
     "node-sass": "^4.9.2",
     "postcss-loader": "^2.1.6",
     "sass-loader": "^7.0.3",
@@ -24,7 +27,8 @@
     "dev": "./node_modules/.bin/encore dev",
     "watch": "./node_modules/.bin/encore dev --watch",
     "prod": "./node_modules/.bin/encore production",
-    "stylelint": "./node_modules/stylelint/bin/stylelint.js \"assets/scss/**/*.(scss|sass)\" \"assets/components/**/*.vue\""
+    "stylelint": "./node_modules/stylelint/bin/stylelint.js \"assets/scss/**/*.(scss|sass)\" \"assets/components/**/*.vue\"",
+    "eslint": "./node_modules/.bin/eslint assets/**/*.{js,vue}"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-import "../scss/main.sass";
+import '../scss/main.sass';
 
 window.Vue = require('vue');
 
