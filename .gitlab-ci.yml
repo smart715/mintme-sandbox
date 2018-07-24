@@ -10,7 +10,7 @@ syntax_php:
     - php bin/console cache:warmup
     - make syntax_check
   tags:
-    - mintme
+    - mintme.abchosting.org
 
 syntax_assets:
   stage: syntax
@@ -19,7 +19,7 @@ syntax_assets:
     - npm run stylelint
     - npm run eslint
   tags:
-    - mintme
+    - mintme.abchosting.org
 
 tests_php:
   stage: tests
@@ -27,7 +27,7 @@ tests_php:
     - composer install
     - make phpunit
   tags:
-    - mintme
+    - mintme.abchosting.org
 
 tests_js:
   stage: tests
@@ -35,4 +35,4 @@ tests_js:
     - npm install
     - npm run unit
   tags:
-    - mintme
+    - mintme.abchosting.org
