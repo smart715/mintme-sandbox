@@ -1,0 +1,13 @@
+{
+    "extends": [
+        "google",
+        "plugin:vue/essential"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 7,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    }
+}
