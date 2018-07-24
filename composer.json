@@ -23,6 +23,13 @@
         "symfony/yaml": "^4.1"
     },
     "require-dev": {
+        "overtrue/phplint": "^1.1",
+        "phpstan/phpstan": "^0.10.1",
+        "squizlabs/php_codesniffer": "*",
+        "slevomat/coding-standard": "~4.0",
+        "phpstan/phpstan-doctrine": "^0.10.0",
+        "phpstan/phpstan-phpunit": "^0.10.0",
+        "phpstan/phpstan-symfony": "^0.10.0",
         "sensiolabs/security-checker": "^4.1",
         "symfony/dotenv": "^4.1",
         "symfony/maker-bundle": "^1.5",

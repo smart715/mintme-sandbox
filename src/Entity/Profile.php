@@ -57,7 +57,7 @@ class Profile
      * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
      * @var Token|null
      */
-    private $token;
+    protected $token;
 
     public function setToken(?Token $token): self
     {

@@ -2,14 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\Token;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityRepository;
 
-class TokenRepository extends ServiceEntityRepository
+class TokenRepository extends EntityRepository
 {
-    public function __construct(RegistryInterface $registry)
-    {
-        parent::__construct($registry, Token::class);
-    }
+
 }

@@ -20,7 +20,7 @@ class Token
      * @ORM\Column(type="integer")
      * @var int
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -28,46 +28,46 @@ class Token
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @var string
      */
-    private $address;
+    protected $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
      * @var string|null
      */
-    private $websiteUrl;
+    protected $websiteUrl;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @AppAssert\IsUrlFromDomain("facebook.com")
      * @var string|null
      */
-    private $facebookUrl;
+    protected $facebookUrl;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @AppAssert\IsUrlFromDomain("youtube.com")
      * @var string|null
      */
-    private $youtubeUrl;
+    protected $youtubeUrl;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      * @var string|null
      */
-    private $description;
+    protected $description;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token", cascade={"persist"})
      * @var Profile
      */
-    private $profile;
+    protected $profile;
 
     public function __construct(Profile $profile, string $address)
     {

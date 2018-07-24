@@ -28,7 +28,7 @@ class IsUrlFromDomainValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $domainRegex = PATTERN_START.$constraint->domain.PATTERN_END;
+        $domainRegex = self::PATTERN_START.$constraint->domain.self::PATTERN_END;
 
         if (!preg_match($domainRegex, $value)) {
             $this->context->buildViolation($constraint->message)
