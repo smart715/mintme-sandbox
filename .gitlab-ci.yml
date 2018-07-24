@@ -1,38 +1,23 @@
 stages:
-  - syntax
   - tests
 
-syntax_php:
-  stage: syntax
+tests_php:
+  stage: tests
   script:
     - export $(grep -v '^#' .env.dist | xargs)
     - composer install
+    - make phpunit
     - php bin/console cache:warmup
     - make syntax_check
   tags:
     - mintme.abchosting.org
 
-syntax_assets:
-  stage: syntax
+tests_assets:
+  stage: tests
   script:
     - npm install
     - npm run stylelint
     - npm run eslint
-  tags:
-    - mintme.abchosting.org
-
-tests_php:
-  stage: tests
-  script:
-    - composer install
-    - make phpunit
-  tags:
-    - mintme.abchosting.org
-
-tests_js:
-  stage: tests
-  script:
-    - npm install
     - npm run unit
   tags:
     - mintme.abchosting.org
