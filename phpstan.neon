@@ -11,6 +11,8 @@ parameters:
 
     level: 7
 
+    tmpDir: "%rootDir%/../../../phpstan"
+
     symfony:
         container_xml_path: %rootDir%/../../../var/cache/dev/srcDevDebugProjectContainer.xml
 
