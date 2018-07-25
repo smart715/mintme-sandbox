@@ -15,6 +15,7 @@
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.1",
         "symfony/lts": "^4@dev",
+        "symfony/monolog-bundle": "^3.3",
         "symfony/orm-pack": "^1.0",
         "symfony/security-bundle": "^4.1",
         "symfony/swiftmailer-bundle": "^3.2",
@@ -34,7 +35,9 @@
         "symfony/dotenv": "^4.1",
         "symfony/maker-bundle": "^1.5",
         "symfony/phpunit-bridge": "^4.1",
+        "symfony/profiler-pack": "^1.0",
         "symfony/test-pack": "^1.0",
+        "symfony/var-dumper": "^4.1",
         "symfony/web-server-bundle": "^4.1"
     },
     "config": {
