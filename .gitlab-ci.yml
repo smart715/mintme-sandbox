@@ -1,0 +1,27 @@
+stages:
+  - tests
+
+before_script:
+  - shopt -s expand_aliases
+  - alias php='/usr/bin/php7.2'
+  - alias npm='/usr/local/bin/npm'
+
+tests_php:
+  stage: tests
+  script:
+    - export $(grep -v '^#' .env.dist | xargs)
+    - composer install
+    - make phpunit
+    - make syntax_check
+  tags:
+    - mintme.abchosting.org
+
+tests_assets:
+  stage: tests
+  script:
+    - npm install
+    - npm run stylelint
+    - npm run eslint
+    - npm run unit
+  tags:
+    - mintme.abchosting.org
