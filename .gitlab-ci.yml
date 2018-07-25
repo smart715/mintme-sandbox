@@ -4,7 +4,7 @@ stages:
 before_script:
   - shopt -s expand_aliases
   - alias php='/usr/bin/php7.2'
-  - alias npm='/root/.nvm/versions/node/v8.11.3/bin/npm'
+  - alias npm='/usr/local/bin/npm'
 
 tests_php:
   stage: tests
@@ -12,7 +12,6 @@ tests_php:
     - export $(grep -v '^#' .env.dist | xargs)
     - composer install
     - make phpunit
-    - php bin/console cache:warmup
     - make syntax_check
   tags:
     - mintme.abchosting.org
