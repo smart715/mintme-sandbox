@@ -6,10 +6,10 @@ use App\Entity\Profile;
 use App\Entity\User;
 use App\Fetcher\ProfileFetcher;
 use App\Manager\ProfileManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ProfileFetcherTest extends TestCase
 {
