@@ -5,13 +5,13 @@
 <script>
 export default {
     name: 'Foo',
-    created () {
-        this.message = 'bye!'
+    created() {
+        this.message = 'bye!';
     },
-    data () {
+    data() {
         return {
-            message: 'hello!'
-        }
+            message: 'hello!',
+        };
     },
 };
 </script>
