@@ -20,8 +20,7 @@ tests_assets:
   stage: tests
   script:
     - npm install
-    - npm run stylelint
-    - npm run eslint
-    - npm run unit
+    - make syntax_check_assets
+    - make karma
   tags:
     - mintme.abchosting.org
