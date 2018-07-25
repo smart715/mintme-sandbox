@@ -10,7 +10,7 @@ class IsUrlFromDomainValidator extends ConstraintValidator
 {
     private const PATTERN_START = '~^((http|https)://){0,1}(';
     private const PATTERN_END = ')
-            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )+      # a path
+            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})+ )+      # a path
             (?:\? (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a query (optional)
             (?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a fragment (optional)
         $~ixu';
@@ -33,7 +33,6 @@ class IsUrlFromDomainValidator extends ConstraintValidator
         if (!preg_match($domainRegex, $value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ string }}', $value)
-                ->setParameter('{{ domain }}', $constraint->domain)
                 ->addViolation();
         }
     }

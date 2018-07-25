@@ -40,9 +40,11 @@
         <testsuite name="unit">
             <directory>tests</directory>
             <exclude>tests/Controller</exclude>
+            <exclude>tests/Repository</exclude>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Controller</directory>
+            <directory>tests/Repository</directory>
         </testsuite>
     </testsuites>
 
@@ -53,6 +55,8 @@
                 <directory>src/*Bundle/Resources</directory>
                 <directory>src/*/*Bundle/Resources</directory>
                 <directory>src/*/Bundle/*Bundle/Resources</directory>
+                <directory>src/Migrations</directory>
+                <directory>src/Kernel.php</directory>
             </exclude>
         </whitelist>
     </filter>

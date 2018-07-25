@@ -44,9 +44,11 @@ class User extends BaseUser
      */
     protected $profile;
 
-    public function setProfile(Profile $profile): void
+    public function setProfile(Profile $profile): self
     {
         $this->profile = $profile;
+
+        return $this;
     }
 
     /** {@inheritdoc} */

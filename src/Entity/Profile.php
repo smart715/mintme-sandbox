@@ -64,12 +64,12 @@ class Profile
         return $this->id;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->lastName;
     }
@@ -98,14 +98,14 @@ class Profile
         return $this;
     }
 
-    public function setFirstName(?string $firstName): self
+    public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function setLastName(?string $lastName): self
+    public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
 
