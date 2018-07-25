@@ -121,6 +121,18 @@ class Token
         return $this;
     }
 
+    public function getYoutubeUrl(): ?string
+    {
+        return $this->youtubeUrl;
+    }
+
+    public function setYoutubeUrl(string $youtubeUrl): self
+    {
+        $this->youtubeUrl = $youtubeUrl;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ formHeader }} | Mint me{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {% if not profileCreated %}
+            <div class="alert alert-info" role="alert">
+                You need to fill your profile data first. [link-to-profile-creation]
+            </div>
+        {% endif %}
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="form-group">
+                <button type="submit" class="btn-primary btn" {{ profileCreated ?: 'disabled' }}>
+                    Create token
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

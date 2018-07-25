@@ -59,11 +59,9 @@ class Profile
      */
     protected $token;
 
-    public function setToken(?Token $token): self
+    public function getId(): int
     {
-        $this->token = $token;
-
-        return $this;
+        return $this->id;
     }
 
     public function getFirstName(): ?string
@@ -110,6 +108,13 @@ class Profile
     public function setLastName(?string $lastName): self
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function setToken(?Token $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }
