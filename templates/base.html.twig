@@ -7,7 +7,7 @@
     <title>{% block title %}MINTME{% endblock %}</title>
     {% block stylesheets %}{% endblock %}
 </head>
-<body>
+<body class="{% block bodyclass %}{% endblock %}">
     {% block body %}{% endblock %}
     {% block javascripts %}{% endblock %}
 </body>
