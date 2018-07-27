@@ -1,14 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100vh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}MINTME{% endblock %}</title>
-    {% block stylesheets %}{% endblock %}
+    {% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('build/main.css') }}">
+    {% endblock stylesheets %}
 </head>
-<body class="{% block bodyclass %}{% endblock %}">
-    {% block body %}{% endblock %}
-    {% block javascripts %}{% endblock %}
+<body class="h-100vh {% block bodyclass %}{% endblock %}">
+    {% block body %}
+        {% block header %}{% endblock header %}
+        {% block main %}
+            <div class="d-table w-100 h-100vh">
+                <div class="d-table w-100 h-100 gradient-bg">
+                    <div class="d-table-row">
+                        <div class="d-table-cell header-bg"></div>
+                    </div>
+                    <div class="d-table-row">
+                        <div class="d-table-cell ">
+                            {% block content %}{% endblock content %}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-table-row">
+                    <div class="d-table-cell footer-bg"></div>
+                </div>
+            </div>
+        {% endblock main %}
+        {% block footer %}
+            <div class="main-footer"></div>
+        {% endblock footer %}
+    {% endblock body %}
+    {% block javascripts %}{% endblock javascripts %}
 </body>
 </html>

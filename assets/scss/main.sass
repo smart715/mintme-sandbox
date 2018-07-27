@@ -1,2 +1,32 @@
 @import 'variables'
 @import '~bootstrap/scss/bootstrap'
+
+.h-100vh
+  height: 100vh
+
+.gradient-bg
+  background: linear-gradient(180deg, $gradiant-blue-dark, $gradiant-blue-light)
+
+.header-bg
+  background: url(../img/header-main.png) no-repeat bottom
+  background-size: cover
+  height: 100px
+  @include media-breakpoint-up(sm)
+    height: 125px
+  @include media-breakpoint-up(md)
+    height: 150px
+  @include media-breakpoint-up(lg)
+    height: 200px
+
+.footer-bg
+  background: url(../img/footer-main.jpg) no-repeat top right
+  background-size: cover
+  height: 200px
+  @include media-breakpoint-up(sm)
+    height: 300px
+  @include media-breakpoint-up(md)
+    height: 400px
+  @include media-breakpoint-up(lg)
+    height: 500px
+  @include media-breakpoint-up(xl)
+    height: 700px
