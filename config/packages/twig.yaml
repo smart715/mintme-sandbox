@@ -2,3 +2,6 @@ twig:
     paths: ['%kernel.project_dir%/templates']
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
+    form_themes:
+        - "@EWZRecaptcha/Form/ewz_recaptcha_widget.html.twig"
+        - 'form/fields.html.twig'

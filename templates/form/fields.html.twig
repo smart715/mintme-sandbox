@@ -1,0 +1,108 @@
+{% block form_row %}
+    {% spaceless %}
+        <div class="form-group">
+            {{ form_label(form) }}
+            {{ form_errors(form) }}
+            {{ form_widget(form) }}
+        </div>
+    {% endspaceless %}
+{% endblock form_row %}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+    <div class="py-2 mb-2 bg-danger text-white text-center">
+        <ul class="pl-3 m-0 list-unstyled">
+            {%- for error in errors -%}
+                <li>{{ error.message }}</li>
+            {%- endfor -%}
+        </ul>
+    </div>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block form_widget_simple -%}
+    {%- set type = type|default('text') -%}
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} class="form-control form-control-md"/>
+{%- endblock form_widget_simple -%}
+
+{%- block form_widget_compound -%}
+    <div {{ block('widget_container_attributes') }}>
+        {{- block('form_rows') -}}
+        {{- form_rest(form) -}}
+    </div>
+{%- endblock form_widget_compound -%}
+
+{%- block button_attributes -%}
+    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%} class="btn btn-primary"
+    {{ block('attributes') }}
+{%- endblock button_attributes -%}
+
+{%- block button_widget -%}
+    {%- if label is empty -%}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {%- endif -%}
+    <div class="form-group text-center">
+        <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+	{%- if  ((attr.cancelbutton is defined) and (attr.cancelbutton == true)) -%}
+	    <button type="button"
+		class="btn btn-primary ml-3" 
+		close>
+		    Cancel
+	    </button>
+	{%- endif -%}
+    </div>
+{%- endblock button_widget -%}
+
+{%- block choice_widget_collapsed -%}
+{%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+    {% set required = false %}
+{%- endif -%}
+<select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %} class="custom-select form-control form-control-md">
+    {%- if placeholder is not none -%}
+        <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+    {%- endif -%}
+    {%- if preferred_choices|length > 0 -%}
+        {% set options = preferred_choices %}
+        {{- block('choice_widget_options') -}}
+        {%- if choices|length > 0 and separator is not none -%}
+            <option disabled="disabled">{{ separator }}</option>
+        {%- endif -%}
+    {%- endif -%}
+    {%- set options = choices -%}
+    {{- block('choice_widget_options') -}}
+</select>
+{%- endblock choice_widget_collapsed -%}
+
+{%- block textarea_widget -%}
+<textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
+{%- endblock textarea_widget -%}
+
+{%- block submit_extended_widget -%}
+    <div class="row">
+        <div class="col-12 mb-2 mt-3 text-center">
+            <button type="submit"
+                class="btn btn-primary mx-auto  ml-md-0 ml-lg-0 d-block d-md-inline d-lg-inline"
+                {%- if attr.feature is defined -%} {{attr.feature}} {%- endif -%}
+                > {{ attr.firstlabel|raw }}
+            </button>
+	    <button type="submit"
+                class="btn btn-primary mx-auto mt-1  ml-md-3 ml-lg-3 d-block d-md-inline d-lg-inline"
+            >{{ attr.secondlabel|raw }}
+            </button>
+	    {%- if  ((attr.cancelbutton is defined) and (attr.cancelbutton == true)) -%}
+	    	<button type="button"
+		    class="btn btn-primary mx-auto mt-1  ml-md-3 ml-lg-3 d-block d-md-inline d-lg-inline" 
+		    close>
+		   	Cancel
+	    	</button>
+	    {%- endif -%}
+        </div>
+    </div>
+{% endblock submit_extended_widget %}

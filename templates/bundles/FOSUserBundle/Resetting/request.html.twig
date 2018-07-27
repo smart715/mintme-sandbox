@@ -1,0 +1,7 @@
+{% extends "@FOSUser/layout.html.twig" %}
+
+{% block contentClass %}wrap-main-form py-4{% endblock %}
+
+{% block fos_user_content %}
+    {{ include("@FOSUser/Resetting/request_content.html.twig") }}
+{% endblock fos_user_content %}

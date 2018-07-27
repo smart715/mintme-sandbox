@@ -1,0 +1,44 @@
+{% trans_default_domain 'FOSUserBundle' %}
+{% extends 'form.html.twig' %}
+
+{% set formHeader = "Log In" %}
+{% block formBody %}
+    {% if error %}
+        <div class="p-2 mb-4 bg-danger text-white">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+    <form action="{{ path("fos_user_security_check") }}" method="post">
+        <div class="form-group row">
+            <label for="inputEmail" class="col-md-4 col-form-label">Email</label>
+            <div class="col-md-8">
+                <input type="email" name="_username"  value ="{{ last_username }}" required="required" id="inputEmail" class="form-control form-control-md" autofocus>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputPassword" class="col-md-4 col-form-label">Password</label>
+            <div class="col-md-8">
+                <input type="password" name="_password" required="required" id="inputPassword" class="form-control form-control-md">
+            </div>
+        </div>
+        <div class="form-group row my-1">
+            <div class="col-md-8 offset-md-4">
+                <label class="custom-control custom-checkbox">
+                    <input type="checkbox" id="remember_me" name="_remember_me" class="custom-control-input">
+                    <label class="custom-control-label" for="remember_me">Remember me</label>
+                </label>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-8 offset-md-4">
+                <input type="submit" id="_submit" name="_submit" class="btn btn-primary" value="Log In"> or <a href="{{ path('fos_user_registration_register') }}">Sign Up</a>
+            </div>
+        </div>
+        <div class="form-group row recover-password-option">
+            <div class="col-md-8 offset-md-4">
+                <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
+            </div>
+        </div>
+        {% if csrf_token %}
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+        {% endif %}
+    </form>
+{% endblock %}
