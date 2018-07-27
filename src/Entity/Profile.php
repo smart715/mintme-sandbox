@@ -35,15 +35,11 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Url()
+     * @AppAssert\IsUrlFromDomain("facebook.com")
      * @var string|null
      */
-    protected $city;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @var string|null
-     */
-    protected $country;
+    protected $facebookUrl;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -52,7 +48,7 @@ class Profile
     protected $description;
 
     /**
-     * @ORM\OneToOne(targetEntity="User", inversedBy="profile", orphanRemoval=true)
+     * @ORM\OneToOne(targetEntity="User", orphanRemoval=true)
      * @var User
      */
     protected $user;
@@ -62,11 +58,6 @@ class Profile
      * @var Token|null
      */
     protected $token;
-
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
 
     public function setToken(?Token $token): self
     {
@@ -90,6 +81,11 @@ class Profile
         return $this->description;
     }
 
+    public function getFacebookUrl(): ?string
+    {
+        return $this->facebookUrl;
+    }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
@@ -97,26 +93,9 @@ class Profile
         return $this;
     }
 
-    public function getCity(): ?string
+    public function setFacebookUrl(?string $facebookUrl): self
     {
-        return $this->city;
-    }
-
-    public function setCity(?string $city): self
-    {
-        $this->city = $city;
-
-        return $this;
-    }
-
-    public function getCountry(): ?string
-    {
-        return $this->country;
-    }
-
-    public function setCountry(?string $country): self
-    {
-        $this->country = $country;
+        $this->facebookUrl = $facebookUrl;
 
         return $this;
     }
