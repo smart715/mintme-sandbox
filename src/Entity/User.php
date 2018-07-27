@@ -32,6 +32,13 @@ class User extends BaseUser
     protected $email;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Assert\Email()
+     * @var string|null
+     */
+    protected $tempEmail;
+
+    /**
      * @Assert\NotBlank()
      * @Assert\Length(min="8")
      * @var string|null
@@ -39,10 +46,30 @@ class User extends BaseUser
     protected $plainPassword;
 
     /**
-     * @ORM\OneToOne(targetEntity="Profile", cascade={"persist"})
+     * @ORM\OneToOne(targetEntity="Profile", mappedBy="user", cascade={"persist"})
      * @var Profile
      */
     protected $profile;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $profile = new Profile($this);
+        $this->setProfile($profile);
+    }
+
+    public function getTempEmail(): ?string
+    {
+        return $this->tempEmail;
+    }
+
+    public function setTempEmail(?string $email): self
+    {
+        $this->tempEmail = $email;
+
+        return $this;
+    }
 
     public function setProfile(Profile $profile): void
     {

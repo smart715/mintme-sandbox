@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div id="settings">
+        <b-tabs>
+            <b-tab title="Personal data" active>
+                {{ form(profileForm) }}
+            </b-tab>
+            <b-tab title="Account settings">
+                <div class="row">
+                    <div class="col">
+                        {{ form(emailForm) }}
+                    </div>
+                    <div class="col">
+                        {{ form(passwordForm) }}
+                    </div>
+                </div>
+            </b-tab>
+        </b-tabs>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('build/settings.js') }}"></script>
+{% endblock %}

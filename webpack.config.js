@@ -7,6 +7,8 @@ Encore
 
     .addEntry('main', './assets/js/main.js')
 
+    .addEntry('settings', './assets/js/settings.js')
+
     .enablePostCssLoader()
 
     .enableSourceMaps(!Encore.isProduction())
