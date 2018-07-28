@@ -34,6 +34,27 @@ body
     height: 500px
   @include media-breakpoint-up(xl)
     height: 700px
+  
+  .bottom-links
+    padding-right: 14rem
+    padding-bottom: 8rem
+    @include media-breakpoint-down(lg)
+      padding-bottom: 0
+    @include media-breakpoint-down(md)
+      padding: 0
+    @include media-breakpoint-down(xs)
+      position: relative
+      bottom: 7rem
+      font-size: .875em
+    .link-box
+      border-right: .0625rem solid $body-text-color
+      &:last-child
+        border: none
+      .list-item:last-child
+        padding-bottom: 0 !important
+      a
+        color: $body-text-color
+        text-decoration: none
 
 .top-navbar
   a
