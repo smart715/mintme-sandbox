@@ -22,6 +22,31 @@ body
   @include media-breakpoint-up(lg)
     height: 160px
 
+.top-navbar
+  a
+    color: inherit
+  .active
+    color: $green
+  .dropdown-toggle
+    border: none
+    &::after
+      border: none
+  .navbar-toggler-icon
+    background-image: $navbar-light-toggler-icon-bg
+  .search
+    background-color: lighten($primary, 28%)
+    color: darken($primary, 10%)
+    border-color: darken($primary, 10%)
+    padding: .375rem .5rem
+    min-width: 32rem
+    @include media-breakpoint-down(lg)
+      min-width: 20rem
+    &::placeholder
+      color: darken($primary, 10%)
+      opacity: 1
+    &:focus
+      box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
+
 .footer-bg
   background: url(../img/footer-main.jpg) no-repeat top right
   background-size: cover
@@ -55,31 +80,6 @@ body
       a
         color: $body-text-color
         text-decoration: none
-
-.top-navbar
-  a
-    color: inherit
-  .active
-    color: $green
-  .dropdown-toggle
-    border: none
-    &::after
-      border: none
-  .navbar-toggler-icon
-    background-image: $navbar-light-toggler-icon-bg
-  .search
-    background-color: lighten($primary, 28%)
-    color: darken($primary, 10%)
-    border-color: darken($primary, 10%)
-    padding: .375rem .5rem
-    min-width: 32rem
-    @include media-breakpoint-down(lg)
-      min-width: 20rem
-    &::placeholder
-      color: darken($primary, 10%)
-      opacity: 1
-    &:focus
-      box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
 
 .icon-profile-big
   width: 2.5em
