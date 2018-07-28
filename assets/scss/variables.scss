@@ -1,10 +1,23 @@
 // Change bootstrap variables to match Mintme style
 
-$body-text-color: #37474f;
+// Fonts
 $open-sans-font: 'Open Sans', sans-serif;
 $oxygen-font: 'Oxygen', sans-serif;
 
 // Colors
 $primary: #55aded;
+
+$body-text-color: #37474f;
 $gradiant-blue-dark: #5cacfd;
 $gradiant-blue-light: #90c7ff;
+
+// Forms
+$input-bg: #e6e6e6;
+$input-btn-padding-y: .5rem;
+$input-btn-padding-x: 1rem;
+$input-border-radius: 0;
+$input-focus-border-color: $input-bg;
+
+$input-btn-focus-color: $input-bg;
+
+$btn-border-radius: 0;

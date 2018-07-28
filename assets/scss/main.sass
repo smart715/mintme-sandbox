@@ -1,6 +1,10 @@
 @import 'variables'
 @import '~bootstrap/scss/bootstrap'
 
+body
+  color: $body-text-color
+  font-family: $open-sans-font
+
 .h-100vh
   height: 100vh
 
@@ -10,13 +14,13 @@
 .header-bg
   background: url(../img/header-main.png) no-repeat bottom
   background-size: cover
-  height: 100px
+  height: 60px
   @include media-breakpoint-up(sm)
-    height: 125px
+    height: 90px
   @include media-breakpoint-up(md)
-    height: 150px
+    height: 110px
   @include media-breakpoint-up(lg)
-    height: 200px
+    height: 160px
 
 .footer-bg
   background: url(../img/footer-main.jpg) no-repeat top right
@@ -30,3 +34,39 @@
     height: 500px
   @include media-breakpoint-up(xl)
     height: 700px
+
+.top-navbar
+  a
+    color: inherit
+  .active
+    color: $green
+  .dropdown-toggle
+    border: none
+    &::after
+      border: none
+  .navbar-toggler-icon
+    background-image: $navbar-light-toggler-icon-bg
+  .search
+    background-color: lighten($primary, 28%)
+    color: darken($primary, 10%)
+    border-color: darken($primary, 10%)
+    padding: .375rem .5rem
+    min-width: 32rem
+    @include media-breakpoint-down(lg)
+      min-width: 20rem
+    &::placeholder
+      color: darken($primary, 10%)
+      opacity: 1
+    &:focus
+      box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
+
+.icon-profile-big
+  width: 2.5em
+  height: 2.5em
+  background: url('../img/profile-big-icon.png') no-repeat
+  background-size: auto 100%
+
+#nav-profile
+  button, button:hover, button:focus
+    box-shadow: none
+    @extend .icon-profile-big
