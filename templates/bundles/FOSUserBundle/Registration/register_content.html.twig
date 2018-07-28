@@ -1,6 +1,5 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
-{% form_theme form 'form/fields.html.twig' %}
 {% set formHeader = "Sign Up" %}
 {% block formBody %}
     {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
