@@ -22,4 +22,7 @@ fos_user_resetting:
     options:
         expose: true
 
+profile:
+    path: /profile
+    controller: App\Controller\DefaultController:profileSettingsAction
 

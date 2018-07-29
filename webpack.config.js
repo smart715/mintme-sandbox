@@ -7,6 +7,7 @@ Encore
 
     .addEntry('main', './assets/js/main.js')
     .addEntry('trading', './assets/js/trading.js')
+    .addEntry('profile', './assets/js/profile.js')
     // this script's purpose is solely to "touch" images so that webpack
     // will "notice" them and include to the build.
     .addEntry('assets', './assets/js/assets.js')

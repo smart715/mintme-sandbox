@@ -48,8 +48,24 @@
                                     <a href="{{ path('fos_user_registration_register') }}" class="nav-link px-3">Sign Up</a>
                                 </li>
                                 <li class="nav-item d-none d-lg-block">
-                                    <div id="nav-profile" class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle ml-2" type="button" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div id="nav-profile" class="dropdown" :class="{ 'show': showProfileMenu }">
+                                        <button
+                                            class="btn btn-secondary dropdown-toggle ml-2"
+                                            type="button" aria-haspopup="true"
+                                            :aria-expanded="showProfileMenu"
+                                            @click="toggleProfileMenu"
+                                            v-click-outside="hideProfileMenu">
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right border-0 mt-2" :class="{ 'show': showProfileMenu }">
+                                            <a class="dropdown-item mx-1 my-1 pl-3" href="{{ path('profile') }}">
+                                                <span class="icon-profile float-left mt-1 mr-1"></span>
+                                                Profile
+                                            </a>
+                                            <a class="dropdown-item mx-1 mb-1 pl-3 pr-5" href="{{ path('fos_user_security_logout') }}">
+                                                <span class="icon-logout float-left mt-1 mr-1"></span>
+                                                Log Out
+                                            </a>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>

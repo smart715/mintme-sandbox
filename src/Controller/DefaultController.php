@@ -23,4 +23,8 @@ class DefaultController extends Controller
     {
         return $this->render('default/trading.html.twig');
     }
+    public function profileSettingsAction(): Response
+    {
+        return $this->render('default/profile.html.twig');
+    }
 }

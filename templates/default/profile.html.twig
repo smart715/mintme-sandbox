@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <div id="profile" class="container">
+        <template>
+            <div class="card code-card">
+                <div class="card-header tabs">
+                    <div class="tab" :class="tabSelected == 'personalData' ? 'selected' : ''" @click="tabSelected = 'personalData'">Personal Data</div>
+                    <div class="tab" :class="tabSelected == 'tokenData' ? 'selected' : ''" @click="tabSelected = 'tokenData'">Token Data</div>
+                    <div class="tab" :class="tabSelected == 'accountSettings' ? 'selected' : ''" @click="tabSelected = 'accountSettings'">Account Settings</div>
+                </div>
+                <div class="card-body">
+                    <div class="col-12">
+                        <div v-show="tabSelected == 'personalData'">
+                            <personal-data></personal-data>
+                        </div>
+                        <div v-show="tabSelected == 'tokenData'">
+                            <token-data></toke-data>
+                        </div>
+                        <div v-show="tabSelected == 'accountSettings'">
+                            <account-settings></account-settings>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </template>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/profile.js') }}"></script>
+{% endblock %}
