@@ -64,7 +64,7 @@
                             <div class="d-table-cell header-bg"></div>
                         </div>
                         <div class="d-table-row">
-                            <div class="d-table-cell ">
+                            <div class="d-table-cell pt-5 contents-wrapper">
                                 {% block content %}{% endblock content %}
                             </div>
                         </div>
@@ -111,10 +111,11 @@
                     </div>
                 </div>
             {% endblock main %}
-            {% block footer %}
-                <div class="main-footer"></div>
-            {% endblock footer %}
+            {% block footer %}{% endblock footer %}
         {% endblock body %}
-        {% block javascripts %}{% endblock javascripts %}
+        {% block javascripts %}
+            <script src="{{ asset('build/main.js') }}"></script>
+            {% block pagescripts %}{% endblock %}
+        {% endblock javascripts %}
     </body>
 </html>

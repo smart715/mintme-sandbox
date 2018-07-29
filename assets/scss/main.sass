@@ -47,6 +47,10 @@ body
     &:focus
       box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
 
+.contents-wrapper
+  @include media-breakpoint-down(xs)
+    padding-bottom: 7rem
+
 .footer-bg
   background: url(../img/footer-main.jpg) no-repeat top right
   background-size: cover
@@ -93,19 +97,35 @@ body
     @extend .icon-profile-big
 
 .card
-  border: none
   .card-header
-    background: #0077AB
-    color: $white
+    background: $card-header-bg-color
     font-size: 1.2em
-  .card-body
-    padding: 1.25rem 2rem 0 2rem
-    form
-      label
-        color: #333333
-        font-weight: 600
-        display: inline-block
-        span
-          font-weight: 400
-        .btn
-          border-radius: 0
+    color: $white
+    padding: .75rem 1.5rem
+    span
+      font-size: .9em
+    .card-header-icon
+      float: right
+      color: $white
+  .card-title
+    margin: 0
+    font-size: 1.25em
+  form
+    label
+      color: #333333
+      font-weight: 600
+      display: inline-block
+
+.table
+  border: .0625rem solid $gray-400
+  th
+    font-weight: normal
+    font-size: .875em
+  td, th
+    &:first-child
+      padding-left: 2rem 
+
+.pagination
+  .page-link
+    border: none
+    border-radius: 0 !important

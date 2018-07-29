@@ -5,11 +5,34 @@
 {% block bodyclass %}trading{% endblock %}
 
 {% block content %}
-    <div class="container-fluid">
+    <div id="trading" class="container">
         <div class="row">
-            <div class="col">
-                Contents of TRADING page
+            <div class="col-12 col-md-9">
+                <div class="card">
+                    <div class="card-header">
+                        Trading
+                    </div>
+                    <div class="card-body">
+                        <trading
+                            table-container-class="table-responsive"
+                            table-class="table"
+                        >
+                        <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
+                            Top 1000 tokens
+                        </div>
+                        </trading>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3 mt-2 mt-md-0">
+                <div class="ads bg-light w-100 h-100">
+                    ADVERTISING
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/trading.js') }}"></script>
 {% endblock %}
