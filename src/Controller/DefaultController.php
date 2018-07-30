@@ -30,16 +30,16 @@ class DefaultController extends Controller
     }
 
     /**
-    * @Route("/wallet", name="wallet")
-    */
+     * @Route("/wallet", name="wallet")
+     */
     public function wallet(): Response
     {
         return $this->render('default/wallet.html.twig');
     }
     
     /**
-    * @Route("/profile", name="profile")
-    */
+     * @Route("/profile", name="profile")
+     */
     public function profile(): Response
     {
         return $this->render('default/profile.html.twig');
