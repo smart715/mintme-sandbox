@@ -122,19 +122,22 @@ body
     font-size: .875em
   td, th
     &:first-child
-      padding-left: 2rem 
+      padding-left: 2rem
+  tbody
+    background: darken($gray-100, 2%)
 
 .pagination
   .page-link
     border: none
     border-radius: 0 !important
+
 .btn-primary
   color: $white
 
 .tabs
   display: flex
   text-align: center
-  padding: 0px
+  padding: 0 !important
   font-size: 1.2rem
   align-items: stretch
   .tab
@@ -145,10 +148,8 @@ body
     color: $headings-color
   .tab.selected 
     background: #0078BB
-    color: $white
- 
+
 #profile
   .card-header
       font-size: 1em
       padding: 0rem 0rem
-    

@@ -23,11 +23,24 @@ class DefaultController extends Controller
     {
         return $this->render('default/trading.html.twig');
     }
+
+    public function profileSettingsAction(): Response
+    {
+        return $this->render('default/profile.html.twig');
+    }
+
+    /**
+    * @Route("/wallet", name="wallet")
+    */
+    public function wallet(): Response
+    {
+        return $this->render('default/wallet.html.twig');
+    }
     
     /**
-     * @Route("/profile", name="profile")
-     */
-    public function profileSettings(): Response
+    * @Route("/profile", name="profile")
+    */
+    public function profile(): Response
     {
         return $this->render('default/profile.html.twig');
     }
