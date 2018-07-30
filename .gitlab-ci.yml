@@ -50,7 +50,7 @@ build_mintme_sites:
     - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
   tags:
     # This job only will be executed by this runner:
-    - webchain
+    - mintme.abchosting.org
   only:
     # this job only will be executed for branches
     - branches
