@@ -19,7 +19,7 @@
                     id="facebook"/>
             </div>
             <div class="form-group">
-                <label for="youtube">Youtube:</label>
+                <label for="youtube">YouTube:</label>
                 <input
                     name="youtube"
                     type="url"
@@ -29,7 +29,7 @@
         </div>
         <div class="col-lg-6">
             <div class="form-group">
-                <label for="desc">Token Description:</label>
+                <label for="desc">Token description:</label>
                 <textarea
                     name="desc"
                     class="form-control"
@@ -39,7 +39,7 @@
             <button
                 type="submit"
                 class="btn btn-primary float-right">
-                Submit
+                Save
             </button>
         </div>
     </div>

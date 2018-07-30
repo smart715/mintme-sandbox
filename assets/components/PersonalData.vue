@@ -20,24 +20,32 @@
             </div>
             <div class="form-group">
                 <label for="profile-fburl">City:</label>
-                <input
+                <select
                     name="city"
                     type="text"
                     class="form-control"
-                    id="city"/>
+                    id="city">
+                    <option>Lagos</option>
+                    <option>Oyo</option>
+                    <option>Ogun</option>
+                </select>
             </div>
             <div class="form-group">
                 <label for="country">Country:</label>
-                <input
+                <select
                     name="country"
                     type="text"
                     class="form-control"
-                    id="country"/>
+                    id="country">
+                    <option>Nigeria</option>
+                    <option>Poland</option>
+                    <option>Ukraine</option>
+                </select>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="form-group">
-                <label for="desc">Description:</label>
+                <label for="desc">About yourself</label>
                 <textarea
                     name="desc"
                     class="form-control"
@@ -47,7 +55,7 @@
             <button
                 type="submit"
                 class="btn btn-primary float-right">
-                Submit
+                Save
             </button>
         </div>
     </div>
