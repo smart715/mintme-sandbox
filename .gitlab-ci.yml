@@ -9,6 +9,7 @@
 stages:
   - update-repository
   - tests
+  - build-sites
 
 update_repository_redmine_training.abchosting.org:
   script:
@@ -41,3 +42,16 @@ tests_assets:
     - make karma
   tags:
     - mintme.abchosting.org
+
+build_mintme_sites:
+  stage: build-sites
+  script:
+    - SRC=$(pwd)
+    - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
+  tags:
+    # This job only will be executed by this runner:
+    - webchain
+  only:
+    # this job only will be executed for branches
+    - branches
+    
