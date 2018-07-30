@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Wallet{% endblock %}
+
+{% block bodyclass %}wallet{% endblock %}
+
+{% block content %}
+    <div id="wallet" class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card code-card">
+                    <div class="card-header tabs">
+                        <div
+                            class="tab"
+                            :class="selectedTab == 'wallet' ? 'selected' : ''"
+                            @click="selectedTab = 'wallet'"
+                        >
+                            Wallet
+                        </div>
+                        <div
+                            class="tab"
+                            :class="selectedTab == 'tradingHistory' ? 'selected' : ''"
+                            @click="selectedTab = 'tradingHistory'"
+                        >
+                            Trading History
+                        </div>
+                        <div
+                            class="tab"
+                            :class="selectedTab == 'depositWithdrowHistory' ? 'selected' : ''"
+                            @click="selectedTab = 'depositWithdrowHistory'"
+                        >
+                            Deposit/Withdrow History
+                        </div>
+                        <div
+                            class="tab"
+                            :class="selectedTab == 'activeOrders' ? 'selected' : ''"
+                            @click="selectedTab = 'activeOrders'"
+                        >
+                            Active Orders
+                        </div>
+                    </div>
+                    <div class="card-body" :class="{'p-0': expandedTable}">
+                        <div class="col-12" :class="{'p-0': expandedTable}">
+                            <div v-show="selectedTab == 'wallet'">
+                                <wallet></wallet>
+                            </div>
+                            <div v-show="selectedTab == 'tradingHistory'">
+                                <trading-history></trading-history>
+                            </div>
+                            <div v-show="selectedTab == 'depositWithdrowHistory'">
+                                <deposit-withdrow-history></deposit-withdrow-history>
+                            </div>
+                            <div v-show="selectedTab == 'activeOrders'">
+                                <active-orders></active-orders>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/wallet.js') }}"></script>
+{% endblock %}

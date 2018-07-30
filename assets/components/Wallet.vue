@@ -1,0 +1,63 @@
+<template>
+    <div>
+        <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
+            Balance
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bitcoin (BTC)</td>
+                        <td>0.123</td>
+                        <td>^</td>
+                    </tr>
+                    <tr>
+                        <td>Webchain (WEB)</td>
+                        <td>120.24</td>
+                        <td>^</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
+            Web tokens you own
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>some token</td>
+                    <td>0.000002</td>
+                    <td>^</td>
+                </tr>
+                <tr>
+                    <td>another token</td>
+                    <td>0.0001</td>
+                    <td>^</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'Wallet',
+    data() {
+        return {};
+    },
+};
+</script>
