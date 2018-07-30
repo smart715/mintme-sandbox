@@ -1,6 +1,5 @@
 import PersonalData from '../components/PersonalData';
 import AccountSettings from '../components/AccountSettings';
-import TokenData from '../components/TokenData';
 new Vue({
     el: '#profile',
     data: {
@@ -9,6 +8,5 @@ new Vue({
     components: {
         PersonalData,
         AccountSettings,
-        TokenData,
     },
 });
