@@ -10,6 +10,7 @@ stages:
   - update-repository
   - tests
   - build-sites
+  - auto-merge
 
 update_repository_redmine_training.abchosting.org:
   script:
@@ -61,11 +62,12 @@ auto_merge_release_branch:
     - sudo auto-merge-release-branch.py
   tags:
     # This job only will be executed by this runner:
-    - webchain
+    - mintme.abchosting.org
   only:
     # this job only will be executed for these branches:
     - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - mintme.abchosting.org
+    - master
   allow_failure: true
+
     
     
