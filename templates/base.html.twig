@@ -32,8 +32,8 @@
                                         aria-label="Search"
                                     >
                                 </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link px-3">My Token</a>
+                                <li class="nav-item {{ app.request.get('_route') == 'token' ? 'active' : '' }}">
+                                    <a href="{{ path('token') }}" class="nav-link px-3">My Token</a>
                                 </li>
                                 <li class="nav-item {{ app.request.get('_route') == 'trading' ? 'active' : '' }}">
                                     <a href="{{ path('trading') }}" class="nav-link px-3">Trading</a>
