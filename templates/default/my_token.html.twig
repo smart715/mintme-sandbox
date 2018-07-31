@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Token{% endblock %}
+
+{% block content %}
+    <div id="my-token" class="container">
+        <div class="card">
+            <div class="card-header">
+                Plant your own token
+            </div>
+            <div class="card-body">
+                <token-data-form></token-data-form>
+            </div>
+        </div>
+    {% endblock %}
+
+    {% block pagescripts %}
+        <script src="{{ asset('build/my_token.js') }}"></script>
+    {% endblock %}
