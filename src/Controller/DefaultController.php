@@ -44,4 +44,12 @@ class DefaultController extends Controller
     {
         return $this->render('default/profile.html.twig');
     }
+    
+    /**
+     * @Route("/token", name="token")
+     */
+    public function token(): Response
+    {
+        return $this->render('default/token.html.twig');
+    }
 }

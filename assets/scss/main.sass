@@ -114,6 +114,11 @@ body
     label
       color: #333333
       display: inline-block
+  &.transparent
+    background-color: transparent
+    >.card-header
+      background-color: $white
+      color: inherit
 
 .table
   border: .0625rem solid $gray-400
@@ -152,7 +157,31 @@ body
   .tab.selected 
     background: #0078BB
 
+.simple-tabs
+  padding: 0 1rem !important
+  font-size: 1.2rem
+  .tab
+    position: relative
+    display: inline-block
+    padding: 0.75rem
+    cursor: pointer
+    .text
+      padding-bottom: .125rem
+      border-bottom: .125rem solid transparent
+    &.selected .text
+        border-bottom-color: #0078BB
+
 #profile
   .card-header
       font-size: 1em
       padding: 0rem 0rem
+
+#token
+  .buy-order, .sell-order
+    @include media-breakpoint-up('lg')
+      max-width: 35%
+  .chart
+    @include media-breakpoint-up('lg')
+      max-width: 30%
+  .fix-height
+    max-height: 28rem

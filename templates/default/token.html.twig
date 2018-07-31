@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Token{% endblock %}
+
+{% block bodyclass %}token{% endblock %}
+
+{% block content %}
+    <div id="token" class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card transparent">
+                    <div class="card-header simple-tabs">
+                        <div
+                            class="tab"
+                            :class="selectedTab == 'tokenInvest' ? 'selected' : ''"
+                            @click="selectedTab = 'tokenInvest'"
+                        >
+                            <span class="text">Invest</span>
+                        </div>
+                        <div
+                            class="tab"
+                            :class="selectedTab == 'tokenIntroduction' ? 'selected' : ''"
+                            @click="selectedTab = 'tokenIntroduction'"
+                        >
+                            <span class="text">Introduction</span>
+                        </div>
+                    </div>
+                    <div class="card-body px-0">
+                        <div v-show="selectedTab == 'tokenInvest'">
+                            <token-invest></token-invest>
+                        </div>
+                        <div v-show="selectedTab == 'tokenIntroduction'">
+                            <token-introduction></token-introduction>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/token.js') }}"></script>
+{% endblock %}
