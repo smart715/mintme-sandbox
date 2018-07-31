@@ -24,7 +24,7 @@
                 </tr>
                 <tr>
                     <td>12-12-1970</td>
-                    <td>Withdrow</td>
+                    <td>Withdraw</td>
                     <td>0xe1f05911dba854fwc...</td>
                     <td>0.0000</td>
                     <td>0</td>
@@ -56,7 +56,7 @@
 
 <script>
 export default {
-    name: 'DepositWithdrowHistory',
+    name: 'DepositWithdrawHistory',
     data() {
         return {};
     },

@@ -1,7 +1,7 @@
 import Wallet from '../components/Wallet';
 import TradingHistory from '../components/TradingHistory';
 import ActiveOrders from '../components/ActiveOrders';
-import DepositWithdrowHistory from '../components/DepositWithdrowHistory';
+import DepositWithdrawHistory from '../components/DepositWithdrawHistory';
 
 new Vue({
   el: '#wallet',
@@ -15,7 +15,7 @@ new Vue({
       let components = [
         'tradingHistory',
         'activeOrders',
-        'depositWithdrowHistory',
+        'depositWithdrawHistory',
       ];
       return components.indexOf(this.selectedTab) > -1;
     },
@@ -24,6 +24,6 @@ new Vue({
     Wallet,
     TradingHistory,
     ActiveOrders,
-    DepositWithdrowHistory,
+    DepositWithdrawHistory,
   },
 });
