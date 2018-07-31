@@ -54,4 +54,18 @@ build_mintme_sites:
   only:
     # this job only will be executed for branches
     - branches
+
+auto_merge_release_branch:
+  stage: auto-merge
+  script:
+    - sudo auto-merge-release-branch.py
+  tags:
+    # This job only will be executed by this runner:
+    - webchain
+  only:
+    # this job only will be executed for these branches:
+    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
+    - mintme.abchosting.org
+  allow_failure: true
+    
     
