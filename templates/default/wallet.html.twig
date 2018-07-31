@@ -26,10 +26,10 @@
                         </div>
                         <div
                             class="tab"
-                            :class="selectedTab == 'depositWithdrowHistory' ? 'selected' : ''"
-                            @click="selectedTab = 'depositWithdrowHistory'"
+                            :class="selectedTab == 'depositWithdrawHistory' ? 'selected' : ''"
+                            @click="selectedTab = 'depositWithdrawHistory'"
                         >
-                            Deposit/Withdrow History
+                            Deposit/Withdraw History
                         </div>
                         <div
                             class="tab"
@@ -47,8 +47,8 @@
                             <div v-show="selectedTab == 'tradingHistory'">
                                 <trading-history></trading-history>
                             </div>
-                            <div v-show="selectedTab == 'depositWithdrowHistory'">
-                                <deposit-withdrow-history></deposit-withdrow-history>
+                            <div v-show="selectedTab == 'depositWithdrawHistory'">
+                                <deposit-withdraw-history></deposit-withdraw-history>
                             </div>
                             <div v-show="selectedTab == 'activeOrders'">
                                 <active-orders></active-orders>
