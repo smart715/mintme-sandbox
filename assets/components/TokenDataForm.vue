@@ -49,13 +49,12 @@
                     <input
                         type="range"
                         class="form-control-range"
-                        data-slider-handle="round" 
+                        data-slider-handle="round"
                         id="lockin">
                     <span>0%</span>
                 </div>
                 <p class="text-right">
                     Short description,...
-                    
                 </p>
                 <button
                     type="submit"
@@ -69,7 +68,7 @@
 
 <script>
     export default {
-    name: 'TokenDataForm',
-            };
+        name: 'TokenDataForm',
+    };
 </script>
 
