@@ -51,39 +51,6 @@ body
   @include media-breakpoint-down(xs)
     padding-bottom: 7rem
 
-.footer-bg
-  background: url(../img/footer-main.jpg) no-repeat top right
-  background-size: cover
-  height: 200px
-  @include media-breakpoint-up(sm)
-    height: 300px
-  @include media-breakpoint-up(md)
-    height: 400px
-  @include media-breakpoint-up(lg)
-    height: 500px
-  @include media-breakpoint-up(xl)
-    height: 700px
-  
-  .bottom-links
-    padding-right: 14rem
-    padding-bottom: 8rem
-    @include media-breakpoint-down(lg)
-      padding-bottom: 0
-    @include media-breakpoint-down(md)
-      padding: 0
-    @include media-breakpoint-down(xs)
-      position: relative
-      bottom: 7rem
-      font-size: .875em
-    .link-box
-      border-right: .0625rem solid $body-text-color
-      &:last-child
-        border: none
-      .list-item:last-child
-        padding-bottom: 0 !important
-      a
-        color: $body-text-color
-        text-decoration: none
 [type=range]
   -webkit-appearance: none
   background: transparent
@@ -133,6 +100,39 @@ body
   width: 20px
   margin-top: 2px
 
+.footer-bg
+  background: url(../img/footer-main.jpg) no-repeat top right
+  background-size: cover
+  height: 200px
+  @include media-breakpoint-up(sm)
+    height: 300px
+  @include media-breakpoint-up(md)
+    height: 400px
+  @include media-breakpoint-up(lg)
+    height: 500px
+  @include media-breakpoint-up(xl)
+    height: 700px
+  
+  .bottom-links
+    padding-right: 14rem
+    padding-bottom: 8rem
+    @include media-breakpoint-down(lg)
+      padding-bottom: 0
+    @include media-breakpoint-down(md)
+      padding: 0
+    @include media-breakpoint-down(xs)
+      position: relative
+      bottom: 7rem
+      font-size: .875em
+    .link-box
+      border-right: .0625rem solid $body-text-color
+      &:last-child
+        border: none
+      .list-item:last-child
+        padding-bottom: 0 !important
+      a
+        color: $body-text-color
+        text-decoration: none
 
 .icon-profile-big
   width: 2.5em
@@ -163,6 +163,11 @@ body
     label
       color: #333333
       display: inline-block
+  &.transparent
+    background-color: transparent
+    >.card-header
+      background-color: $white
+      color: inherit
 
 .table
   border: .0625rem solid $gray-400
@@ -201,9 +206,34 @@ body
   .tab.selected 
     background: #0078BB
 
+.simple-tabs
+  padding: 0 1rem !important
+  font-size: 1.2rem
+  .tab
+    position: relative
+    display: inline-block
+    padding: 0.75rem
+    cursor: pointer
+    .text
+      padding-bottom: .125rem
+      border-bottom: .125rem solid transparent
+    &.selected .text
+        border-bottom-color: #0078BB
+
 #profile
   .card-header
       font-size: 1em
       padding: 0rem 0rem
+
 #token
-  .token-header
+  .buy-order, .sell-order
+    @include media-breakpoint-up('lg')
+      max-width: 35%
+  .chart
+    @include media-breakpoint-up('lg')
+      max-width: 30%
+  .fix-height
+    max-height: 28rem
+  canvas
+    max-height: 14rem
+    background-color: #c0deff

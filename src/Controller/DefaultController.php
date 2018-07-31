@@ -46,10 +46,17 @@ class DefaultController extends Controller
     }
     
     /**
+     * @Route("/token", name="token")
+     */
+    public function token(): Response
+    {
+        return $this->render('default/token.html.twig');
+    }
+    /**
      * @Route("/my-token", name="my_token")
      */
     public function myToken(): Response
     {
-       return $this->render('default/my_token.html.twig');
+        return $this->render('default/my_token.html.twig');
     }
 }
