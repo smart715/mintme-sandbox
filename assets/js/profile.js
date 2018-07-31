@@ -1,4 +1,4 @@
-import PersonalData from '../components/PersonalData';
+import PersonalDataForm from '../components/PersonalDataForm';
 import AccountSettings from '../components/AccountSettings';
 new Vue({
     el: '#profile',
@@ -6,7 +6,7 @@ new Vue({
         tabSelected: 'personalData',
     },
     components: {
-        PersonalData,
+        PersonalDataForm,
         AccountSettings,
     },
 });

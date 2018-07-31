@@ -64,7 +64,7 @@
 
 <script>
 export default {
-    name: 'PersonalData',
+    name: 'PersonalDataForm',
 };
 </script>
 
