@@ -2,23 +2,6 @@
 
 {% block title %}Token{% endblock %}
 
-<<<<<<< HEAD
-{% block content %}
-    <div id="token" class="container">
-        <div class="card">
-            <div class="card-header">
-                Plant your own token
-            </div>
-            <div class="card-body">
-                <token-data-form></token-data-form>
-            </div>
-        </div>
-    {% endblock %}
-
-    {% block pagescripts %}
-        <script src="{{ asset('build/token.js') }}"></script>
-    {% endblock %}
-=======
 {% block bodyclass %}token{% endblock %}
 
 {% block content %}
@@ -31,14 +14,14 @@
                             class="tab"
                             :class="selectedTab == 'tokenInvest' ? 'selected' : ''"
                             @click="selectedTab = 'tokenInvest'"
-                        >
+                            >
                             <span class="text">Invest</span>
                         </div>
                         <div
                             class="tab"
                             :class="selectedTab == 'tokenIntroduction' ? 'selected' : ''"
                             @click="selectedTab = 'tokenIntroduction'"
-                        >
+                            >
                             <span class="text">Introduction</span>
                         </div>
                     </div>
@@ -59,4 +42,3 @@
 {% block pagescripts %}
     <script src="{{ asset('build/token.js') }}"></script>
 {% endblock %}
->>>>>>> d042643a57f40c34726c168ca2b59f440d7682a6
