@@ -3,7 +3,15 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="form-group">
-                    <label for="website">Website:</label>
+                    <label for="name">Token name</label>
+                    <input
+                        name="name"
+                        type="text"
+                        class="form-control"
+                        id="name"/>
+                </div>
+                <div class="form-group">
+                    <label for="website">Website address:</label>
                     <input
                         name="website"
                         type="url"
@@ -11,7 +19,7 @@
                         id="website"/>
                 </div>
                 <div class="form-group">
-                    <label for="lname">Facebook:</label>
+                    <label for="lname">Facebook address:</label>
                     <input
                         name="facebook"
                         type="url"
@@ -19,7 +27,7 @@
                         id="facebook"/>
                 </div>
                 <div class="form-group">
-                    <label for="youtube">YouTube:</label>
+                    <label for="youtube">YouTube address:</label>
                     <input
                         name="youtube"
                         type="url"
@@ -29,7 +37,7 @@
             </div>
             <div class="col-lg-6">
                 <div class="form-group">
-                    <label for="desc">Token description:</label>
+                    <label for="desc">Description:</label>
                     <textarea
                         name="desc"
                         class="form-control"
