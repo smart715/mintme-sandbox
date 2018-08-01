@@ -8,32 +8,17 @@
     <div id="token" class="container">
         <div class="row">
             <div class="col">
-                <div class="card transparent">
-                    <div class="card-header simple-tabs">
-                        <div
-                            class="tab"
-                            :class="selectedTab == 'tokenInvest' ? 'selected' : ''"
-                            @click="selectedTab = 'tokenInvest'"
-                            >
-                            <span class="text">Invest</span>
-                        </div>
-                        <div
-                            class="tab"
-                            :class="selectedTab == 'tokenIntroduction' ? 'selected' : ''"
-                            @click="selectedTab = 'tokenIntroduction'"
-                            >
-                            <span class="text">Introduction</span>
-                        </div>
-                    </div>
-                    <div class="card-body px-0">
-                        <div v-show="selectedTab == 'tokenInvest'">
+                <template>
+                    <b-tabs class="simple-tabs-theme">
+                        <b-tab title="Invest" active>
                             <token-invest></token-invest>
-                        </div>
-                        <div v-show="selectedTab == 'tokenIntroduction'">
+                        </b-tab>
+                        <b-tab title="Introduction" >
                             <token-introduction></token-introduction>
-                        </div>
-                    </div>
-                </div>
+                        </b-tab>
+                    </b-tabs>
+                </template>
+
             </div>
         </div>
     </div>

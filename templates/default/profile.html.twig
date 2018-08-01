@@ -4,26 +4,20 @@
 
 {% block content %}
     <div id="profile" class="container">
-        <template>
-            <div class="card">
-                <div class="card-header tabs">
-                    <div class="tab" :class="tabSelected == 'personalData' ? 'selected' : ''" @click="tabSelected = 'personalData'">Personal Data</div>
-                    <div class="tab" :class="tabSelected == 'accountSettings' ? 'selected' : ''" @click="tabSelected = 'accountSettings'">Account Settings</div>
-                </div>
-                <div class="card-body">
-                    <div class="col-12">
-                        <div v-show="tabSelected == 'personalData'">
+        <div class="row">
+            <div class="col">
+                <template>
+                    <b-tabs class="tabs-theme">
+                        <b-tab title="Personal Data" active>
                             <personal-data-form></personal-data-form>
-                        </div>
-                        <div v-show="tabSelected == 'accountSettings'">
+                        </b-tab>
+                        <b-tab title="Account Settings">
                             <account-settings></account-settings>
-                        </div>
-                    </div>
-
-                </div>
-
+                        </b-tab>
+                    </b-tabs>
+                </template>
             </div>
-        </template>
+        </div>
     </div>
 {% endblock %}
 
