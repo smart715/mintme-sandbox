@@ -6,14 +6,15 @@ import Tabs from 'bootstrap-vue/es/components';
 
 new Vue({
   el: '#wallet',
+  data() {
+    return {
+      tabIndex: 0,
+      tabIndexsWithoutPadding: [1, 2, 3],
+    };
+  },
   computed: {
-    expandedTable: function() {
-      let components = [
-        'tradingHistory',
-        'activeOrders',
-        'depositWithdrawHistory',
-      ];
-      return components.indexOf(this.selectedTab) > -1;
+    expandedTab: function() {
+      return this.tabIndexsWithoutPadding.indexOf(this.tabIndex) > -1;
     },
   },
   components: {

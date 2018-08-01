@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col">
                 <template>
-                    <b-tabs class="tabs-theme">
+                    <b-tabs class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
                         <b-tab title="Wallet" active>
                             <wallet></wallet>
                         </b-tab>

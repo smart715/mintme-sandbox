@@ -192,39 +192,51 @@ body
     padding: 0 !important
     font-size: 1.2rem
     align-items: stretch
+    border: none
     .nav-item
       cursor: pointer
       flex: 1 1 auto
-      padding: 0px
+      padding: 0
       .nav-link
         border: none
-        border-radius: 0px
+        border-radius: 0
         background-color: #2797e8
         color: $white
+        padding: .75rem 1.5rem
       .nav-link.active
         background: #0078BB
   .tab-content
     flex: 1 1 auto
     padding: 1.25rem
     background: $white
-
-.simple-tabs-theme
-  .nav-tabs
-    text-align: center
-    font-size: 1.2rem
-    background-color: $white
-    .nav-item
-      cursor: pointer
-      padding: 0px
-      .nav-link
-        border: none
-        border-radius: 0px
-      .nav-link.active
-        text-decoration: underline;
-  .tab-content
-    flex: 1 1 auto
-    padding: 1.25rem 0rem
-    background: none
+  &.no-padding
+    .tab-content
+      padding: 0
+  &.transparent
+    .nav-tabs
+      display: block
+      background: $white
+      text-align: left
+      border: .0625rem solid $white
+      .nav-item
+        display: inline-block
+        flex: initial
+        .nav-link
+            color: inherit
+            position: relative
+            background: $white
+            &.active::after
+              content: ' '
+              position: absolute
+              bottom: .75rem
+              left: 1.5rem
+              height: .125rem
+              background-color: #0078bb
+              width: calc(100% - 3rem)
+    .tab-content
+      flex: initial
+      padding: 1.25rem 0rem
+      background: none
 
 #profile
   .card-header
