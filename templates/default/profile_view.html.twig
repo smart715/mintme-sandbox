@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        {{ name }}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="pb-1">
+                                    City:
+                                </div>
+                                <div class="pb-1">
+                                    Country:
+                                </div>
+                                <div class="pb-1">
+                                    Lorem Ipsum is simply dummy text of the printing and
+                                    typesetting industry. Lorem Ipsum has been the
+                                    industry's standard dummy text ever since the 1500s,
+                                    when an unknown printer took a galley of type and
+                                    scrambled it to make a type specimen book.
+                                </div>
+                                <div class="col-12 pt-4 text-right">
+                                    <a  href="{{ path('profile') }}" class="btn btn-primary">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-5">
+                    <div class="card-header">
+                        Token
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="pb-1">
+                                    <a href="#"> [Link or Links to all pairs with token in form of full address]</a>
+                                </div>
+                                <div class="pb-1">
+                                    Wallet on Exchange:
+                                </div>
+                                <div class="pb-1">
+                                    Active Orders:
+                                </div>
+                                <div class="pb-1">
+                                    Withdraw:
+                                </div>
+                                <div class="pb-1">
+                                    Sold on Market:
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

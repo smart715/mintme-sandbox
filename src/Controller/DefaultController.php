@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -59,5 +60,14 @@ class DefaultController extends Controller
     public function myToken(): Response
     {
         return $this->render('default/my_token.html.twig');
+    }
+    /**
+     * @Route("/profile/{name}", name="profile_view")
+     */
+    public function profileView(String $name): Response
+    {
+        return $this->render('default/profile_view.html.twig', [
+            'name' => $name,
+        ]);
     }
 }
