@@ -2,20 +2,20 @@
 
 namespace App\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/dashboard", name="dashboard")
+     * @Route(name="home")
+     * @Route("/home")
+     * @Method({"GET"})
      */
-    public function dashboard(Request $request): Response
+    public function home(): Response
     {
-        return $this->render('dashboard.html.twig', [
-            'text' => 'Hello world',
-        ]);
+        return $this->render('base.html.twig');
     }
 }
