@@ -7,5 +7,6 @@ new Vue({
     components: {
         PersonalDataForm,
         AccountSettings,
+        Tabs,
     },
 });

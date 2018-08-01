@@ -7,5 +7,6 @@ new Vue({
   components: {
     TokenInvest,
     TokenIntroduction,
+    Tabs,
   },
 });

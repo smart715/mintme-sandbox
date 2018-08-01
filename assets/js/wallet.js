@@ -21,5 +21,6 @@ new Vue({
     TradingHistory,
     ActiveOrders,
     DepositWithdrawHistory,
+    Tabs,
   },
 });
