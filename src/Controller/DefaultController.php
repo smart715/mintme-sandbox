@@ -36,7 +36,7 @@ class DefaultController extends Controller
     {
         return $this->render('default/wallet.html.twig');
     }
-    
+
     /**
      * @Route("/profile", name="profile")
      */
@@ -44,7 +44,7 @@ class DefaultController extends Controller
     {
         return $this->render('default/profile.html.twig');
     }
-    
+
     /**
      * @Route("/token", name="token")
      */
@@ -52,6 +52,7 @@ class DefaultController extends Controller
     {
         return $this->render('default/token.html.twig');
     }
+
     /**
      * @Route("/my-token", name="my_token")
      */
