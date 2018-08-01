@@ -1,8 +1,8 @@
 <template>
     <div class="trading">
         <slot name="title"></slot>
-        <div :class="tableContainerClass">
-            <table :class="tableClass">
+        <div class="table-responsive">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Pair</th>
@@ -22,7 +22,7 @@
             </table>
         </div>
         <div class="pt-2">
-            <pagination
+            <b-pagination
                 v-model="currentPage"
                 align="center"
                 :limit="6"
@@ -35,8 +35,6 @@
 </template>
 
 <script>
-import Pagination from 'bootstrap-vue/es/components/pagination/pagination';
-
 export default {
     name: 'Trading',
     props: {
@@ -53,9 +51,6 @@ export default {
     },
     created() {
         this.setTokenData(this.currentPage);
-    },
-    components: {
-        Pagination,
     },
     computed: {
         // TODO: This is a dummy simulator.
