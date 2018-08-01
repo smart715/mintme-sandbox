@@ -72,6 +72,11 @@ class TokenController extends AbstractController
     private function redirectToOwnToken(): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
+
+        if (null === $token) {
+            throw $this->createNotFoundException('User doesn\'t have a token created.');
+        }
+
         return $this->redirectToRoute('token_view', [
             'name' => $token->getName(),
         ]);
