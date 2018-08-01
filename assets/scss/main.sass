@@ -185,34 +185,46 @@ body
 .btn-primary
   color: $white
 
-.tabs
-  display: flex
-  text-align: center
-  padding: 0 !important
-  font-size: 1.2rem
-  align-items: stretch
-  .tab
-    flex: 0 1 100%
-    padding: 0.75rem 0
-    cursor: pointer
-    background-color: #2797e8
-    color: $headings-color
-  .tab.selected
-    background: #0078BB
+.tabs-theme
+  .nav-tabs
+    display: flex
+    text-align: center
+    padding: 0 !important
+    font-size: 1.2rem
+    align-items: stretch
+    .nav-item
+      cursor: pointer
+      flex: 1 1 auto
+      padding: 0px
+      .nav-link
+        border: none
+        border-radius: 0px
+        background-color: #2797e8
+        color: $white
+      .nav-link.active
+        background: #0078BB
+  .tab-content
+    flex: 1 1 auto
+    padding: 1.25rem
+    background: $white
 
-.simple-tabs
-  padding: 0 1rem !important
-  font-size: 1.2rem
-  .tab
-    position: relative
-    display: inline-block
-    padding: 0.75rem
-    cursor: pointer
-    .text
-      padding-bottom: .125rem
-      border-bottom: .125rem solid transparent
-    &.selected .text
-        border-bottom-color: #0078BB
+.simple-tabs-theme
+  .nav-tabs
+    text-align: center
+    font-size: 1.2rem
+    background-color: $white
+    .nav-item
+      cursor: pointer
+      padding: 0px
+      .nav-link
+        border: none
+        border-radius: 0px
+      .nav-link.active
+        text-decoration: underline;
+  .tab-content
+    flex: 1 1 auto
+    padding: 1.25rem 0rem
+    background: none
 
 #profile
   .card-header
