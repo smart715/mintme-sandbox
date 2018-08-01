@@ -48,8 +48,43 @@ body
       box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
 
 .contents-wrapper
-  @include media-breakpoint-down(xs)
+  @include media-breakpoint-down(sm)
     padding-bottom: 7rem
+
+.footer-bg
+  background: url(../img/footer-main.jpg) no-repeat top right
+  background-size: cover
+  height: 200px
+  @include media-breakpoint-up(sm)
+    height: 300px
+  @include media-breakpoint-up(md)
+    height: 400px
+  @include media-breakpoint-up(lg)
+    height: 500px
+  @include media-breakpoint-up(xl)
+    height: 700px
+  .bottom-links
+    padding-right: 14rem
+    padding-bottom: 8rem
+    @include media-breakpoint-down(lg)
+      padding-bottom: 0
+    @include media-breakpoint-down(md)
+      padding: 0
+    @include media-breakpoint-down(sm)
+      position: relative
+      bottom: 15rem
+      font-size: .875em
+    @include media-breakpoint-down(xs)
+      bottom: 7rem
+    .link-box
+      border-right: .0625rem solid $body-text-color
+      &:last-child
+        border: none
+      .list-item:last-child
+        padding-bottom: 0 !important
+      a
+        color: $body-text-color
+        text-decoration: none
 
 [type=range]
   -webkit-appearance: none
@@ -92,40 +127,6 @@ body
     outline: 0
   &:focus::-webkit-slider-runnable-track
     background: #fbfbfc
-
-.footer-bg
-  background: url(../img/footer-main.jpg) no-repeat top right
-  background-size: cover
-  height: 200px
-  @include media-breakpoint-up(sm)
-    height: 300px
-  @include media-breakpoint-up(md)
-    height: 400px
-  @include media-breakpoint-up(lg)
-    height: 500px
-  @include media-breakpoint-up(xl)
-    height: 700px
-
-  .bottom-links
-    padding-right: 14rem
-    padding-bottom: 8rem
-    @include media-breakpoint-down(lg)
-      padding-bottom: 0
-    @include media-breakpoint-down(md)
-      padding: 0
-    @include media-breakpoint-down(xs)
-      position: relative
-      bottom: 7rem
-      font-size: .875em
-    .link-box
-      border-right: .0625rem solid $body-text-color
-      &:last-child
-        border: none
-      .list-item:last-child
-        padding-bottom: 0 !important
-      a
-        color: $body-text-color
-        text-decoration: none
 
 .icon-profile-big
   width: 2.5em
