@@ -14,13 +14,13 @@ body
 .header-bg
   background: url(../img/header-main.png) no-repeat bottom
   background-size: cover
-  height: 60px
+  height: 45px
   @include media-breakpoint-up(sm)
-    height: 90px
+    height: 70px
   @include media-breakpoint-up(md)
-    height: 110px
+    height: 100px
   @include media-breakpoint-up(lg)
-    height: 160px
+    height: 145px
 
 .top-navbar
   a
@@ -48,57 +48,8 @@ body
       box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
 
 .contents-wrapper
-  @include media-breakpoint-down(xs)
+  @include media-breakpoint-down(sm)
     padding-bottom: 7rem
-
-[type=range]
-  -webkit-appearance: none
-  background: transparent
-  margin: 12px 0
-  width: 100%
-
-[type=range]::-moz-focus-outer
-  border: 0
-
-[type=range]::-moz-range-thumb
-  box-shadow: 4px 4px 4px rgba(0,0,0,.2),0 0 4px rgba(13,13,13,.2)
-  background: #007ABB
-  border-radius: 12px
-  cursor: default
-  height: 20px
-  width: 20px
-
-[type=range]::-ms-thumb
-  box-shadow: 4px 4px 4px rgba(0,0,0,.2),0 0 4px rgba(13,13,13,.2)
-  background: #007ABB
-  border-radius: 12px
-  cursor: default
-  height: 20px
-  width: 20px
-  margin-top: 2px
-
-[type=range]::-webkit-slider-runnable-track
-  cursor: default
-  height: 4px
-  width: 100%
-  background: #eceff1
-  border: 1px solid #ededed
-
-[type=range]::-webkit-slider-thumb
-  box-shadow: 4px 4px 4px rgba(0,0,0,.2),0 0 4px rgba(13,13,13,.2)
-  background: #007ABB
-  border-radius: 12px
-  cursor: default
-  height: 24px
-  width: 24px
-  -webkit-appearance: none
-  margin-top: -12px
-
-[type=range]:focus
-  outline: 0
-
-[type=range]:focus::-webkit-slider-runnable-track
-  background: #fbfbfc
 
 .footer-bg
   background: url(../img/footer-main.jpg) no-repeat top right
@@ -112,7 +63,6 @@ body
     height: 500px
   @include media-breakpoint-up(xl)
     height: 700px
-  
   .bottom-links
     padding-right: 14rem
     padding-bottom: 8rem
@@ -120,10 +70,12 @@ body
       padding-bottom: 0
     @include media-breakpoint-down(md)
       padding: 0
-    @include media-breakpoint-down(xs)
+    @include media-breakpoint-down(sm)
       position: relative
-      bottom: 7rem
+      bottom: 15rem
       font-size: .875em
+    @include media-breakpoint-down(xs)
+      bottom: 7rem
     .link-box
       border-right: .0625rem solid $body-text-color
       &:last-child
@@ -133,6 +85,48 @@ body
       a
         color: $body-text-color
         text-decoration: none
+
+[type=range]
+  -webkit-appearance: none
+  background: transparent
+  margin: .75rem 0
+  width: 100%
+  &::-moz-focus-outer
+    border: 0
+  &::-moz-range-thumb
+    box-shadow: .1875rem .1875rem .1875rem rgba(0, 0, 0, .2)
+    background: #007ABB
+    border-radius: .75rem
+    cursor: default
+    height: 1.25rem
+    width: 1.25rem
+  &::-ms-thumb
+    box-shadow: .1875rem .1875rem .1875rem rgba(0, 0, 0, .2)
+    background: #007ABB
+    border-radius: .75rem
+    cursor: default
+    height: 1.25rem
+    width: 1.25rem
+    margin-top: .125rem
+  &::-webkit-slider-runnable-track
+    cursor: default
+    height: .25rem
+    width: 100%
+    background: #eceff1
+    border: 1px solid #ededed
+  &::-webkit-slider-thumb
+    box-shadow: .1875rem .1875rem .1875rem rgba(0, 0, 0, .2)
+    background: #007ABB
+    border-radius: .75rem
+    cursor: default
+    height: 1.5rem
+    width: 1.5rem
+    -webkit-appearance: none
+    margin-top: -.75rem
+  &:focus
+    outline: 0
+  &:focus::-webkit-slider-runnable-track
+    background: #fbfbfc
 
 .icon-profile-big
   width: 2.5em
@@ -191,46 +185,34 @@ body
 .btn-primary
   color: $white
 
-.tabs-theme
-  .nav-tabs
-    display: flex
-    text-align: center
-    padding: 0 !important
-    font-size: 1.2rem
-    align-items: stretch
-    .nav-item
-      cursor: pointer
-      flex: 1 1 auto
-      padding: 0px
-      .nav-link
-        border: none
-        border-radius: 0px
-        background-color: #2797e8
-        color: $white
-      .nav-link.active
-        background: #0078BB
-  .tab-content
-    flex: 1 1 auto
-    padding: 1.25rem
-    background: $white
+.tabs
+  display: flex
+  text-align: center
+  padding: 0 !important
+  font-size: 1.2rem
+  align-items: stretch
+  .tab
+    flex: 0 1 100%
+    padding: 0.75rem 0
+    cursor: pointer
+    background-color: #2797e8
+    color: $headings-color
+  .tab.selected
+    background: #0078BB
 
-.simple-tabs-theme
-  .nav-tabs
-    text-align: center
-    font-size: 1.2rem
-    background-color: $white
-    .nav-item
-      cursor: pointer
-      padding: 0px
-      .nav-link
-        border: none
-        border-radius: 0px
-      .nav-link.active
-        text-decoration: underline;
-  .tab-content
-    flex: 1 1 auto
-    padding: 1.25rem 0rem
-    background: none
+.simple-tabs
+  padding: 0 1rem !important
+  font-size: 1.2rem
+  .tab
+    position: relative
+    display: inline-block
+    padding: 0.75rem
+    cursor: pointer
+    .text
+      padding-bottom: .125rem
+      border-bottom: .125rem solid transparent
+    &.selected .text
+        border-bottom-color: #0078BB
 
 #profile
   .card-header
