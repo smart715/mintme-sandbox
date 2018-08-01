@@ -4,8 +4,6 @@ import ActiveOrders from '../components/ActiveOrders';
 import DepositWithdrawHistory from '../components/DepositWithdrawHistory';
 import Tabs from 'bootstrap-vue/es/components';
 
-Vue.use(Tabs);
-
 new Vue({
   el: '#wallet',
   computed: {
