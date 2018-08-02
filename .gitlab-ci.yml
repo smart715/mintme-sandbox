@@ -68,3 +68,6 @@ auto_merge_release_branch:
     - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
     - master
   allow_failure: true
+
+
+
