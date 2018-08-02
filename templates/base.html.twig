@@ -14,40 +14,42 @@
     <body class="h-100vh {% block bodyclass %}{% endblock %}">
         {% block body %}
             {% block header %}
-                <nav class="navbar navbar-expand-lg top-navbar pt-3 pb-0" id="navbar">
-                    <div class="container-fluid">
-                        <a class="navbar-brand" href="{{ path('homepage') }}">
+                <div id="navbar">
+                    <b-navbar toggleable="lg" class="navbar-expand-lg top-navbar pt-3 pb-0">
+
+                        <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+
+                        <b-navbar-brand href="{{ path('homepage') }}">
                             <img src="{{ asset('build/images/main-logo.png') }}" height="40" alt="MINTME">
-                        </a>
-                        <button @click="toggleNavbarMenu" class="navbar-toggler" type="button" :aria-expanded="showNavbarMenu" aria-label="Toggle Navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse">
-                            <ul class="navbar-nav ml-auto">
-                                <li class="nav-item pr-0 pr-3">
+                        </b-navbar-brand>
+
+                        <b-collapse is-nav id="nav_collapse">
+
+                            <b-navbar-nav class="ml-auto">
+                                <b-nav-item class="pr-0 pr-3">
                                     <input
                                         placeholder="Search for token... Use token name or wallet address"
                                         class="search form-control"
                                         type="search"
                                         aria-label="Search"
                                         >
-                                </li>
-                                <li class="nav-item {{ app.request.get('_route') == 'my-token' ? 'active' : '' }}">
-                                    <a href="{{ path('my_token') }}" class="nav-link px-3">My Token</a>
-                                </li>
-                                <li class="nav-item {{ app.request.get('_route') == 'trading' ? 'active' : '' }}">
-                                    <a href="{{ path('trading') }}" class="nav-link px-3">Trading</a>
-                                </li>
-                                <li class="nav-item {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}">
-                                    <a href="{{ path('wallet') }}" class="nav-link px-3">Wallet</a>
-                                </li>
-                                <li class="nav-item {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}">
-                                    <a href="{{ path('fos_user_security_login') }}" class="nav-link px-3">Log in</a>
-                                </li>
-                                <li class="nav-item {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}">
-                                    <a href="{{ path('fos_user_registration_register') }}" class="nav-link px-3">Sign Up</a>
-                                </li>
-                                <li class="nav-item d-none d-lg-block">
+                                </b-nav-item>
+                                <b-nav-item class="nav-item {{ app.request.get('_route') == 'my-token' ? 'active' : '' }}"  href="{{ path('token') }}">
+                                    My Token
+                                </b-nav-item>
+                                <b-nav-item class="{{ app.request.get('_route') == 'trading' ? 'active' : '' }}"  href="{{ path('trading') }}">
+                                    Trading
+                                </b-nav-item>
+                                <b-nav-item class="{{ app.request.get('_route') == 'wallet' ? 'active' : '' }}"  href="{{ path('wallet') }}">
+                                    Wallet
+                                </b-nav-item>
+                                <b-nav-item class="{{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}"  href="{{ path('fos_user_security_login') }}">
+                                    Login
+                                </b-nav-item>
+                                <b-nav-item class="{{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}"  href="{{ path('fos_user_registration_register') }}">
+                                    Sign Up
+                                </b-nav-item>
+                                <b-nav-item class="d-none d-lg-block">
                                     <b-dropdown id="nav-profile" right>
                                         <b-dropdown-item
                                             href="{{ path('profile') }}">
@@ -66,11 +68,12 @@
                                             Log Out
                                         </b-dropdown-item>
                                     </b-dropdown>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </nav>
+                                </b-nav-item>
+                            </b-navbar-nav>
+
+                        </b-collapse>
+                    </b-navbar>
+                </div>
             {% endblock header %}
             {% block main %}
                 <div class="d-table fix-layout w-100 h-100vh">
