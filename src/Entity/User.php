@@ -51,14 +51,6 @@ class User extends BaseUser
      */
     protected $profile;
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        $profile = new Profile($this);
-        $this->setProfile($profile);
-    }
-
     public function getTempEmail(): ?string
     {
         return $this->tempEmail;
