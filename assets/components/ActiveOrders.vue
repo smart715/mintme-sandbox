@@ -16,7 +16,7 @@
             <tbody>
                 <tr>
                     <td>12-12-1970</td>
-                    <td class="text-danger">Sell</td>
+                    <td class="text-yellow">Sell</td>
                     <td>[token]</td>
                     <td>0.0000</td>
                     <td>123456</td>
@@ -26,7 +26,7 @@
                 </tr>
                 <tr>
                     <td>12-12-1970</td>
-                    <td class="text-success">Buy</td>
+                    <td class="text-green">Buy</td>
                     <td>Webchain (WEB)</td>
                     <td>0.0000</td>
                     <td>123456</td>

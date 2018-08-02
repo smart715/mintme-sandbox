@@ -38,6 +38,11 @@
                 </tr>
             </thead>
             <tbody>
+                <tr class="text-orange">
+                    <td>own token</td>
+                    <td>0.000002</td>
+                    <td>^</td>
+                </tr>
                 <tr>
                     <td>some token</td>
                     <td>0.000002</td>
