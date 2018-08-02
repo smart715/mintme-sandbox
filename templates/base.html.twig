@@ -30,7 +30,7 @@
                                         class="search form-control"
                                         type="search"
                                         aria-label="Search"
-                                    >
+                                        >
                                 </li>
                                 <li class="nav-item {{ app.request.get('_route') == 'my-token' ? 'active' : '' }}">
                                     <a href="{{ path('my_token') }}" class="nav-link px-3">My Token</a>
@@ -48,33 +48,24 @@
                                     <a href="{{ path('fos_user_registration_register') }}" class="nav-link px-3">Sign Up</a>
                                 </li>
                                 <li class="nav-item d-none d-lg-block">
-                                    <div id="nav-profile" class="dropdown" :class="{ 'show': showProfileMenu }">
-                                        <button
-                                            class="btn btn-secondary dropdown-toggle ml-2"
-                                            type="button" aria-haspopup="true"
-                                            :aria-expanded="showProfileMenu"
-                                            @click="toggleProfileMenu"
-                                            v-click-outside="hideProfileMenu">
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right border-0 mt-2" :class="{ 'show': showProfileMenu }">
-                                            <a class="dropdown-item mx-1 my-1 pl-3" href="{{ path('profile') }}">
-                                                <span class="icon-profile float-left mt-1 mr-1"></span>
-                                                Profile Form
-                                            </a>
-                                            <a class="dropdown-item mx-1 my-1 pl-3" href="{{ path('profile') }}/Victor Juice">
-                                                <span class="icon-profile float-left mt-1 mr-1"></span>
-                                                Victor Juice Profile
-                                            </a>
-                                            <a class="dropdown-item mx-1 my-1 pl-3" href="{{ path('token') }}">
-                                                <span class="icon-profile float-left mt-1 mr-1"></span>
-                                                Token
-                                            </a>
-                                            <a class="dropdown-item mx-1 mb-1 pl-3 pr-5" href="{{ path('fos_user_security_logout') }}">
-                                                <span class="icon-logout float-left mt-1 mr-1"></span>
-                                                Log Out
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <b-dropdown id="nav-profile" right>
+                                        <b-dropdown-item
+                                            href="{{ path('profile') }}">
+                                            Profile Form
+                                        </b-dropdown-item>
+                                        <b-dropdown-item
+                                            href="{{ path('profile') }}/Adel Bigshan">
+                                            Adel Bigshan Profile
+                                        </b-dropdown-item>
+                                        <b-dropdown-item
+                                            href="{{ path('token') }}">
+                                            Token
+                                        </b-dropdown-item>
+                                        <b-dropdown-item
+                                            href="{{ path('fos_user_security_logout') }}">
+                                            Log Out
+                                        </b-dropdown-item>
+                                    </b-dropdown>
                                 </li>
                             </ul>
                         </div>
@@ -89,57 +80,57 @@
                         </div>
                         <div class="d-table-row">
                             <div class="d-table-cell pt-5 contents-wrapper">
-                                {% block content %}{% endblock content %}
-                            </div>
+                            {% block content %}{% endblock content %}
                         </div>
                     </div>
-                    <div class="d-table-row">
-                        <div class="d-table-cell footer-bg">
-                            <div class="d-flex h-100">
-                                <div class="align-self-end w-100">
-                                    <div class="bottom-links text-center text-lg-right">
-                                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-5 text-left">
-                                            <li class="list-item pb-3">
-                                                <a href="#">Company</a>
-                                            </li>
-                                            <li class="list-item pb-3">
-                                                <a href="#">About Us</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-5 text-left">
-                                            <li class="list-item pb-3">
-                                                <a href="#">Usefull Links</a>
-                                            </li>
-                                            <li class="list-item pb-3">
-                                                <a href="#">Support</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-5 text-left">
-                                            <li class="list-item pb-3">
-                                                <a href="#">Contact Us</a>
-                                            </li>
-                                            <li class="list-item pb-3">
-                                                <a href="#">Fees</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="copyright text-center py-4">
-                                        <div>
-                                            Copyright 2018 - MintMe.
-                                            <span class="d-block d-sm-inline">All rights reserved</span>
-                                        </div>
+                </div>
+                <div class="d-table-row">
+                    <div class="d-table-cell footer-bg">
+                        <div class="d-flex h-100">
+                            <div class="align-self-end w-100">
+                                <div class="bottom-links text-center text-lg-right">
+                                    <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-5 text-left">
+                                        <li class="list-item pb-3">
+                                            <a href="#">Company</a>
+                                        </li>
+                                        <li class="list-item pb-3">
+                                            <a href="#">About Us</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-5 text-left">
+                                        <li class="list-item pb-3">
+                                            <a href="#">Usefull Links</a>
+                                        </li>
+                                        <li class="list-item pb-3">
+                                            <a href="#">Support</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-5 text-left">
+                                        <li class="list-item pb-3">
+                                            <a href="#">Contact Us</a>
+                                        </li>
+                                        <li class="list-item pb-3">
+                                            <a href="#">Fees</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="copyright text-center py-4">
+                                    <div>
+                                        Copyright 2018 - MintMe.
+                                        <span class="d-block d-sm-inline">All rights reserved</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endblock main %}
-            {% block footer %}{% endblock footer %}
-        {% endblock body %}
-        {% block javascripts %}
-            <script src="{{ asset('build/main.js') }}"></script>
-            {% block pagescripts %}{% endblock %}
-        {% endblock javascripts %}
-    </body>
+            </div>
+        {% endblock main %}
+    {% block footer %}{% endblock footer %}
+{% endblock body %}
+{% block javascripts %}
+    <script src="{{ asset('build/main.js') }}"></script>
+{% block pagescripts %}{% endblock %}
+{% endblock javascripts %}
+</body>
 </html>
