@@ -31,7 +31,7 @@ class Token
     protected $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @var string
      */
     protected $address;
@@ -62,18 +62,6 @@ class Token
      * @var string|null
      */
     protected $description;
-
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token", cascade={"persist"})
-     * @var Profile
-     */
-    protected $profile;
-
-    public function __construct(Profile $profile, string $address)
-    {
-        $this->profile = $profile;
-        $this->address = $address;
-    }
 
     public function getId(): int
     {

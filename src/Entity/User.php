@@ -51,6 +51,11 @@ class User extends BaseUser
         return $this;
     }
 
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
+
     /** {@inheritdoc} */
     public function setEmail($email)
     {

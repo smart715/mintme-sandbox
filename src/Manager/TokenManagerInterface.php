@@ -3,12 +3,11 @@
 namespace App\Manager;
 
 use App\Entity\Token;
+use App\Entity\User;
 
 interface TokenManagerInterface
 {
-    public function createToken(): Token;
-
     public function findByName(string $name): ?Token;
 
-    public function getOwnToken(): ?Token;
+    public function getOwnToken(User $user): ?Token;
 }

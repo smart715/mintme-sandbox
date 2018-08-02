@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Token;
 use App\Form\TokenFormType;
 use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +31,7 @@ class TokenController extends AbstractController
 
     /**
      * @Route("/token/{name}", name="token_view")
+     * @Method({"GET"})
      */
     public function tokenView(Request $request, string $name): Response
     {
@@ -51,12 +54,14 @@ class TokenController extends AbstractController
         if ($this->isTokenCreated())
             return $this->redirectToOwnToken();
 
-        $token = $this->tokenManager->createToken();
+        $token = new Token();
         $form = $this->createForm(TokenFormType::class, $token);
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
-            $this->entityManager->persist($token);
+            $profile = $this->getUser()->getProfile();
+            $profile->setToken($token);
+            $this->entityManager->persist($profile);
             $this->entityManager->flush();
 
             return $this->redirectToOwnToken();
@@ -71,7 +76,7 @@ class TokenController extends AbstractController
 
     private function redirectToOwnToken(): RedirectResponse
     {
-        $token = $this->tokenManager->getOwnToken();
+        $token = $this->tokenManager->getOwnToken($this->getUser());
 
         if (null === $token) {
             throw $this->createNotFoundException('User doesn\'t have a token created.');
@@ -84,11 +89,11 @@ class TokenController extends AbstractController
 
     private function isTokenCreated(): bool
     {
-        return null !== $this->tokenManager->getOwnToken();
+        return null !== $this->tokenManager->getOwnToken($this->getUser());
     }
 
     private function isProfileCreated(): bool
     {
-        return null !== $this->profileManager->getProfile($this-getUser());
+        return null !== $this->getUser()->getProfile();
     }
 }

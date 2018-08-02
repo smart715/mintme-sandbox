@@ -12,10 +12,10 @@ class TokenFormTypeTest extends TypeTestCase
     /** @dataProvider formDataProvider */
     public function testSubmitValidData(array $formData): void
     {
-        $tokenToCompare = new Token($this->createMock(Profile::class), '0xstub0123456789');
+        $tokenToCompare = new Token();
         $form = $this->factory->create(TokenFormType::class, $tokenToCompare);
 
-        $token = new Token($this->createMock(Profile::class), '0xstub0123456789');
+        $token = new Token();
         $token = $this->populateTokenWithData($token, $formData);
         
         $form->submit($formData);

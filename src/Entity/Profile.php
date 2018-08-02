@@ -20,14 +20,14 @@ class Profile
     protected $id;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      * @Assert\NotBlank()
      * @var string|null
      */
     protected $firstName;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      * @Assert\NotBlank()
      * @var string|null
      */
@@ -48,13 +48,12 @@ class Profile
     protected $description;
 
     /**
-     * @ORM\OneToOne(targetEntity="User", orphanRemoval=true)
-     * @var User
+     * @ORM\Column(type="boolean", options={"default":false})
      */
-    protected $user;
+    protected $verified = false;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Token", cascade={"persist", "remove"})
      * @var Token|null
      */
     protected $token;
@@ -117,5 +116,22 @@ class Profile
         $this->token = $token;
 
         return $this;
+    }
+
+    public function getToken(): ?Token
+    {
+        return $this->token;
+    }
+
+    public function setVerified(bool $verified): self
+    {
+        $this->verified = $verified;
+
+        return $this;
+    }
+
+    public function getVerified(): bool
+    {
+        return $this->verified;
     }
 }
