@@ -33,7 +33,6 @@ class User extends BaseUser
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Email()
      * @var string|null
      */
     protected $tempEmail;

@@ -22,6 +22,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/^\w+$/")
      * @var string|null
      */
     protected $firstName;
@@ -29,18 +30,21 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/^\w+$/")
      * @var string|null
      */
     protected $lastName;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Regex(pattern="/^\w+$/")
      * @var string|null
      */
     protected $city;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Country()
      * @var string|null
      */
     protected $country;
