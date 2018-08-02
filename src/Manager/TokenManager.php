@@ -13,9 +13,8 @@ class TokenManager implements TokenManagerInterface
     /** @var TokenRepository */
     private $repository;
 
-    public function __construct(
-        EntityManagerInterface $entityManager
-    ) {
+    public function __construct(EntityManagerInterface $entityManager)
+    {
         $this->repository = $entityManager->getRepository(Token::class);
     }
 

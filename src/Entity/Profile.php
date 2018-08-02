@@ -22,14 +22,14 @@ class Profile
     /**
      * @ORM\Column(type="string")
      * @Assert\NotBlank()
-     * @var string|null
+     * @var string
      */
     protected $firstName;
 
     /**
      * @ORM\Column(type="string")
      * @Assert\NotBlank()
-     * @var string|null
+     * @var string
      */
     protected $lastName;
 
@@ -49,6 +49,7 @@ class Profile
 
     /**
      * @ORM\Column(type="boolean", options={"default":false})
+     * @var bool
      */
     protected $verified = false;
 

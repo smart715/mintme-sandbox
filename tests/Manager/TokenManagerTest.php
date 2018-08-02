@@ -49,11 +49,4 @@ class TokenManagerTest extends TestCase
         $tokenManager = new TokenManager($this->createMock(EntityManagerInterface::class));
         $this->assertEquals(null, $tokenManager->getOwnToken($user));
     }
-
-    private function getProfileFetcherMock(?Profile $profile): ProfileFetcherInterface
-    {
-        $profileFetcher = $this->createMock(ProfileFetcherInterface::class);
-        $profileFetcher->method('fetchProfile')->willReturn($profile);
-        return $profileFetcher;
-    }
 }
