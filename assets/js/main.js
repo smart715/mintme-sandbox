@@ -1,5 +1,6 @@
 import '../scss/main.sass';
-import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown';
+import bNavItemDropdown
+from 'bootstrap-vue/es/components/nav/nav-item-dropdown';
 import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import bNavbar from 'bootstrap-vue/es/components/navbar/navbar';
 import bNavbarNav from 'bootstrap-vue/es/components/navbar/navbar-nav';
@@ -14,7 +15,7 @@ Vue.options.delimiters = ['{[', ']}'];
 new Vue({
     el: '#navbar',
     components: {
-        bDropdown,
+        bNavItemDropdown,
         bDropdownItem,
         bNavbar,
         bNavbarNav,
