@@ -18,11 +18,11 @@
         "symfony/lts": "^4@dev",
         "symfony/monolog-bundle": "^3.3",
         "symfony/orm-pack": "^1.0",
-        "symfony/security-bundle": "^4.1",
         "symfony/swiftmailer-bundle": "^3.2",
         "sensiolabs/security-checker": "^4.1",
         "symfony/templating": "^4.1",
         "symfony/twig-bundle": "^4.1",
+        "symfony/security-bundle": "^4.1",
         "symfony/yaml": "^4.1"
     },
     "require-dev": {
