@@ -4,7 +4,7 @@ fos_user:
 controllers:
     resource: ../src/Controller/
     type: annotation
-    
+
 fos_user_registration:
     resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
     prefix: /register

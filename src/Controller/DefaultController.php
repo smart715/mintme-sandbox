@@ -56,6 +56,7 @@ class DefaultController extends Controller
     {
         return $this->render('default/my_token.html.twig');
     }
+
     /**
      * @Route("/profile/{name}", name="profile_view")
      */
