@@ -4,6 +4,7 @@
 $open-sans-font: 'Open Sans', sans-serif;
 $lato-font: 'Lato', sans-serif;
 $oxygen-font: 'Oxygen', sans-serif;
+$base-font-size: 16px;
 
 // Borders
 $border-radius: 0;
@@ -12,8 +13,10 @@ $border-radius: 0;
 $primary: #55aded;
 
 $body-text-color: #1a1a1a;
-$gradiant-blue-dark: #4693fd;
-$gradiant-blue-light: #90c7ff;
+$gradiant-blue-100: #90c7ff;
+$gradiant-blue-200: #29abe2;
+$gradiant-blue-300: #4693fd;
+$gradiant-blue-400: #0071bc;
 $theme-blue: #007ab9;
 $theme-light-blue: #bedeff;
 $theme-yellow: #be8817;

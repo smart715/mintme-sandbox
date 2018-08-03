@@ -2,6 +2,9 @@
 @import '~bootstrap/scss/bootstrap'
 @import url('https://fonts.googleapis.com/css?family=Lato')
 
+html
+  font-size: $base-font-size
+
 body
   color: $body-text-color
   font-family: $lato-font
@@ -18,22 +21,131 @@ a
 .text-orange
   color: $theme-orange
 
+.text-blue
+  color: $theme-blue
+
 .h-100vh
   height: 100vh
 
+.card
+  .card-header
+    background: $card-header-bg-color
+    font-size: 1.2em
+    color: $white
+    padding: .75rem 1.5rem
+    span
+      font-size: .9em
+    .card-header-icon
+      float: right
+      color: $white
+  .card-title
+    margin: 0
+    font-size: 1.25em
+  form
+    label
+      color: #333333
+      display: inline-block
+  &.transparent
+    background-color: transparent
+    >.card-header
+      background-color: $white
+      color: inherit
+
+.homepage
+  .top-showcase
+    @include media-breakpoint-down(xs)
+      font-size: .875rem
+    .title
+      font-size: 2.375em
+      font-weight: 800
+      letter-spacing: -.0625rem
+      word-spacing: -.125rem
+      text-transform: uppercase
+    .description
+      display: inline-block
+      font-size: 1.25em
+      line-height: 1.25
+    .call-to-action
+      padding: .75rem 1.5rem
+      font-size: 1.5em
+      text-transform: uppercase
+      background: linear-gradient(180deg, $gradiant-blue-200, $gradiant-blue-400)
+  .features
+    .card
+      max-width: 29rem
+      &.feature-1, &.feature-3
+        margin-right: 9rem
+        @include media-breakpoint-down(lg)
+          margin-right: 5rem
+        @include media-breakpoint-down(md)
+          margin-top: 1rem
+          margin-right: 2rem
+        @include media-breakpoint-down(sm)
+          margin-right: 1rem
+        @include media-breakpoint-down(xs)
+          margin: 1.5rem 0 0
+      &.feature-1
+        @include media-breakpoint-down(lg)
+          margin-top: 2rem
+      &.feature-2, &.feature-4
+        margin-top: 4rem
+        margin-left: 7rem
+        @include media-breakpoint-down(lg)
+          margin-left: 4rem
+        @include media-breakpoint-down(md)
+          margin-left: 1rem
+          margin-top: 3rem
+        @include media-breakpoint-down(sm)
+          margin-left: .5rem
+        @include media-breakpoint-down(xs)
+          margin: 1.5rem 0 0
+    .contents
+      height: 7rem
+      overflow-y: auto
+    &.top
+      padding-top: 9rem
+      @include media-breakpoint-down(md)
+        padding-top: 6rem
+      @include media-breakpoint-down(sm)
+        padding-top: 4rem
+    &.bottom
+      padding-top: 5rem
+      padding-bottom: 10rem
+      @include media-breakpoint-down(md)
+        padding-top: 3rem
+        padding-bottom: 7rem
+      @include media-breakpoint-down(sm)
+        padding-top: 2rem
+        padding-bottom: 3rem
+      @include media-breakpoint-down(xs)
+        padding-top: 0
+        padding-bottom: 1rem
+  .flower-bg
+    background: url(../img/coin-flower.png) no-repeat
+    background-size: 50rem
+    background-position: center -14.5rem
+    @include media-breakpoint-down(md)
+      background-size: 42rem
+      background-position: center -15rem
+    @include media-breakpoint-down(sm)
+      background-size: 38rem
+      background-position: center -13.5rem
+
 .gradient-bg
-  background: linear-gradient(180deg, $gradiant-blue-dark, $gradiant-blue-light)
+  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100)
 
 .header-bg
   background: url(../img/header-main.png) no-repeat bottom
   background-size: cover
-  height: 45px
+  position: relative
+  z-index: 1
+  height: 2.875rem
   @include media-breakpoint-up(sm)
-    height: 70px
+    height: 4.375rem
   @include media-breakpoint-up(md)
-    height: 100px
+    height: 6.25rem
   @include media-breakpoint-up(lg)
-    height: 145px
+    height: 9rem
 
 .top-navbar
   a
@@ -53,7 +165,7 @@ a
     background-color: $theme-light-blue
     color: darken($primary, 10%)
     border-color: darken($primary, 10%)
-    padding: .375rem .5rem
+    padding: .375rem .75rem
     min-width: 32rem
     @include media-breakpoint-down(lg)
       min-width: 20rem
@@ -70,17 +182,17 @@ a
     padding-bottom: 7rem
 
 .footer-bg
-  background: url(../img/footer-main.jpg) no-repeat top right
+  background: url(../img/footer-main.png) no-repeat top right
   background-size: cover
-  height: 200px
+  height: 12.5rem
   @include media-breakpoint-up(sm)
-    height: 300px
+    height: 18.75rem
   @include media-breakpoint-up(md)
-    height: 400px
+    height: 25rem
   @include media-breakpoint-up(lg)
-    height: 500px
+    height: 31.25rem
   @include media-breakpoint-up(xl)
-    height: 700px
+    height: 43.75rem
   .bottom-links
     padding-right: 14rem
     padding-bottom: 8rem
@@ -131,7 +243,7 @@ a
     height: .25rem
     width: 100%
     background: #eceff1
-    border: 1px solid #ededed
+    border: .0625rem solid #ededed
   &::-webkit-slider-thumb
     box-shadow: .1875rem .1875rem .1875rem rgba(0, 0, 0, .2)
     background: #007ABB
@@ -156,30 +268,6 @@ a
   button, button:hover, button:focus
     box-shadow: none
     @extend .icon-profile-big
-
-.card
-  .card-header
-    background: $card-header-bg-color
-    font-size: 1.2em
-    color: $white
-    padding: .75rem 1.5rem
-    span
-      font-size: .9em
-    .card-header-icon
-      float: right
-      color: $white
-  .card-title
-    margin: 0
-    font-size: 1.25em
-  form
-    label
-      color: #333333
-      display: inline-block
-  &.transparent
-    background-color: transparent
-    >.card-header
-      background-color: $white
-      color: inherit
 
 .table
   border: .0625rem solid $gray-400
