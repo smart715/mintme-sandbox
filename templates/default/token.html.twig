@@ -9,16 +9,18 @@
         <div class="row">
             <div class="col">
                 <template>
-                    <b-tabs class="tabs-theme transparent">
+                    <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                         <b-tab title="Invest" active>
                             <token-invest></token-invest>
                         </b-tab>
                         <b-tab title="Introduction">
                             <token-introduction></token-introduction>
                         </b-tab>
+                        <div slot="tabs" v-if="tabIndex" class="pr-4 d-flex edit-token-profile">
+                            <a href="#" class="btn btn-primary align-self-center">Edit Token Profile</a>
+                        </div>
                     </b-tabs>
                 </template>
-
             </div>
         </div>
     </div>
