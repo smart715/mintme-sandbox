@@ -43,10 +43,13 @@ a
   .dropdown-toggle
     border: none
     &::after
-      border: none
+      display: none
   .navbar-toggler-icon
     background-image: $navbar-light-toggler-icon-bg
   .search
+    @include media-breakpoint-down(md)
+      width: 100%
+  .search-input
     background-color: $theme-light-blue
     color: darken($primary, 10%)
     border-color: darken($primary, 10%)
@@ -54,6 +57,8 @@ a
     min-width: 32rem
     @include media-breakpoint-down(lg)
       min-width: 20rem
+    @include media-breakpoint-down(md)
+      min-width: auto
     &::placeholder
       color: darken($primary, 10%)
       opacity: 1
