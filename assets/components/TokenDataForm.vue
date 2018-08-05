@@ -1,9 +1,9 @@
 <template>
-    <form action="">
+    <form action="" id="token-data-form">
         <div class="row">
             <div class="col-lg-6">
                 <div class="form-group">
-                    <label for="name">Token name</label>
+                    <label for="name" class="mb-0">Token name</label>
                     <input
                         name="name"
                         type="text"
@@ -11,7 +11,7 @@
                         id="name"/>
                 </div>
                 <div class="form-group">
-                    <label for="website">Website address:</label>
+                    <label for="website" class="mb-0">Website address:</label>
                     <input
                         name="website"
                         type="url"
@@ -19,25 +19,50 @@
                         id="website"/>
                 </div>
                 <div class="form-group">
-                    <label for="lname">Facebook address:</label>
-                    <input
-                        name="facebook"
-                        type="url"
-                        class="form-control"
-                        id="facebook"/>
+                    <div class="row" v-if="!showFacebookFormInput">
+                        <div class="col-lg-5 col-md-6">
+                            <a 
+                                class="btn btn-primary custom-btn d-inline-flex align-items-center"
+                                @click="showFacebookFormInput = true">
+                                <font-awesome-icon :icon="['fab', 'facebook']" /> 
+                                Change Facebook
+                            </a>
+                        </div>
+                    </div>
+                    <div  v-else-if="showFacebookFormInput">
+                        <label for="lname" class="mb-0">Facebook address:</label>
+                        <input
+                            name="facebook"
+                            type="url"
+                            class="form-control"
+                            id="facebook"/>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="youtube">YouTube address:</label>
-                    <input
-                        name="youtube"
-                        type="url"
-                        class="form-control"
-                        id="youtube"/>
+                    <div class="row" v-if="!showYoutubeFormInput">
+                        <div class="col-lg-5 col-md-6">
+                            <a 
+                                class="btn btn-primary custom-btn
+                                d-inline-flex align-items-center "
+                                @click="showYoutubeFormInput = true">
+                                <font-awesome-icon :icon="['fab', 'youtube']" /> 
+                                Change YouTube
+                            </a>
+                        </div>
+                    </div>
+                    <div  v-else-if="showYoutubeFormInput">
+                        <label for="youtube" class="mb-0">YouTube address:</label>
+                        <input
+                            name="youtube"
+                            type="url"
+                            class="form-control"
+                            id="youtube"/>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="form-group">
-                    <label for="desc">Description:</label>
+                    <label for="desc" class="mb-0">Description:</label>
                     <textarea
                         name="desc"
                         class="form-control"
@@ -45,13 +70,28 @@
                     </textarea>
                 </div>
                 <div class="form-group">
-                    <label for="lockin">Lock-in:</label>
-                    <input
-                        type="range"
-                        class="form-control-range"
-                        data-slider-handle="round"
-                        id="lockin">
-                    <span>0%</span>
+                    <label for="lockin" class="mb-0">Lock-in:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <font-awesome-icon icon="unlock" /> 
+                            </span>
+                        </div>
+                        <range-slider
+                            class="slider form-control-range mt-2"
+                            min="10"
+                            max="100"
+                            step="1"
+                            v-model="sliderValue">
+                        </range-slider>
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <font-awesome-icon icon="lock" /> 
+                            </span>
+                        </div>
+                    </div>
+
+                    <span>{{ sliderValue }}%</span>
                 </div>
                 <p class="text-right">
                     Short description,...
@@ -67,8 +107,27 @@
 </template>
 
 <script>
-    export default {
-        name: 'TokenDataForm',
-    };
+import RangeSlider from 'vue-range-slider'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faUnlock, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faFacebook, faYoutube } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon, FontAwesomeLayers }
+    from '@fortawesome/vue-fontawesome';
+library.add(faUnlock, faLock, faFacebook, faYoutube);
+export default {
+    name: 'TokenDataForm',
+    components: {
+        FontAwesomeIcon,
+        FontAwesomeLayers,
+        RangeSlider,
+    },
+    data() {
+        return {
+            showFacebookFormInput: false,
+            showYoutubeFormInput: false,
+            sliderValue: 50
+        };
+    },
+};
 </script>
 

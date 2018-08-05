@@ -1,6 +1,7 @@
 @import 'variables'
 @import '~bootstrap/scss/bootstrap'
 @import url('https://fonts.googleapis.com/css?family=Lato')
+@import '~vue-range-slider/dist/vue-range-slider.scss';
 
 html
   font-size: $base-font-size
@@ -26,6 +27,12 @@ a
 
 .h-100vh
   height: 100vh
+
+.range-slider-fill
+  background: #007ABB
+.range-slider-knob
+  background: #007ABB
+  border: none;
 
 .card
   .card-header
@@ -216,48 +223,6 @@ a
         color: $body-text-color
         text-decoration: none
 
-[type=range]
-  -webkit-appearance: none
-  background: transparent
-  margin: .75rem 0
-  width: 100%
-  &::-moz-focus-outer
-    border: 0
-  &::-moz-range-thumb
-    box-shadow: .1875rem .1875rem .1875rem rgba(0, 0, 0, .2)
-    background: #007ABB
-    border-radius: .75rem
-    cursor: default
-    height: 1.25rem
-    width: 1.25rem
-  &::-ms-thumb
-    box-shadow: .1875rem .1875rem .1875rem rgba(0, 0, 0, .2)
-    background: #007ABB
-    border-radius: .75rem
-    cursor: default
-    height: 1.25rem
-    width: 1.25rem
-    margin-top: .125rem
-  &::-webkit-slider-runnable-track
-    cursor: default
-    height: .25rem
-    width: 100%
-    background: #eceff1
-    border: .0625rem solid #ededed
-  &::-webkit-slider-thumb
-    box-shadow: .1875rem .1875rem .1875rem rgba(0, 0, 0, .2)
-    background: #007ABB
-    border-radius: .75rem
-    cursor: default
-    height: 1.5rem
-    width: 1.5rem
-    -webkit-appearance: none
-    margin-top: -.75rem
-  &:focus
-    outline: 0
-  &:focus::-webkit-slider-runnable-track
-    background: #fbfbfc
-
 .icon-profile-big
   width: 2.5em
   height: 2.5em
@@ -365,3 +330,21 @@ a
 #fos_user_registration_form
   label
     margin: 0px
+#token-data-form
+  .custom-btn
+    color: $white !important;
+    vertical-align: middle
+    width: 100%
+    svg
+      width: 1.3em !important;
+      padding-right: 0.4em
+  .form-control-range
+    position: relative
+    -webkit-box-flex: 1
+    -ms-flex: 1 1 auto
+    flex: 1 1 auto
+    width: 1%;
+  .input-group-text
+    background: $white
+    border: none;
+    padding: 0.5rem 0.2rem
