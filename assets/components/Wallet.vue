@@ -7,8 +7,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Amount</th>
+                        <th>Name <font-awesome-icon icon="sort" /></th>
+                        <th>Amount <font-awesome-icon icon="sort" /></th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -20,7 +20,11 @@
                     </tr>
                     <tr>
                         <td>Webchain (WEB)</td>
-                        <td>120.24</td>
+                        <td>120.24353343
+                            <font-awesome-icon
+                                icon="question"
+                                class="text-green" />
+                            :30</td>
                         <td>^</td>
                     </tr>
                 </tbody>
@@ -32,8 +36,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
+                    <th>Name <font-awesome-icon icon="sort" /></th>
+                    <th>Amount <font-awesome-icon icon="sort" /></th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -59,10 +63,19 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faSort, faQuestion} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon, FontAwesomeLayers}
+    from '@fortawesome/vue-fontawesome';
+library.add(faSort, faQuestion);
 export default {
     name: 'Wallet',
     data() {
         return {};
+    },
+    components: {
+        FontAwesomeIcon,
+        FontAwesomeLayers,
     },
 };
 </script>

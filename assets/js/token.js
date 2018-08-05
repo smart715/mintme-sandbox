@@ -1,5 +1,6 @@
 import TokenInvest from '../components/TokenInvest';
 import TokenIntroduction from '../components/TokenIntroduction';
+import TokenDataForm from '../components/TokenDataForm';
 import Tabs from 'bootstrap-vue/es/components';
 
 new Vue({
@@ -12,6 +13,7 @@ new Vue({
   components: {
     TokenInvest,
     TokenIntroduction,
+    TokenDataForm,
     Tabs,
   },
 });

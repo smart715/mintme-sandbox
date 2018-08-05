@@ -21,16 +21,20 @@
                 <div class="form-group">
                     <div class="row" v-if="!showFacebookFormInput">
                         <div class="col-lg-5 col-md-6">
-                            <a 
-                                class="btn btn-primary custom-btn d-inline-flex align-items-center"
+                            <a
+                                class="btn btn-primary custom-btn
+                                d-inline-flex align-items-center"
                                 @click="showFacebookFormInput = true">
-                                <font-awesome-icon :icon="['fab', 'facebook']" /> 
+                                <font-awesome-icon
+                                    :icon="['fab', 'facebook']" />
                                 Change Facebook
                             </a>
                         </div>
                     </div>
                     <div  v-else-if="showFacebookFormInput">
-                        <label for="lname" class="mb-0">Facebook address:</label>
+                        <label for="lname" class="mb-0">
+                            Facebook address:
+                        </label>
                         <input
                             name="facebook"
                             type="url"
@@ -41,17 +45,19 @@
                 <div class="form-group">
                     <div class="row" v-if="!showYoutubeFormInput">
                         <div class="col-lg-5 col-md-6">
-                            <a 
+                            <a
                                 class="btn btn-primary custom-btn
                                 d-inline-flex align-items-center "
                                 @click="showYoutubeFormInput = true">
-                                <font-awesome-icon :icon="['fab', 'youtube']" /> 
+                                <font-awesome-icon :icon="['fab', 'youtube']" />
                                 Change YouTube
                             </a>
                         </div>
                     </div>
                     <div  v-else-if="showYoutubeFormInput">
-                        <label for="youtube" class="mb-0">YouTube address:</label>
+                        <label for="youtube" class="mb-0">
+                            YouTube address:
+                        </label>
                         <input
                             name="youtube"
                             type="url"
@@ -74,7 +80,7 @@
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <font-awesome-icon icon="unlock" /> 
+                                <font-awesome-icon icon="unlock" />
                             </span>
                         </div>
                         <range-slider
@@ -86,7 +92,7 @@
                         </range-slider>
                         <div class="input-group-append">
                             <span class="input-group-text">
-                                <font-awesome-icon icon="lock" /> 
+                                <font-awesome-icon icon="lock" />
                             </span>
                         </div>
                     </div>
@@ -107,27 +113,38 @@
 </template>
 
 <script>
-import RangeSlider from 'vue-range-slider'
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUnlock, faLock } from '@fortawesome/free-solid-svg-icons';
-import { faFacebook, faYoutube } from '@fortawesome/free-brands-svg-icons';
-import { FontAwesomeIcon, FontAwesomeLayers }
+import RangeSlider from 'vue-range-slider';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faUnlock, faLock} from '@fortawesome/free-solid-svg-icons';
+import {faFacebook, faYoutube} from '@fortawesome/free-brands-svg-icons';
+import {FontAwesomeIcon, FontAwesomeLayers}
     from '@fortawesome/vue-fontawesome';
 library.add(faUnlock, faLock, faFacebook, faYoutube);
 export default {
-    name: 'TokenDataForm',
+    name: 'TokenNewForm',
     components: {
         FontAwesomeIcon,
         FontAwesomeLayers,
         RangeSlider,
     },
+    props: {
+        formStatus: String,
+    },
     data() {
         return {
-            showFacebookFormInput: false,
-            showYoutubeFormInput: false,
-            sliderValue: 50
+            showFacebookFormInput: true,
+            showYoutubeFormInput: true,
+            sliderValue: 50,
         };
+    },
+    created: function() {
+        if (this.formStatus == 'edit') {
+            this.showFacebookFormInput = false;
+            this.showYoutubeFormInput = false;
+        } else {
+            this.showFacebookFormInput = true;
+            this.showYoutubeFormInput = true;
+        }
     },
 };
 </script>
-

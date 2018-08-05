@@ -20,15 +20,11 @@
             </div>
             <div class="form-group">
                 <label for="profile-fburl">City:</label>
-                <select
+                <input
                     name="city"
                     type="text"
                     class="form-control"
-                    id="city">
-                    <option>Lagos</option>
-                    <option>Oyo</option>
-                    <option>Ogun</option>
-                </select>
+                    id="city"/>
             </div>
             <div class="form-group">
                 <label for="country">Country:</label>
@@ -54,7 +50,7 @@
             </div>
             <button
                 type="submit"
-                class="btn btn-primary float-right">
+                class="btn btn-primary float-right px-5">
                 Save
             </button>
         </div>

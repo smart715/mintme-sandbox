@@ -9,8 +9,10 @@
                 <!-- /// ReCAPTCHA here /// -->
             </div>
         </div>
-        <div class="form-group text-center">
-            <input type="submit" class="btn btn-primary" value="Sign Up"> or <a href="{{ path('fos_user_security_login') }}">Log In</a>
+        <div class="text-center">
+            <input type="submit" class="btn btn-primary px-4" value="Sign Up">
+            <span class="px-3">or</span>
+            <a href="{{ path('fos_user_security_login') }}">Log In</a>
         </div>
     {{ form_end(form) }}
 {% endblock %}

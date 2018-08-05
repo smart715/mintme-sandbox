@@ -2,6 +2,8 @@
 
 {% block title %}Profile{% endblock %}
 
+{% block bodyclass %}profile-view{% endblock %}
+
 {% block content %}
     <div class="container">
         <div class="row">
@@ -12,51 +14,28 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col">
+                            <div class="col-12 col-md-4">
                                 <div class="pb-1">
-                                    City:
+                                    City: {CityName}
                                 </div>
                                 <div class="pb-1">
-                                    Country:
+                                    Country: {CountryName}
                                 </div>
                                 <div class="pb-1">
-                                    Lorem Ipsum is simply dummy text of the printing and
-                                    typesetting industry. Lorem Ipsum has been the
-                                    industry's standard dummy text ever since the 1500s,
-                                    when an unknown printer took a galley of type and
-                                    scrambled it to make a type specimen book.
-                                </div>
-                                <div class="col-12 pt-4 text-right">
-                                    <a  href="{{ path('profile') }}" class="btn btn-primary">
-                                        Edit
-                                    </a>
+                                    {TokenName} created on July 2018
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card mt-5">
-                    <div class="card-header">
-                        Token
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <div class="pb-1">
-                                    <a href="#"> [Link or Links to all pairs with token in form of full address]</a>
-                                </div>
-                                <div class="pb-1">
-                                    Wallet on Exchange:
-                                </div>
-                                <div class="pb-1">
-                                    Active Orders:
-                                </div>
-                                <div class="pb-1">
-                                    Withdraw:
-                                </div>
-                                <div class="pb-1">
-                                    Sold on Market:
-                                </div>
+                            <div class="col-12 col-md-8 pt-3 pt-md-0 description">
+                                Lorem Ipsum is simply dummy text of the printing and
+                                typesetting industry. Lorem Ipsum has been the
+                                industry's standard dummy text ever since the 1500s,
+                                when an unknown printer took a galley of type and
+                                scrambled it to make a type specimen book.
+                            </div>
+                            <div class="col-12 pt-4 text-right">
+                                <a href="{{ path('profile') }}" class="btn btn-primary px-5">
+                                    Edit
+                                </a>
                             </div>
                         </div>
                     </div>
