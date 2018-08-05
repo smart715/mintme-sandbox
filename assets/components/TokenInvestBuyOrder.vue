@@ -15,17 +15,14 @@
                             class="align-middle"
                             type="checkbox"
                         >
-                        <label
-                            for="buy-price"
-                            class="m-0"
-                        >
+                        <label for="buy-price">
                             Market Price
                         </label>
                     </div>
                     <div class="col-12 pt-3">
                         <label
                             for="buy-price-input"
-                            class="text-primary m-0"
+                            class="text-primary"
                         >
                             Price in WEB:
                         </label>
@@ -38,7 +35,7 @@
                     <div class="col-12 pt-3">
                         <label
                             for="buy-price-amount"
-                            class="text-primary m-0"
+                            class="text-primary"
                         >
                             Amount:
                         </label>
