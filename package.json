@@ -37,7 +37,7 @@
     "postcss-loader": "^2.1.6",
     "requirejs": "^2.3.5",
     "sass-loader": "^7.0.3",
-    "stylelint": "^9.3.0",
+    "stylelint": "^9.4.0",
     "stylelint-config-recommended-scss": "^3.2.0",
     "stylelint-scss": "^3.2.0",
     "vue": "^2.5.16",
