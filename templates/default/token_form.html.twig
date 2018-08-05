@@ -1,0 +1,16 @@
+<div class="card">
+    <div class="card-header">
+        {% if action == 'edit' %}
+            Token edition
+        {% else %}
+            Plant your own token
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if action == 'edit' %}
+            <token-edit-form></token-edit-form>
+        {% else %}
+            <token-new-form></token-new-form>
+        {% endif %}
+    </div>
+</div>

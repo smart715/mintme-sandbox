@@ -131,7 +131,6 @@ label
     align-items: stretch
     border: none
     .nav-item
-      cursor: pointer
       flex: 1 1 auto
       padding: 0
       .nav-link
@@ -139,6 +138,8 @@ label
         background-color: #2797e8
         color: $white
         padding: .75rem 1.5rem
+        &.disabled
+          cursor: default
         &.active
           background: $white
           color: inherit

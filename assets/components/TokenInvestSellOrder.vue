@@ -9,14 +9,19 @@
                     <div class="col">
                         Your WEB: <span class="text-primary">9999</span>
                     </div>
-                    <div class="col">
-                        <input
-                            id="sell-price"
-                            class="align-middle"
-                            type="checkbox"
-                        >
-                        <label for="sell-price">
-                            Market Price
+                    <div class="col text-right">
+                        <label class="custom-control custom-checkbox">
+                            <input
+                                type="checkbox"
+                                id="sell-price"
+                                class="custom-control-input"
+                            >
+                            <label
+                                class="custom-control-label"
+                                for="sell-price"
+                            >
+                                Market Price
+                            </label>
                         </label>
                     </div>
                     <div class="col-12 pt-3">
