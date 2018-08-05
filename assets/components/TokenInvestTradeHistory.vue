@@ -9,13 +9,34 @@
                     <table class="table m-0 border-0">
                         <thead>
                             <tr>
-                                <th>Type</th>
-                                <th>Order maker</th>
-                                <th>Order trader</th>
-                                <th>Price per token</th>
-                                <th>Token amount</th>
-                                <th>WEB amount</th>
-                                <th>Date & Time</th>
+                                <th>
+                                    Type
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Order maker
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Order trader
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Price per token
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Token amount
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    WEB amount
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Date & Time
+                                    <font-awesome-icon icon="sort" />
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -118,13 +139,20 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faSort} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+library.add(faSort);
 export default {
-  name: 'TokenInvestTradeHistory',
-  props: {
-      containerClass: String,
-  },
-  data() {
-    return {};
-  },
+    name: 'TokenInvestTradeHistory',
+    props: {
+        containerClass: String,
+    },
+    data() {
+        return {};
+    },
+    components: {
+        FontAwesomeIcon,
+    },
 };
 </script>

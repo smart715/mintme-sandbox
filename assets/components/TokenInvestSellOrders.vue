@@ -12,10 +12,22 @@
                     <table class="table m-0 border-0">
                         <thead>
                             <tr>
-                                <th>Price</th>
-                                <th>Amount</th>
-                                <th>Sum WEB</th>
-                                <th>Trader</th>
+                                <th>
+                                    Price
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Amount
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Sum WEB
+                                    <font-awesome-icon icon="sort" />
+                                </th>
+                                <th>
+                                    Trader
+                                    <font-awesome-icon icon="sort" />
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,13 +100,20 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faSort} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+library.add(faSort);
 export default {
-  name: 'TokenInvestSellOrders',
-  props: {
-      containerClass: String,
-  },
-  data() {
-    return {};
-  },
+    name: 'TokenInvestSellOrders',
+    props: {
+        containerClass: String,
+    },
+    data() {
+        return {};
+    },
+    components: {
+        FontAwesomeIcon,
+    },
 };
 </script>

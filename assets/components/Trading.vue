@@ -5,10 +5,10 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Pair</th>
-                        <th>Change</th>
-                        <th>Last Price</th>
-                        <th>24H Volume</th>
+                        <th>Pair <font-awesome-icon icon="sort" /></th>
+                        <th>Change <font-awesome-icon icon="sort" /></th>
+                        <th>Last Price <font-awesome-icon icon="sort" /></th>
+                        <th>24H Volume <font-awesome-icon icon="sort" /></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,6 +35,10 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faSort} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+library.add(faSort);
 export default {
     name: 'Trading',
     props: {
@@ -48,6 +52,9 @@ export default {
             perPage: 0,
             totalRows: 0,
         };
+    },
+    components: {
+        FontAwesomeIcon,
     },
     created() {
         this.setTokenData(this.currentPage);

@@ -3,13 +3,13 @@
         <table class="table m-0 border-0">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Address</th>
-                    <th>Amount</th>
-                    <th>Balance</th>
-                    <th>Status</th>
-                    <th>Free</th>
+                    <th>Date <font-awesome-icon icon="sort" /></th>
+                    <th>Type <font-awesome-icon icon="sort" /></th>
+                    <th>Address <font-awesome-icon icon="sort" /></th>
+                    <th>Amount <font-awesome-icon icon="sort" /></th>
+                    <th>Balance <font-awesome-icon icon="sort" /></th>
+                    <th>Status <font-awesome-icon icon="sort" /></th>
+                    <th>Free <font-awesome-icon icon="sort" /></th>
                 </tr>
             </thead>
             <tbody>
@@ -55,10 +55,17 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faSort} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+library.add(faSort);
 export default {
     name: 'DepositWithdrawHistory',
     data() {
         return {};
+    },
+    components: {
+        FontAwesomeIcon,
     },
 };
 </script>

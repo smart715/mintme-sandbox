@@ -3,13 +3,13 @@
         <table class="table m-0 border-0">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Name</th>
-                    <th>Amount</th>
-                    <th>Price</th>
-                    <th>Total cost</th>
-                    <th>Free</th>
+                    <th>Date <font-awesome-icon icon="sort" /></th>
+                    <th>Type <font-awesome-icon icon="sort" /></th>
+                    <th>Name <font-awesome-icon icon="sort" /></th>
+                    <th>Amount <font-awesome-icon icon="sort" /></th>
+                    <th>Price <font-awesome-icon icon="sort" /></th>
+                    <th>Total cost <font-awesome-icon icon="sort" /></th>
+                    <th>Free <font-awesome-icon icon="sort" /></th>
                 </tr>
             </thead>
             <tbody>
@@ -46,10 +46,17 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faSort} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+library.add(faSort);
 export default {
     name: 'TradingHistory',
     data() {
         return {};
+    },
+    components: {
+        FontAwesomeIcon,
     },
 };
 </script>

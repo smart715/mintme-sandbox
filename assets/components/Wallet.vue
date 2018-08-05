@@ -65,8 +65,7 @@
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faSort, faQuestion} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon, FontAwesomeLayers}
-    from '@fortawesome/vue-fontawesome';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 library.add(faSort, faQuestion);
 export default {
     name: 'Wallet',
@@ -75,7 +74,6 @@ export default {
     },
     components: {
         FontAwesomeIcon,
-        FontAwesomeLayers,
     },
 };
 </script>
