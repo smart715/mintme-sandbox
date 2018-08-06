@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use App\Validator\Constraints as AppAssert;
+use App\Validator\Constraints\ProfilePeriodLock;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -23,6 +24,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
+     * @ProfilePeriodLock()
      * @var string|null
      */
     protected $firstName;
@@ -31,6 +33,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
+     * @ProfilePeriodLock()
      * @var string|null
      */
     protected $lastName;
@@ -56,6 +59,12 @@ class Profile
     protected $description;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @var DateTime|null
+     */
+    protected $nameChangedDate;
+
+    /**
      * @ORM\OneToOne(targetEntity="User", inversedBy="profile", orphanRemoval=true)
      * @var User
      */
@@ -70,6 +79,16 @@ class Profile
     public function __construct(User $user)
     {
         $this->user = $user;
+    }
+
+    public function setNameChangedDate(?DateTime $nameChangedDate): void
+    {
+        $this->nameChangedDate = $nameChangedDate;
+    }
+
+    public function getNameChangedDate(): ?DateTime
+    {
+        return $this->nameChangedDate;
     }
 
     public function setToken(?Token $token): self
@@ -137,5 +156,15 @@ class Profile
         $this->lastName = $lastName;
 
         return $this;
+    }
+
+    public function update(self $profile): void
+    {
+        $this->user = $profile->user;
+        $this->city = $profile->city;
+        $this->country = $profile->country;
+        $this->firstName = $profile->firstName;
+        $this->lastName = $profile->lastName;
+        $this->description = $profile->description;
     }
 }

@@ -8,7 +8,7 @@ use FOS\UserBundle\Model\UserInterface;
 
 class ProfileRepository extends EntityRepository
 {
-    public function getProfileByUser(UserInterface $user): Profile
+    public function getProfileByUser(UserInterface $user): ?Profile
     {
         return $this->findOneBy(['user' => $user->getId()]);
     }
