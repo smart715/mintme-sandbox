@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="form-group">
-                    <label for="name" class="mb-0">Token name</label>
+                    <label for="name">Token name*:</label>
                     <input
                         name="name"
                         type="text"
@@ -11,7 +11,7 @@
                         id="name"/>
                 </div>
                 <div class="form-group">
-                    <label for="website" class="mb-0">Website address:</label>
+                    <label for="website">Website address:</label>
                     <input
                         name="website"
                         type="url"
@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     <div  v-else-if="showFacebookFormInput">
-                        <label for="lname" class="mb-0">
+                        <label for="facebook">
                             Facebook address:
                         </label>
                         <input
@@ -55,7 +55,7 @@
                         </div>
                     </div>
                     <div  v-else-if="showYoutubeFormInput">
-                        <label for="youtube" class="mb-0">
+                        <label for="youtube">
                             YouTube address:
                         </label>
                         <input
@@ -68,15 +68,17 @@
             </div>
             <div class="col-lg-6">
                 <div class="form-group">
-                    <label for="desc" class="mb-0">Description:</label>
+                    <label for="desc">Description:</label>
                     <textarea
+                        id="desc"
                         name="desc"
                         class="form-control"
-                        rows="5" id="tokendesc">
+                        rows="5"
+                    >
                     </textarea>
                 </div>
                 <div class="form-group">
-                    <label for="lockin" class="mb-0">Lock-in:</label>
+                    <label for="lockin">Lock-in:</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
@@ -119,7 +121,9 @@ import {faUnlock, faLock} from '@fortawesome/free-solid-svg-icons';
 import {faFacebook, faYoutube} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon, FontAwesomeLayers}
     from '@fortawesome/vue-fontawesome';
+
 library.add(faUnlock, faLock, faFacebook, faYoutube);
+
 export default {
     name: 'TokenNewForm',
     components: {
@@ -128,23 +132,14 @@ export default {
         RangeSlider,
     },
     props: {
-        formStatus: String,
+        action: String,
     },
     data() {
         return {
-            showFacebookFormInput: true,
-            showYoutubeFormInput: true,
+            showFacebookFormInput: this.action !== 'edit',
+            showYoutubeFormInput: this.action !== 'edit',
             sliderValue: 50,
         };
-    },
-    created: function() {
-        if (this.formStatus == 'edit') {
-            this.showFacebookFormInput = false;
-            this.showYoutubeFormInput = false;
-        } else {
-            this.showFacebookFormInput = true;
-            this.showYoutubeFormInput = true;
-        }
     },
 };
 </script>

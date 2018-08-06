@@ -23,7 +23,8 @@
                         <td>120.24353343
                             <font-awesome-icon
                                 icon="question"
-                                class="text-green" />
+                                class="text-green"
+                            />
                             :30</td>
                         <td>^</td>
                     </tr>
@@ -66,7 +67,9 @@
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faSort, faQuestion} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
 library.add(faSort, faQuestion);
+
 export default {
     name: 'Wallet',
     data() {
