@@ -157,14 +157,4 @@ class Profile
 
         return $this;
     }
-
-    public function update(self $profile): void
-    {
-        $this->user = $profile->user;
-        $this->city = $profile->city;
-        $this->country = $profile->country;
-        $this->firstName = $profile->firstName;
-        $this->lastName = $profile->lastName;
-        $this->description = $profile->description;
-    }
 }
