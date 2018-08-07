@@ -2,16 +2,18 @@
 
 namespace App\Communications;
 
-use Graze\GuzzleHttp\JsonRpc\Client;
+use App\Communications\Exception\FetchException;
+use Exception;
+use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
 use Ramsey\Uuid\Uuid;
 
 class GuzzleWrapper implements JsonRpc
 {
-    /** @var Client|null */
+    /** @var ClientInterface|null */
     private $client = null;
 
-    /** @var RpcClientFactoryInterface */
+    /** @var Factory\RpcClientFactoryInterface */
     private $clientFactory;
 
     /** @var string */
@@ -37,7 +39,7 @@ class GuzzleWrapper implements JsonRpc
             $response = $this->sendRequest($methodName, $requestParams);
             return $this->parseResponse($response);
         } catch (\Throwable $e) {
-            throw new Exception\FetchException($e->getMessage(), $e->getCode());
+            throw new FetchException($e->getMessage(), $e->getCode());
         }
     }
 
@@ -48,7 +50,13 @@ class GuzzleWrapper implements JsonRpc
             $methodName,
             $params
         );
-        return $this->client->send($request);
+        $response = $this->client->send($request);
+
+        if (null === $response) {
+            throw new Exception('No response present');
+        }
+
+        return $response;
     }
 
     private function parseResponse(ResponseInterface $response): JsonRpcResponse

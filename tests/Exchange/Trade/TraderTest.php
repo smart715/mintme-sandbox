@@ -2,15 +2,15 @@
 
 namespace App\Tests\Exchange\Trade;
 
-use App\Entity\User;
-use App\ValueObject\Market;
-use App\Exchange\Trade\Trader;
-use App\Exchange\Trade\Config\LimitOrderConfig;
-use App\ValueObject\Order;
+use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpc;
 use App\Communications\JsonRpcResponse;
-use App\Communications\Exception\FetchException;
+use App\Entity\User;
+use App\Exchange\Trade\Config\LimitOrderConfig;
+use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
+use App\ValueObject\Market;
+use App\ValueObject\Order;
 use PHPUnit\Framework\TestCase;
 
 class TraderTest extends TestCase

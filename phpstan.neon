@@ -24,4 +24,4 @@ parameters:
         - vendor/bin/.phpunit/phpunit-6.5/vendor/autoload.php
 
     ignoreErrors:
-#        - '#Method (.*) should return (.*)Repository but returns Doctrine\\Common\\Persistence\\ObjectRepository.#'
+        - '#Cannot call method (.*) on (.*)\|null\.#'

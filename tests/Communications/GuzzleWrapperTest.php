@@ -3,13 +3,13 @@
 namespace App\Tests\Communications;
 
 use App\Communications\Factory\RpcClientFactoryInterface;
+use App\Communications\GuzzleWrapper;
 use App\Communications\JsonRpcResponse;
+use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\RequestInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
-use App\Communications\GuzzleWrapper;
-use Graze\GuzzleHttp\JsonRpc\Client;
-use Psr\Http\Message\StreamInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
 
 class GuzzleWrapperTest extends TestCase
 {
@@ -60,7 +60,7 @@ class GuzzleWrapperTest extends TestCase
         $method = 'stubMethod';
         $params = [['param1', 'param2']];
 
-        $clientMock = $this->createMock(Client::class);
+        $clientMock = $this->createMock(ClientInterface::class);
         $clientMock->method('request')
             ->will($this->throwException(new \Exception()));
 
@@ -88,7 +88,7 @@ class GuzzleWrapperTest extends TestCase
      */
     private function getClientMock(StreamInterface $stream)
     {
-        $clientMock = $this->createMock(Client::class);
+        $clientMock = $this->createMock(ClientInterface::class);
         $clientMock->method('send')
             ->willReturn($this->getResponseMock($stream));
         $clientMock->method('request')
