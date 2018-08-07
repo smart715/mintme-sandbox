@@ -76,6 +76,7 @@ class Profile
      */
     protected $token;
 
+    /** @var bool */
     private $isChangesLocked = false;
 
     public function __construct(User $user)
