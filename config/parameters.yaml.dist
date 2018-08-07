@@ -1,3 +1,9 @@
 # Business configuration variables will go here
 parameters:
     locale: 'en'
+
+    viabtc_rpc: 'http://localhost:8080'
+    viabtc_response_timeout_seconds: 10
+
+    taker_fee_rate: 0.1
+    maker_fee_rate: 0.01
