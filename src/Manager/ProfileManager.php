@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Entity\Profile;
 use App\Repository\ProfileRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
 
@@ -20,5 +21,10 @@ class ProfileManager implements ProfileManagerInterface
     public function getProfile(UserInterface $user): ?Profile
     {
         return $this->profileRepository->getProfileByUser($user);
+    }
+
+    public function lockChangePeriod(Profile $profile): void
+    {
+        $profile->setNameChangedDate(new DateTime('+1 month'));
     }
 }

@@ -76,9 +76,23 @@ class Profile
      */
     protected $token;
 
+    private $isChangesLocked = false;
+
     public function __construct(User $user)
     {
         $this->user = $user;
+    }
+
+    public function isChangesLocked(): bool
+    {
+        return $this->isChangesLocked;
+    }
+
+    public function lockChanges(): self
+    {
+        $this->isChangesLocked = true;
+
+        return $this;
     }
 
     public function setNameChangedDate(?DateTime $nameChangedDate): void

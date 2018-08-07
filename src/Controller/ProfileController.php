@@ -68,7 +68,9 @@ class ProfileController extends AbstractController
         $profileForm->handleRequest($request);
 
         if ($profileForm->isSubmitted() && $profileForm->isValid()) {
-            $profile->setNameChangedDate(new DateTime('+1 month'));
+            if ($profile->isChangesLocked()) {
+                $this->profileManager->lockChangePeriod($profile);
+            }
             $em->persist($profile);
             $em->flush();
             $this->addFlash('success', 'Profile was updated successfully');

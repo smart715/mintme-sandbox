@@ -8,4 +8,5 @@ use FOS\UserBundle\Model\UserInterface;
 interface ProfileManagerInterface
 {
     public function getProfile(UserInterface $user): ?Profile;
+    public function lockChangePeriod(Profile $profile): void;
 }
