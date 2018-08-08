@@ -3,8 +3,10 @@
 namespace App\Exchange\Trade;
 
 use App\Communications\Exception\FetchException;
-use App\Communications\JsonRpc;
+use App\Communications\JsonRpcInterface;
 use App\Entity\User;
+use App\Exchange\Trade\Config\LimitOrderConfig;
+use App\Exchange\Trade\Config\OrderFilterConfig;
 use App\ValueObject\Market;
 use App\ValueObject\Order;
 
@@ -15,13 +17,17 @@ class Trader implements TraderInterface
     private const FINISHED_ORDERS_METHOD = 'order.finished';
     private const PENDING_ORDERS_METHOD = 'order.pending';
 
-    /** @var JsonRpc */
+    private const INSUFFICIENT_BALANCE_CODE = 10;
+    private const ORDER_NOT_FOUND_CODE = 10;
+    private const USER_NOT_MATCH_CODE = 11;
+
+    /** @var JsonRpcInterface */
     private $jsonRpc;
 
-    /** @var Config\LimitOrderConfig */
+    /** @var LimitOrderConfig */
     private $config;
 
-    public function __construct(JsonRpc $jsonRpc, Config\LimitOrderConfig $config)
+    public function __construct(JsonRpcInterface $jsonRpc, LimitOrderConfig $config)
     {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
@@ -47,7 +53,7 @@ class Trader implements TraderInterface
         }
 
         if ($response->hasError()) {
-            return 10 === $response->getError()['code']
+            return self::INSUFFICIENT_BALANCE_CODE === $response->getError()['code']
                 ? new TradeResult(TradeResult::INSUFFICIENT_BALANCE)
                 : new TradeResult(TradeResult::FAILED);
         }
@@ -81,7 +87,7 @@ class Trader implements TraderInterface
      */
     public function getFinishedOrders(User $user, Market $market, array $filterOptions = []): array
     {
-        $options = new Config\OrderFilterConfig();
+        $options = new OrderFilterConfig();
         $options->merge($filterOptions);
 
         $params = [
@@ -116,7 +122,7 @@ class Trader implements TraderInterface
      */
     public function getPendingOrders(User $user, Market $market, array $filterOptions = []): array
     {
-        $options = new Config\OrderFilterConfig();
+        $options = new OrderFilterConfig();
         $options->merge($filterOptions);
 
         $params = [
@@ -173,8 +179,8 @@ class Trader implements TraderInterface
     private function getCancelOrderErrorResult(int $errorCode): TradeResult
     {
         $errorMapping = [
-            10 => TradeResult::ORDER_NOT_FOUND,
-            11 => TradeResult::USER_NOT_MATCH,
+            self::ORDER_NOT_FOUND_CODE => TradeResult::ORDER_NOT_FOUND,
+            self::USER_NOT_MATCH_CODE => TradeResult::USER_NOT_MATCH,
         ];
 
         $result = array_key_exists($errorCode, $errorMapping)

@@ -8,7 +8,7 @@ use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
 use Ramsey\Uuid\Uuid;
 
-class GuzzleWrapper implements JsonRpc
+class GuzzleWrapper implements JsonRpcInterface
 {
     /** @var ClientInterface|null */
     private $client = null;

@@ -2,7 +2,7 @@
 
 namespace App\Communications;
 
-interface JsonRpc
+interface JsonRpcInterface
 {
     public function send(string $methodName, array $requestParams): JsonRpcResponse;
 }

@@ -8,6 +8,7 @@ use App\Communications\JsonRpcResponse;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\RequestInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
@@ -84,7 +85,7 @@ class GuzzleWrapperTest extends TestCase
 
     /**
      * @param StreamInterface $stream
-     * @return \PHPUnit\Framework\MockObject\MockObject|ClientInterface
+     * @return MockObject|ClientInterface
      */
     private function getClientMock(StreamInterface $stream)
     {
@@ -98,7 +99,7 @@ class GuzzleWrapperTest extends TestCase
 
     /**
      * @param StreamInterface $stream
-     * @return \PHPUnit\Framework\MockObject\MockObject|ResponseInterface
+     * @return MockObject|ResponseInterface
      */
     private function getResponseMock(StreamInterface $stream)
     {
