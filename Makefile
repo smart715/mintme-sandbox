@@ -33,3 +33,4 @@ validate:
 correct:
 	make syntax_correction
 	make syntax_correction_assets
+
