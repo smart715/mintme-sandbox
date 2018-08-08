@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <div id="profile" class="container">
+        <div class="row">
+            <div class="col">
+                <template>
+                    <b-tabs class="tabs-theme">
+                        <b-tab title="Personal Data" active>
+                            <personal-data-form></personal-data-form>
+                        </b-tab>
+                        <b-tab title="Account Settings">
+                            <account-settings></account-settings>
+                        </b-tab>
+                    </b-tabs>
+                </template>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/profile.js') }}"></script>
+{% endblock %}
