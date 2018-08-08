@@ -1,15 +1,16 @@
-#token
-  .buy-order, .sell-order
-    @include media-breakpoint-up('lg')
-      max-width: 35%
-  .chart
-    @include media-breakpoint-up('lg')
-      max-width: 30%
-  .fix-height
-    max-height: 28rem
-  canvas
-    max-height: 14rem
-    background-color: #c0deff
+@import 'public'
+
+.buy-order, .sell-order
+  @include media-breakpoint-up('lg')
+    max-width: 35%
+.chart
+  @include media-breakpoint-up('lg')
+    max-width: 30%
+.fix-height
+  max-height: 28rem
+canvas
+  max-height: 14rem
+  background-color: #c0deff
 
 #token-data-form
   .custom-btn
@@ -19,13 +20,14 @@
     svg
       width: 1.5em
       padding-right: 0.4em
-  .form-control-range
-    position: relative
-    -webkit-box-flex: 1
-    -ms-flex: 1 1 auto
-    flex: 1 1 auto
-    width: 1%
-  .input-group-text
-    background: $white
-    border: none
-    padding: 0.5rem 0.2rem
+
+.form-control-range
+  position: relative
+  -webkit-box-flex: 1
+  -ms-flex: 1 1 auto
+  flex: 1 1 auto
+  width: 1%
+.input-group-text
+  background: $white
+  border: none
+  padding: 0.5rem 0.2rem

@@ -9,6 +9,7 @@
         </title>
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('build/main.css') }}">
+            {% block pagestyles %}{% endblock %}
         {% endblock stylesheets %}
     </head>
     <body class="h-100vh {% block bodyclass %}{% endblock %}">
