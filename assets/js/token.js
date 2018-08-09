@@ -1,4 +1,3 @@
-import '../scss/token-page.sass';
 import TokenInvest from '../components/TokenInvest';
 import TokenIntroduction from '../components/TokenIntroduction';
 import TokenDataForm from '../components/TokenDataForm';

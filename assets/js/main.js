@@ -8,28 +8,10 @@ import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand';
 import bNavbarToggle from 'bootstrap-vue/es/components/navbar/navbar-toggle';
 import bNavItem from 'bootstrap-vue/es/components/nav/nav-item';
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse';
+
 window.Vue = require('vue');
 
 Vue.options.delimiters = ['{[', ']}'];
-
-/**
- * Set description width equal to title.
- */
-function setHomepageDescriptionWidth() {
-    let homeShowcaseTitle =
-        document.querySelector('.homepage .top-showcase .title');
-    if (homeShowcaseTitle) {
-        let titleWidth = homeShowcaseTitle.offsetWidth;
-        document
-            .querySelector('.homepage .top-showcase .description')
-            .style.maxWidth = titleWidth + 'px';
-    }
-}
-
-setHomepageDescriptionWidth();
-window.onresize = function() {
-    setHomepageDescriptionWidth();
-};
 
 new Vue({
     el: '#navbar',
