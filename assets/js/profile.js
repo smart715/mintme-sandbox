@@ -1,5 +1,5 @@
-import PersonalDataForm from '../components/PersonalDataForm';
-import AccountSettings from '../components/AccountSettings';
+import PersonalDataForm from '../components/profile/PersonalDataForm';
+import AccountSettings from '../components/profile/AccountSettings';
 import Tabs from 'bootstrap-vue/es/components';
 
 new Vue({

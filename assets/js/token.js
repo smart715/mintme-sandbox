@@ -1,6 +1,6 @@
-import TokenInvest from '../components/TokenInvest';
-import TokenIntroduction from '../components/TokenIntroduction';
-import TokenDataForm from '../components/TokenDataForm';
+import TokenInvest from '../components/token/TokenInvest';
+import TokenIntroduction from '../components/token/TokenIntroduction';
+import TokenDataForm from '../components/token/TokenDataForm';
 import Tabs from 'bootstrap-vue/es/components';
 
 new Vue({

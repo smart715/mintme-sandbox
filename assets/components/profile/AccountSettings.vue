@@ -20,7 +20,5 @@
             EmailForm,
             passwordForm,
         },
-    }
-    ;
+    };
 </script>
-
