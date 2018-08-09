@@ -27,5 +27,5 @@ window.onresize = function() {
 };
 
 new Vue({
-    el: '#navbar'
+    el: '#navbar',
 });
