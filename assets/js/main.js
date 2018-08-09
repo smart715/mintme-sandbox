@@ -13,6 +13,13 @@ window.Vue = require('vue');
 
 Vue.options.delimiters = ['{[', ']}'];
 
+const imagesContext = require.context(
+    '../img',
+    false,
+    /\.(png|jpg|jpeg|gif|ico|svg)$/
+);
+imagesContext.keys().forEach(imagesContext);
+
 new Vue({
     el: '#navbar',
     components: {
