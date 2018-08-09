@@ -15,7 +15,7 @@
                     {% if action == 'edit' or action == 'new' %}
                         <b-tab title="Invest" disabled></b-tab>
                         <b-tab title="Introduction" disabled></b-tab>
-                        {% include 'default/token_form.html.twig' with {'action': action} %}
+                        {% include 'partials/token_form.html.twig' with {'action': action} %}
                     {% else %}
                     <b-tab title="Invest" {% if action == 'invest' %} {{ 'active' }} {% endif %}>
                         <token-invest></token-invest>
