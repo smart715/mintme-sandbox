@@ -1,1 +1,44 @@
 // Change bootstrap variables to match Mintme style
+
+// Fonts
+$open-sans-font: 'Open Sans', sans-serif;
+$lato-font: 'Lato', sans-serif;
+$oxygen-font: 'Oxygen', sans-serif;
+$base-font-size: 16px;
+
+// Borders
+$border-radius: 0;
+
+// Colors
+$primary: #55aded;
+
+$body-text-color: #1a1a1a;
+$gradiant-blue-100: #90c7ff;
+$gradiant-blue-200: #29abe2;
+$gradiant-blue-300: #4693fd;
+$gradiant-blue-400: #0071bc;
+$theme-blue: #007ab9;
+$theme-light-blue: #bedeff;
+$theme-yellow: #be8817;
+$theme-orange: #f7931e;
+$theme-green: #8dc63f;
+$color-tabs: #2797e8;
+$color-tabs-links: #0078bb;
+$color-slider-range: #007ABB;
+
+// Forms
+$input-bg: #e6e6e6;
+$input-btn-padding-y: .5rem;
+$input-btn-padding-x: 1rem;
+$input-focus-border-color: $input-bg;
+
+$input-btn-focus-color: $input-bg;
+
+// Card
+$card-border-width: 0;
+
+$card-header-bg-color: #007abb;
+
+// Pagination
+$pagination-color: $theme-blue;
+$pagination-border-width: 0;

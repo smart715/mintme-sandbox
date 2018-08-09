@@ -1,0 +1,37 @@
+@import "~bootstrap/scss/mixins"
+@import "variables"
+
+.footer-bg
+  background: url(../img/footer-main.png) no-repeat top right
+  background-size: cover
+  height: 12.5rem
+  @include media-breakpoint-up(sm)
+    height: 18.75rem
+  @include media-breakpoint-up(md)
+    height: 25rem
+  @include media-breakpoint-up(lg)
+    height: 31.25rem
+  @include media-breakpoint-up(xl)
+    height: 43.75rem
+  .bottom-links
+    padding-right: 14rem
+    padding-bottom: 8rem
+    @include media-breakpoint-down(lg)
+      padding-bottom: 0
+    @include media-breakpoint-down(md)
+      padding: 0
+    @include media-breakpoint-down(sm)
+      position: relative
+      bottom: 15rem
+      font-size: .875em
+    @include media-breakpoint-down(xs)
+      bottom: 7rem
+    .link-box
+      border-right: .0625rem solid $body-text-color
+      &:last-child
+        border: none
+      .list-item:last-child
+        padding-bottom: 0 !important
+      a
+        color: $body-text-color
+        text-decoration: none

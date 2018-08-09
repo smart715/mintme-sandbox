@@ -1,3 +1,147 @@
-@import '~bootstrap/scss/bootstrap'
+@import 'public'
 @import '~bootstrap-vue/dist/bootstrap-vue.css'
-@import 'variables'
+@import '~bootstrap/scss/bootstrap'
+@import '~vue-range-slider/dist/vue-range-slider'
+@import url('https://fonts.googleapis.com/css?family=Lato')
+@import 'topnav'
+@import 'header'
+@import 'footer'
+
+html
+  font-size: $base-font-size
+
+body
+  color: $body-text-color
+  font-family: $lato-font
+
+a
+  color: $theme-blue
+
+.text-yellow
+  color: $theme-yellow
+
+.text-green
+  color: $theme-green
+
+.text-orange
+  color: $theme-orange
+
+.text-blue
+  color: $theme-blue
+
+.h-100vh
+  height: 100vh
+
+.range-slider-fill
+  background: $color-slider-range
+
+.range-slider-knob
+  background: $color-slider-range
+  border: none
+
+label
+  margin: 0
+
+.card
+  .card-header
+    background: $card-header-bg-color
+    font-size: 1.2em
+    color: $white
+    padding: .75rem 1.5rem
+    span
+      font-size: .9em
+    .card-header-icon
+      float: right
+      color: $white
+  .card-title
+    margin: 0
+    font-size: 1.25em
+  &.transparent
+    background-color: transparent
+    >.card-header
+      background-color: $white
+      color: inherit
+
+.btn-primary
+  color: $white
+
+.gradient-bg
+  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100)
+
+.contents-wrapper
+  @include media-breakpoint-down(sm)
+    padding-bottom: 7rem
+
+.table
+  border: .0625rem solid $gray-400
+  th
+    font-weight: normal
+    font-size: .875em
+  td, th
+    &:first-child
+      padding-left: 2rem
+  tbody
+    background: darken($gray-100, 2%)
+
+.fix-layout
+  table-layout: fixed
+
+.tabs
+  .nav-tabs
+    display: flex
+    text-align: center
+    padding: 0 !important
+    font-size: 1.2rem
+    align-items: stretch
+    border: none
+    .nav-item
+      flex: 1 1 auto
+      padding: 0
+      .nav-link
+        border: none
+        background-color: $color-tabs
+        color: $white
+        padding: .75rem 1.5rem
+        &.disabled
+          cursor: default
+        &.active
+          background: $white
+          color: inherit
+  .tab-content
+    flex: 1 1 auto
+    padding: 1.25rem
+    background: $white
+  &.no-padding
+    .tab-content
+      padding: 0
+  &.transparent
+    .nav-tabs
+      position: relative
+      display: block
+      background: $white
+      text-align: left
+      border: .0625rem solid $white
+      .nav-item
+        display: inline-block
+        flex: initial
+        .nav-link
+            color: inherit
+            position: relative
+            background: $white
+            &.active::after
+              content: ' '
+              position: absolute
+              bottom: .75rem
+              left: 1.5rem
+              height: .125rem
+              background-color: $color-tabs-links
+              width: calc(100% - 3rem)
+      .edit-token-profile
+        position: absolute
+        top: 0
+        right: 0
+        height: 100%
+    .tab-content
+      flex: initial
+      padding: 1.25rem 0
+      background: none

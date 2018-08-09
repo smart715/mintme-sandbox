@@ -1,18 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{% block title %}Mint me{% endblock %}</title>
-    {% block stylesheets %}
-        <link rel="stylesheet" type="text/css" href="{{ asset('build/main.css') }}">
-    {% endblock %}
-</head>
-<body>
-    {% block content %}{% endblock %}
-    {% block javascripts %}
-        <script src="{{ asset('build/main.js') }}"></script>
-    {% endblock %}
-</body>
+<html lang="en" class="h-100vh">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>
+            {% block title %}MINTME{% endblock %}
+        </title>
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('build/main.css') }}">
+            {% block pagestyles %}{% endblock %}
+        {% endblock stylesheets %}
+    </head>
+    <body class="h-100vh {% block bodyclass %}{% endblock %}">
+        {% block body %}
+            {% block header %}
+                {% include 'topnav.html.twig' %}
+                {% block top_showcase %}{% endblock %}
+            {% endblock header %}
+            {% block main %}
+                <div class="d-table fix-layout w-100 h-100vh">
+                    <div class="d-table-row gradient-bg">
+                        <div class="d-table fix-layout w-100 h-100 flower-bg">
+                            <div class="d-table-row">
+                                <div class="d-table-cell header-bg"></div>
+                            </div>
+                            <div class="d-table-row">
+                                <div class="d-table-cell pt-5 contents-wrapper">
+                                    {% block content %}{% endblock content %}
+                                </div>
+                            </div>
+                            <div class="d-table-row">
+                                {% include 'footer.html.twig' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock main %}
+            {% block footer %}{% endblock footer %}
+        {% endblock body %}
+        {% block javascripts %}
+            <script src="{{ asset('build/main.js') }}"></script>
+            {% block pagescripts %}{% endblock %}
+        {% endblock javascripts %}
+    </body>
 </html>

@@ -1,0 +1,44 @@
+<b-navbar id="navbar" toggleable="lg" type="" class="top-navbar pt-3 pb-0">
+    <div class="container-fluid">
+        <b-navbar-brand href="{{ path('homepage') }}">
+            <img src="{{ asset('build/images/main-logo.png') }}" height="40" alt="MINTME">
+        </b-navbar-brand>
+        <b-navbar-toggle target="topnav_collapse" class="mt-2"/></b-navbar-toggle>
+        <b-collapse is-nav="is-nav" id="topnav_collapse">
+            <b-navbar-nav class="ml-auto">
+                <li class="search nav-item align-self-start align-self-lg-center py-3 py-lg-0 pr-0 pr-md-3">
+                    <input placeholder="Search for token... Use token name or wallet address" class="search-input form-control" type="search" aria-label="Search">
+                </li>
+                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token') }}">
+                    <span>My Token</span>
+                </b-nav-item>
+                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'trading' ? 'active' : '' }}" href="{{ path('trading') }}">
+                    Trading
+                </b-nav-item>
+                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
+                    Wallet
+                </b-nav-item>
+                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
+                    Login
+                </b-nav-item>
+                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
+                    <span>Sign Up</span>
+                </b-nav-item>
+                <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
+                    <template slot="button-content">
+                        <i class="d-block icon-profile-big"></i>
+                    </template>
+                    <b-dropdown-item href="{{ path('profile') }}">
+                        Profile
+                    </b-dropdown-item>
+                    <b-dropdown-item href="{{ path('token') }}">
+                        Token
+                    </b-dropdown-item>
+                    <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
+                        Log Out
+                    </b-dropdown-item>
+                </b-nav-item-dropdown>
+            </b-navbar-nav>
+        </b-collapse>
+    </div>
+</b-navbar>

@@ -2,15 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\Profile;
 use App\Form\EditEmailType;
-use App\Form\EditPasswordType;
 use App\Form\EditProfileType;
 use App\Form\Model\EmailModel;
 use App\Manager\ProfileManagerInterface;
 use App\Utils\MailerDispatcherInterface;
-use DateTime;
 use Doctrine\Common\Persistence\ObjectManager;
+use FOS\UserBundle\Form\Type\ResettingFormType;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,11 +42,11 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * @Route("/edit")
+     * @Route(name="profile")
      */
     public function editProfile(Request $request): Response
     {
-        return $this->render('pages/settings.html.twig', [
+        return $this->render('pages/profile.html.twig', [
             'profileForm' => $this->getProfileForm($request)->createView(),
             'emailForm' => $this->getEmailForm($request)->createView(),
             'passwordForm' => $this->getPasswordForm($request)->createView(),
@@ -82,7 +80,7 @@ class ProfileController extends AbstractController
     private function getPasswordForm(Request $request): FormInterface
     {
         $user = $this->getUser();
-        $passwordForm = $this->createForm(EditPasswordType::class, $user);
+        $passwordForm = $this->createForm(ResettingFormType::class, $user);
         $passwordForm->handleRequest($request);
 
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {

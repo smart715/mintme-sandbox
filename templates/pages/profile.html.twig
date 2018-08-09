@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MINTME | Profile{% endblock %}
+
+{% block bodyclass %}profile{% endblock %}
+
+{% block content %}
+    <div id="profile" class="container">
+        <div class="row">
+            <div class="col">
+                <b-tabs>
+                    <b-tab title="Personal data">
+                        {{ form_start(profileForm) }}
+                        <div class="row">
+                            <div class="col-lg-6">
+                                {{ form_row(profileForm.firstName) }}
+                                {{ form_row(profileForm.lastName) }}
+                                {{ form_row(profileForm.city) }}
+                                {{ form_row(profileForm.country) }}
+                            </div>
+                            <div class="col-lg-6">
+                                {{ form_row(profileForm.description) }}
+                                <button type="submit" class="btn btn-primary float-right px-5">Save</button>
+                            </div>
+                        </div>
+                        {{ form_end(profileForm) }}
+                    </b-tab>
+                    <b-tab title="Account settings">
+                        <div class="row m-0">
+                            <div class="col">
+                                {{ form_start(emailForm) }}
+                                    {{ form_rest(emailForm) }}
+                                    <button type="submit" class="btn btn-primary float-right px-5">Save</button>
+                                {{ form_end(emailForm) }}
+                            </div>
+                            <div class="col">
+                                {{ form_start(passwordForm) }}
+                                    {{ form_rest(passwordForm) }}
+                                    <button type="submit" class="btn btn-primary float-right px-5">Save</button>
+                                {{ form_end(passwordForm) }}
+                            </div>
+                        </div>
+                    </b-tab>
+                </b-tabs>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/profile.js') }}"></script>
+{% endblock %}

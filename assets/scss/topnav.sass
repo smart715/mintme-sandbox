@@ -1,0 +1,38 @@
+@import "~bootstrap/scss/mixins"
+@import "variables"
+
+.top-navbar
+  a
+    color: inherit
+  .active
+    color: $theme-green
+  .dropdown-toggle
+    border: none
+    &::after
+      display: none
+  .navbar-toggler-icon
+    background-image: $navbar-light-toggler-icon-bg
+  .search
+    @include media-breakpoint-down(md)
+      width: 100%
+  .search-input
+    background-color: $theme-light-blue
+    color: darken($primary, 10%)
+    border-color: darken($primary, 10%)
+    padding: .375rem .75rem
+    min-width: 32rem
+    @include media-breakpoint-down(lg)
+      min-width: 20rem
+    @include media-breakpoint-down(md)
+      min-width: auto
+    &::placeholder
+      color: darken($primary, 10%)
+      opacity: 1
+    &:focus
+      box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
+
+.icon-profile-big
+  width: 2.5em
+  height: 2.5em
+  background: url('../img/profile-big-icon.png') no-repeat
+  background-size: auto 100%
