@@ -14,5 +14,5 @@ function setHomepageDescriptionWidth() {
 
 setHomepageDescriptionWidth();
 window.onresize = function() {
-  setHomepageDescriptionWidth();
+    setHomepageDescriptionWidth();
 };
