@@ -8,6 +8,11 @@ import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand';
 import bNavbarToggle from 'bootstrap-vue/es/components/navbar/navbar-toggle';
 import bNavItem from 'bootstrap-vue/es/components/nav/nav-item';
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faSearch, faCog} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
+library.add(faSearch, faCog);
 window.Vue = require('vue');
 
 Vue.options.delimiters = ['{[', ']}'];
@@ -42,5 +47,6 @@ new Vue({
         bNavbarToggle,
         bNavItem,
         bCollapse,
+        FontAwesomeIcon,
     },
 });

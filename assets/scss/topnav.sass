@@ -1,6 +1,8 @@
 .top-navbar
   a
     color: inherit
+  a:hover
+    color: $gradiant-blue-400
   .active
     color: $theme-green
   .dropdown-toggle
@@ -27,6 +29,54 @@
       opacity: 1
     &:focus
       box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
+  .input-group-text
+    background: $white
+    border: none
+    font-weight: lighter
+    line-height: 1.5
+    font-size: 1.5rem
+  .icon
+    width: 1em
+    height: 1em
+    display: block
+    background-size: auto 100%
+    background-repeat: no-repeat
+  .icon-token
+    background-image: url('../img/token-icon.png')
+    width: 1.5em
+    height: 1.5em
+    display: block
+    background-size: auto 100%
+    background-repeat: no-repeat
+  .icon-profile
+    background-image: url('../img/profile-icon.png')
+    @extend .icon
+  .icon-profile-hover
+    background-image: url('../img/profile-icon_hover.png')
+    @extend .icon
+  .icon-logout
+    background-image: url('../img/logout-icon.png')
+    @extend .icon
+  .icon-logout-hover
+    background-image: url('../img/logout-icon_hover.png')
+    @extend .icon
+  .dropdown-menu
+    min-width: auto
+    box-shadow: 0 0.2em 0.1em 0 rgba(215, 215, 215, 0.6)
+    padding: 0.15rem
+    border-radius: 5px
+    .dropdown-item
+      color: $primary
+      width: auto
+      border-radius: 0.2em
+      transition: background-color 500ms
+    .dropdown-item:hover, .dropdown-item:focus
+      background-color: $primary
+      color: white
+      .icon-profile
+        @extend .icon-profile-hover
+      .icon-logout
+        @extend .icon-logout-hover
 
 .icon-profile-big
   width: 2.5em
