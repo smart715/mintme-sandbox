@@ -3,11 +3,9 @@
 namespace App\Controller;
 
 use App\Form\EditEmailType;
-use App\Form\EditProfileType;
 use App\Form\Model\EmailModel;
 use App\Manager\ProfileManagerInterface;
 use App\Utils\MailerDispatcherInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Form\Type\ResettingFormType;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -15,12 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * @Route("/profile")
- */
-class ProfileController extends AbstractController
+class UserController extends AbstractController
 {
     /** @var MailerDispatcherInterface */
     protected $mailDispatcher;
@@ -42,39 +36,14 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * @Route(name="profile")
+     * @Route("/settings", name="settings")
      */
-    public function editProfile(Request $request): Response
+    public function editUser(Request $request): Response
     {
-        return $this->render('pages/profile.html.twig', [
-            'profileForm' => $this->getProfileForm($request)->createView(),
+        return $this->render('pages/settings.html.twig', [
             'emailForm' => $this->getEmailForm($request)->createView(),
             'passwordForm' => $this->getPasswordForm($request)->createView(),
         ]);
-    }
-
-    private function getProfileForm(Request $request): FormInterface
-    {
-        $em = $this->getEntityManager();
-
-        $profile = $this->profileManager->getProfile($this->getUser());
-
-        if (null === $profile)
-            throw new NotFoundHttpException('Profile doesn\'t exist');
-
-        $profileForm = $this->createForm(EditProfileType::class, $profile);
-        $profileForm->handleRequest($request);
-
-        if ($profileForm->isSubmitted() && $profileForm->isValid()) {
-            if ($profile->isChangesLocked()) {
-                $this->profileManager->lockChangePeriod($profile);
-            }
-            $em->persist($profile);
-            $em->flush();
-            $this->addFlash('success', 'Profile was updated successfully');
-        }
-
-        return $profileForm;
     }
 
     private function getPasswordForm(Request $request): FormInterface
@@ -113,10 +82,5 @@ class ProfileController extends AbstractController
         }
 
         return $emailForm;
-    }
-
-    private function getEntityManager(): ObjectManager
-    {
-        return $this->getDoctrine()->getManager();
     }
 }

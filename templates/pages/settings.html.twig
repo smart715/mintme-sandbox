@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MINTME | Profile{% endblock %}
+
+{% block bodyclass %}profile{% endblock %}
+
+{% block content %}
+    <div id="profile" class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">Account settings</div>
+                    <div class="card-body m-0">
+                        <div class="row">
+                            <div class="col-6">
+                                {{ form_start(emailForm) }}
+                                {{ form_rest(emailForm) }}
+                                <button type="submit" class="btn btn-primary float-right px-5">Save</button>
+                                {{ form_end(emailForm) }}
+                            </div>
+                            <div class="col-6">
+                                {{ form_start(passwordForm) }}
+                                {{ form_rest(passwordForm) }}
+                                <button type="submit" class="btn btn-primary float-right px-5">Save</button>
+                                {{ form_end(passwordForm) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/profile.js') }}"></script>
+{% endblock %}
