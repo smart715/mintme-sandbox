@@ -19,9 +19,9 @@
     color: darken($primary, 10%)
     border-color: darken($primary, 10%)
     padding: .375rem .75rem
-    min-width: 32rem
+    min-width: 25rem
     @include media-breakpoint-down(lg)
-      min-width: 20rem
+      min-width: 12rem
     @include media-breakpoint-down(md)
       min-width: auto
     &::placeholder
@@ -30,7 +30,7 @@
     &:focus
       box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
   .input-group-text
-    background: $white
+    background: none
     border: none
     font-weight: lighter
     line-height: 1.5
