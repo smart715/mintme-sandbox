@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ValueObject;
+namespace App\Exchange;
 
 use App\Entity\Crypto;
 use App\Entity\Token;

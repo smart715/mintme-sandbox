@@ -46,5 +46,9 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc%'
 
+    App\Exchange\Market\MarketFetcher:
+        arguments:
+            $jsonRpc: '@viabtc.json_rpc'
+
     App\Communications\Factory\GuzzleRpcClientFactoryInterface: ~
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactoryInterface'

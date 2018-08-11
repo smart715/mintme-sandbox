@@ -3,8 +3,8 @@
 namespace App\Exchange\Trade;
 
 use App\Entity\User;
-use App\ValueObject\Market;
-use App\ValueObject\Order;
+use App\Exchange\Market;
+use App\Exchange\Order;
 
 interface TraderInterface
 {

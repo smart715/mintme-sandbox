@@ -5,10 +5,10 @@ namespace App\Exchange\Trade;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Entity\User;
+use App\Exchange\Market;
+use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
-use App\ValueObject\Market;
-use App\ValueObject\Order;
 
 class Trader implements TraderInterface
 {
@@ -36,7 +36,7 @@ class Trader implements TraderInterface
     public function placeOrder(Order $order): TradeResult
     {
         $params = [
-            $order->getUser()->getId(),
+            $order->getMakerId(),
             $order->getMarket()->getHiddenName(),
             $order->getSide(),
             $order->getAmount(),
@@ -64,7 +64,7 @@ class Trader implements TraderInterface
     public function cancelOrder(Order $order): TradeResult
     {
         $params = [
-            $order->getUser()->getId(),
+            $order->getMakerId(),
             $order->getMarket()->getHiddenName(),
             $order->getId(),
         ];
@@ -111,7 +111,7 @@ class Trader implements TraderInterface
         }
 
         $orders = array_map(function (array $rawOrder) use ($user, $market) {
-            return $this->createFinishedOrder($rawOrder, $user, $market);
+            return $this->createOrder($rawOrder, $user, $market, Order::FINISHED_STATUS);
         }, $response->getResult()['records']);
 
         return $orders;
@@ -144,35 +144,24 @@ class Trader implements TraderInterface
         }
 
         $orders = array_map(function (array $rawOrder) use ($user, $market) {
-            return $this->createPendingOrder($rawOrder, $user, $market);
+            return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $response->getResult()['records']);
 
         return $orders;
     }
 
-    private function createFinishedOrder(array $orderData, User $user, Market $market): Order
+    private function createOrder(array $orderData, User $user, Market $market, string $status): Order
     {
         return new Order(
             $orderData['id'],
-            $user,
+            $user->getId(),
+            null,
             $market,
             $orderData['amount'],
             $orderData['side'],
             $orderData['price'],
-            Order::FINISHED_STATUS
-        );
-    }
-
-    private function createPendingOrder(array $orderData, User $user, Market $market): Order
-    {
-        return new Order(
-            $orderData['id'],
-            $user,
-            $market,
-            $orderData['amount'],
-            $orderData['side'],
-            $orderData['price'],
-            Order::PENDING_STATUS
+            $status,
+            $orderData['mtime']
         );
     }
 

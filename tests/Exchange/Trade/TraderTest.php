@@ -6,11 +6,11 @@ use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Entity\User;
+use App\Exchange\Market;
+use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
-use App\ValueObject\Market;
-use App\ValueObject\Order;
 use PHPUnit\Framework\TestCase;
 
 class TraderTest extends TestCase
@@ -224,12 +224,11 @@ class TraderTest extends TestCase
 
     private function createOrder(): Order
     {
-        $user = $this->createUser();
         $market = $this->createMarket();
 
         $order = $this->createMock(Order::class);
         $order->method('getId')->willReturn(1);
-        $order->method('getUser')->willReturn($user);
+        $order->method('getMakerId')->willReturn(1);
         $order->method('getMarket')->willReturn($market);
         $order->method('getSide')->willReturn(1);
         $order->method('getAmount')->willReturn('10');
@@ -285,12 +284,14 @@ class TraderTest extends TestCase
         return [
             new Order(
                 2,
-                $this->createUser(),
+                1,
+                null,
                 $this->createMarket(),
                 '10',
                 1,
                 '5',
-                $status
+                $status,
+                1492697636
             ),
         ];
     }

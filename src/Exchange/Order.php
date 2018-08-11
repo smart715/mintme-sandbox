@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ValueObject;
+namespace App\Exchange;
 
 use App\Entity\User;
 
@@ -19,11 +19,14 @@ class Order
     public const FINISHED_STATUS = 'finished';
     public const PENDING_STATUS = 'pending';
 
-    /** @var int */
+    /** @var int|null */
     private $id;
 
-    /** @var User */
-    private $user;
+    /** @var int */
+    private $makerId;
+
+    /** @var int|null */
+    private $takerId;
 
     /** @var Market */
     private $market;
@@ -40,32 +43,44 @@ class Order
     /** @var string */
     private $status;
 
+    /** @var int|null */
+    private $timestamp;
+
     public function __construct(
-        int $id,
-        User $user,
+        ?int $id,
+        int $makerId,
+        ?int $takerId,
         Market $market,
         string $amount,
         int $side,
         string $price,
-        string $status
+        string $status,
+        ?int $timestamp = null
     ) {
         $this->id = $id;
-        $this->user = $user;
+        $this->makerId = $makerId;
+        $this->takerId = $takerId;
         $this->market = $market;
         $this->amount = $amount;
         $this->side = $side;
         $this->price = $price;
         $this->status = $status;
+        $this->timestamp = $timestamp;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUser(): User
+    public function getMakerId(): int
     {
-        return $this->user;
+        return $this->makerId;
+    }
+
+    public function getTakerId(): ?int
+    {
+        return $this->takerId;
     }
 
     public function getMarket(): Market
@@ -91,5 +106,10 @@ class Order
     public function getStatus(): string
     {
         return $this->status;
+    }
+
+    public function getTimestamp(): ?int
+    {
+        return $this->timestamp;
     }
 }
