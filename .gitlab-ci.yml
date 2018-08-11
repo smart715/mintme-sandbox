@@ -69,5 +69,3 @@ auto_merge_release_branch:
     - master
   allow_failure: true
 
-    
-    

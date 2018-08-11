@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block pagestyles %}
+    <link rel="stylesheet" href="{{ asset('build/profile-view.css') }}">
+{% endblock %}
+
+{% block bodyclass %}profile-view{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        {{ name }}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-md-4">
+                                <div class="pb-1">
+                                    City: {CityName}
+                                </div>
+                                <div class="pb-1">
+                                    Country: {CountryName}
+                                </div>
+                                <div class="pb-1">
+                                    {TokenName} created on July 2018
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-8 pt-3 pt-md-0 description">
+                                Lorem Ipsum is simply dummy text of the printing and
+                                typesetting industry. Lorem Ipsum has been the
+                                industry's standard dummy text ever since the 1500s,
+                                when an unknown printer took a galley of type and
+                                scrambled it to make a type specimen book.
+                            </div>
+                            <div class="col-12 pt-4 text-right">
+                                <a href="{{ path('profile') }}" class="btn btn-primary px-5">
+                                    Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

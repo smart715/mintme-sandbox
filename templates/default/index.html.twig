@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MINTME{% endblock %}
+
+{% block pagestyles %}
+    <link rel="stylesheet" href="{{ asset('build/home.css') }}">
+{% endblock %}
+
+{% block bodyclass %}homepage{% endblock %}
+
+{% block top_showcase %}
+    <div class="container-fluid top-showcase">
+        <div class="row">
+            <div class="col pt-5 pb-2 text-center">
+                <div class="d-inline-block">
+                    <span class="title text-blue">
+                        Lorem ipsum dolor sit amet, cum ullum propriae ex
+                    </span>
+                </div>
+                <div class="description pt-2 px-3">
+                    Aenean Cu ludus fastidii pertinax qui. No nec augue aperiam
+                    intellegebat, vel labores fabellas te. Tale euripidis
+                    eam at, usu cibo ponderum in. Atqui aeterno scribentur
+                    mel ea. Te mel deleniti detraxit comprehensam.
+                </div>
+                <div class="pt-4">
+                    <button class="btn btn-primary call-to-action">
+                        call to action
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row top features">
+            <div class="col-12 col-sm-6 text-right">
+                <div class="card d-inline-block text-left feature-1">
+                    <div class="card-body">
+                        <h1 class="text-blue">Feature 1</h1>
+                        <div class="contents">
+                            Ferri diceret hendrerit sed at, ne quo nihil vocent
+                            impedit, solet cotidieque ullamcorper eu per. Mea
+                            cu partiendo adipiscing.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <div class="card d-inline-block feature-2">
+                    <div class="card-body">
+                        <h1 class="text-blue">Feature 2</h1>
+                        <div class="contents">
+                            Ferri diceret hendrerit sed at, ne quo nihil vocent
+                            impedit, solet cotidieque ullamcorper eu per. Mea
+                            cu partiendo adipiscing. Aperiam detracto
+                            efficiantur eam ei, at nec perpetua explicari,
+                            ei meliore ullamcorper definitiones nam.
+                            His enim putant detraxit ea, aperiam splendide
+                            aliquando qui ea, cu urbanitas voluptatum vim.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row bottom features">
+            <div class="col-12 col-sm-6 text-right">
+                <div class="card d-inline-block text-left feature-3">
+                    <div class="card-body">
+                        <h1 class="text-blue">Feature 3</h1>
+                        <div class="contents">
+                            Ferri diceret hendrerit sed at, ne quo nihil vocent
+                            impedit, solet cotidieque ullamcorper eu per. Mea
+                            cu partiendo adipiscing. Aperiam detracto
+                            efficiantur eam ei, at nec perpetua explicari,
+                            ei meliore ullamcorper definitiones nam.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <div class="card d-inline-block feature-4">
+                    <div class="card-body">
+                        <h1 class="text-blue">Feature 4</h1>
+                        <div class="contents">
+                            Ferri diceret hendrerit sed at, ne quo nihil vocent
+                            impedit, solet cotidieque ullamcorper eu per. Mea
+                            cu partiendo adipiscing. Aperiam detracto
+                            efficiantur eam ei, at nec perpetua explicari,
+                            ei meliore ullamcorper definitiones nam.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

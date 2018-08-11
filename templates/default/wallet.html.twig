@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Wallet{% endblock %}
+
+{% block bodyclass %}wallet{% endblock %}
+
+{% block content %}
+    <div id="wallet" class="container">
+        <div class="row">
+            <div class="col">
+                <template>
+                    <b-tabs class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
+                        <b-tab title="Wallet" active>
+                            <wallet></wallet>
+                        </b-tab>
+                        <b-tab title="Trading History" >
+                            <trading-history></trading-history>
+                        </b-tab>
+                        <b-tab title="Deposit/Withdraw History" >
+                            <deposit-withdraw-history></deposit-withdraw-history>
+                        </b-tab>
+                        <b-tab title="Active Orders" >
+                            <active-orders></active-orders>
+                        </b-tab>
+                    </b-tabs>
+                </template>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/wallet.js') }}"></script>
+{% endblock %}
