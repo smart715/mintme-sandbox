@@ -68,9 +68,9 @@ class UserController extends AbstractController
         $emailForm = $this->createForm(EditEmailType::class, $email);
         $emailForm->handleRequest($request);
 
-        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
+        if ($emailForm->isSubmitted() && $emailForm->isValid() && $user->getEmail() !== $email->getEmail()) {
             // Create temporary user with new email and use him in email sender.
-            // Set new email as temproary for user
+            // Set new email as temporary for user
             $tmpUser = clone $user;
             $tmpUser->setEmail($email->getEmail());
             $user->setTempEmail($email->getEmail());
