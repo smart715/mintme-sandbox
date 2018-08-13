@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use App\Validator\Constraints as AppAssert;
+use App\Validator\Constraints\ProfilePeriodLock;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -22,6 +23,8 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/^\w+$/")
+     * @ProfilePeriodLock()
      * @var string|null
      */
     protected $firstName;
@@ -29,17 +32,25 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/^\w+$/")
+     * @ProfilePeriodLock()
      * @var string|null
      */
     protected $lastName;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Url()
-     * @AppAssert\IsUrlFromDomain("facebook.com")
+     * @Assert\Regex(pattern="/^\w+$/")
      * @var string|null
      */
-    protected $facebookUrl;
+    protected $city;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @Assert\Country()
+     * @var string|null
+     */
+    protected $country;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -48,7 +59,13 @@ class Profile
     protected $description;
 
     /**
-     * @ORM\OneToOne(targetEntity="User", orphanRemoval=true)
+     * @ORM\Column(type="datetime", nullable=true)
+     * @var DateTime|null
+     */
+    protected $nameChangedDate;
+
+    /**
+     * @ORM\OneToOne(targetEntity="User", inversedBy="profile", orphanRemoval=true)
      * @var User
      */
     protected $user;
@@ -58,6 +75,36 @@ class Profile
      * @var Token|null
      */
     protected $token;
+
+    /** @var bool */
+    private $isChangesLocked = false;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
+    public function isChangesLocked(): bool
+    {
+        return $this->isChangesLocked;
+    }
+
+    public function lockChanges(): self
+    {
+        $this->isChangesLocked = true;
+
+        return $this;
+    }
+
+    public function setNameChangedDate(?DateTime $nameChangedDate): void
+    {
+        $this->nameChangedDate = $nameChangedDate;
+    }
+
+    public function getNameChangedDate(): ?DateTime
+    {
+        return $this->nameChangedDate;
+    }
 
     public function setToken(?Token $token): self
     {
@@ -81,11 +128,6 @@ class Profile
         return $this->description;
     }
 
-    public function getFacebookUrl(): ?string
-    {
-        return $this->facebookUrl;
-    }
-
     public function setDescription(?string $description): self
     {
         $this->description = $description;
@@ -93,9 +135,26 @@ class Profile
         return $this;
     }
 
-    public function setFacebookUrl(?string $facebookUrl): self
+    public function getCity(): ?string
     {
-        $this->facebookUrl = $facebookUrl;
+        return $this->city;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getCountry(): ?string
+    {
+        return $this->country;
+    }
+
+    public function setCountry(?string $country): self
+    {
+        $this->country = $country;
 
         return $this;
     }

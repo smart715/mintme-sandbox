@@ -52,3 +52,7 @@ services:
 
     App\Communications\Factory\GuzzleRpcClientFactoryInterface: ~
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactoryInterface'
+
+    App\Utils\MailerDispatcher:
+        arguments:
+            $mailer: '@fos_user.mailer.default'
