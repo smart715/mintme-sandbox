@@ -24,4 +24,4 @@ parameters:
         - vendor/bin/.phpunit/phpunit-6.5/vendor/autoload.php
 
     ignoreErrors:
-        - '#Property (.*) does not accept Doctrine\\ORM\\EntityRepository<(.*)>\.#'
+        - '#Property (.+)Repository \((.+)Repository\) does not accept Doctrine\\ORM\\EntityRepository(.+).#'

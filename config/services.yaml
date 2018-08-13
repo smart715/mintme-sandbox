@@ -36,3 +36,7 @@ services:
 
     App\Manager\TokenManager: ~
     App\Manager\TokenManagerInterface: '@App\Manager\TokenManager'
+
+    App\Utils\MailerDispatcher:
+        arguments:
+            $mailer: '@fos_user.mailer.default'

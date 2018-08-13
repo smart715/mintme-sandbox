@@ -29,3 +29,4 @@ security:
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/my_token$, role: ROLE_USER }
         - { path: ^/token/, role: ROLE_USER }
+        - { path: ^/profile, role: ROLE_USER }
