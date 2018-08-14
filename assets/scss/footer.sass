@@ -2,30 +2,25 @@
 @import "variables"
 
 .footer-bg
-  background: url(../img/footer-main.png) no-repeat top right
-  background-size: cover
-  height: 12.5rem
-  @include media-breakpoint-up(sm)
-    height: 18.75rem
-  @include media-breakpoint-up(md)
-    height: 25rem
-  @include media-breakpoint-up(lg)
-    height: 31.25rem
-  @include media-breakpoint-up(xl)
-    height: 43.75rem
+  position: relative
+  .footer-box
+    position: absolute
+    top: 0
+    left: 0
   .bottom-links
-    padding-right: 14rem
-    padding-bottom: 8rem
+    padding-right: 10rem
+    padding-bottom: 6rem
     @include media-breakpoint-down(lg)
-      padding-bottom: 0
+      padding-right: 6rem
+      padding-bottom: 3rem
     @include media-breakpoint-down(md)
-      padding: 0
+      padding-right: 0
+      padding-bottom: 1rem
     @include media-breakpoint-down(sm)
       position: relative
-      bottom: 15rem
-      font-size: .875em
+      bottom: 13rem
     @include media-breakpoint-down(xs)
-      bottom: 7rem
+      bottom: 8rem
     .link-box
       border-right: .0625rem solid $body-text-color
       &:last-child
