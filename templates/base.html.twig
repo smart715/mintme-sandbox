@@ -24,7 +24,14 @@
                 {% endblock header %}
                 {% block main %}
                     <div class="pt-5 contents-wrapper">
-                    {% block content %}{% endblock content %}
+                        {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                                <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% block content %}{% endblock content %}
                     </div>
                 {% endblock main %}
                 {% block footer %}
