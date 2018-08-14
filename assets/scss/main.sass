@@ -35,10 +35,10 @@ a
   height: 100vh
 
 .range-slider-fill
-  background: $card-header-bg-color
+  background: $color-slider-range
 
 .range-slider-knob
-  background: $card-header-bg-color
+  background: $color-slider-range
   border: none
 
 label
@@ -88,7 +88,7 @@ label
 .fix-layout
   table-layout: fixed
 
-.tabs-theme
+.tabs
   .nav-tabs
     display: flex
     text-align: center
@@ -101,7 +101,7 @@ label
       padding: 0
       .nav-link
         border: none
-        background-color: $card-header-bg-color
+        background-color: $color-tabs
         color: $white
         padding: .75rem 1.5rem
         &.disabled
@@ -136,7 +136,7 @@ label
               bottom: .75rem
               left: 1.5rem
               height: .125rem
-              background-color: $card-header-bg-color
+              background-color: $color-tabs-links
               width: calc(100% - 3rem)
       .edit-token-profile
         position: absolute
@@ -145,5 +145,5 @@ label
         height: 100%
     .tab-content
       flex: initial
-      padding: 1.25rem 0rem
+      padding: 1.25rem 0
       background: none
