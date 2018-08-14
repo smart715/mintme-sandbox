@@ -1,4 +1,5 @@
 import '../scss/main.sass';
+import BootstrapVue from 'bootstrap-vue';
 import bNavItemDropdown
 from 'bootstrap-vue/es/components/nav/nav-item-dropdown';
 import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
@@ -14,6 +15,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 library.add(faSearch, faCog);
 window.Vue = require('vue');
+Vue.use(BootstrapVue);
 
 Vue.options.delimiters = ['{[', ']}'];
 
