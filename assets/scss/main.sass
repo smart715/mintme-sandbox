@@ -145,3 +145,14 @@ label
       flex: initial
       padding: 1.25rem 0
       background: none
+
+.modal.modal-alert
+  .modal-content
+    border-top: 1rem solid $modal-alert-border-color
+
+.modal.show
+  display: block
+  background-color: rgba(0, 0, 0, .5)
+
+.modal-dialog
+  @extend .modal-dialog-centered

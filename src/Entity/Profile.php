@@ -64,12 +64,6 @@ class Profile
      */
     protected $nameChangedDate;
 
-    /**
-     * @ORM\Column(type="boolean", options={"default":false})
-     * @var bool
-     */
-    protected $verified = false;
-
     /** @var bool */
     private $isChangesLocked = false;
 
@@ -187,17 +181,5 @@ class Profile
     public function getToken(): ?Token
     {
         return $this->token;
-    }
-
-    public function setVerified(bool $verified): self
-    {
-        $this->verified = $verified;
-
-        return $this;
-    }
-
-    public function getVerified(): bool
-    {
-        return $this->verified;
     }
 }

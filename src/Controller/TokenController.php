@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Token;
 use App\Form\TokenFormType;
+use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -16,40 +17,47 @@ use Symfony\Component\Routing\Annotation\Route;
 class TokenController extends AbstractController
 {
     /** @var EntityManagerInterface */
-    private $entityManager;
+    protected $em;
+
+    /** @var ProfileManagerInterface */
+    protected $profileManager;
 
     /** @var TokenManagerInterface */
-    private $tokenManager;
+    protected $tokenManager;
+
 
     public function __construct(
-        EntityManagerInterface $entityManager,
+        EntityManagerInterface $em,
+        ProfileManagerInterface $profileManager,
         TokenManagerInterface $tokenManager
     ) {
-        $this->entityManager = $entityManager;
+        $this->em = $em;
+        $this->profileManager = $profileManager;
         $this->tokenManager = $tokenManager;
     }
 
     /**
-     * @Route("/token/{name}", name="token_view")
+     * @Route("/token/{name}/{tab}", name="token_show",
+     * defaults={"tab" = "trade"}, requirements={"tab" = "trade|intro"})
      * @Method({"GET"})
      */
-    public function tokenView(Request $request, string $name): Response
+    public function show(Request $request, string $name): Response
     {
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('The token "'.$name.'" does not exist.');
+            return $this->render('default/token_not_exist.html.twig');
         }
 
-        return $this->render('defaults/token_view.html.twig', [
+        return $this->render('default/token.html.twig', [
             'token' => $token,
         ]);
     }
 
     /**
-     * @Route("/my_token", name="my_token")
+     * @Route("/token", name="token_create")
      */
-    public function myToken(Request $request): Response
+    public function create(Request $request): Response
     {
         if ($this->isTokenCreated())
             return $this->redirectToOwnToken();
@@ -59,16 +67,17 @@ class TokenController extends AbstractController
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
-            $profile = $this->getUser()->getProfile();
+            $profile = $this->profileManager->getProfile($this->getUser());
             $profile->setToken($token);
-            $this->entityManager->persist($profile);
-            $this->entityManager->flush();
+            //TODO: add 1 million tokens
+            $this->em->persist($profile);
+            $this->em->flush();
 
-            return $this->redirectToOwnToken();
+            return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
         }
 
-        return $this->render('defaults/my_token.html.twig', [
-            'formHeader' => 'Create token',
+        return $this->render('pages/token_creation.html.twig', [
+            'formHeader' => 'Plant your own token',
             'form' => $form->createView(),
             'profileCreated' => $this->isProfileCreated(),
         ]);
@@ -76,24 +85,25 @@ class TokenController extends AbstractController
 
     private function redirectToOwnToken(): RedirectResponse
     {
-        $token = $this->tokenManager->getOwnToken($this->getUser());
+        $token = $this->tokenManager->getOwnToken();
 
         if (null === $token) {
+            //FIXME: return "token not exist" template instead
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
-        return $this->redirectToRoute('token_view', [
+        return $this->redirectToRoute('token_show', [
             'name' => $token->getName(),
         ]);
     }
 
     private function isTokenCreated(): bool
     {
-        return null !== $this->tokenManager->getOwnToken($this->getUser());
+        return null !== $this->tokenManager->getOwnToken();
     }
 
     private function isProfileCreated(): bool
     {
-        return null !== $this->getUser()->getProfile();
+        return null !== $this->profileManager->getProfile($this->getUser());
     }
 }

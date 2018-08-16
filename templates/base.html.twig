@@ -10,14 +10,14 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('build/main.css') }}">
             {% block pagestyles %}{% endblock %}
-        {% endblock stylesheets %}
+        {% endblock %}
     </head>
     <body class="h-100vh {% block bodyclass %}{% endblock %}">
         {% block body %}
             {% block header %}
                 {% include 'topnav.html.twig' %}
                 {% block top_showcase %}{% endblock %}
-            {% endblock header %}
+            {% endblock %}
             {% block main %}
                 <div class="d-table fix-layout w-100 h-100vh">
                     <div class="d-table-row gradient-bg">
@@ -34,7 +34,7 @@
                                             </div>
                                         {% endfor %}
                                     {% endfor %}
-                                    {% block content %}{% endblock content %}
+                                    {% block content %}{% endblock %}
                                 </div>
                             </div>
                             <div class="d-table-row">
@@ -43,12 +43,12 @@
                         </div>
                     </div>
                 </div>
-            {% endblock main %}
-            {% block footer %}{% endblock footer %}
-        {% endblock body %}
+            {% endblock %}
+            {% block footer %}{% endblock %}
+        {% endblock %}
         {% block javascripts %}
             <script src="{{ asset('build/main.js') }}"></script>
             {% block pagescripts %}{% endblock %}
-        {% endblock javascripts %}
+        {% endblock %}
     </body>
 </html>

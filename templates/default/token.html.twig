@@ -12,25 +12,24 @@
     <div id="token" class="container">
         <div class="row">
             <div class="col">
-                <div class="h3 pl-4">
-                    {% if tokenName is defined %} {{ tokenName }} {% endif %}
-                </div>
+                <h1 class="token-name">{{ token.name }}</h1>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
-                    {% if action == 'edit' or action == 'new' %}
-                        <b-tab title="Invest" disabled></b-tab>
-                        <b-tab title="Introduction" disabled></b-tab>
-                        {% include 'default/token_form.html.twig' with {'action': action} %}
-                    {% else %}
-                    <b-tab title="Invest" {% if action == 'invest' %} {{ 'active' }} {% endif %}>
+                    <b-tab title="Invest">
                         <token-invest></token-invest>
                     </b-tab>
-                    <b-tab title="Introduction" {% if action == 'intro' %} {{ 'active' }} {% endif %}>
-                        <token-introduction></token-introduction>
+                    <b-tab title="Introduction" active>
+                        <div class="row">
+                            <token-introduction-profile container-class="col-12 col-md-6">
+                            </token-introduction-profile>
+
+                            <token-introduction-statistics container-class="col-12 col-md-6 mt-3 mt-md-0">
+                            </token-introduction-statistics>
+                        </div>
+                        <div class="row">
+                            <token-introduction-description container-class="col-12 mt-3 mt-3">
+                            </token-introduction-description>
+                        </div>
                     </b-tab>
-                    <div slot="tabs" v-if="tabIndex" class="pr-4 d-flex edit-token-profile">
-                        <a href="{{ path('token') }}" class="btn btn-primary align-self-center">Edit Token Profile</a>
-                    </div>
-                    {% endif %}
                 </b-tabs>
             </div>
         </div>

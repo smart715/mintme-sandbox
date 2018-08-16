@@ -25,6 +25,7 @@ $theme-green: #8dc63f;
 $color-tabs: #2797e8;
 $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
+$modal-alert-border-color: #4ecb22;
 
 // Forms
 $input-bg: #e6e6e6;
@@ -42,3 +43,10 @@ $card-header-bg-color: #007abb;
 // Pagination
 $pagination-color: $theme-blue;
 $pagination-border-width: 0;
+
+// Modal
+$modal-content-border-radius: $border-radius;
+$modal-content-border-width: 0;
+
+// Sizing
+$sizes: (70: 70%);

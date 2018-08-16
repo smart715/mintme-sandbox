@@ -17,22 +17,6 @@ class TokenFormType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, ['label' => 'Token name',])
-            ->add('websiteUrl', UrlType::class, [
-                'required' => false,
-                'label' => 'Website address',
-            ])
-            ->add('facebookUrl', UrlType::class, [
-                'required' => false,
-                'label' => 'Facebook',
-            ])
-            ->add('youtubeUrl', UrlType::class, [
-                'required' => false,
-                'label' => 'Youtube',
-            ])
-            ->add('description', TextareaType::class, [
-                'required' => false,
-                'label' => 'Description',
-            ])
         ;
     }
 

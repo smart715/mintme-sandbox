@@ -9,5 +9,5 @@ interface TokenManagerInterface
 {
     public function findByName(string $name): ?Token;
 
-    public function getOwnToken(User $user): ?Token;
+    public function getOwnToken(): ?Token;
 }

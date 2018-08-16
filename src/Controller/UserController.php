@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
-use App\Manager\ProfileManagerInterface;
 use App\Utils\MailerDispatcherInterface;
 use FOS\UserBundle\Form\Type\ResettingFormType;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -22,17 +21,12 @@ class UserController extends AbstractController
     /** @var UserManagerInterface */
     protected $userManager;
 
-    /** @var ProfileManagerInterface */
-    protected $profileManager;
-
     public function __construct(
         MailerDispatcherInterface $mailDispatcher,
-        UserManagerInterface $userManager,
-        ProfileManagerInterface $profileManager
+        UserManagerInterface $userManager
     ) {
         $this->mailDispatcher = $mailDispatcher;
         $this->userManager = $userManager;
-        $this->profileManager = $profileManager;
     }
 
     /**
