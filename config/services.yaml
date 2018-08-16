@@ -31,8 +31,27 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    viabtc.json_rpc:
+        class: App\Communications\GuzzleWrapper
+        arguments:
+            $url: '%viabtc_rpc%'
+            $timeoutSeconds: '%viabtc_response_timeout_seconds%'
+
+    App\Exchange\Trade\Config\LimitOrderConfig:
+        arguments:
+            $takerFeeRate: '%taker_fee_rate%'
+            $makerFeeRate: '%maker_fee_rate%'
+
+    App\Exchange\Trade\Trader:
+        arguments:
+            $jsonRpc: '@viabtc.json_rpc%'
+
+    App\Exchange\Market\MarketFetcher:
+        arguments:
+            $jsonRpc: '@viabtc.json_rpc'
+
+    App\Communications\Factory\GuzzleRpcClientFactoryInterface: ~
+    App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactoryInterface'
 
     App\Manager\TokenManager: ~
     App\Manager\TokenManagerInterface: '@App\Manager\TokenManager'
