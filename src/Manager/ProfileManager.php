@@ -22,9 +22,29 @@ class ProfileManager implements ProfileManagerInterface
     {
         return $this->profileRepository->getProfileByUser($user);
     }
+    public function getProfileByPageUrl(String $pageUrl): ?Profile
+    {
+        return $this->profileRepository->getProfileByPageUrl($pageUrl);
+    }
 
     public function lockChangePeriod(Profile $profile): void
     {
         $profile->setNameChangedDate(new DateTime('+1 month'));
+    }
+    
+    public function generatePageUrl(Profile $profile): String
+    {
+        if (empty($profile->getLastName()))
+            return "";
+
+        if (!empty($profile->getPageUrl()))
+            return $profile->getPageUrl();
+        
+        $currentPageUrl = $profile->getLastName();
+        if (!empty($profile->getFirstName()))
+            $currentPageUrl .= "." . $profile->getFirstName();
+        
+        $checkExistProfile = $this->profileRepository->getProfileByPageUrl($currentPageUrl);
+        return (null === $checkExistProfile)? strtolower($currentPageUrl) : strtolower($currentPageUrl).".".random_bytes(6);
     }
 }

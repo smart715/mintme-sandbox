@@ -79,9 +79,17 @@ class Profile
     /** @var bool */
     private $isChangesLocked = false;
 
+    /** @ORM\Column(type="string", length=255, nullable=true) */
+    private $page_url;
+
     public function __construct(User $user)
     {
         $this->user = $user;
+    }
+    
+    public function getUser(): ?User
+    {
+        return $this->user;
     }
 
     public function isChangesLocked(): bool
@@ -169,6 +177,18 @@ class Profile
     public function setLastName(?string $lastName): self
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getPageUrl(): ?string
+    {
+        return $this->page_url;
+    }
+
+    public function setPageUrl(?string $page_url): self
+    {
+        $this->page_url = $page_url;
 
         return $this;
     }

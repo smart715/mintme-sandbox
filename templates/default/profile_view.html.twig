@@ -9,42 +9,78 @@
 {% block bodyclass %}profile-view{% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div class="container" id="profile">
         <div class="row">
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        {{ name }}
+                        <span v-cloak>{[ lastName ]} {[ firstName ]} </span>
+                        {%- if (canedit == true) -%}
+                            <a @click="loadEditForm('{{ path('profile_edit') }}')">
+                                <font-awesome-icon icon="edit" class="ml-2"></font-awesome-icon>
+                            </a>
+                        {%- endif -%}
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 col-md-4">
-                                <div class="pb-1">
-                                    City: {CityName}
+                                <div v-if="!showEditForm">
+                                    <div class="text-right">
+                                        {%- if (canedit == true) -%}
+                                            <a @click="loadEditForm('{{ path('profile_edit') }}')">
+                                                <font-awesome-icon icon="edit" class="ml-2"></font-awesome-icon>
+                                            </a>
+                                        {%- endif -%}
+                                    </div>
+                                    <div class="pb-1" v-cloak>
+                                        City: {[ city ]} 
+                                    </div>
+                                    <div class="pb-1" v-cloak>
+                                        Country: {[ country ]} 
+                                    </div>
+                                    <div class="pb-1">
+                                        {TokenName} created on July 2018
+                                    </div>
                                 </div>
-                                <div class="pb-1">
-                                    Country: {CountryName}
-                                </div>
-                                <div class="pb-1">
-                                    {TokenName} created on July 2018
-                                </div>
+                                <child-form
+                                    v-if="showEditForm"
+                                    ref="formedit"
+                                    @success-submit="handleFormEditSubmit"
+                                    @error="handleFormEditError"
+                                    @close="showEditForm = false">
+                                </child-form>
                             </div>
+
                             <div class="col-12 col-md-8 pt-3 pt-md-0 description">
-                                Lorem Ipsum is simply dummy text of the printing and
-                                typesetting industry. Lorem Ipsum has been the
-                                industry's standard dummy text ever since the 1500s,
-                                when an unknown printer took a galley of type and
-                                scrambled it to make a type specimen book.
-                            </div>
-                            <div class="col-12 pt-4 text-right">
-                                <a href="{{ path('profile') }}" class="btn btn-primary px-5">
-                                    Edit
-                                </a>
+                                <div v-if="!showDescriptionEditForm">
+                                    <div class="text-right">
+                                        {%- if (canedit == true) -%}
+                                            <a @click="loadDescriptionEditForm('{{ path('profile_description_edit') }}')">
+                                                <font-awesome-icon icon="edit" class="ml-2"></font-awesome-icon>
+                                            </a> 
+                                        {%- endif -%}
+                                    </div>
+                                    <div v-cloak>{[ description ]}</div>
+                                </div>
+                                <child-form
+                                    v-if="showDescriptionEditForm"
+                                    ref="formdescriptionedit"
+                                    @success-submit="handleFormDescriptionEditSubmit"
+                                    @error="handleFormDescriptionEditError"
+                                    @close="showDescriptionEditForm = false">
+                                </child-form>
+                                
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+       <input type="hidden" id="initial-profile-data" value="{{ profile }}"/>
     </div>
 {% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/profile.js') }}"></script>
+{% endblock %}
+

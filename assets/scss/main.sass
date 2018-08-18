@@ -32,6 +32,15 @@ a
 .h-100vh
   height: 100vh
 
+[v-cloak]
+  & > .v-cloak--inline
+    display: inline
+  & > *:not(.v-cloak--inline)
+    display: none
+
+.v-cloak--inline
+  display: none
+
 .range-slider-fill
   background: $color-slider-range
 
