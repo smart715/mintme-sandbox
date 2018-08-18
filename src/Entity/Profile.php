@@ -79,8 +79,8 @@ class Profile
     /** @var bool */
     private $isChangesLocked = false;
 
-    /** 
-     * @ORM\Column(type="string", length=255, nullable=true) 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
      */
     private $page_url;

@@ -44,7 +44,6 @@ class DefaultController extends Controller
 
     /**
      * @Route("/profile/{pageUrl}", name="profile")
-     * 
      */
     public function profile(
         Request $request,
