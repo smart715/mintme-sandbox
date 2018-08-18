@@ -83,7 +83,8 @@ class DefaultController extends Controller
     
     public function addProfile(
         Request $request,
-        ProfileManagerInterface $profileManagerInterface
+        ProfileManagerInterface $profileManagerInterface,
+        SerializerInterface $serializer
     ): Response {
         $user = $this->getUser();
         $profile  = new Profile($user);
@@ -95,7 +96,7 @@ class DefaultController extends Controller
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();
-            return $this->viewProfile($profile);
+            return $this->viewProfile($profile, $serializer);
         }
         return $this->render('default/profile_form.html.twig', [
             'form' => $form->createView(),
