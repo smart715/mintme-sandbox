@@ -23,7 +23,7 @@ class TokenManagerTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->method('getRepository')->willReturn($tokenRepository);
 
-        $tokenManager = new TokenManager($entityManager);
+        $tokenManager = new TokenManager($entityManager, $this->createMock(ProfileFetcherInterface::class));
         $this->assertEquals($token, $tokenManager->findByName($name));
     }
 
@@ -34,19 +34,25 @@ class TokenManagerTest extends TestCase
         $profile = $this->createMock(Profile::class);
         $profile->method('getToken')->willReturn($token);
 
-        $user = $this->createMock(User::class);
-        $user->method('getProfile')->willReturn($profile);
+        $profileFetcher = $this->createMock(ProfileFetcherInterface::class);
+        $profileFetcher->method('fetchProfile')->willReturn($profile);
 
-        $tokenManager = new TokenManager($this->createMock(EntityManagerInterface::class));
-        $this->assertEquals($token, $tokenManager->getOwnToken($user));
+        $tokenManager = new TokenManager(
+            $this->createMock(EntityManagerInterface::class),
+            $profileFetcher
+        );
+        $this->assertEquals($token, $tokenManager->getOwnToken());
     }
 
     public function testGetOwnTokenWhenProfileNotCreated(): void
     {
-        $user = $this->createMock(User::class);
-        $user->method('getProfile')->willReturn(null);
+        $profileFetcher = $this->createMock(ProfileFetcherInterface::class);
+        $profileFetcher->method('fetchProfile')->willReturn(null);
 
-        $tokenManager = new TokenManager($this->createMock(EntityManagerInterface::class));
-        $this->assertEquals(null, $tokenManager->getOwnToken($user));
+        $tokenManager = new TokenManager(
+            $this->createMock(EntityManagerInterface::class),
+            $profileFetcher
+        );
+        $this->assertEquals(null, $tokenManager->getOwnToken());
     }
 }

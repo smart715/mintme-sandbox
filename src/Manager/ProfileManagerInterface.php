@@ -3,10 +3,13 @@
 namespace App\Manager;
 
 use App\Entity\Profile;
-use FOS\UserBundle\Model\UserInterface;
 
 interface ProfileManagerInterface
 {
-    public function getProfile(UserInterface $user): ?Profile;
+    /**
+     * @param mixed $user
+     */
+    public function getProfile($user): ?Profile;
+
     public function lockChangePeriod(Profile $profile): void;
 }

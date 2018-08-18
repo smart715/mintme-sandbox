@@ -11,12 +11,12 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TokenFormType extends AbstractType
+class TokenCreateType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, ['label' => 'Token name',])
+            ->add('name', TextType::class, ['label' => 'Token name'])
         ;
     }
 

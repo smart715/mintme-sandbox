@@ -6,13 +6,16 @@
     <link rel="stylesheet" href="{{ asset('build/token.css') }}">
 {% endblock %}
 
-{% block bodyclass %}token{% endblock %}
-
 {% block content %}
     <div id="token" class="container">
         <div class="row">
             <div class="col">
-                <h1 class="token-name">{{ token.name }}</h1>
+                <token-name
+                    name="{{ token.name }}"
+                    csrf-token="{{ csrf_token('update-token') }}"
+                    update-url="{{ path('token_update', {'name': token.name}) }}"
+                    :editable="{{ isOwner ? 'true' : 'false' }}">
+                </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Invest">
                         <token-invest></token-invest>

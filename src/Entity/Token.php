@@ -26,6 +26,7 @@ class Token
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
+     * @Assert\Length(min = 4, max = 255)
      * @var string
      */
     protected $name;

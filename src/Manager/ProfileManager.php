@@ -3,10 +3,10 @@
 namespace App\Manager;
 
 use App\Entity\Profile;
+use App\Entity\User;
 use App\Repository\ProfileRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\UserBundle\Model\UserInterface;
 
 class ProfileManager implements ProfileManagerInterface
 {
@@ -18,8 +18,15 @@ class ProfileManager implements ProfileManagerInterface
         $this->profileRepository = $entityManager->getRepository(Profile::class);
     }
 
-    public function getProfile(UserInterface $user): ?Profile
+    /**
+     * {@inheritdoc}
+     */
+    public function getProfile($user): ?Profile
     {
+        if (!$user instanceof User) {
+            return null;
+        }
+
         return $this->profileRepository->getProfileByUser($user);
     }
 
