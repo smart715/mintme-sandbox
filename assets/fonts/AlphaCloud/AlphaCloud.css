@@ -1,0 +1,12 @@
+@font-face {
+    font-family: 'AlphaCloud';
+    src: url('AlphaCloud.eot');
+    src: url('AlphaCloud.eot?#iefix') format('embedded-opentype'),
+        url('AlphaCloud.woff2') format('woff2'),
+        url('AlphaCloud.woff') format('woff'),
+        url('AlphaCloud.ttf') format('truetype'),
+        url('AlphaCloud.svg#AlphaCloud') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
