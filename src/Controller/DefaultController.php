@@ -61,7 +61,7 @@ class DefaultController extends Controller
         }
         $profile = $profileManagerInterface->getProfile($this->getUser());
         if (null === $profile)
-            return $this->addProfile($request, $profileManagerInterface);
+            return $this->addProfile($request, $profileManagerInterface, $serializer);
         
         return $this->viewProfile($profile, $serializer);
     }
