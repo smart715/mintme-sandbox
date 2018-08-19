@@ -2,7 +2,14 @@
     <div :class="containerClass">
         <div class="card">
             <div class="card-header">
-                Trade History
+                Sell Orders
+                <span class="card-header-icon">
+                    Total: xxxToken
+                    <font-awesome-icon
+                        icon="question"
+                        class="ml-1 mb-1 p-1 h4 bg-orange rounded-circle square"
+                    />
+                </span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
@@ -10,125 +17,83 @@
                         <thead>
                             <tr>
                                 <th>
-                                    Type
+                                    Price
                                     <font-awesome-icon icon="sort" />
                                 </th>
                                 <th>
-                                    Order maker
+                                    Amount
                                     <font-awesome-icon icon="sort" />
                                 </th>
                                 <th>
-                                    Order trader
+                                    Sum WEB
                                     <font-awesome-icon icon="sort" />
                                 </th>
                                 <th>
-                                    Price per token
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Token amount
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    WEB amount
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Date & Time
+                                    Trader
                                     <font-awesome-icon icon="sort" />
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                             <tr>
-                                <td>Sell</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
+                                <td>771.37300</td>
                                 <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
                             </tr>
                         </tbody>
                     </table>
@@ -146,7 +111,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 library.add(faSort);
 
 export default {
-    name: 'TokenInvestTradeHistory',
+    name: 'TokenTradeSellOrders',
     props: {
         containerClass: String,
     },

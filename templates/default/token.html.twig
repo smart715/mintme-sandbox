@@ -12,7 +12,7 @@
     <div id="token" class="container">
         <div class="row">
             <div class="col">
-                <div class="h3 pl-4">
+                <div class="h3 pl-4 font-weight-bold text-white">
                     {% if tokenName is defined %} {{ tokenName }} {% endif %}
                 </div>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
@@ -21,8 +21,8 @@
                         <b-tab title="Introduction" disabled></b-tab>
                         {% include 'default/token_form.html.twig' with {'action': action} %}
                     {% else %}
-                    <b-tab title="Invest" {% if action == 'invest' %} {{ 'active' }} {% endif %}>
-                        <token-invest></token-invest>
+                    <b-tab title="Trade" {% if action == 'invest' %} {{ 'active' }} {% endif %}>
+                        <token-trade></token-invest>
                     </b-tab>
                     <b-tab title="Introduction" {% if action == 'intro' %} {{ 'active' }} {% endif %}>
                         <token-introduction></token-introduction>
