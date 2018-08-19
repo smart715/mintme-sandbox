@@ -18,27 +18,30 @@
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                     Wallet
                 </b-nav-item>
+                {% if app.user %}
+                    <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
+                        <template slot="button-content">
+                            <i class="d-block icon-profile-big"></i>
+                        </template>
+                        <b-dropdown-item href="{{ path('settings') }}">
+                            Settings
+                        </b-dropdown-item>
+                        <b-dropdown-item href="{{ path('profile') }}/{{ app.user.profile.pageurl }}">
+                            Profile
+                        </b-dropdown-item>
+                        <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
+                            Log Out
+                        </b-dropdown-item>
+                    </b-nav-item-dropdown>
+                </b-navbar-nav>
+            {% else %}
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
                     Login
                 </b-nav-item>
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
                     <span>Sign Up</span>
                 </b-nav-item>
-                <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
-                    <template slot="button-content">
-                        <i class="d-block icon-profile-big"></i>
-                    </template>
-                    <b-dropdown-item href="{{ path('settings') }}">
-                        Settings
-                    </b-dropdown-item>
-                    <b-dropdown-item href="{{ path('token') }}">
-                        Token
-                    </b-dropdown-item>
-                    <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
-                        Log Out
-                    </b-dropdown-item>
-                </b-nav-item-dropdown>
-            </b-navbar-nav>
+            {% endif %}
         </b-collapse>
     </div>
 </b-navbar>
