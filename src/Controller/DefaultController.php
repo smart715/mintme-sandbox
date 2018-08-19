@@ -78,7 +78,7 @@ class DefaultController extends Controller
     
     public function profileNotFoundPage(): Response
     {
-        return $this->render('pages/profile_error.html.twig', []);
+        return $this->render('pages/profile_404.html.twig', []);
     }
     
     public function addProfile(
