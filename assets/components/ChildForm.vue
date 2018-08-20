@@ -8,8 +8,8 @@
                 slot="body">
             </div>
         </div>
-        <div class="row mb-3" v-if="!formLoaded">
-            <div class="col text-center">
+        <div class="row" v-if="!formLoaded">
+            <div class="col text-center mt-3">
                 <font-awesome-layers class="fa-3x">
                     <font-awesome-icon
                         icon="circle-notch"

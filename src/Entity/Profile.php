@@ -33,6 +33,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Length(min="2")
      * @ProfilePeriodLock()
      * @var string|null
      */
@@ -41,6 +42,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Length(min="2")
      * @var string|null
      */
     protected $city;
@@ -48,6 +50,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
+     * @Assert\Length(min="2")
      * @var string|null
      */
     protected $country;
@@ -90,11 +93,6 @@ class Profile
         $this->user = $user;
     }
     
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
     public function isChangesLocked(): bool
     {
         return $this->isChangesLocked;

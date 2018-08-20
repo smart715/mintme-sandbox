@@ -55,7 +55,6 @@ class User extends BaseUser
         return $this->profile;
     }
 
-
     public function getTempEmail(): ?string
     {
         return $this->tempEmail;

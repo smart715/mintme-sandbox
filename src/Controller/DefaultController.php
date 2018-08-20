@@ -72,7 +72,7 @@ class DefaultController extends Controller
     ): Response {
         return $this->render('default/profile_view.html.twig', [
             'profile' => $serializer->serialize($profile, 'json'),
-            'canedit' => ($profile->getUser() === $this->getUser())? true : false,
+            'canedit' => ($profile === $this->getUser()->getProfile()) ? true : false,
         ]);
     }
     
@@ -93,6 +93,9 @@ class DefaultController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $profile = $form->getData();
             $profile->setPageUrl($profileManagerInterface->generatePageUrl($profile));
+            $today = new \DateTime();
+            $today->format('Y-m-d H:i:s');
+            $profile->setNameChangedDate($today);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();
@@ -115,10 +118,18 @@ class DefaultController extends Controller
         $form = $this->createForm(EditProfileType::class, $profile, [
             'action' => $this->generateUrl('profile_edit'),
         ]);
+        if (!empty($profile->getNameChangedDate()) &&
+                $this->getNumberOfDays($profile->getNameChangedDate()) <= 30 ) {
+            $form->remove('lastname');
+            $form->remove('firstname');
+        }
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $profile = $form->getData();
             $profile->setPageUrl($profileManagerInterface->generatePageUrl($profile));
+            $today = new \DateTime();
+            $today->format('Y-m-d H:i:s');
+            $profile->setNameChangedDate($today);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();
@@ -198,5 +209,13 @@ class DefaultController extends Controller
             'header' => $header,
             'body' => $template,
         ]);
+    }
+    
+    private function getNumberOfDays(\DateTime $from): int
+    {
+        $today = new \DateTime();
+        $today->format('Y-m-d H:i:s');
+        $interval = $from->diff($today);
+        return intval($interval->format('%R%a'));
     }
 }

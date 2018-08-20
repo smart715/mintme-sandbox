@@ -13,8 +13,8 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div class="card-header">
-                        <span v-cloak>{[ lastName ]} {[ firstName ]} </span>
+                    <div class="card-header" v-cloak>
+                        <span>{[ lastName ]} {[ firstName ]} </span>
                         {%- if (canedit == true) -%}
                             <a @click="loadEditForm('{{ path('profile_edit') }}')">
                                 <font-awesome-icon icon="edit" class="ml-2"></font-awesome-icon>
@@ -23,7 +23,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-4"  v-cloak>
                                 <div v-if="!showEditForm">
                                     <div class="text-right">
                                         {%- if (canedit == true) -%}
@@ -32,10 +32,10 @@
                                             </a>
                                         {%- endif -%}
                                     </div>
-                                    <div class="pb-1" v-cloak>
+                                    <div class="pb-1">
                                         City: {[ city ]} 
                                     </div>
-                                    <div class="pb-1" v-cloak>
+                                    <div class="pb-1">
                                         Country: {[ country ]} 
                                     </div>
                                     <div class="pb-1">
@@ -51,7 +51,7 @@
                                 </child-form>
                             </div>
 
-                            <div class="col-12 col-md-8 pt-3 pt-md-0 description">
+                            <div class="col-12 col-md-8 pt-3 pt-md-0 description"  v-cloak>
                                 <div v-if="!showDescriptionEditForm">
                                     <div class="text-right">
                                         {%- if (canedit == true) -%}
@@ -60,7 +60,7 @@
                                             </a> 
                                         {%- endif -%}
                                     </div>
-                                    <div v-cloak>{[ description ]}</div>
+                                    <div>{[ description ]}</div>
                                 </div>
                                 <child-form
                                     v-if="showDescriptionEditForm"
