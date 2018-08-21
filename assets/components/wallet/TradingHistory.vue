@@ -1,64 +1,81 @@
 <template>
-    <div class="table-responsive">
-        <table class="table m-0 border-0">
-            <thead>
-                <tr>
-                    <th>Date <font-awesome-icon icon="sort" /></th>
-                    <th>Type <font-awesome-icon icon="sort" /></th>
-                    <th>Name <font-awesome-icon icon="sort" /></th>
-                    <th>Amount <font-awesome-icon icon="sort" /></th>
-                    <th>Price <font-awesome-icon icon="sort" /></th>
-                    <th>Total cost <font-awesome-icon icon="sort" /></th>
-                    <th>Free <font-awesome-icon icon="sort" /></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>12-12-1970</td>
-                    <td class="text-yellow">Sell</td>
-                    <td>[token]</td>
-                    <td>0.0000</td>
-                    <td>123456</td>
-                    <td>9876WEB</td>
-                    <td>9999</td>
-                </tr>
-                <tr>
-                    <td>12-12-1970</td>
-                    <td class="text-yellow">Sell</td>
-                    <td>Webchain (WEB)</td>
-                    <td>0.0000</td>
-                    <td>123456</td>
-                    <td>9876WEB</td>
-                    <td>9999</td>
-                </tr>
-                <tr>
-                    <td>12-12-1970</td>
-                    <td class="text-green">Buy</td>
-                    <td>[token]</td>
-                    <td>0.0000</td>
-                    <td>123456</td>
-                    <td>9876WEB</td>
-                    <td>9999</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="pb-3">
+        <div class="table-responsive">
+            <b-table
+                :items="history"
+                :fields="fields"
+                :current-page="currentPage"
+                :per-page="perPage">
+            </b-table>
+        </div>
+        <div class="row justify-content-center">
+            <b-pagination
+                :total-rows="totalRows"
+                :per-page="perPage"
+                v-model="currentPage"
+                class="my-0" />
+        </div>
     </div>
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faSort} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faSort);
-
 export default {
     name: 'TradingHistory',
     data() {
-        return {};
+        return {
+            history: [],
+            currentPage: 1,
+            perPage: 10,
+            fields: {
+                date: {
+                    label: 'Date',
+                    sortable: true,
+                },
+                type: {
+                    label: 'Type',
+                    sortable: true,
+                },
+                name: {
+                    label: 'Name',
+                    sortable: true,
+                },
+                amount: {
+                    label: 'Amount',
+                    sortable: true,
+                },
+                price: {
+                    label: 'Price',
+                    sortable: true,
+                },
+                total: {
+                    label: 'Total cost',
+                    sortable: true,
+                },
+                free: {
+                    label: 'Free',
+                    sortable: true,
+                },
+            },
+        };
     },
-    components: {
-        FontAwesomeIcon,
+    computed: {
+        totalRows: function() {
+            return this.history.length;
+        },
+    },
+    created: function() {
+        // TODO: This is a dummy simulator.
+        for (let i = 0; i < 100; i++) {
+            this.history.push({
+                date: '12-12-1970',
+                type: (i % 2 === 0) ? 'Buy' : 'Sell',
+                name: 'Webchain (WEB)',
+                amount: Math.floor(Math.random() * 99) + 10,
+                price: Math.floor(Math.random() * 99) + 10,
+                total: Math.floor(Math.random() * 99) + 10 + 'WEB',
+                free: Math.floor(Math.random() * 99) + 10,
+            });
+        }
     },
 };
 </script>

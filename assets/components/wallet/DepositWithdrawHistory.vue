@@ -1,73 +1,81 @@
 <template>
-    <div class="table-responsive">
-        <table class="table m-0 border-0">
-            <thead>
-                <tr>
-                    <th>Date <font-awesome-icon icon="sort" /></th>
-                    <th>Type <font-awesome-icon icon="sort" /></th>
-                    <th>Address <font-awesome-icon icon="sort" /></th>
-                    <th>Amount <font-awesome-icon icon="sort" /></th>
-                    <th>Balance <font-awesome-icon icon="sort" /></th>
-                    <th>Status <font-awesome-icon icon="sort" /></th>
-                    <th>Free <font-awesome-icon icon="sort" /></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>12-12-1970</td>
-                    <td>Deposit</td>
-                    <td>0xe1f05911dba854fwc...</td>
-                    <td>0.0000</td>
-                    <td>0</td>
-                    <td>OK</td>
-                    <td>9999</td>
-                </tr>
-                <tr>
-                    <td>12-12-1970</td>
-                    <td>Withdraw</td>
-                    <td>0xe1f05911dba854fwc...</td>
-                    <td>0.0000</td>
-                    <td>0</td>
-                    <td>OK</td>
-                    <td>9999</td>
-                </tr>
-                <tr>
-                    <td>12-12-1970</td>
-                    <td>Deposit</td>
-                    <td>0xe1f05911dba854fwc...</td>
-                    <td>0.0000</td>
-                    <td>0</td>
-                    <td>OK</td>
-                    <td>9999</td>
-                </tr>
-                <tr>
-                    <td>12-12-1970</td>
-                    <td>Deposit</td>
-                    <td>0xe1f05911dba854fwc...</td>
-                    <td>0.0000</td>
-                    <td>0</td>
-                    <td>OK</td>
-                    <td>9999</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="pb-3">
+        <div class="table-responsive">
+            <b-table
+                :items="history"
+                :fields="fields"
+                :current-page="currentPage"
+                :per-page="perPage">
+            </b-table>
+        </div>
+        <div class="row justify-content-center">
+            <b-pagination
+                :total-rows="totalRows"
+                :per-page="perPage"
+                v-model="currentPage"
+                class="my-0" />
+        </div>
     </div>
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faSort} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faSort);
-
 export default {
     name: 'DepositWithdrawHistory',
     data() {
-        return {};
+        return {
+            history: [],
+            currentPage: 1,
+            perPage: 10,
+            fields: {
+                date: {
+                    label: 'Date',
+                    sortable: true,
+                },
+                type: {
+                    label: 'Type',
+                    sortable: true,
+                },
+                address: {
+                    label: 'Address',
+                    sortable: true,
+                },
+                amount: {
+                    label: 'Amount',
+                    sortable: true,
+                },
+                price: {
+                    label: 'Price',
+                    sortable: true,
+                },
+                total: {
+                    label: 'Total cost',
+                    sortable: true,
+                },
+                free: {
+                    label: 'Free',
+                    sortable: true,
+                },
+            },
+        };
     },
-    components: {
-        FontAwesomeIcon,
+    computed: {
+        totalRows: function() {
+            return this.history.length;
+        },
+    },
+    created: function() {
+        // TODO: This is a dummy simulator.
+        for (let i = 0; i < 100; i++) {
+            this.history.push({
+                date: '12-12-1970',
+                type: (i % 2 === 0) ? 'Deposit' : 'Withdraw',
+                address: '0xe1f05911dba854fwc...',
+                amount: Math.floor(Math.random() * 99) + 10,
+                price: Math.floor(Math.random() * 99) + 10,
+                total: Math.floor(Math.random() * 99) + 10 + 'WEB',
+                free: Math.floor(Math.random() * 99) + 10,
+            });
+        }
     },
 };
 </script>
