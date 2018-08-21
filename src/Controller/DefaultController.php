@@ -18,12 +18,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class DefaultController extends Controller
 {
-    /**
+     /**
      * @Route("/", name="homepage")
      */
     public function index(): Response
     {
-        return $this->render('default/index.html.twig');
+        return $this->render('pages/index.html.twig');
     }
 
     /**
@@ -31,7 +31,7 @@ class DefaultController extends Controller
      */
     public function trading(): Response
     {
-        return $this->render('default/trading.html.twig');
+        return $this->render('pages/trading.html.twig');
     }
 
     /**
@@ -39,7 +39,7 @@ class DefaultController extends Controller
      */
     public function wallet(): Response
     {
-        return $this->render('default/wallet.html.twig');
+        return $this->render('pages/wallet.html.twig');
     }
 
     /**
@@ -70,7 +70,7 @@ class DefaultController extends Controller
         Profile $profile,
         SerializerInterface $serializer
     ): Response {
-        return $this->render('default/profile_view.html.twig', [
+        return $this->render('pages/profile_view.html.twig', [
             'profile' => $serializer->serialize($profile, 'json'),
             'canedit' => ($profile === $this->getUser()->getProfile()) ? true : false,
         ]);
@@ -101,7 +101,7 @@ class DefaultController extends Controller
             $entityManager->flush();
             return $this->viewProfile($profile, $serializer);
         }
-        return $this->render('default/profile_form.html.twig', [
+        return $this->render('pages/profile.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -191,7 +191,7 @@ class DefaultController extends Controller
             $tokenName = null;
         }
 
-        return $this->render('default/token.html.twig', [
+        return $this->render('pages/token.html.twig', [
             'tokenName' => $tokenName,
             'action' => $action,
         ]);
@@ -199,7 +199,7 @@ class DefaultController extends Controller
        
     private function renderAjaxForm(FormInterface $form, string $header = ''): Response
     {
-        $template = $this->renderView('default/ajax_form.html.twig', [
+        $template = $this->renderView('pages/ajax_form.html.twig', [
             'form' => $form->createView(),
         ]);
         return new JsonResponse([
