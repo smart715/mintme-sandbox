@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import LineChart from '../js/line-chart';
+import LineChart from '../../js/line-chart';
 
 export default {
   name: 'TokenInvestChart',
