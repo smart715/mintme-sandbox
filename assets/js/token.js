@@ -7,9 +7,7 @@ import Tabs from 'bootstrap-vue/es/components';
 new Vue({
   el: '#token',
   data() {
-    return {
-      tabIndex: 0,
-    };
+    return {};
   },
   components: {
     TokenTrade,

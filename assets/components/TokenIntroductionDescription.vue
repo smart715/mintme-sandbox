@@ -3,6 +3,12 @@
         <div class="card h-100">
             <div class="card-header">
                 Description
+                <span class="card-header-icon text-white">
+                    <font-awesome-icon
+                        icon="question"
+                        class="m-0 p-1 h4 bg-orange rounded-circle square"
+                    />
+                </span>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -20,6 +26,12 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faQuestion} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
+library.add(faQuestion);
+
 export default {
     name: 'TokenIntroductionDescription',
     props: {
@@ -27,6 +39,9 @@ export default {
     },
     data() {
         return {};
+    },
+    components: {
+        FontAwesomeIcon,
     },
 };
 </script>

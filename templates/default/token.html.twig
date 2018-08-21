@@ -15,7 +15,7 @@
                 <div class="h3 pl-4 font-weight-bold text-white">
                     {% if tokenName is defined %} {{ tokenName }} {% endif %}
                 </div>
-                <b-tabs class="tabs-theme transparent" v-model="tabIndex">
+                <b-tabs class="tabs-theme transparent">
                     {% if action == 'edit' or action == 'new' %}
                         <b-tab title="Invest" disabled></b-tab>
                         <b-tab title="Introduction" disabled></b-tab>
@@ -27,9 +27,6 @@
                     <b-tab title="Introduction" {% if action == 'intro' %} {{ 'active' }} {% endif %}>
                         <token-introduction></token-introduction>
                     </b-tab>
-                    <div slot="tabs" v-if="tabIndex" class="pr-4 d-flex edit-token-profile">
-                        <a href="{{ path('token') }}" class="btn btn-primary align-self-center">Edit Token Profile</a>
-                    </div>
                     {% endif %}
                 </b-tabs>
             </div>
