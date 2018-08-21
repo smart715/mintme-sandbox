@@ -169,8 +169,6 @@ class DefaultController extends Controller
         return $this->renderAjaxForm($form);
     }
     
-    
-
     /**
      * @Route("/token/{name}/{tab}", name="token")
      */
@@ -198,8 +196,7 @@ class DefaultController extends Controller
             'action' => $action,
         ]);
     }
-    
-    
+       
     private function renderAjaxForm(FormInterface $form, string $header = ''): Response
     {
         $template = $this->renderView('default/ajax_form.html.twig', [

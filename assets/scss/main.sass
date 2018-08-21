@@ -1,5 +1,4 @@
-@import 'public'
-@import '~bootstrap-vue/dist/bootstrap-vue.css'
+@import 'variables'
 @import '~bootstrap/scss/bootstrap'
 @import '~vue-range-slider/dist/vue-range-slider'
 @import url('https://fonts.googleapis.com/css?family=Lato')
@@ -7,6 +6,9 @@
 @import 'topnav'
 @import 'header'
 @import 'footer'
+@import 'home-page'
+@import 'token-page'
+@import 'profile-view-page'
 
 html
   font-size: $base-font-size
@@ -22,6 +24,11 @@ a
 .text-yellow
   color: $theme-yellow
 
+.errors
+  font-family: $cloud-font
+  font-size: 4rem
+  color: $white
+ 
 .text-green
   color: $theme-green
 
