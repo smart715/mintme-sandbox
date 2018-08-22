@@ -8,6 +8,12 @@ import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand';
 import bNavbarToggle from 'bootstrap-vue/es/components/navbar/navbar-toggle';
 import bNavItem from 'bootstrap-vue/es/components/nav/nav-item';
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse';
+import fontawesome from '@fortawesome/fontawesome';
+import fas from '@fortawesome/fontawesome-free-solid';
+import fab from '@fortawesome/fontawesome-free-brands';
+import far from '@fortawesome/fontawesome-free-regular';
+fontawesome.library.add(fas, far, fab);
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 
 window.Vue = require('vue');
 
@@ -31,5 +37,7 @@ new Vue({
         bNavbarToggle,
         bNavItem,
         bCollapse,
+        FontAwesomeIcon,
+        FontAwesomeLayers,
     },
 });

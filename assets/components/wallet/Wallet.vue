@@ -64,11 +64,7 @@
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faSort, faQuestion} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faSort, faQuestion);
 
 export default {
     name: 'Wallet',
