@@ -12,39 +12,32 @@
             {% block pagestyles %}{% endblock %}
         {% endblock stylesheets %}
     </head>
-    <body class="h-100vh {% block bodyclass %}{% endblock %}">
+    <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
         {% block body %}
-            {% block header %}
-                {% include 'topnav.html.twig' %}
-                {% block top_showcase %}{% endblock %}
-            {% endblock header %}
-            {% block main %}
-                <div class="d-table fix-layout w-100 h-100vh">
-                    <div class="d-table-row gradient-bg">
-                        <div class="d-table fix-layout w-100 h-100 flower-bg">
-                            <div class="d-table-row">
-                                <div class="d-table-cell header-bg"></div>
-                            </div>
-                            <div class="d-table-row">
-                                <div class="d-table-cell pt-5 contents-wrapper">
-                                    {% for label, messages in app.flashes %}
-                                        {% for message in messages %}
-                                            <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
-                                                {{ message }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endfor %}
-                                    {% block content %}{% endblock content %}
-                                </div>
-                            </div>
-                            <div class="d-table-row">
-                                {% include 'footer.html.twig' %}
-                            </div>
-                        </div>
+            <div class="{% block contentclass %}{% endblock %}">
+                {% block header %}
+                    <div class="header-white">
+                        {% include 'topnav.html.twig' %}
+                        {% block top_showcase %}{% endblock %}
                     </div>
-                </div>
-            {% endblock main %}
-            {% block footer %}{% endblock footer %}
+                    <div class="header-bg"></div>
+                {% endblock header %}
+                {% block main %}
+                    <div class="pt-5 contents-wrapper">
+                        {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                                <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% block content %}{% endblock content %}
+                    </div>
+                {% endblock main %}
+                {% block footer %}
+                    {% include 'footer.html.twig' %}
+                {% endblock footer %}
+            </div>
         {% endblock body %}
         {% block javascripts %}
             <script src="{{ asset('build/main.js') }}"></script>
