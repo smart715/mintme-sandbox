@@ -13,7 +13,7 @@ class DefaultController extends Controller
      */
     public function index(): Response
     {
-        return $this->render('default/index.html.twig');
+        return $this->render('pages/index.html.twig');
     }
 
     /**
@@ -21,7 +21,7 @@ class DefaultController extends Controller
      */
     public function trading(): Response
     {
-        return $this->render('default/trading.html.twig');
+        return $this->render('pages/trading.html.twig');
     }
 
     /**
@@ -29,7 +29,15 @@ class DefaultController extends Controller
      */
     public function wallet(): Response
     {
-        return $this->render('default/wallet.html.twig');
+        return $this->render('pages/wallet.html.twig');
+    }
+
+    /**
+     * @Route("/profile", name="profile")
+     */
+    public function profile(): Response
+    {
+        return $this->render('pages/profile.html.twig');
     }
 
     /**
@@ -37,7 +45,7 @@ class DefaultController extends Controller
      */
     public function profileView(String $name): Response
     {
-        return $this->render('default/profile_view.html.twig', [
+        return $this->render('pages/profile_view.html.twig', [
             'name' => $name,
         ]);
     }
@@ -47,7 +55,7 @@ class DefaultController extends Controller
      */
     public function token(?String $name = null, ?String $tab = null): Response
     {
-        // FIXME: This data is for view test only.
+        // FIXME: This is for view test only.
         $tokenName = $name;
         $action = 'invest';
         $tab = strtolower(strval($tab));
@@ -64,7 +72,7 @@ class DefaultController extends Controller
             $tokenName = null;
         }
 
-        return $this->render('default/token.html.twig', [
+        return $this->render('pages/token.html.twig', [
             'tokenName' => $tokenName,
             'action' => $action,
         ]);

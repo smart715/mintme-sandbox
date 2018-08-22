@@ -2,10 +2,6 @@
 
 {% block title %}Token{% endblock %}
 
-{% block pagestyles %}
-    <link rel="stylesheet" href="{{ asset('build/token.css') }}">
-{% endblock %}
-
 {% block bodyclass %}token{% endblock %}
 
 {% block content %}
@@ -19,7 +15,7 @@
                     {% if action == 'edit' or action == 'new' %}
                         <b-tab title="Invest" disabled></b-tab>
                         <b-tab title="Introduction" disabled></b-tab>
-                        {% include 'default/token_form.html.twig' with {'action': action} %}
+                        {% include 'partials/token_form.html.twig' with {'action': action} %}
                     {% else %}
                     <b-tab title="Trade" {% if action == 'invest' %} {{ 'active' }} {% endif %}>
                         <token-trade></token-invest>

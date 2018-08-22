@@ -9,12 +9,8 @@ Encore
     .addEntry('home', './assets/js/home.js')
     .addEntry('trading', './assets/js/trading.js')
     .addEntry('profile', './assets/js/profile.js')
-    .addEntry('profile-view', './assets/js/profile-view.js')
     .addEntry('wallet', './assets/js/wallet.js')
     .addEntry('token', './assets/js/token.js')
-    // this script's purpose is solely to "touch" images so that webpack
-    // will "notice" them and include to the build.
-    .addEntry('assets', './assets/js/assets.js')
 
     .enablePostCssLoader()
 

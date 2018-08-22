@@ -22,12 +22,12 @@
 </template>
 
 <script>
-import TokenTradeBuyOrder from '../components/TokenTradeBuyOrder';
-import TokenTradeSellOrder from '../components/TokenTradeSellOrder';
-import TokenTradeChart from '../components/TokenTradeChart';
-import TokenTradeBuyOrders from '../components/TokenTradeBuyOrders';
-import TokenTradeSellOrders from '../components/TokenTradeSellOrders';
-import TokenTradeTradeHistory from '../components/TokenTradeTradeHistory';
+import TokenTradeBuyOrder from './TokenTradeBuyOrder';
+import TokenTradeSellOrder from './TokenTradeSellOrder';
+import TokenTradeChart from './TokenTradeChart';
+import TokenTradeBuyOrders from './TokenTradeBuyOrders';
+import TokenTradeSellOrders from './TokenTradeSellOrders';
+import TokenTradeTradeHistory from './TokenTradeTradeHistory';
 
 export default {
   name: 'TokenTrade',
