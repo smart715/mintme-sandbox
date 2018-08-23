@@ -5,7 +5,7 @@
             <b-table
                 :items="tokens"
                 :fields="fields"
-                :current-page="currentPage"
+                :current-page=
                 :per-page="perPage">
             </b-table>
         </div>

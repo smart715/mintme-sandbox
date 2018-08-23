@@ -19,11 +19,6 @@
 </template>
 
 <script>
-<<<<<<< HEAD
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-=======
->>>>>>> 06ee66073d54dda8a04abb9ed1e1d48a0a5d879a
 export default {
     name: 'DepositWithdrawHistory',
     data() {
