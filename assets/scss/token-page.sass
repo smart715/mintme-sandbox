@@ -1,21 +1,15 @@
-@import 'public'
-
-.token-name
-  color: $white
-  font-size: 1.75rem
-
-
-.buy-order, .sell-order
-  @include media-breakpoint-up('lg')
-    max-width: 35%
-.chart
-  @include media-breakpoint-up('lg')
-    max-width: 30%
-.fix-height
-  max-height: 28rem
-canvas
-  max-height: 14rem
-  background-color: #c0deff
+#token
+  .buy-order, .sell-order
+    @include media-breakpoint-up('lg')
+      max-width: 35%
+  .chart
+    @include media-breakpoint-up('lg')
+      max-width: 30%
+  .fix-height
+    max-height: 28rem
+  canvas
+    max-height: 14rem
+    background-color: $theme-light-blue
 
 #token-data-form
   .custom-btn

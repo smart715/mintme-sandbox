@@ -13,7 +13,7 @@ class DefaultController extends Controller
      */
     public function index(): Response
     {
-        return $this->render('default/index.html.twig');
+        return $this->render('pages/index.html.twig');
     }
 
     /**
@@ -21,7 +21,7 @@ class DefaultController extends Controller
      */
     public function trading(): Response
     {
-        return $this->render('default/trading.html.twig');
+        return $this->render('pages/trading.html.twig');
     }
 
     /**
@@ -29,7 +29,15 @@ class DefaultController extends Controller
      */
     public function wallet(): Response
     {
-        return $this->render('default/wallet.html.twig');
+        return $this->render('pages/wallet.html.twig');
+    }
+
+    /**
+     * @Route("/profile", name="profile")
+     */
+    public function profile(): Response
+    {
+        return $this->render('pages/profile.html.twig');
     }
 
     /**

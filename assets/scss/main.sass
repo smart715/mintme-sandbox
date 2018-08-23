@@ -1,18 +1,24 @@
-@import 'public'
-@import '~bootstrap-vue/dist/bootstrap-vue.css'
+@import 'variables'
 @import '~bootstrap/scss/bootstrap'
 @import '~vue-range-slider/dist/vue-range-slider'
 @import url('https://fonts.googleapis.com/css?family=Lato')
+@import '../fonts/AlphaCloud/AlphaCloud.css'
 @import 'topnav'
 @import 'header'
 @import 'footer'
+@import 'home-page'
+@import 'token-page'
+@import 'profile-view-page'
 
 html
   font-size: $base-font-size
+  height: 100%
 
 body
   color: $body-text-color
   font-family: $lato-font
+  height: 100%
+  width: 100%
 
 a
   color: $theme-blue
@@ -20,6 +26,11 @@ a
 .text-yellow
   color: $theme-yellow
 
+.errors
+  font-family: $cloud-font
+  font-size: 4rem
+  color: $white
+ 
 .text-green
   color: $theme-green
 
@@ -66,7 +77,7 @@ label
   color: $white
 
 .gradient-bg
-  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100)
+  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100) fixed
 
 .contents-wrapper
   @include media-breakpoint-down(sm)
@@ -156,3 +167,13 @@ label
 
 .modal-dialog
   @extend .modal-dialog-centered
+
+.sorting
+  background: url('../img/sort_both.png') no-repeat right center
+
+.sorting_asc
+  background: url('../img/sort_asc.png') no-repeat right center
+
+.sorting_desc
+  background: url('../img/sort_desc.png') no-repeat right center
+  
