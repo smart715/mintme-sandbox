@@ -9,109 +9,52 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <table class="table m-0 border-0">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Price
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Amount
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Sum WEB
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Trader
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                            <tr>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>Jon Doe 😄</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <b-table
+                        :items="orders"
+                        :fields="fields">
+                    </b-table>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
+>
 <script>
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
 export default {
     name: 'TokenInvestBuyOrders',
     props: {
         containerClass: String,
     },
     data() {
-        return {};
+        return {
+            orders: [],
+            fields: {
+                price: {
+                    label: 'Price',
+                },
+                amount: {
+                    label: 'Amount',
+                },
+                sum_web: {
+                    label: 'Sum WEB',
+                },
+                trader: {
+                    label: 'Trader',
+                },
+            },
+        };
     },
-    components: {
-        FontAwesomeIcon,
+    created: function() {
+        // TODO: This is a dummy simulator.
+        for (let i = 0; i < 100; i++) {
+            this.orders.push({
+                price: Math.floor(Math.random() * 99) + 1000,
+                amount: Math.floor(Math.random() * 99) + 10,
+                sum_web: Math.floor(Math.random() * 99) + 10 + 'WEB',
+                trader: 'John Doe',
+            });
+        }
     },
 };
 </script>

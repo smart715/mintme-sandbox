@@ -5,7 +5,7 @@
             <b-table
                 :items="tokens"
                 :fields="fields"
-                :current-page=
+                :current-page="currentPage"
                 :per-page="perPage">
             </b-table>
         </div>
@@ -20,8 +20,6 @@
 </template>
 
 <script>
-
-
 export default {
     name: 'Trading',
     props: {

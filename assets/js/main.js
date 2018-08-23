@@ -12,6 +12,7 @@ import fontawesome from '@fortawesome/fontawesome';
 import fas from '@fortawesome/fontawesome-free-solid';
 import fab from '@fortawesome/fontawesome-free-brands';
 import far from '@fortawesome/fontawesome-free-regular';
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 fontawesome.library.add(fas, far, fab);
 
 window.Vue = require('vue');
@@ -36,5 +37,7 @@ new Vue({
         bNavbarToggle,
         bNavItem,
         bCollapse,
+        FontAwesomeIcon,
+        FontAwesomeLayers,
     },
 });

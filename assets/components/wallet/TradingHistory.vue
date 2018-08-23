@@ -20,7 +20,7 @@
 
 <script>
 export default {
-    name: 'DepositWithdrawHistory',
+    name: 'TradingHistory',
     data() {
         return {
             history: [],
@@ -35,8 +35,8 @@ export default {
                     label: 'Type',
                     sortable: true,
                 },
-                address: {
-                    label: 'Address',
+                name: {
+                    label: 'Name',
                     sortable: true,
                 },
                 amount: {
@@ -68,8 +68,8 @@ export default {
         for (let i = 0; i < 100; i++) {
             this.history.push({
                 date: '12-12-1970',
-                type: (i % 2 === 0) ? 'Deposit' : 'Withdraw',
-                address: '0xe1f05911dba854fwc...',
+                type: (i % 2 === 0) ? 'Buy' : 'Sell',
+                name: 'Webchain (WEB)',
                 amount: Math.floor(Math.random() * 99) + 10,
                 price: Math.floor(Math.random() * 99) + 10,
                 total: Math.floor(Math.random() * 99) + 10 + 'WEB',

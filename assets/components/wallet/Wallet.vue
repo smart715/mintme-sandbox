@@ -7,8 +7,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Name <font-awesome-icon icon="sort" /></th>
-                        <th>Amount <font-awesome-icon icon="sort" /></th>
+                        <th>Name</th>
+                        <th>Amount</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -37,8 +37,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name <font-awesome-icon icon="sort" /></th>
-                    <th>Amount <font-awesome-icon icon="sort" /></th>
+                    <th>Name</th>
+                    <th>Amount</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -64,15 +64,10 @@
 </template>
 
 <script>
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
 export default {
     name: 'Wallet',
     data() {
         return {};
-    },
-    components: {
-        FontAwesomeIcon,
     },
 };
 </script>
