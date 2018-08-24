@@ -31,46 +31,28 @@
                         <template slot="button-content">
                             <i class="d-block icon-profile-big"></i>
                         </template>
-                        <b-dropdown-item href="{{ path('settings') }}">
-                            Settings
-                        </b-dropdown-item>
                         <b-dropdown-item href="{{ path('profile') }}/{{ app.user.profile.pageurl }}">
+                            <span class="icon-profile float-left mt-1 mr-1"></span>
                             Profile
                         </b-dropdown-item>
+                        <b-dropdown-item>
+                            <font-awesome-icon icon="cog"></font-awesome-icon>
+                            Setting
+                        </b-dropdown-item>
                         <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
+                            <span class="icon-logout float-left mt-1 mr-1"></span>
                             Log Out
                         </b-dropdown-item>
                     </b-nav-item-dropdown>
-                </b-navbar-nav>
-            {% else %}
-                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
-                    Login
-                </b-nav-item>
-                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
-                    <span>Sign Up</span>
-                </b-nav-item>
-<<<<<<< HEAD
-            {% endif %}
-=======
-                <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
-                    <template slot="button-content">
-                        <i class="d-block icon-profile-big"></i>
-                    </template>
-                    <b-dropdown-item>
-                        <span class="icon-profile float-left mt-1 mr-1"></span>
-                        Profile
-                    </b-dropdown-item>
-                    <b-dropdown-item>
-                        <font-awesome-icon icon="cog"></font-awesome-icon>
-                        Setting
-                    </b-dropdown-item>
-                    <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
-                        <span class="icon-logout float-left mt-1 mr-1"></span>
-                        Log Out
-                    </b-dropdown-item>
-                </b-nav-item-dropdown>
+                {% else %}
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
+                        Login
+                    </b-nav-item>
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
+                        <span>Sign Up</span>
+                    </b-nav-item>
+                {% endif %}
             </b-navbar-nav>
->>>>>>> 06ee66073d54dda8a04abb9ed1e1d48a0a5d879a
         </b-collapse>
     </div>
 </b-navbar>

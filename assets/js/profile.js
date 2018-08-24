@@ -1,10 +1,7 @@
 import ChildForm from '../components/ChildForm';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import VueTippy from 'vue-tippy';
 import Toasted from 'vue-toasted';
-library.add(faEdit);
 Vue.use(VueTippy);
 Vue.use(Toasted, {
     position: 'top-center',

@@ -23,11 +23,7 @@
 <script>
 import axios from 'axios';
 import serialize from 'form-serialize';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
-
-library.add(faCircleNotch);
 
 export default {
     name: 'ChildForm',
