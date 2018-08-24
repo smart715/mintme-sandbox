@@ -116,11 +116,6 @@
 
 <script>
 import RangeSlider from 'vue-range-slider';
-<<<<<<< HEAD
-import {FontAwesomeIcon, FontAwesomeLayers}
-    from '@fortawesome/vue-fontawesome';
-=======
->>>>>>> cd3f2a2bbe81b0335ffddce2ba830f52f4b74726
 
 export default {
     name: 'TokenNewForm',

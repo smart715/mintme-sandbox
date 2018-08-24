@@ -48,7 +48,6 @@ export default {
             },
         };
     },
-<<<<<<< HEAD:assets/components/token/TokenInvestSellOrders.vue
     created: function() {
         // TODO: This is a dummy simulator.
         for (let i = 0; i < 100; i++) {
@@ -60,8 +59,6 @@ export default {
             });
         }
     },
-=======
->>>>>>> cd3f2a2bbe81b0335ffddce2ba830f52f4b74726:assets/components/token/TokenTradeSellOrders.vue
 };
 </script>
 
