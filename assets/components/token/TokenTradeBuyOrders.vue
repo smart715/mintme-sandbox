@@ -2,9 +2,13 @@
     <div :class="containerClass">
         <div class="card">
             <div class="card-header">
-                Sell Orders
+                Buy Orders
                 <span class="card-header-icon">
-                    Total: xxxToken
+                    Total: xxxWEB
+                    <font-awesome-icon
+                        icon="question"
+                        class="ml-1 mb-1 p-1 h4 bg-orange rounded-circle square"
+                    />
                 </span>
             </div>
             <div class="card-body p-0">
@@ -100,22 +104,13 @@
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faSort} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faSort);
-
 export default {
-    name: 'TokenInvestSellOrders',
+    name: 'TokenTradeBuyOrders',
     props: {
         containerClass: String,
     },
     data() {
         return {};
-    },
-    components: {
-        FontAwesomeIcon,
     },
 };
 </script>

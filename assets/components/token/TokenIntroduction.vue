@@ -1,10 +1,10 @@
 <template>
     <div class="row">
         <token-introduction-profile
-            container-class="col-12 col-md-7 col-lg-8"
+            container-class="col-12 col-md-6"
         />
         <token-introduction-statistics
-            container-class="col-12 col-md-5 col-lg-4 mt-3 mt-md-0"
+            container-class="col-12 col-md-6 mt-3 mt-md-0"
         />
         <token-introduction-description
             container-class="col-12 mt-3 mt-3"
