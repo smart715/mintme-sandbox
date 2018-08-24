@@ -23,14 +23,9 @@
 <script>
 import axios from 'axios';
 import serialize from 'form-serialize';
-import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 
 export default {
     name: 'ChildForm',
-    components: {
-        FontAwesomeLayers,
-        FontAwesomeIcon,
-    },
     data() {
         return {
             formLoaded: false,
