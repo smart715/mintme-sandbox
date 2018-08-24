@@ -16,18 +16,33 @@
                                 <a href="#" target="_blank">
                                     linktofacebookprofile.com
                                 </a>
+                                <font-awesome-icon
+                                    icon="question"
+                                    class="ml-1 mb-1 bg-blue text-white
+                                           rounded-circle square blue-question"
+                                />
                             </div>
                             <div class="pb-1">
                                 YouTube:
                                 <a href="#" target="_blank">
                                     linktoyoutubeprofile.com
                                 </a>
+                                <font-awesome-icon
+                                    icon="question"
+                                    class="ml-1 mb-1 bg-blue text-white
+                                           rounded-circle square blue-question"
+                                />
                             </div>
                             <div>
                                 Web:
                                 <a href="#" target="_blank">
                                     linktowebpage.com
                                 </a>
+                                <font-awesome-icon
+                                    icon="question"
+                                    class="ml-1 mb-1 bg-blue text-white
+                                           rounded-circle square blue-question"
+                                />
                             </div>
                         </div>
                     </div>

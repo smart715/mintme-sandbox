@@ -3,6 +3,12 @@
         <div class="card h-100">
             <div class="card-header">
                 Description
+                <span class="card-header-icon text-white">
+                    <font-awesome-icon
+                        icon="question"
+                        class="m-0 p-1 h4 bg-orange rounded-circle square"
+                    />
+                </span>
             </div>
             <div class="card-body">
                 <div class="row">

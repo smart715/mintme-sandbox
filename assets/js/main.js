@@ -12,9 +12,12 @@ import fontawesome from '@fortawesome/fontawesome';
 import fas from '@fortawesome/fontawesome-free-solid';
 import fab from '@fortawesome/fontawesome-free-brands';
 import far from '@fortawesome/fontawesome-free-regular';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
 fontawesome.library.add(fas, far, fab);
 
 window.Vue = require('vue');
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.options.delimiters = ['{[', ']}'];
 

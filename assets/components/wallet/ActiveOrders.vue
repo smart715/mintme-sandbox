@@ -25,8 +25,6 @@
     </div>
 </template>
 <script>
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
 export default {
     name: 'ActiveOrders',
     data() {
@@ -70,9 +68,6 @@ export default {
                 },
             },
         };
-    },
-    components: {
-        FontAwesomeIcon,
     },
     computed: {
         totalRows: function() {
