@@ -16,6 +16,13 @@
                     <b-table
                         :items="orders"
                         :fields="fields">
+                        <template slot="trader" slot-scope="row">
+                           {{ row.value }}
+                           <img
+                               src="../../img/avatar.png"
+                               class="float-right"
+                               alt="avatar">
+                        </template>
                     </b-table>
                 </div>
             </div>
