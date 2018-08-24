@@ -1,9 +1,9 @@
-import '../scss/token-page.sass';
-import TokenInvest from '../components/TokenInvest';
-import TokenIntroductionProfile from '../components/TokenIntroductionProfile';
-import TokenIntroductionStatistics from '../components/TokenIntroductionStatistics';
-import TokenIntroductionDescription from '../components/TokenIntroductionDescription';
-import TokenName from '../components/TokenName';
+import Tabs from 'bootstrap-vue/es/components';
+import TokenInvest from '../components/token/TokenInvest';
+import TokenIntroductionProfile from '../components/token/TokenIntroductionProfile';
+import TokenIntroductionStatistics from '../components/token/TokenIntroductionStatistics';
+import TokenIntroductionDescription from '../components/token/TokenIntroductionDescription';
+import TokenName from '../components/token/TokenName';
 
 new Vue({
   el: '#token',
@@ -14,6 +14,7 @@ new Vue({
     };
   },
   components: {
+    Tabs,
     TokenInvest,
     TokenIntroductionProfile,
     TokenIntroductionStatistics,

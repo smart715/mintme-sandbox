@@ -1,8 +1,7 @@
 import Wallet from '../components/wallet/Wallet';
 import TradingHistory from '../components/wallet/TradingHistory';
 import ActiveOrders from '../components/wallet/ActiveOrders';
-import DepositWithdrawHistory
-  from '../components/wallet/DepositWithdrawHistory';
+import DepositWithdrawHistory from '../components/wallet/DepositWithdrawHistory';
 import Tabs from 'bootstrap-vue/es/components';
 
 new Vue({

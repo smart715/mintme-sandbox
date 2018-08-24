@@ -41,14 +41,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/profile", name="profile")
-     */
-    public function profile(): Response
-    {
-        return $this->render('default/profile.html.twig');
-    }
-
-    /**
      * @Route("/profile/{name}", name="profile_view")
      */
     public function profileView(String $name): Response

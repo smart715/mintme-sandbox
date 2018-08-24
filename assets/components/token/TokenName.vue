@@ -1,9 +1,9 @@
 <template>
-    <h1 class="token-name">
+    <h1>
         <span v-if="!editingName">{{ currentName }}</span>
         <template v-if="editable">
             <input type="text" v-model="newName" v-if="editingName">
-            <font-awesome-icon :icon="icon" transform="shrink-4 up-1.5" @click="editName" />
+            <font-awesome-icon class="icon" :icon="icon" transform="shrink-4 up-1.5" @click="editName" />
         </template>
     </h1>
 </template>
@@ -82,12 +82,17 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-    @import '../scss/public.sass';
+    h1
+        font-size: 2rem
+        color: #fff
+
+    .icon
+        cursor: pointer
 
     input[type="text"]
-        background-color: $white
-        border-style: unset;
-        padding: 0 5px;
+        background-color: #fff
+        border-style: unset
+        padding: 0 5px
 </style>
 
 

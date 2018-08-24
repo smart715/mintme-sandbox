@@ -50,12 +50,12 @@ class TokenController extends AbstractController
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            return $this->render('default/token_not_exist.html.twig');
+            return $this->render('pages/token_404.html.twig');
         }
 
         $isOwner = $token == $this->tokenManager->getOwnToken();
 
-        return $this->render('default/token.html.twig', [
+        return $this->render('pages/token.html.twig', [
             'token' => $token,
             'isOwner' => $isOwner,
         ]);
