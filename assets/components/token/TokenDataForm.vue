@@ -116,19 +116,10 @@
 
 <script>
 import RangeSlider from 'vue-range-slider';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faUnlock, faLock} from '@fortawesome/free-solid-svg-icons';
-import {faFacebook, faYoutube} from '@fortawesome/free-brands-svg-icons';
-import {FontAwesomeIcon, FontAwesomeLayers}
-    from '@fortawesome/vue-fontawesome';
-
-library.add(faUnlock, faLock, faFacebook, faYoutube);
 
 export default {
     name: 'TokenNewForm',
     components: {
-        FontAwesomeIcon,
-        FontAwesomeLayers,
         RangeSlider,
     },
     props: {

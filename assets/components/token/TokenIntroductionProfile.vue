@@ -71,11 +71,6 @@
 <script>
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown';
 import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faQuestion} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faQuestion);
 
 export default {
     name: 'TokenIntroductionProfile',
@@ -88,7 +83,6 @@ export default {
     components: {
         bDropdown,
         bDropdownItem,
-        FontAwesomeIcon,
     },
 };
 </script>

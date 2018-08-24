@@ -100,12 +100,6 @@
 </template>
 
 <script>
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faQuestion} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-library.add(faQuestion);
-
 export default {
   name: 'TokenTradeSellOrder',
   props: {
@@ -113,9 +107,6 @@ export default {
   },
   data() {
     return {};
-  },
-  components: {
-      FontAwesomeIcon,
   },
 };
 </script>
