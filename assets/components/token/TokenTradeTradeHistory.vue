@@ -3,6 +3,12 @@
         <div class="card">
             <div class="card-header">
                 Trade History
+                <span class="card-header-icon">
+                    <font-awesome-icon
+                        icon="question"
+                        class="ml-1 mb-1 p-1 h4 bg-orange rounded-circle square"
+                    />
+                </span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
@@ -18,7 +24,7 @@
 
 <script>
 export default {
-    name: 'TokenInvestTradeHistory',
+    name: 'TokenTradeTradeHistory',
     props: {
         containerClass: String,
     },
@@ -50,6 +56,7 @@ export default {
             },
         };
     },
+<<<<<<< HEAD:assets/components/token/TokenInvestTradeHistory.vue
     created: function() {
         // TODO: This is a dummy simulator.
         for (let i = 0; i < 100; i++) {
@@ -65,6 +72,8 @@ export default {
             });
         }
     },
+=======
+>>>>>>> cd3f2a2bbe81b0335ffddce2ba830f52f4b74726:assets/components/token/TokenTradeTradeHistory.vue
 };
 </script>
 

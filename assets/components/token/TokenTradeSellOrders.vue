@@ -2,9 +2,13 @@
     <div :class="containerClass">
         <div class="card">
             <div class="card-header">
-                Buy Orders
+                Sell Orders
                 <span class="card-header-icon">
-                    Total: xxxWEB
+                    Total: xxxToken
+                    <font-awesome-icon
+                        icon="question"
+                        class="ml-1 mb-1 p-1 h4 bg-orange rounded-circle square"
+                    />
                 </span>
             </div>
             <div class="card-body p-0">
@@ -19,10 +23,9 @@
     </div>
 </template>
 
->
 <script>
 export default {
-    name: 'TokenInvestBuyOrders',
+    name: 'TokenTradeSellOrders',
     props: {
         containerClass: String,
     },
@@ -45,6 +48,7 @@ export default {
             },
         };
     },
+<<<<<<< HEAD:assets/components/token/TokenInvestSellOrders.vue
     created: function() {
         // TODO: This is a dummy simulator.
         for (let i = 0; i < 100; i++) {
@@ -56,5 +60,8 @@ export default {
             });
         }
     },
+=======
+>>>>>>> cd3f2a2bbe81b0335ffddce2ba830f52f4b74726:assets/components/token/TokenTradeSellOrders.vue
 };
 </script>
+

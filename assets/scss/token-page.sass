@@ -1,15 +1,23 @@
 #token
   .buy-order, .sell-order
-    @include media-breakpoint-up('lg')
+    @include media-breakpoint-up('xl')
+      flex: 0 0 35%
       max-width: 35%
   .chart
-    @include media-breakpoint-up('lg')
+    @include media-breakpoint-up('xl')
+      flex: 0 0 30%
       max-width: 30%
   .fix-height
     max-height: 28rem
   canvas
     max-height: 14rem
     background-color: $theme-light-blue
+  .blue-question
+    padding: .125rem
+    font-size: .875em
+  .square
+    width: 1em
+    height: 1em
 
 #token-data-form
   .custom-btn
