@@ -12,10 +12,13 @@
 
 html
   font-size: $base-font-size
+  height: 100%
 
 body
   color: $body-text-color
   font-family: $lato-font
+  height: 100%
+  width: 100%
 
 a
   color: $theme-blue
@@ -80,7 +83,7 @@ label
   color: $white
 
 .gradient-bg
-  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100)
+  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100) fixed
 
 .contents-wrapper
   @include media-breakpoint-down(sm)
@@ -159,3 +162,11 @@ label
       flex: initial
       padding: 1.25rem 0
       background: none
+
+.sorting
+  background: url('../img/sort_both.png') no-repeat right center
+.sorting_asc
+  background: url('../img/sort_asc.png') no-repeat right center
+.sorting_desc
+  background: url('../img/sort_desc.png') no-repeat right center
+  
