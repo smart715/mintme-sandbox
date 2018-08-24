@@ -7,9 +7,17 @@
         <b-collapse is-nav="is-nav" id="topnav_collapse">
             <b-navbar-nav class="ml-auto">
                 <li class="search nav-item align-self-start align-self-lg-center py-3 py-lg-0 pr-0 pr-md-3">
-                    <input placeholder="Search for token... Use token name or wallet address" class="search-input form-control" type="search" aria-label="Search">
+                    <div class="input-group">
+                        <input placeholder="Search for token... Use token name or wallet address" class="search-input form-control" type="search" aria-label="Search">
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <font-awesome-icon icon="search"></font-awesome-icon>
+                            </span>
+                        </div>
+                    </div>
                 </li>
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token') }}">
+                    <span class="icon-token float-left  mr-1"></span>
                     <span>My Token</span>
                 </b-nav-item>
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'trading' ? 'active' : '' }}" href="{{ path('trading') }}">
@@ -41,7 +49,28 @@
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
                     <span>Sign Up</span>
                 </b-nav-item>
+<<<<<<< HEAD
             {% endif %}
+=======
+                <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
+                    <template slot="button-content">
+                        <i class="d-block icon-profile-big"></i>
+                    </template>
+                    <b-dropdown-item>
+                        <span class="icon-profile float-left mt-1 mr-1"></span>
+                        Profile
+                    </b-dropdown-item>
+                    <b-dropdown-item>
+                        <font-awesome-icon icon="cog"></font-awesome-icon>
+                        Setting
+                    </b-dropdown-item>
+                    <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
+                        <span class="icon-logout float-left mt-1 mr-1"></span>
+                        Log Out
+                    </b-dropdown-item>
+                </b-nav-item-dropdown>
+            </b-navbar-nav>
+>>>>>>> 06ee66073d54dda8a04abb9ed1e1d48a0a5d879a
         </b-collapse>
     </div>
 </b-navbar>
