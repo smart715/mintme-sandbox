@@ -12,16 +12,13 @@ import fontawesome from '@fortawesome/fontawesome';
 import fas from '@fortawesome/fontawesome-free-solid';
 import fab from '@fortawesome/fontawesome-free-brands';
 import far from '@fortawesome/fontawesome-free-regular';
-<<<<<<< HEAD
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
-=======
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
->>>>>>> cd3f2a2bbe81b0335ffddce2ba830f52f4b74726
 fontawesome.library.add(fas, far, fab);
 
 window.Vue = require('vue');
 Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('font-awesome-layer', FontAwesomeLayers);
 
 Vue.options.delimiters = ['{[', ']}'];
 
@@ -43,7 +40,5 @@ new Vue({
         bNavbarToggle,
         bNavItem,
         bCollapse,
-        FontAwesomeIcon,
-        FontAwesomeLayers,
     },
 });

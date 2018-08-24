@@ -7,8 +7,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Amount</th>
+                        <th>Name <font-awesome-icon icon="sort" /></th>
+                        <th>Amount <font-awesome-icon icon="sort" /></th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -37,8 +37,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
+                    <th>Name <font-awesome-icon icon="sort" /></th>
+                    <th>Amount <font-awesome-icon icon="sort" /></th>
                     <th>Action</th>
                 </tr>
             </thead>
