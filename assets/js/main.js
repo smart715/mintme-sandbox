@@ -18,7 +18,7 @@ fontawesome.library.add(fas, far, fab);
 
 window.Vue = require('vue');
 Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component('font-awesome-layer', FontAwesomeLayers);
+Vue.component('font-awesome-layers', FontAwesomeLayers);
 
 Vue.options.delimiters = ['{[', ']}'];
 
