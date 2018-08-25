@@ -12,132 +12,24 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <table class="table m-0 border-0">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Type
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Order maker
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Order trader
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Price per token
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Token amount
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    WEB amount
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                                <th>
-                                    Date & Time
-                                    <font-awesome-icon icon="sort" />
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                            <tr>
-                                <td>Sell</td>
-                                <td>Jon Doe 😄</td>
-                                <td>Jon Doe 😄</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>771.37300</td>
-                                <td>26.07.2018 16.25.09</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <b-table
+                        :items="history"
+                        :fields="fields">
+                        <template slot="order_maker" slot-scope="row">
+                           {{ row.value }}
+                           <img
+                               src="../../img/avatar.png"
+                               class="float-right"
+                               alt="avatar">
+                        </template>
+                        <template slot="order_trader" slot-scope="row">
+                           {{ row.value }}
+                           <img
+                               src="../../img/avatar.png"
+                               class="float-right"
+                               alt="avatar">
+                        </template>
+                    </b-table>
                 </div>
             </div>
         </div>
@@ -151,7 +43,48 @@ export default {
         containerClass: String,
     },
     data() {
-        return {};
+        return {
+            history: [],
+            fields: {
+                type: {
+                    label: 'Type',
+                },
+                order_maker: {
+                    label: 'Order maker',
+                },
+                order_trader: {
+                    label: 'Order trader',
+                },
+                price_per_token: {
+                    label: 'Price per token',
+                },
+                token_amount: {
+                    label: 'Token amount',
+                },
+                web_amount: {
+                    label: 'WEB amount',
+                },
+                date_time: {
+                    label: 'Date & Time',
+                },
+            },
+        };
+    },
+    created: function() {
+        // TODO: This is a dummy simulator.
+        for (let i = 0; i < 100; i++) {
+            this.history.push({
+                date_time: '12-12-1970',
+                order_maker: 'John Doe',
+                order_trader: 'John Doe',
+                type: (i % 2 === 0) ? 'Buy' : 'Sell',
+                price_per_token: Math.floor(Math.random() * 99) + 1000,
+                token_amount: Math.floor(Math.random() * 99) + 10,
+                web_amount: Math.floor(Math.random() * 99) + 10 + 'WEB',
+                free: Math.floor(Math.random() * 99) + 10,
+            });
+        }
     },
 };
 </script>
+
