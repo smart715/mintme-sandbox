@@ -29,7 +29,12 @@
                             </token-introduction-statistics>
                         </div>
                         <div class="row">
-                            <token-introduction-description container-class="col-12 mt-3 mt-3">
+                            <token-introduction-description
+                                class="col-12 mt-3 mt-3"
+                                description="{{ token.description }}"
+                                csrf-token="{{ csrf_token('update-token') }}"
+                                update-url="{{ path('token_update', {'name': token.name}) }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-description>
                         </div>
                     </b-tab>
