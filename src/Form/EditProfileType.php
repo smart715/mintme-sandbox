@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Form\Model\EmailModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,6 +19,6 @@ class EditProfileType extends AbstractType
             ->add('lastname', TextType::class, [ 'label' => 'Last Name' ])
             ->add('city', TextType::class, [ 'label' => 'City' ])
             ->add('country', CountryType::class, [ 'label' => 'Country' ])
-            ->add('save', SubmitType::class, [ 'label' => 'Save', 'attr' => [ 'cancellink' => true, 'close' =>  true]]);
+            ->add('description', TextareaType::class, [ 'label' => 'Description']);
     }
 }

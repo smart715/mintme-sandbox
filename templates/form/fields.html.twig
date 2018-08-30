@@ -48,13 +48,14 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <div class="form-group text-right">
+    <div class="form-group text-center">
         <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
-    {%- if (attr.cancellink is defined and  attr.href is defined) -%}
-        <a  href="{{ path(attr.href) }}" class="ml-3" >Cancel</a>
-    {%- endif -%}
-    {%- if (attr.cancellink is defined and  attr.close is defined) -%}
-        <a class="ml-3" href="#" close="true">Cancel</a>
+    {%- if  ((attr.cancelbutton is defined) and (attr.cancelbutton == true)) -%}
+        <button type="button"
+        class="btn btn-primary ml-3"
+        close>
+            Cancel
+        </button>
     {%- endif -%}
     </div>
 {%- endblock button_widget -%}

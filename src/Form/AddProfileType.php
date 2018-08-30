@@ -16,7 +16,6 @@ class AddProfileType extends AbstractType
     {
         $builder
             ->add('firstName', TextType::class, [ 'label' => 'First Name' ])
-            ->add('lastName', TextType::class, [ 'label' => 'Last Name' ])
-            ->add('save', SubmitType::class, [ 'label' => 'Save', 'attr' => [ 'cancellink' => true, 'href' => 'trading'] ]);
+            ->add('lastName', TextType::class, [ 'label' => 'Last Name' ]);
     }
 }

@@ -14,16 +14,20 @@
             <div class="col-xs-12 col-lg-10 col-xl-6">
                 <div class="card">
                     <div class="card-header">
-                       Plant your profile
+                        Plant your profile
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
                                 {{ form_start(form) }}
                                 {{ form_widget(form) }}
+                                <div class="text-center">
+                                    <input type="submit" class="btn btn-primary px-4" value="Save">
+                                    <a href="{{ path('trading') }}" class="ml-3" >Cancel</a>
+                                </div>
                                 {{ form_end(form) }}
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>

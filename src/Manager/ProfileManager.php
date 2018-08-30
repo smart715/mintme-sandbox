@@ -37,14 +37,24 @@ class ProfileManager implements ProfileManagerInterface
         if (empty($profile->getLastName()))
             return "";
 
-        if (!empty($profile->getPageUrl()))
-            return $profile->getPageUrl();
-        
         $currentPageUrl = $profile->getLastName();
         if (!empty($profile->getFirstName()))
             $currentPageUrl .= "." . $profile->getFirstName();
         
         $checkExistProfile = $this->profileRepository->getProfileByPageUrl($currentPageUrl);
-        return (null === $checkExistProfile)? strtolower($currentPageUrl) : strtolower($currentPageUrl).".".random_bytes(6);
+        return
+            (null === $checkExistProfile
+                || ($currentPageUrl === $checkExistProfile->getPageUrl()
+                    && $profile->getUser() === $checkExistProfile->getUser()))
+            ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . $this->random_string(6);
+    }
+    function random_string($length)
+    {
+        $keys = array_merge(range(0, 9), range('a', 'z'));
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $keys[array_rand($keys)];
+        }
+
+        return $key;
     }
 }

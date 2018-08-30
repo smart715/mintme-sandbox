@@ -48,32 +48,50 @@ class DefaultController extends Controller
     public function profile(
         Request $request,
         ProfileManagerInterface $profileManagerInterface,
-        SerializerInterface $serializer,
         ?String $pageUrl = null
     ): Response {
         if (!empty($pageUrl)) {
             $profile = $profileManagerInterface->getProfileByPageUrl($pageUrl);
             if (null !== $profile) {
-                 return $this->viewProfile($profile, $serializer);
+                 return $this->viewProfile($request, $profile, $profileManagerInterface);
             } else {
                 return $this->profileNotFoundPage();
             }
         }
-        $profile = $profileManagerInterface->getProfile($this->getUser());
-        if (null === $profile)
-            return $this->addProfile($request, $profileManagerInterface, $serializer);
-        
-        return $this->viewProfile($profile, $serializer);
+        return $this->addProfile($request, $profileManagerInterface);
     }
     
     public function viewProfile(
+        Request $request,
         Profile $profile,
-        SerializerInterface $serializer
+        ProfileManagerInterface $profileManagerInterface
     ): Response {
-        return $this->render('pages/profile_view.html.twig', [
-            'profile' => $serializer->serialize($profile, 'json'),
-            'canedit' => ($profile === $this->getUser()->getProfile()) ? true : false,
-        ]);
+        $form = $this->createForm(EditProfileType::class, $profile);
+        if (!empty($profile->getNameChangedDate()) &&
+            $this->getNumberOfDays($profile->getNameChangedDate()) < 0 ) {
+            $form->remove('lastname');
+            $form->remove('firstname');
+        }
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid())
+            return $this->render('pages/profile_view.html.twig', [
+                'lastName' => $profile->getLastName(),
+                'firstName' => $profile->getFirstName(),
+                'city' => $profile->getCity(),
+                'country' => $profile->getCountry(),
+                'description' => $profile->getDescription(),
+                'canedit' => ($profile === $this->getUser()->getProfile()) ? true : false,
+                'form' =>  $form->createView(),
+            ]);
+        
+        $profile->setPageUrl($profileManagerInterface->generatePageUrl($profile));
+        $today = new \DateTime();
+        $today->format('Y-m-d H:i:s');
+        $profile->setNameChangedDate($today);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($profile);
+        $entityManager->flush();
+        return $this->redirect('/profile/'.$profile->getPageUrl());
     }
     
     public function profileNotFoundPage(): Response
@@ -83,92 +101,28 @@ class DefaultController extends Controller
     
     public function addProfile(
         Request $request,
-        ProfileManagerInterface $profileManagerInterface,
-        SerializerInterface $serializer
+        ProfileManagerInterface $profileManagerInterface
     ): Response {
         $user = $this->getUser();
         $profile  = new Profile($user);
         $form = $this->createForm(AddProfileType::class, $profile);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $profile = $form->getData();
-            $profile->setPageUrl($profileManagerInterface->generatePageUrl($profile));
-            $today = new \DateTime();
-            $today->format('Y-m-d H:i:s');
-            $profile->setNameChangedDate($today);
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($profile);
-            $entityManager->flush();
-            return $this->viewProfile($profile, $serializer);
-        }
-        return $this->render('pages/profile.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-    
-    /**
-     * @Route("/profile-edit", name="profile_edit")
-     */
-    public function editProfile(
-        Request $request,
-        ProfileManagerInterface $profileManagerInterface,
-        SerializerInterface $serializer
-    ): Response {
-        $profile = $profileManagerInterface->getProfile($this->getUser());
-        $form = $this->createForm(EditProfileType::class, $profile, [
-            'action' => $this->generateUrl('profile_edit'),
-        ]);
-        if (!empty($profile->getNameChangedDate()) &&
-                $this->getNumberOfDays($profile->getNameChangedDate()) <= 30 ) {
-            $form->remove('lastname');
-            $form->remove('firstname');
-        }
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $profile = $form->getData();
-            $profile->setPageUrl($profileManagerInterface->generatePageUrl($profile));
-            $today = new \DateTime();
-            $today->format('Y-m-d H:i:s');
-            $profile->setNameChangedDate($today);
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($profile);
-            $entityManager->flush();
-            return new JsonResponse([
-                'action' => 'edit-profile',
-                'profile' => json_decode($serializer->serialize($profile, 'json')),
-                'message' => 'Profile  was saved successfully.',
+        
+        if (!$form->isSubmitted() || !$form->isValid())
+            return $this->render('pages/profile.html.twig', [
+                'form' => $form->createView(),
             ]);
-        }
-        return $this->renderAjaxForm($form);
+        
+        $profile->setPageUrl($profileManagerInterface->generatePageUrl($profile));
+        $today = new \DateTime();
+        $today->format('Y-m-d H:i:s');
+        $profile->setNameChangedDate($today);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($profile);
+        $entityManager->flush();
+        return $this->redirect('/profile/'.$profile->getPageUrl());
     }
-    
-    /**
-     * @Route("/profile-description-edit", name="profile_description_edit")
-     */
-    public function editProfileDescription(
-        Request $request,
-        ProfileManagerInterface $profileManagerInterface,
-        SerializerInterface $serializer
-    ): Response {
-        $profile = $profileManagerInterface->getProfile($this->getUser());
-        $form = $this->createForm(EditProfileDescriptionType::class, $profile, [
-            'action' => $this->generateUrl('profile_description_edit'),
-        ]);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $profile = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($profile);
-            $entityManager->flush();
-            return new JsonResponse([
-                'action' => 'edit-profile-description',
-                'profile' => json_decode($serializer->serialize($profile, 'json')),
-                'message' => 'Profile description was saved successfully.',
-            ]);
-        }
-        return $this->renderAjaxForm($form);
-    }
-    
+        
     /**
      * @Route("/token/{name}/{tab}", name="token")
      */
@@ -197,17 +151,6 @@ class DefaultController extends Controller
         ]);
     }
        
-    private function renderAjaxForm(FormInterface $form, string $header = ''): Response
-    {
-        $template = $this->renderView('pages/ajax_form.html.twig', [
-            'form' => $form->createView(),
-        ]);
-        return new JsonResponse([
-            'header' => $header,
-            'body' => $template,
-        ]);
-    }
-    
     private function getNumberOfDays(\DateTime $from): int
     {
         $today = new \DateTime();
