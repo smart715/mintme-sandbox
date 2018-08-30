@@ -58,6 +58,9 @@ class DefaultController extends Controller
                 return $this->profileNotFoundPage();
             }
         }
+        if ($this->getUser()->getProfile())
+            return $this->redirect('/profile/'.$this->getUser()->getProfile()->getPageUrl());
+        
         return $this->addProfile($request, $profileManagerInterface);
     }
     

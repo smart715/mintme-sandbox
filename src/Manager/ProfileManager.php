@@ -42,10 +42,7 @@ class ProfileManager implements ProfileManagerInterface
             $currentPageUrl .= "." . $profile->getFirstName();
         
         $checkExistProfile = $this->profileRepository->getProfileByPageUrl($currentPageUrl);
-        return
-            (null === $checkExistProfile
-                || ($currentPageUrl === $checkExistProfile->getPageUrl()
-                    && $profile->getUser() === $checkExistProfile->getUser()))
+        return (null === $checkExistProfile || $profile === $checkExistProfile)
             ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . $this->randomString(6);
     }
     private function randomString(int $length): String
