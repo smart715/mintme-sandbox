@@ -48,7 +48,7 @@ class ProfileManager implements ProfileManagerInterface
                     && $profile->getUser() === $checkExistProfile->getUser()))
             ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . $this->randomString(6);
     }
-    function randomString($length)
+    private function randomString(int $length): String
     {
         $keys = array_merge(range(0, 9), range('a', 'z'));
         for ($i = 0; $i < $length; $i++) {
