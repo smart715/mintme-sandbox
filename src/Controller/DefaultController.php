@@ -45,7 +45,7 @@ class DefaultController extends Controller
     /**
      * @Route("/profile/{pageUrl}", name="profile")
      */
-    public function profile(Request $request, ProfileManagerInterface $profileManagerInterface, ?String $pageUrl = null): Response
+    public function profile(Request $request, ProfileManagerInterface $profileManagerInterface, ?string $pageUrl = null): Response
     {
         if (!empty($pageUrl)) {
             $profile = $profileManagerInterface->getProfileByPageUrl($pageUrl);
@@ -122,7 +122,7 @@ class DefaultController extends Controller
     /**
      * @Route("/token/{name}/{tab}", name="token")
      */
-    public function token(?String $name = null, ?String $tab = null): Response
+    public function token(?string $name = null, ?string $tab = null): Response
     {
         // FIXME: This data is for view test only.
         $tokenName = $name;

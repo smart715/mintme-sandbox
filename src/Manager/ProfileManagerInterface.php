@@ -10,5 +10,5 @@ interface ProfileManagerInterface
     public function getProfile(UserInterface $user): ?Profile;
     public function getProfileByPageUrl(String $pageUrl): ?Profile;
     public function lockChangePeriod(Profile $profile): void;
-    public function generatePageUrl(Profile $profile): ?String;
+    public function generatePageUrl(Profile $profile): ?string;
 }

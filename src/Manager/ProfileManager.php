@@ -22,7 +22,7 @@ class ProfileManager implements ProfileManagerInterface
     {
         return $this->profileRepository->getProfileByUser($user);
     }
-    public function getProfileByPageUrl(String $pageUrl): ?Profile
+    public function getProfileByPageUrl(string $pageUrl): ?Profile
     {
         return $this->profileRepository->getProfileByPageUrl($pageUrl);
     }
@@ -32,7 +32,7 @@ class ProfileManager implements ProfileManagerInterface
         $profile->setNameChangedDate(new DateTime('+1 month'));
     }
     
-    public function generatePageUrl(Profile $profile): String
+    public function generatePageUrl(Profile $profile): string
     {
         if (empty($profile->getLastName()))
             return "";
@@ -46,7 +46,7 @@ class ProfileManager implements ProfileManagerInterface
             ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . $this->randomString(6);
     }
     
-    private function randomString(int $length): String
+    private function randomString(int $length): string
     {
         $key = '';
         $keys = array_merge(range(0, 9), range('a', 'z'));
