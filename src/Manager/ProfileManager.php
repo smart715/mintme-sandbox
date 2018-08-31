@@ -45,6 +45,7 @@ class ProfileManager implements ProfileManagerInterface
         return (null === $checkExistProfile || $profile === $checkExistProfile)
             ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . $this->randomString(6);
     }
+    
     private function randomString(int $length): String
     {
         $key = '';

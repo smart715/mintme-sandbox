@@ -39,33 +39,27 @@
                         </div>
                         <div v-if="showEditForm">
                             {{ form_start(form) }}
-                            {{ form_errors(form) }}
-
                             <div class="row mb-3">
                                 <div class="col-12 col-md-4">
                                     <div class="pb-1">
-                                        {{ form_label(form.lastname) }}
-                                        {{ form_errors(form.lastname) }}
-                                        {{ form_widget(form.lastname) }}
-                                        {{ form_help(form.lastname) }}
+                                        {%- if (form.lastname is defined) -%}
+                                            {{ form_label(form.lastname) }}
+                                            {{ form_widget(form.lastname) }}
+                                        {%- endif -%}
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_label(form.firstname) }}
-                                        {{ form_errors(form.firstname) }}
-                                        {{ form_widget(form.firstname) }}
-                                        {{ form_help(form.firstname) }}
+                                        {%- if (form.firstname is defined) -%}
+                                            {{ form_label(form.firstname) }}
+                                            {{ form_widget(form.firstname) }}
+                                        {%- endif -%}
                                     </div>
                                     <div class="pb-1">
                                         {{ form_label(form.city) }}
-                                        {{ form_errors(form.city) }}
                                         {{ form_widget(form.city) }}
-                                        {{ form_help(form.city) }}
                                     </div>
                                     <div class="pb-1">
                                         {{ form_label(form.country) }}
-                                        {{ form_errors(form.country) }}
                                         {{ form_widget(form.country) }}
-                                        {{ form_help(form.country) }}
                                     </div>
 
                                 </div>
@@ -73,9 +67,7 @@
                                 <div class="col-12 col-md-8 pt-3 pt-md-0 description">
                                     <div>
                                         {{ form_label(form.description) }}
-                                        {{ form_errors(form.description) }}
                                         {{ form_widget(form.description) }}
-                                        {{ form_help(form.description) }}
                                     </div>
                                 </div>
                             </div>

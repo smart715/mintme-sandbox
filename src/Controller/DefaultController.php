@@ -45,11 +45,8 @@ class DefaultController extends Controller
     /**
      * @Route("/profile/{pageUrl}", name="profile")
      */
-    public function profile(
-        Request $request,
-        ProfileManagerInterface $profileManagerInterface,
-        ?String $pageUrl = null
-    ): Response {
+    public function profile(Request $request, ProfileManagerInterface $profileManagerInterface, ?String $pageUrl = null): Response
+    {
         if (!empty($pageUrl)) {
             $profile = $profileManagerInterface->getProfileByPageUrl($pageUrl);
             if (null !== $profile) {
@@ -64,14 +61,11 @@ class DefaultController extends Controller
         return $this->addProfile($request, $profileManagerInterface);
     }
     
-    public function viewProfile(
-        Request $request,
-        Profile $profile,
-        ProfileManagerInterface $profileManagerInterface
-    ): Response {
+    public function viewProfile(Request $request, Profile $profile, ProfileManagerInterface $profileManagerInterface): Response
+    {
         $form = $this->createForm(EditProfileType::class, $profile);
         if (!empty($profile->getNameChangedDate()) &&
-            $this->getNumberOfDays($profile->getNameChangedDate()) < 0 ) {
+            $this->getNumberOfDays($profile->getNameChangedDate()) <= 30 ) {
             $form->remove('lastname');
             $form->remove('firstname');
         }
@@ -102,10 +96,8 @@ class DefaultController extends Controller
         return $this->render('pages/profile_404.html.twig', []);
     }
     
-    public function addProfile(
-        Request $request,
-        ProfileManagerInterface $profileManagerInterface
-    ): Response {
+    public function addProfile(Request $request, ProfileManagerInterface $profileManagerInterface): Response
+    {
         $user = $this->getUser();
         $profile  = new Profile($user);
         $form = $this->createForm(AddProfileType::class, $profile);
