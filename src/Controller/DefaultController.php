@@ -78,6 +78,7 @@ class DefaultController extends Controller
                 'country' => $profile->getCountry(),
                 'description' => $profile->getDescription(),
                 'canedit' => ($profile === $this->getUser()->getProfile()) ? true : false,
+                'showeditFormFirst' => (empty($profile->getCity()) && empty($profile->getCountry()) && empty($profile->getDescription())) ? true : false,
                 'form' =>  $form->createView(),
             ]);
         
