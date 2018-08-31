@@ -12,7 +12,7 @@
                     <div class="card-header">
                         <span>{{ lastName }} {{ firstName }} </span>
                         {%- if (canedit == true) -%}
-                        <a @click="showEditForm = true">
+                        <a @click="showEditForm = true" class="float-right">
                             <font-awesome-icon icon="edit" class="ml-2"></font-awesome-icon>
                         </a>
                         {%- endif -%}
