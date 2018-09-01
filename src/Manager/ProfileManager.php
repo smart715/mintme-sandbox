@@ -3,8 +3,8 @@
 namespace App\Manager;
 
 use App\Entity\Profile;
-use App\Entity\User;
 use App\Entity\Token;
+use App\Entity\User;
 use App\Repository\ProfileRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
