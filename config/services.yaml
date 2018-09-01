@@ -62,3 +62,9 @@ services:
     App\Utils\MailerDispatcher:
         arguments:
             $mailer: '@fos_user.mailer.default'
+
+    App\Verify\WebsiteVerifier:
+        arguments:
+            $timeoutSeconds: '%verify_timeout_seconds%'
+
+    App\Verify\WebsiteVerifierInterface: '@App\Verify\WebsiteVerifier'

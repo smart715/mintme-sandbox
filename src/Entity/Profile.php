@@ -74,7 +74,7 @@ class Profile
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Token", inversedBy="profile", cascade={"persist", "remove"})
      * @var Token|null
      */
     protected $token;

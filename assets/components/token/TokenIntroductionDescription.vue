@@ -3,18 +3,20 @@
         <div class="card h-100">
             <div class="card-header">
                 Description
+                <span class="card-header-icon">
+                    <font-awesome-icon
+                        v-if="editable"
+                        class="icon float-right"
+                        size="2x"
+                        :icon="icon"
+                        transform="shrink-4 up-1.5"
+                        @click="editDescription"
+                    />
+                </span>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
-                        <font-awesome-icon
-                            v-if="editable"
-                            class="icon float-right"
-                            size="2x"
-                            :icon="icon"
-                            transform="shrink-4 up-1.5"
-                            @click="editDescription"
-                        />
                         <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
                             <textarea class="form-control" v-model="newDescription" v-if="editingDescription"></textarea>
@@ -97,3 +99,9 @@ export default {
     }
 };
 </script>
+
+<style lang="sass" scoped>
+    p
+        white-space: pre-line
+</style>
+

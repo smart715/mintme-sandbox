@@ -7,13 +7,19 @@ use App\Form\TokenCreateType;
 use App\Form\TokenType;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validation;
 
 class TokenController extends AbstractController
 {
@@ -57,6 +63,7 @@ class TokenController extends AbstractController
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
+            'profile' => $this->profileManager->findByToken($token),
             'isOwner' => $isOwner,
         ]);
     }
@@ -119,10 +126,84 @@ class TokenController extends AbstractController
             return new Response($formErrorsSerialized, Response::HTTP_BAD_REQUEST);
         }
 
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
+        $this->em->flush();
 
         return new Response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Route("/token/{name}/website-confirmation", name="token_website_confirmation", methods={"GET"})
+     */
+    public function getWebsiteConfirmationFile(Request $request, string $name): Response
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        if (null === $token->getWebsiteConfirmationToken()) {
+            $token->setWebsiteConfirmationToken(Uuid::uuid1()->toString());
+            $this->em->flush();
+        }
+
+        $fileContent = WebsiteVerifierInterface::PREFIX.': '.$token->getWebsiteConfirmationToken();
+        $response = new Response($fileContent);
+
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'mintme.html'
+        );
+
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
+    }
+
+    /**
+     * @Route("/token/{name}/website-confirmation", name="token_website_confirm", methods={"POST"})
+     */
+    public function confirmWebsite(
+        Request $request,
+        WebsiteVerifierInterface $websiteVerifier,
+        string $name
+    ): Response {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        if (null === $token->getWebsiteConfirmationToken()) {
+            return new Response(null, Response::HTTP_BAD_REQUEST);
+        }
+
+        $url = $request->request->get('url');
+
+        $validator = Validation::createValidator();
+        $urlViolations = $validator->validate($url, new Url());
+
+        if (0 < count($urlViolations)) {
+            return new JsonResponse([
+                'verified' => false,
+                'errors' => array_map(function ($violation) {
+                    return $violation->getMessage();
+                }, iterator_to_array($urlViolations)),
+            ]);
+        }
+
+        $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
+
+        if ($isVerified) {
+            $token->setWebsiteUrl($url);
+            $this->em->flush();
+        }
+
+        return new JsonResponse(['verified' => $isVerified, 'errors' => []]);
     }
 
     private function redirectToOwnToken(): RedirectResponse

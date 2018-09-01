@@ -7,3 +7,5 @@ parameters:
 
     taker_fee_rate: 0.1
     maker_fee_rate: 0.01
+
+    verify_timeout_seconds: 10

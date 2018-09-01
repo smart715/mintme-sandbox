@@ -22,7 +22,13 @@
                     </b-tab>
                     <b-tab title="Introduction" active>
                         <div class="row">
-                            <token-introduction-profile container-class="col-12 col-md-6">
+                            <token-introduction-profile
+                                class="col-12 col-md-6"
+                                confirm-website-file-url="{{ path('token_website_confirmation', {'name': token.name}) }}"
+                                confirm-website-url="{{ path('token_website_confirm', {'name': token.name}) }}"
+                                profile-name="{{ profile.firstName }} {{ profile.lastName }}"
+                                website-url="{{ token.websiteUrl }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-profile>
 
                             <token-introduction-statistics container-class="col-12 col-md-6 mt-3 mt-md-0">
@@ -42,6 +48,8 @@
             </div>
         </div>
     </div>
+
+    <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': token.name}) }}">
 {% endblock %}
 
 {% block pagescripts %}

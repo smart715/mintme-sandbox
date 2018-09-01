@@ -64,6 +64,18 @@ class Token
      */
     protected $description;
 
+    /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     * @var string|null
+     */
+    protected $websiteConfirmationToken;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
+     * @var Profile
+     */
+    protected $profile;
+
     public function getId(): int
     {
         return $this->id;
@@ -130,6 +142,18 @@ class Token
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getWebsiteConfirmationToken(): ?string
+    {
+        return $this->websiteConfirmationToken;
+    }
+
+    public function setWebsiteConfirmationToken(string $websiteConfirmationToken): self
+    {
+        $this->websiteConfirmationToken = $websiteConfirmationToken;
 
         return $this;
     }
