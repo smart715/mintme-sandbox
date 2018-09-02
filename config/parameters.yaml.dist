@@ -7,3 +7,5 @@ parameters:
 
     taker_fee_rate: 0.1
     maker_fee_rate: 0.01
+    mintme_launch_date: 'October 15, 2018 00:00:00'
+    users_count_refresh_rate_seconds: 60

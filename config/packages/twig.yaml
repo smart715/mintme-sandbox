@@ -4,3 +4,7 @@ twig:
     strict_variables: '%kernel.debug%'
     form_themes:
         - 'form/fields.html.twig'
+    globals:
+        users_count_refresh_rate: '%users_count_refresh_rate_seconds%'
+        mintme_launch_date: '%mintme_launch_date%'
+    

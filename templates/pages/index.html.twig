@@ -6,9 +6,9 @@
 {% block contentclass %}flower-bg{% endblock %}
 
 {% block top_showcase %}
-    <div class="container-fluid top-showcase">
+    <div class="container-fluid top-showcase" id="home">
         <div class="row">
-            <div class="col pt-5 pb-2 text-center">
+            <div class="col-xl-8 pt-5 pb-2 text-center">
                 <div class="d-block">
                     <span class="title text-blue">
                         Lorem ipsum dolor sit amet, cum ullum propriae ex
@@ -25,6 +25,22 @@
                         call to action
                     </button>
                 </div>
+            </div>
+            <div class="col-xl-4 pt-5 pb-2 text-center" >
+                <div class="d-block">
+                    <span class="title text-blue">
+                        met, cum ullum propriae ex
+                    </span>
+                </div>
+                <div class="description pt-2 px-3 d-inline-block">
+                    Aenean Cu ludus fastidii pertinax qui. No nec augue aperiam
+                </div>
+                <count-down end-date="{{ mintme_launch_date }}" current-date="{{ 'now'|date("Y-m-d H:i:s") }}" disabled="false">
+                    <div slot="content">
+                        <h4>--End--</h4>
+                    </div>
+                </count-down>
+
             </div>
         </div>
     </div>

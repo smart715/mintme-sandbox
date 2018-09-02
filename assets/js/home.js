@@ -16,3 +16,12 @@ setHomepageDescriptionWidth();
 window.onresize = function() {
     setHomepageDescriptionWidth();
 };
+
+import CountDown from '../components/CountDown.vue';
+
+new Vue({
+    el: '#home',
+    components: {
+        CountDown,
+    },
+});
