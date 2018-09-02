@@ -11,14 +11,14 @@ $cloud-font: 'AlphaCloud', sans-serif;
 $border-radius: 0;
 
 // Colors
-$primary: #55aded;
+$primary: #007ab9;
 
 $body-text-color: #1a1a1a;
 $gradiant-blue-100: #90c7ff;
 $gradiant-blue-200: #29abe2;
 $gradiant-blue-300: #4693fd;
 $gradiant-blue-400: #0071bc;
-$theme-blue: #007ab9;
+$theme-blue: $primary;
 $theme-light-blue: #bedeff;
 $theme-yellow: #be8817;
 $theme-orange: #f7931e;

@@ -8,7 +8,7 @@
                         Last price: 0.000000001WEB
                         <font-awesome-icon
                             icon="question"
-                            class="ml-1 mb-1 bg-blue text-white
+                            class="ml-1 mb-1 bg-primary text-white
                                    rounded-circle square blue-question"
                         />
                     </div>
@@ -18,7 +18,7 @@
                                 24h change
                                 <font-awesome-icon
                                     icon="question"
-                                    class="ml-1 mb-1 bg-blue text-white
+                                    class="ml-1 mb-1 bg-primary text-white
                                            rounded-circle square blue-question"
                                 />
                             </div>
@@ -29,7 +29,7 @@
                                 24h volume
                                 <font-awesome-icon
                                     icon="question"
-                                    class="ml-1 mb-1 bg-blue text-white
+                                    class="ml-1 mb-1 bg-primary text-white
                                            rounded-circle square blue-question"
                                 />
                             </div>

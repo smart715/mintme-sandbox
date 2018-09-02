@@ -21,7 +21,7 @@
                             9999
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </span>
@@ -43,7 +43,7 @@
                                 Market Price
                                 <font-awesome-icon
                                     icon="question"
-                                    class="ml-1 mb-1 bg-blue text-white
+                                    class="ml-1 mb-1 bg-primary text-white
                                            rounded-circle square blue-question"
                                 />
                             </label>
@@ -57,7 +57,7 @@
                             Price in WEB:
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </label>
@@ -84,7 +84,7 @@
                         Total Price: 999 WEB
                         <font-awesome-icon
                             icon="question"
-                            class="ml-1 mb-1 bg-blue text-white
+                            class="ml-1 mb-1 bg-primary text-white
                                    rounded-circle square blue-question"
                         />
                     </div>
