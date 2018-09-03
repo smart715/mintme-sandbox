@@ -23,7 +23,7 @@ $theme-light-blue: #bedeff;
 $theme-yellow: #be8817;
 $theme-orange: #f7931e;
 $theme-green: #8dc63f;
-$color-tabs: #2797e8;
+$color-tabs: $theme-blue;
 $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
 
@@ -37,8 +37,7 @@ $input-btn-focus-color: $input-bg;
 
 // Card
 $card-border-width: 0;
-
-$card-header-bg-color: #007abb;
+$card-header-bg-color: $theme-blue;
 
 // Pagination
 $pagination-color: $theme-blue;
