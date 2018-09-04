@@ -21,8 +21,12 @@ class ProfileController extends Controller
     /**
      * @Route("/profile/{pageUrl}/{action}", name="profile")
      */
-    public function profile(Request $request, ProfileManagerInterface $profileManager, ?string $pageUrl = null, ?string $action = null): Response
-    {
+    public function profile(
+        Request $request,
+        ProfileManagerInterface $profileManager,
+        ?string $pageUrl = null,
+        ?string $action = null
+    ): Response {
         if (!empty($pageUrl)) {
             $profile = $profileManager->getProfileByPageUrl($pageUrl);
             if (null === $profile) {
@@ -39,8 +43,12 @@ class ProfileController extends Controller
         return $this->addProfile($request, $profileManager);
     }
     
-    public function viewProfile(Request $request, Profile $profile, ProfileManagerInterface $profileManager, ?string $action): Response
-    {
+    public function viewProfile(
+        Request $request,
+        Profile $profile,
+        ProfileManagerInterface $profileManager,
+        ?string $action
+    ): Response {
         $form = $this->createForm(EditProfileType::class, $profile);
         $form->handleRequest($request);
         
