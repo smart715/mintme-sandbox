@@ -31,7 +31,7 @@ a
   font-family: $cloud-font
   font-size: 4rem
   color: $white
- 
+
 .text-green
   color: $theme-green
 
@@ -125,6 +125,9 @@ label
     .nav-item
       flex: 1 1 auto
       padding: 0
+      border-left: .0625rem solid $white
+      &:first-child
+        border-left: none
       .nav-link
         border: none
         background-color: $color-tabs
@@ -180,4 +183,3 @@ label
   background: url('../img/sort_asc.png') no-repeat right center
 .sorting_desc
   background: url('../img/sort_desc.png') no-repeat right center
-  
