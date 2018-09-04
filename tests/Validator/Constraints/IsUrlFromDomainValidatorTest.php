@@ -43,7 +43,7 @@ class IsUrlFromDomainValidatorTest extends ConstraintValidatorTestCase
     public function testValidDomainUrls(string $url): void
     {
         $constraint = new IsUrlFromDomain();
-        $constraint->domain = 'facebook.com';
+        $constraint->domain = 'www.facebook.com';
         $this->validator->validate($url, $constraint);
 
         $this->assertNoViolation();
@@ -52,11 +52,11 @@ class IsUrlFromDomainValidatorTest extends ConstraintValidatorTestCase
     public function getValidDomainUrls(): array
     {
         return [
-            ['facebook.com/something'],
-            ['https://facebook.com/something'],
-            ['https://facebook.com/username'],
-            ['http://facebook.com/something'],
-            ['http://facebook.com/username?q=something&u=another'],
+            ['www.facebook.com/something'],
+            ['https://www.facebook.com/something'],
+            ['https://www.facebook.com/username'],
+            ['http://www.facebook.com/something/'],
+            ['http://www.facebook.com/username?q=something&u=another'],
         ];
     }
 

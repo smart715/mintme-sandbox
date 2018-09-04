@@ -46,14 +46,14 @@ class Token
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @AppAssert\IsUrlFromDomain("facebook.com")
+     * @AppAssert\IsUrlFromDomain("www.facebook.com")
      * @var string|null
      */
     protected $facebookUrl;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @AppAssert\IsUrlFromDomain("youtube.com")
+     * @AppAssert\IsUrlFromDomain("www.youtube.com")
      * @var string|null
      */
     protected $youtubeUrl;

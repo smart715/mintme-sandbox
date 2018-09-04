@@ -28,6 +28,10 @@
                                 confirm-website-url="{{ path('token_website_confirm', {'name': token.name}) }}"
                                 profile-name="{{ profile.firstName }} {{ profile.lastName }}"
                                 website-url="{{ token.websiteUrl }}"
+                                facebook-url="{{ token.facebookUrl }}"
+                                youtube-url="{{ token.youtubeUrl }}"
+                                update-url="{{ path('token_update', {'name': token.name}) }}"
+                                csrf-token="{{ csrf_token('update-token') }}"
                                 :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-profile>
 
@@ -53,5 +57,6 @@
 {% endblock %}
 
 {% block pagescripts %}
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="{{ asset('build/token.js') }}"></script>
 {% endblock %}
