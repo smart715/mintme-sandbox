@@ -38,6 +38,7 @@
                             </div>
                         </div>
                         <div v-if="showEditForm">
+                            {%- if (canEdit == true) -%}
                             {{ form_start(form) }}
                             <div class="row mb-3">
                                 <div class="col-12 col-md-4">
@@ -76,6 +77,7 @@
                                 <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
                             </div>
                             {{ form_end(form) }}
+                            {%- endif -%}
                         </div>
                     </div>
                     <input type="hidden" ref="isNew" value="{{ isNew }}"/>
