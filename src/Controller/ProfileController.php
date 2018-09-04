@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProfileController extends Controller
 {
-    private $showEditFormFirst = false;
     /**
      * @Route("/profile/{pageUrl}/{action}", name="profile")
      */
@@ -26,7 +25,6 @@ class ProfileController extends Controller
     {
         if (!empty($pageUrl)) {
             $profile = $profileManager->getProfileByPageUrl($pageUrl);
-
             if (null === $profile) {
                  throw new NotFoundHttpException();
             }
@@ -45,6 +43,7 @@ class ProfileController extends Controller
     {
         $form = $this->createForm(EditProfileType::class, $profile);
         $form->handleRequest($request);
+        
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile_view.html.twig', [
                 'lastName' => $profile->getLastName(),
@@ -57,6 +56,7 @@ class ProfileController extends Controller
                 'form' =>  $form->createView(),
             ]);
         }
+        
         $profile->setPageUrl($profileManager->generatePageUrl($profile));
         $now = new DateTime();
         $profile->setNameChangedDate($now);
