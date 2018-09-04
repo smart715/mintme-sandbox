@@ -18,11 +18,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProfileController extends Controller
 {
-    
+    private $showEditFormFirst = false;
     /**
-     * @Route("/profile/{pageUrl}", name="profile")
+     * @Route("/profile/{pageUrl}/{action}", name="profile")
      */
-    public function profile(Request $request, ProfileManagerInterface $profileManager, ?string $pageUrl = null): Response
+    public function profile(Request $request, ProfileManagerInterface $profileManager, ?string $pageUrl = null, ?string $action = null): Response
     {
         if (!empty($pageUrl)) {
             $profile = $profileManager->getProfileByPageUrl($pageUrl);
@@ -30,14 +30,18 @@ class ProfileController extends Controller
             if (null === $profile) {
                  throw new NotFoundHttpException();
             }
-
-            return $this->viewProfile($request, $profile, $profileManager);
+            return $this->viewProfile($request, $profile, $profileManager, $action);
         }
-
+        
+        $profile = $profileManager->getProfile($this->getUser());
+        if (null !== $profile) {
+            return $this->redirect('/profile/'.$profile->getPageUrl());
+        }
+        
         return $this->addProfile($request, $profileManager);
     }
     
-    public function viewProfile(Request $request, Profile $profile, ProfileManagerInterface $profileManager): Response
+    public function viewProfile(Request $request, Profile $profile, ProfileManagerInterface $profileManager, ?string $action): Response
     {
         $form = $this->createForm(EditProfileType::class, $profile);
         $form->handleRequest($request);
@@ -49,7 +53,7 @@ class ProfileController extends Controller
                 'country' => $profile->getCountry(),
                 'description' => $profile->getDescription(),
                 'canEdit' => ($profile === $this->getUser()->getProfile()) ? true : false,
-                'showEditFormFirst' => (empty($profile->getCity()) && empty($profile->getCountry()) && empty($profile->getDescription())) ? true : false,
+                'isNew' => ('new' === $action) ? true : false,
                 'form' =>  $form->createView(),
             ]);
         }
@@ -74,12 +78,13 @@ class ProfileController extends Controller
                 'form' => $form->createView(),
             ]);
         }
+        
         $profile->setPageUrl($profileManager->generatePageUrl($profile));
         $now = new DateTime();
         $profile->setNameChangedDate($now);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
-        return $this->redirect('/profile/'.$profile->getPageUrl());
+        return $this->redirect('/profile/'.$profile->getPageUrl().'/new');
     }
 }
