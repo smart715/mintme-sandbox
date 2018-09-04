@@ -25,8 +25,8 @@ class ProfileController extends Controller
         Request $request,
         ProfileManagerInterface $profileManager,
         ?string $pageUrl = null,
-        ?string $action = null
-    ): Response {
+        ?string $action = null): Response
+    {
         if (!empty($pageUrl)) {
             $profile = $profileManager->getProfileByPageUrl($pageUrl);
             if (null === $profile) {
@@ -47,8 +47,8 @@ class ProfileController extends Controller
         Request $request,
         Profile $profile,
         ProfileManagerInterface $profileManager,
-        ?string $action
-    ): Response {
+        ?string $action): Response
+    {
         $form = $this->createForm(EditProfileType::class, $profile);
         $form->handleRequest($request);
         
