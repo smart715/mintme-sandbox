@@ -12,7 +12,7 @@ class ProfileRepository extends EntityRepository
     {
         return $this->findOneBy(['user' => $user->getId()]);
     }
-    public function getProfileByPageUrl(String $pageUrl): ?Profile
+    public function getProfileByPageUrl(string $pageUrl): ?Profile
     {
         return $this->findOneBy(['page_url' => $pageUrl]);
     }

@@ -43,17 +43,6 @@ class ProfileManager implements ProfileManagerInterface
         
         $checkExistProfile = $this->profileRepository->getProfileByPageUrl($currentPageUrl);
         return (null === $checkExistProfile || $profile === $checkExistProfile)
-            ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . $this->randomString(6);
-    }
-    
-    private function randomString(int $length): string
-    {
-        $key = '';
-        $keys = array_merge(range(0, 9), range('a', 'z'));
-        for ($i = 0; $i < $length; $i++) {
-            $key .= $keys[array_rand($keys)];
-        }
-
-        return $key;
+            ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . bin2hex(random_bytes(3));
     }
 }
