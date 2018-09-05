@@ -12,4 +12,9 @@ class ProfileRepository extends EntityRepository
     {
         return $this->findOneBy(['user' => $user->getId()]);
     }
+    
+    public function findReferrer(string $referralCode): ?Profile
+    {
+        return $this->findOneBy([ 'referralCode' => $referralCode ]);
+    }
 }

@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MINTME | Settings{% endblock %}
+
+{% block bodyclass %}referral{% endblock %}
+
+{% block content %}
+    <div id="profile" class="container">
+        <div class="row justify-content-center">
+            <div class="col-xs-12 col-lg-10 col-xl-6">
+                <div class="card">
+                    <div class="card-header">Referral Program</div>
+                    <div class="card-body m-0">
+                        <div class="text-justify">
+                            <p>
+                                When you refer someone, YOU WILL GET {{ referral_percentage }}% of his trading fees and additional days without
+                                trading fees! <br/>
+                                How to get started? it's very easy! <br/>
+                                Below is unique link to registration. if a user registers via the link, you will get {{ referral_percentage }}%
+                                of his trading fees and additional days without trading fees!
+                            </p>
+                            <p>This {{ referral_percentage }}% goes from our pocket, so neither you nor the referred person lose anything!</p>
+                        </div>
+                        <div class="mt-3">
+                            <div class="row justify-content-center">
+                                <div class="col-12 text-center">
+                                    <p>Share this registration link to your friends:</p>
+                                </div>
+                                <div class="col-12 mb-1 text-center" id="referral-link-text">
+                                    <pre><code class="html">{{ absolute_url(
+                                    path('register_referral', { referralCode: referralCode })
+                                    ) }}</code></pre>
+                            </div>
+                            <div class="col-4 mb-2 text-left">
+                                <span class="stats-mini-block">Total earned:
+                                    <span>
+                                       Total earned: 0.00000000 <small>XMR</small>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="col-4 mb-2 text-left">
+                                <span class="stats-mini-block">Free trading to:
+                                    <span>
+                                        {{ referral_free_trading_date|date("d.m.Y") }}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="col-4 mb-2 text-left">
+                                <span class="stats-mini-block">Referrals
+                                    <span>
+                                       0
+                                    </span>
+                                </span>
+                            </div>
+                            
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

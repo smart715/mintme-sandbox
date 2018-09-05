@@ -7,4 +7,6 @@ twig:
     globals:
         users_count_refresh_rate: '%users_count_refresh_rate_seconds%'
         mintme_launch_date: '%mintme_launch_date%'
+        referral_percentage: '%referral_percentage%'
+        referral_free_trading_date: '%referral_free_trading_date%'
     

@@ -6,7 +6,7 @@
         <b-navbar-toggle target="topnav_collapse" class="mt-2"></b-navbar-toggle>
         <b-collapse is-nav="is-nav" id="topnav_collapse">
             <b-navbar-nav class="ml-auto">
-                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
+                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral') }}">
                     Refferal Program
                 </b-nav-item>
                  {% if app.user %}

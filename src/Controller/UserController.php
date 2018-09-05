@@ -25,6 +25,8 @@ class UserController extends AbstractController
     /** @var ProfileManagerInterface */
     protected $profileManager;
 
+    private const REFERRAL_COOKIE_EXPIRE_DAYS = 7;
+    
     public function __construct(
         MailerDispatcherInterface $mailDispatcher,
         UserManagerInterface $userManager,
@@ -82,5 +84,35 @@ class UserController extends AbstractController
         }
 
         return $emailForm;
+    }
+    
+    /**
+     * @Route("/referral", name="referral")
+     */
+    public function referral(ProfileManagerInterface $profileManager): Response
+    {
+        return $this->render('pages/referral.html.twig', [
+            'referralCode' => $profileManager->getProfile($this->getUser())->getReferralCode(),
+        ]);
+    }
+
+    /**
+     * @Route("/invite/{referralCode}", name="register_referral", requirements={"referralCode" = "^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$"})
+     */
+    public function registerReferral(Request $request, string $referralCode): Response
+    {
+        $response = $this->redirectToRoute('fos_user_registration_register');
+        $response->headers->setCookie($this->createReferralCookie($referralCode));
+        $request->getSession()->set('referral', $referralCode);
+        return $response;
+    }
+    
+    private function createReferralCookie(string $referralCode): Cookie
+    {
+        $cookieExpireTime = new DateTime();
+        $cookieExpireTime->add(new DateInterval(
+            'P'.self::REFERRAL_COOKIE_EXPIRE_DAYS.'D'
+        ));
+        return new Cookie('referral', $referralCode, $cookieExpireTime);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -69,6 +70,18 @@ class Profile
      * @var User
      */
     protected $user;
+    
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Profile", mappedBy="referencer")
+     * @var Collection
+     */
+    private $referencedProfiles;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Profile", inversedBy="referencedProfiles")
+     * @var Profile|null
+     */
+    private $referencer;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
@@ -79,11 +92,18 @@ class Profile
     /** @var bool */
     private $isChangesLocked = false;
 
+    /** @ORM\Column(type="integer", nullable=true) */
+    private $referencer_id;
+
+    /** @ORM\Column(type="string", length=255) */
+    private $referral_code;
+
     public function __construct(User $user)
     {
         $this->user = $user;
+        $this->generateReferralCode();
     }
-
+    
     public function isChangesLocked(): bool
     {
         return $this->isChangesLocked;
@@ -171,5 +191,47 @@ class Profile
         $this->lastName = $lastName;
 
         return $this;
+    }
+
+    public function getReferencerId(): ?int
+    {
+        return $this->referencer_id;
+    }
+
+    public function setReferencerId(?int $referencer_id): self
+    {
+        $this->referencer_id = $referencer_id;
+
+        return $this;
+    }
+
+    public function getReferralCode(): ?string
+    {
+        if (empty($this->referralCode))
+            $this->generateReferralCode();
+
+        return $this->referralCode;
+    }
+
+    public function setReferralCode(string $referral_code): self
+    {
+        $this->referral_code = $referral_code;
+
+        return $this;
+    }
+    
+    private function generateReferralCode(): void
+    {
+        $this->referralCode = Uuid::uuid4();
+    }
+    
+    public function referenceBy(Profile $profile): void
+    {
+        $this->referencer = $profile;
+    }
+    
+    public function getReferencer(): ?Profile
+    {
+        return $this->referencer;
     }
 }
