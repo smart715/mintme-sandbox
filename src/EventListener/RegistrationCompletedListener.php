@@ -13,6 +13,7 @@ use FOS\UserBundle\Event\FilterUserResponseEvent;
  */
 class RegistrationCompletedListener
 {
+    /** @var ProfileManagerInterface */
     private $profileManager;
 
     /** @var FilterUserResponseEvent $event */

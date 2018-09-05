@@ -92,10 +92,16 @@ class Profile
     /** @var bool */
     private $isChangesLocked = false;
 
-    /** @ORM\Column(type="integer", nullable=true) */
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @var string|null
+     */
     private $referencerId;
 
-    /** @ORM\Column(type="string", length=255) */
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @var string|null
+     */
     private $referralCode;
 
     public function __construct(User $user)
