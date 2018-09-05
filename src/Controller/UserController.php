@@ -6,11 +6,14 @@ use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
 use App\Manager\ProfileManagerInterface;
 use App\Utils\MailerDispatcherInterface;
+use DateInterval;
+use DateTime;
 use FOS\UserBundle\Form\Type\ResettingFormType;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -91,8 +94,12 @@ class UserController extends AbstractController
      */
     public function referral(ProfileManagerInterface $profileManager): Response
     {
+        if (null  === $this->getUser())
+            return $this->redirect('/login');
+        $profile = $profileManager->getProfile($this->getUser());
         return $this->render('pages/referral.html.twig', [
-            'referralCode' => $profileManager->getProfile($this->getUser())->getReferralCode(),
+            'referralCode' => $profile->getReferralCode(),
+            'referralsTotal' => $profileManager->getReferencesTotal($profile->getId()),
         ]);
     }
 

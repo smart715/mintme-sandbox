@@ -10,5 +10,6 @@ interface ProfileManagerInterface
     public function createProfile(UserInterface $user): Profile;
     public function createProfileReferral(UserInterface $user, string $referralCode): Profile;
     public function getProfile(UserInterface $user): ?Profile;
+    public function getReferencesTotal(int $profileId): ?int;
     public function lockChangePeriod(Profile $profile): void;
 }

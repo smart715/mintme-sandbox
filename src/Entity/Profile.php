@@ -93,10 +93,10 @@ class Profile
     private $isChangesLocked = false;
 
     /** @ORM\Column(type="integer", nullable=true) */
-    private $referencer_id;
+    private $referencerId;
 
     /** @ORM\Column(type="string", length=255) */
-    private $referral_code;
+    private $referralCode;
 
     public function __construct(User $user)
     {
@@ -133,6 +133,11 @@ class Profile
         return $this;
     }
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+    
     public function getFirstName(): ?string
     {
         return $this->firstName;
@@ -195,12 +200,12 @@ class Profile
 
     public function getReferencerId(): ?int
     {
-        return $this->referencer_id;
+        return $this->referencerId;
     }
 
-    public function setReferencerId(?int $referencer_id): self
+    public function setReferencerId(?int $referencerId): self
     {
-        $this->referencer_id = $referencer_id;
+        $this->referencerId = $referencerId;
 
         return $this;
     }
@@ -213,9 +218,9 @@ class Profile
         return $this->referralCode;
     }
 
-    public function setReferralCode(string $referral_code): self
+    public function setReferralCode(string $referralCode): self
     {
-        $this->referral_code = $referral_code;
+        $this->referral_code = $referralCode;
 
         return $this;
     }
@@ -233,5 +238,10 @@ class Profile
     public function getReferencer(): ?Profile
     {
         return $this->referencer;
+    }
+    
+    public function getReferencedProfiles(): ?Profile
+    {
+        return $this->referencedProfiles;
     }
 }

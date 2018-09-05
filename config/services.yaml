@@ -56,3 +56,6 @@ services:
     App\Utils\MailerDispatcher:
         arguments:
             $mailer: '@fos_user.mailer.default'
+    App\EventListener\RegistrationCompletedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.completed }

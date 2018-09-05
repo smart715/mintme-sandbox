@@ -14,9 +14,10 @@ class ProfileManager implements ProfileManagerInterface
 {
     /** @var ProfileRepository */
     private $profileRepository;
-
+    private $entityManager;
     public function __construct(EntityManagerInterface $entityManager)
     {
+        $this->entityManager = $entityManager;
         $this->profileRepository = $entityManager->getRepository(Profile::class);
     }
     public function createProfile(UserInterface $user): Profile
@@ -44,6 +45,11 @@ class ProfileManager implements ProfileManagerInterface
     {
         return $this->profileRepository->getProfileByUser($user);
     }
+    
+    public function getReferencesTotal(int $profileId): ?int
+    {
+        return count($this->profileRepository->findReferences($profileId));
+    }
 
     public function lockChangePeriod(Profile $profile): void
     {
@@ -54,8 +60,8 @@ class ProfileManager implements ProfileManagerInterface
     {
         $profile = new Profile($user);
         $changeProfile($profile);
-        $this->orm->persist($profile);
-        $this->orm->flush();
+        $this->entityManager->persist($profile);
+        $this->entityManager->flush();
         return $profile;
     }
 }
