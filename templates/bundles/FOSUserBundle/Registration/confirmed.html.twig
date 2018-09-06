@@ -1,0 +1,24 @@
+{% extends "@FOSUser/layout.html.twig" %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block contentClass %}signup-confirmed py-4{% endblock %}
+
+{% block fos_user_content %}
+    <div class="container">
+        <div class="row align-items-center">
+           <div class="col-xs-12">
+                <p>The user has been created successfully</p>
+                <p>{{ 'registration.confirmed'|trans({'%username%': user.username}) }}</p>
+                
+                <p>
+                    {% if targetUrl is empty %}
+                        <a href="{{ path('referral') }}">Go to Referral Program .</a>
+                    {% else %}
+                        <a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock fos_user_content %}

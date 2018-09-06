@@ -5,7 +5,7 @@
 {% block bodyclass %}referral{% endblock %}
 
 {% block content %}
-    <div id="profile" class="container">
+    <div id="referral" class="container">
         <div class="row justify-content-center">
             <div class="col-xs-12 col-lg-10 col-xl-6">
                 <div class="card">
@@ -23,37 +23,42 @@
                         </div>
                         <div class="mt-3">
                             <div class="row justify-content-center">
-                                <div class="col-12 text-center">
+                                <div class="col-12 text-center text-grey font-bold">
                                     <p>Share this registration link to your friends:</p>
                                 </div>
                                 <div class="col-12 mb-1 text-center" id="referral-link-text">
-                                    <pre><code class="html">{{ absolute_url(
-                                    path('register_referral', { referralCode: referralCode })
-                                    ) }}</code></pre>
-                            </div>
-                            <div class="col-4 mb-2 text-left">
-                                <span class="stats-mini-block">Total earned:
-                                    <span>
-                                       Total earned: 0.00000000 <small>XMR</small>
+                                    <code class="p-2">
+                                        <span id="code-referral"> {{ absolute_url(path('register_referral', { referralCode: referralCode })) }} </span>
+                                        <copy-link class="code-copy" id="code-copy-btn" data-clipboard-action="copy" data-clipboard-target="#code-referral">
+                                           <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                                        </copy-link>
+                                    </code>
+                                    <div class="clearfix"></div>
+                                </div>
+
+                                <code class="p-2 mt-2 bg-grey">
+                                    <span class="stats-mini-block">Total earned:
+                                        <span>
+                                            Total earned: 0.00000000 <small>XMR</small>
+                                        </span>
                                     </span>
-                                </span>
-                            </div>
-                            <div class="col-4 mb-2 text-left">
-                                <span class="stats-mini-block">Free trading to:
-                                    <span>
-                                        {{ referral_free_trading_date|date("d.m.Y") }}
+                                </code>
+                                <code class="p-2 mx-2 mt-2 bg-grey">
+                                    <span class="stats-mini-block">Free trading to:
+                                        <span>
+                                            {{ referral_free_trading_date|date("d.m.Y") }}
+                                        </span>
                                     </span>
-                                </span>
-                            </div>
-                            <div class="col-4 mb-2 text-left">
-                                <span class="stats-mini-block">Referrals
-                                    <span>
-                                       {{ referralsTotal }}
+                                </code>
+                                <code class="p-2 mt-2 bg-grey">
+                                    <span class="stats-mini-block">Referrals
+                                        <span>
+                                            {{ referralsTotal }}
+                                        </span>
                                     </span>
-                                </span>
+                                </code>
+
                             </div>
-                            
-                        </div>
 
                         </div>
                     </div>
@@ -61,4 +66,8 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/referral.js') }}"></script>
 {% endblock %}
