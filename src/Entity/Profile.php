@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -73,7 +75,7 @@ class Profile
     
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Profile", mappedBy="referencer")
-     * @var Collection
+     * @var Collection|null
      */
     private $referencedProfiles;
 
@@ -233,7 +235,7 @@ class Profile
     
     private function generateReferralCode(): void
     {
-        $this->referralCode = (string) Uuid::uuid4();
+        $this->referralCode = Uuid::uuid4()->toString();
     }
     
     public function referenceBy(Profile $profile): void
@@ -244,5 +246,25 @@ class Profile
     public function getReferencer(): ?Profile
     {
         return $this->referencer;
+    }
+    
+    public function getReferrals(): Collection
+    {
+        return $this->referencedProfiles->filter(function (Profile $profile) {
+            if (null === $profile->user)
+                return false;
+
+            return $profile->user->isEnabled();
+        });
+    }
+    
+    /**
+     * Returns count of referrals that profile has
+     *
+     * @return int
+     */
+    public function getReferralsCount(): int
+    {
+        return count($this->getReferrals());
     }
 }

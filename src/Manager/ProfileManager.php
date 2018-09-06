@@ -6,6 +6,7 @@ use App\Entity\Profile;
 use App\Entity\User;
 use App\OrmAdapter\OrmAdapterInterface;
 use App\Repository\ProfileRepository;
+use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
@@ -23,13 +24,13 @@ class ProfileManager implements ProfileManagerInterface
         $this->entityManager = $entityManager;
         $this->profileRepository = $entityManager->getRepository(Profile::class);
     }
-    public function createProfile(UserInterface $user): Profile
+    public function createProfile(UserInterface $user): ?Profile
     {
         return $this->doCreateProfile($user, function (Profile $profile): void {
         });
     }
     
-    public function createProfileReferral(UserInterface $user, string $referralCode): Profile
+    public function createProfileReferral(UserInterface $user, string $referralCode): ?Profile
     {
         return $this->doCreateProfile(
             $user,
@@ -51,7 +52,11 @@ class ProfileManager implements ProfileManagerInterface
     
     public function getReferencesTotal(?int $profileId): ?int
     {
-        return count($this->profileRepository->findReferences($profileId));
+        $referencees = $this->profileRepository->findReferences($profileId);
+        if (null === $referencees)
+            return 0;
+        
+        return count($referencees);
     }
 
     public function lockChangePeriod(Profile $profile): void
@@ -59,8 +64,13 @@ class ProfileManager implements ProfileManagerInterface
         $profile->setNameChangedDate(new DateTime('+1 month'));
     }
     
-    private function doCreateProfile(UserInterface $user, callable $changeProfile): Profile
+    private function doCreateProfile(UserInterface $user, callable $changeProfile): ?Profile
     {
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $user = $userRepository->find($user->getId());
+        if (null === $user)
+            return  null;
+        
         $profile = new Profile($user);
         $changeProfile($profile);
         $this->entityManager->persist($profile);
