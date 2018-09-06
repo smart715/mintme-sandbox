@@ -49,7 +49,7 @@ class ProfileManager implements ProfileManagerInterface
         return $this->profileRepository->getProfileByUser($user);
     }
     
-    public function getReferencesTotal(int $profileId): ?int
+    public function getReferencesTotal(?int $profileId): ?int
     {
         return count($this->profileRepository->findReferences($profileId));
     }

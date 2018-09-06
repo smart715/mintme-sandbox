@@ -28,7 +28,6 @@ class RegistrationCompletedListener
     {
         $this->event = $event;
         $this->createProfile();
-        $this->event = null;
     }
 
     private function createProfile(): void

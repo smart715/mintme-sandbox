@@ -99,7 +99,7 @@ class UserController extends AbstractController
         $profile = $profileManager->getProfile($this->getUser());
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $profile->getReferralCode(),
-            'referralsTotal' => $profileManager->getReferencesTotal($profile->getId()),
+            'referralsTotal' => $profileManager->getReferencesTotal(intval($profile->getId())),
         ]);
     }
 

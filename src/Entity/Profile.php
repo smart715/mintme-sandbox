@@ -94,13 +94,13 @@ class Profile
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @var string|null
+     * @var int|null
      */
     private $referencerId;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @var string|null
+     * @var string
      */
     private $referralCode;
 
@@ -226,14 +226,14 @@ class Profile
 
     public function setReferralCode(string $referralCode): self
     {
-        $this->referral_code = $referralCode;
+        $this->referralCode = $referralCode;
 
         return $this;
     }
     
     private function generateReferralCode(): void
     {
-        $this->referralCode = Uuid::uuid4();
+        $this->referralCode = (string) Uuid::uuid4();
     }
     
     public function referenceBy(Profile $profile): void
@@ -244,10 +244,5 @@ class Profile
     public function getReferencer(): ?Profile
     {
         return $this->referencer;
-    }
-    
-    public function getReferencedProfiles(): ?Profile
-    {
-        return $this->referencedProfiles;
     }
 }
