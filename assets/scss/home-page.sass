@@ -70,7 +70,7 @@
   .flower-bg
     background: url(../img/coin-flower.png) no-repeat
     background-size: 48rem
-    background-position:  top 9.5rem center
+    background-position:  top 10.4rem center
     @include media-breakpoint-down(lg)
       background-size: 42rem
       background-position:  top 25rem center
@@ -86,26 +86,29 @@
 
 .count-down
   align-items: center
-  background-color: transparent
-  display: flex
+  background-color: $black
+  display: inline-flex
+  border-radius: 10px
   justify-content: center
   .block
     display: flex
     flex-direction: column
     margin: 10px
     .digit
-      color: #35789D
+      background: $white
+      color: $theme-blue
       font-size: 3.125rem
       font-weight: 100
       font-family: 'Roboto', serif
       text-align: center
+      padding: 10px
     .text
-      color: #08A2E8
+      color: $white
       font-size: 1.25rem
       font-family: 'Roboto Condensed', serif
       font-weight: 40
       margin-top: -20px
-      margin-bottom: 10px
+      margin-bottom: 0px
       text-align: center
   @include media-breakpoint-down(xs)
     .block

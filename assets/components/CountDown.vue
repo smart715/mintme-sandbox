@@ -5,15 +5,15 @@
         </div>
         <div class="count-down" v-else>
             <div class="block">
-                <p class="digit">{{ days | twoDigits }} :</p>
+                <p class="digit">{{ days | twoDigits }}</p>
                 <p class="text">Days</p>
             </div>
             <div class="block">
-                <p class="digit">{{ hours | twoDigits }} :</p>
+                <p class="digit">{{ hours | twoDigits }}</p>
                 <p class="text">Hours</p>
             </div>
             <div class="block">
-                <p class="digit">{{ minutes | twoDigits }} :</p>
+                <p class="digit">{{ minutes | twoDigits }}</p>
                 <p class="text">Minutes</p>
             </div>
             <div class="block">
