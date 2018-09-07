@@ -19,8 +19,8 @@
       width: 100%
   .search-input
     background-color: $theme-light-blue
-    color: darken($primary, 10%)
-    border-color: darken($primary, 10%)
+    color: $primary
+    border-color: lighten($primary, 10%)
     padding: .375rem .75rem
     min-width: 25rem
     @include media-breakpoint-down(lg)
@@ -28,7 +28,7 @@
     @include media-breakpoint-down(md)
       min-width: auto
     &::placeholder
-      color: darken($primary, 10%)
+      color: lighten($primary, 5%)
       opacity: 1
     &:focus
       box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
