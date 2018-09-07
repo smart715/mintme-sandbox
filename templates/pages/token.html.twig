@@ -24,12 +24,14 @@
                         <div class="row">
                             <token-introduction-profile
                                 class="col-12 col-md-6"
+                                youtube-client-id="{{ global_youtube_client_id }}"
+                                facebook-app-id="{{ global_facebook_app_id }}"
                                 confirm-website-file-url="{{ path('token_website_confirmation', {'name': token.name}) }}"
                                 confirm-website-url="{{ path('token_website_confirm', {'name': token.name}) }}"
                                 profile-name="{{ profile.firstName }} {{ profile.lastName }}"
                                 website-url="{{ token.websiteUrl }}"
                                 facebook-url="{{ token.facebookUrl }}"
-                                youtube-url="{{ token.youtubeUrl }}"
+                                youtube-channel-id="{{ token.youtubeChannelId }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
                                 :editable="{{ isOwner ? 'true' : 'false' }}">
@@ -57,6 +59,7 @@
 {% endblock %}
 
 {% block pagescripts %}
+    <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="{{ asset('build/token.js') }}"></script>
 {% endblock %}

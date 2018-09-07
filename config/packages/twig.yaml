@@ -4,3 +4,6 @@ twig:
     strict_variables: '%kernel.debug%'
     form_themes:
         - 'form/fields.html.twig'
+    globals:
+        global_youtube_client_id: '%youtube_client_id%'
+        global_facebook_app_id: '%facebook_app_id%'

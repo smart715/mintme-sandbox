@@ -53,10 +53,9 @@ class Token
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @AppAssert\IsUrlFromDomain("www.youtube.com")
      * @var string|null
      */
-    protected $youtubeUrl;
+    protected $youtubeChannelId;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -122,14 +121,14 @@ class Token
         return $this;
     }
 
-    public function getYoutubeUrl(): ?string
+    public function getYoutubeChannelId(): ?string
     {
-        return $this->youtubeUrl;
+        return $this->youtubeChannelId;
     }
 
-    public function setYoutubeUrl(string $youtubeUrl): self
+    public function setYoutubeChannelId(string $youtubeChannelId): self
     {
-        $this->youtubeUrl = $youtubeUrl;
+        $this->youtubeChannelId = $youtubeChannelId;
 
         return $this;
     }

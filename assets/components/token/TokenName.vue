@@ -64,7 +64,6 @@ export default {
                 }
             }, error => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
-                    console.log(error.response.data[0][0]);
                     this.$toasted.error(error.response.data[0][0].message);
                 }
                 else {
