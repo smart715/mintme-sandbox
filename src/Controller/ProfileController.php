@@ -30,7 +30,7 @@ class ProfileController extends Controller
         if (!empty($pageUrl)) {
             $profile = $profileManager->getProfileByPageUrl($pageUrl);
             if (null === $profile) {
-                 throw new NotFoundHttpException();
+                throw new NotFoundHttpException();
             }
             return $this->viewProfile($request, $profile, $profileManager, $action);
         }
