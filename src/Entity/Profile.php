@@ -190,7 +190,11 @@ class Profile
     public function setPageUrl(?string $page_url): self
     {
         $this->page_url = $page_url;
-
+        
         return $this;
+    }
+    public function getUserEmail(): string
+    {
+        return $this->user->getEmail();
     }
 }
