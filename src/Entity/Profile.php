@@ -172,4 +172,9 @@ class Profile
 
         return $this;
     }
+
+    public function getUserEmail(): string
+    {
+        return $this->user->getEmail();
+    }
 }
