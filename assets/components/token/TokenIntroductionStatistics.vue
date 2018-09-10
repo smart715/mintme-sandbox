@@ -20,7 +20,7 @@
                             Wallet on exchange: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
@@ -28,7 +28,7 @@
                             Active orders: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
@@ -36,7 +36,7 @@
                             Withdrawn: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
@@ -44,7 +44,7 @@
                             Sold on the market: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
@@ -57,7 +57,7 @@
                             Release period: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
@@ -65,7 +65,7 @@
                             Monthly installment: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
@@ -73,7 +73,7 @@
                             Already released: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
@@ -81,7 +81,7 @@
                             Remaining: xxx
                             <font-awesome-icon
                                 icon="question"
-                                class="ml-1 mb-1 bg-blue text-white
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"
                             />
                         </div>
