@@ -1,4 +1,4 @@
-<b-navbar id="navbar" toggleable="lg" type="" class="top-navbar pt-3 pb-0" v-cloak>
+<b-navbar id="navbar" toggleable="lg" type="" class="top-navbar pt-3 pb-0">
     <div class="container-fluid">
         <b-navbar-brand href="{{ path('homepage') }}">
             <img src="{{ asset('build/images/main-logo.png') }}" height="40" alt="MINTME">
@@ -26,7 +26,14 @@
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                     Wallet
                 </b-nav-item>
-                {% if app.user %}
+                {% if not app.user %}
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
+                        Login
+                    </b-nav-item>
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
+                        <span>Sign Up</span>
+                    </b-nav-item>
+                {% else %}
                     <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
                         <template slot="button-content">
                             <i class="d-block icon-profile-big"></i>
@@ -35,7 +42,7 @@
                             <span class="icon-profile float-left mt-1 mr-1"></span>
                             Profile
                         </b-dropdown-item>
-                        <b-dropdown-item>
+                        <b-dropdown-item href="{{ path('settings') }}">
                             <font-awesome-icon icon="cog"></font-awesome-icon>
                             Setting
                         </b-dropdown-item>
@@ -44,13 +51,6 @@
                             Log Out
                         </b-dropdown-item>
                     </b-nav-item-dropdown>
-                {% else %}
-                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
-                        Login
-                    </b-nav-item>
-                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
-                        <span>Sign Up</span>
-                    </b-nav-item>
                 {% endif %}
             </b-navbar-nav>
         </b-collapse>
