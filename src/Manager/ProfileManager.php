@@ -41,15 +41,25 @@ class ProfileManager implements ProfileManagerInterface
     
     public function generatePageUrl(Profile $profile): string
     {
-        if (empty($profile->getLastName()))
-            return "";
+        $route = $profile->getFirstName() . '.' . $profile->getLastName();
 
-        $currentPageUrl = $profile->getLastName();
-        if (!empty($profile->getFirstName()))
-            $currentPageUrl .= "." . $profile->getFirstName();
-        
-        $checkExistProfile = $this->profileRepository->getProfileByPageUrl($currentPageUrl);
-        return (null === $checkExistProfile || $profile === $checkExistProfile)
-            ? strtolower($currentPageUrl) : strtolower($currentPageUrl) . "." . bin2hex(random_bytes(3));
+        if ('.' === substr($route, 0, 1))
+            throw new \Exception('Can\'t generate profile link for empty profile');
+
+        $existedProfile = $this->profileRepository->getProfileByPageUrl($route);
+
+        return (null === $existedProfile || $profile === $existedProfile)
+            ? strtolower($route) : $this->generateUniqueUrl($route);
+    }
+
+    private function generateUniqueUrl(string $prefix): string
+    {
+        $str = strtolower($prefix . "." . bin2hex(openssl_random_pseudo_bytes(3) ?: uniqid()));
+
+        if ($this->profileRepository->getProfileByPageUrl($str)) {
+            return $this->generateUniqueUrl($prefix);
+        }
+
+        return $str;
     }
 }
