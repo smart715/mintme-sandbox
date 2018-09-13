@@ -38,11 +38,6 @@ class ProfileManager implements ProfileManagerInterface
         $user = $this->userRepository->findByEmail($email);
         return is_null($user) ? null : $this->getProfile($user);
     }
-
-    public function lockChangePeriod(Profile $profile): void
-    {
-        $profile->setNameChangedDate(new DateTime('+1 month'));
-    }
     
     public function generatePageUrl(Profile $profile): string
     {
