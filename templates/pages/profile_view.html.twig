@@ -2,49 +2,79 @@
 
 {% block title %}Profile{% endblock %}
 
-{% block pagestyles %}
-    <link rel="stylesheet" href="{{ asset('build/profile-view.css') }}">
-{% endblock %}
-
 {% block bodyclass %}profile-view{% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div class="container" id="profile">
         <div class="row">
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        {{ name }}
+                        <span>{{ profile.firstName }} {{ profile.lastName }} </span>
+
+                        {%- if (canEdit == true) -%}
+                            <a @click="showEditForm = true" class="float-right">
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2"></font-awesome-icon>
+                            </a>
+                        {%- endif -%}
                     </div>
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row" v-if="!showEditForm">
                             <div class="col-12 col-md-4">
                                 <div class="pb-1">
-                                    City: {CityName}
+                                    City: {{ profile.city }}
                                 </div>
                                 <div class="pb-1">
-                                    Country: {CountryName}
+                                    Country: {{ profile.country }}
                                 </div>
                                 <div class="pb-1">
                                     {TokenName} created on July 2018
                                 </div>
+
                             </div>
                             <div class="col-12 col-md-8 pt-3 pt-md-0 description">
-                                Lorem Ipsum is simply dummy text of the printing and
-                                typesetting industry. Lorem Ipsum has been the
-                                industry's standard dummy text ever since the 1500s,
-                                when an unknown printer took a galley of type and
-                                scrambled it to make a type specimen book.
-                            </div>
-                            <div class="col-12 pt-4 text-right">
-                                <a href="{{ path('profile') }}" class="btn btn-primary px-5">
-                                    Edit
-                                </a>
+                                <div>{{ profile.description }}</div>
                             </div>
                         </div>
+
+                        <div v-if="showEditForm" v-cloak>
+                            {{ form_start(form) }}
+                            <div class="row mb-3">
+                                <div class="col-12 col-md-4">
+                                    <div class="pb-1">
+                                        {{ form_row(form.firstName) }}
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.lastName) }}
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.city) }}
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.country) }}
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-8 pt-3 pt-md-0 description">
+                                    <div>
+                                        {{ form_row(form.description) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <input type="submit" class="btn btn-primary px-4" value="Save">
+                                <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
                     </div>
+                    <input type="hidden" ref="editFormShowFirst" value="{{ editFormShowFirst }}"/>
                 </div>
             </div>
         </div>
     </div>
 {% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/profile.js') }}"></script>
+{% endblock %}
+
