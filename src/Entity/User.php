@@ -49,6 +49,11 @@ class User extends BaseUser
      * @var Profile
      */
     protected $profile;
+    
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
 
     public function getTempEmail(): ?string
     {

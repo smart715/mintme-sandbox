@@ -39,9 +39,10 @@ class ProfilePeriodLockValidator extends ConstraintValidator
     private function isPropertyChanged(Profile $profile, string $value): bool
     {
         $originalProfileData = $this->entityManager->getUnitOfWork()->getOriginalEntityData($profile);
-
+        if (empty($originalProfileData))
+            return true;
+        
         $isChanged = $value !== $originalProfileData[$this->context->getPropertyName()];
-
         if ($isChanged) {
             $profile->lockChanges();
         }
