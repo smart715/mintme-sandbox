@@ -1,0 +1,7 @@
+scheb_two_factor:
+    google:
+        enabled: true
+        template: security/2fa_login.html.twig
+
+    backup_codes:
+        enabled: true
