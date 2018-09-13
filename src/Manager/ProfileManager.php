@@ -28,15 +28,38 @@ class ProfileManager implements ProfileManagerInterface
     {
         return $this->profileRepository->getProfileByUser($user);
     }
+    public function getProfileByPageUrl(string $pageUrl): ?Profile
+    {
+        return $this->profileRepository->getProfileByPageUrl($pageUrl);
+    }
 
     public function findByEmail(string $email): ?Profile
     {
         $user = $this->userRepository->findByEmail($email);
         return is_null($user) ? null : $this->getProfile($user);
     }
-
-    public function lockChangePeriod(Profile $profile): void
+    
+    public function generatePageUrl(Profile $profile): string
     {
-        $profile->setNameChangedDate(new DateTime('+1 month'));
+        $route = $profile->getFirstName() . '.' . $profile->getLastName();
+
+        if ('.' === substr($route, 0, 1))
+            throw new \Exception('Can\'t generate profile link for empty profile');
+
+        $existedProfile = $this->profileRepository->getProfileByPageUrl($route);
+
+        return (null === $existedProfile || $profile === $existedProfile)
+            ? strtolower($route) : $this->generateUniqueUrl($route);
+    }
+
+    private function generateUniqueUrl(string $prefix): string
+    {
+        $str = strtolower($prefix . "." . bin2hex(openssl_random_pseudo_bytes(3) ?: uniqid()));
+
+        if ($this->profileRepository->getProfileByPageUrl($str)) {
+            return $this->generateUniqueUrl($prefix);
+        }
+
+        return $str;
     }
 }

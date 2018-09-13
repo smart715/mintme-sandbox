@@ -33,24 +33,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/profile", name="profile")
-     */
-    public function profile(): Response
-    {
-        return $this->render('pages/profile.html.twig');
-    }
-
-    /**
-     * @Route("/profile/{name}", name="profile_view")
-     */
-    public function profileView(String $name): Response
-    {
-        return $this->render('pages/profile_view.html.twig', [
-            'name' => $name,
-        ]);
-    }
-
-    /**
      * @Route("/token/{name}/{tab}", name="token")
      */
     public function token(?String $name = null, ?String $tab = null): Response
