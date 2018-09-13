@@ -5,10 +5,12 @@ namespace App\Entity;
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Profile
 {
@@ -25,6 +27,7 @@ class Profile
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @ProfilePeriodLock()
+     * @Groups({"default"})
      * @var string|null
      */
     protected $firstName;
@@ -35,6 +38,7 @@ class Profile
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
      * @ProfilePeriodLock()
+     * @Groups({"default"})
      * @var string|null
      */
     protected $lastName;
@@ -43,6 +47,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
+     * @Groups({"default"})
      * @var string|null
      */
     protected $city;
@@ -51,12 +56,14 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
      * @Assert\Length(min="2")
+     * @Groups({"default"})
      * @var string|null
      */
     protected $country;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Groups({"default"})
      * @var string|null
      */
     protected $description;
@@ -105,9 +112,12 @@ class Profile
         return $this;
     }
 
-    public function setNameChangedDate(?DateTime $nameChangedDate): void
+    /** @ORM\PrePersist() */
+    public function updateNameChangedDate(): self
     {
-        $this->nameChangedDate = $nameChangedDate;
+        $this->nameChangedDate = new DateTime('+1 month');
+
+        return $this;
     }
 
     public function getNameChangedDate(): ?DateTime

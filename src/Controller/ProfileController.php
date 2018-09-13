@@ -3,85 +3,74 @@
 namespace App\Controller;
 
 use App\Entity\Profile;
-use App\Entity\User;
 use App\Form\AddProfileType;
-use App\Form\EditProfileDescriptionType;
 use App\Form\EditProfileType;
 use App\Manager\ProfileManagerInterface;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+/** @Route("/profile") */
 class ProfileController extends Controller
 {
-    /**
-     * @Route("/profile/{pageUrl}", name="profile")
-     */
-    public function profile(
-        SessionInterface $session,
+    /** @Route("/{pageUrl}", name="profile-view") */
+    public function profileView(
         Request $request,
+        SessionInterface $session,
         ProfileManagerInterface $profileManager,
-        ?string $pageUrl = null
+        NormalizerInterface $normalizer,
+        string $pageUrl
     ): Response {
-        if (!empty($pageUrl)) {
-            $profile = $profileManager->getProfileByPageUrl($pageUrl);
-            if (null === $profile) {
-                throw new NotFoundHttpException();
-            }
-            return $this->viewProfile($session, $request, $profile, $profileManager);
+        $profile = $profileManager->getProfileByPageUrl($pageUrl);
+
+        if (null === $profile) {
+            throw new NotFoundHttpException();
         }
-        
-        $profile = $profileManager->getProfile($this->getUser());
-        if (null !== $profile) {
-            return $this->redirectToRoute('profile', array('pageUrl' => $profile->getPageUrl()));
-        }
-        
-        return $this->addProfile($session, $request, $profileManager);
-    }
-    
-    private function viewProfile(
-        SessionInterface $session,
-        Request $request,
-        Profile $profile,
-        ProfileManagerInterface $profileManager
-    ): Response {
+
         $form = $this->createForm(EditProfileType::class, $profile);
         $form->handleRequest($request);
-        
+
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile_view.html.twig', [
-                'lastName' => $profile->getLastName(),
-                'firstName' => $profile->getFirstName(),
-                'city' => $profile->getCity(),
-                'country' => $profile->getCountry(),
-                'description' => $profile->getDescription(),
-                'canEdit' => ($profile === $this->getUser()->getProfile()) ? true : false,
-                'editFormShowFirst' => $session->get('editFormShowFirst'),
+                'profile' => $normalizer->normalize($profile, null, [ 'groups' => [ 'default' ] ]),
                 'form' =>  $form->createView(),
+                'canEdit' => $profile === $this->getUser()->getProfile(),
+                'editFormShowFirst' => $session->get('editFormShowFirst') || $form->getErrors(true)->count(),
             ]);
         }
-        
+
         $profile->setPageUrl($profileManager->generatePageUrl($profile));
-        $profile->setNameChangedDate(new DateTime());
+
+        if (!$profile->isChangesLocked()) {
+            $profile->updateNameChangedDate();
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
+
         $session->set('editFormShowFirst', false);
-        return  $this->redirectToRoute('profile', array('pageUrl' => $profile->getPageUrl()));
+
+        return  $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }
-    
-    private function addProfile(
-        SessionInterface $session,
+
+    /** @Route(name="profile") */
+    public function profile(
         Request $request,
+        SessionInterface $session,
         ProfileManagerInterface $profileManager
     ): Response {
-        $user = $this->getUser();
-        $profile  = new Profile($user);
+        $profile = $profileManager->getProfile($this->getUser());
+
+        if (null !== $profile) {
+            return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+        }
+
+        $profile  = new Profile($this->getUser());
         $form = $this->createForm(AddProfileType::class, $profile);
         $form->handleRequest($request);
         
@@ -92,11 +81,13 @@ class ProfileController extends Controller
         }
         
         $profile->setPageUrl($profileManager->generatePageUrl($profile));
-        $profile->setNameChangedDate(new DateTime());
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
+
         $session->set('editFormShowFirst', true);
-        return  $this->redirectToRoute('profile', array('pageUrl' => $profile->getPageUrl()));
+
+        return  $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }
 }

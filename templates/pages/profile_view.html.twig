@@ -10,65 +10,53 @@
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        <span>{{ lastName }} {{ firstName }} </span>
+                        <span>{{ profile.firstName }} {{ profile.lastName }} </span>
+
                         {%- if (canEdit == true) -%}
-                        <a @click="showEditForm = true" class="float-right">
-                            <font-awesome-icon icon="edit" class="ml-2"></font-awesome-icon>
-                        </a>
+                            <a @click="showEditForm = true" class="float-right">
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2"></font-awesome-icon>
+                            </a>
                         {%- endif -%}
                     </div>
-                    <div class="card-body" v-cloak>
+                    <div class="card-body">
                         <div class="row" v-if="!showEditForm">
                             <div class="col-12 col-md-4">
                                 <div class="pb-1">
-                                    City: {{ city }} 
+                                    City: {{ profile.city }}
                                 </div>
                                 <div class="pb-1">
-                                    Country: {{ country }} 
+                                    Country: {{ profile.country }}
                                 </div>
                                 <div class="pb-1">
                                     {TokenName} created on July 2018
                                 </div>
 
                             </div>
-
                             <div class="col-12 col-md-8 pt-3 pt-md-0 description">
-                                <div>{{ description }}</div>
-
+                                <div>{{ profile.description }}</div>
                             </div>
                         </div>
-                        <div v-if="showEditForm">
-                            {%- if (canEdit == true) -%}
+
+                        <div v-if="showEditForm" v-cloak>
                             {{ form_start(form) }}
                             <div class="row mb-3">
                                 <div class="col-12 col-md-4">
                                     <div class="pb-1">
-                                        {%- if (form.lastname is defined) -%}
-                                            {{ form_label(form.lastname) }}
-                                            {{ form_widget(form.lastname) }}
-                                        {%- endif -%}
+                                        {{ form_row(form.firstName) }}
                                     </div>
                                     <div class="pb-1">
-                                        {%- if (form.firstname is defined) -%}
-                                            {{ form_label(form.firstname) }}
-                                            {{ form_widget(form.firstname) }}
-                                        {%- endif -%}
+                                        {{ form_row(form.lastName) }}
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_label(form.city) }}
-                                        {{ form_widget(form.city) }}
+                                        {{ form_row(form.city) }}
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_label(form.country) }}
-                                        {{ form_widget(form.country) }}
+                                        {{ form_row(form.country) }}
                                     </div>
-
                                 </div>
-
                                 <div class="col-12 col-md-8 pt-3 pt-md-0 description">
                                     <div>
-                                        {{ form_label(form.description) }}
-                                        {{ form_widget(form.description) }}
+                                        {{ form_row(form.description) }}
                                     </div>
                                 </div>
                             </div>
@@ -77,7 +65,6 @@
                                 <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
                             </div>
                             {{ form_end(form) }}
-                            {%- endif -%}
                         </div>
                     </div>
                     <input type="hidden" ref="editFormShowFirst" value="{{ editFormShowFirst }}"/>
