@@ -28,6 +28,24 @@
                 </div>
             </div>
         </div>
+        <div class="row justify-content-center">
+            <div class="col-xs-12 col-lg-10 col-xl-6">
+                <div class="text-center">
+                    <h5>Two-Factor Authentication</h5>
+                    <p>Increase your account's security by enabling Two-Factor Authentication (2FA).</p>
+                </div>
+                {% if twoFactorAuth %}
+                    <a href="{{ path('two_factor_auth') }}" class="btn btn-info btn-block" role="button">
+                        Manage two-factor authentication
+                    </a>
+                {% else %}
+                    <a href="{{ path('two_factor_auth') }}" class="btn btn-success btn-block" role="button">
+                        Enable two-factor authentication
+                    </a>
+                {% endif %}
+
+            </div>
+        </div>
     </div>
 {% endblock %}
 

@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
+use App\Form\TwoFactorType;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\TwoFactorManagerInterface;
 use App\Utils\MailerDispatcherInterface;
 use FOS\UserBundle\Form\Type\ResettingFormType;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -40,9 +43,11 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
+        
         return $this->render('pages/settings.html.twig', [
             'emailForm' => $this->getEmailForm($request)->createView(),
             'passwordForm' => $this->getPasswordForm($request)->createView(),
+            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
         ]);
     }
 
@@ -82,5 +87,71 @@ class UserController extends AbstractController
         }
 
         return $emailForm;
+    }
+    
+     /**
+     * @Route("//profile/2fa", name="two_factor_auth")
+     */
+    public function twoFactorAuthAction(
+        Request $request,
+        TwoFactorManagerInterface $twoFactorManager
+    ): Response {
+        $user = $this->getUser();
+        $form = $this->createForm(TwoFactorType::class);
+        $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
+
+        if (!$isTwoFactor) {
+            $user->setGoogleAuthenticatorSecret($twoFactorManager->generateSecretCode());
+            $imgUrl = $twoFactorManager->generateUrl($user);
+            $formHeader = 'Enable two-factor authentication';
+        }
+
+        $form->handleRequest($request);
+
+        $parameters = [
+            'form' => $form->createView(),
+            'imgUrl' => $imgUrl ?? '',
+            'formHeader' => $formHeader ?? 'Disable two-factor authentication',
+            'backupCodes' => [],
+            'isTwoFactor' => $isTwoFactor,
+            'twoFactorKey' => $user->getGoogleAuthenticatorSecret(),
+        ];
+
+        if (!$form->isSubmitted() || !$form->isValid())
+            return $this->render('security/2fa_manager.html.twig', $parameters);
+
+        if ($twoFactorManager->checkCode($user, $form)) {
+            if ($isTwoFactor) {
+                $this->turnOffAuthenticator($twoFactorManager);
+                return $this->redirectToRoute('profile');
+            }
+            $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
+            return $this->render('security/2fa_manager.html.twig', $parameters);
+        }
+
+        $this->addFlash('error', 'Invalid two-factor authentication code.');
+        return $this->render('security/2fa_manager.html.twig', $parameters);
+    }
+    
+    private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager, User $user): array
+    {
+        $backupCodes = $twoFactorManager->generateBackupCodes();
+        $user->setGoogleAuthenticatorBackupCodes($backupCodes);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+        $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
+        return $backupCodes;
+    }
+
+    private function turnOffAuthenticator(TwoFactorManagerInterface $twoFactorManager): void
+    {
+        /** @var User */
+        $user = $this->getUser();
+        $googleAuth = $twoFactorManager->getGoogleAuthEntry($user->getId());
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($googleAuth);
+        $entityManager->flush();
+        $this->addFlash('notice', 'You have disabled two-factor authentication!');
     }
 }

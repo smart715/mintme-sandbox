@@ -24,3 +24,10 @@ fos_user_resetting:
 controllers:
     resource: ../src/Controller/
     type: annotation
+    
+2fa_login:
+    path: /2fa
+    controller: "scheb_two_factor.form_controller::form"
+
+2fa_login_check:
+    path: /2fa_check
