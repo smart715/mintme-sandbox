@@ -5,9 +5,9 @@ namespace App\Tests\Manager;
 use App\Entity\GoogleAuthenticatorEntry;
 use App\Entity\User;
 use App\Manager\TwoFactorManager;
-use App\OrmAdapter\OrmAdapterInterface;
 use App\Repository\GoogleAuthenticatorEntryRepository;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
@@ -20,26 +20,26 @@ class TwoFactorManagerTest extends TestCase
     {
         $form = $this->mockFormInterface(['code' => '1']);
         $session = $this->mockSession();
-        $ormAdapter = $this->mockOrmAdapter();
+        $entityManager = $this->mockEntityManager();
         $googleAuth = $this->mockGoogleAuthenticatorInterface();
         $googleAuthEntry = $this->mockUser(['1', '2']);
-        $manager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $this->assertTrue($manager->checkCode($googleAuthEntry, $form));
-        $manager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $googleAuthEntry = $this->mockUser(['3', '2']);
         $this->assertFalse($manager->checkCode($googleAuthEntry, $form));
         $googleAuthEntry = $this->mockUser(['2', '2']);
         $googleAuth = $this->mockGoogleAuthenticatorInterface(true);
-        $manager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $this->assertTrue($manager->checkCode($googleAuthEntry, $form));
     }
 
     public function testGenerateBackUpCodes(): void
     {
         $session = $this->mockSession();
-        $ormAdapter = $this->mockOrmAdapter();
+        $entityManager = $this->mockEntityManager();
         $googleAuth = $this->mockGoogleAuthenticatorInterface();
-        $twoFactorManager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $twoFactorManager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $this->assertCount(5, $twoFactorManager->generateBackupCodes());
         $this->assertEquals(12, strlen($twoFactorManager->generateBackupCodes()[0]));
     }
@@ -47,12 +47,12 @@ class TwoFactorManagerTest extends TestCase
     public function testGenerateSecretCode(): void
     {
         $session = $this->mockSession(true, '1');
-        $ormAdapter = $this->mockOrmAdapter();
+        $entityManager = $this->mockEntityManager();
         $googleAuth = $this->mockGoogleAuthenticatorInterface(true, '', '2');
-        $twoFactorManager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $twoFactorManager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $this->assertEquals('1', $twoFactorManager->generateSecretCode());
         $session = $this->mockSession(false, '1');
-        $twoFactorManager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $twoFactorManager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $this->assertEquals('2', $twoFactorManager->generateSecretCode());
     }
 
@@ -61,18 +61,18 @@ class TwoFactorManagerTest extends TestCase
         /** @var User|MockObject $user */
         $user = $this->createMock(User::class);
         $session = $this->mockSession();
-        $ormAdapter = $this->mockOrmAdapter();
+        $entityManager = $this->mockEntityManager();
         $googleAuth = $this->mockGoogleAuthenticatorInterface(true, 'test');
-        $twoFactorManager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $twoFactorManager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $this->assertEquals('test', $twoFactorManager->generateUrl($user));
     }
 
     public function testGetGoogleAuthEntry(): void
     {
         $session = $this->mockSession();
-        $ormAdapter = $this->mockOrmAdapter($this->mockGoogleAuthRepo());
+        $entityManager = $this->mockEntityManager($this->mockGoogleAuthRepo());
         $googleAuth = $this->mockGoogleAuthenticatorInterface();
-        $twoFactorManager = new TwoFactorManager($session, $ormAdapter, $googleAuth);
+        $twoFactorManager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $instance = $twoFactorManager->getGoogleAuthEntry(1);
         $this->assertInstanceOf(GoogleAuthenticatorEntry::class, $instance);
     }
@@ -115,12 +115,12 @@ class TwoFactorManagerTest extends TestCase
         return $user;
     }
 
-    private function mockOrmAdapter(?ObjectRepository $repository = null): OrmAdapterInterface
+    private function mockEntityManager(?ObjectRepository $repository = null): EntityManagerInterface
     {
-        /** @var OrmAdapterInterface|MockObject $ormAdapter */
-        $ormAdapter = $this->createMock(OrmAdapterInterface::class);
-        $ormAdapter->method('getRepository')->willReturn($repository);
-        return $ormAdapter;
+        /** @var EntityManagerInterface|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getRepository')->willReturn($repository);
+        return $entityManager;
     }
 
     private function mockGoogleAuthRepo(): GoogleAuthenticatorEntryRepository

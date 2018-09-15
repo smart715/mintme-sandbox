@@ -33,8 +33,8 @@ class GoogleAuthenticatorEntry
     protected $secret;
 
     /**
-     * @ORM\Column(type="simple_array", nullable=true)
-     * @var array|null
+     * @ORM\Column(type="json_array", nullable=true)
+     * @var string[]|null
      */
     protected $backupCodes;
     
@@ -76,8 +76,10 @@ class GoogleAuthenticatorEntry
 
     public function invalidateBackupCode(string $code): void
     {
-        $key = array_search($code, $this->backupCodes);
-        if (false !== $key)
+        if (null !== $this->backupCodes) {
+            $key = array_search($code, $this->backupCodes);
+            if (false !== $key)
             unset($this->backupCodes[$key]);
+        }
     }
 }

@@ -4,8 +4,8 @@ namespace App\Manager;
 
 use App\Entity\GoogleAuthenticatorEntry;
 use App\Entity\User;
-use App\OrmAdapter\OrmAdapterInterface;
 use App\Repository\GoogleAuthenticatorEntryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use PragmaRX\Random\Random;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 use Symfony\Component\Form\FormInterface;
@@ -16,19 +16,19 @@ class TwoFactorManager implements TwoFactorManagerInterface
     /** @var SessionInterface */
     private $session;
 
-    /** @var OrmAdapterInterface */
-    private $ormAdapter;
-
     /** @var GoogleAuthenticatorInterface */
     private $authenticator;
-
+    
+    /** @var EntityManagerInterface */
+    private $entityManager;
+    
     public function __construct(
         SessionInterface $session,
-        OrmAdapterInterface $ormAdapter,
+        EntityManagerInterface $entityManager,
         GoogleAuthenticatorInterface $authenticator
     ) {
         $this->session = $session;
-        $this->ormAdapter = $ormAdapter;
+        $this->entityManager = $entityManager;
         $this->authenticator = $authenticator;
     }
 
@@ -64,7 +64,7 @@ class TwoFactorManager implements TwoFactorManagerInterface
     public function getGoogleAuthEntry(int $userId): GoogleAuthenticatorEntry
     {
         /** @var GoogleAuthenticatorEntryRepository */
-        $repository = $this->ormAdapter->getRepository(GoogleAuthenticatorEntry::class);
+        $repository = $this->entityManager->getRepository(GoogleAuthenticatorEntry::class);
         return $repository->getGoogleAuthenticator($userId);
     }
 }

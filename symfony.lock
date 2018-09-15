@@ -167,6 +167,9 @@
     "phpstan/phpstan-symfony": {
         "version": "0.10"
     },
+    "pragmarx/random": {
+        "version": "v0.2.2"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },
