@@ -90,7 +90,7 @@ class UserController extends AbstractController
     }
     
      /**
-     * @Route("//profile/2fa", name="two_factor_auth")
+     * @Route("/settings/2fa", name="two_factor_auth")
      */
     public function twoFactorAuthAction(
         Request $request,
