@@ -1,32 +1,76 @@
 @import "~bootstrap/scss/mixins"
 @import "variables"
 
-.footer-bg
+.footer-container
   position: relative
-  .footer-box
+
+  .bottom-links-container
     position: absolute
-    top: 0
-    left: 0
+    bottom: 0
+    right: 0
+    z-index: 1
+    .bottom-links-wrapper
+      position: relative
+
   .bottom-links
+    position: absolute
+    right: 0
+    bottom: 0
     padding-right: 10rem
     padding-bottom: 6rem
+
     @include media-breakpoint-down(lg)
       padding-right: 6rem
-      padding-bottom: 3rem
+      padding-bottom: 5rem
+
     @include media-breakpoint-down(md)
       padding-right: 0
-      padding-bottom: 1rem
+      padding-bottom: 3rem
+
     @include media-breakpoint-down(sm)
-      position: relative
-      bottom: 13rem
+      bottom: 16rem
+
     @include media-breakpoint-down(xs)
       bottom: 7rem
+
     .link-box
       border-right: .0625rem solid $body-text-color
+
       &:last-child
         border: none
+
       .list-item:last-child
         padding-bottom: 0 !important
+
       a
         color: $body-text-color
         text-decoration: none
+
+  .social-network
+    position: absolute
+    width: 4.25%
+    height: 10.125%
+    font-size: 2.75vw
+
+    @include media-breakpoint-down(xs)
+      z-index: 2
+
+    &.facebook
+      background: $color-facebook
+      top: 28.5%
+      left: 10.75%
+
+    &.twitter
+      background: $color-twitter
+      top: 43%
+      left: 11.5%
+
+    &.linkedin
+      background: $color-linkedin
+      top: 58.25%
+      left: 12.25%
+
+  .copyright
+    position: absolute
+    left: 0
+    bottom: 0

@@ -42,3 +42,7 @@ new Vue({
         bCollapse,
     },
 });
+
+new Vue({
+    el: '#footer',
+});
