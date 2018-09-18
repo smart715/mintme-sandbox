@@ -88,9 +88,7 @@ class UserController extends AbstractController
         return $emailForm;
     }
     
-     /**
-     * @Route("/settings/2fa", name="two_factor_auth")
-     */
+    /** @Route("/settings/2fa", name="two_factor_auth")*/
     public function twoFactorAuthAction(
         Request $request,
         TwoFactorManagerInterface $twoFactorManager
