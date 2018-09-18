@@ -43,7 +43,6 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
-        
         return $this->render('pages/settings.html.twig', [
             'emailForm' => $this->getEmailForm($request)->createView(),
             'passwordForm' => $this->getPasswordForm($request)->createView(),
