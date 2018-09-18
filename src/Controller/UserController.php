@@ -123,7 +123,7 @@ class UserController extends AbstractController
         if ($twoFactorManager->checkCode($user, $form)) {
             if ($isTwoFactor) {
                 $this->turnOffAuthenticator($twoFactorManager);
-                return $this->redirectToRoute('profile');
+                return $this->redirectToRoute('settings');
             }
             $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
             return $this->render('security/2fa_manager.html.twig', $parameters);
