@@ -21,6 +21,13 @@ fos_user_resetting:
     resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
     prefix: /resetting
 
+2fa_login:
+    path: /2fa
+    controller: "scheb_two_factor.form_controller::form"
+
+2fa_login_check:
+    path: /2fa_check
+
 controllers:
     resource: ../src/Controller/
     type: annotation
