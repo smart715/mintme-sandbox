@@ -1,4 +1,4 @@
-<b-navbar id="navbar" toggleable="lg" type="" class="top-navbar pt-3 pb-0">
+<b-navbar id="navbar" toggleable="lg" type="" class="top-navbar pt-3 pb-0" v-cloak>
     <div class="container-fluid">
         <b-navbar-brand href="{{ path('homepage') }}">
             <img src="{{ asset('build/images/main-logo.png') }}" height="40" alt="MINTME">
@@ -15,7 +15,7 @@
                             <i class="d-block icon-profile-big"></i>
                         </template>
                        <b-dropdown-item  href="{{ path('settings') }}">
-                            <font-awesome-icon icon="cog"></font-awesome-icon>
+                            <font-awesome-icon icon="cog" class="float-left mt-1 mr-1"></font-awesome-icon>
                             Setting
                         </b-dropdown-item>
                         <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
