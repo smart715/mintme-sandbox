@@ -1,0 +1,11 @@
+//mixins.scss
+
+// font scales mixins
+@mixin font-scale($scale) { 
+  @if map-has-key($font-scales, $scale) {
+    font-size: map-get($font-scales, $scale);
+  }
+  @else {
+    @warn "Unknown `#{$scale}` in $font-scales.";
+  }
+}

@@ -1,4 +1,5 @@
 @import 'variables'
+@import 'mixins'
 @import '~bootstrap/scss/bootstrap'
 @import '~vue-range-slider/dist/vue-range-slider'
 @import url('https://fonts.googleapis.com/css?family=Lato')
@@ -11,7 +12,7 @@
 @import 'profile-view-page'
 
 html
-  font-size: $base-font-size
+  @include font-scale(sm)
   height: 100%
 
 body
@@ -59,7 +60,7 @@ label
 .card
   .card-header
     background: $card-header-bg-color
-    font-size: 1.2em
+    @include font-scale(md)
     color: $white
     padding: .75rem 1.5rem
     span
@@ -69,7 +70,7 @@ label
       color: $white
   .card-title
     margin: 0
-    font-size: 1.25em
+    @include font-scale(md)
   &.transparent
     background-color: transparent
     >.card-header
@@ -90,7 +91,7 @@ label
   border: .0625rem solid $gray-400
   th
     font-weight: normal
-    font-size: .875em
+    @include font-scale(sm)
   td, th
     &:first-child
       padding-left: 2rem
@@ -105,7 +106,7 @@ label
     display: flex
     text-align: center
     padding: 0 !important
-    font-size: 1.2rem
+    @include font-scale(md)
     align-items: stretch
     border: none
     .nav-item
