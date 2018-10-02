@@ -4,14 +4,16 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity("email")
  */
-class User extends BaseUser
+class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 {
     /**
      * @ORM\Id
@@ -49,6 +51,17 @@ class User extends BaseUser
      * @var Profile
      */
     protected $profile;
+    
+    /**
+     * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist"})
+     * @var GoogleAuthenticatorEntry
+     */
+    private $googleAuthenticatorEntry;
+
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
 
     public function getTempEmail(): ?string
     {
@@ -69,15 +82,66 @@ class User extends BaseUser
         return $this;
     }
 
-    public function getProfile(): ?Profile
-    {
-        return $this->profile;
-    }
-
     /** {@inheritdoc} */
     public function setEmail($email)
     {
         $this->username = $email;
         return parent::setEmail($email);
+    }
+    
+    public function isGoogleAuthenticatorEnabled(): bool
+    {
+        return null !== $this->googleAuthenticatorEntry;
+    }
+
+    public function getGoogleAuthenticatorUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function getGoogleAuthenticatorSecret(): string
+    {
+        $googleAuth = $this->googleAuthenticatorEntry;
+        if (null !== $googleAuth)
+            return (null !==  $googleAuth->getSecret()) ? $googleAuth->getSecret() : '';
+    }
+
+    public function isBackupCode(string $code): bool
+    {
+        $googleAuth = $this->googleAuthenticatorEntry;
+        return (null !== $googleAuth) ? in_array($code, $googleAuth->getBackupCodes()) : false;
+    }
+    
+    public function invalidateBackupCode(string $code): void
+    {
+        if (null !== $this->googleAuthenticatorEntry)
+            $this->googleAuthenticatorEntry->invalidateBackupCode($code);
+    }
+
+    public function getGoogleAuthenticatorBackupCodes(): array
+    {
+        $googleAuth = $this->googleAuthenticatorEntry;
+        return (null !== $googleAuth) ? $googleAuth->getBackupCodes() : [];
+    }
+
+    public function setGoogleAuthenticatorSecret(string $secret): void
+    {
+        $this->getGoogleAuthenticatorEntry()->setSecret($secret);
+    }
+
+    public function setGoogleAuthenticatorBackupCodes(array $codes): void
+    {
+        $this->getGoogleAuthenticatorEntry()->setBackupCodes($codes);
+    }
+
+    private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
+    {
+        if (null === $this->googleAuthenticatorEntry)
+            $this->googleAuthenticatorEntry = new GoogleAuthenticatorEntry();
+        elseif (null !== $this->googleAuthenticatorEntry
+            && $this !== $this->googleAuthenticatorEntry->getUser())
+            $this->googleAuthenticatorEntry->setUser($this);
+        
+        return $this->googleAuthenticatorEntry;
     }
 }

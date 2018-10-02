@@ -26,29 +26,32 @@
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                     Wallet
                 </b-nav-item>
-                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
-                    Login
-                </b-nav-item>
-                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
-                    <span>Sign Up</span>
-                </b-nav-item>
-                <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
-                    <template slot="button-content">
-                        <i class="d-block icon-profile-big"></i>
-                    </template>
-                    <b-dropdown-item>
-                        <span class="icon-profile float-left mt-1 mr-1"></span>
-                        Profile
-                    </b-dropdown-item>
-                    <b-dropdown-item>
-                        <font-awesome-icon icon="cog"></font-awesome-icon>
-                        Setting
-                    </b-dropdown-item>
-                    <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
-                        <span class="icon-logout float-left mt-1 mr-1"></span>
-                        Log Out
-                    </b-dropdown-item>
-                </b-nav-item-dropdown>
+                {% if not app.user %}
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
+                        Login
+                    </b-nav-item>
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
+                        <span>Sign Up</span>
+                    </b-nav-item>
+                {% else %}
+                    <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
+                        <template slot="button-content">
+                            <i class="d-block icon-profile-big"></i>
+                        </template>
+                        <b-dropdown-item href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
+                            <span class="icon-profile float-left mt-1 mr-1"></span>
+                            Profile
+                        </b-dropdown-item>
+                        <b-dropdown-item href="{{ path('settings') }}">
+                            <font-awesome-icon icon="cog" class="float-left mt-1 mr-1"></font-awesome-icon>
+                            Setting
+                        </b-dropdown-item>
+                        <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
+                            <span class="icon-logout float-left mt-1 mr-1"></span>
+                            Log Out
+                        </b-dropdown-item>
+                    </b-nav-item-dropdown>
+                {% endif %}
             </b-navbar-nav>
         </b-collapse>
     </div>

@@ -21,7 +21,7 @@ body
   width: 100%
 
 a
-  color: $theme-blue
+  color: $primary
 
 .text-yellow
   color: $theme-yellow
@@ -30,15 +30,15 @@ a
   font-family: $cloud-font
   font-size: 4rem
   color: $white
- 
+
 .text-green
   color: $theme-green
 
 .text-orange
   color: $theme-orange
 
-.text-blue
-  color: $theme-blue
+.bg-orange
+  background-color: $theme-orange
 
 .h-100vh
   height: 100vh
@@ -49,6 +49,9 @@ a
 .range-slider-knob
   background: $color-slider-range
   border: none
+
+.c-pointer
+  cursor: pointer
 
 label
   margin: 0
@@ -108,6 +111,9 @@ label
     .nav-item
       flex: 1 1 auto
       padding: 0
+      border-left: .0625rem solid $white
+      &:first-child
+        border-left: none
       .nav-link
         border: none
         background-color: $color-tabs
@@ -176,4 +182,41 @@ label
 
 .sorting_desc
   background: url('../img/sort_desc.png') no-repeat right center
-  
+
+.modal-content
+  border-top-width: 20px
+  border-top-style: solid
+  border-top-color: $theme-green
+  .modal-header
+    display: block
+    border-bottom: none
+    .cancel-button
+      top: -3.5em
+      right: -2.5em
+      position: relative
+      float: right
+      border-top-width: 5px
+      border-top-style: solid
+      border-top-color: $theme-green
+      background: $white
+      opacity: 1
+      height: 80px
+      width: 80px
+      border-radius: 50%
+      .inner
+        background: $white
+        color: $theme-green
+        vertical-align: middle
+        text-align: center
+        height: 73px
+        width: 73px
+        border-radius: 50%
+        top: -0.02em
+        right: -0.02em
+        position: relative
+        font-size: 50px
+        a:hover
+          cursor: pointer
+          color: $black
+  .modal-body
+    margin-top: -50px

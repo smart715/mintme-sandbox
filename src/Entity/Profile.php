@@ -5,10 +5,12 @@ namespace App\Entity;
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Profile
 {
@@ -25,6 +27,7 @@ class Profile
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @ProfilePeriodLock()
+     * @Groups({"default"})
      * @var string
      */
     protected $firstName;
@@ -33,7 +36,9 @@ class Profile
      * @ORM\Column(type="string")
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Length(min="2")
      * @ProfilePeriodLock()
+     * @Groups({"default"})
      * @var string
      */
     protected $lastName;
@@ -41,6 +46,8 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Length(min="2")
+     * @Groups({"default"})
      * @var string|null
      */
     protected $city;
@@ -48,12 +55,15 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
+     * @Assert\Length(min="2")
+     * @Groups({"default"})
      * @var string|null
      */
     protected $country;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Groups({"default"})
      * @var string|null
      */
     protected $description;
@@ -63,9 +73,6 @@ class Profile
      * @var DateTime|null
      */
     protected $nameChangedDate;
-
-    /** @var bool */
-    private $isChangesLocked = false;
 
     /**
      * @ORM\OneToOne(targetEntity="User", inversedBy="profile", orphanRemoval=true)
@@ -78,6 +85,15 @@ class Profile
      * @var Token|null
      */
     protected $token;
+
+    /** @var bool */
+    private $isChangesLocked = false;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    private $page_url;
 
     public function __construct(User $user)
     {
@@ -96,9 +112,12 @@ class Profile
         return $this;
     }
 
-    public function setNameChangedDate(?DateTime $nameChangedDate): void
+    /** @ORM\PrePersist() */
+    public function updateNameChangedDate(): self
     {
-        $this->nameChangedDate = $nameChangedDate;
+        $this->nameChangedDate = new DateTime('+1 month');
+
+        return $this;
     }
 
     public function getNameChangedDate(): ?DateTime
@@ -109,6 +128,13 @@ class Profile
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setToken(?Token $token): self
+    {
+        $this->token = $token;
+
+        return $this;
     }
 
     public function getFirstName(): string
@@ -171,11 +197,21 @@ class Profile
         return $this;
     }
 
-    public function setToken(?Token $token): self
+    public function getPageUrl(): ?string
     {
-        $this->token = $token;
+        return $this->page_url;
+    }
+
+    public function setPageUrl(?string $page_url): self
+    {
+        $this->page_url = $page_url;
 
         return $this;
+    }
+
+    public function getUserEmail(): string
+    {
+        return $this->user->getEmail();
     }
 
     public function getToken(): ?Token

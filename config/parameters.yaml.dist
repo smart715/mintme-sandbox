@@ -12,3 +12,5 @@ parameters:
 
     youtube_client_id: 0123456789-abcdef0123456789.apps.googleusercontent.com
     facebook_app_id: 0123456789
+
+    version: 'V1.0.0'

@@ -53,6 +53,8 @@ services:
     App\Communications\Factory\GuzzleRpcClientFactoryInterface: ~
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactoryInterface'
 
+    App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
+
     App\Manager\TokenManager: ~
     App\Manager\TokenManagerInterface: '@App\Manager\TokenManager'
 
@@ -62,6 +64,13 @@ services:
     App\Utils\MailerDispatcher:
         arguments:
             $mailer: '@fos_user.mailer.default'
+
+    FOS\UserBundle\Form\Factory\FormFactory:
+        arguments:
+            $formFactory: '@form.factory'
+            $name: '%fos_user.profile.form.name%'
+            $type: '%fos_user.profile.form.type%'
+            $validationGroups: '%fos_user.profile.form.validation_groups%'
 
     App\Verify\WebsiteVerifier:
         arguments:

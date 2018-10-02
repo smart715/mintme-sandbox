@@ -33,20 +33,30 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/profile", name="profile")
+     * @Route("/token/{name}/{tab}", name="token")
      */
-    public function profile(): Response
+    public function token(?String $name = null, ?String $tab = null): Response
     {
-        return $this->render('pages/profile.html.twig');
-    }
+        // FIXME: This is for view test only.
+        $tokenName = $name;
+        $action = 'invest';
+        $tab = strtolower(strval($tab));
+        $name = strtolower(strval($name));
+        if (empty($name) && empty($tab)) {
+            $action = 'edit';
+            if (empty($tokenName))
+                $tokenName = 'Dummy Token Name';
+        } elseif (!empty($tab)) {
+            if ('invest' === $tab || 'intro' === $tab)
+                $action = $tab;
+        } elseif ('new' === $name) {
+            $action = 'new';
+            $tokenName = null;
+        }
 
-    /**
-     * @Route("/profile/{name}", name="profile_view")
-     */
-    public function profileView(String $name): Response
-    {
-        return $this->render('default/profile_view.html.twig', [
-            'name' => $name,
+        return $this->render('pages/token.html.twig', [
+            'tokenName' => $tokenName,
+            'action' => $action,
         ]);
     }
 }

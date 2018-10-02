@@ -8,13 +8,19 @@ import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand';
 import bNavbarToggle from 'bootstrap-vue/es/components/navbar/navbar-toggle';
 import bNavItem from 'bootstrap-vue/es/components/nav/nav-item';
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse';
-import {library} from '@fortawesome/fontawesome-svg-core';
+import fontawesome from '@fortawesome/fontawesome';
+import fas from '@fortawesome/fontawesome-free-solid';
+import fab from '@fortawesome/fontawesome-free-brands';
+import far from '@fortawesome/fontawesome-free-regular';
 import {faSearch, faCog, } from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 
-library.add(faSearch, faCog);
+fontawesome.library.add(fas, far, fab, faSearch, faCog);
 
 window.Vue = require('vue');
+
+Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('font-awesome-layers', FontAwesomeLayers);
 
 Vue.options.delimiters = ['{[', ']}'];
 
@@ -36,6 +42,9 @@ new Vue({
         bNavbarToggle,
         bNavItem,
         bCollapse,
-        FontAwesomeIcon,
     },
+});
+
+new Vue({
+    el: '#footer',
 });

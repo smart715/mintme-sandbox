@@ -1,4 +1,9 @@
 new Vue({
-    el: '#profile',
-    components: {},
+   el: '#profile',
+   data: {
+        showEditForm: false,
+   },
+   mounted: function() {
+       this.showEditForm = this.$refs.editFormShowFirst.value;
+   },
 });

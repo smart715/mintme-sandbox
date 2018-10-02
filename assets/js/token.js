@@ -1,5 +1,4 @@
 import Tabs from 'bootstrap-vue/es/components';
-import TokenInvest from '../components/token/TokenInvest';
 import TokenIntroductionProfile from '../components/token/TokenIntroductionProfile';
 import TokenIntroductionStatistics from '../components/token/TokenIntroductionStatistics';
 import TokenIntroductionDescription from '../components/token/TokenIntroductionDescription';
@@ -14,11 +13,10 @@ new Vue({
     };
   },
   components: {
-    Tabs,
-    TokenInvest,
     TokenIntroductionProfile,
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
     TokenName,
+    Tabs,
   },
 });
