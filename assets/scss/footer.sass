@@ -3,7 +3,7 @@
 
 .footer-container
   position: relative
-
+  @include font-scale(sm)
   .bottom-links-container
     position: absolute
     bottom: 0
@@ -17,21 +17,21 @@
     right: 0
     bottom: 0
     padding-right: 10rem
-    padding-bottom: 6rem
+    padding-bottom: 2rem
 
     @include media-breakpoint-down(lg)
       padding-right: 6rem
-      padding-bottom: 5rem
+      padding-bottom: 2rem
 
     @include media-breakpoint-down(md)
-      padding-right: 0
-      padding-bottom: 3rem
+      padding-right: 0rem
+      padding-bottom: 2rem
 
     @include media-breakpoint-down(sm)
-      bottom: 16rem
+      bottom: 8rem
 
     @include media-breakpoint-down(xs)
-      bottom: 7rem
+      bottom: 5rem
 
     .link-box
       border-right: .0625rem solid $body-text-color
@@ -48,29 +48,30 @@
 
   .social-network
     position: absolute
-    width: 4.25%
-    height: 10.125%
-    font-size: 2.75vw
+    width: 2.15%
+    height: 8.125%
+    font-size: 1.0vw
 
     @include media-breakpoint-down(xs)
       z-index: 2
 
     &.facebook
       background: $color-facebook
-      top: 28.5%
-      left: 10.75%
+      top: 36.5%
+      left: 10.5%
 
     &.twitter
       background: $color-twitter
-      top: 43%
-      left: 11.5%
+      top: 49.5%
+      left: 11%
 
     &.linkedin
       background: $color-linkedin
-      top: 58.25%
-      left: 12.25%
+      top: 62.5%
+      left: 11.25%
 
   .copyright
     position: absolute
     left: 0
     bottom: 0
+    @include font-scale(xs)
