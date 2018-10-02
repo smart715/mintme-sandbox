@@ -1,4 +1,5 @@
 @import 'variables'
+@import 'mixins'
 @import '~bootstrap/scss/bootstrap'
 @import '~vue-range-slider/dist/vue-range-slider'
 @import url('https://fonts.googleapis.com/css?family=Lato')
@@ -11,7 +12,7 @@
 @import 'profile-view-page'
 
 html
-  font-size: $base-font-size
+  @include font-scale(sm)
   height: 100%
 
 body
@@ -21,33 +22,16 @@ body
   width: 100%
 
 a
-  color: $theme-blue
-
-code
-  background-color: $theme-light-grey
-  color: $theme-dark-grey
-
-.code-copy
-  font-size: 1.4em
-  color: $theme-light-grey
-  cursor: pointer
-  :hover
-    color: $theme-grey
-
-.bg-grey
-  background-color: $theme-grey
+  color: $primary
 
 .text-yellow
   color: $theme-yellow
-
-.text-grey
-  color: $theme-dark-grey
 
 .errors
   font-family: $cloud-font
   font-size: 4rem
   color: $white
- 
+
 .text-green
   color: $theme-green
 
@@ -56,12 +40,6 @@ code
 
 .bg-orange
   background-color: $theme-orange
-
-.text-blue
-  color: $theme-blue
-
-.bg-blue
-  background-color: $theme-blue
 
 .h-100vh
   height: 100vh
@@ -73,13 +51,16 @@ code
   background: $color-slider-range
   border: none
 
+.c-pointer
+  cursor: pointer
+
 label
   margin: 0
 
 .card
   .card-header
     background: $card-header-bg-color
-    font-size: 1.2em
+    @include font-scale(md)
     color: $white
     padding: .75rem 1.5rem
     span
@@ -89,7 +70,7 @@ label
       color: $white
   .card-title
     margin: 0
-    font-size: 1.25em
+    @include font-scale(md)
   &.transparent
     background-color: transparent
     >.card-header
@@ -110,7 +91,7 @@ label
   border: .0625rem solid $gray-400
   th
     font-weight: normal
-    font-size: .875em
+    @include font-scale(sm)
   td, th
     &:first-child
       padding-left: 2rem
@@ -125,12 +106,15 @@ label
     display: flex
     text-align: center
     padding: 0 !important
-    font-size: 1.2rem
+    @include font-scale(md)
     align-items: stretch
     border: none
     .nav-item
       flex: 1 1 auto
       padding: 0
+      border-left: .0625rem solid $white
+      &:first-child
+        border-left: none
       .nav-link
         border: none
         background-color: $color-tabs
@@ -186,4 +170,58 @@ label
   background: url('../img/sort_asc.png') no-repeat right center
 .sorting_desc
   background: url('../img/sort_desc.png') no-repeat right center
-  
+
+.modal-content
+  border-top-width: 20px
+  border-top-style: solid
+  border-top-color: $theme-green
+  .modal-header
+    display: block
+    border-bottom: none
+    .cancel-button
+      top: -3.5em
+      right: -2.5em
+      position: relative
+      float: right
+      border-top-width: 5px
+      border-top-style: solid
+      border-top-color: $theme-green
+      background: $white
+      opacity: 1
+      height: 80px
+      width: 80px
+      border-radius: 50%
+      .inner
+        background: $white
+        color: $theme-green
+        vertical-align: middle
+        text-align: center
+        height: 73px
+        width: 73px
+        border-radius: 50%
+        top: -0.02em
+        right: -0.02em
+        position: relative
+        font-size: 50px
+        a:hover
+          cursor: pointer
+          color: $black
+  .modal-body
+    margin-top: -50px
+
+code
+  background-color: $theme-light-grey
+  color: $theme-dark-grey
+
+.code-copy
+  font-size: 1.4em
+  color: $theme-light-grey
+  cursor: pointer
+  :hover
+    color: $theme-grey
+
+.bg-grey
+  background-color: $theme-grey
+
+.text-grey
+  color: $theme-dark-grey

@@ -1,40 +1,51 @@
-<div>
-    <div class="footer-bg">
-        <img class="img-fluid w-100" src="{{ asset('build/images/footer-main.png') }}" alt="">
-        <div class="footer-box d-flex w-100 h-100">
-            <div class="align-self-end w-100">
-                <div class="bottom-links text-center text-lg-right">
-                    <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
-                        <li class="list-item pb-2 pb-lg-3">
-                            <a href="#">Company</a>
-                        </li>
-                        <li class="list-item pb-2 pb-lg-3">
-                            <a href="#">About Us</a>
-                        </li>
-                    </ul>
-                    <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
-                        <li class="list-item pb-2 pb-lg-3">
-                            <a href="#">Usefull Links</a>
-                        </li>
-                        <li class="list-item pb-2 pb-lg-3">
-                            <a href="#">Support</a>
-                        </li>
-                    </ul>
-                    <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
-                        <li class="list-item pb-2 pb-lg-3">
-                            <a href="#">Contact Us</a>
-                        </li>
-                        <li class="list-item pb-2 pb-lg-3">
-                            <a href="#">Fees</a>
-                        </li>
-                    </ul>
+<div id="footer">
+    <div class="footer-container">
+        <img class="img-fluid w-100" src="{{ asset('build/images/footer-main.png') }}" alt="" />
+        <div>
+            <a href="#" class="social-network facebook rounded-circle text-white d-flex align-content-center justify-content-center flex-wrap">
+                <font-awesome-icon class="align-self-center" :icon="['fab', 'facebook-f']"></font-awesome-icon>
+            </a>
+            <a href="#" class="social-network twitter rounded-circle text-white d-flex align-content-center justify-content-center flex-wrap">
+                <font-awesome-icon class="align-self-center" :icon="['fab', 'twitter']"></font-awesome-icon>
+            </a>
+            <a href="#" class="social-network linkedin rounded-circle text-white d-flex align-content-center justify-content-center flex-wrap">
+                <font-awesome-icon class="align-self-center" :icon="['fab', 'linkedin-in']"></font-awesome-icon>
+            </a>
+        </div>
+        <div class="bottom-links-container w-100">
+            <div class="bottom-links-wrapper w-100">
+                <div class="bottom-links text-center text-lg-right w-100">
+                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
+                            <li class="list-item pb-2 pb-lg-3">
+                                <a href="#">Company</a>
+                            </li>
+                            <li class="list-item pb-2 pb-lg-3">
+                                <a href="#">About Us</a>
+                            </li>
+                        </ul>
+                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
+                            <li class="list-item pb-2 pb-lg-3">
+                                <a href="#">Usefull Links</a>
+                            </li>
+                            <li class="list-item pb-2 pb-lg-3">
+                                <a href="#">Support</a>
+                            </li>
+                        </ul>
+                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
+                            <li class="list-item pb-2 pb-lg-3">
+                                <a href="#">Contact Us</a>
+                            </li>
+                            <li class="list-item pb-2 pb-lg-3">
+                                <a href="#">Fees</a>
+                            </li>
+                        </ul>
                 </div>
-                <div class="copyright text-center pb-2">
-                    <div>
-                        Copyright 2018 - MintMe.
-                        <div class="d-sm-inline">All rights reserved</div>
-                    </div>
-                </div>
+            </div>
+        </div>
+        <div class="copyright text-center pb-sm-2 w-100">
+            <div>
+                Copyright 2018 - MintMe.
+                <div class="d-sm-inline">All rights reserved</div>
             </div>
         </div>
     </div>

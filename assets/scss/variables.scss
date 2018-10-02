@@ -4,31 +4,39 @@
 $open-sans-font: 'Open Sans', sans-serif;
 $lato-font: 'Lato', sans-serif;
 $oxygen-font: 'Oxygen', sans-serif;
-$base-font-size: 16px;
 $cloud-font: 'AlphaCloud', sans-serif;
+$font-scales: (
+  xs: 13px,
+  sm: 16px,
+  md: 24px,
+  lg: 32px
+);
 
 // Borders
 $border-radius: 0;
 
 // Colors
-$primary: #55aded;
+$primary: #007ab9;
 
 $body-text-color: #1a1a1a;
 $gradiant-blue-100: #90c7ff;
 $gradiant-blue-200: #29abe2;
 $gradiant-blue-300: #4693fd;
 $gradiant-blue-400: #0071bc;
-$theme-blue: #007ab9;
 $theme-light-blue: #bedeff;
 $theme-yellow: #be8817;
 $theme-orange: #f7931e;
+$theme-green: #8dc63f;
+$color-tabs: $primary;
+$color-tabs-links: #0078bb;
+$color-slider-range: #007ABB;
+$color-facebook: #3b5998;
+$color-twitter: #1da1f3;
+$color-linkedin: #0077b5;
 $theme-light-grey: #ededed;
 $theme-dark-grey: #666666;
 $theme-grey: #cccccc;
-$theme-green: #8dc63f;
-$color-tabs: #2797e8;
-$color-tabs-links: #0078bb;
-$color-slider-range: #007ABB;
+
 
 // Forms
 $input-bg: #e6e6e6;
@@ -40,9 +48,8 @@ $input-btn-focus-color: $input-bg;
 
 // Card
 $card-border-width: 0;
-
-$card-header-bg-color: #007abb;
+$card-header-bg-color: $primary;
 
 // Pagination
-$pagination-color: $theme-blue;
+$pagination-color: $primary;
 $pagination-border-width: 0;

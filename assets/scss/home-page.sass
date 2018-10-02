@@ -3,18 +3,18 @@
     @include media-breakpoint-down(xs)
       font-size: .875rem
     .title
-      font-size: 2.375em
+      @include font-scale(lg)
       font-weight: 800
       letter-spacing: -.0625rem
       word-spacing: -.125rem
       text-transform: uppercase
     .description
       display: inline-block
-      font-size: 1.25em
+      @include font-scale(md)
       line-height: 1.25
     .call-to-action
       padding: .75rem 1.5rem
-      font-size: 1.5em
+      @include font-scale(md)
       text-transform: uppercase
       background: linear-gradient(180deg, $gradiant-blue-200, $gradiant-blue-400)
   .features
@@ -70,7 +70,7 @@
   .flower-bg
     background: url(../img/coin-flower.png) no-repeat
     background-size: 48rem
-    background-position:  top 10.4rem center
+    background-position:  top 6.4rem center
     @include media-breakpoint-down(lg)
       background-size: 42rem
       background-position:  top 25rem center
@@ -93,15 +93,15 @@
   .block
     display: flex
     flex-direction: column
-    margin: 10px
+    margin: 8px
     .digit
       background: $white
-      color: $theme-blue
+      color: $gradiant-blue-400
       font-size: 3.125rem
       font-weight: 100
       font-family: 'Roboto', serif
       text-align: center
-      padding: 10px
+      padding: 3px
     .text
       color: $white
       font-size: 1.25rem

@@ -13,9 +13,8 @@ function setHomepageDescriptionWidth() {
 }
 
 setHomepageDescriptionWidth();
-window.onresize = function() {
-    setHomepageDescriptionWidth();
-};
+onresize = setHomepageDescriptionWidth;
+
 
 import CountDown from '../components/CountDown.vue';
 
