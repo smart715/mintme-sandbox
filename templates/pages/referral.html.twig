@@ -46,7 +46,7 @@
                                 <code class="p-2 mx-2 mt-2 bg-grey font-bold">
                                     <span class="stats-mini-block">Free trading to:
                                         <span>
-                                            {{ referral_free_trading_date|date("d.m.Y") }}
+                                            {{ referral_free_trading_date|date_modify("+" ~ referralsTotal ~ " day")|date("d.m.Y") }}
                                         </span>
                                     </span>
                                 </code>
