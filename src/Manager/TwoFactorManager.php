@@ -42,15 +42,20 @@ class TwoFactorManager implements TwoFactorManagerInterface
     public function generateBackupCodes(): array
     {
         $codes = [];
-        for ($i = 0; $i < 5; $i++)
+
+        for ($i = 0; $i < 5; $i++) {
             $codes[] = (new Random())->size(12)->get();
+        }
+
         return $codes;
     }
 
     public function generateSecretCode(): string
     {
-        if ($this->session->has('googleSecreteCode'))
+        if ($this->session->has('googleSecreteCode')) {
             return $this->session->get('googleSecreteCode');
+        }
+
         $secrete = $this->authenticator->generateSecret();
         $this->session->set('googleSecreteCode', $secrete);
         return $secrete;

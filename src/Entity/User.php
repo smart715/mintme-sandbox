@@ -102,26 +102,31 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     public function getGoogleAuthenticatorSecret(): string
     {
         $googleAuth = $this->googleAuthenticatorEntry;
-        if (null !== $googleAuth)
-            return (null !==  $googleAuth->getSecret()) ? $googleAuth->getSecret() : '';
+
+        return null !== $googleAuth && null !==  $googleAuth->getSecret()
+            ? $googleAuth->getSecret()
+            : '';
     }
 
     public function isBackupCode(string $code): bool
     {
         $googleAuth = $this->googleAuthenticatorEntry;
-        return (null !== $googleAuth) ? in_array($code, $googleAuth->getBackupCodes()) : false;
+        return null !== $googleAuth
+            ? in_array($code, $googleAuth->getBackupCodes())
+            : false;
     }
     
     public function invalidateBackupCode(string $code): void
     {
-        if (null !== $this->googleAuthenticatorEntry)
+        if (null !== $this->googleAuthenticatorEntry) {
             $this->googleAuthenticatorEntry->invalidateBackupCode($code);
+        }
     }
 
     public function getGoogleAuthenticatorBackupCodes(): array
     {
         $googleAuth = $this->googleAuthenticatorEntry;
-        return (null !== $googleAuth) ? $googleAuth->getBackupCodes() : [];
+        return null !== $googleAuth ? $googleAuth->getBackupCodes() : [];
     }
 
     public function setGoogleAuthenticatorSecret(string $secret): void
@@ -136,11 +141,13 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 
     private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
     {
-        if (null === $this->googleAuthenticatorEntry)
+        if (null === $this->googleAuthenticatorEntry) {
             $this->googleAuthenticatorEntry = new GoogleAuthenticatorEntry();
-        elseif (null !== $this->googleAuthenticatorEntry
-            && $this !== $this->googleAuthenticatorEntry->getUser())
+        } elseif (null !== $this->googleAuthenticatorEntry
+            && $this !== $this->googleAuthenticatorEntry->getUser()
+        ) {
             $this->googleAuthenticatorEntry->setUser($this);
+        }
         
         return $this->googleAuthenticatorEntry;
     }

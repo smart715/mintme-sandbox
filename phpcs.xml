@@ -34,7 +34,12 @@
             <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit" />
             <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment" />
             <exclude name="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
+            <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses" />
+            <exclude name="SlevomatCodingStandard.ControlStructures.ControlStructureSpacing" />
+            <exclude name="SlevomatCodingStandard.Functions.UnusedParameter" />
     </rule>
+
+    <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses" />
 
     <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses">
         <properties>

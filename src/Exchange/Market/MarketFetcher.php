@@ -78,7 +78,7 @@ class MarketFetcher
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
-        return array_map(function (array $orderData) use ($market) {
+        return array_map(static function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
                 $orderData['user'],
@@ -96,7 +96,7 @@ class MarketFetcher
     /** @return Order[] */
     private function parseExecutedOrders(array $result, Market $market): array
     {
-        return array_map(function (array $orderData) use ($market) {
+        return array_map(static function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
                 $orderData['maker'],

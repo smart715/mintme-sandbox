@@ -25,8 +25,9 @@ class ProfileFetcher implements ProfileFetcherInterface
 
     public function fetchProfile(): ?Profile
     {
-        if (null === $this->tokenStorage->getToken())
+        if (null === $this->tokenStorage->getToken()) {
             throw new RuntimeException('Not authenticated.');
+        }
 
         return $this->profileManager->getProfile(
             $this->tokenStorage->getToken()->getUser()

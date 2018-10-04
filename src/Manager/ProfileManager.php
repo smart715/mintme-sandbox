@@ -42,20 +42,24 @@ class ProfileManager implements ProfileManagerInterface
     public function findByEmail(string $email): ?Profile
     {
         $user = $this->userRepository->findByEmail($email);
-        return is_null($user) ? null : $this->getProfile($user);
+        return is_null($user)
+            ? null
+            : $this->getProfile($user);
     }
 
     public function generatePageUrl(Profile $profile): string
     {
         $route = $profile->getFirstName() . '.' . $profile->getLastName();
 
-        if ('.' === substr($route, 0, 1))
+        if ('.' === substr($route, 0, 1)) {
             throw new \Exception('Can\'t generate profile link for empty profile');
+        }
 
         $existedProfile = $this->profileRepository->getProfileByPageUrl($route);
 
-        return (null === $existedProfile || $profile === $existedProfile)
-            ? strtolower($route) : $this->generateUniqueUrl($route);
+        return null === $existedProfile || $profile === $existedProfile
+                ? strtolower($route)
+                : $this->generateUniqueUrl($route);
     }
 
     public function findByToken(Token $token): Profile

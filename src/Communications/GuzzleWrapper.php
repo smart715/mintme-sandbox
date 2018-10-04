@@ -66,8 +66,9 @@ class GuzzleWrapper implements JsonRpcInterface
 
     private function constructClient(): void
     {
-        if (!is_null($this->client))
+        if (!is_null($this->client)) {
             return;
+        }
 
         $this->client = $this->clientFactory->createClient($this->url, [
             'timeout' => $this->timeoutSeconds,

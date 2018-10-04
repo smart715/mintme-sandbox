@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Profile;
 use App\Entity\Token;
 use App\Form\TokenCreateType;
 use App\Form\TokenType;
@@ -59,7 +60,7 @@ class TokenController extends AbstractController
             return $this->render('pages/token_404.html.twig');
         }
 
-        $isOwner = $token == $this->tokenManager->getOwnToken();
+        $isOwner = $token === $this->tokenManager->getOwnToken();
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
@@ -73,8 +74,9 @@ class TokenController extends AbstractController
      */
     public function create(Request $request): Response
     {
-        if ($this->isTokenCreated())
+        if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken();
+        }
 
         $token = new Token();
         $form = $this->createForm(TokenCreateType::class, $token);
@@ -82,11 +84,14 @@ class TokenController extends AbstractController
     
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-            $profile->setToken($token);
-            //TODO: add 1 million tokens
-            $this->em->persist($profile);
-            $this->em->flush();
 
+            if (null !== $profile) {
+                $profile->setToken($token);
+                //TODO: add 1 million tokens
+                $this->em->persist($profile);
+                $this->em->flush();
+            }
+            
             return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
         }
 
@@ -190,7 +195,7 @@ class TokenController extends AbstractController
         if (0 < count($urlViolations)) {
             return new JsonResponse([
                 'verified' => false,
-                'errors' => array_map(function ($violation) {
+                'errors' => array_map(static function ($violation) {
                     return $violation->getMessage();
                 }, iterator_to_array($urlViolations)),
             ]);

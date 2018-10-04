@@ -33,8 +33,10 @@ class TokenManager implements TokenManagerInterface
     public function getOwnToken(): ?Token
     {
         $profile = $this->getProfile();
-        if (null === $profile)
+
+        if (null === $profile) {
             return null;
+        }
 
         return $profile->getToken();
     }

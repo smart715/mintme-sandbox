@@ -14,8 +14,8 @@ class SecurityController extends FOSSecurityController
     protected $container;
 
     public function __construct(
-        ?CsrfTokenManagerInterface $tokenManager = null,
-        ContainerInterface $container
+        ContainerInterface $container,
+        ?CsrfTokenManagerInterface $tokenManager = null
     ) {
         $this->container = $container;
         parent::__construct($tokenManager);

@@ -17,7 +17,7 @@ class OrderFilterConfig implements ArrayAccess
 
     public function merge(array $options): self
     {
-        $validOptions = array_filter($options, function ($value) {
+        $validOptions = array_filter($options, static function ($value) {
             return null !== $value;
         });
         $this->defaultOptions = array_merge($this->defaultOptions, $validOptions);

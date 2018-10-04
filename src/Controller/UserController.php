@@ -114,8 +114,9 @@ class UserController extends AbstractController
             'twoFactorKey' => $user->getGoogleAuthenticatorSecret(),
         ];
 
-        if (!$form->isSubmitted() || !$form->isValid())
+        if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('security/2fa_manager.html.twig', $parameters);
+        }
 
         if ($twoFactorManager->checkCode($user, $form)) {
             if ($isTwoFactor) {

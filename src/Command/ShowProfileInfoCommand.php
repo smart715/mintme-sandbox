@@ -37,15 +37,18 @@ class ShowProfileInfoCommand extends Command
     {
         $style = new SymfonyStyle($input, $output);
 
+        /** @var string $email */
         $email = $input->getArgument('email');
         $profile = $this->profileManager->findByEmail($email);
 
-        if (is_null($profile))
+        if (is_null($profile)) {
             $style->error("Profile of '$email' not found");
-        else $style->table(
-            ['Parameter', 'Info'],
-            $this->buildProfileFields($profile)
-        );
+        } else {
+            $style->table(
+                ['Parameter', 'Info'],
+                $this->buildProfileFields($profile)
+            );
+        }
     }
 
     private function buildProfileFields(Profile $profile): array

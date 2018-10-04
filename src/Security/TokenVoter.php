@@ -48,6 +48,6 @@ class TokenVoter extends Voter
 
     private function canEdit(Token $token): bool
     {
-        return $this->tokenManager->getOwnToken() == $token;
+        return $this->tokenManager->getOwnToken() === $token;
     }
 }

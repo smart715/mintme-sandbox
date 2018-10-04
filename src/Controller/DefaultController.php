@@ -44,11 +44,13 @@ class DefaultController extends Controller
         $name = strtolower(strval($name));
         if (empty($name) && empty($tab)) {
             $action = 'edit';
-            if (empty($tokenName))
+            if (empty($tokenName)) {
                 $tokenName = 'Dummy Token Name';
+            }
         } elseif (!empty($tab)) {
-            if ('invest' === $tab || 'intro' === $tab)
+            if ('invest' === $tab || 'intro' === $tab) {
                 $action = $tab;
+            }
         } elseif ('new' === $name) {
             $action = 'new';
             $tokenName = null;

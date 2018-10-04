@@ -78,8 +78,9 @@ class GoogleAuthenticatorEntry
     {
         if (null !== $this->backupCodes) {
             $key = array_search($code, $this->backupCodes);
-            if (false !== $key)
+            if (false !== $key) {
                 unset($this->backupCodes[$key]);
+            }
         }
     }
 }
