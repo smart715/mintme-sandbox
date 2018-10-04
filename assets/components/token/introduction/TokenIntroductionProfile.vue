@@ -6,7 +6,7 @@
                 <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable"
-                        class="icon float-right"
+                        class="icon float-right c-pointer"
                         size="2x"
                         :icon="icon"
                         transform="shrink-4 up-1.5"
@@ -108,8 +108,8 @@
 </template>
 
 <script>
-import TokenFacebookAddress from './TokenFacebookAddress';
-import TokenYoutubeAddress from './TokenYoutubeAddress';
+import TokenFacebookAddress from '../TokenFacebookAddress';
+import TokenYoutubeAddress from '../TokenYoutubeAddress';
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown';
 import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';

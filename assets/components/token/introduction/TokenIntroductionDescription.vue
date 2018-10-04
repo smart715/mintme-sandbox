@@ -6,7 +6,7 @@
                 <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable"
-                        class="icon float-right"
+                        class="icon float-right c-pointer"
                         size="2x"
                         :icon="icon"
                         transform="shrink-4 up-1.5"

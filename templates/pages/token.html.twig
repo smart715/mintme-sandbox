@@ -14,7 +14,7 @@
                     name="{{ token.name }}"
                     csrf-token="{{ csrf_token('update-token') }}"
                     update-url="{{ path('token_update', {'name': token.name}) }}"
-                    :editable="{{ isOwner ? 'true' : 'false' }}">
+                    editable="{{ isOwner ? 'true' : 'false' }}">
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Invest">
@@ -46,7 +46,7 @@
                                 description="{{ token.description }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
-                                :editable="{{ isOwner ? 'true' : 'false' }}">
+                                editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-description>
                         </div>
                     </b-tab>

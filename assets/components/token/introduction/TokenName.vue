@@ -3,7 +3,7 @@
         <span v-if="!editingName">{{ currentName }}</span>
         <template v-if="editable">
             <input type="text" v-model="newName" v-if="editingName">
-            <font-awesome-icon class="icon" :icon="icon" transform="shrink-4 up-1.5" @click="editName" />
+            <font-awesome-icon class="icon c-pointer" :icon="icon" transform="shrink-4 up-1.5" @click="editName" />
         </template>
     </h1>
 </template>
@@ -46,10 +46,14 @@ export default {
     },
     methods: {
         editName: function() {
-            if (this.icon == 'check')
+            if (this.icon === 'check') {
                 return this.doEditName();
-            if (!this.editable)
+            }
+
+            if (!this.editable) {
                 return;
+            }
+
             this.editingName = !this.editingName;
             this.icon = 'check';
         },
@@ -65,8 +69,7 @@ export default {
             }, error => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data[0][0].message);
-                }
-                else {
+                } else {
                     this.$toasted.error('An error has ocurred, please try again later');
                 }
             })

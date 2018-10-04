@@ -1,8 +1,8 @@
 import Tabs from 'bootstrap-vue/es/components';
-import TokenIntroductionProfile from '../components/token/TokenIntroductionProfile';
-import TokenIntroductionStatistics from '../components/token/TokenIntroductionStatistics';
-import TokenIntroductionDescription from '../components/token/TokenIntroductionDescription';
-import TokenName from '../components/token/TokenName';
+import TokenIntroductionProfile from '../components/token/introduction/TokenIntroductionProfile';
+import TokenIntroductionStatistics from '../components/token/introduction/TokenIntroductionStatistics';
+import TokenIntroductionDescription from '../components/token/introduction/TokenIntroductionDescription';
+import TokenName from '../components/token/introduction/TokenName';
 
 new Vue({
   el: '#token',

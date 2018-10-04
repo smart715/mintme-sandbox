@@ -28,6 +28,10 @@ fos_user_resetting:
 2fa_login_check:
     path: /2fa_check
 
+api_controllers:
+    resource: ../src/Controller/API/
+    type: rest
+
 controllers:
     resource: ../src/Controller/
     type: annotation
