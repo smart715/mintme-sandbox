@@ -23,23 +23,23 @@ class Profile
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @ProfilePeriodLock()
      * @Groups({"default"})
-     * @var string
+     * @var string|null
      */
     protected $firstName;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
      * @ProfilePeriodLock()
      * @Groups({"default"})
-     * @var string
+     * @var string|null
      */
     protected $lastName;
 
@@ -137,12 +137,12 @@ class Profile
         return $this;
     }
 
-    public function getFirstName(): string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    public function getLastName(): string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
