@@ -4,8 +4,13 @@
 $open-sans-font: 'Open Sans', sans-serif;
 $lato-font: 'Lato', sans-serif;
 $oxygen-font: 'Oxygen', sans-serif;
-$base-font-size: 16px;
 $cloud-font: 'AlphaCloud', sans-serif;
+$font-scales: (
+  xs: 13px,
+  sm: 16px,
+  md: 24px,
+  lg: 32px
+);
 
 // Borders
 $border-radius: 0;

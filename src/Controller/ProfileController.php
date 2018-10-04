@@ -38,7 +38,7 @@ class ProfileController extends Controller
             return $this->render('pages/profile_view.html.twig', [
                 'profile' => $normalizer->normalize($profile, null, [ 'groups' => [ 'default' ] ]),
                 'form' =>  $form->createView(),
-                'canEdit' => $profile === $this->getUser()->getProfile(),
+                'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
                 'editFormShowFirst' => $session->get('editFormShowFirst') || $form->getErrors(true)->count(),
             ]);
         }

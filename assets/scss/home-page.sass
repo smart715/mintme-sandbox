@@ -3,21 +3,23 @@
     @include media-breakpoint-down(xs)
       font-size: .875rem
     .title
-      font-size: 2.375em
+      @include font-scale(lg)
       font-weight: 800
       letter-spacing: -.0625rem
       word-spacing: -.125rem
       text-transform: uppercase
     .description
       display: inline-block
-      font-size: 1.25em
+      @include font-scale(md)
       line-height: 1.25
     .call-to-action
       padding: .75rem 1.5rem
-      font-size: 1.5em
+      @include font-scale(md)
       text-transform: uppercase
       background: linear-gradient(180deg, $gradiant-blue-200, $gradiant-blue-400)
   .features
+    h1
+      @include font-scale(md)
     .card
       max-width: 29rem
       &.feature-1, &.feature-3
@@ -70,16 +72,16 @@
   .flower-bg
     background: url(../img/coin-flower.png) no-repeat
     background-size: 48rem
-    background-position:  top 3.5rem center
+    background-position: top 2.5rem center
     @include media-breakpoint-down(lg)
       background-size: 42rem
-      background-position:  top 6rem center
+      background-position: top 6rem center
     @include media-breakpoint-down(md)
       background-size: 38rem
-      background-position:  top 13rem center
+      background-position: top 13rem center
     @include media-breakpoint-down(sm)
       background-size: 30rem
-      background-position:  top 18rem center
+      background-position: top 18rem center
     @include media-breakpoint-down(xs)
       background-size: 40rem
-      background-position:  top 21rem center
+      background-position: top 21rem center
