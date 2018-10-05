@@ -66,10 +66,12 @@ export default {
     },
     methods: {
         editDescription: function() {
-            if (this.icon == 'check')
-                return this.doEditDescription();
-            if (!this.editable)
-                return;
+            if (this.icon == 'check') {
+return this.doEditDescription();
+}
+            if (!this.editable) {
+return;
+}
             this.editingDescription = !this.editingDescription;
             this.icon = 'check';
         },
@@ -78,15 +80,14 @@ export default {
                 description: this.newDescription,
                 _csrf_token: this.csrfToken,
             })
-            .then(response => {
+            .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
                     this.currentDescription = this.newDescription;
                 }
-            }, error => {
+            }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data[0][0].message);
-                }
-                else {
+                } else {
                     this.$toasted.error('An error has ocurred, please try again later');
                 }
             })
@@ -95,13 +96,12 @@ export default {
                 this.editingDescription = false;
                 this.icon = 'edit';
             });
-        }
-    }
+        },
+    },
 };
 </script>
 
 <style lang="sass" scoped>
     p
-        white-space: pre-line
-</style>
+        white-space: pre-line</style>
 

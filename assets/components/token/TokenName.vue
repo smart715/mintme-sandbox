@@ -62,11 +62,11 @@ export default {
                 name: this.newName,
                 _csrf_token: this.csrfToken,
             })
-            .then(response => {
+            .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
                     this.currentName = this.newName;
                 }
-            }, error => {
+            }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data[0][0].message);
                 } else {
@@ -78,9 +78,9 @@ export default {
                 this.editingName = false;
                 this.icon = 'edit';
             });
-        }
+        },
     },
-}
+};
 </script>
 
 <style lang="sass" scoped>
@@ -94,7 +94,6 @@ export default {
     input[type="text"]
         background-color: #fff
         border-style: unset
-        padding: 0 5px
-</style>
+        padding: 0 5px</style>
 
 

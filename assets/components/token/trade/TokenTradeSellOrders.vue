@@ -2,9 +2,9 @@
     <div :class="containerClass">
         <div class="card">
             <div class="card-header">
-                Buy Orders
+                Sell Orders
                 <span class="card-header-icon">
-                    Total: xxxWEB
+                    Total: xxxToken
                     <font-awesome-icon
                         icon="question"
                         class="ml-1 mb-1 p-1 h4 bg-orange rounded-circle square"
@@ -19,7 +19,7 @@
                         <template slot="trader" slot-scope="row">
                            {{ row.value }}
                            <img
-                               src="../../img/avatar.png"
+                               src="../../../img/avatar.png"
                                class="float-right"
                                alt="avatar">
                         </template>
@@ -30,10 +30,9 @@
     </div>
 </template>
 
->
 <script>
 export default {
-    name: 'TokenTradeBuyOrders',
+    name: 'TokenTradeSellOrders',
     props: {
         containerClass: String,
     },
@@ -69,3 +68,4 @@ export default {
     },
 };
 </script>
+

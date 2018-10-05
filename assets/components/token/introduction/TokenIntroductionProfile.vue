@@ -173,19 +173,17 @@ export default {
             this.showConfirmWebsiteModal = true;
         },
         confirmWebsite: function() {
-            axios.post(this.confirmWebsiteUrl, { url: this.parsedWebsite })
+            axios.post(this.confirmWebsiteUrl, {url: this.parsedWebsite})
                 .then((response) => {
                     if (response.data.verified) {
                         this.currentWebsite = this.parsedWebsite;
                         this.$toasted.success('Website confirmed successfully');
-                    }
-                    else if (response.data.errors.length) {
-                        response.data.errors.forEach(error => {
+                    } else if (response.data.errors.length) {
+                        response.data.errors.forEach((error) => {
                             this.$toasted.error(error);
                         });
                         this.newWebsite = this.currentWebsite;
-                    }
-                    else {
+                    } else {
                         this.$toasted.error('Website couldn\'t be confirmed, try again');
                         this.newWebsite = this.currentWebsite;
                     }

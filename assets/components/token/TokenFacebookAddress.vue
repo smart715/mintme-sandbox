@@ -13,7 +13,7 @@
         </div>
         <div v-show="editing">
             <button class="btn btn-primary" @click="addPage">
-                <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/> 
+                <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
                 Add Facebook address
             </button>
         </div>
@@ -67,25 +67,6 @@ Vue.use(Toasted, {
 const HTTP_NO_CONTENT = 204;
 const HTTP_BAD_REQUEST = 400;
 
-function doLoadFacebookSdk(appId) {
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId            : appId,
-            autoLogAppEvents : true,
-            xfbml            : true,
-            version          : 'v3.1'
-        });
-    };
-
-    (function(d, s, id){
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {return;}
-        js = d.createElement(s); js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-}
-
 export default {
     name: 'TokenFacebookAddress',
     props: {
@@ -110,18 +91,36 @@ export default {
     },
     computed: {
         selectedUrl: function() {
-            if (this.pages.length)
-                return this.pages[0].link;
-            else
-                return '';
+            if (this.pages.length) {
+return this.pages[0].link;
+} else {
+return '';
+}
         },
         currentAddressEncoded: function() {
             return encodeURIComponent(this.currentAddress);
-        }
+        },
     },
     methods: {
         loadFacebookSdk: function() {
-            doLoadFacebookSdk(this.appId);
+            window.fbAsyncInit = () => {
+                FB.init({
+                    appId: this.appId,
+                    autoLogAppEvents: true,
+                    xfbml: true,
+                    version: 'v3.1',
+                });
+            };
+
+            (function(d, s, id) {
+                let js; let fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {
+                    return;
+                }
+                js = d.createElement(s); js.id = id;
+                js.src = 'https://connect.facebook.net/en_US/sdk.js';
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
         },
         addPage: function() {
             FB.login((response) => {
@@ -135,7 +134,7 @@ export default {
                         this.showConfirmModal = true;
                     });
                 }
-            }, { scope: 'pages_show_list' });
+            }, {scope: 'pages_show_list'});
         },
         savePage: function() {
             axios.patch(this.updateUrl, {
@@ -150,8 +149,7 @@ export default {
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data[0][0].message);
-                }
-                else {
+                } else {
                     this.$toasted.error('An error has ocurred, please try again later');
                 }
             })
@@ -160,7 +158,7 @@ export default {
             });
         },
     },
-}
+};
 </script>
 
 <style lang="sass" scoped>
@@ -169,5 +167,4 @@ export default {
         width: 100%
         white-space: nowrap
         overflow: hidden
-        text-overflow: ellipsis
-</style>
+        text-overflow: ellipsis</style>
