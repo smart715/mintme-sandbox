@@ -110,11 +110,9 @@ class Trader implements TraderInterface
             return [];
         }
 
-        $orders = array_map(function (array $rawOrder) use ($user, $market) {
+        return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::FINISHED_STATUS);
         }, $response->getResult()['records']);
-
-        return $orders;
     }
 
     /**
@@ -143,11 +141,9 @@ class Trader implements TraderInterface
             return [];
         }
 
-        $orders = array_map(function (array $rawOrder) use ($user, $market) {
+        return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $response->getResult()['records']);
-
-        return $orders;
     }
 
     private function createOrder(array $orderData, User $user, Market $market, string $status): Order
@@ -172,10 +168,8 @@ class Trader implements TraderInterface
             self::USER_NOT_MATCH_CODE => TradeResult::USER_NOT_MATCH,
         ];
 
-        $result = array_key_exists($errorCode, $errorMapping)
+        return array_key_exists($errorCode, $errorMapping)
             ? new TradeResult($errorMapping[$errorCode])
             : new TradeResult(TradeResult::FAILED);
-
-        return $result;
     }
 }

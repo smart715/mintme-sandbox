@@ -9,6 +9,7 @@ use FOS\UserBundle\Model\UserManagerInterface;
 
 class UserFixturesFactory extends AbstractFixturesFactory
 {
+
     use FakerHelper;
 
     private const DEFAULT_NAME = 'mintme';
