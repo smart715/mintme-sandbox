@@ -4,11 +4,11 @@
             <div class="d-flex">
                 <div class="display-text">
                     Youtube:
-                    <a :href="'https://www.youtube.com/channel/'+this.currentChannelId" target="_blank" rel="nofollow">
+                    <a v-if="currentChannelId" :href="'https://www.youtube.com/channel/'+this.currentChannelId" target="_blank" rel="nofollow">
                         https://www.youtube.com/channel/{{ this.currentChannelId }}
                     </a>
                 </div>
-                <div class="g-ytsubscribe" :data-channelid="currentChannelId" data-layout="default" data-count="default"></div>
+                <div v-if="currentChannelId" class="g-ytsubscribe" :data-channelid="currentChannelId" data-layout="default" data-count="default"></div>
             </div>
         </div>
         <div v-show="editing">
@@ -55,8 +55,8 @@ export default {
     },
     created: function() {
         if (this.editable) {
-this.loadYoutubeClient();
-}
+            this.loadYoutubeClient();
+        }
     },
     data() {
         return {
@@ -122,4 +122,5 @@ this.loadYoutubeClient();
         width: 100%
         white-space: nowrap
         overflow: hidden
-        text-overflow: ellipsis</style>
+        text-overflow: ellipsis
+</style>

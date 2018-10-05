@@ -34,7 +34,8 @@ class TokenAPIController extends FOSRestController
      * @Rest\View()
      * @Rest\Patch("/{name}", name="token_update")
      * @Rest\RequestParam(name="_csrf_token", allowBlank=false)
-     * @Rest\RequestParam(name="name", allowBlank=false)
+     * @Rest\RequestParam(name="name", nullable=true)
+     * @Rest\RequestParam(name="description", nullable=true)
      */
     public function update(ParamFetcherInterface $request, SerializerInterface $serializer, string $name): View
     {
@@ -51,7 +52,9 @@ class TokenAPIController extends FOSRestController
             'allow_extra_fields' => true,
         ]);
 
-        $form->submit($request->all(), false);
+        $form->submit(array_filter($request->all(), function ($value) {
+            return null !== $value;
+        }), false);
 
         $csrfToken = $request->get('_csrf_token');
 

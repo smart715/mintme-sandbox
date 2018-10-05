@@ -29,8 +29,8 @@
                                     </a>
                                 </div>
                                 <div class="form-group" v-else>
-                                    <label for="">Website address:</label>
-                                    <input type="text" v-model="newWebsite" class="form-control" :class="{ 'is-invalid': showWebsiteError }" @keyup.enter="checkWebsiteUrl">
+                                    <label for="website-err">Website address:</label>
+                                    <input id="website-err" type="text" v-model="newWebsite" class="form-control" :class="{ 'is-invalid': showWebsiteError }" @keyup.enter="checkWebsiteUrl">
                                     <div class="invalid-feedback" v-if="showWebsiteError">
                                         Please provide a valid URL.
                                     </div>
@@ -70,6 +70,12 @@
                                 target="_blank"
                             >
                                 LinkedIn
+                            </b-dropdown-item>
+                            <b-dropdown-item
+                                    href="#"
+                                    target="_blank"
+                            >
+                                YouTube
                             </b-dropdown-item>
                         </b-dropdown>
                     </div>
