@@ -77,10 +77,12 @@ class TokenController extends AbstractController
     
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-            $profile->setToken($token);
             //TODO: add 1 million tokens
-            $this->em->persist($profile);
-            $this->em->flush();
+            if (null !== $profile) {
+                $token->setProfile($profile);
+                $this->em->persist($token);
+                $this->em->flush();
+            }
 
             return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
         }

@@ -31,7 +31,6 @@ class DefaultController extends Controller
     {
         return $this->render('pages/wallet.html.twig');
     }
-//
 //    /**
 //     * @Route("/token/{name}/{tab}", name="token")
 //     */

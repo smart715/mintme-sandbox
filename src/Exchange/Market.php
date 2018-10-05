@@ -32,7 +32,7 @@ class Market
         return $this->crypto->getSymbol();
     }
 
-    public function getTokenName(): string
+    public function getTokenName(): ?string
     {
         return $this->token->getName();
     }

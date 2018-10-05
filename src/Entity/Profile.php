@@ -81,7 +81,7 @@ class Profile
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token", inversedBy="profile", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
      * @var Token|null
      */
     protected $token;
@@ -128,13 +128,6 @@ class Profile
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function setToken(?Token $token): self
-    {
-        $this->token = $token;
-
-        return $this;
     }
 
     public function getFirstName(): ?string

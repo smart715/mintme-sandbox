@@ -92,7 +92,7 @@ class Token
         return $this;
     }
 
-    public function getAddress(): string
+    public function getAddress(): ?string
     {
         return $this->address;
     }
@@ -153,6 +153,13 @@ class Token
     public function setWebsiteConfirmationToken(string $websiteConfirmationToken): self
     {
         $this->websiteConfirmationToken = $websiteConfirmationToken;
+
+        return $this;
+    }
+
+    public function setProfile(Profile $profile): self
+    {
+        $this->profile = $profile;
 
         return $this;
     }

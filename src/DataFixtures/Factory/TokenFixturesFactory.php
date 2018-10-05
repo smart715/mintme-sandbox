@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class TokenFixturesFactory extends AbstractFixturesFactory
 {
+
     use FakerHelper;
 
     /** @var ProfileFixturesFactory */
@@ -22,18 +23,14 @@ class TokenFixturesFactory extends AbstractFixturesFactory
 
     public function create(): Token
     {
-        $token = new Token(
-            $this->profileFixturesFactory->create(),
-            $this->getFaker()->address
-        );
-        $token
+        $token = (new Token())
             ->setDescription($this->getFaker()->sentence)
             ->setFacebookUrl('https://facebook.com/')
             ->setName($this->getFaker()->company)
-            ->setWebsiteUrl($this->getFaker()->url);
+            ->setWebsiteUrl($this->getFaker()->url)
+            ->setProfile($this->profileFixturesFactory->create());
 
         $this->manager->persist($token);
-
         $this->manager->flush();
 
         return $token;
