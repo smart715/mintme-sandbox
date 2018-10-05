@@ -18,8 +18,8 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        foreach (range(1, 50) as $index) {
+        array_map(function (): void {
             $this->tokenFixturesFactory->create();
-        }
+        }, range(1, 50));
     }
 }

@@ -48,7 +48,7 @@ class ProfileManager implements ProfileManagerInterface
 
         $existedProfile = $this->profileRepository->getProfileByPageUrl($route);
 
-        return (null === $existedProfile || $profile === $existedProfile)
+        return null === $existedProfile || $profile === $existedProfile
             ? strtolower($route) : $this->generateUniqueUrl($route);
     }
 

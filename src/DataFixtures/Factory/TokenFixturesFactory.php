@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class TokenFixturesFactory extends AbstractFixturesFactory
 {
+
     use FakerHelper;
 
     /** @var ProfileFixturesFactory */
