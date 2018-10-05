@@ -59,7 +59,7 @@ class TokenController extends AbstractController
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
-            'profile' => $this->profileManager->findByToken($token),
+            'profile' => $token->getProfile(),
             'isOwner' => $isOwner,
         ]);
     }

@@ -62,11 +62,6 @@ class ProfileManager implements ProfileManagerInterface
                 : $this->generateUniqueUrl($route);
     }
 
-    public function findByToken(Token $token): Profile
-    {
-        return $this->profileRepository->findByToken($token);
-    }
-
     private function generateUniqueUrl(string $prefix): string
     {
         $str = strtolower($prefix . "." . bin2hex(openssl_random_pseudo_bytes(3) ?: uniqid()));

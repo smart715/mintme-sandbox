@@ -34,6 +34,7 @@ class TokenAPIController extends FOSRestController
      * @Rest\View()
      * @Rest\Patch("/{name}", name="token_update")
      * @Rest\RequestParam(name="_csrf_token", allowBlank=false)
+     * @Rest\RequestParam(name="name", allowBlank=false)
      */
     public function update(ParamFetcherInterface $request, SerializerInterface $serializer, string $name): View
     {
@@ -61,9 +62,10 @@ class TokenAPIController extends FOSRestController
             return $this->view($formErrorsSerialized, Response::HTTP_BAD_REQUEST);
         }
 
+        $this->em->persist($token);
         $this->em->flush();
 
-        return $this->view(null, Response::HTTP_NO_CONTENT);
+        return $this->view($token, Response::HTTP_NO_CONTENT);
     }
 
     /**

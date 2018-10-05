@@ -163,4 +163,9 @@ class Token
 
         return $this;
     }
+
+    public function getProfile(): Profile
+    {
+        return $this->profile;
+    }
 }
