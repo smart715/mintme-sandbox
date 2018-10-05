@@ -66,12 +66,12 @@ export default {
     },
     methods: {
         editDescription: function() {
-            if (this.icon == 'check') {
-return this.doEditDescription();
-}
+            if (this.icon === 'check') {
+                return this.doEditDescription();
+            }
             if (!this.editable) {
-return;
-}
+                return;
+            }
             this.editingDescription = !this.editingDescription;
             this.icon = 'check';
         },
@@ -103,5 +103,6 @@ return;
 
 <style lang="sass" scoped>
     p
-        white-space: pre-line</style>
+        white-space: pre-line
+</style>
 
