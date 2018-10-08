@@ -3,10 +3,10 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
+use App\Utils\RandomNumberInterface;
 use Exception;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
-use Ramsey\Uuid\Uuid;
 
 class GuzzleWrapper implements JsonRpcInterface
 {
@@ -22,7 +22,11 @@ class GuzzleWrapper implements JsonRpcInterface
     /** @var int */
     private $timeoutSeconds;
 
+    /** @var RandomNumberInterface */
+    private $random;
+
     public function __construct(
+        RandomNumberInterface $randomNumber,
         Factory\RpcClientFactoryInterface $clientFactory,
         string $url,
         int $timeoutSeconds
@@ -30,6 +34,7 @@ class GuzzleWrapper implements JsonRpcInterface
         $this->clientFactory = $clientFactory;
         $this->url = $url;
         $this->timeoutSeconds = $timeoutSeconds;
+        $this->random = $randomNumber;
     }
 
     public function send(string $methodName, array $requestParams): JsonRpcResponse
@@ -46,7 +51,7 @@ class GuzzleWrapper implements JsonRpcInterface
     private function sendRequest(string $methodName, array $params): ResponseInterface
     {
         $request = $this->client->request(
-            Uuid::uuid4()->toString(),
+            $this->random->getNumber(),
             $methodName,
             $params
         );

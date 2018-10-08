@@ -2,45 +2,60 @@
 
 namespace App\Exchange\Balance;
 
-use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Token;
 use App\Entity\User;
+use App\Utils\RandomNumberInterface;
+use App\Utils\TokenNameConverterInterface;
 
 class BalanceHandler implements BalanceHandlerInterface
 {
-    private const UPDATE_BALANCE_METHOD = 'balace.update';
+    private const UPDATE_BALANCE_METHOD = 'balance.update';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
 
-    public function __construct(JsonRpcInterface $jsonRpc)
-    {
+    /** @var TokenNameConverterInterface */
+    private $converter;
+
+    /** @var RandomNumberInterface */
+    private $random;
+
+    public function __construct(
+        JsonRpcInterface $jsonRpc,
+        TokenNameConverterInterface $converter,
+        RandomNumberInterface $randomNumber
+    ) {
         $this->jsonRpc = $jsonRpc;
+        $this->converter = $converter;
+        $this->random = $randomNumber;
     }
 
-    public function deposit(User $user, string $assetName, string $balance): void
+    public function deposit(User $user, Token $token, string $amount): void
     {
-        $params = [
+        $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
             $user->getId(),
-            $assetName,
+            $this->converter->convert(
+                $token
+            ),
             'deposit',
-            100,
-            $balance,
-        ];
-
-        $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [$params]);
+            $this->random->getNumber(),
+            $amount,
+            [ 'extra' => 1 ],
+        ]);
     }
 
-    public function withdraw(User $user, string $assetName, string $balance): void
+    public function withdraw(User $user, Token $token, string $amount): void
     {
-        $params = [
+        $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
             $user->getId(),
-            $assetName,
+            $this->converter->convert(
+                $token
+            ),
             'withdraw',
-            100,
-            $balance,
-        ];
-
-        $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [$params]);
+            $this->random->getNumber(),
+            $amount,
+            [ 'extra' => 1 ],
+        ]);
     }
 }

@@ -58,11 +58,8 @@ class TokenAPIController extends FOSRestController
 
         $csrfToken = $request->get('_csrf_token');
 
-        $formErrors = $form->getErrors(true, false);
-        $formErrorsSerialized = $serializer->serialize($formErrors, 'json');
-
         if (!$form->isValid() || !$this->isCsrfTokenValid('update-token', $csrfToken)) {
-            return $this->view($formErrorsSerialized, Response::HTTP_BAD_REQUEST);
+            return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
 
         $this->em->persist($token);

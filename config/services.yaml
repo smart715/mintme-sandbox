@@ -44,7 +44,7 @@ services:
 
     App\Exchange\Trade\Trader:
         arguments:
-            $jsonRpc: '@viabtc.json_rpc%'
+            $jsonRpc: '@viabtc.json_rpc'
 
     App\Exchange\Market\MarketFetcher:
         arguments:
@@ -54,8 +54,7 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
-    App\Communications\Factory\GuzzleRpcClientFactoryInterface: ~
-    App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactoryInterface'
+    App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 
     App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
 

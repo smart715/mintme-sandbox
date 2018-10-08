@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Token;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\TokenCreateType;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -65,8 +66,9 @@ class TokenController extends AbstractController
     }
 
     /** @Route(name="token_create") */
-    public function create(Request $request): Response
+    public function create(Request $request, BalanceHandlerInterface $balanceHandler): Response
     {
+        $balanceHandler->deposit($this->getUser(), $this->tokenManager->getOwnToken(), '1000000');
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken();
         }
@@ -77,12 +79,14 @@ class TokenController extends AbstractController
     
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-            //TODO: add 1 million tokens
+
             if (null !== $profile) {
                 $token->setProfile($profile);
                 $this->em->persist($token);
                 $this->em->flush();
             }
+
+            $balanceHandler->deposit($this->getUser(), $token, '1000000');
 
             return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
         }
