@@ -16,14 +16,16 @@
         {% block body %}
             <div class="{% block contentclass %}{% endblock %}">
                 {% block header %}
-                    <div class="header-white">
-                        {% include 'topnav.html.twig' %}
-                        {% block top_showcase %}{% endblock %}
+                    <div id="header">
+                        <div class="header-white">
+                            {% include 'topnav.html.twig' %}
+                            {% block top_showcase %}{% endblock %}
+                        </div>
+                        <div class="header-bg"></div>
                     </div>
-                    <div class="header-bg"></div>
                 {% endblock header %}
                 {% block main %}
-                    <div class="pt-5 contents-wrapper">
+                    <div class="pt-5 contents-wrapper" id="content-wrapper">
                         {% for label, messages in app.flashes %}
                             {% for message in messages %}
                                 <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">

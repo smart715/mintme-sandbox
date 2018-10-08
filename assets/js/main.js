@@ -13,6 +13,7 @@ import fas from '@fortawesome/fontawesome-free-solid';
 import fab from '@fortawesome/fontawesome-free-brands';
 import far from '@fortawesome/fontawesome-free-regular';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
+import {setContentMinHeightDynamically} from './util.js';
 
 fontawesome.library.add(fas, far, fab);
 
@@ -22,6 +23,7 @@ Vue.component('font-awesome-layers', FontAwesomeLayers);
 
 Vue.options.delimiters = ['{[', ']}'];
 
+setContentMinHeightDynamically(document.getElementById('content-wrapper'));
 const imagesContext = require.context(
     '../img',
     false,
