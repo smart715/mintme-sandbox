@@ -18,4 +18,5 @@ return [
     FOS\RestBundle\FOSRestBundle::class => ['all' => true],
     Scheb\TwoFactorBundle\SchebTwoFactorBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['all' => true],
+    OldSound\RabbitMqBundle\OldSoundRabbitMqBundle::class => ['all' => true],
 ];

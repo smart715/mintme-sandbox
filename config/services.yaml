@@ -37,6 +37,12 @@ services:
             $url: '%viabtc_rpc%'
             $timeoutSeconds: '%viabtc_response_timeout_seconds%'
 
+    withdraw.json_rpc:
+        class: App\Communications\GuzzleWrapper
+        arguments:
+            $url: '%withdraw_rpc%'
+            $timeoutSeconds: '%withdraw_response_timeout_seconds%'
+
     App\Exchange\Trade\Config\LimitOrderConfig:
         arguments:
             $takerFeeRate: '%taker_fee_rate%'
@@ -50,11 +56,20 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
+    App\Withdraw\Fetcher\Storage\WithdrawStorage:
+        arguments:
+            $jsonRpc: '@withdraw.json_rpc'
+            $service: '%service%'
+
     App\Exchange\Balance\BalanceHandler:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
+
+    App\EventListener\RegistrationInitializedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.initialize }
 
     App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
 
@@ -67,6 +82,13 @@ services:
     App\Utils\MailerDispatcher:
         arguments:
             $mailer: '@fos_user.mailer.default'
+
+    App\Withdraw\Communicator\AMQPCommunicator:
+        arguments:
+            $paymentProducer: '@old_sound_rabbit_mq.payment_producer'
+            $paymentRetryProducer: '@old_sound_rabbit_mq.payment_retry_producer'
+            $service: '%service%'
+            $fee: '%withdraw_fee%'
 
     FOS\UserBundle\Form\Factory\FormFactory:
         arguments:

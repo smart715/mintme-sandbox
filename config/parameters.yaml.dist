@@ -1,9 +1,14 @@
 # Business configuration variables will go here
 parameters:
+    service: 'mintme'
+
     locale: 'en'
 
     viabtc_rpc: 'http://localhost:8080'
     viabtc_response_timeout_seconds: 10
+
+    withdraw_rpc: 'http://localhost:8081'
+    withdraw_response_timeout_seconds: 10
 
     taker_fee_rate: 0.1
     maker_fee_rate: 0.01
@@ -14,3 +19,5 @@ parameters:
     facebook_app_id: 0123456789
 
     version: 'V1.0.0'
+
+    withdraw_fee: 0.1

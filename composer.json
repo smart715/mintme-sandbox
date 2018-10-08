@@ -15,6 +15,7 @@
         "fzaninotto/faker": "^1.8",
         "graze/guzzle-jsonrpc": "^3.2",
         "incenteev/composer-parameter-handler": "^2.1",
+        "php-amqplib/rabbitmq-bundle": "^1.14",
         "pragmarx/random": "^0.2.2",
         "ramsey/uuid": "^3.8",
         "scheb/two-factor-bundle": "^3.12",
