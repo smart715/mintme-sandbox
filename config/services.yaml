@@ -68,7 +68,11 @@ services:
 
     App\Communications\Factory\GuzzleRpcClientFactoryInterface: ~
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
-
+    
+    App\EventListener\RegistrationInitializedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.initialize }
+  
     App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
 
     App\Utils\MailerDispatcher:
