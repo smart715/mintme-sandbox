@@ -85,9 +85,15 @@ class TokenController extends AbstractController
                 $this->em->flush();
             }
 
-            $balanceHandler->withdraw($this->getUser(), $token, '1000000');
+            try {
+                $balanceHandler->withdraw($this->getUser(), $token, 1000000);
 
-            return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
+                return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
+            } catch (\Throwable $exception) {
+                $this->em->remove($token);
+                $this->em->flush();
+                $this->addFlash('error', 'Exchanger connection lost. Try again.');
+            }
         }
 
         return $this->render('pages/token_creation.html.twig', [
