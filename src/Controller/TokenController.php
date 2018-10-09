@@ -68,7 +68,6 @@ class TokenController extends AbstractController
     /** @Route(name="token_create") */
     public function create(Request $request, BalanceHandlerInterface $balanceHandler): Response
     {
-        $balanceHandler->deposit($this->getUser(), $this->tokenManager->getOwnToken(), '1000000');
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken();
         }
