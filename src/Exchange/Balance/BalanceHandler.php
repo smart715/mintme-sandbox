@@ -50,7 +50,7 @@ class BalanceHandler implements BalanceHandlerInterface
     {
         try {
             $response = $this->jsonRpc->send(self::SUMMARY_METHOD, [
-                $this->converter->convert($token)
+                $this->converter->convert($token),
             ]);
         } catch (\Throwable $exception) {
             return SummaryResult::fail();
@@ -72,10 +72,6 @@ class BalanceHandler implements BalanceHandlerInterface
         );
     }
 
-    /**
-     * @throws \Exception
-     * @throws BalanceException
-     */
     private function updateBalance(User $user, Token $token, int $amount, string $type): void
     {
         $responce = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [

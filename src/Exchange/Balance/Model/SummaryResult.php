@@ -23,7 +23,12 @@ class SummaryResult
     private $freezeCount;
 
     private function __construct(
-        string $name, int $total, int $available, int $availableCount, int $freeze, int $freezeCount
+        string $name,
+        int $total,
+        int $available,
+        int $availableCount,
+        int $freeze,
+        int $freezeCount
     ) {
         $this->name = $name;
         $this->total = $total;
@@ -64,7 +69,12 @@ class SummaryResult
     }
 
     public static function success(
-        string $name, int $total, int $available, int $availableCount, int $freeze, int $freezeCount
+        string $name,
+        int $total,
+        int $available,
+        int $availableCount,
+        int $freeze,
+        int $freezeCount
     ): self {
         return new self($name, $total, $available, $availableCount, $freeze, $freezeCount);
     }

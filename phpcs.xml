@@ -43,6 +43,11 @@
             <exclude name="SlevomatCodingStandard.Functions.StaticClosure" />
     </rule>
 
+    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration">
+        <properties>
+            <property name="allAnnotationsAreUseful" value="true" />
+        </properties>
+    </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses" />
 
     <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses">
