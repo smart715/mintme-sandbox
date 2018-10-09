@@ -85,7 +85,7 @@ class TokenController extends AbstractController
                 $this->em->flush();
             }
 
-            $balanceHandler->deposit($this->getUser(), $token, '1000000');
+            $balanceHandler->withdraw($this->getUser(), $token, '1000000');
 
             return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
         }

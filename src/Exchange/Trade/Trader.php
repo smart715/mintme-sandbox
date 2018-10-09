@@ -126,7 +126,7 @@ class Trader implements TraderInterface
         ];
 
         try {
-            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, $params);
         } catch (FetchException $e) {
             return [];
         }

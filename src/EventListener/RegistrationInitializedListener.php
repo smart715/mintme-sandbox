@@ -35,8 +35,9 @@ class RegistrationInitializedListener
     
     private function redirectToProfileIfAuthenticated(GetResponseUserEvent $event): void
     {
-        if (!$this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED'))
+        if (!$this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             return;
+        }
 
         $event->setResponse(new RedirectResponse(
             $this->router->generate('profile')

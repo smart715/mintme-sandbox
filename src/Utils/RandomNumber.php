@@ -8,6 +8,6 @@ class RandomNumber implements RandomNumberInterface
 {
     public function getNumber(): int
     {
-        return (new Random())->numeric()->get();
+        return (int)(new Random())->numeric()->get();
     }
 }
