@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Balance;
 
+use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Entity\Token;
 use App\Entity\User;
@@ -72,6 +73,10 @@ class BalanceHandler implements BalanceHandlerInterface
         );
     }
 
+    /**
+     * @throws BalanceException
+     * @throws FetchException
+     */
     private function updateBalance(User $user, Token $token, int $amount, string $type): void
     {
         $responce = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
