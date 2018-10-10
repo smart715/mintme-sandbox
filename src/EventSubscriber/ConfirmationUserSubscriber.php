@@ -31,8 +31,9 @@ class ConfirmationUserSubscriber implements EventSubscriberInterface
         /** @var User $user */
         $user = $event->getUser();
 
-        if (empty($user->getTempEmail()))
+        if (empty($user->getTempEmail())) {
             return;
+        }
 
         $user->setEmail($user->getTempEmail());
         $user->setTempEmail(null);

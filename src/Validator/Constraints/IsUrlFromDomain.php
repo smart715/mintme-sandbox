@@ -14,7 +14,7 @@ class IsUrlFromDomain extends Constraint
     public $domain;
 
     /** @var string */
-    public $message = 'The string "{{ string }}" is not a valid {{ domain }} url.';
+    public $message = 'The string "{{ string }}" is not a valid url.';
 
     /**
      * {@inheritdoc}

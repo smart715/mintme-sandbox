@@ -99,7 +99,7 @@ class Profile
     {
         $this->user = $user;
     }
-    
+
     public function isChangesLocked(): bool
     {
         return $this->isChangesLocked;
@@ -125,11 +125,9 @@ class Profile
         return $this->nameChangedDate;
     }
 
-    public function setToken(?Token $token): self
+    public function getId(): int
     {
-        $this->token = $token;
-
-        return $this;
+        return $this->id;
     }
 
     public function getFirstName(): ?string
@@ -178,14 +176,14 @@ class Profile
         return $this;
     }
 
-    public function setFirstName(?string $firstName): self
+    public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function setLastName(?string $lastName): self
+    public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
 
@@ -200,11 +198,17 @@ class Profile
     public function setPageUrl(?string $page_url): self
     {
         $this->page_url = $page_url;
-        
+
         return $this;
     }
+
     public function getUserEmail(): string
     {
         return $this->user->getEmail();
+    }
+
+    public function getToken(): ?Token
+    {
+        return $this->token;
     }
 }

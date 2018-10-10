@@ -2,34 +2,64 @@
 
 {% block title %}Token{% endblock %}
 
-{% block bodyclass %}token{% endblock %}
+{% block pagestyles %}
+    <link rel="stylesheet" href="{{ asset('build/token.css') }}">
+{% endblock %}
 
 {% block content %}
     <div id="token" class="container">
         <div class="row">
             <div class="col">
-                <div class="h3 pl-4 font-weight-bold text-white">
-                    {% if tokenName is defined %} {{ tokenName }} {% endif %}
-                </div>
-                <b-tabs class="tabs-theme transparent">
-                    {% if action == 'edit' or action == 'new' %}
-                        <b-tab title="Invest" disabled></b-tab>
-                        <b-tab title="Introduction" disabled></b-tab>
-                        {% include 'partials/token_form.html.twig' with {'action': action} %}
-                    {% else %}
-                    <b-tab title="Trade" {% if action == 'invest' %} {{ 'active' }} {% endif %}>
-                        <token-trade></token-invest>
+                <token-name
+                    name="{{ token.name }}"
+                    csrf-token="{{ csrf_token('update-token') }}"
+                    update-url="{{ path('token_update', {'name': token.name}) }}"
+                    editable="{{ isOwner ? 'true' : 'false' }}">
+                </token-name>
+                <b-tabs class="tabs-theme transparent" v-model="tabIndex">
+                    <b-tab title="Invest">
+                        <token-invest></token-invest>
                     </b-tab>
-                    <b-tab title="Introduction" {% if action == 'intro' %} {{ 'active' }} {% endif %}>
-                        <token-introduction></token-introduction>
+                    <b-tab title="Introduction" active>
+                        <div class="row">
+                            <token-introduction-profile
+                                class="col-12 col-md-6"
+                                youtube-client-id="{{ global_youtube_client_id }}"
+                                facebook-app-id="{{ global_facebook_app_id }}"
+                                confirm-website-file-url="{{ path('token_website_confirmation', {'name': token.name}) }}"
+                                confirm-website-url="{{ path('token_website_confirm', {'name': token.name}) }}"
+                                profile-name="{{ profile.firstName }} {{ profile.lastName }}"
+                                website-url="{{ token.websiteUrl }}"
+                                facebook-url="{{ token.facebookUrl }}"
+                                youtube-channel-id="{{ token.youtubeChannelId }}"
+                                update-url="{{ path('token_update', {'name': token.name}) }}"
+                                csrf-token="{{ csrf_token('update-token') }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}">
+                            </token-introduction-profile>
+
+                            <token-introduction-statistics container-class="col-12 col-md-6 mt-3 mt-md-0">
+                            </token-introduction-statistics>
+                        </div>
+                        <div class="row">
+                            <token-introduction-description
+                                class="col-12 mt-3 mt-3"
+                                description="{{ token.description }}"
+                                csrf-token="{{ csrf_token('update-token') }}"
+                                update-url="{{ path('token_update', {'name': token.name}) }}"
+                                editable="{{ isOwner ? 'true' : 'false' }}">
+                            </token-introduction-description>
+                        </div>
                     </b-tab>
-                    {% endif %}
                 </b-tabs>
             </div>
         </div>
     </div>
+
+    <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': token.name}) }}">
 {% endblock %}
 
 {% block pagescripts %}
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="{{ asset('build/token.js') }}"></script>
 {% endblock %}

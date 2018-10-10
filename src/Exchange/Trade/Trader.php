@@ -35,19 +35,17 @@ class Trader implements TraderInterface
 
     public function placeOrder(Order $order): TradeResult
     {
-        $params = [
-            $order->getMakerId(),
-            $order->getMarket()->getHiddenName(),
-            $order->getSide(),
-            $order->getAmount(),
-            $order->getPrice(),
-            (string) $this->config->getTakerFeeRate(),
-            (string) $this->config->getMakerFeeRate(),
-            '',
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [
+                $order->getMakerId(),
+                $order->getMarket()->getHiddenName(),
+                $order->getSide(),
+                $order->getAmount(),
+                $order->getPrice(),
+                (string) $this->config->getTakerFeeRate(),
+                (string) $this->config->getMakerFeeRate(),
+                '',
+            ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);
         }
@@ -63,14 +61,12 @@ class Trader implements TraderInterface
 
     public function cancelOrder(Order $order): TradeResult
     {
-        $params = [
-            $order->getMakerId(),
-            $order->getMarket()->getHiddenName(),
-            $order->getId(),
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::CANCEL_ORDER_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::CANCEL_ORDER_METHOD, [
+                $order->getMakerId(),
+                $order->getMarket()->getHiddenName(),
+                $order->getId(),
+            ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);
         }
@@ -90,18 +86,16 @@ class Trader implements TraderInterface
         $options = new OrderFilterConfig();
         $options->merge($filterOptions);
 
-        $params = [
-            $user->getId(),
-            $market->getHiddenName(),
-            $options['start_time'],
-            $options['end_time'],
-            $options['offset'],
-            $options['limit'],
-            Order::SIDE_MAP[$options['side']],
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [
+                $user->getId(),
+                $market->getHiddenName(),
+                $options['start_time'],
+                $options['end_time'],
+                $options['offset'],
+                $options['limit'],
+                Order::SIDE_MAP[$options['side']],
+            ]);
         } catch (FetchException $e) {
             return [];
         }
@@ -132,7 +126,7 @@ class Trader implements TraderInterface
         ];
 
         try {
-            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, $params);
         } catch (FetchException $e) {
             return [];
         }

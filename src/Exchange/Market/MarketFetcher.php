@@ -34,14 +34,12 @@ class MarketFetcher
 
     public function getExecutedOrders(Market $market, int $offset = 0, int $limit = 100): array
     {
-        $params = [
-            $market->getHiddenName(),
-            $limit,
-            $offset,
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::EXECUTED_ORDERS_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::EXECUTED_ORDERS_METHOD, [
+                $market->getHiddenName(),
+                $limit,
+                $offset,
+            ]);
         } catch (FetchException $e) {
             return [];
         }
@@ -55,15 +53,13 @@ class MarketFetcher
 
     private function getPendingOrders(Market $market, int $offset, int $limit, string $side): array
     {
-        $params = [
-            $market->getHiddenName(),
-            $side,
-            $offset,
-            $limit,
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
+                $market->getHiddenName(),
+                $side,
+                $offset,
+                $limit,
+            ]);
         } catch (FetchException $e) {
             return [];
         }
@@ -78,7 +74,7 @@ class MarketFetcher
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
-        return array_map(function (array $orderData) use ($market) {
+        return array_map(static function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
                 $orderData['user'],
@@ -96,7 +92,7 @@ class MarketFetcher
     /** @return Order[] */
     private function parseExecutedOrders(array $result, Market $market): array
     {
-        return array_map(function (array $orderData) use ($market) {
+        return array_map(static function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
                 $orderData['maker'],

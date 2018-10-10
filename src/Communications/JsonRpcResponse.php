@@ -18,8 +18,9 @@ class JsonRpcResponse
     {
         $decodedResponse = json_decode($response, true);
 
-        if (JSON_ERROR_NONE !== json_last_error())
+        if (JSON_ERROR_NONE !== json_last_error()) {
             throw new Exception('Failed to parse response');
+        }
 
         return new self($decodedResponse);
     }

@@ -33,6 +33,7 @@ $color-slider-range: #007ABB;
 $color-facebook: #3b5998;
 $color-twitter: #1da1f3;
 $color-linkedin: #0077b5;
+$modal-alert-border-color: #4ecb22;
 
 // Forms
 $input-bg: #e6e6e6;
@@ -49,3 +50,10 @@ $card-header-bg-color: $primary;
 // Pagination
 $pagination-color: $primary;
 $pagination-border-width: 0;
+
+// Modal
+$modal-content-border-radius: $border-radius;
+$modal-content-border-width: 0;
+
+// Sizing
+$sizes: (70: 70%);

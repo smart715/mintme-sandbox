@@ -50,7 +50,7 @@ services:
 
     App\Exchange\Trade\Trader:
         arguments:
-            $jsonRpc: '@viabtc.json_rpc%'
+            $jsonRpc: '@viabtc.json_rpc'
 
     App\Exchange\Market\MarketFetcher:
         arguments:
@@ -60,20 +60,24 @@ services:
         arguments:
             $jsonRpc: '@withdraw.json_rpc'
             $service: '%service%'
-   
+
     App\Exchange\Balance\BalanceHandler:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
-
-    App\Communications\Factory\GuzzleRpcClientFactoryInterface: ~
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
-    
+
     App\EventListener\RegistrationInitializedListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.initialize }
-  
+
     App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
+
+    App\Manager\TokenManager: ~
+    App\Manager\TokenManagerInterface: '@App\Manager\TokenManager'
+
+    App\Fetcher\ProfileFetcher: ~
+    App\Fetcher\ProfileFetcherInterface: '@App\Fetcher\ProfileFetcher'
 
     App\Utils\MailerDispatcher:
         arguments:
@@ -92,3 +96,9 @@ services:
             $name: '%fos_user.profile.form.name%'
             $type: '%fos_user.profile.form.type%'
             $validationGroups: '%fos_user.profile.form.validation_groups%'
+
+    App\Verify\WebsiteVerifier:
+        arguments:
+            $timeoutSeconds: '%verify_timeout_seconds%'
+
+    App\Verify\WebsiteVerifierInterface: '@App\Verify\WebsiteVerifier'

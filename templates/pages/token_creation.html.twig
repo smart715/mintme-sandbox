@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row py-3 justify-content-center">
+            <div class="col-xs-12 col-lg-10 col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        {{ formHeader }}
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(form) }}
+                            {{ form_widget(form) }}
+
+                            <div class="form-group row">
+                                <div class="col-md-12 text-center">
+                                    <input type="submit" class="btn btn-primary" value="Create Token" />
+                                </div>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-alert {{ profileCreated ? '' : 'show' }}" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <p>You need to create profile, only then you will be able to create token</p>
+                    <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

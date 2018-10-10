@@ -1,4 +1,4 @@
-var Encore = require('@symfony/webpack-encore');
+const Encore = require('@symfony/webpack-encore');
 
 Encore
     .setOutputPath('public/build/')
@@ -25,12 +25,19 @@ Encore
     .enableVueLoader()
 
     .configureFilenames({
-        'images': 'images/[name].[hash:8].[ext]'
+        'images': 'images/[name].[hash:8].[ext]',
+    })
+
+    .addExternals({
+        gapi: 'gapi',
+        FB: 'FB',
     })
 ;
 
 // export the final configuration
 let config = Encore.getWebpackConfig();
-config.resolve.alias['vue$'] = Encore.isProduction() ? 'vue/dist/vue.min.js' : 'vue/dist/vue.js';
+config.resolve.alias['vue$'] = Encore.isProduction()
+    ? 'vue/dist/vue.min.js'
+    : 'vue/dist/vue.js';
 
 module.exports = config;

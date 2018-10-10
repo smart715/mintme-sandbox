@@ -10,7 +10,7 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('build/main.css') }}">
             {% block pagestyles %}{% endblock %}
-        {% endblock stylesheets %}
+        {% endblock %}
     </head>
     <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
         {% block body %}
@@ -21,7 +21,7 @@
                         {% block top_showcase %}{% endblock %}
                     </div>
                     <div class="header-bg"></div>
-                {% endblock header %}
+                {% endblock %}
                 {% block main %}
                     <div class="pt-5 contents-wrapper">
                         {% for label, messages in app.flashes %}
@@ -31,17 +31,17 @@
                                 </div>
                             {% endfor %}
                         {% endfor %}
-                        {% block content %}{% endblock content %}
+                        {% block content %}{% endblock %}
                     </div>
-                {% endblock main %}
+                {% endblock %}
                 {% block footer %}
                     {% include 'footer.html.twig' %}
-                {% endblock footer %}
+                {% endblock %}
             </div>
-        {% endblock body %}
+        {% endblock %}
         {% block javascripts %}
             <script src="{{ asset('build/main.js') }}"></script>
             {% block pagescripts %}{% endblock %}
-        {% endblock javascripts %}
+        {% endblock %}
     </body>
 </html>

@@ -32,6 +32,8 @@ security:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/token/[a-zA-Z0-9]+, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/token$, role: ROLE_USER }
         - { path: ^/profile$, role: ROLE_USER }
         - { path: ^/settings, role: ROLE_USER }
         - { path: ^/2fa, role: IS_AUTHENTICATED_2FA_IN_PROGRESS }

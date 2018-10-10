@@ -27,7 +27,7 @@ class TraderTest extends TestCase
 
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
         $trader = new Trader($jsonRpc, $this->createOrderConfig());
@@ -71,7 +71,7 @@ class TraderTest extends TestCase
 
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
         $trader = new Trader($jsonRpc, $this->createOrderConfig());
@@ -121,7 +121,7 @@ class TraderTest extends TestCase
 
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
         $trader = new Trader($jsonRpc, $this->createOrderConfig());
@@ -176,7 +176,7 @@ class TraderTest extends TestCase
 
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
         $trader = new Trader($jsonRpc, $this->createOrderConfig());

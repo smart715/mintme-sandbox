@@ -87,7 +87,7 @@ class UserController extends AbstractController
 
         return $emailForm;
     }
-    
+
     /** @Route("/settings/2fa", name="two_factor_auth")*/
     public function twoFactorAuthAction(
         Request $request,
@@ -114,8 +114,9 @@ class UserController extends AbstractController
             'twoFactorKey' => $user->getGoogleAuthenticatorSecret(),
         ];
 
-        if (!$form->isSubmitted() || !$form->isValid())
+        if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('security/2fa_manager.html.twig', $parameters);
+        }
 
         if ($twoFactorManager->checkCode($user, $form)) {
             if ($isTwoFactor) {
@@ -129,7 +130,7 @@ class UserController extends AbstractController
         $this->addFlash('error', 'Invalid two-factor authentication code.');
         return $this->render('security/2fa_manager.html.twig', $parameters);
     }
-    
+
     private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager, User $user): array
     {
         $backupCodes = $twoFactorManager->generateBackupCodes();

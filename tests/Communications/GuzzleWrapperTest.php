@@ -5,6 +5,7 @@ namespace App\Tests\Communications;
 use App\Communications\Factory\RpcClientFactoryInterface;
 use App\Communications\GuzzleWrapper;
 use App\Communications\JsonRpcResponse;
+use App\Utils\RandomNumber;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\RequestInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
@@ -28,9 +29,11 @@ class GuzzleWrapperTest extends TestCase
             ->with($this->equalTo($url), $this->equalTo(['timeout' => $timeout]))
             ->willReturn($client);
 
-        $wrapper = new GuzzleWrapper($clientFactory, $url, $timeout);
-        for ($i = 0; $i < 5; $i++)
+        $wrapper = new GuzzleWrapper($this->getRandomNumber(), $clientFactory, $url, $timeout);
+
+        for ($i = 0; $i < 5; $i++) {
             $wrapper->send('stubmethod', [['stubparam1', 'stubparam2']]);
+        }
     }
 
     public function testSendSuccessful(): void
@@ -50,7 +53,7 @@ class GuzzleWrapperTest extends TestCase
             ->with($url, ['timeout' => $timeout])
             ->willReturn($client);
 
-        $wrapper = new GuzzleWrapper($clientFactory, $url, $timeout);
+        $wrapper = new GuzzleWrapper($this->getRandomNumber(), $clientFactory, $url, $timeout);
         $this->assertInstanceOf(JsonRpcResponse::class, $wrapper->send($method, $params));
     }
 
@@ -70,7 +73,7 @@ class GuzzleWrapperTest extends TestCase
             ->with($url, ['timeout' => $timeout])
             ->willReturn($clientMock);
 
-        $wrapper = new GuzzleWrapper($clientFactory, $url, $timeout);
+        $wrapper = new GuzzleWrapper($this->getRandomNumber(), $clientFactory, $url, $timeout);
 
         $this->expectException(\Throwable::class);
         $wrapper->send($method, $params);
@@ -106,5 +109,11 @@ class GuzzleWrapperTest extends TestCase
         $responseMock = $this->createMock(ResponseInterface::class);
         $responseMock->method('getBody')->willReturn($stream);
         return $responseMock;
+    }
+
+    /** @return MockObject|RandomNumber */
+    private function getRandomNumber(): RandomNumber
+    {
+        return $this->createMock(RandomNumber::class);
     }
 }

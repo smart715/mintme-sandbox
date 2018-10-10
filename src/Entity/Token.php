@@ -26,13 +26,14 @@ class Token
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
-     * @var string
+     * @Assert\Length(min = 4, max = 255)
+     * @var string|null
      */
     protected $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
      */
     protected $address;
 
@@ -45,17 +46,16 @@ class Token
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @AppAssert\IsUrlFromDomain("facebook.com")
+     * @AppAssert\IsUrlFromDomain("www.facebook.com")
      * @var string|null
      */
     protected $facebookUrl;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @AppAssert\IsUrlFromDomain("youtube.com")
      * @var string|null
      */
-    protected $youtubeUrl;
+    protected $youtubeChannelId;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -64,35 +64,41 @@ class Token
     protected $description;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token", cascade={"persist"})
+     * @ORM\Column(type="string", length=180, nullable=true)
+     * @var string|null
+     */
+    protected $websiteConfirmationToken;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @var int
+     */
+    protected $releasePeriod = 10;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
      * @var Profile
      */
     protected $profile;
-
-    public function __construct(Profile $profile, string $address)
-    {
-        $this->profile = $profile;
-        $this->address = $address;
-    }
 
     public function getId(): int
     {
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getAddress(): string
+    public function getAddress(): ?string
     {
         return $this->address;
     }
@@ -121,6 +127,18 @@ class Token
         return $this;
     }
 
+    public function getYoutubeChannelId(): ?string
+    {
+        return $this->youtubeChannelId;
+    }
+
+    public function setYoutubeChannelId(string $youtubeChannelId): self
+    {
+        $this->youtubeChannelId = $youtubeChannelId;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -131,5 +149,29 @@ class Token
         $this->description = $description;
 
         return $this;
+    }
+
+    public function getWebsiteConfirmationToken(): ?string
+    {
+        return $this->websiteConfirmationToken;
+    }
+
+    public function setWebsiteConfirmationToken(string $websiteConfirmationToken): self
+    {
+        $this->websiteConfirmationToken = $websiteConfirmationToken;
+
+        return $this;
+    }
+
+    public function setProfile(Profile $profile): self
+    {
+        $this->profile = $profile;
+
+        return $this;
+    }
+
+    public function getProfile(): Profile
+    {
+        return $this->profile;
     }
 }

@@ -18,14 +18,14 @@
                         <template slot="order_maker" slot-scope="row">
                            {{ row.value }}
                            <img
-                               src="../../img/avatar.png"
+                               src="../../../img/avatar.png"
                                class="float-right"
                                alt="avatar">
                         </template>
                         <template slot="order_trader" slot-scope="row">
                            {{ row.value }}
                            <img
-                               src="../../img/avatar.png"
+                               src="../../../img/avatar.png"
                                class="float-right"
                                alt="avatar">
                         </template>

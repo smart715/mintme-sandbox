@@ -27,8 +27,9 @@ class ProfilePeriodLockValidator extends ConstraintValidator
         if (null === $profile ||
             !$this->isPropertyChanged($profile, $value) ||
             null === $profile->getNameChangedDate() ||
-            $profile->getNameChangedDate()->getTimestamp() < (new DateTime())->getTimestamp())
+            $profile->getNameChangedDate()->getTimestamp() < (new DateTime())->getTimestamp()) {
             return;
+        }
 
         $this->context
             ->buildViolation($constraint->message)
@@ -39,8 +40,9 @@ class ProfilePeriodLockValidator extends ConstraintValidator
     private function isPropertyChanged(Profile $profile, string $value): bool
     {
         $originalProfileData = $this->entityManager->getUnitOfWork()->getOriginalEntityData($profile);
-        if (empty($originalProfileData))
+        if (empty($originalProfileData)) {
             return true;
+        }
         
         $isChanged = $value !== $originalProfileData[$this->context->getPropertyName()];
         if ($isChanged) {
