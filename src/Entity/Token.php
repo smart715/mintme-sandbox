@@ -70,12 +70,6 @@ class Token
     protected $websiteConfirmationToken;
 
     /**
-     * @ORM\Column(type="integer")
-     * @var int
-     */
-    protected $releasePeriod = 10;
-
-    /**
      * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
      * @var Profile
      */
