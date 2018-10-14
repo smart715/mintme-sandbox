@@ -59,3 +59,16 @@ services:
     App\EventListener\RegistrationCompletedListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed }
+            
+    FOS\UserBundle\Form\Factory\FormFactory:
+        arguments:
+            $formFactory: '@form.factory'
+            $name: '%fos_user.profile.form.name%'
+            $type: '%fos_user.profile.form.type%'
+            $validationGroups: '%fos_user.profile.form.validation_groups%'
+            
+    App\EventListener\RegistrationInitializedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.initialize }
+
+  
