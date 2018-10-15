@@ -1,77 +1,83 @@
 @import "~bootstrap/scss/mixins"
 @import "variables"
 
-.footer-container
-  position: relative
-  @include font-scale(sm)
-  .bottom-links-container
-    position: absolute
-    bottom: 0
-    right: 0
-    z-index: 1
-    .bottom-links-wrapper
-      position: relative
 
-  .bottom-links
-    position: absolute
-    right: 0
-    bottom: 0
-    padding-right: 10rem
-    padding-bottom: 2rem
+#footer
+  display: table
+  width: 100%
 
-    @include media-breakpoint-down(lg)
-      padding-right: 6rem
+  .footer-container
+    position: relative
+
+    @include font-scale(sm)
+    .bottom-links-container
+      position: absolute
+      bottom: 0
+      right: 0
+      z-index: 1
+      .bottom-links-wrapper
+        position: relative
+
+    .bottom-links
+      position: absolute
+      right: 0
+      bottom: 0
+      padding-right: 10rem
       padding-bottom: 2rem
 
-    @include media-breakpoint-down(md)
-      padding-right: 0rem
-      padding-bottom: 2rem
+      @include media-breakpoint-down(lg)
+        padding-right: 6rem
+        padding-bottom: 2rem
 
-    @include media-breakpoint-down(sm)
-      bottom: 8rem
+      @include media-breakpoint-down(md)
+        padding-right: 0rem
+        padding-bottom: 2rem
 
-    @include media-breakpoint-down(xs)
-      bottom: 5rem
+      @include media-breakpoint-down(sm)
+        bottom: 8rem
 
-    .link-box
-      border-right: .0625rem solid $body-text-color
+      @include media-breakpoint-down(xs)
+        bottom: 5rem
 
-      &:last-child
-        border: none
+      .link-box
+        border-right: .0625rem solid $body-text-color
 
-      .list-item:last-child
-        padding-bottom: 0 !important
+        &:last-child
+          border: none
 
-      a
-        color: $body-text-color
-        text-decoration: none
+        .list-item:last-child
+          padding-bottom: 0 !important
 
-  .social-network
-    position: absolute
-    width: 2.15%
-    height: 8.125%
-    font-size: 1.0vw
+        a
+          color: $body-text-color
+          text-decoration: none
 
-    @include media-breakpoint-down(xs)
-      z-index: 2
+    .social-network
+      position: absolute
+      width: 2.15%
+      height: 8.125%
+      font-size: 1.0vw
 
-    &.facebook
-      background: $color-facebook
-      top: 36.5%
-      left: 10.5%
+      @include media-breakpoint-down(xs)
+        z-index: 2
 
-    &.twitter
-      background: $color-twitter
-      top: 49.5%
-      left: 11%
+      &.facebook
+        background: $color-facebook
+        top: 36.5%
+        left: 10.5%
 
-    &.linkedin
-      background: $color-linkedin
-      top: 62.5%
-      left: 11.25%
+      &.twitter
+        background: $color-twitter
+        top: 49.5%
+        left: 11%
 
-  .copyright
-    position: absolute
-    left: 0
-    bottom: 0
-    @include font-scale(xs)
+      &.linkedin
+        background: $color-linkedin
+        top: 62.5%
+        left: 11.25%
+
+    .copyright
+      position: absolute
+      left: 0
+      bottom: 0
+      @include font-scale(xs)

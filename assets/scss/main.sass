@@ -14,6 +14,10 @@
 html
   @include font-scale(sm)
   height: 100%
+  box-sizing: border-box
+
+*, *:before, *:after
+  box-sizing: inherit
 
 body
   color: $body-text-color
@@ -23,6 +27,15 @@ body
 
 a
   color: $primary
+
+.content-wrapper
+  height: 100%
+  width: 100%
+  display: table
+
+  .content
+    display: table-row
+    height: 100%
 
 .text-yellow
   color: $theme-yellow

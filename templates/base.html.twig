@@ -14,26 +14,28 @@
     </head>
     <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div class="{% block contentclass %}{% endblock %}">
-                {% block header %}
-                    <div class="header-white">
-                        {% include 'topnav.html.twig' %}
-                        {% block top_showcase %}{% endblock %}
-                    </div>
-                    <div class="header-bg"></div>
-                {% endblock %}
-                {% block main %}
-                    <div class="pt-5 contents-wrapper">
-                        {% for label, messages in app.flashes %}
-                            {% for message in messages %}
-                                <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
-                                    {{ message }}
-                                </div>
+            <div class="content-wrapper {% block contentclass %}{% endblock %}">
+                <div class="content">
+                    {% block header %}
+                        <div class="header-white">
+                            {% include 'topnav.html.twig' %}
+                            {% block top_showcase %}{% endblock %}
+                        </div>
+                        <div class="header-bg"></div>
+                    {% endblock %}
+                    {% block main %}
+                        <div class="pt-5 contents-wrapper">
+                            {% for label, messages in app.flashes %}
+                                {% for message in messages %}
+                                    <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
-                        {% block content %}{% endblock %}
-                    </div>
-                {% endblock %}
+                            {% block content %}{% endblock %}
+                        </div>
+                    {% endblock %}
+                </div>
                 {% block footer %}
                     {% include 'footer.html.twig' %}
                 {% endblock %}
