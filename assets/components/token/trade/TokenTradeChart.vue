@@ -57,9 +57,11 @@ export default {
     props: {
         websocketUrl: String,
         containerClass: String,
+        marketName: String,
     },
     mounted() {
         console.log(this.websocketUrl);
+        console.log(this.market);
     },
     data() {
         return {
@@ -112,6 +114,11 @@ export default {
                 },
             },
         };
+    },
+    computed: {
+        market: function() {
+            return JSON.parse(this.marketName);
+        },
     },
     components: {
         LineChart,
