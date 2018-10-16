@@ -48,7 +48,7 @@ class TokenController extends AbstractController
      *     requirements={"tab" = "trade|intro"}
      * )
      */
-    public function show(string $name): Response
+    public function show(string $name, ?string $tab): Response
     {
         $token = $this->tokenManager->findByName($name);
 
@@ -62,6 +62,7 @@ class TokenController extends AbstractController
             'token' => $token,
             'profile' => $token->getProfile(),
             'isOwner' => $isOwner,
+            'tab' => $tab,
         ]);
     }
 
@@ -75,7 +76,7 @@ class TokenController extends AbstractController
         $token = new Token();
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
 
