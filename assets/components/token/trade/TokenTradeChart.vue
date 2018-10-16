@@ -55,7 +55,11 @@ import LineChart from '../../../js/line-chart';
 export default {
     name: 'TokenTradeChart',
     props: {
+        websocketUrl: String,
         containerClass: String,
+    },
+    mounted() {
+        console.log(this.websocketUrl);
     },
     data() {
         return {

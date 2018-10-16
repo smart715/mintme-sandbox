@@ -18,7 +18,7 @@
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
-                        <token-trade></token-trade>
+                        <token-trade websocket-url="{{ global_websocket_url }}"></token-trade>
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
