@@ -51,6 +51,7 @@
 
 <script>
 import LineChart from '../../../js/line-chart';
+import {w3cwebsocket as W3CWebSocket} from 'websocket';
 
 export default {
     name: 'TokenTradeChart',
@@ -58,10 +59,6 @@ export default {
         websocketUrl: String,
         containerClass: String,
         marketName: String,
-    },
-    mounted() {
-        console.log(this.websocketUrl);
-        console.log(this.market);
     },
     data() {
         return {
@@ -113,12 +110,31 @@ export default {
                     display: false,
                 },
             },
+            wsClient: null,
+            wsResult: {},
         };
     },
     computed: {
         market: function() {
             return JSON.parse(this.marketName);
         },
+    },
+    mounted() {
+        if (this.websocketUrl) {
+            this.wsClient = new W3CWebSocket(this.websocketUrl);
+            this.wsClient.onmessage = (result) => {
+                if (typeof result.data === 'string') {
+                    this.wsResult = JSON.parse(result.data);
+                }
+            };
+            this.wsClient.onopen = () => {
+                this.wsClient.send(`{
+                    "method": "state.subscribe",
+                    "params": ["${this.market.hiddenName}"],
+                    "id": 1
+                }`);
+            };
+        }
     },
     components: {
         LineChart,
