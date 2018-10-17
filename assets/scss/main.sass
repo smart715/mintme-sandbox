@@ -14,12 +14,26 @@
 html
   @include font-scale(sm)
   height: 100%
+  box-sizing: border-box
+
+*, *:before, *:after
+  box-sizing: inherit
+
 
 body
   color: $body-text-color
   font-family: $lato-font
   height: 100%
   width: 100%
+
+.content-wrapper
+  height: 100%
+  width: 100%
+  display: table
+
+  .content
+    display: table-row
+    height: 100%
 
 a
   color: $primary
