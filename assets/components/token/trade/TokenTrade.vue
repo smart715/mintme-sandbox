@@ -2,9 +2,11 @@
     <div class="row">
         <token-trade-buy-order
             container-class="buy-order col-12 col-md-6 col-lg-4"
+            :websocket-url="websocketUrl"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
+            :websocket-url="websocketUrl"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -31,6 +33,9 @@ import TokenTradeTradeHistory from './TokenTradeTradeHistory';
 
 export default {
   name: 'TokenTrade',
+  props: {
+      websocketUrl: String,
+  },
   data() {
     return {};
   },

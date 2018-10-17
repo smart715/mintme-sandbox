@@ -21,3 +21,5 @@ parameters:
     version: 'V1.0.0'
 
     withdraw_fee: 0.1
+
+    websocket_url: 'ws://mintme.abchosting.org:8364'

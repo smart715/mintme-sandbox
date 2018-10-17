@@ -104,6 +104,10 @@ export default {
   name: 'TokenTradeSellOrder',
   props: {
       containerClass: String,
+      websocketUrl: String,
+  },
+  mounted() {
+      console.log(this.websocketUrl);
   },
   data() {
     return {};
