@@ -1,11 +1,5 @@
-import Vue from 'vue';
+import '../js/main';
 import TokenTradeChart from '../components/token/trade/TokenTradeChart';
-import fontawesome from '@fortawesome/fontawesome';
-import fas from '@fortawesome/fontawesome-free-solid';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-
-fontawesome.library.add(fas);
-Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 describe('TokenTradeChart:', () => {
     it('Mock websocket data and check chart data', (done) => {

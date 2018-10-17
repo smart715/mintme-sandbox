@@ -51,7 +51,9 @@
 
 <script>
 import LineChart from '../../../js/line-chart';
-import {w3cwebsocket as W3CWebSocket} from 'websocket';
+import WebSocket from '../../../js/websocket';
+
+Vue.use(WebSocket);
 
 export default {
     name: 'TokenTradeChart',
@@ -140,7 +142,7 @@ export default {
         this.chartData.datasets[0].data = this.chartInitValues;
 
         if (this.websocketUrl) {
-            this.wsClient = new W3CWebSocket(this.websocketUrl);
+            this.wsClient = this.$socket(this.websocketUrl);
             this.wsClient.onmessage = (result) => {
                 if (typeof result.data === 'string') {
                     this.wsResult = JSON.parse(result.data);
