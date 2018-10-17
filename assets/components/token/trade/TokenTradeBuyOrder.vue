@@ -89,9 +89,14 @@
                         />
                     </div>
                     <div class="col-12 pt-4 text-center">
-                        <button class="btn btn-primary">
+                        <button v-if="loggedIn" class="btn btn-primary">
                             Create buy order
                         </button>
+                        <template v-else>
+                            <a :href="loginUrl" class="btn btn-primary">Log In</a>
+                            <span class="px-2">or</span>
+                            <a :href="signupUrl">Sign Up</a>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -105,10 +110,11 @@ export default {
   props: {
       containerClass: String,
       websocketUrl: String,
+      loginUrl: String,
+      signupUrl: String,
+      loggedIn: Boolean,
   },
-  mounted() {
-      console.log(this.websocketUrl);
-  },
+  mounted() {},
   data() {
     return {};
   },

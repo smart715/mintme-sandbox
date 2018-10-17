@@ -3,10 +3,16 @@
         <token-trade-buy-order
             container-class="buy-order col-12 col-md-6 col-lg-4"
             :websocket-url="websocketUrl"
+            :login-url="loginUrl"
+            :signup-url="signupUrl"
+            :logged-in="loggedIn"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
             :websocket-url="websocketUrl"
+            :login-url="loginUrl"
+            :signup-url="signupUrl"
+            :logged-in="loggedIn"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -35,6 +41,9 @@ export default {
   name: 'TokenTrade',
   props: {
       websocketUrl: String,
+      loginUrl: String,
+      signupUrl: String,
+      loggedIn: Boolean,
   },
   data() {
     return {};

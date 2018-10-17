@@ -18,7 +18,11 @@
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
-                        <token-trade websocket-url="{{ global_websocket_url }}"/>
+                        <token-trade websocket-url="{{ global_websocket_url }}"
+                                     login-url="{{ path('fos_user_security_login') }}"
+                                     signup-url="{{ path('fos_user_registration_register') }}"
+                                     :logged-in="{{ app.user ? 'true' : 'false' }}"
+                        />
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
