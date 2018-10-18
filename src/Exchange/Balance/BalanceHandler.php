@@ -15,6 +15,7 @@ class BalanceHandler implements BalanceHandlerInterface
 {
     private const UPDATE_BALANCE_METHOD = 'balance.update';
     private const SUMMARY_METHOD = 'asset.summary';
+    private const FETCH_BALANCE_METHOD = 'balance.query';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -71,6 +72,17 @@ class BalanceHandler implements BalanceHandlerInterface
             (int)$result['freeze_balance'],
             $result['freeze_count']
         );
+    }
+
+    public function fetchBalance(int $userId, string $currencySymbol): array
+    {
+        $response = $this->jsonRpc->send(self::FETCH_BALANCE_METHOD, [
+            $userId, strtoupper($currencySymbol)
+        ]);
+        
+        $result = $response->getResult()[strtoupper($currencySymbol)];
+
+        return $result;
     }
 
     /**
