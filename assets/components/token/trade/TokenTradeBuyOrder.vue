@@ -112,11 +112,17 @@ export default {
       websocketUrl: String,
       loginUrl: String,
       signupUrl: String,
+      marketName: String,
       loggedIn: Boolean,
   },
-  mounted() {},
-  data() {
-    return {};
+  computed: {
+      market: function() {
+          return JSON.parse(this.marketName);
+      }
   },
+  data() {
+      return {};
+  },
+  mounted() {},
 };
 </script>

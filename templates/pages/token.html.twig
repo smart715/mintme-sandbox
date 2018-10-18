@@ -21,6 +21,7 @@
                         <token-trade websocket-url="{{ global_websocket_url }}"
                                      login-url="{{ path('fos_user_security_login') }}"
                                      signup-url="{{ path('fos_user_registration_register') }}"
+                                     market-name="{{ marketName | json_encode }}"
                                      :logged-in="{{ app.user ? 'true' : 'false' }}"
                         />
                     </b-tab>

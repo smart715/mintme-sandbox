@@ -6,6 +6,7 @@
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
+            :market-name="marketName"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
@@ -13,6 +14,7 @@
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
+            :market-name="marketName"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -43,6 +45,7 @@ export default {
       websocketUrl: String,
       loginUrl: String,
       signupUrl: String,
+      marketName: String,
       loggedIn: Boolean,
   },
   data() {

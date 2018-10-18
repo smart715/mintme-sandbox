@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\TokenCreateType;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Verify\WebsiteVerifierInterface;
@@ -29,15 +31,24 @@ class TokenController extends AbstractController
     /** @var TokenManagerInterface */
     protected $tokenManager;
 
+    /** @var CryptoManagerInterface */
+    protected $cryptoManager;
+
+    /** @var MarketManagerInterface */
+    protected $marketManager;
 
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        CryptoManagerInterface $cryptoManager,
+        MarketManagerInterface $marketManager
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
         $this->tokenManager = $tokenManager;
+        $this->cryptoManager = $cryptoManager;
+        $this->marketManager = $marketManager;
     }
 
     /**
@@ -58,11 +69,26 @@ class TokenController extends AbstractController
 
         $isOwner = $token === $this->tokenManager->getOwnToken();
 
+        $webCrypto = $this->cryptoManager->findBySymbol('WEB');
+
+        $market = $webCrypto
+            ? $this->marketManager->getMarket($webCrypto, $token)
+            : null;
+
+        $marketName = $market
+            ? [
+                'hiddenName' => $market->getHiddenName(),
+                'tokenName' => $market->getTokenName(),
+                'currncySymbol' => $market->getCurrencySymbol(),
+            ]
+            : [];
+
         return $this->render('pages/token.html.twig', [
             'token' => $token,
             'profile' => $token->getProfile(),
             'isOwner' => $isOwner,
             'tab' => $tab,
+            'marketName' => $marketName,
         ]);
     }
 
