@@ -6,6 +6,8 @@
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
+            :token-name="tokenName"
+            :place-order-url="placeOrderUrl"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
@@ -13,6 +15,8 @@
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
+            :token-name="tokenName"
+            :place-order-url="placeOrderUrl"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -44,6 +48,8 @@ export default {
       loginUrl: String,
       signupUrl: String,
       loggedIn: Boolean,
+      tokenName: String,
+      placeOrderUrl: String,
   },
   data() {
     return {};
