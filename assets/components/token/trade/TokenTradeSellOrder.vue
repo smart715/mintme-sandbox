@@ -18,7 +18,7 @@
                     >
                         Your Tokens:
                         <span class="text-primary">
-                            9999
+                            {{webBalance}}
                             <font-awesome-icon
                                 icon="question"
                                 class="ml-1 mb-1 bg-primary text-white
@@ -32,6 +32,7 @@
                         >
                         <label class="custom-control custom-checkbox">
                             <input
+                                v-model.number="useMarketPrice"
                                 type="checkbox"
                                 id="sell-price"
                                 class="custom-control-input"
@@ -62,9 +63,11 @@
                             />
                         </label>
                         <input
+                            v-model.number="sellPrice"
                             type="text"
                             id="sell-price-input"
                             class="form-control"
+                            :disabled="useMarketPrice"
                         >
                     </div>
                     <div class="col-12 pt-3">
@@ -75,13 +78,14 @@
                             Amount:
                         </label>
                         <input
+                            v-model="sellAmount"
                             type="text"
                             id="sell-price-amount"
                             class="form-control"
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: 999 WEB
+                        Total Price: {{totalPrice}} WEB
                         <font-awesome-icon
                             icon="question"
                             class="ml-1 mb-1 bg-primary text-white
@@ -105,6 +109,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: 'TokenTradeSellOrder',
   props: {
@@ -113,10 +118,54 @@ export default {
       loginUrl: String,
       signupUrl: String,
       loggedIn: Boolean,
+      tokenName: String,
+      placeOrderUrl: String
   },
-  mounted() {},
   data() {
-    return {};
+    return {
+        sellPrice: 0,
+        sellAmount: 0,
+        useMarketPrice: false,
+        action: 'sell',
+        webBalance: ''
+    };
   },
+  methods: {
+    placeOrder: function() 
+    {
+        let data = {
+            tokenName: this.tokenName,
+            amountInput: this.sellAmount,
+            priceInput: this.sellPrice,
+            marketPrice: this.useMarketPrice,
+            action: this.action
+        };
+        axios.post(this.placeOrderUrl, data)
+        .then( response => {
+            console.log(response);
+        })
+        .catch( error => { 
+            console.log('Axios Error: ' + error)
+        });
+    }
+  },
+  computed: {
+    totalPrice: function() {
+          return this.sellPrice * this.sellAmount;
+    }
+  },
+  watch: {
+      useMarketPrice: function() {
+          if (this.useMarketPrice) {
+              this.sellPrice = 10;
+          }
+      }
+  },
+  mounted: function() {
+        axios.get("http://localhost:8000/fetch-balance/web")
+        .then(response => {
+          return this.webBalance = response.data["balance"];
+        });
+    }
 };
 </script>

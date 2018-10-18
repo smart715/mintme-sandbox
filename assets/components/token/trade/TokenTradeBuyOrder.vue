@@ -18,7 +18,7 @@
                     >
                         Your WEB:
                         <span class="text-primary">
-                            9999
+                            {{webBalance}}
                             <font-awesome-icon
                                 icon="question"
                                 class="ml-1 mb-1 bg-primary text-white
@@ -32,9 +32,10 @@
                     >
                         <label class="custom-control custom-checkbox">
                             <input
+                                v-model="useMarketPrice"
                                 type="checkbox"
                                 id="buy-price"
-                                class="custom-control-input"
+                                class="custom-control-input"                                
                             >
                             <label
                                 class="custom-control-label"
@@ -62,9 +63,11 @@
                             />
                         </label>
                         <input
+                            v-model.number="buyPrice"
                             type="text"
                             id="buy-price-input"
                             class="form-control"
+                            :disabled="useMarketPrice"
                         >
                     </div>
                     <div class="col-12 pt-3">
@@ -75,13 +78,14 @@
                             Amount:
                         </label>
                         <input
+                            v-model.number="buyAmount"
                             type="text"
                             id="buy-price-amount"
                             class="form-control"
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: 999 WEB
+                        Total Price: {{totalPrice}} WEB
                         <font-awesome-icon
                             icon="question"
                             class="ml-1 mb-1 bg-primary text-white
@@ -89,7 +93,7 @@
                         />
                     </div>
                     <div class="col-12 pt-4 text-center">
-                        <button v-if="loggedIn" class="btn btn-primary">
+                        <button @click="placeOrder" v-if="loggedIn" class="btn btn-primary">
                             Create buy order
                         </button>
                         <template v-else>
@@ -105,6 +109,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: 'TokenTradeBuyOrder',
   props: {
@@ -113,10 +118,65 @@ export default {
       loginUrl: String,
       signupUrl: String,
       loggedIn: Boolean,
+      tokenName: String,
+      placeOrderUrl: String
   },
-  mounted() {},
   data() {
-    return {};
+    return {
+        buyPrice: 0,
+        buyAmount: 0,
+        useMarketPrice: false,
+        action: 'buy',
+        webBalance: ''        
+    };
   },
+  methods: {
+    placeOrder: function() 
+    {
+        if (this.validate()){
+            let data = {
+                tokenName: this.tokenName,
+                amountInput: this.buyAmount,
+                priceInput: this.buyPrice,
+                marketPrice: this.useMarketPrice,
+                action: this.action
+            };
+
+            axios.post(this.placeOrderUrl, data)
+            .then( response => {
+               console.log(response);
+            })
+            .catch( error => { 
+                console.log('Axios Error: ' + error)
+            });
+        }
+    },
+    validate: function() {
+        if (this.buyAmount !== undefined && this.buyPrice !== undefined) {
+            return true;
+        } 
+        else {
+            return false;
+        }
+    }
+  },
+  computed: {
+    totalPrice: function() {
+          return this.buyPrice * this.buyAmount;
+    }
+  },
+  watch: {
+      useMarketPrice: function() {
+          if (this.useMarketPrice) {
+              this.buyPrice = 10;
+          }
+      }
+  },
+  mounted: function() {
+        axios.get("http://localhost:8000/fetch-balance/web")
+        .then(response => {
+          return this.webBalance = response.data["balance"];
+        });
+    }
 };
 </script>
