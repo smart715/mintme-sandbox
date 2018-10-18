@@ -22,6 +22,8 @@
                                      login-url="{{ path('fos_user_security_login') }}"
                                      signup-url="{{ path('fos_user_registration_register') }}"
                                      :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                     token-name= "{{ token.name }}"
+                                     place-order-url= "{{ path('place_order', {'tokenName' : token.name})}}"
                         />
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
