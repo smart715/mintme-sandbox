@@ -7,6 +7,7 @@
             :signup-url="signupUrl"
             :logged-in="loggedIn"
             :market-name="marketName"
+            :buy="buy"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
@@ -15,6 +16,7 @@
             :signup-url="signupUrl"
             :logged-in="loggedIn"
             :market-name="marketName"
+            :sell="sell"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -38,26 +40,101 @@ import TokenTradeChart from './TokenTradeChart';
 import TokenTradeBuyOrders from './TokenTradeBuyOrders';
 import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
+import WebSocket from '../../../js/websocket';
+
+Vue.use(WebSocket);
 
 export default {
-  name: 'TokenTrade',
-  props: {
-      websocketUrl: String,
-      loginUrl: String,
-      signupUrl: String,
-      marketName: String,
-      loggedIn: Boolean,
-  },
-  data() {
-    return {};
-  },
-  components: {
-      TokenTradeBuyOrder,
-      TokenTradeSellOrder,
-      TokenTradeChart,
-      TokenTradeBuyOrders,
-      TokenTradeSellOrders,
-      TokenTradeTradeHistory,
-  },
+    name: 'TokenTrade',
+    props: {
+        websocketUrl: String,
+        loginUrl: String,
+        signupUrl: String,
+        marketName: String,
+        loggedIn: Boolean,
+    },
+    data() {
+        return {
+            wsClient: null,
+            wsResult: {},
+            buy: {
+                amount: 0,
+                price: 0,
+            },
+            sell: {
+                amount: 0,
+                price: 0,
+            },
+        };
+    },
+    mounted() {
+        if (this.websocketUrl) {
+            this.wsClient = this.$socket(this.websocketUrl);
+            this.wsClient.onmessage = (result) => {
+                if (typeof result.data === 'string') {
+                    this.wsResult = JSON.parse(result.data);
+                }
+            };
+            this.wsClient.onopen = () => {
+                this.wsClient.send(`{
+                    "method": "deals.subscribe",
+                    "params": ["${this.market.hiddenName}"],
+                    "id": 1
+                }`);
+            };
+        }
+    },
+    computed: {
+        market: function() {
+            return JSON.parse(this.marketName);
+        },
+    },
+    components: {
+        TokenTradeBuyOrder,
+        TokenTradeSellOrder,
+        TokenTradeChart,
+        TokenTradeBuyOrders,
+        TokenTradeSellOrders,
+        TokenTradeTradeHistory,
+    },
+    methods: {
+        updateMarketData: function(marketData) {
+            if (!marketData.params) {
+                return;
+            }
+
+            const marketDealsInfo = marketData.params[1];
+
+            marketDealsInfo.forEach((deal) => {
+                // Pending order.
+                if (!deal.maker_id) {
+                    const price = parseFloat(deal.price);
+                    const amount = parseFloat(deal.amount);
+                    switch (deal.type) {
+                        case 'buy':
+                            if (price > this.sell.price) {
+                                this.sell.price = price;
+                                this.sell.amount = amount;
+                            }
+                            break;
+                        case 'sell':
+                            if (price < this.buy.price) {
+                                this.buy.price = price;
+                                this.buy.amount = amount;
+                            }
+                            break;
+                    }
+                }
+            });
+        },
+    },
+    watch: {
+        wsResult: {
+            handler(value) {
+                this.updateMarketData(value);
+            },
+            deep: true,
+        },
+    },
 };
 </script>

@@ -65,6 +65,7 @@
                             type="text"
                             id="buy-price-input"
                             class="form-control"
+                            :value="price"
                         >
                     </div>
                     <div class="col-12 pt-3">
@@ -78,6 +79,7 @@
                             type="text"
                             id="buy-price-amount"
                             class="form-control"
+                            :value="amount"
                         >
                     </div>
                     <div class="col-12 pt-3">
@@ -106,23 +108,30 @@
 
 <script>
 export default {
-  name: 'TokenTradeBuyOrder',
-  props: {
-      containerClass: String,
-      websocketUrl: String,
-      loginUrl: String,
-      signupUrl: String,
-      marketName: String,
-      loggedIn: Boolean,
-  },
-  computed: {
-      market: function() {
-          return JSON.parse(this.marketName);
-      }
-  },
-  data() {
-      return {};
-  },
-  mounted() {},
+    name: 'TokenTradeBuyOrder',
+    props: {
+        containerClass: String,
+        websocketUrl: String,
+        loginUrl: String,
+        signupUrl: String,
+        marketName: String,
+        loggedIn: Boolean,
+        buy: Object,
+    },
+    computed: {
+        market: function() {
+            return JSON.parse(this.marketName);
+        },
+        amount: function() {
+            return this.buy.amount || null;
+        },
+        price: function() {
+            return this.buy.price || null;
+        },
+    },
+    data() {
+        return {};
+    },
+    mounted() {},
 };
 </script>
