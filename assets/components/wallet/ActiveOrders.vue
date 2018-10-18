@@ -1,13 +1,17 @@
 <template>
     <div class="pb-3">
         <div class="table-responsive">
+            <confirm-modal
+                    :visible="confirmModal"
+                    v-on:close="removeOrderModal"
+            ></confirm-modal>
             <b-table
                 :items="history"
                 :fields="fields"
                 :current-page="currentPage"
                 :per-page="perPage">
                 <template slot="action" slot-scope="row">
-                    <a>
+                    <a @click="removeOrderModal(row.item)">
                         <font-awesome-icon
                             icon="times"
                             class="text-danger" />
@@ -25,14 +29,40 @@
     </div>
 </template>
 <script>
+import ConfirmModal from '../modal/ConfirmModal';
+import {w3cwebsocket as W3CWebSocket} from 'websocket';
+
 export default {
     name: 'ActiveOrders',
+    components: {
+        ConfirmModal,
+    },
+    methods: {
+        removeOrderModal: function(test) {
+            console.log(test);
+            this.confirmModal = !this.confirmModal;
+        },
+    },
+    mounted() {
+        this.wsClient = new W3CWebSocket('ws://mintme.abchosting.org:8364');
+        this.wsClient.onmessage = (result) => {
+            console.log(JSON.parse(result.data));
+        };
+        this.wsClient.onopen = () => {
+            this.wsClient.send(`{
+                "method": "server.auth",
+                "params": ["token123", "web"],
+                "id": 0
+            }`);
+        };
+    },
     data() {
         return {
             history: [],
             currentPage: 1,
             perPage: 10,
             pageOptions: [10, 20, 30],
+            confirmModal: false,
             fields: {
                 date: {
                     label: 'Date',

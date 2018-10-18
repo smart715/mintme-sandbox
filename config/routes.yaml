@@ -31,3 +31,7 @@ api_controllers:
 controllers:
     resource: ../src/Controller/
     type: annotation
+
+api_user_auth_controller:
+    path: /internal/exchange/user/auth
+    controller: App\Controller\AuthAPIController::authUser
