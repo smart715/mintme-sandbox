@@ -83,7 +83,7 @@
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: 999 WEB
+                        Total Price: {{ totalPrice }} WEB
                         <font-awesome-icon
                             icon="question"
                             class="ml-1 mb-1 bg-primary text-white
@@ -127,6 +127,9 @@ export default {
         },
         price: function() {
             return this.buy.price || null;
+        },
+        totalPrice: function() {
+            return this.amount && this.price ? this.amount * this.price : 0;
         },
     },
     data() {
