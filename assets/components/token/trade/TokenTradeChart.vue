@@ -149,11 +149,11 @@ export default {
                 }
             };
             this.wsClient.onopen = () => {
-                this.wsClient.send(`{
-                    "method": "state.subscribe",
-                    "params": ["${this.market.hiddenName}"],
-                    "id": 1
-                }`);
+                this.wsClient.send('{' +
+                    '"method": "state.subscribe",' +
+                    '"params": ["' + this.market.hiddenName + '"],' +
+                    '"id": 1' +
+                '}');
             };
         }
     },

@@ -2,7 +2,18 @@ import '../js/main';
 import TokenTradeChart from '../components/token/trade/TokenTradeChart';
 
 describe('TokenTradeChart:', () => {
-    it('Mock websocket data and check chart data', (done) => {
+    const Constructor = Vue.extend(TokenTradeChart);
+    const vm = new Constructor({
+        propsData: {
+            marketName: '{' +
+                '"hiddenName":"TOK000000000001WEB",' +
+                '"tokenName":"tok1",' +
+                '"currncySymbol":"WEB"' +
+            '}',
+        },
+    }).$mount();
+
+    it('Mock first websocket message', (done) => {
         const wsResult1 = {
             'method': 'state.update',
             'params': [
@@ -20,6 +31,17 @@ describe('TokenTradeChart:', () => {
             ],
             'id': null,
         };
+
+        vm.wsResult = wsResult1;
+
+        Vue.nextTick(() => {
+            expect(vm.chartData.datasets[0].data)
+                .to.deep.equal([0, 0, 0, 0, 0, 0, 0, 0, 0, 321]);
+            done();
+        });
+    });
+
+    it('Mock second websocket message', (done) => {
         const wsResult2 = {
             'method': 'state.update',
             'params': [
@@ -38,28 +60,11 @@ describe('TokenTradeChart:', () => {
             'id': null,
         };
 
-        const Constructor = Vue.extend(TokenTradeChart);
-        const vm = new Constructor({
-            propsData: {
-                marketName: '{' +
-                    '"hiddenName":"TOK000000000001WEB",' +
-                    '"tokenName":"tok1",' +
-                    '"currncySymbol":"WEB"' +
-                '}',
-            },
-        }).$mount();
-
-        vm.wsResult = wsResult1;
+        vm.wsResult = wsResult2;
 
         Vue.nextTick(() => {
             expect(vm.chartData.datasets[0].data)
-                .to.deep.equal([0, 0, 0, 0, 0, 0, 0, 0, 0, 321]);
-            vm.wsResult = wsResult2;
-            Vue.nextTick(() => {
-              expect(vm.chartData.datasets[0].data)
-                  .to.deep.equal([0, 0, 0, 0, 0, 0, 0, 0, 321, 3210]);
-              done();
-            });
+                .to.deep.equal([0, 0, 0, 0, 0, 0, 0, 0, 321, 3210]);
             done();
         });
     });
