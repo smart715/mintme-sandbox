@@ -3,7 +3,11 @@
         <div class="table-responsive">
             <confirm-modal
                     :visible="confirmModal"
-                    v-on:close="removeOrderModal"
+                    :tokenName="tokenName"
+                    :amount="amount"
+                    :price="price"
+                    v-on:close="switchConfirmModal"
+                    v-on:confirm="removeOrder"
             ></confirm-modal>
             <b-table
                 :items="history"
@@ -38,10 +42,18 @@ export default {
         ConfirmModal,
     },
     methods: {
-        removeOrderModal: function(test) {
-            console.log(test);
+        removeOrderModal: function(row) {
+            this.tokenName = row.name;
+            this.amount = row.amount;
+            this.price = row.price;
             this.confirmModal = !this.confirmModal;
         },
+        switchConfirmModal: function() {
+            this.confirmModal = !this.confirmModal;
+        },
+        removeOrder: function() {
+            alert("this method for remove order");
+        }
     },
     mounted() {
         this.wsClient = new W3CWebSocket('ws://mintme.abchosting.org:8364');
@@ -63,6 +75,9 @@ export default {
             perPage: 10,
             pageOptions: [10, 20, 30],
             confirmModal: false,
+            tokenName: null,
+            amount: null,
+            price: null,
             fields: {
                 date: {
                     label: 'Date',
