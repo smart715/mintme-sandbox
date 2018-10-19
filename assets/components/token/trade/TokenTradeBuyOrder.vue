@@ -144,7 +144,7 @@ export default {
 
             axios.post(this.placeOrderUrl, data)
             .then( response => {
-               console.log(response);
+               this.$emit('showModal');
             })
             .catch( error => { 
                 console.log('Axios Error: ' + error)

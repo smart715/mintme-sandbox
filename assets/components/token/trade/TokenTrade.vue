@@ -30,6 +30,12 @@
         <token-trade-trade-history
             container-class="col-12 mt-3"
         />
+        <order-modal 
+            :visible="isModalVisible"
+            @showModal="showModal"
+            @close="hideModal"
+        >
+        </order-modal> 
     </div>
 </template>
 
@@ -40,7 +46,7 @@ import TokenTradeChart from './TokenTradeChart';
 import TokenTradeBuyOrders from './TokenTradeBuyOrders';
 import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
-
+import OrderModal from '../../modal/OrderModal';
 export default {
   name: 'TokenTrade',
   props: {
@@ -52,7 +58,9 @@ export default {
       placeOrderUrl: String,
   },
   data() {
-    return {};
+    return {
+        isModalVisible: false
+    };
   },
   components: {
       TokenTradeBuyOrder,
@@ -61,6 +69,15 @@ export default {
       TokenTradeBuyOrders,
       TokenTradeSellOrders,
       TokenTradeTradeHistory,
+      OrderModal
   },
+  methods: {
+      showModal: function() {
+          this.isModalVisible = true;
+      },
+      hideModal: function() {
+          this.isModalVisible = false;
+      }
+  }
 };
 </script>
