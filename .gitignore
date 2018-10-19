@@ -20,3 +20,5 @@ public/build
 /.idea
 /.phplint-cache
 /phpstan
+
+.vscode
