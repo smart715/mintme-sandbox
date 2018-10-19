@@ -8,7 +8,10 @@
                         {{ currentAddress }}
                     </a>
                 </div>
-                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a target="_blank" :href="'https://www.facebook.com/sharer/sharer.php?u='+currentAddressEncoded+'&amp;src=sdkpreparse'" class="fb-xfbml-parse-ignore">Share</a></div>
+                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                     data-layout="button_count" data-size="small" data-mobile-iframe="true">
+                    <a target="_blank" :href="'https://www.facebook.com/sharer/sharer.php?u='+currentAddressEncoded
+                    +'&amp;src=sdkpreparse'" class="fb-xfbml-parse-ignore">Share</a></div>
             </div>
         </div>
         <div v-show="editing">
@@ -33,7 +36,8 @@
                                 <div class="form-group">
                                     <label for="select-fb-pages">Select Facebook page to show:</label>
                                     <select v-model="selectedUrl" class="form-control" id="select-fb-pages">
-                                        <option v-for="(page, index) in pages" :selected="index === 0 ? 'selected' : ''" :key="page.id" :value="page.link">
+                                        <option v-for="(page, index) in pages" :selected="index === 0 ? 'selected'
+                                         : ''" :key="page.id" :value="page.link">
                                             {{ page.name }}
                                         </option>
                                     </select>

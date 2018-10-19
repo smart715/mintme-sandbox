@@ -19,7 +19,8 @@
                     <div class="col-12">
                         <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
-                            <textarea class="form-control" v-model="newDescription" v-if="editingDescription"></textarea>
+                            <textarea class="form-control" v-model="newDescription" v-if="editingDescription">
+                            </textarea>
                         </template>
                     </div>
                 </div>

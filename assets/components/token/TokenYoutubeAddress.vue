@@ -4,11 +4,13 @@
             <div class="d-flex">
                 <div class="display-text">
                     Youtube:
-                    <a v-if="currentChannelId" :href="'https://www.youtube.com/channel/'+this.currentChannelId" target="_blank" rel="nofollow">
+                    <a v-if="currentChannelId" :href="'https://www.youtube.com/channel/'+this.currentChannelId"
+                       target="_blank" rel="nofollow">
                         https://www.youtube.com/channel/{{ this.currentChannelId }}
                     </a>
                 </div>
-                <div v-if="currentChannelId" class="g-ytsubscribe" :data-channelid="currentChannelId" data-layout="default" data-count="default"></div>
+                <div v-if="currentChannelId" class="g-ytsubscribe" :data-channelid="currentChannelId"
+                     data-layout="default" data-count="default"></div>
             </div>
         </div>
         <div v-show="editing">

@@ -52,8 +52,8 @@ export default {
             this.confirmModal = !this.confirmModal;
         },
         removeOrder: function() {
-            alert("this method for remove order");
-        }
+            alert('this method for remove order');
+        },
     },
     mounted() {
         this.wsClient = new W3CWebSocket('ws://mintme.abchosting.org:8364');

@@ -30,7 +30,9 @@
                                 </div>
                                 <div class="form-group" v-else>
                                     <label for="website-err">Website address:</label>
-                                    <input id="website-err" type="text" v-model="newWebsite" class="form-control" :class="{ 'is-invalid': showWebsiteError }" @keyup.enter="checkWebsiteUrl">
+                                    <input id="website-err" type="text" v-model="newWebsite"
+                                           class="form-control" :class="{ 'is-invalid': showWebsiteError }"
+                                           @keyup.enter="checkWebsiteUrl">
                                     <div class="invalid-feedback" v-if="showWebsiteError">
                                         Please provide a valid URL.
                                     </div>
@@ -95,9 +97,14 @@
                         <div class="row">
                             <div class="col-12">
                                 <ol>
-                                    <li>Download <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a></li>
+                                    <li>Download
+                                        <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
+                                    </li>
                                     <li>Upload the file to {{ parsedWebsite }}</li>
-                                    <li>Check if file was uploaded successfully by visiting <a :href="parsedWebsite+'/mintme.html'" target="_blank" rel="nofollow">{{ parsedWebsite }}/mintme.html</a></li>
+                                    <li>Check if file was uploaded successfully by visiting
+                                        <a :href="parsedWebsite+'/mintme.html'" target="_blank" rel="nofollow">
+                                            {{ parsedWebsite }}/mintme.html
+                                        </a></li>
                                     <li>Click confirm below</li>
                                 </ol>
                             </div>
