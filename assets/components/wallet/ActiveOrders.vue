@@ -34,7 +34,9 @@
 </template>
 <script>
 import ConfirmModal from '../modal/ConfirmModal';
-import {w3cwebsocket as W3CWebSocket} from 'websocket';
+import WebSocket from '../../js/websocket';
+
+Vue.use(WebSocket);
 
 export default {
     name: 'ActiveOrders',
@@ -56,7 +58,7 @@ export default {
         },
     },
     mounted() {
-        this.wsClient = new W3CWebSocket('ws://mintme.abchosting.org:8364');
+        this.wsClient = this.$socket('ws://mintme.abchosting.org:8364');
         this.wsClient.onmessage = (result) => {
             console.log(JSON.parse(result.data));
         };
