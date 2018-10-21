@@ -2,6 +2,8 @@
 
 namespace App\Controller\API;
 
+use App\Entity\Token\LockIn;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\TokenType;
 use App\Manager\TokenManagerInterface;
 use App\Verify\WebsiteVerifierInterface;
@@ -11,7 +13,6 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 
@@ -37,7 +38,7 @@ class TokenAPIController extends FOSRestController
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      */
-    public function update(ParamFetcherInterface $request, SerializerInterface $serializer, string $name): View
+    public function update(ParamFetcherInterface $request, string $name): View
     {
         $token = $this->tokenManager->findByName($name);
 
@@ -112,5 +113,57 @@ class TokenAPIController extends FOSRestController
         }
 
         return $this->view(['verified' => $isVerified, 'errors' => []], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/lock-in", name="lock_in")
+     * @Rest\RequestParam(name="released", allowBlank=false)
+     * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
+     * @Rest\RequestParam(name="_csrf_token", allowBlank=false)
+     */
+    public function setTokenReleasePeriod(
+        ParamFetcherInterface $request,
+        BalanceHandlerInterface $balanceHandler,
+        string $name
+    ): View {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        $lock = $token->getLockIn() ?? new LockIn($token);
+
+        $form = $this->createFormBuilder($lock, [
+                'csrf_protection' => false,
+                'allow_extra_fields' => true,
+            ])
+            ->add('releasePeriod')
+            ->getForm();
+
+        $form->submit($request->all());
+
+        if (!$form->isValid() || !$this->isCsrfTokenValid('update-token', $request->get('_csrf_token'))) {
+            return $this->view($form);
+        }
+
+        if (!$lock->getId()) {
+            $balance = $balanceHandler->balance($this->getUser(), $token);
+
+            if ($balance->isFailed()) {
+                return $this->view('Exchanger connection lost. Try again.', Response::HTTP_BAD_REQUEST);
+            }
+
+            $releasedAmount = $balance->getAvailable() / 100 * $request->get('released');
+            $lock->setAmountToRelease($balance->getAvailable() - $releasedAmount);
+        }
+
+        $this->em->persist($lock);
+        $this->em->flush();
+
+        return $this->view($lock);
     }
 }

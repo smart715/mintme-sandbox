@@ -3,7 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\Profile;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 
 interface ProfileManagerInterface
 {

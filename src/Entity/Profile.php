@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -81,7 +82,7 @@ class Profile
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
      * @var Token|null
      */
     protected $token;

@@ -12,7 +12,7 @@ const webpackConfig = require('./webpack.config');
 module.exports = function(config) {
   config.set({
     basePath: '',
-    frameworks: ['mocha', 'requirejs', 'chai'],
+    frameworks: ['mocha', 'requirejs', 'chai', 'es6-shim'],
     files: [
       'test-main.js',
       { pattern: 'assets/tests/**/*Spec.js', included: false },
@@ -26,7 +26,9 @@ module.exports = function(config) {
         noInfo: true
     },
     preprocessors: {
-        'assets/tests/**/*Spec.js': ['webpack']
+        'assets/tests/**/*Spec.js': ['webpack'],
+        'assets/js/**/*.js': ['webpack', 'coverage'],
+        'assets/components/**/*.vue': ['webpack', 'coverage']
     },
     coverageReporter: {
       type : 'text-summary',
@@ -42,4 +44,4 @@ module.exports = function(config) {
     singleRun: true,
     concurrency: Infinity
   })
-}
+};

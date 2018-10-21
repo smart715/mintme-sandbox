@@ -2,7 +2,7 @@
 
 namespace App\Utils;
 
-use App\Entity\Token;
+use App\Entity\Token\Token;
 
 class TokenNameConverter implements TokenNameConverterInterface
 {

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\TokenCreateType;
 use App\Manager\ProfileManagerInterface;
@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /** @Route("/token") */
 class TokenController extends AbstractController
@@ -48,7 +49,7 @@ class TokenController extends AbstractController
      *     requirements={"tab" = "trade|intro"}
      * )
      */
-    public function show(string $name): Response
+    public function show(string $name, NormalizerInterface $normalizer): Response
     {
         $token = $this->tokenManager->findByName($name);
 
@@ -60,6 +61,9 @@ class TokenController extends AbstractController
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
+            'stats' => $normalizer->normalize($token->getLockIn(), null, [
+                'groups' => [ 'Default' ],
+            ]),
             'profile' => $token->getProfile(),
             'isOwner' => $isOwner,
         ]);
@@ -86,7 +90,11 @@ class TokenController extends AbstractController
             }
 
             try {
-                $balanceHandler->withdraw($this->getUser(), $token, 1000000);
+                $balanceHandler->withdraw(
+                    $this->getUser(),
+                    $token,
+                    $this->getParameter('token_quantity')
+                );
 
                 return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
             } catch (\Throwable $exception) {
@@ -103,7 +111,9 @@ class TokenController extends AbstractController
         ]);
     }
 
-    /** @Route("/{name}/website-confirmation", name="token_website_confirmation") */
+    /**
+     * @Route("/{name}/website-confirmation", name="token_website_confirmation")
+     */
     public function getWebsiteConfirmationFile(string $name): Response
     {
         $token = $this->tokenManager->findByName($name);

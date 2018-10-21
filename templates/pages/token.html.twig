@@ -14,11 +14,11 @@
                     name="{{ token.name }}"
                     csrf-token="{{ csrf_token('update-token') }}"
                     update-url="{{ path('token_update', {'name': token.name}) }}"
-                    editable="{{ isOwner ? 'true' : 'false' }}">
+                    :editable="{{ isOwner ? 'true' : 'false' }}">
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Invest">
-                        <token-invest></token-invest>
+
                     </b-tab>
                     <b-tab title="Introduction" active>
                         <div class="row">
@@ -37,7 +37,14 @@
                                 :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-profile>
 
-                            <token-introduction-statistics container-class="col-12 col-md-6 mt-3 mt-md-0">
+                            <token-introduction-statistics
+                                container-class="col-12 col-md-6 mt-3 mt-md-0"
+                                :editable="{{ isOwner ? 'true' : 'false' }}"
+                                csrf="{{ csrf_token('update-token') }}"
+                                {% if stats is not null %}
+                                    :stats="{{ stats | json_encode }}"
+                                {% endif %}
+                                release-period-route="{{ path('lock_in', {'name': token.name}) }}">
                             </token-introduction-statistics>
                         </div>
                         <div class="row">
@@ -46,7 +53,7 @@
                                 description="{{ token.description }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
-                                editable="{{ isOwner ? 'true' : 'false' }}">
+                                :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-description>
                         </div>
                     </b-tab>

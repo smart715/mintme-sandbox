@@ -43,3 +43,25 @@ export function isValidUrl(url) {
 
       return regex.test(url);
 }
+
+/**
+ * @param {object|Array} object
+ * @return {Array}
+ */
+export function deepFlatten(object) {
+    if (typeof object === 'object') {
+        object = Array.from(Object.keys(object), (k) => object[k]);
+    }
+
+    const flat = [];
+
+    object.forEach((item) => {
+        if (Array.isArray(item) || typeof item === 'object') {
+            flat.push(...deepFlatten(item));
+        } else {
+            flat.push(item);
+        }
+    });
+
+    return flat;
+}
