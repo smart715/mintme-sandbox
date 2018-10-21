@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Token;
 
+use App\Entity\Profile;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -75,9 +76,20 @@ class Token
      */
     protected $profile;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Token\LockIn", mappedBy="token")
+     * @var LockIn|null
+     */
+    protected $lockIn;
+
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getLockIn(): ?LockIn
+    {
+        return $this->lockIn;
     }
 
     public function getName(): ?string
