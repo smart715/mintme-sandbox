@@ -1,7 +1,7 @@
 import '../js/main';
 import TokenTradeChart from '../components/token/trade/TokenTradeChart';
 
-describe('TokenTradeChart:', () => {
+describe('TokenTradeChart', () => {
     const Constructor = Vue.extend(TokenTradeChart);
     const vm = new Constructor({
         propsData: {
@@ -13,8 +13,8 @@ describe('TokenTradeChart:', () => {
         },
     }).$mount();
 
-    it('Mock first websocket message', (done) => {
-        const wsResult1 = {
+    it('market with volume 321 should be last in chart data', (done) => {
+        const wsResult = {
             'method': 'state.update',
             'params': [
                 'TOK000000000001WEB',
@@ -32,7 +32,7 @@ describe('TokenTradeChart:', () => {
             'id': null,
         };
 
-        vm.wsResult = wsResult1;
+        vm.wsResult = wsResult;
 
         Vue.nextTick(() => {
             expect(vm.chartData.datasets[0].data)
@@ -41,8 +41,8 @@ describe('TokenTradeChart:', () => {
         });
     });
 
-    it('Mock second websocket message', (done) => {
-        const wsResult2 = {
+    it('Market with volume 3210 should be after 321 in chart data', (done) => {
+        const wsResult = {
             'method': 'state.update',
             'params': [
                 'TOK000000000002WEB',
@@ -60,7 +60,7 @@ describe('TokenTradeChart:', () => {
             'id': null,
         };
 
-        vm.wsResult = wsResult2;
+        vm.wsResult = wsResult;
 
         Vue.nextTick(() => {
             expect(vm.chartData.datasets[0].data)
