@@ -10,6 +10,7 @@
             :buy="buy"
             :token-name="tokenName"
             :place-order-url="placeOrderUrl"
+            :fetch-balance-url="fetchBalanceUrl"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
@@ -21,6 +22,7 @@
             :sell="sell"
             :token-name="tokenName"
             :place-order-url="placeOrderUrl"
+            :fetch-balance-url="fetchBalanceUrl"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -59,6 +61,7 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
+        fetchBalanceUrl: String
     },
     data() {
         return {

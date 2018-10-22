@@ -127,6 +127,7 @@ export default {
       placeOrderUrl: String,
       marketName: String,
       buy: Object,
+      fetchBalanceUrl: String
   },
   data() {
     return {
@@ -188,9 +189,9 @@ export default {
       }
   },
   mounted: function() {
-        axios.get("http://localhost:8000/fetch-balance/web")
+        axios.get(this.fetchBalanceUrl)
         .then(response => {
-          return this.webBalance = response.data["balance"];
+          return this.webBalance = response.data["available"];
         });
     }
 };
