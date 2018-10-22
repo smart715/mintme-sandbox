@@ -135,6 +135,14 @@ export default {
             }
             return values;
         },
+        wpRequest: function() {
+            const request = {
+                method: 'state.subscribe',
+                params: [this.market.hiddenName],
+                id: 1,
+            };
+            return JSON.stringify(request);
+        },
     },
     mounted() {
         // Init values cause chart stick to xAxes initially.
@@ -149,11 +157,7 @@ export default {
                 }
             };
             this.wsClient.onopen = () => {
-                this.wsClient.send('{' +
-                    '"method": "state.subscribe",' +
-                    '"params": ["' + this.market.hiddenName + '"],' +
-                    '"id": 1' +
-                '}');
+                this.wsClient.send(this.wpRequest);
             };
         }
     },
