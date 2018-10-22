@@ -26,6 +26,8 @@
                                      token-name= "{{ token.name }}"
                                      place-order-url= "{{ path('place_order', {'tokenName' : token.name})}}"
                         />
+                    <b-tab title="Invest">
+
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
@@ -44,7 +46,14 @@
                                 :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-profile>
 
-                            <token-introduction-statistics container-class="col-12 col-md-6 mt-3 mt-md-0">
+                            <token-introduction-statistics
+                                container-class="col-12 col-md-6 mt-3 mt-md-0"
+                                :editable="{{ isOwner ? 'true' : 'false' }}"
+                                csrf="{{ csrf_token('update-token') }}"
+                                {% if stats is not null %}
+                                    :stats="{{ stats | json_encode }}"
+                                {% endif %}
+                                release-period-route="{{ path('lock_in', {'name': token.name}) }}">
                             </token-introduction-statistics>
                         </div>
                         <div class="row">

@@ -2,7 +2,7 @@
 
 namespace App\Security;
 
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\TokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

@@ -4,9 +4,10 @@ namespace App\Exchange\Balance;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\SummaryResult;
 use App\Utils\RandomNumberInterface;
 use App\Utils\TokenNameConverterInterface;
@@ -15,7 +16,7 @@ class BalanceHandler implements BalanceHandlerInterface
 {
     private const UPDATE_BALANCE_METHOD = 'balance.update';
     private const SUMMARY_METHOD = 'asset.summary';
-    private const FETCH_BALANCE_METHOD = 'balance.query';
+    private const BALANCE_METHOD = 'balance.query';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -74,15 +75,27 @@ class BalanceHandler implements BalanceHandlerInterface
         );
     }
 
-    public function fetchBalance(int $userId, string $currencySymbol): array
+    public function balance(User $user, Token $token): BalanceResult
     {
-        $response = $this->jsonRpc->send(self::FETCH_BALANCE_METHOD, [
-            $userId, strtoupper($currencySymbol)
-        ]);
-        
-        $result = $response->getResult()[strtoupper($currencySymbol)];
+        try {
+            $response = $this->jsonRpc->send(self::BALANCE_METHOD, [
+                $user->getId(),
+                $this->converter->convert($token),
+            ]);
+        } catch (\Throwable $exception) {
+            return BalanceResult::fail();
+        }
 
-        return $result;
+        if ($response->hasError()) {
+            return BalanceResult::fail();
+        }
+
+        $result = $response->getResult();
+
+        return BalanceResult::success(
+            (float)$result[$this->converter->convert($token)]['available'],
+            (float)$result[$this->converter->convert($token)]['freeze']
+        );
     }
 
     /**
