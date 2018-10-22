@@ -25,4 +25,5 @@ interface BalanceHandlerInterface
 
     public function summary(Token $token): SummaryResult;
     public function balance(User $user, Token $token): BalanceResult;
+    public function balanceWeb(User $user): BalanceResult;
 }
