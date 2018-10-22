@@ -12,7 +12,11 @@ class UserRepository extends EntityRepository
         return $this->findOneBy(['email' => $email]);
     }
 
-    public function findByHash(?string $hash): ?User
+    /**
+     * @param array|string|null $hash
+     * @return User|null
+     */
+    public function findByHash($hash): ?User
     {
         return $this->findOneBy(['hash' => $hash]);
     }

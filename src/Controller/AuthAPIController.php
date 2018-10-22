@@ -12,10 +12,9 @@ class AuthAPIController
 {
     public function authUser(ProfileManagerInterface $profileManager, LoggerInterface $logger, Request $request): JsonResponse
     {
-//        $headers = apache_request_headers();
-//        $hash = $headers['Authorization'] ?? null;
-        $user = $profileManager->validateUserApi("sadasd");
-        $debug = (string)json_encode($request->headers->all());
+        $token = $request->headers->get('authorization');
+        $user = $profileManager->validateUserApi($token);
+        $debug = (string)json_encode($request->headers->get('authorization'));
         $logger->alert($debug);
         return $user
             ? $this->confirmed($user)
