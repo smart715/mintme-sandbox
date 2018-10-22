@@ -23,6 +23,8 @@
                                      signup-url="{{ path('fos_user_registration_register') }}"
                                      market-name="{{ marketName | json_encode }}"
                                      :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                     token-name= "{{ token.name }}"
+                                     place-order-url= "{{ path('place_order', {'tokenName' : token.name})}}"
                         />
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>

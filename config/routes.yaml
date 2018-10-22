@@ -31,3 +31,11 @@ api_controllers:
 controllers:
     resource: ../src/Controller/
     type: annotation
+
+place_order:
+    path: /token/{tokenName}/place-order
+    controller: App\Controller\TokenController::placeOrder
+
+fetch_web_balance:
+    path: /fetch-balance/{currencySymbol}
+    controller: App\Controller\TokenController::fetchBalance
