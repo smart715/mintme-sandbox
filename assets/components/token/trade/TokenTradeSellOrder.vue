@@ -3,64 +3,86 @@
         <div class="card h-100">
             <div class="card-header text-center">
                 Sell Order
-                <span class="card-header-icon text-white">
-                    <font-awesome-icon
-                        icon="question"
-                        class="m-0 p-1 h4 bg-orange rounded-circle square"
-                    />
-                </span>
+                <guide>
+                    <template slot="header">
+                        Sell Order Guide
+                    </template>
+                    <template slot="body">
+                        Lorem psum dolor sit amet, consectetur adipisicing elit.
+                    </template>
+                </guide>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div
                         class="col-12 col-sm-6 col-md-12 col-xl-6
-                               pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
-                    >
+                        pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
+                        >
                         Your Tokens:
                         <span class="text-primary">
                             {{webBalance}}
-                            <font-awesome-icon
-                                icon="question"
-                                class="ml-1 mb-1 bg-primary text-white
-                                       rounded-circle square blue-question"
-                            />
+                            <guide>
+                                <font-awesome-icon
+                                    icon="question"
+                                    slot='icon'
+                                    class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                                <template slot="header">
+                                    Your Tokens Guide
+                                </template>
+                                <template slot="body">
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                </template>
+                            </guide>
                         </span>
                     </div>
                     <div
                         class="col-12 col-sm-6 col-md-12 col-xl-6
-                               text-sm-right text-md-left text-xl-right"
-                        >
+                        text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"
                                 type="checkbox"
                                 id="sell-price"
-                                class="custom-control-input"
-                            >
+                                class="custom-control-input">
                             <label
                                 class="custom-control-label"
-                                for="sell-price"
-                            >
+                                for="sell-price">
                                 Market Price
-                                <font-awesome-icon
-                                    icon="question"
-                                    class="ml-1 mb-1 bg-primary text-white
-                                           rounded-circle square blue-question"
-                                />
+                                <guide>
+                                    <font-awesome-icon
+                                        icon="question"
+                                        slot='icon'
+                                        class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                                    <template slot="header">
+                                        Market Price Guide
+                                    </template>
+                                    <template slot="body">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    </template>
+                                </guide>
                             </label>
                         </label>
                     </div>
                     <div class="col-12 pt-3">
                         <label
                             for="sell-price-input"
-                            class="text-primary"
-                        >
+                            class="text-primary">
                             Price in WEB:
-                            <font-awesome-icon
-                                icon="question"
-                                class="ml-1 mb-1 bg-primary text-white
-                                       rounded-circle square blue-question"
-                            />
+                            <guide>
+                                <font-awesome-icon
+                                    icon="question"
+                                    slot='icon'
+                                    class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                                <template slot="header">
+                                    Price in WEB Guide
+                                </template>
+                                <template slot="body">
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                </template>
+                            </guide>
                         </label>
                         <input
                             v-model.number="sellPrice"
@@ -74,8 +96,7 @@
                     <div class="col-12 pt-3">
                         <label
                             for="sell-price-amount"
-                            class="text-primary"
-                        >
+                            class="text-primary">
                             Amount:
                         </label>
                         <input
@@ -88,11 +109,19 @@
                     </div>
                     <div class="col-12 pt-3">
                         Total Price: {{totalPrice}} WEB
-                        <font-awesome-icon
-                            icon="question"
-                            class="ml-1 mb-1 bg-primary text-white
-                                   rounded-circle square blue-question"
-                        />
+                        <guide>
+                            <font-awesome-icon
+                                icon="question"
+                                slot='icon'
+                                class="ml-1 mb-1 bg-primary text-white
+                                       rounded-circle square blue-question"/>
+                            <template slot="header">
+                                Total Price Guide
+                            </template>
+                            <template slot="body">
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                            </template>
+                        </guide>
                     </div>
                     <div class="col-12 pt-4 text-center">
                         <button 
@@ -116,8 +145,13 @@
 
 <script>
 import axios from 'axios';
+import Guide from '../../Guide';
+
 export default {
   name: 'TokenTradeSellOrder',
+  components: {
+      Guide,
+  },
   props: {
       containerClass: String,
       websocketUrl: String,
@@ -192,5 +226,5 @@ export default {
           return this.webBalance = response.data["available"];
         });
     }
-};
+}
 </script>

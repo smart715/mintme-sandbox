@@ -6,32 +6,56 @@
                 <div class="text-center">
                     <div class="pt-2">
                         Last price: 0.000000001WEB
-                        <font-awesome-icon
-                            icon="question"
-                            class="ml-1 mb-1 bg-primary text-white
-                                   rounded-circle square blue-question"
-                        />
+                        <guide>
+                            <font-awesome-icon
+                                icon="question"
+                                slot='icon'
+                                class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                            <template slot="header">
+                                Last price Guide
+                            </template>
+                            <template slot="body">
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                            </template>
+                        </guide>
                     </div>
                     <div class="pt-3">
                         <div class="d-inline-block px-2">
                             <div>
                                 24h change
-                                <font-awesome-icon
-                                    icon="question"
-                                    class="ml-1 mb-1 bg-primary text-white
-                                           rounded-circle square blue-question"
-                                />
+                                <guide>
+                                    <font-awesome-icon
+                                        icon="question"
+                                        slot='icon'
+                                        class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                                    <template slot="header">
+                                        24h change Guide
+                                    </template>
+                                    <template slot="body">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    </template>
+                                </guide>
                             </div>
                             <div>+2.002%</div>
                         </div>
                         <div class="d-inline-block px-2">
                             <div>
                                 24h volume
-                                <font-awesome-icon
-                                    icon="question"
-                                    class="ml-1 mb-1 bg-primary text-white
-                                           rounded-circle square blue-question"
-                                />
+                                <guide>
+                                    <font-awesome-icon
+                                        icon="question"
+                                        slot='icon'
+                                        class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                                    <template slot="header">
+                                        24h volume Guide
+                                    </template>
+                                    <template slot="body">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    </template>
+                                </guide>
                             </div>
                             <div>52555.25354 Tokens</div>
                         </div>
@@ -43,7 +67,7 @@
                 <line-chart
                     :data="chartData"
                     :options="chartOptions"
-                />
+                    />
             </div>
         </div>
     </div>
@@ -51,7 +75,7 @@
 
 <script>
 import LineChart from '../../../js/line-chart';
-
+import Guide from '../../Guide';
 export default {
     name: 'TokenTradeChart',
     props: {
@@ -111,6 +135,7 @@ export default {
     },
     components: {
         LineChart,
+        Guide,
     },
 };
 </script>
