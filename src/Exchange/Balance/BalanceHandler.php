@@ -98,6 +98,25 @@ class BalanceHandler implements BalanceHandlerInterface
         );
     }
 
+    public function balanceWeb(User $user)
+    {
+        try {
+            $response = $this->jsonRpc->send(self::BALANCE_METHOD, [
+                $user->getId(),
+                "WEB",
+            ]);
+        } catch (\Throwable $exception) {
+            return BalanceResult::fail();
+        }
+
+        $result = $response->getResult();
+
+        return BalanceResult::success(
+            (float)$result['WEB']['available'],
+            (float)$result['WEB']['freeze']
+        );
+    }
+
     /**
      * @throws BalanceException
      * @throws FetchException
