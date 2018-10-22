@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthAPIController
 {
-    public function authUser(Request $request): JsonResponse {
+    public function authUser(Request $request): JsonResponse
+    {
         return new JsonResponse(
             [
                 "code" => 0,
@@ -19,5 +20,4 @@ class AuthAPIController
             ]
         );
     }
-
 }
