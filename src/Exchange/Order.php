@@ -28,7 +28,7 @@ class Order
     /** @var int|null */
     private $takerId;
 
-    /** @var Market */
+    /** @var Market|null */
     private $market;
 
     /** @var string */
@@ -50,7 +50,7 @@ class Order
         ?int $id,
         int $makerId,
         ?int $takerId,
-        Market $market,
+        ?Market $market,
         string $amount,
         int $side,
         string $price,
@@ -83,7 +83,7 @@ class Order
         return $this->takerId;
     }
 
-    public function getMarket(): Market
+    public function getMarket(): ?Market
     {
         return $this->market;
     }

@@ -8,7 +8,7 @@ use App\Exchange\Market;
 
 class MarketManager implements MarketManagerInterface
 {
-    public function getMarket(Crypto $crypto, Token $token): ?Market
+    public function getMarket(?Crypto $crypto, ?Token $token): ?Market
     {
         return new Market($crypto, $token);
     }
