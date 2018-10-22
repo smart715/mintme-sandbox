@@ -4,15 +4,17 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthAPIController
 {
-    public function authUser(ProfileManagerInterface $profileManager): JsonResponse
+    public function authUser(ProfileManagerInterface $profileManager, LoggerInterface $logger): JsonResponse
     {
         $headers = apache_request_headers();
         $hash = $headers['Authorization'] ?? null;
         $user = $profileManager->validateUserApi($hash);
+        $logger->info(json_encode($headers));
         return $user
             ? $this->confirmed($user)
             : $this->error() ;

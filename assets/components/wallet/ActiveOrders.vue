@@ -45,10 +45,12 @@ export default {
     },
     props: {
         hash: String,
+        token: String,
     },
     methods: {
         removeOrderModal: function(row) {
             console.log(this.hash);
+            console.log(this.token);
             this.tokenName = row.name;
             this.amount = row.amount;
             this.price = row.price;
@@ -60,7 +62,7 @@ export default {
         removeOrder: function() {
             alert('this method for remove order');
         },
-    },
+},
     mounted() {
         this.wsClient = this.$socket('ws://mintme.abchosting.org:8364');
         this.wsClient.onmessage = (result) => {

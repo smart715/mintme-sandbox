@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Manager\ProfileManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,12 +32,15 @@ class DefaultController extends Controller
      * @param ProfileManagerInterface $profileManager
      * @return Response
      */
-    public function wallet(ProfileManagerInterface $profileManager): Response
+    public function wallet(ProfileManagerInterface $profileManager, TokenManagerInterface $tokenManager
+    ): Response
     {
         $user = $profileManager->findHash($this->getUser());
-
+        $token = $tokenManager->getOwnToken();
+        dump($token);
         return $this->render('pages/wallet.html.twig', [
             'hash' => $user->getHash(),
+            'token' => $token->getName(),
         ]);
     }
 }
