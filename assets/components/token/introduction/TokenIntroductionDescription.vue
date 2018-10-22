@@ -3,6 +3,14 @@
         <div class="card h-100">
             <div class="card-header">
                 Description
+                <guide>
+                    <template  slot="header">
+                        Description Guide
+                    </template>
+                    <template slot="body">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                    </template>
+                </guide>
                 <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable"
@@ -19,7 +27,27 @@
                     <div class="col-12">
                         <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
-                            <textarea class="form-control" v-model="newDescription" v-if="editingDescription"></textarea>
+                            <div  v-if="editingDescription">
+                                <div class="pb-1">
+                                    About your plan
+                                    <guide>
+                                        <font-awesome-icon
+                                            icon="question"
+                                            slot='icon'
+                                            class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                                        <template slot="header">
+                                            About your plan Guide
+                                        </template>
+                                        <template slot="body">
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                        </template>
+                                    </guide>
+                                </div>
+                                <div class="pb-1">Please describe goals milestones plans promises</div>
+
+                                <textarea class="form-control" v-model="newDescription"></textarea>
+                            </div>
                         </template>
                     </div>
                 </div>
@@ -33,6 +61,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import Guide from '../../Guide';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
 
@@ -55,6 +84,7 @@ export default {
     },
     components: {
         FontAwesomeIcon,
+        Guide,
     },
     data() {
         return {

@@ -10,8 +10,7 @@
                         size="2x"
                         :icon="icon"
                         transform="shrink-4 up-1.5"
-                        @click="editUrls"
-                    />
+                        @click="editUrls"/>
                 </span>
             </div>
             <div class="card-body">
@@ -27,11 +26,30 @@
                                     <a :href="this.currentWebsite" target="_blank" rel="nofollow">
                                         {{ this.currentWebsite }}
                                     </a>
+                                    <guide>
+                                        <font-awesome-icon
+                                            icon="question"
+                                            slot='icon'
+                                            class="ml-1 mb-1 bg-primary text-white
+                                            rounded-circle square blue-question"/>
+                                        <template  slot="header">
+                                            Web Guide
+                                        </template>
+                                        <template slot="body">
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                        </template>
+                                    </guide>
                                 </div>
                                 <div class="form-group" v-else>
                                     <label for="website-err">Website address:</label>
-                                    <input id="website-err" type="text" v-model="newWebsite" class="form-control" :class="{ 'is-invalid': showWebsiteError }" @keyup.enter="checkWebsiteUrl">
-                                    <div class="invalid-feedback" v-if="showWebsiteError">
+                                    <input
+                                        id="website-err"
+                                        type="text"
+                                        v-model="newWebsite"
+                                        class="form-control"
+                                        :class="{ 'is-invalid': showWebsiteError }"
+                                        @keyup.enter="checkWebsiteUrl">
+                                        <div class="invalid-feedback" v-if="showWebsiteError">
                                         Please provide a valid URL.
                                     </div>
                                 </div>
@@ -42,8 +60,7 @@
                                     :editing="editingUrls"
                                     :address="facebookUrl"
                                     :update-url="updateUrl"
-                                    :csrfToken="csrfToken"
-                                />
+                                    :csrfToken="csrfToken"/>
                             </div>
                             <div>
                                 <token-youtube-address
@@ -52,8 +69,7 @@
                                     :editing="editingUrls"
                                     :channel-id="youtubeChannelId"
                                     :update-url="updateUrl"
-                                    :csrfToken="csrfToken"
-                                />
+                                    :csrfToken="csrfToken"/>
                             </div>
                         </div>
                     </div>
@@ -61,20 +77,17 @@
                         <b-dropdown id="share" text="Share" variant="primary">
                             <b-dropdown-item
                                 href="#"
-                                target="_blank"
-                            >
+                                target="_blank">
                                 Facebook
                             </b-dropdown-item>
                             <b-dropdown-item
                                 href="#"
-                                target="_blank"
-                            >
+                                target="_blank">
                                 LinkedIn
                             </b-dropdown-item>
                             <b-dropdown-item
-                                    href="#"
-                                    target="_blank"
-                            >
+                                href="#"
+                                target="_blank">
                                 YouTube
                             </b-dropdown-item>
                         </b-dropdown>
@@ -83,7 +96,7 @@
             </div>
         </div>
         <div class="modal" :class="{ show: showConfirmWebsiteModal }" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
+             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Website Confirmation</h5>
@@ -95,22 +108,33 @@
                         <div class="row">
                             <div class="col-12">
                                 <ol>
-                                    <li>Download <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a></li>
+                                    <li>
+                                        Download
+                                        <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
+                                    </li>
                                     <li>Upload the file to {{ parsedWebsite }}</li>
-                                    <li>Check if file was uploaded successfully by visiting <a :href="parsedWebsite+'/mintme.html'" target="_blank" rel="nofollow">{{ parsedWebsite }}/mintme.html</a></li>
-                                    <li>Click confirm below</li>
-                                </ol>
-                            </div>
-                            <div class="col-12 text-center">
-                                <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
-                                <button class="btn btn-default" @click="showConfirmWebsiteModal = false">Cancel</button>
-                            </div>
+                                    <li>
+                                        Check if file was uploaded successfully by visiting
+                                        <a
+                                            :href="parsedWebsite+'/mintme.html'"
+                                            target="_blank"
+                                            rel="nofollow">
+                                            {{ parsedWebsite }}/mintme.html
+                                    </a>
+                                </li>
+                                <li>Click confirm below</li>
+                            </ol>
+                        </div>
+                        <div class="col-12 text-center">
+                            <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
+                            <button class="btn btn-default" @click="showConfirmWebsiteModal = false">Cancel</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -123,6 +147,7 @@ import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
+import Guide from '../../Guide';
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -151,6 +176,7 @@ export default {
         FontAwesomeIcon,
         TokenFacebookAddress,
         TokenYoutubeAddress,
+        Guide,
     },
     data() {
         return {
