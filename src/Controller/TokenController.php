@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Crypto;
 use App\Entity\Token;
+use App\Exchange\Order;
+use App\Exchange\Market;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
@@ -13,6 +17,7 @@ use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,19 +41,24 @@ class TokenController extends AbstractController
 
     /** @var MarketManagerInterface */
     protected $marketManager;
+    
+    /** @var TraderInterface */
+    protected $trader;
 
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        MarketManagerInterface $marketManager
+        MarketManagerInterface $marketManager,
+        TraderInterface $trader
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
+        $this->trader = $trader;
     }
 
     /**
@@ -157,6 +167,46 @@ class TokenController extends AbstractController
         $response->headers->set('Content-Disposition', $disposition);
 
         return $response;
+    }
+
+    public function placeOrder(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $token = $this->tokenManager->findByName($data['tokenName']);
+        $crypto = $this->em->getRepository('App\Entity\Crypto')->findBy(['symbol' => 'WEB'])[0];
+        $market = new Market($crypto, $token);
+        $user = $this->getUser();
+        $side = $data['action'] == 'sell' ? 1 : 2;
+        
+        $order = new Order(null, 
+                           $user->getId(), 
+                           null , 
+                           $market, 
+                           $data['amountInput'], 
+                           $side, 
+                           $data['priceInput'], 
+                           "pending"
+                        );
+            
+        $tradeResult = $this->trader->placeOrder($order);
+
+        $response = new JsonResponse([
+            'result' => $tradeResult->getResult(),
+            'message' => $tradeResult->getMessage()
+        ]);
+
+        return $response;
+    }
+
+    public function fetchBalance(string $currencySymbol, BalanceHandlerInterface $balanceHandler): Response
+    {   
+        $userId = $this->getUser()->getId();
+        $balance = $balanceHandler->fetchBalance($userId, $currencySymbol);
+        return new JsonResponse([
+            'balance' => $balance['available'],
+            'freeze' => $balance['freeze']
+        ]);
     }
 
     private function redirectToOwnToken(): RedirectResponse
