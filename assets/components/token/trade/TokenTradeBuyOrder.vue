@@ -18,7 +18,7 @@
                     >
                         Your WEB:
                         <span class="text-primary">
-                            9999
+                            {{webBalance}}
                             <font-awesome-icon
                                 icon="question"
                                 class="ml-1 mb-1 bg-primary text-white
@@ -32,9 +32,10 @@
                     >
                         <label class="custom-control custom-checkbox">
                             <input
+                                v-model="useMarketPrice"
                                 type="checkbox"
                                 id="buy-price"
-                                class="custom-control-input"
+                                class="custom-control-input"                                
                             >
                             <label
                                 class="custom-control-label"
@@ -62,10 +63,12 @@
                             />
                         </label>
                         <input
-                            type="text"
+                            v-model.number="buyPrice"
+                            type="number"
                             id="buy-price-input"
                             class="form-control"
-                            :value="price"
+                            :disabled="useMarketPrice"
+                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
@@ -76,14 +79,15 @@
                             Amount:
                         </label>
                         <input
-                            type="text"
+                            v-model.number="buyAmount"
+                            type="number"
                             id="buy-price-amount"
                             class="form-control"
-                            :value="amount"
+                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: {{ totalPrice }} WEB
+                        Total Price: {{totalPrice}} WEB
                         <font-awesome-icon
                             icon="question"
                             class="ml-1 mb-1 bg-primary text-white
@@ -91,7 +95,10 @@
                         />
                     </div>
                     <div class="col-12 pt-4 text-center">
-                        <button v-if="loggedIn" class="btn btn-primary">
+                        <button @click="placeOrder" 
+                        v-if="loggedIn" 
+                        class="btn btn-primary"
+                        :disabled="fieldsValid">
                             Create buy order
                         </button>
                         <template v-else>
@@ -107,34 +114,84 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-    name: 'TokenTradeBuyOrder',
-    props: {
-        containerClass: String,
-        websocketUrl: String,
-        loginUrl: String,
-        signupUrl: String,
-        marketName: String,
-        loggedIn: Boolean,
-        buy: Object,
+  name: 'TokenTradeBuyOrder',
+  props: {
+      containerClass: String,
+      websocketUrl: String,
+      loginUrl: String,
+      signupUrl: String,
+      loggedIn: Boolean,
+      tokenName: String,
+      placeOrderUrl: String,
+      marketName: String,
+      buy: Object,
+  },
+  data() {
+    return {
+        buyPrice: 0,
+        buyAmount: 0,
+        useMarketPrice: false,
+        action: 'buy',
+        webBalance: ''        
+    };
+  },
+  methods: {
+    placeOrder: function() 
+    {  if(this.buyPrice && this.buyAmount) {
+        let data = {
+            tokenName: this.tokenName,
+            amountInput: this.buyAmount,
+            priceInput: this.buyPrice,
+            marketPrice: this.useMarketPrice,
+            action: this.action
+        };
+
+        axios.post(this.placeOrderUrl, data)
+        .then( response => {
+           this.$emit('showModal', response.data);
+           console.log(response.data.message);
+        })
+        .catch( error => { 
+            console.log('Axios Error: ' + error)
+        });
+    }
+    }
+  },
+  computed: {
+    totalPrice: function() {
+        return this.buyPrice * this.buyAmount;
     },
-    computed: {
-        market: function() {
-            return JSON.parse(this.marketName);
-        },
-        amount: function() {
-            return this.buy.amount || null;
-        },
-        price: function() {
-            return this.buy.price || null;
-        },
-        totalPrice: function() {
-            return this.amount && this.price ? this.amount * this.price : 0;
-        },
+    market: function() {
+        return JSON.parse(this.marketName);
     },
-    data() {
-        return {};
+    amount: function() {
+        return this.buy.amount || null;
     },
-    mounted() {},
+    price: function() {
+        return this.buy.price || null;
+    },
+    fieldsValid: function () {
+        if ( this.buyPrice && this.buyAmount ){
+            return false;
+        } else {
+            return true;
+        }
+    }
+  },
+  watch: {
+      useMarketPrice: function() {
+          if (this.useMarketPrice) {
+              this.buyPrice = this.price || 0;
+          }
+      }
+  },
+  mounted: function() {
+        axios.get("http://localhost:8000/fetch-balance/web")
+        .then(response => {
+          return this.webBalance = response.data["balance"];
+        });
+    }
 };
 </script>

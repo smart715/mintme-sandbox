@@ -8,6 +8,8 @@
             :logged-in="loggedIn"
             :market-name="marketName"
             :buy="buy"
+            :token-name="tokenName"
+            :place-order-url="placeOrderUrl"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
@@ -17,6 +19,8 @@
             :logged-in="loggedIn"
             :market-name="marketName"
             :sell="sell"
+            :token-name="tokenName"
+            :place-order-url="placeOrderUrl"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -41,6 +45,7 @@ import TokenTradeBuyOrders from './TokenTradeBuyOrders';
 import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
 import WebSocket from '../../../js/websocket';
+import OrderModal from '../../modal/OrderModal';
 
 Vue.use(WebSocket);
 
@@ -52,6 +57,8 @@ export default {
         signupUrl: String,
         marketName: String,
         loggedIn: Boolean,
+        tokenName: String,
+        placeOrderUrl: String,
     },
     data() {
         return {
@@ -65,6 +72,7 @@ export default {
                 amount: 0,
                 price: 0,
             },
+            showModal: true
         };
     },
     mounted() {
@@ -73,6 +81,7 @@ export default {
             this.wsClient.onmessage = (result) => {
                 if (typeof result.data === 'string') {
                     this.wsResult = JSON.parse(result.data);
+                    console.log('wsResult: ', this.wsResult);
                 }
             };
             this.wsClient.onopen = () => {
@@ -86,6 +95,7 @@ export default {
     },
     computed: {
         market: function() {
+            console.log('market Name: ', this.marketName);
             return JSON.parse(this.marketName);
         },
     },
@@ -96,6 +106,7 @@ export default {
         TokenTradeBuyOrders,
         TokenTradeSellOrders,
         TokenTradeTradeHistory,
+        OrderModal
     },
     methods: {
         updateMarketData: function(marketData) {
@@ -127,6 +138,9 @@ export default {
                 }
             });
         },
+        hideModal: function() {
+            this.showModal = false;
+        }
     },
     watch: {
         wsResult: {

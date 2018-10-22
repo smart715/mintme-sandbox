@@ -18,7 +18,7 @@
                     >
                         Your Tokens:
                         <span class="text-primary">
-                            9999
+                            {{webBalance}}
                             <font-awesome-icon
                                 icon="question"
                                 class="ml-1 mb-1 bg-primary text-white
@@ -32,6 +32,7 @@
                         >
                         <label class="custom-control custom-checkbox">
                             <input
+                                v-model.number="useMarketPrice"
                                 type="checkbox"
                                 id="sell-price"
                                 class="custom-control-input"
@@ -62,10 +63,12 @@
                             />
                         </label>
                         <input
-                            type="text"
+                            v-model.number="sellPrice"
+                            type="number"
                             id="sell-price-input"
                             class="form-control"
-                            :value="price"
+                            :disabled="useMarketPrice"
+                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
@@ -76,14 +79,15 @@
                             Amount:
                         </label>
                         <input
-                            type="text"
+                            v-model="sellAmount"
+                            type="number"
                             id="sell-price-amount"
                             class="form-control"
-                            :value="amount"
+                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: {{ totalPrice }} WEB
+                        Total Price: {{totalPrice}} WEB
                         <font-awesome-icon
                             icon="question"
                             class="ml-1 mb-1 bg-primary text-white
@@ -91,7 +95,11 @@
                         />
                     </div>
                     <div class="col-12 pt-4 text-center">
-                        <button v-if="loggedIn" class="btn btn-primary">
+                        <button 
+                            v-if="loggedIn" 
+                            class="btn btn-primary"
+                            :disabled="fieldsValid"
+                        >
                             Create sell order
                         </button>
                         <template v-else>
@@ -107,34 +115,81 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-    name: 'TokenTradeSellOrder',
-    props: {
-        containerClass: String,
-        websocketUrl: String,
-        loginUrl: String,
-        signupUrl: String,
-        marketName: String,
-        loggedIn: Boolean,
-        sell: Object,
+  name: 'TokenTradeSellOrder',
+  props: {
+      containerClass: String,
+      websocketUrl: String,
+      loginUrl: String,
+      signupUrl: String,
+      loggedIn: Boolean,
+      tokenName: String,
+      placeOrderUrl: String,
+      marketName: String,
+      sell: Object,
+  },
+  data() {
+    return {
+        sellPrice: 0,
+        sellAmount: 0,
+        useMarketPrice: false,
+        action: 'sell',
+        webBalance: ''
+    };
+  },
+  methods: {
+    placeOrder: function() 
+    {
+        let data = {
+            tokenName: this.tokenName,
+            amountInput: this.sellAmount,
+            priceInput: this.sellPrice,
+            marketPrice: this.useMarketPrice,
+            action: this.action
+        };
+        axios.post(this.placeOrderUrl, data)
+        .then( response => {
+            console.log(response);
+        })
+        .catch( error => { 
+            console.log('Axios Error: ' + error)
+        });
+    }
+  },
+  computed: {
+    totalPrice: function() {
+        return this.sellPrice * this.sellAmount;
     },
-    computed: {
-        market: function() {
-            return JSON.parse(this.marketName);
-        },
-        amount: function() {
-            return this.sell.amount || null;
-        },
-        price: function() {
-            return this.sell.price || null;
-        },
-        totalPrice: function() {
-            return this.amount && this.price ? this.amount * this.price : 0;
-        },
+    market: function() {
+        return JSON.parse(this.marketName);
     },
-    data() {
-        return {};
+    amount: function() {
+        return this.sell.amount || null;
     },
-    mounted() {},
+    price: function() {
+        return this.sell.price || null;
+    },
+    fieldsValid: function () {
+        if ( this.sellPrice && this.sellAmount ){
+            return false;
+        } else {
+            return true;
+        }
+    }
+  },
+  watch: {
+      useMarketPrice: function() {
+          if (this.useMarketPrice) {
+              this.sellPrice = this.price || 0;
+          }
+      }
+  },
+  mounted: function() {
+        axios.get("http://localhost:8000/fetch-balance/web")
+        .then(response => {
+          return this.webBalance = response.data["balance"];
+        });
+    }
 };
 </script>
