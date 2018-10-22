@@ -98,7 +98,7 @@ class BalanceHandler implements BalanceHandlerInterface
         );
     }
 
-    public function balanceWeb(User $user)
+    public function balanceWeb(User $user): BalanceResult
     {
         try {
             $response = $this->jsonRpc->send(self::BALANCE_METHOD, [

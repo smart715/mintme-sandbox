@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Exchange\Order;
-use App\Exchange\Market;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Market;
+use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
@@ -187,36 +187,36 @@ class TokenController extends AbstractController
         $crypto = $this->cryptoManager->findBySymbol('web');
         $market = new Market($crypto, $token);
         $user = $this->getUser();
-        $side = $data['action'] == 'sell' ? 1 : 2;
-        
-        $order = new Order(null, 
-                           $user->getId(), 
-                           null , 
-                           $market, 
-                           $data['amountInput'], 
-                           $side, 
-                           $data['priceInput'], 
-                           "pending"
-                        );
-            
+        $side = 'sell' == $data['action'] ? 1
+            : 2;
+
+        $order = new Order(
+            null,
+            $user->getId(),
+            null,
+            $market,
+            $data['amountInput'],
+            $side,
+            $data['priceInput'],
+            "pending"
+        );
+
         $tradeResult = $this->trader->placeOrder($order);
 
-        $response = new JsonResponse([
+        return new JsonResponse([
             'result' => $tradeResult->getResult(),
-            'message' => $tradeResult->getMessage()
+            'message' => $tradeResult->getMessage(),
         ]);
-
-        return $response;
     }
 
     public function fetchBalanceWeb(BalanceHandlerInterface $balanceHandler): JsonResponse
-    {   
+    {
         $user = $this->getUser();
         $balance = $balanceHandler->balanceWeb($user);
 
         return new JsonResponse([
             'available' => $balance->getAvailable(),
-            'freeze' => $balance->getFreeze()
+            'freeze' => $balance->getFreeze(),
         ]);
     }
 
