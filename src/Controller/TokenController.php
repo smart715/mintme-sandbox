@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Crypto;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use App\Exchange\Order;
 use App\Exchange\Market;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -70,7 +70,7 @@ class TokenController extends AbstractController
      *     requirements={"tab" = "trade|intro"}
      * )
      */
-    public function show(string $name, NormalizerInterface $normalizer): Response
+    public function show(string $name, NormalizerInterface $normalizer, ?string $tab): Response
     {
         $token = $this->tokenManager->findByName($name);
 
@@ -184,7 +184,7 @@ class TokenController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $token = $this->tokenManager->findByName($data['tokenName']);
-        $crypto = $this->em->getRepository('App\Entity\Crypto')->findBy(['symbol' => 'WEB'])[0];
+        $crypto = $this->cryptoManager->findBySymbol('web');
         $market = new Market($crypto, $token);
         $user = $this->getUser();
         $side = $data['action'] == 'sell' ? 1 : 2;
@@ -209,13 +209,14 @@ class TokenController extends AbstractController
         return $response;
     }
 
-    public function fetchBalance(string $currencySymbol, BalanceHandlerInterface $balanceHandler): Response
+    public function fetchBalanceWeb(BalanceHandlerInterface $balanceHandler): JsonResponse
     {   
-        $userId = $this->getUser()->getId();
-        $balance = $balanceHandler->fetchBalance($userId, $currencySymbol);
+        $user = $this->getUser();
+        $balance = $balanceHandler->balanceWeb($user);
+
         return new JsonResponse([
-            'balance' => $balance['available'],
-            'freeze' => $balance['freeze']
+            'available' => $balance->getAvailable(),
+            'freeze' => $balance->getFreeze()
         ]);
     }
 
