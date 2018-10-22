@@ -13,8 +13,9 @@ class AuthAPIController
     public function authUser(ProfileManagerInterface $profileManager, LoggerInterface $logger, Request $request): JsonResponse
     {
         $token = $request->headers->get('authorization');
+        $token = trim(str_replace('Basic', '', $token));
         $user = $profileManager->validateUserApi($token);
-        $debug = (string)json_encode($request->headers->get('authorization'));
+        $debug = (string)json_encode($token);
         $logger->alert($debug);
         return $user
             ? $this->confirmed($user)
