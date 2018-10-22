@@ -12,10 +12,10 @@ class AuthAPIController
 {
     public function authUser(ProfileManagerInterface $profileManager, LoggerInterface $logger, Request $request): JsonResponse
     {
-        $logger->alert(json_encode($_SERVER));
+        $logger->alert((string)json_encode($_SERVER));
         $token = $request->headers->get('authorization');
         $user = $profileManager->validateUserApi($token);
-        
+
         return $user
             ? $this->confirmed($user)
             : $this->error() ;
