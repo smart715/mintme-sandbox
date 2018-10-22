@@ -157,17 +157,11 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this->googleAuthenticatorEntry;
     }
 
-    /**
-     * @return null|string
-     */
     public function getHash(): ?string
     {
         return $this->hash;
     }
 
-    /**
-     * @param null|string $hash
-     */
     public function setHash(?string $hash): void
     {
         $this->hash = $hash;

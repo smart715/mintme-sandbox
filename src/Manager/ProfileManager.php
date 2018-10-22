@@ -65,21 +65,19 @@ class ProfileManager implements ProfileManagerInterface
                 : $this->generateUniqueUrl($route);
     }
 
-    public function findHash(User $user)
+    public function findHash(User $user): User
     {
-        if (null === $user->getHash() || '' === $user->getHash())
-        {
+        if (null === $user->getHash() || '' === $user->getHash()) {
             $user->setHash(base64_encode(uniqid("", true)));
             $this->em->persist($user);
             $this->em->flush();
         }
-        $hash = $this->userRepository->findByHash($user->getHash());
-        return $hash;
+        return $this->userRepository->findByHash($user->getHash());
     }
 
-    public function validateUserApi(?string $token)
+    public function validateUserApi(?string $token): ?User
     {
-        if (null === $token || '' === $token){
+        if (null === $token || '' === $token) {
             return null;
         }
 

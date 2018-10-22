@@ -11,8 +11,8 @@ interface ProfileManagerInterface
     public function getProfileByPageUrl(String $pageUrl): ?Profile;
     public function findByEmail(string $email): ?Profile;
     public function generatePageUrl(Profile $profile): ?string;
-    public function findHash(User $user);
-    public function validateUserApi(?string $token);
+    public function findHash(User $user): User;
+    public function validateUserApi(?string $token): ?User;
 
     /**
      * @param mixed $user
