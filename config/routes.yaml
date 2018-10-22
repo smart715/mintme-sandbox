@@ -36,6 +36,6 @@ place_order:
     path: /token/{tokenName}/place-order
     controller: App\Controller\TokenController::placeOrder
 
-fetch_web_balance:
-    path: /fetch-balance/{currencySymbol}
-    controller: App\Controller\TokenController::fetchBalance
+fetch_balance_web:
+    path: /fetch-balance-web
+    controller: App\Controller\TokenController::fetchBalanceWeb
