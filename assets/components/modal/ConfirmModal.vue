@@ -34,8 +34,8 @@ export default {
     props: {
         visible: Boolean,
         tokenName: String,
-        amount: String,
-        price: String,
+        amount: Number,
+        price: Number,
     },
     methods: {
         closeModal: function() {

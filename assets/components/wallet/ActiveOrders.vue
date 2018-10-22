@@ -43,8 +43,12 @@ export default {
     components: {
         ConfirmModal,
     },
+    props: {
+        hash: String,
+    },
     methods: {
         removeOrderModal: function(row) {
+            console.log(this.hash);
             this.tokenName = row.name;
             this.amount = row.amount;
             this.price = row.price;

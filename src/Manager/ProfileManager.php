@@ -16,10 +16,14 @@ class ProfileManager implements ProfileManagerInterface
     /** @var UserRepository */
     private $userRepository;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->profileRepository = $entityManager->getRepository(Profile::class);
         $this->userRepository = $entityManager->getRepository(User::class);
+        $this->em = $entityManager;
     }
 
     /**
@@ -59,6 +63,27 @@ class ProfileManager implements ProfileManagerInterface
         return null === $existedProfile || $profile === $existedProfile
                 ? strtolower($route)
                 : $this->generateUniqueUrl($route);
+    }
+
+    public function findHash(User $user)
+    {
+        if (null === $user->getHash() || '' === $user->getHash())
+        {
+            $user->setHash(base64_encode(uniqid("", true)));
+            $this->em->persist($user);
+            $this->em->flush();
+        }
+        $hash = $this->userRepository->findByHash($user->getHash());
+        return $hash;
+    }
+
+    public function validateUserApi(?string $token)
+    {
+        if (null === $token || '' === $token){
+            return null;
+        }
+
+        return $this->userRepository->findByHash($token);
     }
 
     private function generateUniqueUrl(string $prefix): string
