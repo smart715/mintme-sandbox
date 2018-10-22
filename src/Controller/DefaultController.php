@@ -37,7 +37,7 @@ class DefaultController extends Controller
     {
         $user = $profileManager->findHash($this->getUser());
         $token = $tokenManager->getOwnToken();
-        dump($token);
+
         return $this->render('pages/wallet.html.twig', [
             'hash' => $user->getHash(),
             'token' => $token->getName(),
