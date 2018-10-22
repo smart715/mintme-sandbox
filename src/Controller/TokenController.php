@@ -184,8 +184,8 @@ class TokenController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $token = $this->tokenManager->findByName($data['tokenName']);
-        $crypto = $this->cryptoManager->findBySymbol('web');
-        $market = new Market($crypto, $token);
+        $crypto = $this->cryptoManager->findBySymbol('WEB');
+        $market = $this->marketManager->getMarket($crypto, $token);
         $user = $this->getUser();
         $side = 'sell' == $data['action'] ? 1
             : 2;
