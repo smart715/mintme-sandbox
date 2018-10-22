@@ -4,9 +4,10 @@ namespace App\Exchange\Balance;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\SummaryResult;
 use App\Utils\RandomNumberInterface;
 use App\Utils\TokenNameConverterInterface;
@@ -15,6 +16,7 @@ class BalanceHandler implements BalanceHandlerInterface
 {
     private const UPDATE_BALANCE_METHOD = 'balance.update';
     private const SUMMARY_METHOD = 'asset.summary';
+    private const BALANCE_METHOD = 'balance.query';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -70,6 +72,29 @@ class BalanceHandler implements BalanceHandlerInterface
             $result['available_count'],
             (int)$result['freeze_balance'],
             $result['freeze_count']
+        );
+    }
+
+    public function balance(User $user, Token $token): BalanceResult
+    {
+        try {
+            $response = $this->jsonRpc->send(self::BALANCE_METHOD, [
+                $user->getId(),
+                $this->converter->convert($token),
+            ]);
+        } catch (\Throwable $exception) {
+            return BalanceResult::fail();
+        }
+
+        if ($response->hasError()) {
+            return BalanceResult::fail();
+        }
+
+        $result = $response->getResult();
+
+        return BalanceResult::success(
+            (float)$result[$this->converter->convert($token)]['available'],
+            (float)$result[$this->converter->convert($token)]['freeze']
         );
     }
 

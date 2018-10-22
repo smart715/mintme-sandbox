@@ -5,7 +5,7 @@ namespace App\Tests\Exchange\Balance;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Balance\Exception\BalanceException;
@@ -16,6 +16,53 @@ use PHPUnit\Framework\TestCase;
 
 class BalanceHandlerTest extends TestCase
 {
+    public function testBalance(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'balance.query',
+                [ 1, 'TOK999' ]
+            )
+            ->willReturn($this->mockResponse(false, [
+                'TOK999' => [
+                    'available' => '1000000',
+                    'freeze' => '100',
+                ],
+            ]));
+
+        $handler = new BalanceHandler(
+            $rpc,
+            $this->mockConverter(),
+            $this->mockRandom(21)
+        );
+
+        $result = $handler->balance(
+            $this->mockUser(1),
+            $this->mockToken(999)
+        );
+
+        $this->assertFalse($result->isFailed());
+        $this->assertEquals(1000000, $result->getAvailable());
+        $this->assertEquals(100, $result->getFreeze());
+    }
+
+    public function testBalanceWithException(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc->method('send')->willThrowException(new FetchException());
+
+        $handler = new BalanceHandler(
+            $rpc,
+            $this->mockConverter(),
+            $this->mockRandom(21)
+        );
+
+        $result = $handler->balance($this->mockUser(1), $this->mockToken(999));
+
+        $this->assertTrue($result->isFailed());
+    }
+
     public function testSummary(): void
     {
         $rpc = $this->mockRpc();
@@ -42,6 +89,11 @@ class BalanceHandlerTest extends TestCase
         $result = $handler->summary($this->mockToken(999));
 
         $this->assertFalse($result->isFailed());
+        $this->assertEquals(1000000, $result->getTotal());
+        $this->assertEquals(500000, $result->getAvailable());
+        $this->assertEquals(10, $result->getAvailableCount());
+        $this->assertEquals(500000, $result->getFreeze());
+        $this->assertEquals(10, $result->getFreezeCount());
     }
 
     public function testSummaryWithException(): void

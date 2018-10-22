@@ -1,9 +1,15 @@
 monolog:
     handlers:
+        cron:
+            type: stream
+            path: "%kernel.logs_dir%/cron.log"
+            level: info
+            channels: ['cron']
         main:
             type: fingers_crossed
             action_level: error
             handler: nested
+            channels: ['!cron']
             excluded_404s:
                 # regex: exclude all 404 errors from the logs
                 - ^/

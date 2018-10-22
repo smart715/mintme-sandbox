@@ -102,3 +102,9 @@ services:
             $timeoutSeconds: '%verify_timeout_seconds%'
 
     App\Verify\WebsiteVerifierInterface: '@App\Verify\WebsiteVerifier'
+
+    App\Command\UpdateTokenRelease:
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: cron }

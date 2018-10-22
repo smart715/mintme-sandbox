@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Profile;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use Doctrine\ORM\EntityRepository;
 use FOS\UserBundle\Model\UserInterface;
 

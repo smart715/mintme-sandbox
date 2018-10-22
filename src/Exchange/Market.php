@@ -3,7 +3,7 @@
 namespace App\Exchange;
 
 use App\Entity\Crypto;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 
 class Market
 {

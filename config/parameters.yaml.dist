@@ -1,5 +1,7 @@
 # Business configuration variables will go here
 parameters:
+    # Don't change this value.
+    # It's a routing key to this project on withdraw gateway
     service: 'mintme'
 
     locale: 'en'
@@ -23,3 +25,6 @@ parameters:
     withdraw_fee: 0.1
 
     websocket_url: 'ws://mintme.abchosting.org:8364'
+
+    # Permanent quantity of each token asset
+    token_quantity: 1000000
