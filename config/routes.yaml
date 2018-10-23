@@ -39,3 +39,7 @@ place_order:
 fetch_balance_web:
     path: /fetch-balance-web
     controller: App\Controller\TokenController::fetchBalanceWeb
+
+fetch_balance_token:
+    path: /fetch-balance-token/{tokenName}
+    controller: App\Controller\TokenController::fetchBalanceToken
