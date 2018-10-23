@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Exchange\Market;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Repository\UserRepository;
@@ -32,14 +34,20 @@ class DefaultController extends Controller
      * @param ProfileManagerInterface $profileManager
      * @return Response
      */
-    public function wallet(ProfileManagerInterface $profileManager, TokenManagerInterface $tokenManager
-    ): Response
-    {
+    public function wallet(
+        ProfileManagerInterface $profileManager,
+        TokenManagerInterface $tokenManager,
+        CryptoManagerInterface $cryptoManager
+    ): Response {
         $user = $profileManager->findHash($this->getUser());
+        $crypto = $cryptoManager->findBySymbol('WEB');
         $token = $tokenManager->getOwnToken();
-        return $this->render('pages/wallet.html.twig', [
-            'hash' => $user->getHash(),
-            'token' => $token->getName(),
-        ]);
+        if (null !== $crypto && null !== $token) {
+            $market = new Market($crypto, $token);
+            return $this->render('pages/wallet.html.twig', [
+                'hash' => $user->getHash(),
+                'token' => $market->getHiddenName(),
+            ]);
+        }
     }
 }

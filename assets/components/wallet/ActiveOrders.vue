@@ -35,6 +35,7 @@
 <script>
 import ConfirmModal from '../modal/ConfirmModal';
 import WebSocket from '../../js/websocket';
+import axios from 'axios';
 
 Vue.use(WebSocket);
 
@@ -49,8 +50,7 @@ export default {
     },
     methods: {
         removeOrderModal: function(row) {
-            console.log(this.hash);
-            console.log(this.token);
+            this.url = row.action;
             this.tokenName = row.name;
             this.amount = row.amount;
             this.price = row.price;
@@ -60,12 +60,12 @@ export default {
             this.confirmModal = !this.confirmModal;
         },
         removeOrder: function() {
-            alert('this method for remove order');
+            axios.get('..' + this.url);
         },
         getOrders: function() {
             this.request = JSON.stringify({
                 'method': 'order.query',
-                'params': ['TOK000000000001WEB', 0, 100],
+                'params': [this.token, 0, 100],
                 'id': 2,
             });
             this.wsClient.send(this.request);
@@ -73,7 +73,7 @@ export default {
         subscribe: function() {
             this.request = JSON.stringify({
                 'method': 'order.subscribe',
-                'params': ['TOK000000000001WEB'],
+                'params': this.token,
                 'id': 3,
             });
             this.wsClient.send(this.request);
@@ -90,7 +90,8 @@ export default {
                         price: orders[key].price,
                         total: (orders[key].price * orders[key].amount + orders[key].maker_fee),
                         free: orders[key].maker_fee,
-                        action: '',
+                        action: '/api/user/cancel-order/' + this.userId + '/'
+                                + orders[key].market.slice(3, -3) + '/' + orders[key].id,
                     });
                 }
             }
@@ -110,7 +111,7 @@ export default {
         this.wsClient.onopen = () => {
             this.request = JSON.stringify({
                 method: 'server.auth',
-                params: ['NWJjZGU5YWMxNTcyNjMuNDc3MzIyMTQ=', 'web'],
+                params: [this.hash, 'web'],
                 id: 1,
             });
             this.wsClient.send(this.request);
@@ -118,6 +119,8 @@ export default {
     },
     data() {
         return {
+            url: '',
+            userId: 1,
             request: {},
             orders: null,
             history: [],

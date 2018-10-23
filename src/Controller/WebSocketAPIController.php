@@ -23,7 +23,7 @@ class WebSocketAPIController
     private $cryptoManager;
 
     /** @var TokenManagerInterface */
-    private  $tokenManager;
+    private $tokenManager;
 
     public function __construct(TraderInterface $trader, CryptoManagerInterface $cryptoManager, TokenManagerInterface $tokenManager)
     {
@@ -42,31 +42,31 @@ class WebSocketAPIController
             : $this->error();
     }
 
-    public function cancelOrder($userid, $market, $orderid): JsonResponse
+    public function cancelOrder(int $userid, String $market, int $orderid): JsonResponse
     {
         $crypto = $this->cryptoManager->findBySymbol('WEB');
         $token = $this->tokenManager->findByName($market);
-        dump($crypto);
-        $market = new Market($crypto, $token);
-//        dump(json_encode($market));
-        $order = new Order(
-            $orderid,
-            $userid,
-            null,
-            $market,
-            "",
-            1,
-            "",
-             "",
-            null
-        );
+        if (null !== $token && null !== $crypto && null !== $userid) {
+            $market = new Market($crypto, $token);
+            $order = new Order(
+                $orderid,
+                $userid,
+                null,
+                $market,
+                "",
+                1,
+                "",
+                "",
+                null
+            );
 
-        $tradeResult = $this->trader->cancelOrder($order);
+            $tradeResult = $this->trader->cancelOrder($order);
 
-        return new JsonResponse([
-            'result' => $tradeResult->getResult(),
-            'message' => $tradeResult->getMessage(),
-        ]);
+            return new JsonResponse([
+                'result' => $tradeResult->getResult(),
+                'message' => $tradeResult->getMessage(),
+            ]);
+        }
     }
 
     private function error(): JsonResponse
