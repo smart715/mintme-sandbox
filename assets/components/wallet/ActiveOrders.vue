@@ -71,7 +71,7 @@ export default {
         this.wsClient.onopen = () => {
             const request = JSON.stringify({
                 method: 'server.auth',
-                params: ['token123', 'web'],
+                params: [this.hash, 'web'],
                 id: 1,
             });
             this.wsClient.send(request);
