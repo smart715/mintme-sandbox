@@ -161,7 +161,7 @@ export default {
       placeOrderUrl: String,
       marketName: String,
       buy: Object,
-      fetchBalanceUrl: String,
+      fetchBalanceWebUrl: String,
   },
   data() {
     return {
@@ -223,7 +223,7 @@ export default {
       },
   },
   mounted: function() {
-        axios.get(this.fetchBalanceUrl)
+        axios.get(this.fetchBalanceWebUrl)
         .then( (response) => {
           return this.webBalance = response.data['available'];
         });

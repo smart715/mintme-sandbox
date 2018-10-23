@@ -20,7 +20,7 @@
                         >
                         Your Tokens:
                         <span class="text-primary">
-                            {{webBalance}}
+                            {{tokenBalance}}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -162,7 +162,7 @@ export default {
       placeOrderUrl: String,
       marketName: String,
       sell: Object,
-      fetchBalanceUrl: String,
+      fetchBalanceTokenUrl: String,
   },
   data() {
     return {
@@ -170,7 +170,7 @@ export default {
         sellAmount: 0,
         useMarketPrice: false,
         action: 'sell',
-        webBalance: '',
+        tokenBalance: '',
     };
   },
   methods: {
@@ -222,9 +222,9 @@ export default {
       },
   },
   mounted: function() {
-        axios.get(this.fetchBalanceUrl)
+        axios.get(this.fetchBalanceTokenUrl)
         .then( (response) => {
-          return this.webBalance = response.data['available'];
+          return this.tokenBalance = response.data['available'];
         });
     },
 };
