@@ -10,8 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthAPIController
 {
-    public function authUser(): JsonResponse
+    public function authUser(Request $request, LoggerInterface $logger): JsonResponse
     {
+        $logger->alert((string)json_encode($request->headers->all()));
         return new JsonResponse(
             [
                 "code" => 0,
