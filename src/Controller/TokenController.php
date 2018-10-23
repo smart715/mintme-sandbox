@@ -186,6 +186,11 @@ class TokenController extends AbstractController
         $token = $this->tokenManager->findByName($data['tokenName']);
         $crypto = $this->cryptoManager->findBySymbol('WEB');
         $market = $this->marketManager->getMarket($crypto, $token);
+
+        if (null === $market) {
+            throw $this->createNotFoundException('Market not found.');
+        }
+
         $user = $this->getUser();
         $side = 'sell' == $data['action'] ? 1
             : 2;
@@ -206,6 +211,24 @@ class TokenController extends AbstractController
         return new JsonResponse([
             'result' => $tradeResult->getResult(),
             'message' => $tradeResult->getMessage(),
+        ]);
+    }
+
+    public function fetchBalanceToken(string $tokenName, BalanceHandlerInterface $balanceHandler): Response
+    {
+        $user = $this->getUser();
+        $token = $this->tokenManager->findByName($tokenName);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist.');
+        }
+
+        $balance = $balanceHandler->balance($user, $token);
+        
+
+        return new JsonResponse([
+            'available' => $balance->getAvailable(),
+            'freeze' => $balance->getFreeze(),
         ]);
     }
 
