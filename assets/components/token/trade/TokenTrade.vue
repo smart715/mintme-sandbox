@@ -78,6 +78,11 @@ export default {
             showModal: true,
         };
     },
+    computed: {
+        market: function() {
+            return JSON.parse(this.marketName);
+        },
+    },
     mounted() {
         if (this.websocketUrl) {
             this.wsClient = this.$socket(this.websocketUrl);
@@ -88,19 +93,14 @@ export default {
                 }
             };
             this.wsClient.onopen = () => {
-                this.wsClient.send(`{
-                    "method": "deals.subscribe",
-                    "params": ["${this.market.hiddenName}"],
-                    "id": 1
-                }`);
+                const request = JSON.stringify({
+                    method: 'deals.subscribe',
+                    params: [this.market.hiddenName],
+                    id: 1,
+                });
+                this.wsClient.send(request);
             };
         }
-    },
-    computed: {
-        market: function() {
-            console.log('market Name: ', this.marketName);
-            return JSON.parse(this.marketName);
-        },
     },
     components: {
         TokenTradeBuyOrder,
@@ -121,7 +121,7 @@ export default {
 
             marketDealsInfo.forEach((deal) => {
                 // Pending order.
-                if (!deal.maker_id) {
+                if (!deal.taker_id) {
                     const price = parseFloat(deal.price);
                     const amount = parseFloat(deal.amount);
                     switch (deal.type) {
@@ -132,7 +132,7 @@ export default {
                             }
                             break;
                         case 'sell':
-                            if (price < this.buy.price) {
+                            if (0 === this.buy.price || price < this.buy.price) {
                                 this.buy.price = price;
                                 this.buy.amount = amount;
                             }
