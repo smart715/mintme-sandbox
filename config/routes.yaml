@@ -34,4 +34,8 @@ controllers:
 
 api_user_auth_controller:
     path: /internal/exchange/user/auth
-    controller: App\Controller\AuthAPIController::authUser
+    controller: App\Controller\WebSocketAPIController::authUser
+
+api_user_cancel_order:
+    path: /api/user/cancel-order/{userid}/{market}/{orderid}
+    controller: App\Controller\WebSocketAPIController::cancelOrder

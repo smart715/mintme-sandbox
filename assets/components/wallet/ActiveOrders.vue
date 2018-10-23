@@ -65,7 +65,7 @@ export default {
         getOrders: function() {
             this.request = JSON.stringify({
                 'method': 'order.query',
-                'params': ['TOK000000000001WEB', 0, 10],
+                'params': ['TOK000000000001WEB', 0, 100],
                 'id': 2,
             });
             this.wsClient.send(this.request);
@@ -79,6 +79,7 @@ export default {
             this.wsClient.send(this.request);
         },
         parseOrders: function(orders) {
+            console.log(orders);
             for (let key in orders) {
                 if (orders.hasOwnProperty(key)) {
                     this.history.push({
