@@ -128,6 +128,7 @@
                             v-if="loggedIn"
                             class="btn btn-primary"
                             :disabled="fieldsValid"
+                            @click="placeOrder"
                         >
                             Create sell order
                         </button>
@@ -140,17 +141,24 @@
                 </div>
             </div>
         </div>
+        <order-modal
+            :type="modalSuccess"
+            :visible="showModal"
+            @close="showModal = false"
+        />
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import Guide from '../../Guide';
+import OrderModal from '../../modal/OrderModal';
 
 export default {
   name: 'TokenTradeSellOrder',
   components: {
       Guide,
+      OrderModal,
   },
   props: {
       containerClass: String,
@@ -171,6 +179,8 @@ export default {
         useMarketPrice: false,
         action: 'sell',
         tokenBalance: '',
+        showModal: false,
+        modalSuccess: false,
     };
   },
   methods: {
@@ -185,12 +195,23 @@ export default {
         };
         axios.post(this.placeOrderUrl, data)
         .then( (response) => {
-            console.log(response);
+           this.showModalAction(response.data.result);
+           this.updateBalance();
         })
         .catch( (error) => {
-            console.log('Axios Error: ' + error);
+            this.showModalAction();
         });
     }
+    },
+    showModalAction: function(result) {
+        this.modalSuccess = 1 === result ? true : false;
+        this.showModal = true;
+    },
+    updateBalance: function() {
+        axios.get(this.fetchBalanceTokenUrl)
+        .then( (response) => {
+          return this.tokenBalance = response.data['available'];
+        });
     },
   },
   computed: {
@@ -222,10 +243,7 @@ export default {
       },
   },
   mounted: function() {
-        axios.get(this.fetchBalanceTokenUrl)
-        .then( (response) => {
-          return this.tokenBalance = response.data['available'];
-        });
+        this.updateBalance();
     },
 };
 </script>

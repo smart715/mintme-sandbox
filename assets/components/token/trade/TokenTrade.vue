@@ -76,7 +76,6 @@ export default {
                 amount: 0,
                 price: 0,
             },
-            showModal: true,
         };
     },
     computed: {
@@ -90,7 +89,6 @@ export default {
             this.wsClient.onmessage = (result) => {
                 if (typeof result.data === 'string') {
                     this.wsResult = JSON.parse(result.data);
-                    console.log('wsResult: ', this.wsResult);
                 }
             };
             this.wsClient.onopen = () => {
@@ -141,9 +139,6 @@ export default {
                     }
                 }
             });
-        },
-        hideModal: function() {
-            this.showModal = false;
         },
     },
     watch: {
