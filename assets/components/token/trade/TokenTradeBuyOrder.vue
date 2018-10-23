@@ -43,8 +43,8 @@
                                 v-model="useMarketPrice"
                                 type="checkbox"
                                 id="buy-price"
-                                class="custom-control-input"                                
-                            >
+                                class="custom-control-input"
+                                >
                             <label
                                 class="custom-control-label"
                                 for="buy-price">
@@ -124,8 +124,8 @@
                         </guide>
                     </div>
                     <div class="col-12 pt-4 text-center">
-                        <button @click="placeOrder" 
-                        v-if="loggedIn" 
+                        <button @click="placeOrder"
+                        v-if="loggedIn"
                         class="btn btn-primary"
                         :disabled="fieldsValid">
                             Create buy order
@@ -161,7 +161,7 @@ export default {
       placeOrderUrl: String,
       marketName: String,
       buy: Object,
-      fetchBalanceUrl: String
+      fetchBalanceUrl: String,
   },
   data() {
     return {
@@ -169,30 +169,30 @@ export default {
         buyAmount: 0,
         useMarketPrice: false,
         action: 'buy',
-        webBalance: ''        
+        webBalance: '',
     };
   },
   methods: {
-    placeOrder: function() 
-    {  if(this.buyPrice && this.buyAmount) {
+    placeOrder: function() {
+        if (this.buyPrice && this.buyAmount) {
         let data = {
             tokenName: this.tokenName,
             amountInput: this.buyAmount,
             priceInput: this.buyPrice,
             marketPrice: this.useMarketPrice,
-            action: this.action
+            action: this.action,
         };
 
         axios.post(this.placeOrderUrl, data)
-        .then( response => {
+        .then( (response) => {
            this.$emit('showModal', response.data);
            console.log(response.data.message);
         })
-        .catch( error => { 
-            console.log('Axios Error: ' + error)
+        .catch( (error) => {
+            console.log('Axios Error: ' + error);
         });
     }
-    }
+    },
   },
   computed: {
     totalPrice: function() {
@@ -207,26 +207,26 @@ export default {
     price: function() {
         return this.buy.price || null;
     },
-    fieldsValid: function () {
-        if ( this.buyPrice && this.buyAmount ){
+    fieldsValid: function() {
+        if ( this.buyPrice && this.buyAmount ) {
             return false;
         } else {
             return true;
         }
-    }
+    },
   },
   watch: {
       useMarketPrice: function() {
           if (this.useMarketPrice) {
               this.buyPrice = this.price || 0;
           }
-      }
+      },
   },
   mounted: function() {
         axios.get(this.fetchBalanceUrl)
-        .then(response => {
-          return this.webBalance = response.data["available"];
+        .then( (response) => {
+          return this.webBalance = response.data['available'];
         });
-    }
+    },
 };
 </script>

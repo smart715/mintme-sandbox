@@ -61,7 +61,7 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        fetchBalanceUrl: String
+        fetchBalanceUrl: String,
     },
     data() {
         return {
@@ -75,7 +75,7 @@ export default {
                 amount: 0,
                 price: 0,
             },
-            showModal: true
+            showModal: true,
         };
     },
     mounted() {
@@ -109,7 +109,7 @@ export default {
         TokenTradeBuyOrders,
         TokenTradeSellOrders,
         TokenTradeTradeHistory,
-        OrderModal
+        OrderModal,
     },
     methods: {
         updateMarketData: function(marketData) {
@@ -143,7 +143,7 @@ export default {
         },
         hideModal: function() {
             this.showModal = false;
-        }
+        },
     },
     watch: {
         wsResult: {

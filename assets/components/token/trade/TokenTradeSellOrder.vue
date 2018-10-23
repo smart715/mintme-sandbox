@@ -124,8 +124,8 @@
                         </guide>
                     </div>
                     <div class="col-12 pt-4 text-center">
-                        <button 
-                            v-if="loggedIn" 
+                        <button
+                            v-if="loggedIn"
                             class="btn btn-primary"
                             :disabled="fieldsValid"
                         >
@@ -162,7 +162,7 @@ export default {
       placeOrderUrl: String,
       marketName: String,
       sell: Object,
-      fetchBalanceUrl: String
+      fetchBalanceUrl: String,
   },
   data() {
     return {
@@ -170,27 +170,28 @@ export default {
         sellAmount: 0,
         useMarketPrice: false,
         action: 'sell',
-        webBalance: ''
+        webBalance: '',
     };
   },
   methods: {
-    placeOrder: function() 
-    {
+    placeOrder: function() {
+        if (this.sellPrice && this.sellAmount) {
         let data = {
             tokenName: this.tokenName,
             amountInput: this.sellAmount,
             priceInput: this.sellPrice,
             marketPrice: this.useMarketPrice,
-            action: this.action
+            action: this.action,
         };
         axios.post(this.placeOrderUrl, data)
-        .then( response => {
+        .then( (response) => {
             console.log(response);
         })
-        .catch( error => { 
-            console.log('Axios Error: ' + error)
+        .catch( (error) => {
+            console.log('Axios Error: ' + error);
         });
     }
+    },
   },
   computed: {
     totalPrice: function() {
@@ -205,26 +206,26 @@ export default {
     price: function() {
         return this.sell.price || null;
     },
-    fieldsValid: function () {
-        if ( this.sellPrice && this.sellAmount ){
+    fieldsValid: function() {
+        if ( this.sellPrice && this.sellAmount ) {
             return false;
         } else {
             return true;
         }
-    }
+    },
   },
   watch: {
       useMarketPrice: function() {
           if (this.useMarketPrice) {
               this.sellPrice = this.price || 0;
           }
-      }
+      },
   },
   mounted: function() {
         axios.get(this.fetchBalanceUrl)
-        .then(response => {
-          return this.webBalance = response.data["available"];
+        .then( (response) => {
+          return this.webBalance = response.data['available'];
         });
-    }
-}
+    },
+};
 </script>
