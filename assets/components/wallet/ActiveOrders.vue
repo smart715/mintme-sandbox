@@ -62,23 +62,63 @@ export default {
         removeOrder: function() {
             alert('this method for remove order');
         },
-},
+        getOrders: function() {
+            this.request = JSON.stringify({
+                'method': 'order.query',
+                'params': ['TOK000000000001WEB', 0, 10],
+                'id': 2,
+            });
+            this.wsClient.send(this.request);
+        },
+        subscribe: function() {
+            this.request = JSON.stringify({
+                'method': 'order.subscribe',
+                'params': ['TOK000000000001WEB'],
+                'id': 3,
+            });
+            this.wsClient.send(this.request);
+        },
+        parseOrders: function(orders) {
+            for (let key in orders) {
+                if (orders.hasOwnProperty(key)) {
+                    this.history.push({
+                        date: new Date(orders[key].ctime).toDateString(),
+                        type: (1 === orders[key].type) ? 'Deposit' : 'Withdraw',
+                        name: orders[key].market,
+                        amount: orders[key].amount,
+                        price: orders[key].price,
+                        total: (orders[key].price * orders[key].amount + orders[key].maker_fee),
+                        free: orders[key].maker_fee,
+                        action: '',
+                    });
+                }
+            }
+        },
+    },
     mounted() {
         this.wsClient = this.$socket('ws://mintme.abchosting.org:8364');
         this.wsClient.onmessage = (result) => {
-            console.log(JSON.parse(result.data));
+            this.orders = JSON.parse(result.data);
+            if (this.orders.id === 1) {
+                this.getOrders();
+            }
+            if (this.orders.id === 2) {
+                this.parseOrders(this.orders.result.records);
+            }
         };
         this.wsClient.onopen = () => {
-            const request = JSON.stringify({
+            this.request = JSON.stringify({
                 method: 'server.auth',
-                params: [this.hash, 'web'],
+                params: ['NWJjZGU5YWMxNTcyNjMuNDc3MzIyMTQ=', 'web'],
                 id: 1,
             });
-            this.wsClient.send(request);
+            this.wsClient.send(this.request);
         };
     },
     data() {
         return {
+            request: {},
+            orders: null,
             history: [],
             currentPage: 1,
             perPage: 10,
@@ -127,21 +167,6 @@ export default {
         totalRows: function() {
             return this.history.length;
         },
-    },
-    created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
-            this.history.push({
-                date: '12-12-1970',
-                type: (i % 2 === 0) ? 'Deposit' : 'Withdraw',
-                name: (i % 2 === 0) ? '[Token]' : 'Webchain (WEB)',
-                amount: Math.floor(Math.random() * 99) + 10,
-                price: Math.floor(Math.random() * 99) + 10,
-                total: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                free: Math.floor(Math.random() * 99) + 10,
-                action: '',
-            });
-        }
     },
 };
 </script>
