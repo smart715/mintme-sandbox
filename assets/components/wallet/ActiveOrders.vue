@@ -69,11 +69,12 @@ export default {
             console.log(JSON.parse(result.data));
         };
         this.wsClient.onopen = () => {
-            this.wsClient.send(`{
-                "method": "server.auth",
-                "params": ["token123", "web"],
-                "id": 0
-            }`);
+            const request = JSON.stringify({
+                method: 'server.auth',
+                params: ['token123', 'web'],
+                id: 1,
+            });
+            this.wsClient.send(request);
         };
     },
     data() {
