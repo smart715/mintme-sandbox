@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthAPIController
 {
-    public function authUser(Request $request): JsonResponse
+    public function authUser(): JsonResponse
     {
         return new JsonResponse(
             [
