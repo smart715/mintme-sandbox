@@ -109,16 +109,4 @@ describe('TokenTrade', () => {
             });
         });
     });
-
-    //     Vue.nextTick(() => {
-    //         expect(vm.buy).to.deep.equal({
-    //             amount: 26,
-    //             price: .5,
-    //         });
-    //         expect(vm.sell).to.deep.equal({
-    //             amount: 18,
-    //             price: 2,
-    //         });
-    //         done();
-    //     });
 });
