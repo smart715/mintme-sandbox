@@ -3,7 +3,7 @@
 namespace App\DataFixtures\Factory;
 
 use App\DataFixtures\FakerHelper;
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use Doctrine\Common\Persistence\ObjectManager;
 
 class TokenFixturesFactory extends AbstractFixturesFactory

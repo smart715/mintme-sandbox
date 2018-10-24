@@ -7,22 +7,48 @@
                     <a :href="currentAddress" target="_blank" rel="nofollow">
                         {{ currentAddress }}
                     </a>
+                    <guide>
+                        <font-awesome-icon
+                            icon="question"
+                            slot='icon'
+                            class="ml-1 mb-1 bg-primary text-white
+                            rounded-circle square blue-question"/>
+                        <template slot="header">
+                            Facebook Guide
+                        </template>
+                        <template slot="body">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                        </template>
+                    </guide>
                 </div>
-                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
-                     data-layout="button_count" data-size="small" data-mobile-iframe="true">
-                    <a target="_blank" :href="'https://www.facebook.com/sharer/sharer.php?u='+currentAddressEncoded
-                    +'&amp;src=sdkpreparse'" class="fb-xfbml-parse-ignore">Share</a></div>
+                <div
+                    class="fb-share-button"
+                    data-href="https://developers.facebook.com/docs/plugins/"
+                    data-layout="button_count"
+                    data-size="small"
+                    data-mobile-iframe="true">
+                    <a
+                        target="_blank"
+                        :href="'https://www.facebook.com/sharer/sharer.php?u='
+                        +currentAddressEncoded+'&amp;src=sdkpreparse'"
+                        class="fb-xfbml-parse-ignore">
+                        Share
+                    </a>
+                </div>
+                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a target="_blank" :href="'https://www.facebook.com/sharer/sharer.php?u='+currentAddressEncoded+'&amp;src=sdkpreparse'" class="fb-xfbml-parse-ignore">Share</a></div>
             </div>
         </div>
         <div v-show="editing">
-            <button class="btn btn-primary" @click="addPage">
-                <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
-                Add Facebook address
-            </button>
+            <div class="col-lg-6 col-md-9 d-block mx-0 my-1 p-0">
+                <button class="btn btn-primary btn-block" @click="addPage">
+                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
+                    Add Facebook address
+                </button>
+            </div>
         </div>
 
         <div class="modal" :class="{ show: showConfirmModal }" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
+             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Facebook Confirmation</h5>
@@ -36,8 +62,11 @@
                                 <div class="form-group">
                                     <label for="select-fb-pages">Select Facebook page to show:</label>
                                     <select v-model="selectedUrl" class="form-control" id="select-fb-pages">
-                                        <option v-for="(page, index) in pages" :selected="index === 0 ? 'selected'
-                                         : ''" :key="page.id" :value="page.link">
+                                        <option
+                                            v-for="(page, index) in pages"
+                                            :selected="index === 0 ? 'selected' : ''"
+                                            :key="page.id"
+                                            :value="page.link">
                                             {{ page.name }}
                                         </option>
                                     </select>
@@ -61,6 +90,7 @@ import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import Guide from '../Guide';
 
 library.add(faFacebookSquare);
 Vue.use(Toasted, {
@@ -82,6 +112,7 @@ export default {
     },
     components: {
         FontAwesomeIcon,
+        Guide,
     },
     created: function() {
         this.loadFacebookSdk();

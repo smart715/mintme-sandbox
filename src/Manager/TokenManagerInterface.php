@@ -2,7 +2,7 @@
 
 namespace App\Manager;
 
-use App\Entity\Token;
+use App\Entity\Token\Token;
 use App\Entity\User;
 
 interface TokenManagerInterface

@@ -4,20 +4,43 @@
             <div class="d-flex">
                 <div class="display-text">
                     Youtube:
-                    <a v-if="currentChannelId" :href="'https://www.youtube.com/channel/'+this.currentChannelId"
-                       target="_blank" rel="nofollow">
+                    <a
+                        v-if="currentChannelId"
+                        :href="'https://www.youtube.com/channel/'+this.currentChannelId"
+                        target="_blank"
+                        rel="nofollow">
                         https://www.youtube.com/channel/{{ this.currentChannelId }}
                     </a>
+                    <guide>
+                        <font-awesome-icon
+                            icon="question"
+                            slot='icon'
+                            class="ml-1 mb-1 bg-primary text-white
+                        rounded-circle square blue-question"/>
+                        <template slot="header">
+                            Youtube Guide
+                        </template>
+                        <template slot="body">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                        </template>
+                    </guide>
                 </div>
-                <div v-if="currentChannelId" class="g-ytsubscribe" :data-channelid="currentChannelId"
-                     data-layout="default" data-count="default"></div>
+                <div
+                    v-if="currentChannelId"
+                    class="g-ytsubscribe"
+                    :data-channelid="currentChannelId"
+                    data-layout="default"
+                    data-count="default">
+                </div>
             </div>
         </div>
         <div v-show="editing">
-            <button class="btn btn-primary" @click="addChannel">
-                <font-awesome-icon :icon="{prefix: 'fab', iconName: 'youtube-square'}" size="lg"/>
-                Add Youtube channel
-            </button>
+            <div class="col-lg-6 col-md-9  d-block mx-0 my-1 p-0">
+                <button class="btn btn-primary btn-block" @click="addChannel">
+                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'youtube-square'}" size="lg"/>
+                    Add Youtube channel
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -29,6 +52,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
 import gapi from 'gapi';
+import Guide from '../Guide';
 
 library.add(faYoutubeSquare);
 Vue.use(Toasted, {
@@ -54,6 +78,7 @@ export default {
     },
     components: {
         FontAwesomeIcon,
+        Guide,
     },
     created: function() {
         if (this.editable) {
