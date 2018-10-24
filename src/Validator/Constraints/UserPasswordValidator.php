@@ -7,7 +7,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class UserPasswordValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint)
+    public function validate(String $value, Constraint $constraint): void
     {
         if (!empty($value) && !preg_match('/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/', $value)) {
             $this->context->buildViolation($constraint->message)->addViolation();
