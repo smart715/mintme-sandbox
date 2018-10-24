@@ -20,3 +20,7 @@ public/build
 /.idea
 /.phplint-cache
 /phpstan
+
+.vscode
+.dockerignore
+Dockerfile
