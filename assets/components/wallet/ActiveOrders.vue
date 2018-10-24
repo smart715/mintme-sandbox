@@ -65,7 +65,7 @@ export default {
         getOrders: function() {
             this.request = JSON.stringify({
                 'method': 'order.query',
-                'params': ['TOK000000000001WEB', 0, 100],
+                'params': [this.token, 0, 100],
                 'id': 2,
             });
             this.wsClient.send(this.request);
@@ -73,7 +73,7 @@ export default {
         subscribe: function() {
             this.request = JSON.stringify({
                 'method': 'order.subscribe',
-                'params': ['TOK000000000001WEB'],
+                'params': this.token,
                 'id': 3,
             });
             this.wsClient.send(this.request);
@@ -91,16 +91,8 @@ export default {
                         total: (orders[key].price * orders[key].amount + orders[key].maker_fee),
                         free: orders[key].maker_fee,
                         action: '/api/user/cancel-order/' + this.userId + '/'
-                                + orders[key].market.slice(3, -3) + '/' + orders[key].id,
-                        id: orders[key].id,
+                        + orders[key].market.slice(3, -3) + '/' + orders[key].id,
                     });
-                }
-            }
-        },
-        deleteHistoryOrder: function(id) {
-            for (let i = 0; i < this.history.length; i++) {
-                if (this.history[i].id === id) {
-                    delete this.history[i];
                 }
             }
         },
@@ -109,22 +101,17 @@ export default {
         this.wsClient = this.$socket('ws://mintme.abchosting.org:8364');
         this.wsClient.onmessage = (result) => {
             this.orders = JSON.parse(result.data);
-            if (this.orders.hasOwnProperty('method') && this.orders.method === 'order.update') {
-                console.log(this.orders.params[1].id);
-                this.deleteHistoryOrder(this.orders.params[1].id);
-            }
             if (this.orders.id === 1) {
                 this.getOrders();
             }
             if (this.orders.id === 2) {
                 this.parseOrders(this.orders.result.records);
-                this.subscribe();
             }
         };
         this.wsClient.onopen = () => {
             this.request = JSON.stringify({
                 method: 'server.auth',
-                params: ['NWJjZGU5YWMxNTcyNjMuNDc3MzIyMTQ=', 'web'],
+                params: [this.hash, 'web'],
                 id: 1,
             });
             this.wsClient.send(this.request);
@@ -187,4 +174,3 @@ export default {
     },
 };
 </script>
-
