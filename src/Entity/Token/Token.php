@@ -180,4 +180,11 @@ class Token
     {
         return $this->profile;
     }
+
+    public static function getWeb(): self
+    {
+        $web = new Token();
+        $web->setName("WEB");
+        return $web;
+    }
 }
