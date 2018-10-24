@@ -1,20 +1,20 @@
-import '../js/main';
-import TokenTrade from '../components/token/trade/TokenTrade';
+import '../../js/main';
+import {mount} from '../testHelper';
+import TokenTrade from '../../components/token/trade/TokenTrade';
 
 describe('TokenTrade', () => {
-    const Constructor = Vue.extend(TokenTrade);
-    const vm = new Constructor({
-        propsData: {
-            marketName: '{' +
-                '"hiddenName":"TOK000000000001WEB",' +
-                '"tokenName":"tok1",' +
-                '"currncySymbol":"WEB"' +
-            '}',
-        },
-    }).$mount();
-
-    it('Should fetch pending orders', (done) => {
-        const wsResult = {
+    describe('data field', () => {
+        const market = JSON.stringify({
+            hiddenName: 'TOK000000000001WEB',
+            tokenName: 'tok1',
+            currncySymbol: 'WEB',
+        });
+        const vm = mount(TokenTrade, {
+            propsData: {
+                marketName: market,
+            },
+        });
+        const websocketResult = {
             'method': 'deals.update',
             'params': [
                 'TOK000000000001WEB',
@@ -77,18 +77,48 @@ describe('TokenTrade', () => {
             'id': null,
         };
 
-        vm.wsResult = wsResult;
+        describe(':buy', () => {
+            context('when fetch markets deal from server', () => {
+                vm.wsResult = websocketResult;
 
-        Vue.nextTick(() => {
-            expect(vm.buy).to.deep.equal({
-                amount: 26,
-                price: .5,
+                it('should set with minimum price of pending markets', (done) => {
+                    Vue.nextTick(() => {
+                        expect(vm.buy).to.deep.equal({
+                            amount: 26,
+                            price: .5,
+                        });
+                        done();
+                    });
+                });
             });
-            expect(vm.sell).to.deep.equal({
-                amount: 18,
-                price: 2,
+        });
+
+        describe(':sell', () => {
+            context('when fetch markets deal from server', () => {
+                vm.wsResult = websocketResult;
+
+                it('should set with maximum price of pending markets', (done) => {
+                    Vue.nextTick(() => {
+                        expect(vm.sell).to.deep.equal({
+                            amount: 18,
+                            price: 2,
+                        });
+                        done();
+                    });
+                });
             });
-            done();
         });
     });
+
+    //     Vue.nextTick(() => {
+    //         expect(vm.buy).to.deep.equal({
+    //             amount: 26,
+    //             price: .5,
+    //         });
+    //         expect(vm.sell).to.deep.equal({
+    //             amount: 18,
+    //             price: 2,
+    //         });
+    //         done();
+    //     });
 });
