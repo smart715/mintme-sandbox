@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\API;
 
 use App\Entity\Crypto;
 use App\Entity\User;
@@ -10,11 +10,13 @@ use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
-use Psr\Log\LoggerInterface;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class WebSocketAPIController
+class WebSocketAPIController extends FOSRestController
 {
     /** @var TraderInterface */
     private $trader;
@@ -32,16 +34,21 @@ class WebSocketAPIController
         $this->tokenManager = $tokenManager;
     }
 
-    public function authUser(Request $request, LoggerInterface $logger, ProfileManagerInterface $profileManager): JsonResponse
+    /** @Rest\Route("/internal/exchange/user/auth/") */
+    public function authUser(Request $request, ProfileManagerInterface $profileManager): JsonResponse
     {
-        $logger->alert((string)json_encode($request->headers->all()));
         $token = $request->headers->get('authorization');
-        $user = $profileManager->validateUserApi($token);
-        return $user
-            ? $this->confirmed($user)
-            : $this->error();
+        if ($token != null && !is_array($token)) {
+            $user = $profileManager->validateUserApi($token);
+            return $user
+                ? $this->confirmed($user)
+                : $this->error();
+        } else {
+            return $this->error();
+        }
     }
 
+    /** @Rest\Route("/api/user/cancel-order/{userid}/{market}/{orderid}") */
     public function cancelOrder(int $userid, String $market, int $orderid): JsonResponse
     {
         $crypto = $this->cryptoManager->findBySymbol('WEB');
@@ -67,6 +74,7 @@ class WebSocketAPIController
                 'message' => $tradeResult->getMessage(),
             ]);
         }
+        return $this->error();
     }
 
     private function error(): JsonResponse

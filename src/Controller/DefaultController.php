@@ -39,7 +39,7 @@ class DefaultController extends Controller
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager
     ): Response {
-        $user = $profileManager->findHash($this->getUser());
+        $user = $profileManager->findUserByHash($this->getUser());
         $crypto = $cryptoManager->findBySymbol('WEB');
         $token = $tokenManager->getOwnToken();
         if (null !== $crypto && null !== $token) {
@@ -47,7 +47,10 @@ class DefaultController extends Controller
             return $this->render('pages/wallet.html.twig', [
                 'hash' => $user->getHash(),
                 'token' => $market->getHiddenName(),
+                'user_id' => $user->getId(),
             ]);
+        } else {
+            return $this->redirectToRoute('fos_user_security_login');
         }
     }
 }

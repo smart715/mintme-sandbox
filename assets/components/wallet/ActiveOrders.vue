@@ -3,9 +3,7 @@
         <div class="table-responsive">
             <confirm-modal
                     :visible="confirmModal"
-                    :tokenName="tokenName"
-                    :amount="amount"
-                    :price="price"
+                    :message="modalMessage"
                     v-on:close="switchConfirmModal"
                     v-on:confirm="removeOrder"
             ></confirm-modal>
@@ -13,7 +11,9 @@
                 :items="history"
                 :fields="fields"
                 :current-page="currentPage"
-                :per-page="perPage">
+                :per-page="perPage"
+                @filtered="onFiltered">
+                v-model="history">
                 <template slot="action" slot-scope="row">
                     <a @click="removeOrderModal(row.item)">
                         <font-awesome-icon
@@ -37,6 +37,10 @@ import ConfirmModal from '../modal/ConfirmModal';
 import WebSocket from '../../js/websocket';
 import axios from 'axios';
 
+const METHOD_AUTH = 12345;
+const METHOD_ORDER_QUERY = 54321;
+const METHOD_ORDER_SUBSCRIBE = 12878;
+
 Vue.use(WebSocket);
 
 export default {
@@ -47,81 +51,96 @@ export default {
     props: {
         hash: String,
         token: String,
+        user_id: Number,
+        websocket_url: String,
     },
     methods: {
         removeOrderModal: function(row) {
+            this.modalMessage = 'Are you sure that you want to remove ' + row.name +
+                'with amount ' + row.amount + 'and price ' + row.price;
             this.url = row.action;
-            this.tokenName = row.name;
-            this.amount = row.amount;
-            this.price = row.price;
             this.confirmModal = !this.confirmModal;
         },
         switchConfirmModal: function() {
             this.confirmModal = !this.confirmModal;
         },
         removeOrder: function() {
-            axios.get('..' + this.url);
+            axios.get(this.url);
         },
         getOrders: function() {
-            this.request = JSON.stringify({
+            this.wsClient.send(JSON.stringify({
                 'method': 'order.query',
-                'params': [this.token, 0, 100],
-                'id': 2,
-            });
-            this.wsClient.send(this.request);
+                'params': ['TOK000000000001WEB', 0, 100],
+                'id': METHOD_ORDER_QUERY,
+            }));
         },
         subscribe: function() {
-            this.request = JSON.stringify({
+            this.wsClient.send(JSON.stringify({
                 'method': 'order.subscribe',
-                'params': this.token,
-                'id': 3,
-            });
-            this.wsClient.send(this.request);
+                'params': ['TOK000000000001WEB'],
+                'id': METHOD_ORDER_SUBSCRIBE,
+            }));
         },
         parseOrders: function(orders) {
-            console.log(orders);
-            for (let key in orders) {
-                if (orders.hasOwnProperty(key)) {
-                    this.history.push({
-                        date: new Date(orders[key].ctime).toDateString(),
-                        type: (1 === orders[key].type) ? 'Deposit' : 'Withdraw',
-                        name: orders[key].market,
-                        amount: orders[key].amount,
-                        price: orders[key].price,
-                        total: (orders[key].price * orders[key].amount + orders[key].maker_fee),
-                        free: orders[key].maker_fee,
-                        action: '/api/user/cancel-order/' + this.userId + '/'
-                        + orders[key].market.slice(3, -3) + '/' + orders[key].id,
-                    });
+            orders.forEach((order) => {
+                this.history.push({
+                    date: new Date(order.ctime).toDateString(),
+                    type: (1 === order.type) ? 'Deposit' : 'Withdraw',
+                    name: order.market,
+                    amount: order.amount,
+                    price: order.price,
+                    total: (order.price * order.amount + order.maker_fee),
+                    free: order.maker_fee,
+                    action: '../api/user/cancel-order/' + this.user_id + '/'
+                    + order.market.slice(3, -3) + '/' + order.id,
+                    id: order.id,
+                });
+            });
+        },
+        deleteHistoryOrder: function(id) {
+            for (let i = 0; i < this.history.length; i++) {
+                if (this.history[i].id === id) {
+                    delete this.history[i];
                 }
             }
         },
     },
     mounted() {
-        this.wsClient = this.$socket('ws://mintme.abchosting.org:8364');
+        this.wsClient = this.$socket(this.websocket_url);
         this.wsClient.onmessage = (result) => {
-            this.orders = JSON.parse(result.data);
-            if (this.orders.id === 1) {
-                this.getOrders();
-            }
-            if (this.orders.id === 2) {
-                this.parseOrders(this.orders.result.records);
+            let orders = JSON.parse(result.data);
+            console.log(orders);
+            switch (orders.id) {
+                case METHOD_AUTH:
+                    if (orders.error === null) {
+                        console.log(orders);
+                        this.getOrders();
+                    }
+                    break;
+                case METHOD_ORDER_QUERY:
+                    this.parseOrders(orders.result.records);
+                    this.subscribe();
+                    break;
+                case null:
+                    if (orders.method === 'order.update') {
+                        console.log(orders.params[1].id);
+                        this.deleteHistoryOrder(orders.params[1].id)
+                    }
+                    break;
             }
         };
         this.wsClient.onopen = () => {
-            this.request = JSON.stringify({
+            this.wsClient.send(JSON.stringify({
                 method: 'server.auth',
-                params: [this.hash, 'web'],
-                id: 1,
-            });
-            this.wsClient.send(this.request);
+                params: ['NWJjZGU5YWMxNTcyNjMuNDc3MzIyMTQ=', 'web'],
+                id: METHOD_AUTH,
+            }));
         };
     },
     data() {
         return {
+            modalMessage: '',
             url: '',
-            userId: 1,
-            request: {},
             orders: null,
             history: [],
             currentPage: 1,
@@ -171,6 +190,9 @@ export default {
         totalRows: function() {
             return this.history.length;
         },
+        historyI: function() {
+            return this.history;
+        }
     },
 };
 </script>

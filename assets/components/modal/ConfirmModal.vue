@@ -6,8 +6,7 @@
             <div class="text-center">
                 <div class="mb-5">
                     <img src="../../img/are-you-sure.png"/>
-                    <slot><h3>Are you sure that you want to remove {{ tokenName }}
-                        with amount {{ amount }} and price {{ price }}</h3></slot>
+                    <slot><h3>{{ message }}</h3></slot>
                 </div>
                 <button
                     class="btn btn-primary"
@@ -33,9 +32,7 @@ export default {
     },
     props: {
         visible: Boolean,
-        tokenName: String,
-        amount: Number,
-        price: Number,
+        message: String,
     },
     methods: {
         closeModal: function() {

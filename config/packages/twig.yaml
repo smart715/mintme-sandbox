@@ -8,3 +8,4 @@ twig:
         global_youtube_client_id: '%youtube_client_id%'
         global_facebook_app_id: '%facebook_app_id%'
         version: '%version%'
+        global_websocket_url: '`ws://mintme.abchosting.org:8364`'

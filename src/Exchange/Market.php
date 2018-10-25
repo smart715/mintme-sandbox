@@ -22,7 +22,6 @@ class Market
     public function getHiddenName(): string
     {
         $cryptoSymbol = strtoupper($this->crypto->getSymbol());
-        /**TODO SET GET ID INSTEAD 1*/
         $tokenName = 'TOK'.str_pad((string) 1, 12, '0', STR_PAD_LEFT);
 
         return $tokenName.$cryptoSymbol;

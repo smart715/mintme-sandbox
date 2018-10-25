@@ -23,6 +23,8 @@
                             <active-orders
                                 :hash="{{ hash | json_encode }}"
                                 :token="{{ token | json_encode }}"
+                                :user_id="{{ user_id | json_encode }}"
+                                :websocket_url="{{ global_websocket_url }}"
                             ></active-orders>
                         </b-tab>
                     </b-tabs>

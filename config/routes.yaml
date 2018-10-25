@@ -31,11 +31,3 @@ api_controllers:
 controllers:
     resource: ../src/Controller/
     type: annotation
-
-api_user_auth_controller:
-    path: /internal/exchange/user/auth
-    controller: App\Controller\WebSocketAPIController::authUser
-
-api_user_cancel_order:
-    path: /api/user/cancel-order/{userid}/{market}/{orderid}
-    controller: App\Controller\WebSocketAPIController::cancelOrder
