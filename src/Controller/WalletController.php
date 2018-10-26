@@ -8,6 +8,7 @@ use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class WalletController extends AbstractController
@@ -30,18 +31,17 @@ class WalletController extends AbstractController
         $token = $tokenManager->getOwnToken();
         $cryptoWEB = $cryptoManager->findBySymbol('WEB');
         $cryptoBTC = $cryptoManager->findBySymbol('BTC');
-        if ($cryptoWEB!= null && $token != null){
-            $marketWEB = new Market($cryptoWEB, $token);
-        } else {
-            $marketWEB = null;
-        }
+        null == $token || null == $cryptoWEB
+            ? $marketWEB = null
+            : $marketWEB = new Market($cryptoWEB, $token);
 
-        $marketBTC = $cryptoBTC || $token
-            ? new Market($cryptoBTC, $token)
-            : null;
+        null == $token || null == $cryptoBTC
+            ? $marketBTC = null
+            : $marketBTC = new Market($cryptoBTC, $token);
+
         $markets = [
-            $marketWEB ? $marketWEB->getHiddenName() : null,
-            $marketBTC ? $marketBTC->getHiddenName() : null,
+            $marketWEB->getHiddenName() ?? null,
+            $marketBTC->getHiddenName() ?? null,
         ];
 
         return $this->render('pages/wallet.html.twig', [

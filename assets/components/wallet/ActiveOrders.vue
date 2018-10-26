@@ -140,7 +140,7 @@ export default {
         this.wsClient.onopen = () => {
             this.wsClient.send(JSON.stringify({
                 method: 'server.auth',
-                params: ['NWJjZGU5YWMxNTcyNjMuNDc3MzIyMTQ=', 'web'],
+                params: [this.hash, 'web'],
                 id: METHOD_AUTH,
             }));
         };
