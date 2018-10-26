@@ -7,6 +7,7 @@ use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Balance\BalanceFetcher;
 use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Utils\RandomNumber;
@@ -14,7 +15,7 @@ use App\Utils\TokenNameConverterInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class BalanceHandlerTest extends TestCase
+class BalanceFetcherTest extends TestCase
 {
     public function testBalance(): void
     {
@@ -31,15 +32,14 @@ class BalanceHandlerTest extends TestCase
                 ],
             ]));
 
-        $handler = new BalanceHandler(
+        $handler = new BalanceFetcher(
             $rpc,
-            $this->mockConverter(),
             $this->mockRandom(21)
         );
 
         $result = $handler->balance(
-            $this->mockUser(1),
-            $this->mockToken(999)
+            1,
+            'TOK999'
         );
 
         $this->assertFalse($result->isFailed());
@@ -52,13 +52,12 @@ class BalanceHandlerTest extends TestCase
         $rpc = $this->mockRpc();
         $rpc->method('send')->willThrowException(new FetchException());
 
-        $handler = new BalanceHandler(
+        $handler = new BalanceFetcher(
             $rpc,
-            $this->mockConverter(),
             $this->mockRandom(21)
         );
 
-        $result = $handler->balance($this->mockUser(1), $this->mockToken(999));
+        $result = $handler->balance(1, 'TOK999');
 
         $this->assertTrue($result->isFailed());
     }
@@ -80,13 +79,12 @@ class BalanceHandlerTest extends TestCase
                 'freeze_count' => 10,
             ]));
 
-        $handler = new BalanceHandler(
+        $handler = new BalanceFetcher(
             $rpc,
-            $this->mockConverter(),
             $this->mockRandom(21)
         );
 
-        $result = $handler->summary($this->mockToken(999));
+        $result = $handler->summary('TOK999');
 
         $this->assertFalse($result->isFailed());
         $this->assertEquals(1000000, $result->getTotal());
@@ -101,13 +99,12 @@ class BalanceHandlerTest extends TestCase
         $rpc = $this->mockRpc();
         $rpc->method('send')->willThrowException(new FetchException());
 
-        $handler = new BalanceHandler(
+        $handler = new BalanceFetcher(
             $rpc,
-            $this->mockConverter(),
             $this->mockRandom(21)
         );
 
-        $result = $handler->summary($this->mockToken(999));
+        $result = $handler->summary('TOK999');
 
         $this->assertTrue($result->isFailed());
     }
@@ -122,13 +119,12 @@ class BalanceHandlerTest extends TestCase
             )
             ->willReturn($this->mockResponse(true));
 
-        $handler = new BalanceHandler(
+        $handler = new BalanceFetcher(
             $rpc,
-            $this->mockConverter(),
             $this->mockRandom(21)
         );
 
-        $result = $handler->summary($this->mockToken(999));
+        $result = $handler->summary('TOK999');
 
         $this->assertTrue($result->isFailed());
     }
@@ -138,18 +134,17 @@ class BalanceHandlerTest extends TestCase
         $rpc = $this->mockRpc();
         $rpc->method('send')->willReturn($this->mockResponse(true));
 
-        $handler = new BalanceHandler(
+        $handler = new BalanceFetcher(
             $rpc,
-            $this->mockConverter(),
             $this->mockRandom(21)
         );
 
         $this->expectException(BalanceException::class);
 
-        $handler->withdraw($this->mockUser(1), $this->mockToken(999), 1000000);
+        $handler->update(1, 'TOK999', 1000000, 'withdraw');
     }
 
-    public function testWithdraw(): void
+    public function testUpdate(): void
     {
         $rpc = $this->mockRpc();
         $rpc->expects($this->once())->method('send')->with(
@@ -157,30 +152,12 @@ class BalanceHandlerTest extends TestCase
             [ 1, 'TOK999', 'withdraw', 21, '1000000', [ 'extra' => 1 ] ]
         );
 
-        $handler = new BalanceHandler(
+        $handler = new BalanceFetcher(
             $rpc,
-            $this->mockConverter(),
             $this->mockRandom(21)
         );
 
-        $handler->withdraw($this->mockUser(1), $this->mockToken(999), 1000000);
-    }
-
-    public function testDeposit(): void
-    {
-        $rpc = $this->mockRpc();
-        $rpc->expects($this->once())->method('send')->with(
-            'balance.update',
-            [ 1, 'TOK999', 'deposit', 21, '1000000', [ 'extra' => 1 ] ]
-        );
-
-        $handler = new BalanceHandler(
-            $rpc,
-            $this->mockConverter(),
-            $this->mockRandom(21)
-        );
-
-        $handler->deposit($this->mockUser(1), $this->mockToken(999), 1000000);
+        $handler->update(1, 'TOK999', 1000000, 'withdraw');
     }
 
     /** @return MockObject|JsonRpcResponse */
@@ -193,24 +170,6 @@ class BalanceHandlerTest extends TestCase
         return $response;
     }
 
-    /** @return MockObject|Token */
-    private function mockToken(int $value): Token
-    {
-        $token = $this->createMock(Token::class);
-        $token->method('getId')->willReturn($value);
-
-        return $token;
-    }
-
-    /** @return MockObject|User */
-    private function mockUser(int $value): User
-    {
-        $user = $this->createMock(User::class);
-        $user->method('getId')->willReturn($value);
-
-        return $user;
-    }
-
     /** @return MockObject|RandomNumber */
     private function mockRandom(int $value): RandomNumber
     {
@@ -218,17 +177,6 @@ class BalanceHandlerTest extends TestCase
         $random->method('getNumber')->willReturn($value);
 
         return $random;
-    }
-
-    /** @return MockObject|TokenNameConverterInterface */
-    private function mockConverter(): TokenNameConverterInterface
-    {
-        $converter = $this->createMock(TokenNameConverterInterface::class);
-        $converter->method('convert')->willReturnCallback(function (Token $token) {
-            return 'TOK'.$token->getId();
-        });
-
-        return $converter;
     }
 
     /** @return MockObject|JsonRpcInterface */
