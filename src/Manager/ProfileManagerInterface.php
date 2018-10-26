@@ -12,12 +12,7 @@ interface ProfileManagerInterface
     public function findByEmail(string $email): ?Profile;
     public function generatePageUrl(Profile $profile): ?string;
     public function findUserByHash(User $user): User;
-
-    /**
-     * @param array|string|null $token
-     * @return User|null
-     */
-    public function validateUserApi($token): ?User;
+    public function validateUserApi(string $token): ?User;
 
     /**
      * @param mixed $user

@@ -7,13 +7,11 @@
                     v-on:close="switchConfirmModal"
                     v-on:confirm="removeOrder"
             ></confirm-modal>
-            <b-table
-                :items="history"
+            <b-table ref="table"
+                :items="myProvider"
                 :fields="fields"
                 :current-page="currentPage"
-                :per-page="perPage"
-                @filtered="onFiltered">
-                v-model="history">
+                :per-page="perPage">
                 <template slot="action" slot-scope="row">
                     <a @click="removeOrderModal(row.item)">
                         <font-awesome-icon
@@ -50,11 +48,14 @@ export default {
     },
     props: {
         hash: String,
-        token: String,
+        tokens: Array,
         user_id: Number,
         websocket_url: String,
     },
     methods: {
+        myProvider: function() {
+          return this.history;
+        },
         removeOrderModal: function(row) {
             this.modalMessage = 'Are you sure that you want to remove ' + row.name +
                 'with amount ' + row.amount + 'and price ' + row.price;
@@ -68,18 +69,26 @@ export default {
             axios.get(this.url);
         },
         getOrders: function() {
-            this.wsClient.send(JSON.stringify({
-                'method': 'order.query',
-                'params': ['TOK000000000001WEB', 0, 100],
-                'id': METHOD_ORDER_QUERY,
-            }));
+            this.tokens.forEach((token) => {
+                if (token !== null) {
+                    this.wsClient.send(JSON.stringify({
+                    'method': 'order.query',
+                    'params': [token, 0, 100],
+                    'id': METHOD_ORDER_QUERY,
+                    }));
+                }
+            });
         },
         subscribe: function() {
-            this.wsClient.send(JSON.stringify({
-                'method': 'order.subscribe',
-                'params': ['TOK000000000001WEB'],
-                'id': METHOD_ORDER_SUBSCRIBE,
-            }));
+            this.tokens.forEach((token) => {
+                if (token !== null) {
+                    this.wsClient.send(JSON.stringify({
+                        'method': 'order.subscribe',
+                        'params': [token],
+                        'id': METHOD_ORDER_SUBSCRIBE,
+                    }));
+                }
+            });
         },
         parseOrders: function(orders) {
             orders.forEach((order) => {
@@ -95,25 +104,25 @@ export default {
                     + order.market.slice(3, -3) + '/' + order.id,
                     id: order.id,
                 });
+                this.$refs.table.refresh();
             });
         },
         deleteHistoryOrder: function(id) {
-            for (let i = 0; i < this.history.length; i++) {
-                if (this.history[i].id === id) {
-                    delete this.history[i];
+            this.history.forEach((item, key) => {
+                if (item.id === id) {
+                    delete this.history[key];
                 }
-            }
+            });
+            this.$refs.table.refresh();
         },
     },
     mounted() {
         this.wsClient = this.$socket(this.websocket_url);
         this.wsClient.onmessage = (result) => {
             let orders = JSON.parse(result.data);
-            console.log(orders);
             switch (orders.id) {
                 case METHOD_AUTH:
                     if (orders.error === null) {
-                        console.log(orders);
                         this.getOrders();
                     }
                     break;
@@ -123,8 +132,7 @@ export default {
                     break;
                 case null:
                     if (orders.method === 'order.update') {
-                        console.log(orders.params[1].id);
-                        this.deleteHistoryOrder(orders.params[1].id)
+                        this.deleteHistoryOrder(orders.params[1].id);
                     }
                     break;
             }
@@ -190,9 +198,6 @@ export default {
         totalRows: function() {
             return this.history.length;
         },
-        historyI: function() {
-            return this.history;
-        }
     },
 };
 </script>

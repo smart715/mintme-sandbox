@@ -76,13 +76,9 @@ class ProfileManager implements ProfileManagerInterface
         return $this->userRepository->findByHash($user->getHash());
     }
 
-    /**
-     * @param string $token
-     * @return User|null
-     */
-    public function validateUserApi($token): ?User
+    public function validateUserApi(string $token): ?User
     {
-        if (null === $token || '' === $token) {
+        if (null == $token || '' === $token) {
             return null;
         }
 
