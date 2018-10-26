@@ -9,5 +9,5 @@ parameters:
     maker_fee_rate: 0.01
     mintme_launch_date: 'October 15, 2019 00:00:00'
     users_count_refresh_rate_seconds: 60
-    referral_percentage: 20
+    referral_percentage: 50
     referral_free_trading_date: 'September 31, 2020 00:00:00'
