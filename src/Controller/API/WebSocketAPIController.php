@@ -38,7 +38,7 @@ class WebSocketAPIController extends FOSRestController
     public function authUser(Request $request, ProfileManagerInterface $profileManager): JsonResponse
     {
         $token = $request->headers->get('authorization');
-        if (null != $token && !is_array($token)) {
+        if (null != $token) {
             $user = $profileManager->validateUserApi($token);
             return $user
                 ? $this->confirmed($user)
