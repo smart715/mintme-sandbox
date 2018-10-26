@@ -39,8 +39,8 @@ class BalanceFetcherTest extends TestCase
 
         $result = $handler->balance(
             1,
-            'TOK999'
-        );
+            ['TOK999']
+        )->get('TOK999');
 
         $this->assertFalse($result->isFailed());
         $this->assertEquals(1000000, $result->getAvailable());
@@ -57,7 +57,7 @@ class BalanceFetcherTest extends TestCase
             $this->mockRandom(21)
         );
 
-        $result = $handler->balance(1, 'TOK999');
+        $result = $handler->balance(1, ['TOK999'])->get('TOK999');
 
         $this->assertTrue($result->isFailed());
     }

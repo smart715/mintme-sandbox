@@ -4,7 +4,7 @@ namespace App\Exchange\Balance;
 
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Balance\Exception\BalanceException;
-use App\Exchange\Balance\Model\BalanceResult;
+use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
 use App\Utils\RandomNumberInterface;
 
@@ -70,26 +70,25 @@ class BalanceFetcher implements BalanceFetcherInterface
         );
     }
 
-    public function balance(int $userId, string $tokenName): BalanceResult
+    public function balance(int $userId, array $tokenNames): BalanceResultContainer
     {
         try {
-            $response = $this->jsonRpc->send(self::BALANCE_METHOD, [
-                $userId,
-                $tokenName,
-            ]);
+            $response = $this->jsonRpc->send(
+                self::BALANCE_METHOD,
+                array_merge([ $userId ], $tokenNames)
+            );
         } catch (\Throwable $exception) {
-            return BalanceResult::fail();
+            return BalanceResultContainer::fail();
         }
 
         if ($response->hasError()) {
-            return BalanceResult::fail();
+            return BalanceResultContainer::fail();
         }
 
         $result = $response->getResult();
 
-        return BalanceResult::success(
-            (float)$result[$tokenName]['available'],
-            (float)$result[$tokenName]['freeze']
+        return BalanceResultContainer::success(
+            $result
         );
     }
 }

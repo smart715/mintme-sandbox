@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResult;
+use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
 use App\Utils\TokenNameConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,9 +49,21 @@ class BalanceHandler implements BalanceHandlerInterface
         return $this->balanceFetcher->summary($this->converter->convert($token));
     }
 
+    /**
+     * @param Token[] $tokens
+     */
+    public function balances(User $user, array $tokens): BalanceResultContainer
+    {
+        return $this->balanceFetcher
+            ->balance($user->getId(), array_map(function (Token $token) {
+                return $this->converter->convert($token);
+            }, $tokens));
+    }
+
     public function balance(User $user, Token $token): BalanceResult
     {
-        return $this->balanceFetcher->balance($user->getId(), $this->converter->convert($token));
+        return $this->balances($user, [$token])
+            ->get($this->converter->convert($token));
     }
 
     /**
