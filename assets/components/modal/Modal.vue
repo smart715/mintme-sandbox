@@ -1,9 +1,9 @@
 <template>
-    <b-modal  :visible="visible" :size="size" hide-footer>
+    <b-modal :visible="visible" :size="size" hide-footer>
         <div slot="modal-header">
             <div class="cancel-button">
                 <div class="inner">
-                    <a  @click="closeModal()">&times;</a>
+                    <a @click="closeModal()">&times;</a>
                 </div>
             </div>
         </div>
