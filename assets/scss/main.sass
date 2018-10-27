@@ -185,35 +185,50 @@ label
     display: block
     border-bottom: none
     .cancel-button
-      top: -3.5em
-      right: -2.5em
+      top: -60.5px
+      right: -28px
       position: relative
       float: right
       border-top-width: 5px
       border-top-style: solid
       border-top-color: $theme-green
-      background: $white
+      background: $theme-green
       opacity: 1
-      height: 80px
-      width: 80px
+      height: 70px
+      width: 70px
       border-radius: 50%
       .inner
         background: $white
         color: $theme-green
         vertical-align: middle
         text-align: center
-        height: 73px
-        width: 73px
+        height: 65px
+        width: 65px
         border-radius: 50%
-        top: -0.02em
-        right: -0.02em
+        top: -4px
+        right: -5px
         position: relative
-        font-size: 50px
+        font-size: 45px
         a:hover
           cursor: pointer
           color: $black
   .modal-body
     margin-top: -50px
+
+.input-custom-padding
+  padding-right: 75px
+
+.btn-input
+  position: relative
+  right: 5px
+  top: -38px
+  height: 34px
+  padding-top: 5px
+  padding-bottom: 5px
+
+.wallet-code
+  color: $theme-dark-grey
+  @include font-scale(sm)
 
 .modal.modal-alert
   .modal-content
