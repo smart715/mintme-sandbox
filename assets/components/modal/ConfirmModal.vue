@@ -15,6 +15,7 @@
                 </button>
                 <a
                     href="#"
+                    class="ml-3"
                     @click="onCancel">
                     <slot name="cancel">CANCEL</slot>
                 </a>

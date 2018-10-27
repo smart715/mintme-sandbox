@@ -19,7 +19,15 @@
                     <b>1%</b>
                 </b-col>
                 <b-col class="p-0">
-                    <vue-slider ref="released-slider" :disabled="releasedDisabled" v-model="released" :min="1" :max="100" :interval="1" :tooltip="false" width="100%"></vue-slider>
+                    <vue-slider
+                        ref="released-slider"
+                        :disabled="releasedDisabled"
+                        v-model="released"
+                        :min="1" :max="100"
+                        :interval="1"
+                        :tooltip="false"
+                        width="100%">
+                    </vue-slider>
                 </b-col>
                 <b-col cols="1" class="px-0 ml-1">
                     <b>100%</b>
@@ -33,7 +41,15 @@
                     <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
                 </b-col>
                 <b-col class="p-0">
-                    <vue-slider ref="release-period-slider" v-model="period" :min="10" :max="80" :interval="10" :tooltip="false" width="100%"></vue-slider>
+                    <vue-slider
+                        ref="release-period-slider"
+                        v-model="period"
+                        :min="10"
+                        :max="80"
+                        :interval="10"
+                        :tooltip="false"
+                        width="100%">
+                    </vue-slider>
                 </b-col>
                 <b-col cols="1" class="p-0" ml-1>
                     <font-awesome-icon icon="lock" class="ml-1 mb-1" />
