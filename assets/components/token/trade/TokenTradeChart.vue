@@ -181,7 +181,7 @@ export default {
                 const request = JSON.stringify({
                     method: 'state.subscribe',
                     params: [this.market.hiddenName],
-                    id: 1,
+                    id: parseInt(Math.random().toString().replace('0.', '')),
                 });
                 this.wsClient.send(request);
             };
