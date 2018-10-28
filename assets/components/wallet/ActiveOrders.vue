@@ -3,7 +3,6 @@
         <div class="table-responsive">
             <confirm-modal
                     :visible="confirmModal"
-                    :message="modalMessage"
                     v-on:close="switchConfirmModal"
                     v-on:confirm="removeOrder"
             >
@@ -68,7 +67,10 @@ export default {
             this.confirmModal = !this.confirmModal;
         },
         removeOrder: function() {
-            axios.get(this.url);
+            axios.get(this.url)
+                .catch(function(error) {
+                    console.log(error);
+                });
         },
         getOrders: function() {
             this.tokens.forEach((token) => {

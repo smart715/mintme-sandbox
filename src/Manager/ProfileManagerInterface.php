@@ -14,7 +14,7 @@ interface ProfileManagerInterface
     public function findUserByHash(User $user): User;
 
     /**
-     * @param array|string $token
+     * @param array|string|null $token
      * @return User|null
      */
     public function validateUserApi($token): ?User;

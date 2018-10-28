@@ -13,6 +13,7 @@ use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -39,18 +40,16 @@ class WebSocketAPIController extends FOSRestController
      * @param ProfileManagerInterface $profileManager
      * @return JsonResponse
      */
-    public function authUser(Request $request, ProfileManagerInterface $profileManager): JsonResponse
+    public function authUser(Request $request, ProfileManagerInterface $profileManager, LoggerInterface $logger): JsonResponse
     {
+        $logger->alert((string)json_encode($request->headers->all()));
         $token = $request->headers->get('authorization');
-        if (null != $token) {
-            $user = $profileManager->validateUserApi($token);
-            return $user
-                ? $this->confirmed($user)
-                : $this->error();
-        } else {
-            return $this->error();
-        }
+        $user = $profileManager->validateUserApi($token);
+        return $user
+            ? $this->confirmed($user)
+            : $this->error();
     }
+
 
     /** @Rest\Route("/api/user/cancel-order/{userid}/{market}/{orderid}") */
     public function cancelOrder(int $userid, String $market, int $orderid): JsonResponse
