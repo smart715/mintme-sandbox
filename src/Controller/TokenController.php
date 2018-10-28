@@ -235,7 +235,7 @@ class TokenController extends AbstractController
     public function fetchBalanceWeb(BalanceHandlerInterface $balanceHandler): JsonResponse
     {
         $user = $this->getUser();
-        $balance = $balanceHandler->balanceWeb($user);
+        $balance = $balanceHandler->balance($user, Token::getWeb());
 
         return new JsonResponse([
             'available' => $balance->getAvailable(),

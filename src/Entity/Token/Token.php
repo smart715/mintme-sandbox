@@ -184,7 +184,7 @@ class Token
     public static function getWeb(): self
     {
         $web = new Token();
-        $web->setName("WEB");
+        $web->setName("GET_WEB");
         return $web;
     }
 }
