@@ -3,99 +3,67 @@
 namespace App\Exchange\Balance;
 
 use App\Communications\Exception\FetchException;
-use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
+use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
-use App\Utils\RandomNumberInterface;
 use App\Utils\TokenNameConverterInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 class BalanceHandler implements BalanceHandlerInterface
 {
-    private const UPDATE_BALANCE_METHOD = 'balance.update';
-    private const SUMMARY_METHOD = 'asset.summary';
-    private const BALANCE_METHOD = 'balance.query';
-
-    /** @var JsonRpcInterface */
-    private $jsonRpc;
-
     /** @var TokenNameConverterInterface */
     private $converter;
 
-    /** @var RandomNumberInterface */
-    private $random;
+    /** @var BalanceFetcherInterface */
+    private $balanceFetcher;
+
+    /** @var EntityManagerInterface */
+    private $entityManager;
 
     public function __construct(
-        JsonRpcInterface $jsonRpc,
         TokenNameConverterInterface $converter,
-        RandomNumberInterface $randomNumber
+        BalanceFetcherInterface $balanceFetcher,
+        EntityManagerInterface $entityManager
     ) {
-        $this->jsonRpc = $jsonRpc;
         $this->converter = $converter;
-        $this->random = $randomNumber;
+        $this->balanceFetcher = $balanceFetcher;
+        $this->entityManager = $entityManager;
     }
 
     /** {@inheritdoc} */
     public function deposit(User $user, Token $token, int $amount): void
     {
-        $this->updateBalance($user, $token, $amount, 'deposit');
+        $this->update($user, $token, $amount, 'deposit');
     }
 
     /** {@inheritdoc} */
     public function withdraw(User $user, Token $token, int $amount): void
     {
-        $this->updateBalance($user, $token, $amount, 'withdraw');
+        $this->update($user, $token, $amount, 'withdraw');
     }
 
     public function summary(Token $token): SummaryResult
     {
-        try {
-            $response = $this->jsonRpc->send(self::SUMMARY_METHOD, [
-                $this->converter->convert($token),
-            ]);
-        } catch (\Throwable $exception) {
-            return SummaryResult::fail();
-        }
+        return $this->balanceFetcher->summary($this->converter->convert($token));
+    }
 
-        if ($response->hasError()) {
-            return SummaryResult::fail();
-        }
-
-        $result = $response->getResult();
-
-        return SummaryResult::success(
-            $result['name'],
-            (int)$result['total_balance'],
-            (int)$result['available_balance'],
-            $result['available_count'],
-            (int)$result['freeze_balance'],
-            $result['freeze_count']
-        );
+    /**
+     * @param Token[] $tokens
+     */
+    public function balances(User $user, array $tokens): BalanceResultContainer
+    {
+        return $this->balanceFetcher
+            ->balance($user->getId(), array_map(function (Token $token) {
+                return $this->converter->convert($token);
+            }, $tokens));
     }
 
     public function balance(User $user, Token $token): BalanceResult
     {
-        try {
-            $response = $this->jsonRpc->send(self::BALANCE_METHOD, [
-                $user->getId(),
-                $this->converter->convert($token),
-            ]);
-        } catch (\Throwable $exception) {
-            return BalanceResult::fail();
-        }
-
-        if ($response->hasError()) {
-            return BalanceResult::fail();
-        }
-
-        $result = $response->getResult();
-
-        return BalanceResult::success(
-            (float)$result[$this->converter->convert($token)]['available'],
-            (float)$result[$this->converter->convert($token)]['freeze']
-        );
+        return $this->balances($user, [$token])
+            ->get($this->converter->convert($token));
     }
 
     public function balanceWeb(User $user): BalanceResult
@@ -118,24 +86,17 @@ class BalanceHandler implements BalanceHandlerInterface
     }
 
     /**
-     * @throws BalanceException
      * @throws FetchException
+     * @throws \Exception
      */
-    private function updateBalance(User $user, Token $token, int $amount, string $type): void
+    private function update(User $user, Token $token, int $amount, string $type): void
     {
-        $responce = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
-            $user->getId(),
-            $this->converter->convert(
-                $token
-            ),
-            $type,
-            $this->random->getNumber(),
-            (string)$amount,
-            [ 'extra' => 1 ],
-        ]);
+        $this->balanceFetcher->update($user->getId(), $this->converter->convert($token), $amount, $type);
 
-        if ($responce->hasError()) {
-            throw new BalanceException();
+        if (!in_array($token, $user->getRelatedTokens())) {
+            $user->addRelatedToken($token);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
         }
     }
 }

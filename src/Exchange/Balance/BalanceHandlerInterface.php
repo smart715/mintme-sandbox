@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
+use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
 
 interface BalanceHandlerInterface
@@ -25,5 +26,5 @@ interface BalanceHandlerInterface
 
     public function summary(Token $token): SummaryResult;
     public function balance(User $user, Token $token): BalanceResult;
-    public function balanceWeb(User $user): BalanceResult;
+    public function balances(User $user, array $tokens): BalanceResultContainer;
 }

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
@@ -55,7 +57,37 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist"})
      * @var GoogleAuthenticatorEntry
      */
-    private $googleAuthenticatorEntry;
+    protected $googleAuthenticatorEntry;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token")
+     * @ORM\JoinTable(name="user_tokens",
+     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="token_id", referencedColumnName="id")}
+     * )
+     * @var ArrayCollection
+     */
+    protected $relatedTokens;
+
+    /** @return Token[] */
+    public function getRelatedTokens(): array
+    {
+        return $this->relatedTokens->toArray();
+    }
+
+    public function addRelatedToken(Token $token): self
+    {
+        $this->relatedTokens->add($token);
+
+        return $this;
+    }
+
+    public function removeRelatedToken(Token $token): self
+    {
+        $this->relatedTokens->removeElement($token);
+
+        return $this;
+    }
 
     public function getProfile(): ?Profile
     {
