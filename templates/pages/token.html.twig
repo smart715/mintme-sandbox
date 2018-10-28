@@ -24,7 +24,7 @@
                                      market-name="{{ marketName | json_encode }}"
                                      :logged-in="{{ app.user ? 'true' : 'false' }}"
                                      token-name= "{{ token.name }}"
-                                     place-order-url= "{{ path('place_order', {'tokenName' : token.name}) }}"
+                                     place-order-url= "{{ path('token_place_order', {'tokenName' : token.name}) }}"
                                      fetch-balance-web-url= "{{ path('fetch_balance_web') }}"
                                      fetch-balance-token-url= "{{ path('fetch_balance_token', {'tokenName' : token.name}) }}"
                         />
