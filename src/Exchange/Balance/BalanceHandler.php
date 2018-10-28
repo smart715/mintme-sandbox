@@ -66,25 +66,6 @@ class BalanceHandler implements BalanceHandlerInterface
             ->get($this->converter->convert($token));
     }
 
-    public function balanceWeb(User $user): BalanceResult
-    {
-        try {
-            $response = $this->jsonRpc->send(self::BALANCE_METHOD, [
-                $user->getId(),
-                "WEB",
-            ]);
-        } catch (\Throwable $exception) {
-            return BalanceResult::fail();
-        }
-
-        $result = $response->getResult();
-
-        return BalanceResult::success(
-            (float)$result['WEB']['available'],
-            (float)$result['WEB']['freeze']
-        );
-    }
-
     /**
      * @throws FetchException
      * @throws \Exception
