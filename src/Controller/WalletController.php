@@ -30,18 +30,18 @@ class WalletController extends AbstractController
         $user = $profileManager->findUserByHash($this->getUser());
         $token = $tokenManager->getOwnToken();
         $cryptoWEB = $cryptoManager->findBySymbol('WEB');
-        $cryptoBTC = $cryptoManager->findBySymbol('BTC');
+//        $cryptoBTC = $cryptoManager->findBySymbol('BTC');
         null == $token || null == $cryptoWEB
             ? $marketWEB = null
             : $marketWEB = new Market($cryptoWEB, $token);
-
-        null == $token || null == $cryptoBTC
-            ? $marketBTC = null
-            : $marketBTC = new Market($cryptoBTC, $token);
+//
+//        null == $token || null == $cryptoBTC
+//            ? $marketBTC = null
+//            : $marketBTC = new Market($cryptoBTC, $token);
 
         $markets = [
             $marketWEB->getHiddenName() ?? null,
-            $marketBTC->getHiddenName() ?? null,
+//            $marketBTC->getHiddenName() ?? null,
         ];
 
         return $this->render('pages/wallet.html.twig', [

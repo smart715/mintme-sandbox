@@ -6,7 +6,9 @@
                     :message="modalMessage"
                     v-on:close="switchConfirmModal"
                     v-on:confirm="removeOrder"
-            ></confirm-modal>
+            >
+                {{ this.modalMessage }}
+            </confirm-modal>
             <b-table ref="table"
                 :items="myProvider"
                 :fields="fields"

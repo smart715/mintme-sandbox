@@ -1,12 +1,12 @@
 <template>
     <modal
-        :visible="visible"
-        @close="closeModal">
+            :visible="visible"
+            @close="closeModal">
         <template slot="body">
             <div class="text-center">
                 <div class="mb-5">
                     <img src="../../img/are-you-sure.png"/>
-                    <slot><h3>{{ message }}</h3></slot>
+                    <slot><h3>ARE YOU SURE?</h3></slot>
                 </div>
                 <button
                     class="btn btn-primary"
@@ -33,7 +33,6 @@ export default {
     },
     props: {
         visible: Boolean,
-        message: String,
     },
     methods: {
         closeModal: function() {
@@ -50,4 +49,3 @@ export default {
     },
 };
 </script>
-
