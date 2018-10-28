@@ -1,4 +1,0 @@
-App\Entity\User:
-    properties:
-        plainPassword:
-            - App\Validator\Constraints\UserPassword: ~
