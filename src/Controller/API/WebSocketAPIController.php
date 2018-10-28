@@ -34,7 +34,11 @@ class WebSocketAPIController extends FOSRestController
         $this->tokenManager = $tokenManager;
     }
 
-    /** @Rest\Route("/internal/exchange/user/auth/") */
+    /**@Rest\Route("/internal/exchange/user/auth")
+     * @param Request $request
+     * @param ProfileManagerInterface $profileManager
+     * @return JsonResponse
+     */
     public function authUser(Request $request, ProfileManagerInterface $profileManager): JsonResponse
     {
         $token = $request->headers->get('authorization');

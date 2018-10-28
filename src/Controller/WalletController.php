@@ -34,7 +34,6 @@ class WalletController extends AbstractController
         null == $token || null == $cryptoWEB
             ? $marketWEB = null
             : $marketWEB = new Market($cryptoWEB, $token);
-//
 //        null == $token || null == $cryptoBTC
 //            ? $marketBTC = null
 //            : $marketBTC = new Market($cryptoBTC, $token);
