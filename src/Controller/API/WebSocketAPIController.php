@@ -44,17 +44,21 @@ class WebSocketAPIController extends FOSRestController
     {
         $logger->alert((string)json_encode($request->headers->all()));
         $token = $request->headers->get('authorization');
-        $user = $profileManager->validateUserApi($token);
-        return $user
-            ? $this->confirmed($user)
-            : $this->error();
+        if (null != $token && !is_array($token)) {
+            $user = $profileManager->findProfileByHash($token);
+            return $user
+                ? $this->confirmed($user)
+                : $this->error();
+        } else {
+            return $this->error();
+        }
     }
 
 
     /** @Rest\Route("/api/user/cancel-order/{userid}/{market}/{orderid}") */
     public function cancelOrder(int $userid, String $market, int $orderid): JsonResponse
     {
-        $crypto = $this->cryptoManager->findBySymbol('WEB');
+        $crypto = $this->cryptoManager->findBySymbol(substr($market, -3));
         $token = $this->tokenManager->findByName($market);
         if (null !== $token && null !== $crypto && null !== $userid) {
             $market = new Market($crypto, $token);

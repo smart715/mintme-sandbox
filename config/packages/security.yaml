@@ -37,3 +37,4 @@ security:
         - { path: ^/profile$, role: ROLE_USER }
         - { path: ^/settings, role: ROLE_USER }
         - { path: ^/2fa, role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        - { path: ^/wallet, roles: ROLE_USER }

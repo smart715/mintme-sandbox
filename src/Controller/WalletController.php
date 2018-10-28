@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Crypto;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
@@ -20,33 +21,23 @@ class WalletController extends AbstractController
      */
     public function wallet(
         ProfileManagerInterface $profileManager,
-        TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager
     ): Response {
-        if (!$this->getUser()) {
-            return $this->redirectToRoute('fos_user_security_login');
-        }
+        $profile = $this->getUser();
+        $user = $profileManager->findProfileByHash($profile->getHash()) ?? $profileManager->createHash($profile);
 
-        $user = $profileManager->findUserByHash($this->getUser());
-        $token = $tokenManager->getOwnToken();
-        $cryptoWEB = $cryptoManager->findBySymbol('WEB');
-//        $cryptoBTC = $cryptoManager->findBySymbol('BTC');
-        null == $token || null == $cryptoWEB
-            ? $marketWEB = null
-            : $marketWEB = new Market($cryptoWEB, $token);
-//        null == $token || null == $cryptoBTC
-//            ? $marketBTC = null
-//            : $marketBTC = new Market($cryptoBTC, $token);
-
-        $markets = [
-            $marketWEB->getHiddenName() ?? null,
-//            $marketBTC->getHiddenName() ?? null,
-        ];
+        $symbols = $cryptoManager->findAllSymbols();
+        $markets = array_map(function (Crypto $crypto, TokenManagerInterface $tokenManager) {
+            $token = $tokenManager->getOwnToken();
+            return null != $token
+                ? (new Market($crypto, $token))->getHiddenName()
+                : null;
+        }, $cryptoManager->findBySymbols($symbols));
 
         return $this->render('pages/wallet.html.twig', [
-                'hash' => $user->getHash(),
-                'tokens' => $markets,
-                'user_id' => $user->getId(),
+            'markets' => $markets,
+            'hash' => $user->getHash(),
+            'user_id' => $user->getId(),
         ]);
     }
 }

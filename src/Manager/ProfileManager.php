@@ -66,27 +66,21 @@ class ProfileManager implements ProfileManagerInterface
                 : $this->generateUniqueUrl($route);
     }
 
-    public function findUserByHash(User $user): User
+    public function createHash(User $user): User
     {
-        if (null === $user->getHash() || '' === $user->getHash()) {
-            $user->setHash(hash('sha256', Uuid::uuid4()->toString()));
-            $this->em->persist($user);
-            $this->em->flush();
-        }
-        return $this->userRepository->findByHash($user->getHash());
+        $user->setHash(hash('sha256', Uuid::uuid4()->toString()));
+        $this->em->persist($user);
+        $this->em->flush();
+        return $user;
     }
 
-    /**
-     * @param array|string $token
-     * @return User|null
-     */
-    public function validateUserApi($token): ?User
+    public function findProfileByHash(string $hash): ?User
     {
-        if (null == $token || '' === $token) {
+        if (null == $hash || '' === $hash) {
             return null;
         }
 
-        return $this->userRepository->findByHash($token);
+        return $this->userRepository->findByHash($hash);
     }
 
     private function generateUniqueUrl(string $prefix): string

@@ -20,4 +20,16 @@ class CryptoManager implements CryptoManagerInterface
     {
         return $this->repository->getBySymbol($symbol);
     }
+
+    public function findBySymbols(array $symbols): array
+    {
+        return array_map(function ($symbol) {
+            return $this->repository->getBySymbol($symbol);
+        }, $symbols);
+    }
+
+    public function findAllSymbols(): array
+    {
+        return $this->repository->findAll();
+    }
 }
