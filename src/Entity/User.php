@@ -41,6 +41,12 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     /**
      * @Assert\NotBlank()
      * @Assert\Length(min="8")
+     * @Assert\Regex(
+     *     pattern="/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/",
+     *     match=true,
+     *     message="The password must contain minimum eight symbols,
+           at least one uppercase letter, a lowercase letter, and a number"
+     * )
      * @var string|null
      */
     protected $plainPassword;
