@@ -40,9 +40,8 @@ class WebSocketAPIController extends FOSRestController
      * @param ProfileManagerInterface $profileManager
      * @return JsonResponse
      */
-    public function authUser(Request $request, ProfileManagerInterface $profileManager, LoggerInterface $logger): JsonResponse
+    public function authUser(Request $request, ProfileManagerInterface $profileManager): JsonResponse
     {
-        $logger->alert((string)json_encode($request->headers->all()));
         $token = $request->headers->get('authorization');
         if (null != $token && !is_array($token)) {
             $user = $profileManager->findProfileByHash($token);
