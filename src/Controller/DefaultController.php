@@ -23,12 +23,4 @@ class DefaultController extends Controller
     {
         return $this->render('pages/trading.html.twig');
     }
-
-    /**
-     * @Route("/wallet", name="wallet")
-     */
-    public function wallet(): Response
-    {
-        return $this->render('pages/wallet.html.twig');
-    }
 }
