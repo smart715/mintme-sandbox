@@ -4,11 +4,15 @@ namespace App\Exchange\Trade;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
+use App\Repository\UserRepository;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class Trader implements TraderInterface
 {
@@ -27,14 +31,22 @@ class Trader implements TraderInterface
     /** @var LimitOrderConfig */
     private $config;
 
-    public function __construct(JsonRpcInterface $jsonRpc, LimitOrderConfig $config)
-    {
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(
+        JsonRpcInterface $jsonRpc,
+        LimitOrderConfig $config,
+        EntityManagerInterface $entityManager
+    ) {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
+        $this->entityManager = $entityManager;
     }
 
     public function placeOrder(Order $order): TradeResult
     {
+
         try {
             $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [
                 $order->getMakerId(),
@@ -55,6 +67,11 @@ class Trader implements TraderInterface
                 ? new TradeResult(TradeResult::INSUFFICIENT_BALANCE)
                 : new TradeResult(TradeResult::FAILED);
         }
+
+        $maker = $this->getUserRepository()->find($order->getMakerId());
+        $taker = $this->getUserRepository()->find($order->getTakerId() ?? 0);
+
+        $this->updateUsers([$maker, $taker], $order->getMarket()->getToken());
 
         return new TradeResult(TradeResult::SUCCESS);
     }
@@ -138,6 +155,25 @@ class Trader implements TraderInterface
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $response->getResult()['records']);
+    }
+
+    /**
+     * @param User[] $users
+     */
+    private function updateUsers(array $users, Token $token): void
+    {
+        foreach ($users as $user) {
+            if (null !== $user && !in_array($token, $user->getRelatedTokens())) {
+                $user->addRelatedToken($token);
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
+    private function getUserRepository(): UserRepository
+    {
+        return $this->entityManager->getRepository(User::class);
     }
 
     private function createOrder(array $orderData, User $user, Market $market, string $status): Order

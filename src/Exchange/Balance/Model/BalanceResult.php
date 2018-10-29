@@ -5,20 +5,20 @@ namespace App\Exchange\Balance\Model;
 class BalanceResult
 {
     /** @var float */
-    private $abailable;
+    private $available;
 
     /** @var float */
     private $freeze;
 
     private function __construct(float $abailable, float $freeze)
     {
-        $this->abailable = $abailable;
+        $this->available = $abailable;
         $this->freeze = $freeze;
     }
 
     public function getAvailable(): float
     {
-        return $this->abailable;
+        return $this->available;
     }
 
     public function getFreeze(): float
@@ -28,12 +28,12 @@ class BalanceResult
 
     public function isFailed(): bool
     {
-        return empty($this->abailable) && empty($this->freeze);
+        return empty($this->available) && empty($this->freeze);
     }
 
-    public static function success(float $abailable, float $freeze): self
+    public static function success(float $available, float $freeze): self
     {
-        return new self($abailable, $freeze);
+        return new self($available, $freeze);
     }
 
     public static function fail(): self
