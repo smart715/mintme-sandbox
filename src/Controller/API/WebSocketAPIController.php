@@ -13,6 +13,7 @@ use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use FOS\RestBundle\View\View;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,11 +36,7 @@ class WebSocketAPIController extends FOSRestController
         $this->tokenManager = $tokenManager;
     }
 
-    /**@Rest\Route("/internal/exchange/user/auth")
-     * @param Request $request
-     * @param ProfileManagerInterface $profileManager
-     * @return JsonResponse
-     */
+    /** @Rest\Route("/internal/exchange/user/auth") */
     public function authUser(Request $request, ProfileManagerInterface $profileManager): JsonResponse
     {
         $token = $request->headers->get('authorization');
