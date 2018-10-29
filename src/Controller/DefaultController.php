@@ -43,12 +43,4 @@ class DefaultController extends Controller
             'marketNames' => $marketNames,
         ]);
     }
-
-    /**
-     * @Route("/wallet", name="wallet")
-     */
-    public function wallet(): Response
-    {
-        return $this->render('pages/wallet.html.twig');
-    }
 }

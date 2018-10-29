@@ -61,7 +61,7 @@ services:
             $jsonRpc: '@withdraw.json_rpc'
             $service: '%service%'
 
-    App\Exchange\Balance\BalanceHandler:
+    App\Exchange\Balance\BalanceFetcher:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
@@ -108,3 +108,6 @@ services:
             $logger: '@logger'
         tags:
             - { name: monolog.logger, channel: cron }
+
+    App\Serializer\BalanceResultContainerNormalizer:
+        tags: ['serializer.normalizer']

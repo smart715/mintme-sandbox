@@ -1,7 +1,8 @@
-init_dev:
-	composer install
+init_docker:
+	php bin/console doctrine:database:create --if-not-exists
 	php bin/console doctrine:migrations:migrate --allow-no-migration -n
-	npm install
+	php bin/console cron:start
+	docker-php-entrypoint php-fpm
 
 phpunit:
 	./vendor/bin/simple-phpunit

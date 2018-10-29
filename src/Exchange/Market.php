@@ -36,4 +36,9 @@ class Market
     {
         return $this->token->getName();
     }
+
+    public function getToken(): Token
+    {
+        return $this->token;
+    }
 }
