@@ -34,7 +34,7 @@
         <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
             Web tokens you own
         </div>
-        <table class="table">
+        <table class="table table-orange-hover">
             <thead>
                 <tr>
                     <th>Name <font-awesome-icon icon="sort" /></th>
@@ -43,19 +43,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="text-orange">
-                    <td>own token</td>
-                    <td>0.000002</td>
-                    <td>^</td>
-                </tr>
-                <tr>
-                    <td>some token</td>
-                    <td>0.000002</td>
-                    <td>^</td>
-                </tr>
-                <tr>
-                    <td>another token</td>
-                    <td>0.0001</td>
+                <tr v-for="(token, name) in tokens">
+                    <td>{{ name }}</td>
+                    <td>{{ token.available }}</td>
                     <td>^</td>
                 </tr>
             </tbody>
@@ -66,8 +56,19 @@
 <script>
 export default {
     name: 'Wallet',
+    props: {
+        tokens: { type: Object, required: true }
+    },
     data() {
         return {};
     },
 };
 </script>
+
+<style lang="sass">
+    @import '../../scss/variables'
+
+    .table-orange-hover
+        tr:hover
+            color: $theme-orange
+</style>

@@ -108,3 +108,6 @@ services:
             $logger: '@logger'
         tags:
             - { name: monolog.logger, channel: cron }
+
+    App\Serializer\BalanceResultNormalizer:
+        tags: ['serializer.normalizer']
