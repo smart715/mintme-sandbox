@@ -12,4 +12,19 @@ class MarketManager implements MarketManagerInterface
     {
         return new Market($crypto, $token);
     }
+
+    public function getAllMarkets(CryptoManager $cryptoManager, TokenManager $tokenManager): array
+    {
+        $cryptos = $cryptoManager->findAll();
+        $tokens = $tokenManager->findAll();
+        $markets = [];
+
+        foreach ($cryptos as $crypto) {
+            foreach ($tokens as $token) {
+                $markets[] = $this->getMarket($crypto, $token);
+            }
+        }
+
+        return $markets;
+    }
 }
