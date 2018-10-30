@@ -35,12 +35,14 @@
 import ConfirmModal from '../modal/ConfirmModal';
 import WebSocket from '../../js/websocket';
 import axios from 'axios';
+import Toasted from 'vue-toasted';
 
 const METHOD_AUTH = 12345;
 const METHOD_ORDER_QUERY = 54321;
 const METHOD_ORDER_SUBSCRIBE = 12878;
 
 Vue.use(WebSocket);
+Vue.use(Toasted);
 
 export default {
     name: 'ActiveOrders',
@@ -68,17 +70,17 @@ export default {
         },
         removeOrder: function() {
             axios.get(this.url)
-                .catch(function(error) {
-                    console.log(error);
+                .catch(() => {
+                    this.$toasted.show('Service unavailable, try again later');
                 });
         },
         getOrders: function() {
             this.markets.forEach((token) => {
                 if (token !== null) {
                     this.wsClient.send(JSON.stringify({
-                    'method': 'order.query',
-                    'params': [token, 0, 100],
-                    'id': METHOD_ORDER_QUERY,
+                        'method': 'order.query',
+                        'params': [token, 0, 100],
+                        'id': METHOD_ORDER_QUERY,
                     }));
                 }
             });
@@ -108,15 +110,11 @@ export default {
                     + order.market + '/' + order.id,
                     id: order.id,
                 });
-                this.$refs.table.refresh();
             });
+            this.$refs.table.refresh();
         },
         deleteHistoryOrder: function(id) {
-            this.history.forEach((item, key) => {
-                if (item.id === id) {
-                    delete this.history[key];
-                }
-            });
+            delete this.history.filter((item) => item.id === id)[0];
             this.$refs.table.refresh();
         },
     },
@@ -124,7 +122,6 @@ export default {
         this.wsClient = this.$socket(this.websocket_url);
         this.wsClient.onmessage = (result) => {
             let orders = JSON.parse(result.data);
-            console.log(orders);
             switch (orders.id) {
                 case METHOD_AUTH:
                     if (orders.error === null) {

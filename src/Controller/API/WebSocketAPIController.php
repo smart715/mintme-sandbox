@@ -33,7 +33,7 @@ class WebSocketAPIController extends FOSRestController
         $this->tokenManager = $tokenManager;
     }
 
-    /** @Rest\Route("/internal/exchange/user/auth")
+    /** @Rest\Route("/api/ws/auth")
      *  @Rest\View()
      */
     public function authUser(Request $request, ProfileManagerInterface $profileManager): View
@@ -50,7 +50,7 @@ class WebSocketAPIController extends FOSRestController
     }
 
 
-    /** @Rest\Get("/api/user/cancel-order/{userid}/{market}/{orderid}")
+    /** @Rest\Get("/api/ws/cancel-order/{userid}/{market}/{orderid}")
      *  @Rest\View()
      */
     public function cancelOrder(int $userid, String $market, int $orderid): View
