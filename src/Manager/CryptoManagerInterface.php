@@ -10,5 +10,5 @@ interface CryptoManagerInterface
 
     public function findBySymbols(array $symbols): array;
 
-    public function findAllSymbols(): array;
+    public function findAll(): array;
 }

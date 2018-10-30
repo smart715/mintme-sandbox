@@ -30,6 +30,11 @@ class TokenManager implements TokenManagerInterface
         return $this->repository->findByName($name);
     }
 
+    public function findAll(): array
+    {
+        return $this->repository->findAll();
+    }
+
     public function getOwnToken(): ?Token
     {
         $profile = $this->getProfile();

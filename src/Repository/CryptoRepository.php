@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityRepository;
 
 class CryptoRepository extends EntityRepository
 {
-
     public function getBySymbol(string $symbol): ?Crypto
     {
         return $this->findOneBy(['symbol' => $symbol]);

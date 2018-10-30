@@ -11,7 +11,7 @@
                 <template>
                     <b-tabs class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
                         <b-tab title="Wallet" active>
-                            <wallet></wallet>
+                            <wallet :tokens="{{ tokens | json_encode }}"></wallet>
                         </b-tab>
                         <b-tab title="Trading History" >
                             <trading-history></trading-history>

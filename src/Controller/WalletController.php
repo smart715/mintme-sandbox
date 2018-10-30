@@ -11,19 +11,26 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Exchange\Balance\BalanceHandler;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class WalletController extends AbstractController
 {
     /**
      * @Route("/wallet", name="wallet")
-     * @param ProfileManagerInterface $profileManager
-     * @return Response
      */
     public function wallet(
         ProfileManagerInterface $profileManager,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager
     ): Response {
+        $tokens = $balanceHandler->balances(
+            $this->getUser(),
+            $this->getUser()->getRelatedTokens()
+        );
         $profile = $this->getUser();
         $user = $profileManager->findProfileByHash($profile->getHash()) ?? $profileManager->createHash($profile);
 
@@ -39,6 +46,7 @@ class WalletController extends AbstractController
             'markets' => $markets,
             'hash' => $user->getHash(),
             'user_id' => $user->getId(),
+            'tokens' => $normalizer->normalize($tokens),
         ]);
     }
 }

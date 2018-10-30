@@ -20,17 +20,22 @@
 </template>
 
 <script>
+import WebSocket from '../../js/websocket';
+
+Vue.use(WebSocket);
+
 export default {
     name: 'Trading',
     props: {
         tableContainerClass: String,
         tableClass: String,
+        websocketUrl: String,
+        marketNames: String,
     },
     data() {
         return {
-            tokens: [],
             currentPage: 1,
-            perPage: 10,
+            perPage: 25,
             fields: {
                 pair: {
                     label: 'Pair',
@@ -49,23 +54,132 @@ export default {
                     sortable: true,
                 },
             },
+            sanitizedMarkets: {},
+            sanitizedMarketsOnTop: [],
+            marketsOnTop: [
+                {token: 'WEB', currency: 'BTC'},
+            ],
+            wsClient: null,
+            wsResult: {},
         };
     },
     computed: {
         totalRows: function() {
-            return this.tokens.length;
+            return this.markets.length;
+        },
+        markets: function() {
+            return JSON.parse(this.marketNames);
+        },
+        marketsHiddenNames: function() {
+            return Object.keys(this.markets);
+        },
+        tokens: function() {
+            let tokens = [];
+            Object.keys(this.sanitizedMarkets).forEach((marketName) => {
+                tokens.push(this.sanitizedMarkets[marketName]);
+            });
+
+            tokens.sort((first, second) => {
+                let firstVolume = parseFloat(first.volume);
+                let secondVolume = parseFloat(second.volume);
+                if (firstVolume > secondVolume) {
+                    return -1;
+                }
+                if (firstVolume < secondVolume) {
+                    return 1;
+                }
+                return 0;
+            });
+
+            return this.sanitizedMarketsOnTop.concat(tokens);
         },
     },
-    created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 1000; i++) {
-            this.tokens.push({
-                pair: 'WEB/BTC',
-                change: Math.floor(Math.random() * 49) + 50 + '%',
-                lastPrice: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                volume: Math.floor(Math.random() * 9999) + 1000,
-            });
+    mounted() {
+        if (this.websocketUrl) {
+            this.wsClient = this.$socket(this.websocketUrl);
+            this.wsClient.onmessage = (result) => {
+                if (typeof result.data === 'string') {
+                    this.wsResult = JSON.parse(result.data);
+                }
+            };
+            this.wsClient.onopen = () => {
+                const request = JSON.stringify({
+                    method: 'state.subscribe',
+                    params: this.marketsHiddenNames,
+                    id: parseInt(Math.random().toString().replace('0.', '')),
+                });
+                this.wsClient.send(request);
+            };
         }
+    },
+    methods: {
+        sanitizeMarket: function(marketData) {
+            if (!marketData.params) {
+                return;
+            }
+
+            const marketName = marketData.params[0];
+            const marketInfo = marketData.params[1];
+
+            const marketOpenPrice = parseFloat(marketInfo.open);
+            const marketLastPrice = parseFloat(marketInfo.last);
+            const makretVolume = parseFloat(marketInfo.volume);
+
+            const priceDiff = marketLastPrice - marketOpenPrice;
+            const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
+
+            const marketCurrency = this.markets[marketName][1];
+            const marketToken = this.markets[marketName][0];
+
+            const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
+
+            if (marketOnTopIndex > -1) {
+                this.sanitizedMarketsOnTop[marketOnTopIndex] = this.getSanitizedMarket(
+                    marketToken,
+                    marketCurrency,
+                    changePercentage,
+                    marketLastPrice,
+                    makretVolume
+                );
+            } else {
+                this.$set(
+                    this.sanitizedMarkets,
+                    marketName,
+                    this.getSanitizedMarket(
+                        marketCurrency,
+                        marketToken,
+                        changePercentage,
+                        marketLastPrice,
+                        makretVolume
+                    )
+                );
+            }
+        },
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume) {
+            return {
+                pair: `${currency}/${token}`,
+                change: changePercentage.toFixed(2),
+                lastPrice: lastPrice.toFixed(2),
+                volume: volume.toFixed(2),
+            };
+        },
+        getMarketOnTopIndex: function(currency, token) {
+            let index = -1;
+            this.marketsOnTop.forEach((market, key) => {
+                if (token === market.token && currency === market.currency) {
+                    index = key;
+                }
+            });
+            return index;
+        },
+    },
+    watch: {
+        wsResult: {
+            handler(value) {
+                this.sanitizeMarket(value);
+            },
+            deep: true,
+        },
     },
 };
 </script>

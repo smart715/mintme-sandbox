@@ -17,8 +17,13 @@
                     :editable="{{ isOwner ? 'true' : 'false' }}">
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
-                    <b-tab title="Invest"></b-tab>
-                    <b-tab title="Introduction" active>
+                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
+                        <token-trade
+                            websocket-url="{{ global_websocket_url }}"
+                            market-name="{{ marketName | json_encode }}"
+                        />
+                    </b-tab>
+                    <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
                             <token-introduction-profile
                                 class="col-12 col-md-6"
