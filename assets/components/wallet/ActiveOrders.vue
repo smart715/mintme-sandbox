@@ -2,9 +2,9 @@
     <div class="pb-3">
         <div class="table-responsive">
             <confirm-modal
-                    :visible="confirmModal"
-                    v-on:close="switchConfirmModal"
-                    v-on:confirm="removeOrder"
+                :visible="confirmModal"
+                v-on:close="switchConfirmModal"
+                v-on:confirm="removeOrder"
             >
                 {{ this.modalMessage }}
             </confirm-modal>
