@@ -124,6 +124,7 @@ export default {
         this.wsClient = this.$socket(this.websocket_url);
         this.wsClient.onmessage = (result) => {
             let orders = JSON.parse(result.data);
+            console.log(orders);
             switch (orders.id) {
                 case METHOD_AUTH:
                     if (orders.error === null) {

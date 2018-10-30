@@ -3,15 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Crypto;
+use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Exchange\Balance\BalanceHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,7 +21,9 @@ class WalletController extends AbstractController
     public function wallet(
         ProfileManagerInterface $profileManager,
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        BalanceHandler $balanceHandler,
+        NormalizerInterface $normalizer
     ): Response {
         $tokens = $balanceHandler->balances(
             $this->getUser(),
@@ -34,7 +32,7 @@ class WalletController extends AbstractController
         $profile = $this->getUser();
         $user = $profileManager->findProfileByHash($profile->getHash()) ?? $profileManager->createHash($profile);
 
-        $symbols = $cryptoManager->findAllSymbols();
+        $symbols = $cryptoManager->findAll();
         $markets = array_map(function (Crypto $crypto, $tokenManager) {
             $token = $tokenManager->getOwnToken();
             return null != $token
