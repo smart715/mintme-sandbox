@@ -12,10 +12,7 @@ use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class WebSocketAPIController extends FOSRestController
@@ -36,8 +33,10 @@ class WebSocketAPIController extends FOSRestController
         $this->tokenManager = $tokenManager;
     }
 
-    /** @Rest\Route("/internal/exchange/user/auth") */
-    public function authUser(Request $request, ProfileManagerInterface $profileManager): JsonResponse
+    /** @Rest\Route("/internal/exchange/user/auth")
+     *  @Rest\View()
+     */
+    public function authUser(Request $request, ProfileManagerInterface $profileManager): View
     {
         $token = $request->headers->get('authorization');
         if (null != $token && !is_array($token)) {
@@ -51,11 +50,13 @@ class WebSocketAPIController extends FOSRestController
     }
 
 
-    /** @Rest\Route("/api/user/cancel-order/{userid}/{market}/{orderid}") */
-    public function cancelOrder(int $userid, String $market, int $orderid): JsonResponse
+    /** @Rest\Get("/api/user/cancel-order/{userid}/{market}/{orderid}")
+     *  @Rest\View()
+     */
+    public function cancelOrder(int $userid, String $market, int $orderid): View
     {
         $crypto = $this->cryptoManager->findBySymbol(substr($market, -3));
-        $token = $this->tokenManager->findByName($market);
+        $token = $this->tokenManager->findByName(substr($market, 3, -3));
         if (null !== $token && null !== $crypto && null !== $userid) {
             $market = new Market($crypto, $token);
             $order = new Order(
@@ -72,7 +73,7 @@ class WebSocketAPIController extends FOSRestController
 
             $tradeResult = $this->trader->cancelOrder($order);
 
-            return new JsonResponse([
+            return $this->view([
                 'result' => $tradeResult->getResult(),
                 'message' => $tradeResult->getMessage(),
             ]);
@@ -80,9 +81,9 @@ class WebSocketAPIController extends FOSRestController
         return $this->error();
     }
 
-    private function error(): JsonResponse
+    private function error(): View
     {
-        return new JsonResponse(
+        return $this->view(
             [
                 "error" =>
                     [
@@ -95,9 +96,9 @@ class WebSocketAPIController extends FOSRestController
         );
     }
 
-    private function confirmed(User $user): JsonResponse
+    private function confirmed(User $user): View
     {
-        return new JsonResponse(
+        return $this->view(
             [
                 "code" => 0,
                 "message" => null,

@@ -21,18 +21,19 @@ class WalletController extends AbstractController
      */
     public function wallet(
         ProfileManagerInterface $profileManager,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ): Response {
         $profile = $this->getUser();
         $user = $profileManager->findProfileByHash($profile->getHash()) ?? $profileManager->createHash($profile);
 
         $symbols = $cryptoManager->findAllSymbols();
-        $markets = array_map(function (Crypto $crypto, TokenManagerInterface $tokenManager) {
+        $markets = array_map(function (Crypto $crypto, $tokenManager) {
             $token = $tokenManager->getOwnToken();
             return null != $token
                 ? (new Market($crypto, $token))->getHiddenName()
                 : null;
-        }, $cryptoManager->findBySymbols($symbols));
+        }, $cryptoManager->findBySymbols($symbols), [$tokenManager]);
 
         return $this->render('pages/wallet.html.twig', [
             'markets' => $markets,

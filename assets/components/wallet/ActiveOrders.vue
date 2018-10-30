@@ -49,7 +49,7 @@ export default {
     },
     props: {
         hash: String,
-        tokens: Array,
+        markets: Array,
         user_id: Number,
         websocket_url: String,
     },
@@ -73,7 +73,7 @@ export default {
                 });
         },
         getOrders: function() {
-            this.tokens.forEach((token) => {
+            this.markets.forEach((token) => {
                 if (token !== null) {
                     this.wsClient.send(JSON.stringify({
                     'method': 'order.query',
@@ -84,7 +84,7 @@ export default {
             });
         },
         subscribe: function() {
-            this.tokens.forEach((token) => {
+            this.markets.forEach((token) => {
                 if (token !== null) {
                     this.wsClient.send(JSON.stringify({
                         'method': 'order.subscribe',
@@ -105,7 +105,7 @@ export default {
                     total: (order.price * order.amount + order.maker_fee),
                     free: order.maker_fee,
                     action: '../api/user/cancel-order/' + this.user_id + '/'
-                    + order.market.slice(3, -3) + '/' + order.id,
+                    + order.market + '/' + order.id,
                     id: order.id,
                 });
                 this.$refs.table.refresh();
