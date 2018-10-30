@@ -25,6 +25,7 @@ class BalanceResultNormalizer implements NormalizerInterface
 
     /**
      * {@inheritdoc}
+     * 
      * @param BalanceResultContainer $object
      */
     public function normalize($object, $format = null, array $context = array())
