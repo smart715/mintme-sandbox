@@ -15,6 +15,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 
+/** @Rest\Route("/api/ws") */
 class WebSocketAPIController extends FOSRestController
 {
     /** @var TraderInterface */
@@ -33,7 +34,8 @@ class WebSocketAPIController extends FOSRestController
         $this->tokenManager = $tokenManager;
     }
 
-    /** @Rest\Route("/api/ws/auth")
+    /**
+     *  @Rest\Get("/auth")
      *  @Rest\View()
      */
     public function authUser(Request $request, ProfileManagerInterface $profileManager): View
@@ -50,7 +52,8 @@ class WebSocketAPIController extends FOSRestController
     }
 
 
-    /** @Rest\Get("/api/ws/cancel-order/{userid}/{market}/{orderid}")
+    /**
+     *  @Rest\Get("/cancel-order/{userid}/{market}/{orderid}")
      *  @Rest\View()
      */
     public function cancelOrder(int $userid, String $market, int $orderid): View
