@@ -6,7 +6,10 @@
                 v-on:close="switchConfirmModal"
                 v-on:confirm="removeOrder"
             >
-                {{ this.modalMessage }}
+                <div>
+                    Are you sure that you want to remove {{ this.currentRow.name }}
+                    with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
+                </div>
             </confirm-modal>
             <b-table ref="table"
                 :items="myProvider"
@@ -60,8 +63,9 @@ export default {
           return this.history;
         },
         removeOrderModal: function(row) {
-            this.modalMessage = 'Are you sure that you want to remove ' + row.name +
-                'with amount ' + row.amount + 'and price ' + row.price;
+            this.currentRow.name = row.name;
+            this.currentRow.amount = row.amount;
+            this.currentRow.price = row.price;
             this.url = row.action;
             this.confirmModal = !this.confirmModal;
         },
@@ -149,7 +153,11 @@ export default {
     },
     data() {
         return {
-            modalMessage: '',
+            currentRow: {
+                name: null,
+                amount: null,
+                price: null,
+            },
             url: '',
             orders: null,
             history: [],
