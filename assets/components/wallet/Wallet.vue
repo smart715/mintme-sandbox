@@ -43,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(token, name) in tokens">
+                <tr v-for="(token, name) in tokens" :key="name">
                     <td>{{ name }}</td>
                     <td>{{ token.available }}</td>
                     <td>^</td>
@@ -57,7 +57,7 @@
 export default {
     name: 'Wallet',
     props: {
-        tokens: { type: Object, required: true }
+        tokens: {type: Object, required: true},
     },
     data() {
         return {};

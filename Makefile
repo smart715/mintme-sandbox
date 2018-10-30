@@ -1,7 +1,4 @@
-init_dev:
-	cp -r ../temp/node_modules ./
-	cp -r ../temp/public/build ./public
-	composer install
+init_docker:
 	php bin/console doctrine:database:create --if-not-exists
 	php bin/console doctrine:migrations:migrate --allow-no-migration -n
 	php bin/console cron:start

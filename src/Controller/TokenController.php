@@ -2,11 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Market;
-use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
@@ -17,7 +14,6 @@ use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,7 +38,7 @@ class TokenController extends AbstractController
 
     /** @var MarketManagerInterface */
     protected $marketManager;
-    
+
     /** @var TraderInterface */
     protected $trader;
 
@@ -70,15 +66,13 @@ class TokenController extends AbstractController
      *     requirements={"tab" = "trade|intro"}
      * )
      */
-    public function show(string $name, NormalizerInterface $normalizer, ?string $tab): Response
+    public function show(string $name, ?string $tab, NormalizerInterface $normalizer): Response
     {
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             return $this->render('pages/token_404.html.twig');
         }
-
-        $isOwner = $token === $this->tokenManager->getOwnToken();
 
         $webCrypto = $this->cryptoManager->findBySymbol('WEB');
 
@@ -93,6 +87,8 @@ class TokenController extends AbstractController
                 'currncySymbol' => $market->getCurrencySymbol(),
             ]
             : [];
+
+        $isOwner = $token === $this->tokenManager->getOwnToken();
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,

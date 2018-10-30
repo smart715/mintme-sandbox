@@ -4,9 +4,7 @@ namespace App\Exchange\Balance\Model;
 
 class BalanceResultContainer
 {
-    /**
-     * @var mixed[]
-     */
+    /** @var mixed[] */
     private $balances;
 
     private function __construct(array $balances)

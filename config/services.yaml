@@ -109,5 +109,5 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
-    App\Serializer\BalanceResultNormalizer:
+    App\Serializer\BalanceResultContainerNormalizer:
         tags: ['serializer.normalizer']

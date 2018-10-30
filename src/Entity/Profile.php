@@ -101,6 +101,11 @@ class Profile
         $this->user = $user;
     }
 
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
     public function isChangesLocked(): bool
     {
         return $this->isChangesLocked;

@@ -4,14 +4,10 @@ namespace App\Exchange\Balance\Model;
 
 class BalanceResult
 {
-    /**
-     * @var float
-     */
+    /** @var float */
     private $available;
 
-    /*
-     * @var float
-     */
+    /** @var float */
     private $freeze;
 
     private function __construct(float $abailable, float $freeze)

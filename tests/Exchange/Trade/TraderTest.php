@@ -11,6 +11,9 @@ use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TraderTest extends TestCase
@@ -30,7 +33,7 @@ class TraderTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader($jsonRpc, $this->createOrderConfig(), $this->mockEntityManager());
         $this->assertEquals(
             $tradeResult,
             $trader->placeOrder($this->createOrder())->getResult()
@@ -52,7 +55,7 @@ class TraderTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class), $this->mockEntityManager());
         $this->assertEquals(
             TradeResult::FAILED,
             $trader->placeOrder($this->createMock(Order::class))->getResult()
@@ -74,7 +77,7 @@ class TraderTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader($jsonRpc, $this->createOrderConfig(), $this->mockEntityManager());
         $this->assertEquals(
             $tradeResult,
             $trader->cancelOrder($this->createOrder())->getResult()
@@ -97,7 +100,7 @@ class TraderTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class), $this->mockEntityManager());
         $this->assertEquals(
             TradeResult::FAILED,
             $trader->cancelOrder($this->createMock(Order::class))->getResult()
@@ -124,7 +127,7 @@ class TraderTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader($jsonRpc, $this->createOrderConfig(), $this->mockEntityManager());
         $this->assertEquals(
             $finishedOrders,
             $trader->getFinishedOrders(
@@ -149,7 +152,11 @@ class TraderTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createMock(LimitOrderConfig::class),
+            $this->mockEntityManager()
+        );
         $this->assertEquals(
             [],
             $trader->getFinishedOrders(
@@ -179,7 +186,7 @@ class TraderTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader($jsonRpc, $this->createOrderConfig(), $this->mockEntityManager());
         $this->assertEquals(
             $pendingOrders,
             $trader->getPendingOrders(
@@ -204,7 +211,11 @@ class TraderTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createMock(LimitOrderConfig::class),
+            $this->mockEntityManager()
+        );
         $this->assertEquals(
             [],
             $trader->getPendingOrders(
@@ -214,6 +225,23 @@ class TraderTest extends TestCase
         );
     }
 
+    /** @return MockObject|EntityManagerInterface */
+    private function mockEntityManager(): EntityManagerInterface
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $em->method('getRepository')->with(User::class)->willReturn($this->mockUserRepo());
+
+        return $em;
+    }
+
+    /** @return MockObject|UserRepository */
+    private function mockUserRepo(): UserRepository
+    {
+        return $this->createMock(UserRepository::class);
+    }
+
+    /** @return MockObject|LimitOrderConfig */
     private function createOrderConfig(): LimitOrderConfig
     {
         $orderConfig = $this->createMock(LimitOrderConfig::class);
@@ -222,6 +250,7 @@ class TraderTest extends TestCase
         return $orderConfig;
     }
 
+    /** @return MockObject|Order */
     private function createOrder(): Order
     {
         $market = $this->createMarket();
@@ -237,6 +266,7 @@ class TraderTest extends TestCase
         return $order;
     }
 
+    /** @return MockObject|User */
     private function createUser(): User
     {
         $user = $this->createMock(User::class);
@@ -244,6 +274,7 @@ class TraderTest extends TestCase
         return $user;
     }
 
+    /** @return MockObject|Market */
     private function createMarket(): Market
     {
         $market = $this->createMock(Market::class);
