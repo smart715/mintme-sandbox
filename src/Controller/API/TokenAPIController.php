@@ -198,12 +198,15 @@ class TokenAPIController extends FOSRestController
     {
         $token = $this->tokenManager->findByName($request->get('tokenName'));
         $crypto = $this->cryptoManager->findBySymbol('WEB');
+        
+        if (null === $token || null === $crypto)
+            throw $this->createNotFoundException('Token or Crypto not found.');
+
         $market = $this->marketManager->getMarket($crypto, $token);
 
-        if (null === $market) {
+        if (null === $market)
             throw $this->createNotFoundException('Market not found.');
-        }
-
+        
         $order = new Order(
             null,
             $this->getUser()->getId(),

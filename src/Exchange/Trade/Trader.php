@@ -71,7 +71,10 @@ class Trader implements TraderInterface
         $maker = $this->getUserRepository()->find($order->getMakerId());
         $taker = $this->getUserRepository()->find($order->getTakerId() ?? 0);
 
-        $this->updateUsers([$maker, $taker], $order->getMarket()->getToken());
+        $token = $order->getMarket()->getToken();
+        
+        if (null !== $token)
+            $this->updateUsers([$maker, $taker], $token);
 
         return new TradeResult(TradeResult::SUCCESS);
     }
