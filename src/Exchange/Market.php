@@ -7,13 +7,13 @@ use App\Entity\Token\Token;
 
 class Market
 {
-    /** @var Crypto */
+    /** @var Crypto|null */
     private $crypto;
 
-    /** @var Token */
+    /** @var Token|null */
     private $token;
 
-    public function __construct(Crypto $crypto, Token $token)
+    public function __construct(?Crypto $crypto, ?Token $token)
     {
         $this->crypto = $crypto;
         $this->token = $token;
@@ -37,7 +37,7 @@ class Market
         return $this->token->getName();
     }
 
-    public function getToken(): Token
+    public function getToken(): ?Token
     {
         return $this->token;
     }

@@ -3,11 +3,11 @@
 namespace App\Serializer;
 
 use App\Entity\Token\Token;
-use App\Entity\User;
+use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\TokenManagerInterface;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -19,17 +19,17 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     /** @var ObjectNormalizer */
     private $normalizer;
 
-    /** @var mixed */
-    private $user;
+    /** @var TokenManagerInterface */
+    private $tokenManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         ObjectNormalizer $normalizer,
-        TokenStorageInterface $storage
+        TokenManagerInterface $tokenManager
     ) {
         $this->entityManager = $entityManager;
         $this->normalizer = $normalizer;
-        $this->user = $storage->getToken()->getUser();
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -39,18 +39,20 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $data = $this->normalizer->normalize($object, $format, $context);
+        $data = $object->getAll();
+        array_walk($data, function (BalanceResult &$balanceResult, string $key): void {
+            $token = Token::WEB_SYMBOL === $key
+                ? Token::getWeb()
+                : $this->getTokenFromHiddenName($key);
+
+            $balanceResult = $this->tokenManager->getRealBalance($token, $balanceResult);
+        });
+        $data = $this->normalizer->normalize($data, $format, $context);
 
         $result = [];
 
         foreach ($data['all'] as $name => $props) {
             $token = $this->getTokenFromHiddenName($name);
-
-            if ($token->getProfile()->getUser() === $this->user) {
-                $props['available'] -= $token->getLockIn()
-                    ? $token->getLockIn()->getFrozenAmount()
-                    : 0;
-            }
             $result[$token->getName()] = $props;
         }
 
