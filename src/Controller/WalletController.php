@@ -41,7 +41,7 @@ class WalletController extends AbstractController
         }, $cryptoManager->findBySymbols($symbols), [$tokenManager]);
         return $this->render('pages/wallet.html.twig', [
             'markets' => $markets,
-            'hash' => 'NWJjZGU5YWMxNTcyNjMuNDc3MzIyMTQ=',//$user->getHash(),
+            'hash' => $user->getHash(),
             'user_id' => $user->getId(),
             'tokens' => $normalizer->normalize($tokens),
         ]);
