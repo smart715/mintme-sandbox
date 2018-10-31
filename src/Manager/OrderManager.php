@@ -24,36 +24,37 @@ class OrderManager implements OrderManagerInterface
         $this->userManager = $userManager;
     }
 
-    public function getSellPendingOrdersList(User $user, Market $market): array
+    public function getSellPendingOrdersList(?User $user, Market $market): array
     {
         return $this->getPendingOrdersList($user, $market, self::SELL_SIDE);
     }
 
-    public function getBuyPendingOrdersList(User $user, Market $market): array
+    public function getBuyPendingOrdersList(?User $user, Market $market): array
     {
         return $this->getPendingOrdersList($user, $market, self::BUY_SIDE);
     }
 
-    public function getPendingOrdersList(User $user, Market $market, string $side): array
+    public function getPendingOrdersList(?User $user, Market $market, string $side): array
     {
         $pendingOrders = $this->mapOrdersByUserId($this->getAllPendingOrders($market, $side));
 
-        $users = $this->userManager->findByIds(array_keys($pendingOrders));
+        $ordersUsers = $this->userManager->findByIds(array_keys($pendingOrders));
 
-        return array_map(function (User $user) use ($pendingOrders) {
-            $userId = $user->getId();
-            $amount = floatval($pendingOrders[$userId]->getAmount());
-            $price = floatval($pendingOrders[$userId]->getPrice());
+        return array_map(function (User $orderUser) use ($pendingOrders, $user) {
+            $orderUserId = $orderUser->getId();
+            $userOrder = $pendingOrders[$orderUserId];
+            $amount = floatval($userOrder->getAmount());
+            $price = floatval($userOrder->getPrice());
 
             return [
-                'firstName' => $user->getProfile()->getFirstName(),
-                'lastName' => $user->getProfile()->getFirstName(),
+                'firstName' => $userOrder->getProfile()->getFirstName(),
+                'lastName' => $userOrder->getProfile()->getFirstName(),
                 'amount' => $amount,
                 'price' => $price,
                 'total' => $price * $amount,
-                'isOwner' => $userId === $user->getId(),
+                'isOwner' => $user && $orderUserId === $user->getId(),
             ];
-        }, $users);
+        }, $ordersUsers);
     }
 
     public function getAllPendingOrders(Market $market, string $side): array
