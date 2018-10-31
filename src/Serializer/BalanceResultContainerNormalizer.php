@@ -39,22 +39,19 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $data = $object->getAll();
-        array_walk($data, function (BalanceResult &$balanceResult, string $key): void {
-            $token = Token::WEB_SYMBOL === $key
-                ? Token::getWeb()
-                : $this->getTokenFromHiddenName($key);
-
-            $balanceResult = $this->tokenManager->getRealBalance($token, $balanceResult);
-        });
-        $data = $this->normalizer->normalize($data, $format, $context);
-
         $result = [];
+        $data = $object->getAll();
 
-        foreach ($data['all'] as $name => $props) {
-            $token = $this->getTokenFromHiddenName($name);
-            $result[$token->getName()] = $props;
-        }
+        array_walk($data, function (BalanceResult $balanceResult, string $key) use (&$result, $format, $context): void {
+            $token = $this->getTokenFromHiddenName($key);
+
+            $result[$token->getName()] = $this->tokenManager->getRealBalance(
+                $token,
+                $balanceResult
+            );
+
+            $result[$token->getName()] = $this->normalizer->normalize($result[$token->getName()], $format, $context);
+        });
 
         return $result;
     }
@@ -69,7 +66,9 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
 
     private function getTokenFromHiddenName(string $name): Token
     {
-        return $this->getTokenRepository()->find($this->getIdFromName($name));
+        return Token::WEB_SYMBOL === $name ?
+            Token::getWeb() :
+            $this->getTokenRepository()->find($this->getIdFromName($name));
     }
 
     private function getIdFromName(string $name): int
