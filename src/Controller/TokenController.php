@@ -74,7 +74,7 @@ class TokenController extends AbstractController
             return $this->render('pages/token_404.html.twig');
         }
 
-        $webCrypto = $this->cryptoManager->findBySymbol('WEB');
+        $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
         $market = $webCrypto
             ? $this->marketManager->getMarket($webCrypto, $token)

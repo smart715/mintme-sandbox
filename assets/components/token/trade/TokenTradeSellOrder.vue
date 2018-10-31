@@ -204,13 +204,20 @@ export default {
     }
     },
     showModalAction: function(result) {
-        this.modalSuccess = 1 === result ? true : false;
+        this.modalSuccess = 1 === result;
         this.showModal = true;
     },
     updateBalance: function() {
         axios.get(this.fetchBalanceTokenUrl)
-        .then( (response) => {
+        .then((response) => {
           return this.tokenBalance = response.data['available'];
+        })
+        .catch((error) => {
+            if (400 === error.response.status) {
+                this.$toasted.error(error.response.data.error);
+            } else {
+                this.$toasted.error('Connection problem. Try again later.');
+            }
         });
     },
   },
@@ -228,11 +235,7 @@ export default {
         return this.sell.price || null;
     },
     fieldsValid: function() {
-        if ( this.sellPrice && this.sellAmount ) {
-            return false;
-        } else {
-            return true;
-        }
+        return this.sellPrice && this.sellAmount;
     },
   },
   watch: {

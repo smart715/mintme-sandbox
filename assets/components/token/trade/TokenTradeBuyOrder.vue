@@ -19,7 +19,7 @@
                         pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0">
                         Your WEB:
                         <span class="text-primary">
-                            {{webBalance}}
+                            {{ webBalance }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -203,13 +203,20 @@ export default {
     }
     },
     showModalAction: function(result) {
-        this.modalSuccess = 1 === result ? true : false;
+        this.modalSuccess = 1 === result;
         this.showModal = true;
     },
     updateBalance: function() {
         axios.get(this.fetchBalanceWebUrl)
         .then( (response) => {
           return this.webBalance = response.data['available'];
+        })
+        .catch((error) => {
+            if (400 === error.response.status) {
+                this.$toasted.error(error.response.data.error);
+            } else {
+                this.$toasted.error('Connection problem. Try again later.');
+            }
         });
     },
   },
@@ -227,11 +234,7 @@ export default {
         return this.buy.price || null;
     },
     fieldsValid: function() {
-        if ( this.buyPrice && this.buyAmount ) {
-            return false;
-        } else {
-            return true;
-        }
+        return this.buyPrice && this.buyAmount;
     },
   },
   watch: {

@@ -187,13 +187,13 @@ class TokenAPIController extends FOSRestController
     }
 
     /**
-    * @Rest\View()
-    * @Rest\Post("/{tokenName}/place-order", name="token_place_order")
-    * @Rest\RequestParam(name="tokenName", allowBlank=false)
-    * @Rest\RequestParam(name="priceInput", allowBlank=false)
-    * @Rest\RequestParam(name="amountInput", allowBlank=false)
-    * @Rest\RequestParam(name="action", allowBlank=false)
-    */
+     * @Rest\View()
+     * @Rest\Post("/{tokenName}/place-order", name="token_place_order")
+     * @Rest\RequestParam(name="tokenName", allowBlank=false)
+     * @Rest\RequestParam(name="priceInput", allowBlank=false)
+     * @Rest\RequestParam(name="amountInput", allowBlank=false)
+     * @Rest\RequestParam(name="action", allowBlank=false)
+     */
     public function placeOrder(ParamFetcherInterface $request, TraderInterface $trader): View
     {
         $token = $this->tokenManager->findByName($request->get('tokenName'));
@@ -232,13 +232,15 @@ class TokenAPIController extends FOSRestController
     }
 
     /**
-    * @Rest\Get("/{tokenName}/get-balance-token", name="fetch_balance_token")
-    * @Rest\RequestParam(name="tokenName", allowBlank=false)
-    */
+     * @Rest\View()
+     * @Rest\Get("/{tokenName}/balance", name="fetch_balance_token")
+     */
     public function fetchBalanceToken(string $tokenName, BalanceHandlerInterface $balanceHandler): View
     {
         $user = $this->getUser();
-        $token = $this->tokenManager->findByName($tokenName);
+        $token = Token::WEB_SYMBOL === $tokenName
+            ? Token::getWeb()
+            : $this->tokenManager->findByName($tokenName);
 
         if (null === $token) {
             throw $this->createNotFoundException('Token does not exist.');
@@ -246,29 +248,12 @@ class TokenAPIController extends FOSRestController
 
         $balance = $balanceHandler->balance($user, $token);
 
-        return $this->view(
-            [
-                'available' => $balance->getAvailable(),
-                'freeze' => $balance->getFreeze(),
-            ],
-            Response::HTTP_ACCEPTED
-        );
-    }
+        if ($balance->isFailed()) {
+            return $this->view([
+                'error' => 'Exchanger connection lost. Try to reload page.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
 
-    /**
-    * @Rest\Get("/get-balance-web", name="fetch_balance_web")
-    */
-    public function fetchBalanceWeb(BalanceHandlerInterface $balanceHandler): View
-    {
-        $user = $this->getUser();
-        $balance = $balanceHandler->balance($user, Token::getWeb());
-
-        return $this->view(
-            [
-                'available' => $balance->getAvailable(),
-                'freeze' => $balance->getFreeze(),
-            ],
-            Response::HTTP_ACCEPTED
-        );
+        return $this->view($this->tokenManager->getRealBalance($token, $balance));
     }
 }

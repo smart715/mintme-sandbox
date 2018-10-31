@@ -57,7 +57,7 @@
 export default {
     name: 'Wallet',
     props: {
-        tokens: {type: Object, required: true},
+        tokens: {type: Array, required: true},
     },
     data() {
         return {};

@@ -2,9 +2,14 @@
 
 namespace App\Exchange\Balance\Model;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+
 class BalanceResult
 {
-    /** @var float */
+    /**
+     * @var float
+     * @Groups({"API"})
+     */
     private $available;
 
     /** @var float */
