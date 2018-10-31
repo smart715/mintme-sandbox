@@ -2,7 +2,7 @@
 
 namespace App\Exchange\Balance\Model;
 
-class BalanceResultContainer
+class BalanceResultContainer implements \IteratorAggregate
 {
     /** @var mixed[] */
     private $balances;
@@ -35,5 +35,11 @@ class BalanceResultContainer
     public static function fail(): self
     {
         return new self([]);
+    }
+
+    /** {@inheritdoc} */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->getAll());
     }
 }
