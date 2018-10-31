@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
@@ -38,18 +39,23 @@ class TokenController extends AbstractController
     /** @var MarketManagerInterface */
     protected $marketManager;
 
+    /** @var TraderInterface */
+    protected $trader;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        MarketManagerInterface $marketManager
+        MarketManagerInterface $marketManager,
+        TraderInterface $trader
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
+        $this->trader = $trader;
     }
 
     /**
@@ -68,7 +74,7 @@ class TokenController extends AbstractController
             return $this->render('pages/token_404.html.twig');
         }
 
-        $webCrypto = $this->cryptoManager->findBySymbol('WEB');
+        $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
         $market = $webCrypto
             ? $this->marketManager->getMarket($webCrypto, $token)

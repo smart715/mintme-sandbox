@@ -15,6 +15,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Token
 {
+    public const WEB_SYMBOL = "WEB";
+    public const BTC_SYMBOL = "BTC";
+
+    public const PREDEFINED_TOKENS = [
+        self::WEB_SYMBOL,
+        self::BTC_SYMBOL,
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -179,5 +187,12 @@ class Token
     public function getProfile(): Profile
     {
         return $this->profile;
+    }
+
+    public static function getWeb(): self
+    {
+        $web = new Token();
+        $web->setName(self::WEB_SYMBOL);
+        return $web;
     }
 }

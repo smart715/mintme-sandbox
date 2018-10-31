@@ -18,10 +18,16 @@
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
-                        <token-trade
-                            websocket-url="{{ global_websocket_url }}"
-                            market-name="{{ marketName | json_encode }}"
-                        />
+                        <token-trade websocket-url="{{ global_websocket_url }}"
+                                     login-url="{{ path('fos_user_security_login') }}"
+                                     signup-url="{{ path('fos_user_registration_register') }}"
+                                     market-name="{{ marketName | json_encode }}"
+                                     :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                     token-name= "{{ token.name }}"
+                                     place-order-url= "{{ path('token_place_order', {'tokenName' : token.name}) }}"
+                                     fetch-balance-web-url= "{{ path('fetch_balance_token', {'tokenName' : 'WEB'}) }}"
+                                     fetch-balance-token-url= "{{ path('fetch_balance_token', {'tokenName' : token.name}) }}">
+                        </token-trade>
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">

@@ -10,7 +10,9 @@ use App\Manager\TokenManager;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TokenManagerTest extends TestCase
 {
@@ -23,7 +25,12 @@ class TokenManagerTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->method('getRepository')->willReturn($tokenRepository);
 
-        $tokenManager = new TokenManager($entityManager, $this->createMock(ProfileFetcherInterface::class));
+        $tokenManager = new TokenManager(
+            $entityManager,
+            $this->createMock(ProfileFetcherInterface::class),
+            $this->mockTokenStorage()
+        );
+
         $this->assertEquals($token, $tokenManager->findByName($name));
     }
 
@@ -39,7 +46,8 @@ class TokenManagerTest extends TestCase
 
         $tokenManager = new TokenManager(
             $this->createMock(EntityManagerInterface::class),
-            $profileFetcher
+            $profileFetcher,
+            $this->mockTokenStorage()
         );
         $this->assertEquals($token, $tokenManager->getOwnToken());
     }
@@ -51,8 +59,15 @@ class TokenManagerTest extends TestCase
 
         $tokenManager = new TokenManager(
             $this->createMock(EntityManagerInterface::class),
-            $profileFetcher
+            $profileFetcher,
+            $this->mockTokenStorage()
         );
         $this->assertEquals(null, $tokenManager->getOwnToken());
+    }
+
+    /** @return MockObject|TokenStorageInterface */
+    private function mockTokenStorage(): TokenStorageInterface
+    {
+        return $this->createMock(TokenStorageInterface::class);
     }
 }
