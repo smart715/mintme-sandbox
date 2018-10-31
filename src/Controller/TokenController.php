@@ -7,6 +7,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
+use App\Manager\OrderManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Verify\WebsiteVerifierInterface;
@@ -38,18 +39,23 @@ class TokenController extends AbstractController
     /** @var MarketManagerInterface */
     protected $marketManager;
 
+    /** @var OrderManagerInterface */
+    protected $orderManager;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        MarketManagerInterface $marketManager
+        MarketManagerInterface $marketManager,
+        OrderManagerInterface $orderManager
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
+        $this->orderManager = $orderManager;
     }
 
     /**
@@ -84,6 +90,13 @@ class TokenController extends AbstractController
 
         $isOwner = $token === $this->tokenManager->getOwnToken();
 
+        $pendingSellOrders = $market
+            ? $this->orderManager->getSellPendingOrdersList($this->getUser(), $market)
+            : [];
+        $pendingBuyOrders = $market
+            ? $this->orderManager->getBuyPendingOrdersList($this->getUser(), $market)
+            : [];
+
         return $this->render('pages/token.html.twig', [
             'token' => $token,
             'stats' => $normalizer->normalize($token->getLockIn(), null, [
@@ -93,6 +106,8 @@ class TokenController extends AbstractController
             'isOwner' => $isOwner,
             'tab' => $tab,
             'marketName' => $marketName,
+            'pendingSellOrders' => $pendingSellOrders,
+            'pendingBuyOrders' => $pendingBuyOrders,
         ]);
     }
 

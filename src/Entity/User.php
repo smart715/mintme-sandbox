@@ -47,7 +47,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      *     pattern="/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/",
      *     match=true,
      *     message="The password must contain minimum eight symbols,
-           at least one uppercase letter, a lowercase letter, and a number"
+     *     at least one uppercase letter, a lowercase letter, and a number"
      * )
      * @var string|null
      */
@@ -58,7 +58,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @var Profile
      */
     protected $profile;
-    
+
     /**
      * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist"})
      * @var GoogleAuthenticatorEntry
@@ -74,6 +74,11 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @var ArrayCollection
      */
     protected $relatedTokens;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
 
     /** @return Token[] */
     public function getRelatedTokens(): array
@@ -125,7 +130,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         $this->username = $email;
         return parent::setEmail($email);
     }
-    
+
     public function isGoogleAuthenticatorEnabled(): bool
     {
         return null !== $this->googleAuthenticatorEntry;
@@ -152,7 +157,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
             ? in_array($code, $googleAuth->getBackupCodes())
             : false;
     }
-    
+
     public function invalidateBackupCode(string $code): void
     {
         if (null !== $this->googleAuthenticatorEntry) {
@@ -185,7 +190,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         ) {
             $this->googleAuthenticatorEntry->setUser($this);
         }
-        
+
         return $this->googleAuthenticatorEntry;
     }
 }

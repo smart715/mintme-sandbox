@@ -51,7 +51,7 @@ class MarketFetcher
         return $this->parseExecutedOrders($response->getResult(), $market);
     }
 
-    private function getPendingOrders(Market $market, int $offset, int $limit, string $side): array
+    public function getPendingOrders(Market $market, int $offset, int $limit, string $side): array
     {
         try {
             $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [

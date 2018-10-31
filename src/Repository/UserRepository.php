@@ -11,4 +11,14 @@ class UserRepository extends EntityRepository
     {
         return $this->findOneBy(['email' => $email]);
     }
+
+    public function findByIds(array $userIds): array
+    {
+        return $this->createQueryBuilder('user')
+            ->where('user.id IN(:userIds)')
+            ->setParameter('userIds', $userIds)
+            ->getQuery()
+            ->execute()
+        ;
+    }
 }
