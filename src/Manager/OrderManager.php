@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
+use App\Fetcher\OrdersUserFetcher;
 
 class OrderManager implements OrderManagerInterface
 {
@@ -36,26 +37,30 @@ class OrderManager implements OrderManagerInterface
 
     public function getPendingOrdersList(?User $currentUser, Market $market, string $side): array
     {
-        $pendingOrders = $this->mapPendingOrdersByUser($this->getAllPendingOrders($market, $side));
+        $pendingOrders = $this->getAllPendingOrders($market, $side);
 
-        $usersOfPendingOrders = $this->userManager->findByIds(array_keys($pendingOrders));
+        $pendingOrdersUsers = $this->mapUsersById(
+            $this->userManager->findByIds(
+                $this->fetchOrdersUsers($pendingOrders)->fetchMakerIds()
+            )
+        );
 
-        return array_map(function (User $userOfPendingOrder) use ($pendingOrders, $currentUser) {
-            $orderUserId = $userOfPendingOrder->getId();
-            $order = $pendingOrders[$orderUserId];
-            $amount = floatval($order->getAmount());
-            $price = floatval($order->getPrice());
+        return array_map(function (Order $pendingOrder) use ($pendingOrdersUsers, $currentUser) {
+            $orderMakerId = $pendingOrder->getMakerId();
+            $amount = floatval($pendingOrder->getAmount());
+            $price = floatval($pendingOrder->getPrice());
+            $user = $pendingOrdersUsers[$orderMakerId];
 
             return [
-                'firstName' => $userOfPendingOrder->getProfile()->getFirstName(),
-                'lastName' => $userOfPendingOrder->getProfile()->getLastName(),
-                'profileUrl' => $userOfPendingOrder->getProfile()->getPageUrl(),
+                'firstName' => $user->getProfile()->getFirstName(),
+                'lastName' => $user->getProfile()->getLastName(),
+                'profileUrl' => $user->getProfile()->getPageUrl(),
                 'amount' => $amount,
                 'price' => $price,
                 'total' => $price * $amount,
-                'isOwner' => $currentUser && $orderUserId === $currentUser->getId(),
+                'isOwner' => $currentUser && $orderMakerId === $currentUser->getId(),
             ];
-        }, $usersOfPendingOrders);
+        }, $pendingOrders);
     }
 
     public function getAllPendingOrders(Market $market, string $side): array
@@ -73,17 +78,22 @@ class OrderManager implements OrderManagerInterface
         return $allPendingOrders;
     }
 
-    private function mapPendingOrdersByUser(array $orders): array
+    private function mapUsersById(array $users): array
     {
         return array_column(
-            array_map(function (Order $order) {
+            array_map(function (User $user) {
                 return [
-                    'userId' => $order->getMakerId(),
-                    'order' => $order,
+                    'id' => $user->getId(),
+                    'user' => $user,
                 ];
-            }, $orders),
-            'order',
-            'userId'
+            }, $users),
+            'user',
+            'id'
         );
+    }
+
+    private function fetchOrdersUsers(array $orders): OrdersUserFetcher
+    {
+        return new OrdersUserFetcher($orders);
     }
 }
