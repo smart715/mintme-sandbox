@@ -36,7 +36,7 @@ class OrderManager implements OrderManagerInterface
 
     public function getPendingOrdersList(?User $currentUser, Market $market, string $side): array
     {
-        $pendingOrders = $this->mapOrdersByUserId($this->getAllPendingOrders($market, $side));
+        $pendingOrders = $this->mapPendingOrdersByUser($this->getAllPendingOrders($market, $side));
 
         $usersOfPendingOrders = $this->userManager->findByIds(array_keys($pendingOrders));
 
@@ -49,6 +49,7 @@ class OrderManager implements OrderManagerInterface
             return [
                 'firstName' => $userOfPendingOrder->getProfile()->getFirstName(),
                 'lastName' => $userOfPendingOrder->getProfile()->getLastName(),
+                'profileUrl' => $userOfPendingOrder->getProfile()->getPageUrl(),
                 'amount' => $amount,
                 'price' => $price,
                 'total' => $price * $amount,
@@ -72,7 +73,7 @@ class OrderManager implements OrderManagerInterface
         return $allPendingOrders;
     }
 
-    private function mapOrdersByUserId(array $orders): array
+    private function mapPendingOrdersByUser(array $orders): array
     {
         return array_column(
             array_map(function (Order $order) {

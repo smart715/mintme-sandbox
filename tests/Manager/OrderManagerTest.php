@@ -16,7 +16,7 @@ class OrderManagerTest extends TestCase
     public function testGetPendingOrdersListWithoutOwner(): void
     {
         $pendingOrders = $this->getOrderManager()->getPendingOrdersList(
-            $this->mockUser(1, 'firstName1', 'lastName1'),
+            $this->mockUser(1, 'firstName1', 'lastName1', ''),
             $this->mockMarket(),
             'sell'
         );
@@ -26,6 +26,7 @@ class OrderManagerTest extends TestCase
                 [
                     'firstName' => 'firstName12',
                     'lastName' => 'lastName12',
+                    'profileUrl' => 'profileUrl12',
                     'amount' => 34.0,
                     'price' => 56.0,
                     'total' => 34.0 * 56.0,
@@ -34,6 +35,7 @@ class OrderManagerTest extends TestCase
                 [
                     'firstName' => 'firstName21',
                     'lastName' => 'lastName21',
+                    'profileUrl' => 'profileUrl21',
                     'amount' => 43.0,
                     'price' => 65.0,
                     'total' => 43.0 * 65.0,
@@ -46,7 +48,7 @@ class OrderManagerTest extends TestCase
     public function testGetPendingOrdersListWithOwner(): void
     {
         $pendingOrders = $this->getOrderManager()->getPendingOrdersList(
-            $this->mockUser(12, 'firstName12', 'lastName12'),
+            $this->mockUser(12, 'firstName12', 'lastName12', ''),
             $this->mockMarket(),
             'sell'
         );
@@ -56,6 +58,7 @@ class OrderManagerTest extends TestCase
                 [
                     'firstName' => 'firstName12',
                     'lastName' => 'lastName12',
+                    'profileUrl' => 'profileUrl12',
                     'amount' => 34.0,
                     'price' => 56.0,
                     'total' => 34.0 * 56.0,
@@ -64,6 +67,7 @@ class OrderManagerTest extends TestCase
                 [
                     'firstName' => 'firstName21',
                     'lastName' => 'lastName21',
+                    'profileUrl' => 'profileUrl21',
                     'amount' => 43.0,
                     'price' => 65.0,
                     'total' => 43.0 * 65.0,
@@ -88,8 +92,8 @@ class OrderManagerTest extends TestCase
             ],
         ];
         $users = [
-            $this->mockUser(12, 'firstName12', 'lastName12'),
-            $this->mockUser(21, 'firstName21', 'lastName21'),
+            $this->mockUser(12, 'firstName12', 'lastName12', 'profileUrl12'),
+            $this->mockUser(21, 'firstName21', 'lastName21', 'profileUrl21'),
         ];
 
         return new OrderManager(
@@ -98,7 +102,7 @@ class OrderManagerTest extends TestCase
         );
     }
 
-    private function mockUser(int $userId, string $firstName, string $lastName): User
+    private function mockUser(int $userId, string $firstName, string $lastName, string $profileUrl): User
     {
         $userMock = $this->createMock(User::class);
         $userMock
@@ -107,12 +111,12 @@ class OrderManagerTest extends TestCase
         ;
         $userMock
             ->method('getProfile')
-            ->willReturn($this->mockProfile($firstName, $lastName))
+            ->willReturn($this->mockProfile($firstName, $lastName, $profileUrl))
         ;
         return $userMock;
     }
 
-    private function mockProfile(string $firstName, string $lastName): Profile
+    private function mockProfile(string $firstName, string $lastName, string $profileUrl): Profile
     {
         $profileMock = $this->createMock(Profile::class);
         $profileMock
@@ -122,6 +126,10 @@ class OrderManagerTest extends TestCase
         $profileMock
             ->method('getLastName')
             ->willReturn($lastName)
+        ;
+        $profileMock
+            ->method('getPageUrl')
+            ->willReturn($profileUrl)
         ;
         return $profileMock;
     }
