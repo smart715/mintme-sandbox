@@ -78,6 +78,44 @@ class OrderManager implements OrderManagerInterface
         return $allPendingOrders;
     }
 
+    public function getOrdersHistory(Market $market, int $offset = 0, int $limit = 20): array
+    {
+        $executedOrders = $this->marketFetcher->getExecutedOrders($market, $offset, $limit);
+
+        $executedOrdersUsers = $this->mapUsersById(
+            $this->userManager->findByIds(
+                $this->fetchOrdersUsers($executedOrders)->fetchAllIds()
+            )
+        );
+
+        return array_map(function (Order $executedOrder) use ($executedOrdersUsers) {
+            $orderMakerId = $executedOrder->getMakerId();
+            $orderTakerId = $executedOrder->getTakerId();
+            $amount = floatval($executedOrder->getAmount());
+            $price = floatval($executedOrder->getPrice());
+            $makerUser = $executedOrdersUsers[$orderMakerId];
+            $takerUser = $executedOrdersUsers[$orderTakerId];
+
+            return [
+                'maker' => [
+                    'firstName' => $makerUser->getProfile()->getFirstName(),
+                    'lastName' => $makerUser->getProfile()->getLastName(),
+                    'profileUrl' => $makerUser->getProfile()->getPageUrl(),
+                ],
+                'taker' => [
+                    'firstName' => $takerUser->getProfile()->getFirstName(),
+                    'lastName' => $takerUser->getProfile()->getLastName(),
+                    'profileUrl' => $takerUser->getProfile()->getPageUrl(),
+                ],
+                'amount' => $amount,
+                'price' => $price,
+                'total' => $price * $amount,
+                'side' => $executedOrder->getSide(),
+                'timestamp' => $executedOrder->getTimestamp(),
+            ];
+        }, $executedOrders);
+    }
+
     private function mapUsersById(array $users): array
     {
         return array_column(
