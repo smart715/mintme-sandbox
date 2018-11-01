@@ -14,4 +14,6 @@ interface OrderManagerInterface
     public function getPendingOrdersList(User $user, Market $market, string $side): array;
 
     public function getAllPendingOrders(Market $market, string $side): array;
+
+    public function getOrdersHistory(Market $market, int $offset = 0, int $limit = 20): array;
 }

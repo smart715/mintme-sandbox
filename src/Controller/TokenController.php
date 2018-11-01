@@ -96,6 +96,9 @@ class TokenController extends AbstractController
         $pendingBuyOrders = $market
             ? $this->orderManager->getBuyPendingOrdersList($this->getUser(), $market)
             : [];
+        $ordersHistory = $market
+            ? $this->orderManager->getOrdersHistory($market)
+            : [];
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
@@ -108,6 +111,7 @@ class TokenController extends AbstractController
             'marketName' => $marketName,
             'pendingSellOrders' => $pendingSellOrders,
             'pendingBuyOrders' => $pendingBuyOrders,
+            'ordersHistory' => $ordersHistory,
         ]);
     }
 

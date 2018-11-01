@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
+use App\Order\OrderInfo;
 use App\Order\OrdersUsers;
 
 class OrderManager implements OrderManagerInterface
@@ -46,20 +47,12 @@ class OrderManager implements OrderManagerInterface
         );
 
         return array_map(function (Order $pendingOrder) use ($pendingOrdersUsers, $currentUser) {
-            $orderMakerId = $pendingOrder->getMakerId();
-            $amount = floatval($pendingOrder->getAmount());
-            $price = floatval($pendingOrder->getPrice());
-            $user = $pendingOrdersUsers[$orderMakerId];
-
-            return [
-                'firstName' => $user->getProfile()->getFirstName(),
-                'lastName' => $user->getProfile()->getLastName(),
-                'profileUrl' => $user->getProfile()->getPageUrl(),
-                'amount' => $amount,
-                'price' => $price,
-                'total' => $price * $amount,
-                'isOwner' => $currentUser && $orderMakerId === $currentUser->getId(),
-            ];
+            return $this->orderInfo(
+                $pendingOrder,
+                $pendingOrdersUsers[$pendingOrder->getMakerId()],
+                null,
+                $currentUser
+            );
         }, $pendingOrders);
     }
 
@@ -89,30 +82,12 @@ class OrderManager implements OrderManagerInterface
         );
 
         return array_map(function (Order $executedOrder) use ($executedOrdersUsers) {
-            $orderMakerId = $executedOrder->getMakerId();
-            $orderTakerId = $executedOrder->getTakerId();
-            $amount = floatval($executedOrder->getAmount());
-            $price = floatval($executedOrder->getPrice());
-            $makerUser = $executedOrdersUsers[$orderMakerId];
-            $takerUser = $executedOrdersUsers[$orderTakerId];
-
-            return [
-                'maker' => [
-                    'firstName' => $makerUser->getProfile()->getFirstName(),
-                    'lastName' => $makerUser->getProfile()->getLastName(),
-                    'profileUrl' => $makerUser->getProfile()->getPageUrl(),
-                ],
-                'taker' => [
-                    'firstName' => $takerUser->getProfile()->getFirstName(),
-                    'lastName' => $takerUser->getProfile()->getLastName(),
-                    'profileUrl' => $takerUser->getProfile()->getPageUrl(),
-                ],
-                'amount' => $amount,
-                'price' => $price,
-                'total' => $price * $amount,
-                'side' => $executedOrder->getSide(),
-                'timestamp' => $executedOrder->getTimestamp(),
-            ];
+            return $this->orderInfo(
+                $executedOrder,
+                $executedOrdersUsers[$executedOrder->getMakerId()],
+                $executedOrdersUsers[$executedOrder->getTakerId()],
+                null
+            );
         }, $executedOrders);
     }
 
@@ -128,6 +103,11 @@ class OrderManager implements OrderManagerInterface
             'user',
             'id'
         );
+    }
+
+    private function orderInfo(Order $order, User $makerUser, ?User $takerUser, ?User $currentUser): OrderInfo
+    {
+        return new OrderInfo($order, $makerUser, $takerUser, $currentUser);
     }
 
     private function ordersUsers(array $orders): OrdersUsers
