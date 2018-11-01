@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
-use App\Fetcher\OrdersUserFetcher;
+use App\Order\OrdersUsers;
 
 class OrderManager implements OrderManagerInterface
 {
@@ -41,7 +41,7 @@ class OrderManager implements OrderManagerInterface
 
         $pendingOrdersUsers = $this->mapUsersById(
             $this->userManager->findByIds(
-                $this->fetchOrdersUsers($pendingOrders)->fetchMakerIds()
+                $this->ordersUsers($pendingOrders)->getMakerIds()
             )
         );
 
@@ -84,7 +84,7 @@ class OrderManager implements OrderManagerInterface
 
         $executedOrdersUsers = $this->mapUsersById(
             $this->userManager->findByIds(
-                $this->fetchOrdersUsers($executedOrders)->fetchAllIds()
+                $this->ordersUsers($executedOrders)->getAllIds()
             )
         );
 
@@ -130,8 +130,8 @@ class OrderManager implements OrderManagerInterface
         );
     }
 
-    private function fetchOrdersUsers(array $orders): OrdersUserFetcher
+    private function ordersUsers(array $orders): OrdersUsers
     {
-        return new OrdersUserFetcher($orders);
+        return new OrdersUsers($orders);
     }
 }

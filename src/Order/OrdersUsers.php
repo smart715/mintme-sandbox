@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Fetcher;
+namespace App\Order;
 
 use App\Entity\User;
 use App\Exchange\Order;
 
-class OrdersUserFetcher implements OrdersUserFetcherInterface
+class OrdersUsers implements OrdersUsersInterface
 {
     /** @var Order[] */
     private $orders;
@@ -15,7 +15,7 @@ class OrdersUserFetcher implements OrdersUserFetcherInterface
         $this->orders = $orders;
     }
 
-    public function fetchMakerIds(): array
+    public function getMakerIds(): array
     {
         return array_unique(
             array_map(function (Order $order) {
@@ -26,7 +26,7 @@ class OrdersUserFetcher implements OrdersUserFetcherInterface
         );
     }
 
-    public function fetchTakerIds(): array
+    public function getTakerIds(): array
     {
         return array_unique(
             array_map(function (Order $order) {
@@ -37,10 +37,10 @@ class OrdersUserFetcher implements OrdersUserFetcherInterface
         );
     }
 
-    public function fetchAllIds(): array
+    public function getAllIds(): array
     {
         return array_unique(
-            array_merge($this->fetchMakerIds(), $this->fetchTakerIds())
+            array_merge($this->getMakerIds(), $this->getTakerIds())
         );
     }
 }
