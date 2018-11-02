@@ -66,7 +66,7 @@ class OrderManager implements OrderManagerInterface
             $pendingOrders = $this->marketFetcher->getPendingOrders($market, $step * $rows, $rows, $side);
             $allPendingOrders = array_merge($allPendingOrders, $pendingOrders);
             ++$step;
-        } while (0 === count($pendingOrders));
+        } while ($rows === count($pendingOrders));
 
         return $allPendingOrders;
     }
