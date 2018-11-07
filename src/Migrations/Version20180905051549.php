@@ -15,7 +15,7 @@ final class Version20180905051549 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE profile ADD referencer_id INT DEFAULT NULL, ADD referral_code VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE user ADD referencer_id INT DEFAULT NULL, ADD referral_code VARCHAR(255)');
     }
 
     public function down(Schema $schema) : void
@@ -23,6 +23,6 @@ final class Version20180905051549 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE profile DROP referencer_id, DROP referral_code');
+        $this->addSql('ALTER TABLE user DROP referencer_id, DROP referral_code');
     }
 }

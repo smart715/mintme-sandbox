@@ -50,15 +50,6 @@ class ProfileManager implements ProfileManagerInterface
         return $this->profileRepository->getProfileByUser($user);
     }
     
-    public function getReferencesTotal(?int $profileId): ?int
-    {
-        $referencees = $this->profileRepository->findReferences($profileId);
-        if (null === $referencees)
-            return 0;
-        
-        return count($referencees);
-    }
-
     public function lockChangePeriod(Profile $profile): void
     {
         $profile->setNameChangedDate(new DateTime('+1 month'));

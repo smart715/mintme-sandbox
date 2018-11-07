@@ -4,12 +4,12 @@ namespace App\Controller;
 
 use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
-use App\Manager\ProfileManagerInterface;
+use App\Manager\UserManagerInterface;
 use App\Utils\MailerDispatcherInterface;
 use DateInterval;
 use DateTime;
 use FOS\UserBundle\Form\Type\ResettingFormType;
-use FOS\UserBundle\Model\UserManagerInterface;
+//use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -25,19 +25,15 @@ class UserController extends AbstractController
     /** @var UserManagerInterface */
     protected $userManager;
 
-    /** @var ProfileManagerInterface */
-    protected $profileManager;
 
     private const REFERRAL_COOKIE_EXPIRE_DAYS = 7;
     
     public function __construct(
         MailerDispatcherInterface $mailDispatcher,
-        UserManagerInterface $userManager,
-        ProfileManagerInterface $profileManager
+        UserManagerInterface $userManager
     ) {
         $this->mailDispatcher = $mailDispatcher;
         $this->userManager = $userManager;
-        $this->profileManager = $profileManager;
     }
 
     /**
@@ -92,14 +88,13 @@ class UserController extends AbstractController
     /**
      * @Route("/referral", name="referral")
      */
-    public function referral(ProfileManagerInterface $profileManager): Response
+    public function referral(UserManagerInterface $userManager): Response
     {
         if (null  === $this->getUser())
             return $this->redirect('/login');
-        $profile = $profileManager->getProfile($this->getUser());
         return $this->render('pages/referral.html.twig', [
-            'referralCode' => $profile->getReferralCode(),
-            'referralsTotal' => $profileManager->getReferencesTotal(intval($profile->getId())),
+            'referralCode' => $this->getUser()->getReferralCode(),
+            'referralsTotal' => $userManager->getReferencesTotal(intval($this->getUser()->getId())),
         ]);
     }
 

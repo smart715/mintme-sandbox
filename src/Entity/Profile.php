@@ -73,37 +73,11 @@ class Profile
      */
     protected $user;
     
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Profile", mappedBy="referencer")
-     * @var Collection|null
-     */
-    private $referencedProfiles;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Profile", inversedBy="referencedProfiles")
-     * @var Profile|null
-     */
-    private $referencer;
-
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
-     * @var Token|null
-     */
     protected $token;
 
     /** @var bool */
     private $isChangesLocked = false;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @var int|null
-     */
-    private $referencerId;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @var string
-     */
     private $referralCode;
 
     public function __construct(User $user)
@@ -206,65 +180,4 @@ class Profile
         return $this;
     }
 
-    public function getReferencerId(): ?int
-    {
-        return $this->referencerId;
-    }
-
-    public function setReferencerId(?int $referencerId): self
-    {
-        $this->referencerId = $referencerId;
-
-        return $this;
-    }
-
-    public function getReferralCode(): ?string
-    {
-        if (empty($this->referralCode))
-            $this->generateReferralCode();
-
-        return $this->referralCode;
-    }
-
-    public function setReferralCode(string $referralCode): self
-    {
-        $this->referralCode = $referralCode;
-
-        return $this;
-    }
-    
-    private function generateReferralCode(): void
-    {
-        $this->referralCode = Uuid::uuid4()->toString();
-    }
-    
-    public function referenceBy(Profile $profile): void
-    {
-        $this->referencer = $profile;
-    }
-    
-    public function getReferencer(): ?Profile
-    {
-        return $this->referencer;
-    }
-    
-    public function getReferrals(): Collection
-    {
-        return $this->referencedProfiles->filter(function (Profile $profile) {
-            if (null === $profile->user)
-                return false;
-
-            return $profile->user->isEnabled();
-        });
-    }
-    
-    /**
-     * Returns count of referrals that profile has
-     *
-     * @return int
-     */
-    public function getReferralsCount(): int
-    {
-        return count($this->getReferrals());
-    }
 }

@@ -2,7 +2,7 @@
 
 namespace App\EventListener;
 
-use App\Manager\ProfileManagerInterface;
+use App\Manager\UserManagerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 
 /**
@@ -13,35 +13,33 @@ use FOS\UserBundle\Event\FilterUserResponseEvent;
  */
 class RegistrationCompletedListener
 {
-    /** @var ProfileManagerInterface */
-    private $profileManager;
+    /** @var UserManagerInterface */
+    private $userManager;
 
     /** @var FilterUserResponseEvent $event */
     private $event;
 
-    public function __construct(ProfileManagerInterface $profileManager)
+    public function __construct(UserManagerInterface $userManager)
     {
-        $this->profileManager = $profileManager;
+        $this->userManager = $userManager;
     }
 
     public function onFosuserRegistrationCompleted(FilterUserResponseEvent $event): void
     {
         $this->event = $event;
-        $this->createProfile();
+        $this->addReferralcode();
     }
 
-    private function createProfile(): void
+    private function addReferralcode(): void
     {
         $user = $this->event->getUser();
 
-        if (!is_null($this->profileManager->getProfile($user)))
-            return;
-        elseif (!is_null($this->extractReferralCode()))
-            $this->profileManager->createProfileReferral(
+        if (!is_null($this->extractReferralCode()))
+            $this->userManager->createUserReferral(
                 $user,
                 $this->extractReferralCode()
             );
-        else $this->profileManager->createProfile($user);
+        else $this->userManager->createUserReferral($user, null);
     }
 
     private function extractReferralCode(): ?string

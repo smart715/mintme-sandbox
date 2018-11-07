@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Entity;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use Ramsey\Uuid\Uuid;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -55,6 +57,37 @@ class User extends BaseUser
      * @var Profile
      */
     protected $profile;
+    
+       
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="referencer")
+     * @var Collection|null
+     */
+    private $referencedUsers;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="referencedUsers")
+     * @var User|null
+     */
+    private $referencer;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @var int|null
+     */
+    private $referencerId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @var string
+     */
+    private $referralCode;
+    
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
 
     public function getTempEmail(): ?string
     {
@@ -79,4 +112,67 @@ class User extends BaseUser
         $this->username = $email;
         return parent::setEmail($email);
     }
+    
+    public function getReferencerId(): ?int
+    {
+        return $this->referencerId;
+    }
+
+    public function setReferencerId(?int $referencerId): self
+    {
+        $this->referencerId = $referencerId;
+
+        return $this;
+    }
+
+    public function getReferralCode(): ?string
+    {
+        if (empty($this->referralCode))
+            $this->generateReferralCode();
+
+        return $this->referralCode;
+    }
+
+    public function setReferralCode(string $referralCode): self
+    {
+        $this->referralCode = $referralCode;
+
+        return $this;
+    }
+    
+    private function generateReferralCode(): void
+    {
+        $this->referralCode = Uuid::uuid4()->toString();
+    }
+    
+    public function referenceBy(Profile $profile): void
+    {
+        $this->referencer = $profile;
+    }
+    
+    public function getReferencer(): ?User
+    {
+        return $this->referencer;
+    }
+    
+    public function getReferrals(): Collection
+    {
+        return $this->referencedUsers->filter(function (User $user) {
+            if (null === $user)
+                return false;
+
+            return $profile->user->isEnabled();
+        });
+    }
+    
+    /**
+     * Returns count of referrals that user has
+     *
+     * @return int
+     */
+    public function getReferralsCount(): int
+    {
+        return count($this->getReferrals());
+    }
+
 }
