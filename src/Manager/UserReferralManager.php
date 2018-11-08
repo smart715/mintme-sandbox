@@ -7,9 +7,8 @@ use App\OrmAdapter\OrmAdapterInterface;
 use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\UserBundle\Model\UserInterface;
 
-class UserManager implements UserManagerInterface
+class UserReferralManager implements UserReferralManagerInterface
 {
     /** @var UserRepository */
     private $userRepository;
@@ -23,13 +22,15 @@ class UserManager implements UserManagerInterface
         $this->userRepository = $entityManager->getRepository(User::class);
     }
    
-    public function createUserReferral(UserInterface $user, string $referralCode): ?User
+    public function createUserReferral(int $userId, ?string $referralCode): ?User
     {
+        $user = $this->userRepository->findOneBy([ 'id' => $userId ]);
         $referrer = $this->userRepository->findOneBy([ 'referralCode' => $referralCode ]);
-
-        if (is_null($referrer)) {
+        
+        if (!is_null($referrer)) {
             $user->referenceBy($referrer);
         }
+        $user->setReferralCode($user->getReferralCode());
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         return $user;
@@ -44,5 +45,4 @@ class UserManager implements UserManagerInterface
         
         return count($referencees);
     }
-
 }

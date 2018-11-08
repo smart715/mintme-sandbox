@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -58,13 +59,6 @@ class User extends BaseUser
      */
     protected $profile;
     
-       
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="referencer")
-     * @var Collection|null
-     */
-    private $referencedUsers;
-
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="referencedUsers")
      * @var User|null
@@ -145,34 +139,13 @@ class User extends BaseUser
         $this->referralCode = Uuid::uuid4()->toString();
     }
     
-    public function referenceBy(Profile $profile): void
+    public function referenceBy(User $user): void
     {
-        $this->referencer = $profile;
+        $this->referencer = $user;
     }
     
     public function getReferencer(): ?User
     {
         return $this->referencer;
     }
-    
-    public function getReferrals(): Collection
-    {
-        return $this->referencedUsers->filter(function (User $user) {
-            if (null === $user)
-                return false;
-
-            return $profile->user->isEnabled();
-        });
-    }
-    
-    /**
-     * Returns count of referrals that user has
-     *
-     * @return int
-     */
-    public function getReferralsCount(): int
-    {
-        return count($this->getReferrals());
-    }
-
 }

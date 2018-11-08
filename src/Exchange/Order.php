@@ -22,7 +22,7 @@ class Order
     /** @var int|null */
     private $id;
 
-    /** @var int */
+    /** @var int|null */
     private $makerId;
 
     /** @var int|null */
@@ -48,7 +48,7 @@ class Order
 
     public function __construct(
         ?int $id,
-        int $makerId,
+        ?int $makerId,
         ?int $takerId,
         Market $market,
         string $amount,
@@ -73,7 +73,7 @@ class Order
         return $this->id;
     }
 
-    public function getMakerId(): int
+    public function getMakerId(): ?int
     {
         return $this->makerId;
     }

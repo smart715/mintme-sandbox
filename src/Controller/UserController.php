@@ -4,12 +4,12 @@ namespace App\Controller;
 
 use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
-use App\Manager\UserManagerInterface;
+use App\Manager\UserReferralManagerInterface;
 use App\Utils\MailerDispatcherInterface;
 use DateInterval;
 use DateTime;
 use FOS\UserBundle\Form\Type\ResettingFormType;
-//use FOS\UserBundle\Model\UserManagerInterface;
+use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -88,13 +88,13 @@ class UserController extends AbstractController
     /**
      * @Route("/referral", name="referral")
      */
-    public function referral(UserManagerInterface $userManager): Response
+    public function referral(UserReferralManagerInterface $userReferralManager): Response
     {
         if (null  === $this->getUser())
             return $this->redirect('/login');
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $this->getUser()->getReferralCode(),
-            'referralsTotal' => $userManager->getReferencesTotal(intval($this->getUser()->getId())),
+            'referralsTotal' => $userReferralManager->getReferencesTotal(intval($this->getUser()->getId())),
         ]);
     }
 

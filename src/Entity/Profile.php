@@ -73,17 +73,18 @@ class Profile
      */
     protected $user;
     
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
+     * @var Token|null
+     */
     protected $token;
 
     /** @var bool */
     private $isChangesLocked = false;
 
-    private $referralCode;
-
     public function __construct(User $user)
     {
         $this->user = $user;
-        $this->generateReferralCode();
     }
     
     public function isChangesLocked(): bool
@@ -179,5 +180,4 @@ class Profile
 
         return $this;
     }
-
 }
