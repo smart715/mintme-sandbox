@@ -9,6 +9,5 @@ fos_rest:
         groups: ['API']
     format_listener:
         rules:
-            - { path: ^/api/ws, prefer_extension: true, fallback_format: json }
-            - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [ json, html ] }
+            - { path: ^/api, prefer_extension: true, fallback_format: json }
             - { path: ^/, prefer_extension: true, fallback_format: html, priorities: [ html, '*/*' ] }

@@ -12,7 +12,7 @@
                 </div>
             </confirm-modal>
             <b-table ref="table"
-                :items="myProvider"
+                :items="getHistory"
                 :fields="fields"
                 :current-page="currentPage"
                 :per-page="perPage">
@@ -58,22 +58,68 @@ export default {
         user_id: Number,
         websocket_url: String,
     },
+    data() {
+        return {
+            currentRow: {},
+            actionUrl: '',
+            history: [],
+            currentPage: 1,
+            perPage: 10,
+            pageOptions: [10, 20, 30],
+            confirmModal: false,
+            tokenName: null,
+            amount: null,
+            price: null,
+            fields: {
+                date: {
+                    label: 'Date',
+                    sortable: true,
+                },
+                type: {
+                    label: 'Type',
+                    sortable: true,
+                },
+                name: {
+                    label: 'Address',
+                    sortable: true,
+                },
+                amount: {
+                    label: 'Amount',
+                    sortable: true,
+                },
+                price: {
+                    label: 'Price',
+                    sortable: true,
+                },
+                total: {
+                    label: 'Total cost',
+                    sortable: true,
+                },
+                free: {
+                    label: 'Free',
+                    sortable: true,
+                },
+                action: {
+                    label: 'Action',
+                    sortable: false,
+                },
+            },
+        };
+    },
     methods: {
-        myProvider: function() {
+        getHistory: function() {
           return this.history;
         },
         removeOrderModal: function(row) {
-            this.currentRow.name = row.name;
-            this.currentRow.amount = row.amount;
-            this.currentRow.price = row.price;
-            this.url = row.action;
+            this.currentRow = row;
+            this.actionUrl = row.action;
             this.confirmModal = !this.confirmModal;
         },
         switchConfirmModal: function() {
             this.confirmModal = !this.confirmModal;
         },
         removeOrder: function() {
-            axios.get(this.url)
+            axios.get(this.actionUrl)
                 .catch(() => {
                     this.$toasted.show('Service unavailable, try again later');
                 });
@@ -149,59 +195,6 @@ export default {
                 params: [this.hash, 'auth_api'],
                 id: METHOD_AUTH,
             }));
-        };
-    },
-    data() {
-        return {
-            currentRow: {
-                name: null,
-                amount: null,
-                price: null,
-            },
-            url: '',
-            orders: null,
-            history: [],
-            currentPage: 1,
-            perPage: 10,
-            pageOptions: [10, 20, 30],
-            confirmModal: false,
-            tokenName: null,
-            amount: null,
-            price: null,
-            fields: {
-                date: {
-                    label: 'Date',
-                    sortable: true,
-                },
-                type: {
-                    label: 'Type',
-                    sortable: true,
-                },
-                name: {
-                    label: 'Address',
-                    sortable: true,
-                },
-                amount: {
-                    label: 'Amount',
-                    sortable: true,
-                },
-                price: {
-                    label: 'Price',
-                    sortable: true,
-                },
-                total: {
-                    label: 'Total cost',
-                    sortable: true,
-                },
-                free: {
-                    label: 'Free',
-                    sortable: true,
-                },
-                action: {
-                    label: 'Action',
-                    sortable: false,
-                },
-            },
         };
     },
     computed: {

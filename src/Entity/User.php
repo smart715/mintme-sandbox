@@ -200,8 +200,10 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this->hash;
     }
 
-    public function setHash(?string $hash): void
+    public function setHash(?string $hash): self
     {
         $this->hash = $hash;
+
+        return $this;
     }
 }

@@ -35,7 +35,7 @@ class WebSocketAPIController extends FOSRestController
     }
 
     /**
-     *  @Rest\Get("/auth")
+     *  @Rest\Get("/auth", name="auth")
      *  @Rest\View()
      */
     public function authUser(Request $request, ProfileManagerInterface $profileManager): View
