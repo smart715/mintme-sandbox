@@ -1,10 +1,8 @@
 # Business configuration variables will go here
 parameters:
-    locale: 'en'
-
-    viabtc_rpc: 'http://localhost:8080'
+    locale: en
+    viabtc_rpc: 'abc104.abchosting.org:8080'
     viabtc_response_timeout_seconds: 10
-
     taker_fee_rate: 0.1
     maker_fee_rate: 0.01
     mintme_launch_date: 'October 15, 2019 00:00:00'
