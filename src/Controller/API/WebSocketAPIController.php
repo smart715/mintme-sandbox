@@ -10,6 +10,7 @@ use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\MarketNameParserInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
@@ -27,11 +28,19 @@ class WebSocketAPIController extends FOSRestController
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    public function __construct(TraderInterface $trader, CryptoManagerInterface $cryptoManager, TokenManagerInterface $tokenManager)
-    {
+    /** @var MarketNameParserInterface */
+    private $marketParser;
+
+    public function __construct(
+        TraderInterface $trader,
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
+        MarketNameParserInterface $marketParser
+    ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->marketParser = $marketParser;
     }
 
     /**
@@ -58,8 +67,8 @@ class WebSocketAPIController extends FOSRestController
      */
     public function cancelOrder(int $userid, String $market, int $orderid): View
     {
-        $crypto = $this->cryptoManager->findBySymbol(substr($market, -3));
-        $token = $this->tokenManager->findByName(substr($market, 3, -3));
+        $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
+        $token = $this->tokenManager->findByName($this->marketParser->parseName($market));
         if (null !== $token && null !== $crypto && null !== $userid) {
             $market = new Market($crypto, $token);
             $order = new Order(
