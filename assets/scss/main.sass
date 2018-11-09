@@ -239,3 +239,15 @@ code
 
 .text-grey
   color: $theme-dark-grey
+
+.notification
+  background: url('../img/cloud.png') no-repeat 
+  background-size: contain;
+  padding: 4em;
+ span
+    @include font-scale(md)
+  .title
+    @include font-scale(lg)
+
+  a
+    @include font-scale(sm)
