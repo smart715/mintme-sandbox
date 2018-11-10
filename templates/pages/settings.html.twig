@@ -3,7 +3,7 @@
 {% block title %}MINTME | Settings{% endblock %}
 
 {% block bodyclass %}profile{% endblock %}
-
+{% block messagesContainer %}{% endblock %}
 {% block content %}
     <div id="profile" class="container">
         <div class="row justify-content-center">
@@ -13,6 +13,13 @@
                     <div class="card-body m-0">
                         <div>
                             {{ form_start(emailForm) }}
+                            {% for label, messages in app.flashes %}
+                                {% for message in messages %}
+                                    <div class=" mx-auto mb-3 alert alert-{{ label }}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
                             {{ form_rest(emailForm) }}
                             <button type="submit" class="btn btn-primary float-right px-5">Save</button>
                             {{ form_end(emailForm) }}

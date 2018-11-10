@@ -7,12 +7,13 @@
 {% block fos_user_content %}
     <div class="container">
         <div class="row align-items-center d-flex justify-content-center">
-            <div class="col-xs-12">
-                <div class="notification  mx-auto text-center">
+            <div class="col-xs-12 notification">
+                <div class="bell"></div>
+                <div class="cloud  mx-auto text-center">
                     <span>The user has been created successfully</span><br/>
                     <span class="font-weight title">Congrats {{ user.username }}</span><br/>
                     <span>your account is now activated</span><br/>
-                    <p>
+                    <p class="mt-1">
                         {% if targetUrl is empty %}
                             <a href="{{ path('referral') }}">Go to Referral Program .</a>
                         {% else %}

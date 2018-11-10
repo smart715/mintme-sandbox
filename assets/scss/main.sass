@@ -241,15 +241,20 @@ code
   color: $theme-dark-grey
 
 .notification
-  background: url('../img/cloud.png') no-repeat 
-  background-size: contain
-  padding: 4em
-  padding-bottom: 7em
-  min-height: 500px !important
-  span
-    @include font-scale(sm)
-  .title
-    @include font-scale(lg)
-    font-weight: bold
-  a
-    @include font-scale(xs)
+  .bell
+    background: url('../img/bell.png') no-repeat
+  .cloud
+    background: url('../img/cloud.png') no-repeat 
+    background-size: contain
+    padding: 4em
+    padding-bottom: 7em
+    
+    span
+      @include font-scale(sm)
+    .title
+      @include font-scale(lg)
+      font-weight: bold
+    a
+      @include font-scale(xs)
+    @include media-breakpoint-down(xs)
+      background: none;
