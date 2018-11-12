@@ -7,6 +7,9 @@ fos_user:
             type: App\Form\RegistrationType
         confirmation:
             enabled: true
+            template: bundles/FOSUserBundle/Registration/email.html.twig
     from_email:
         address: "%env(MAILER_USER)%"
         sender_name: "%env(MAILER_USER)%"
+    service:
+        mailer: fos_user.mailer.twig_swift
