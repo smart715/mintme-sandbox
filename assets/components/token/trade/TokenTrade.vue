@@ -36,6 +36,7 @@ export default {
   props: {
       websocketUrl: String,
       marketName: String,
+      ordersHistory: Array,
   },
   data() {
     return {};

@@ -41,6 +41,7 @@ export default {
     name: 'TokenTradeTradeHistory',
     props: {
         containerClass: String,
+        ordersHistory: Array,
     },
     data() {
         return {

@@ -111,7 +111,7 @@ class TokenController extends AbstractController
             'marketName' => $marketName,
             'pendingSellOrders' => $pendingSellOrders,
             'pendingBuyOrders' => $pendingBuyOrders,
-            'ordersHistory' => $ordersHistory,
+            'ordersHistory' => $normalizer->normalize($ordersHistory),
         ]);
     }
 

@@ -84,8 +84,8 @@ class OrderManager implements OrderManagerInterface
         return array_map(function (Order $executedOrder) use ($executedOrdersUsers) {
             return $this->orderInfo(
                 $executedOrder,
-                $executedOrdersUsers[$executedOrder->getMakerId()],
-                $executedOrdersUsers[$executedOrder->getTakerId()],
+                $executedOrdersUsers['1'],
+                $executedOrdersUsers['1'],
                 null
             );
         }, $executedOrders);

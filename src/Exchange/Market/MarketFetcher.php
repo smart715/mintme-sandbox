@@ -95,8 +95,8 @@ class MarketFetcher
         return array_map(static function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
-                $orderData['maker'],
-                $orderData['taker'],
+                $orderData['maker_id'] ?? 1,
+                $orderData['taker_id'] ?? 1,
                 $market,
                 $orderData['amount'],
                 Order::SIDE_MAP[$orderData['type']],
