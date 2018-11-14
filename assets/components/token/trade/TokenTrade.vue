@@ -19,6 +19,7 @@
         />
         <token-trade-trade-history
             container-class="col-12 mt-3"
+            :orders-history="ordersHistory"
         />
     </div>
 </template>
@@ -36,7 +37,7 @@ export default {
   props: {
       websocketUrl: String,
       marketName: String,
-      ordersHistory: Array,
+      ordersHistory: String,
   },
   data() {
     return {};

@@ -41,7 +41,7 @@ export default {
     name: 'TokenTradeTradeHistory',
     props: {
         containerClass: String,
-        ordersHistory: Array,
+        ordersHistory: String,
     },
     data() {
         return {
@@ -72,19 +72,18 @@ export default {
         };
     },
     created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
+        let orders = JSON.parse(this.ordersHistory);
+        orders.forEach( (order) => {
             this.history.push({
-                date_time: '12-12-1970',
-                order_maker: 'John Doe',
-                order_trader: 'John Doe',
-                type: (i % 2 === 0) ? 'Buy' : 'Sell',
-                price_per_token: Math.floor(Math.random() * 99) + 1000,
-                token_amount: Math.floor(Math.random() * 99) + 10,
-                web_amount: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                free: Math.floor(Math.random() * 99) + 10,
+                date_time: new Date(order.timestamp * 1000).toDateString(),
+                order_maker: order.makerFirstName + order.makerLastName,
+                order_trader: order.takerFirstName + order.takerLastName,
+                type: (order.side === 0) ? 'Buy' : 'Sell',
+                price_per_token: order.price,
+                token_amount: order.amount,
+                web_amount: order.total,
             });
-        }
+        });
     },
 };
 </script>
