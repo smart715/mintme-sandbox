@@ -11,16 +11,18 @@
             <div class="col-xs-12 notification">
                 <div class="bell"></div>
                 <div class="cloud  mx-auto text-center">
-                    <span>The user has been created successfully</span><br/>
-                    <span class="font-weight title">Congrats {{ user.username }}</span><br/>
-                    <span>your account is now activated</span><br/>
-                    <p class="mt-1">
-                        {% if targetUrl is empty %}
-                            <a href="{{ path('referral') }}">Go to Referral Program .</a>
-                        {% else %}
-                            <a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a>
-                        {% endif %}
-                    </p>
+                    <div>
+                        <span>The user has been created successfully</span><br/>
+                        <span class="font-weight title">Congrats {{ user.username }}</span><br/>
+                        <span>your account is now activated</span><br/>
+                        <p class="mt-1">
+                            {% if targetUrl is empty %}
+                                <a href="{{ path('referral') }}">Go to Referral Program .</a>
+                            {% else %}
+                                <a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a>
+                            {% endif %}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
