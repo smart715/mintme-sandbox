@@ -35,6 +35,7 @@ export default {
     name: 'TokenTradeSellOrders',
     props: {
         containerClass: String,
+        sellOrders: String,
     },
     data() {
         return {
@@ -56,15 +57,15 @@ export default {
         };
     },
     created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
+        let orders = JSON.parse(this.sellOrders);
+        orders.forEach( (order) => {
             this.orders.push({
-                price: Math.floor(Math.random() * 99) + 1000,
-                amount: Math.floor(Math.random() * 99) + 10,
-                sum_web: Math.floor(Math.random() * 99) + 10 + 'WEB',
+                price: order.price,
+                amount: order.amount,
+                sum_web: order.total,
                 trader: 'John Doe',
             });
-        }
+        });
     },
 };
 </script>

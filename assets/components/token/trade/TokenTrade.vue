@@ -13,9 +13,11 @@
         />
         <token-trade-buy-orders
             container-class="col-12 col-md-6 mt-3"
+            :buy-orders="pendingBuyOrders"
         />
         <token-trade-sell-orders
             container-class="col-12 col-md-6 mt-3"
+            :sell-orders="pendingSellOrders"
         />
         <token-trade-trade-history
             container-class="col-12 mt-3"
@@ -38,6 +40,8 @@ export default {
       websocketUrl: String,
       marketName: String,
       ordersHistory: String,
+      pendingBuyOrders: String,
+      pendingSellOrders: String,
   },
   data() {
     return {};

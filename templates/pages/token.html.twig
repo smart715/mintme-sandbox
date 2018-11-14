@@ -22,6 +22,8 @@
                             websocket-url="{{ global_websocket_url }}"
                             market-name="{{ marketName | json_encode }}"
                             orders-history="{{ ordersHistory | json_encode }}"
+                            pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
+                            pending-sell-orders="{{ pendingSellOrders | json_encode }}"
                         />
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>

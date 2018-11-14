@@ -109,8 +109,8 @@ class TokenController extends AbstractController
             'isOwner' => $isOwner,
             'tab' => $tab,
             'marketName' => $marketName,
-            'pendingSellOrders' => $pendingSellOrders,
-            'pendingBuyOrders' => $pendingBuyOrders,
+            'pendingSellOrders' => $normalizer->normalize($pendingSellOrders),
+            'pendingBuyOrders' => $normalizer->normalize($pendingBuyOrders),
             'ordersHistory' => $normalizer->normalize($ordersHistory),
         ]);
     }
