@@ -249,7 +249,10 @@ code
   .cloud
     background: url('../img/cloud.png') no-repeat 
     background-size: 100%
-    padding: 4rem
+    padding: 3rem
+    min-height: 300px
+    min-width: 500px
+    overflow: hidden
     
     span
       @include font-scale(sm)
@@ -259,7 +262,7 @@ code
     a
       @include font-scale(xs)
     @include media-breakpoint-down(xs)
-      background: none;
+      background: none
 
 .v-cloak--block
   display: none
