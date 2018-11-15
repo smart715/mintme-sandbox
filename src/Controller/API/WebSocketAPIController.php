@@ -19,30 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 /** @Rest\Route("/api/ws") */
 class WebSocketAPIController extends FOSRestController
 {
-    /** @var TraderInterface */
-    private $trader;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var MarketNameParserInterface */
-    private $marketParser;
-
-    public function __construct(
-        TraderInterface $trader,
-        CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager,
-        MarketNameParserInterface $marketParser
-    ) {
-        $this->trader = $trader;
-        $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
-        $this->marketParser = $marketParser;
-    }
-
     /**
      *  @Rest\Get("/auth", name="auth")
      *  @Rest\View()
@@ -52,45 +28,15 @@ class WebSocketAPIController extends FOSRestController
         $token = $request->headers->get('authorization');
         if (null != $token && !is_array($token)) {
             $user = $profileManager->findProfileByHash($token);
+            null != $user
+                ? $profileManager->dumpHash($user)
+                : null;
             return $user
                 ? $this->confirmed($user)
                 : $this->error();
         } else {
             return $this->error();
         }
-    }
-
-
-    /**
-     *  @Rest\Get("/cancel-order/{userid}/{market}/{orderid}")
-     *  @Rest\View()
-     */
-    public function cancelOrder(int $userid, String $market, int $orderid): View
-    {
-        $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
-        $token = $this->tokenManager->findByName($this->marketParser->parseName($market));
-        if (null !== $token && null !== $crypto && null !== $userid) {
-            $market = new Market($crypto, $token);
-            $order = new Order(
-                $orderid,
-                $userid,
-                null,
-                $market,
-                "",
-                1,
-                "",
-                "",
-                null
-            );
-
-            $tradeResult = $this->trader->cancelOrder($order);
-
-            return $this->view([
-                'result' => $tradeResult->getResult(),
-                'message' => $tradeResult->getMessage(),
-            ]);
-        }
-        return $this->error();
     }
 
     private function error(): View

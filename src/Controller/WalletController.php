@@ -29,7 +29,7 @@ class WalletController extends AbstractController
             $this->getUser(),
             $this->getUser()->getRelatedTokens()
         );
-        $hash = $this->getUser()->getHash() ?? $profileManager->createHash($this->getUser())->getHash();
+        $hash = $profileManager->createHash($this->getUser())->getHash();
         $user = $profileManager->findProfileByHash($hash);
 
         $symbols = $cryptoManager->findAll();

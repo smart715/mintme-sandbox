@@ -24,7 +24,7 @@
                                 :hash="{{ hash | json_encode }}"
                                 :markets="{{ markets | json_encode }}"
                                 :user_id="{{ user_id | json_encode }}"
-                                :websocket_url="{{ global_websocket_url }}"
+                                :websocket_url="{{ global_websocket_url | json_encode }}"
                             ></active-orders>
                         </b-tab>
                     </b-tabs>

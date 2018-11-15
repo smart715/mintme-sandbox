@@ -4,9 +4,7 @@ import ActiveOrders from '../../components/wallet/ActiveOrders';
 
 describe('ActiveOrders', () => {
     describe('get result from server', () => {
-        const markets = {
-            0: 'TOK000000000001WEB',
-        };
+        const markets = ['TOK000000000001WEB'];
 
         const vm = mount(ActiveOrders, {
             propsData: {

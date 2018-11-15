@@ -137,15 +137,17 @@ export default {
             });
         },
         subscribe: function() {
+            let market = '';
             this.markets.forEach((token) => {
                 if (token !== null) {
-                    this.wsClient.send(JSON.stringify({
-                        'method': 'order.subscribe',
-                        'params': [token],
-                        'id': METHOD_ORDER_SUBSCRIBE,
-                    }));
+                    market += '"' + token + '",';
                 }
             });
+            this.wsClient.send(JSON.stringify({
+                'method': 'order.subscribe',
+                'params': [market],
+                'id': METHOD_ORDER_SUBSCRIBE,
+            }));
         },
         parseOrders: function(orders) {
             orders.forEach((order) => {
@@ -172,20 +174,20 @@ export default {
     mounted() {
         this.wsClient = this.$socket(this.websocket_url);
         this.wsClient.onmessage = (result) => {
-            let orders = JSON.parse(result.data);
-            switch (orders.id) {
+            let response = JSON.parse(result.data);
+            switch (response.id) {
                 case METHOD_AUTH:
-                    if (orders.error === null) {
+                    if (response.error === null) {
                         this.getOrders();
                     }
                     break;
                 case METHOD_ORDER_QUERY:
-                    this.parseOrders(orders.result.records);
+                    this.parseOrders(response.result.records);
                     this.subscribe();
                     break;
                 case null:
-                    if (orders.method === 'order.update') {
-                        this.deleteHistoryOrder(orders.params[1].id);
+                    if (response.method === 'order.update') {
+                        this.deleteHistoryOrder(response.params[1].id);
                     }
                     break;
             }

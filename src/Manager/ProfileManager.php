@@ -74,6 +74,14 @@ class ProfileManager implements ProfileManagerInterface
         return $user;
     }
 
+    public function dumpHash(User $user): void
+    {
+        $user->setHash(null);
+        $this->em->persist($user);
+        $this->em->flush();
+        dump($user);
+    }
+
     public function findProfileByHash(string $hash): ?User
     {
         if (null == $hash || '' === $hash) {
