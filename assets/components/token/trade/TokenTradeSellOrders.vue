@@ -63,7 +63,7 @@ export default {
                 price: order.price,
                 amount: order.amount,
                 sum_web: order.total,
-                trader: 'John Doe',
+                trader: order.FirstName + order.LastName,
             });
         });
     },
