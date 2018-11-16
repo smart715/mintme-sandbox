@@ -20,7 +20,7 @@
                         >
                         Your Tokens:
                         <span class="text-primary">
-                            9999
+                            {{tokenBalance}}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -41,6 +41,7 @@
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
+                                v-model.number="useMarketPrice"
                                 type="checkbox"
                                 id="sell-price"
                                 class="custom-control-input">
@@ -84,9 +85,13 @@
                             </guide>
                         </label>
                         <input
-                            type="text"
+                            v-model.number="sellPrice"
+                            type="number"
                             id="sell-price-input"
-                            class="form-control">
+                            class="form-control"
+                            :disabled="useMarketPrice"
+                            min="0"
+                        >
                     </div>
                     <div class="col-12 pt-3">
                         <label
@@ -95,12 +100,15 @@
                             Amount:
                         </label>
                         <input
-                            type="text"
+                            v-model="sellAmount"
+                            type="number"
                             id="sell-price-amount"
-                            class="form-control">
+                            class="form-control"
+                            min="0"
+                        >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: 999 WEB
+                        Total Price: {{totalPrice}} WEB
                         <guide>
                             <font-awesome-icon
                                 icon="question"
@@ -116,28 +124,129 @@
                         </guide>
                     </div>
                     <div class="col-12 pt-4 text-center">
-                        <button class="btn btn-primary">
+                        <button
+                            v-if="loggedIn"
+                            class="btn btn-primary"
+                            :disabled="fieldsValid"
+                            @click="placeOrder"
+                        >
                             Create sell order
                         </button>
+                        <template v-else>
+                            <a :href="loginUrl" class="btn btn-primary">Log In</a>
+                            <span class="px-2">or</span>
+                            <a :href="signupUrl">Sign Up</a>
+                        </template>
                     </div>
                 </div>
             </div>
         </div>
+        <order-modal
+            :type="modalSuccess"
+            :visible="showModal"
+            @close="showModal = false"
+        />
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import Guide from '../../Guide';
+import OrderModal from '../../modal/OrderModal';
+
 export default {
-    name: 'TokenTradeSellOrder',
-    components: {
-        Guide,
+  name: 'TokenTradeSellOrder',
+  components: {
+      Guide,
+      OrderModal,
+  },
+  props: {
+      containerClass: String,
+      websocketUrl: String,
+      loginUrl: String,
+      signupUrl: String,
+      loggedIn: Boolean,
+      tokenName: String,
+      placeOrderUrl: String,
+      marketName: String,
+      sell: Object,
+      fetchBalanceTokenUrl: String,
+  },
+  data() {
+    return {
+        sellPrice: 0,
+        sellAmount: 0,
+        useMarketPrice: false,
+        action: 'sell',
+        tokenBalance: '',
+        showModal: false,
+        modalSuccess: false,
+    };
+  },
+  methods: {
+    placeOrder: function() {
+        if (this.sellPrice && this.sellAmount) {
+        let data = {
+            tokenName: this.tokenName,
+            amountInput: this.sellAmount,
+            priceInput: this.sellPrice,
+            marketPrice: this.useMarketPrice,
+            action: this.action,
+        };
+        axios.post(this.placeOrderUrl, data)
+        .then( (response) => {
+           this.showModalAction(response.data.result);
+           this.updateBalance();
+        })
+        .catch( (error) => {
+            this.showModalAction();
+        });
+    }
     },
-    props: {
-        containerClass: String,
+    showModalAction: function(result) {
+        this.modalSuccess = 1 === result;
+        this.showModal = true;
     },
-    data() {
-        return {};
+    updateBalance: function() {
+        axios.get(this.fetchBalanceTokenUrl)
+        .then((response) => {
+          return this.tokenBalance = response.data['available'];
+        })
+        .catch((error) => {
+            if (400 === error.response.status) {
+                this.$toasted.error(error.response.data.error);
+            } else {
+                this.$toasted.error('Connection problem. Try again later.');
+            }
+        });
+    },
+  },
+  computed: {
+    totalPrice: function() {
+        return this.sellPrice * this.sellAmount;
+    },
+    market: function() {
+        return JSON.parse(this.marketName);
+    },
+    amount: function() {
+        return this.sell.amount || null;
+    },
+    price: function() {
+        return this.sell.price || null;
+    },
+    fieldsValid: function() {
+        return this.sellPrice && this.sellAmount;
+    },
+  },
+  watch: {
+      useMarketPrice: function() {
+          if (this.useMarketPrice) {
+              this.sellPrice = this.price || 0;
+          }
+      },
+  },
+  mounted: function() {
+        this.updateBalance();
     },
 };
 </script>

@@ -3,11 +3,11 @@
 namespace App\Serializer;
 
 use App\Entity\Token\Token;
-use App\Entity\User;
+use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\TokenManagerInterface;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -19,17 +19,17 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     /** @var ObjectNormalizer */
     private $normalizer;
 
-    /** @var mixed */
-    private $user;
+    /** @var TokenManagerInterface */
+    private $tokenManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         ObjectNormalizer $normalizer,
-        TokenStorageInterface $storage
+        TokenManagerInterface $tokenManager
     ) {
         $this->entityManager = $entityManager;
         $this->normalizer = $normalizer;
-        $this->user = $storage->getToken()->getUser();
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -39,20 +39,19 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $data = $this->normalizer->normalize($object, $format, $context);
-
         $result = [];
+        $data = $object->getAll();
 
-        foreach ($data['all'] as $name => $props) {
-            $token = $this->getTokenFromHiddenName($name);
+        array_walk($data, function (BalanceResult $balanceResult, string $key) use (&$result, $format, $context): void {
+            $token = $this->getTokenFromHiddenName($key);
 
-            if ($token->getProfile()->getUser() === $this->user) {
-                $props['available'] -= $token->getLockIn()
-                    ? $token->getLockIn()->getFrozenAmount()
-                    : 0;
-            }
-            $result[$token->getName()] = $props;
-        }
+            $result[$token->getName()] = $this->tokenManager->getRealBalance(
+                $token,
+                $balanceResult
+            );
+
+            $result[$token->getName()] = $this->normalizer->normalize($result[$token->getName()], $format, $context);
+        });
 
         return $result;
     }
@@ -67,7 +66,9 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
 
     private function getTokenFromHiddenName(string $name): Token
     {
-        return $this->getTokenRepository()->find($this->getIdFromName($name));
+        return Token::WEB_SYMBOL === $name ?
+            Token::getWeb() :
+            $this->getTokenRepository()->find($this->getIdFromName($name));
     }
 
     private function getIdFromName(string $name): int

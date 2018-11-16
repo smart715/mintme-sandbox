@@ -55,7 +55,7 @@ class ProfileController extends Controller
 
         $session->set('editFormShowFirst', false);
 
-        return  $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }
 
     /** @Route(name="profile") */
@@ -88,6 +88,6 @@ class ProfileController extends Controller
 
         $session->set('editFormShowFirst', true);
 
-        return  $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }
 }
