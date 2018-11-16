@@ -52,7 +52,7 @@ class TokenController extends AbstractController
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         MarketManagerInterface $marketManager,
-        OrderManagerInterface $orderManager
+        OrderManagerInterface $orderManager,
         TraderInterface $trader
     ) {
         $this->em = $em;
