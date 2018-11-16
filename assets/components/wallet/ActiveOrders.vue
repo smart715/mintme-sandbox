@@ -39,11 +39,12 @@ import ConfirmModal from '../modal/ConfirmModal';
 import WebSocket from '../../js/websocket';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
+import Routing from '../js/routing';
+
 
 const METHOD_AUTH = 12345;
 const METHOD_ORDER_QUERY = 54321;
 const METHOD_ORDER_SUBSCRIBE = 12878;
-const API_ORDER_CANCEL = '../api/user/cancel-order/';
 
 Vue.use(WebSocket);
 Vue.use(Toasted);
@@ -159,8 +160,9 @@ export default {
                     price: order.price,
                     total: (order.price * order.amount + order.maker_fee),
                     free: order.maker_fee,
-                    action: API_ORDER_CANCEL + this.user_id + '/'
-                    + order.market + '/' + order.id,
+                    action: Routing.generate('order_cancel', {
+                            userid: this.user_id, market: order.market, orderid: order.id,
+                    }),
                     id: order.id,
                 });
             });

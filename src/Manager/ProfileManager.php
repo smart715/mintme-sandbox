@@ -82,7 +82,7 @@ class ProfileManager implements ProfileManagerInterface
         dump($user);
     }
 
-    public function findProfileByHash(string $hash): ?User
+    public function findProfileByHash(?string $hash): ?User
     {
         if (null == $hash || '' === $hash) {
             return null;

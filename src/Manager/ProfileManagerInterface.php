@@ -13,7 +13,7 @@ interface ProfileManagerInterface
     public function generatePageUrl(Profile $profile): ?string;
     public function createHash(User $user): User;
     public function dumpHash(User $user): void;
-    public function findProfileByHash(string $hash): ?User;
+    public function findProfileByHash(?string $hash): ?User;
 
     /**
      * @param mixed $user
