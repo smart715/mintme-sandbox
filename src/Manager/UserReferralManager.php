@@ -27,7 +27,7 @@ class UserReferralManager implements UserReferralManagerInterface
         $user = $this->userRepository->findOneBy([ 'id' => $userId ]);
         $referrer = $this->userRepository->findOneBy([ 'referralCode' => $referralCode ]);
         
-        if (!is_null($referrer)) {
+        if (!is_null($referrer) && $userId !== $referrer->getId()) {
             $user->referenceBy($referrer);
         }
         $user->setReferralCode($user->getReferralCode());
