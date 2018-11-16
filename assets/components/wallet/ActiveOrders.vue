@@ -39,7 +39,7 @@ import ConfirmModal from '../modal/ConfirmModal';
 import WebSocket from '../../js/websocket';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
-import Routing from '../js/routing';
+import Routing from '../../js/routing';
 
 
 const METHOD_AUTH = 12345;
