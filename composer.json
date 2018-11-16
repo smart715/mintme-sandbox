@@ -11,6 +11,7 @@
         "cron/cron-bundle": "^2.0",
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "excelwebzone/recaptcha-bundle": "^1.5",
+        "friendsofsymfony/jsrouting-bundle": "^2.2",
         "friendsofsymfony/rest-bundle": "^2.3",
         "friendsofsymfony/user-bundle": "^2.1",
         "fzaninotto/faker": "^1.8",
