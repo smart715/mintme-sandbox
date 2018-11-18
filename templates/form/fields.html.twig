@@ -9,11 +9,13 @@
 {% endblock form_row %}
 
 {%- block form_errors -%}
+    {% set break = false %}
     {%- if errors|length > 0 -%}
     <div class="py-2 mb-2 bg-danger text-white text-center">
         <ul class="pl-3 m-0 list-unstyled">
-            {%- for error in errors -%}
+            {%- for error in errors if not break  -%}
                 <li>{{ error.message }}</li>
+                {% set break = true %}
             {%- endfor -%}
         </ul>
     </div>
