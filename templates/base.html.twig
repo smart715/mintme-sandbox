@@ -25,15 +25,17 @@
                     {% endblock %}
                     {% block main %}
                         <div class="pt-5 contents-wrapper">
-                            <div class="{% block messagesClass %} {% endblock %}">
-                                {% for label, messages in app.flashes %}
-                                    {% for message in messages %}
-                                        <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
-                                            {{ message }}
-                                        </div>
+                            {% block messagesContent %}
+                                <div class="{% block messagesClass %} {% endblock %}">
+                                    {% for label, messages in app.flashes %}
+                                        {% for message in messages %}
+                                            <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
+                                                {{ message }}
+                                            </div>
+                                        {% endfor %}
                                     {% endfor %}
-                                {% endfor %}
-                            </div>
+                                </div>
+                            {% endblock %}
                             {% block content %}{% endblock %}
                         </div>
                     {% endblock %}
