@@ -249,3 +249,19 @@ label
 
 .sorting_desc
   background: url('../img/sort_desc.png') no-repeat right center
+
+.v-cloak--block
+  display: none
+
+.v-cloak--inline
+  display: none
+
+[v-cloak]
+  & > .v-cloak--block
+    display: block
+
+  & > .v-cloak--inline
+    display: inline
+
+  & > *:not(.v-cloak--inline)
+    display: none
