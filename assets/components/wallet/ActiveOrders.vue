@@ -57,7 +57,6 @@ export default {
     props: {
         hash: String,
         markets: Array,
-        user_id: Number,
         websocket_url: String,
     },
     data() {
@@ -138,15 +137,9 @@ export default {
             });
         },
         subscribe: function() {
-            let market = '';
-            this.markets.forEach((token) => {
-                if (token !== null) {
-                    market += '"' + token + '",';
-                }
-            });
             this.wsClient.send(JSON.stringify({
                 'method': 'order.subscribe',
-                'params': [market],
+                'params': this.markets.filter(Boolean).join(','),
                 'id': METHOD_ORDER_SUBSCRIBE,
             }));
         },
@@ -161,7 +154,7 @@ export default {
                     total: (order.price * order.amount + order.maker_fee),
                     free: order.maker_fee,
                     action: Routing.generate('order_cancel', {
-                            userid: this.user_id, market: order.market, orderid: order.id,
+                        market: order.market, orderid: order.id,
                     }),
                     id: order.id,
                 });

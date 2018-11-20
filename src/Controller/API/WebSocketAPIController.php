@@ -20,23 +20,26 @@ use Symfony\Component\HttpFoundation\Request;
 class WebSocketAPIController extends FOSRestController
 {
     /**
-     *  @Rest\Get("/auth", name="auth")
-     *  @Rest\View()
+     * @Rest\Get("/auth", name="auth")
+     * @Rest\View()
      */
     public function authUser(Request $request, ProfileManagerInterface $profileManager): View
     {
         $token = $request->headers->get('authorization');
-        if (null != $token && !is_array($token)) {
-            $user = $profileManager->findProfileByHash($token);
-            null != $user
-                ? $profileManager->dumpHash($user)
-                : null;
-            return $user
-                ? $this->confirmed($user)
-                : $this->error();
-        } else {
+
+        if (null == $token || is_array($token)) {
             return $this->error();
         }
+
+        $user = $profileManager->findProfileByHash($token);
+
+        if (null === $user) {
+            return $this->error();
+        }
+
+        $profileManager->createHash($user, false);
+
+        return $this->confirmed($user);
     }
 
     private function error(): View

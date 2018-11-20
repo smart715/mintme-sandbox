@@ -29,8 +29,7 @@ class WalletController extends AbstractController
             $this->getUser(),
             $this->getUser()->getRelatedTokens()
         );
-        $hash = $profileManager->createHash($this->getUser())->getHash();
-        $user = $profileManager->findProfileByHash($hash);
+        $user = $profileManager->findProfileByHash($this->getUser()->getHash());
 
         $symbols = $cryptoManager->findAll();
         $markets = array_map(function (Crypto $crypto, $tokenManager) {
@@ -42,7 +41,6 @@ class WalletController extends AbstractController
         return $this->render('pages/wallet.html.twig', [
             'markets' => $markets,
             'hash' => $user->getHash(),
-            'user_id' => $user->getId(),
             'tokens' => $normalizer->normalize($tokens),
         ]);
     }

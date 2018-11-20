@@ -40,18 +40,18 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     *  @Rest\Get("/cancel-order/{userid}/{market}/{orderid}", name="order_cancel")
+     *  @Rest\Get("/cancel-order/{market}/{orderid}", name="order_cancel")
      *  @Rest\View()
      */
-    public function cancelOrder(int $userid, String $market, int $orderid): View
+    public function cancelOrder(String $market, int $orderid): View
     {
         $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
         $token = $this->tokenManager->findByName($this->marketParser->parseName($market));
-        if (null !== $token && null !== $crypto && null !== $userid) {
+        if (null !== $token && null !== $crypto) {
             $market = new Market($crypto, $token);
             $order = new Order(
                 $orderid,
-                $userid,
+                $this->getUser()->getId(),
                 null,
                 $market,
                 "",

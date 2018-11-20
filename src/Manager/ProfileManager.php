@@ -66,20 +66,14 @@ class ProfileManager implements ProfileManagerInterface
                 : $this->generateUniqueUrl($route);
     }
 
-    public function createHash(User $user): User
+    public function createHash(User $user, bool $hash = true): User
     {
-        $user->setHash(hash('sha256', Uuid::uuid4()->toString()));
+        false === $hash
+            ? $user->setHash(null)
+            : $user->setHash(hash('sha256', Uuid::uuid4()->toString()));
         $this->em->persist($user);
         $this->em->flush();
         return $user;
-    }
-
-    public function dumpHash(User $user): void
-    {
-        $user->setHash(null);
-        $this->em->persist($user);
-        $this->em->flush();
-        dump($user);
     }
 
     public function findProfileByHash(?string $hash): ?User
