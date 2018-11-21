@@ -22,12 +22,13 @@ class TraderTest extends TestCase
     public function testPlaceOrder(bool $hasError, array $error, int $tradeResult): void
     {
         $method = 'order.put_limit';
-        $params = [1, 'TOK000000000001WEB', 1, '10', '5', 0.01, 0.01, ''];
+        $params = [1, 'TOK000000000001WEB', 1, '10', '5', '0.01', '0.01', '', 0, '0'];
 
         $jsonResponse = $this->createMock(JsonRpcResponse::class);
         $jsonResponse->method('hasError')->willReturn($hasError);
         $jsonResponse->method('getError')->willReturn($error);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->with($this->equalTo($method), $this->equalTo($params))
@@ -51,6 +52,7 @@ class TraderTest extends TestCase
 
     public function testPlaceOrderException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
@@ -72,6 +74,7 @@ class TraderTest extends TestCase
         $jsonResponse->method('hasError')->willReturn($hasError);
         $jsonResponse->method('getError')->willReturn($error);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->with($this->equalTo($method), $this->equalTo($params))
@@ -96,6 +99,7 @@ class TraderTest extends TestCase
 
     public function testCancelOrderException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
@@ -122,6 +126,7 @@ class TraderTest extends TestCase
         $jsonResponse->method('getError')->willReturn($error);
         $jsonResponse->method('getResult')->willReturn($result);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->with($this->equalTo($method), $this->equalTo($params))
@@ -148,6 +153,7 @@ class TraderTest extends TestCase
 
     public function testGetFinishedOrdersException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
@@ -181,6 +187,7 @@ class TraderTest extends TestCase
         $jsonResponse->method('getError')->willReturn($error);
         $jsonResponse->method('getResult')->willReturn($result);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->with($this->equalTo($method), $this->equalTo($params))
@@ -207,6 +214,7 @@ class TraderTest extends TestCase
 
     public function testGetPendingOrdersException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));

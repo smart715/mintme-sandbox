@@ -51,6 +51,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
             );
 
             $result[$token->getName()] = $this->normalizer->normalize($result[$token->getName()], $format, $context);
+            $result[$token->getName()]['fullname'] = $token->getFullname();
         });
 
         return $result;
@@ -66,8 +67,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
 
     private function getTokenFromHiddenName(string $name): Token
     {
-        return Token::WEB_SYMBOL === $name ?
-            Token::getWeb() :
+        return $this->tokenManager->findByName($name) ??
             $this->getTokenRepository()->find($this->getIdFromName($name));
     }
 

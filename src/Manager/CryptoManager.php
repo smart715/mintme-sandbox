@@ -32,6 +32,7 @@ class CryptoManager implements CryptoManagerInterface
         }, $symbols);
     }
 
+    /** {@inheritdoc} */
     public function findAll(): array
     {
         return $this->repository->findAll();

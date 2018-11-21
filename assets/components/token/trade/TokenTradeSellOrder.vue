@@ -127,7 +127,7 @@
                         <button
                             v-if="loggedIn"
                             class="btn btn-primary"
-                            :disabled="fieldsValid"
+                            :disabled="!fieldsValid"
                             @click="placeOrder"
                         >
                             Create sell order
@@ -235,7 +235,7 @@ export default {
         return this.sell.price || null;
     },
     fieldsValid: function() {
-        return this.sellPrice && this.sellAmount;
+        return Boolean(this.sellPrice && this.sellAmount);
     },
   },
   watch: {

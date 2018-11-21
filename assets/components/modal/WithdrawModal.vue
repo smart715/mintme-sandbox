@@ -4,34 +4,48 @@
         @close="closeModal">
         <template slot="body" v-if="formLoaded">
             <div class="text-center">
-                <h3>WITHDRAW(NAME)</h3>
+                <h3>WITHDRAW({{ currency }})</h3>
                 <div class="col-12 pt-3">
                     <label for="address" class="d-block text-left">
                         Address:
                     </label>
                     <input
+                        v-model="$v.address.$model"
                         type="text"
                         id="address"
+                        :class="{ 'is-invalid': $v.address.$error }"
                         class="form-control">
+                    <div v-if="$v.address.$error" class="invalid-feedback">
+                        Address can't be empty and must contain alphanumeric letters only.
+                    </div>
                 </div>
                 <div class="col-12 pt-3">
-                    <label for="amount"  class="d-block text-left">
+                    <label for="wamount"  class="d-block text-left">
                         Amount (balance):
                     </label>
                     <div class="text-right">
-                        <input type="text" class="form-control text-left input-custom-padding">
+                        <input
+                            id="wamount"
+                            v-model.number="$v.amount.$model"
+                            type="text"
+                            :class="{ 'is-invalid': $v.amount.$error }"
+                            class="form-control text-left input-custom-padding">
                         <button
                             class="btn btn-primary btn-input"
-                            type="button">
+                            type="button"
+                            @click="setMaxAmount">
                             All
                         </button>
+                    </div>
+                    <div v-if="$v.amount.$error" class="invalid-feedback">
+                        You can't set bigger amount than your own balance. Amount must be decimal.
                     </div>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
-                        Amount WEB:
+                        Amount {{ currency }}:
                     </label>
-                    <span class="float-right">{{ amountWEB }}</span>
+                    <span class="float-right">{{ maxAmount }}</span>
                 </div>
                 <div class="pt-3">
                     <button
@@ -62,6 +76,9 @@
 
 <script>
 import Modal from './Modal.vue';
+import axios from 'axios';
+import {required, minLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
+
 export default {
     name: 'WithdrawModal',
     components: {
@@ -69,28 +86,88 @@ export default {
     },
     props: {
         visible: Boolean,
-        amountWEB: Number,
+        currency: String,
+        balanceUrl: String,
+        withdrawUrl: String,
     },
     data() {
         return {
             formLoaded: false,
+            amount: 0,
+            maxAmount: 0,
+            address: '',
         };
-    },
-    mounted: function() {
-        this.formLoaded = true;
     },
     methods: {
         closeModal: function() {
+            this.amount = 0;
+            this.address = '';
             this.$emit('close');
         },
         onWithdraw: function() {
-            this.closeModal();
-            this.$emit('withdraw');
+            if (this.$v.address.$error || this.$v.amount.$error) {
+                this.$toasted.error('Correct your form fields');
+                return;
+            }
+
+            axios.post(this.withdrawUrl, {
+                crypto: this.currency,
+                amount: this.amount,
+                address: this.address,
+            })
+            .then((response) => {
+                this.$toasted.success('Paid');
+                this.closeModal();
+            })
+            .catch((error) => {
+                this.$toasted.error(error.response.data.error);
+            });
+
+            this.$emit('withdraw', this.currency, this.amount, this.address);
         },
         onCancel: function() {
-            this.closeModal();
             this.$emit('cancel');
+            this.closeModal();
         },
+        fetchMaxAmount: function() {
+            return axios.get(this.balanceUrl.replace('currency', this.currency));
+        },
+        setMaxAmount: function() {
+            this.amount = this.maxAmount;
+        },
+    },
+    watch: {
+        visible: function(value) {
+            if (!value) {
+                this.formLoaded = false;
+                return;
+            }
+
+            this.fetchMaxAmount()
+                .then((response) => {
+                    this.maxAmount = response.data['available'];
+                    this.formLoaded = true;
+                })
+                .catch((error) => {
+                    this.$emit('close');
+                    this.$toasted.error('Service unavailable now. Try later');
+                });
+        },
+    },
+    validations() {
+        return {
+            amount: {
+                required,
+                decimal,
+                maxValue: maxValue(this.maxAmount),
+                minValue: minValue(0.00001),
+            },
+            address: {
+                required,
+                alphaNum,
+                minLength: minLength(1),
+            },
+        };
     },
 };
 </script>

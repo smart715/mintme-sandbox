@@ -23,7 +23,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,*/Model}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -109,5 +109,20 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
+    App\Consumers\PaymentConsumer:
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
     App\Serializer\BalanceResultContainerNormalizer:
         tags: ['serializer.normalizer']
+
+    payment_consumer: '@App\Consumers\PaymentConsumer'
+
+    App\Manager\UserManager:
+        arguments:
+            - "@fos_user.util.password_updater"
+            - "@fos_user.util.canonical_fields_updater"
+            - "@doctrine.orm.entity_manager"
+            - "%fos_user.model.user.class%"

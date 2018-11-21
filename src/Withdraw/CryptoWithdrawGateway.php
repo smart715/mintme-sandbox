@@ -5,7 +5,10 @@ namespace App\Withdraw;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Withdraw\Communicator\CommunicatorInterface;
+use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use App\Withdraw\Fetcher\Mapper\MapperInterface;
+use App\Withdraw\Payment\Status;
+use App\Withdraw\Payment\Transaction;
 
 class CryptoWithdrawGateway implements WithdrawGatewayInterface
 {
@@ -21,19 +24,24 @@ class CryptoWithdrawGateway implements WithdrawGatewayInterface
         $this->mapper = $mapper;
     }
 
-    public function withdraw(User $user, string $balance, string $address, Crypto $crypto): void
+    public function withdraw(User $user, float $balance, string $address, Crypto $crypto): void
     {
         $this->communicator->sendWithdrawRequest($user, $balance, $address, $crypto);
     }
 
-    /** {@inheritdoc} */
-    public function getHistory(User $user): array
+    public function retryWithdraw(WithdrawCallbackMessage $callbackMessage): void
     {
-        return $this->mapper->getHistory($user);
+        $this->communicator->sendRetryMessage($callbackMessage);
     }
 
     /** {@inheritdoc} */
-    public function getBalance(Crypto $crypto): array
+    public function getHistory(User $user, int $offset = 0, int $limit = 50): array
+    {
+        return $this->mapper->getHistory($user, $offset, $limit);
+    }
+
+    /** {@inheritdoc} */
+    public function getBalance(Crypto $crypto): ?float
     {
         return $this->mapper->getBalance($crypto);
     }
