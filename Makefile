@@ -2,6 +2,7 @@ init_docker:
 	php bin/console doctrine:database:create --if-not-exists
 	php bin/console doctrine:migrations:migrate --allow-no-migration -n
 	php bin/console cron:start
+	nohup php bin/console rabbitmq:consumer payment &
 	docker-php-entrypoint php-fpm
 
 phpunit:

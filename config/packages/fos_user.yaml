@@ -13,3 +13,4 @@ fos_user:
         sender_name: "%env(MAILER_USER)%"
     service:
         mailer: fos_user.mailer.twig_swift
+        user_manager: App\Manager\UserManagerInterface

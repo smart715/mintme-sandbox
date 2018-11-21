@@ -2,6 +2,7 @@
 
 namespace App\Entity\Token;
 
+use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,11 +18,6 @@ class Token
 {
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
-
-    public const PREDEFINED_TOKENS = [
-        self::WEB_SYMBOL,
-        self::BTC_SYMBOL,
-    ];
 
     /**
      * @ORM\Id()
@@ -90,7 +86,22 @@ class Token
      */
     protected $lockIn;
 
-    public function getId(): int
+    /** @var string|null */
+    protected $fullname;
+
+    public function getFullname(): ?string
+    {
+        return $this->fullname;
+    }
+
+    public function setFullname(string $name): self
+    {
+        $this->fullname = $name;
+
+        return $this;
+    }
+
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -189,10 +200,8 @@ class Token
         return $this->profile;
     }
 
-    public static function getWeb(): self
+    public static function getFromCrypto(Crypto $crypto): self
     {
-        $web = new Token();
-        $web->setName(self::WEB_SYMBOL);
-        return $web;
+        return (new self())->setName($crypto->getSymbol());
     }
 }

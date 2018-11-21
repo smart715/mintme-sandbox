@@ -5,6 +5,7 @@ namespace App\Exchange\Balance;
 use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
@@ -33,13 +34,13 @@ class BalanceHandler implements BalanceHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function deposit(User $user, Token $token, int $amount): void
+    public function deposit(User $user, Token $token, float $amount): void
     {
-        $this->update($user, $token, $amount, 'deposit');
+        $this->update($user, $token, -abs($amount), 'deposit');
     }
 
     /** {@inheritdoc} */
-    public function withdraw(User $user, Token $token, int $amount): void
+    public function withdraw(User $user, Token $token, float $amount): void
     {
         $this->update($user, $token, $amount, 'withdraw');
     }
@@ -68,13 +69,13 @@ class BalanceHandler implements BalanceHandlerInterface
 
     /**
      * @throws FetchException
-     * @throws \Exception
+     * @throws BalanceException
      */
-    private function update(User $user, Token $token, int $amount, string $type): void
+    private function update(User $user, Token $token, float $amount, string $type): void
     {
         $this->balanceFetcher->update($user->getId(), $this->converter->convert($token), $amount, $type);
 
-        if (!in_array($token, $user->getRelatedTokens())) {
+        if (!in_array($token, $user->getRelatedTokens()) && $token->getId()) {
             $user->addRelatedToken($token);
             $this->entityManager->persist($user);
             $this->entityManager->flush();

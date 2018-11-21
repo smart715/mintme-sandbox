@@ -12,7 +12,11 @@ interface TokenManagerInterface
 
     public function getOwnToken(): ?Token;
 
+    /** @return Token[] */
     public function findAll(): array;
+
+    /** @return Token[] */
+    public function findAllPredefined(): array;
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult;
 }

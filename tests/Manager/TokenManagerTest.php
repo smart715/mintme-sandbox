@@ -2,33 +2,57 @@
 
 namespace App\Tests\Manager;
 
+use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
-use App\Entity\User;
 use App\Fetcher\ProfileFetcherInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManager;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\UserBundle\Model\UserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TokenManagerTest extends TestCase
 {
+    public function testFindByNameWithCrypto(): void
+    {
+        $name = 'TOKEN';
+
+        /** @var MockObject|EntityManagerInterface $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $tokenManager = new TokenManager(
+            $entityManager,
+            $this->createMock(ProfileFetcherInterface::class),
+            $this->mockTokenStorage(),
+            $this->mockCryptoManager([$this->mockCrypto($name)])
+        );
+
+        $this->assertEquals($name, $tokenManager->findByName($name)->getFullname());
+        $this->assertEquals($name, $tokenManager->findByName($name)->getName());
+        $this->assertNotSame($tokenManager->findByName($name), $tokenManager->findByName($name));
+    }
+
     public function testFindByName(): void
     {
         $name = 'TOKEN';
         $token = $this->createMock(Token::class);
+
+        /** @var MockObject|TokenRepository $tokenRepository */
         $tokenRepository = $this->createMock(TokenRepository::class);
         $tokenRepository->method('findByName')->with($name)->willReturn($token);
+
+        /** @var MockObject|EntityManagerInterface $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->method('getRepository')->willReturn($tokenRepository);
 
         $tokenManager = new TokenManager(
             $entityManager,
             $this->createMock(ProfileFetcherInterface::class),
-            $this->mockTokenStorage()
+            $this->mockTokenStorage(),
+            $this->mockCryptoManager([])
         );
 
         $this->assertEquals($token, $tokenManager->findByName($name));
@@ -41,26 +65,30 @@ class TokenManagerTest extends TestCase
         $profile = $this->createMock(Profile::class);
         $profile->method('getToken')->willReturn($token);
 
+        /** @var MockObject|ProfileFetcherInterface $profileFetcher */
         $profileFetcher = $this->createMock(ProfileFetcherInterface::class);
         $profileFetcher->method('fetchProfile')->willReturn($profile);
 
         $tokenManager = new TokenManager(
             $this->createMock(EntityManagerInterface::class),
             $profileFetcher,
-            $this->mockTokenStorage()
+            $this->mockTokenStorage(),
+            $this->mockCryptoManager([])
         );
         $this->assertEquals($token, $tokenManager->getOwnToken());
     }
 
     public function testGetOwnTokenWhenProfileNotCreated(): void
     {
+        /** @var MockObject|ProfileFetcherInterface $profileFetcher */
         $profileFetcher = $this->createMock(ProfileFetcherInterface::class);
         $profileFetcher->method('fetchProfile')->willReturn(null);
 
         $tokenManager = new TokenManager(
             $this->createMock(EntityManagerInterface::class),
             $profileFetcher,
-            $this->mockTokenStorage()
+            $this->mockTokenStorage(),
+            $this->mockCryptoManager([])
         );
         $this->assertEquals(null, $tokenManager->getOwnToken());
     }
@@ -69,5 +97,36 @@ class TokenManagerTest extends TestCase
     private function mockTokenStorage(): TokenStorageInterface
     {
         return $this->createMock(TokenStorageInterface::class);
+    }
+
+    /**
+     * @param Crypto[] $cryptos
+     * @return MockObject|CryptoManagerInterface
+     */
+    private function mockCryptoManager(array $cryptos): CryptoManagerInterface
+    {
+        $manager = $this->createMock(CryptoManagerInterface::class);
+
+        $manager->method('findAll')->willReturn($cryptos);
+        $manager->method('findBySymbol')->willReturnCallback(function (string $str) use ($cryptos) {
+            return $cryptos[
+                array_search($str, array_map(function (Crypto $crypto) {
+                    return $crypto->getSymbol();
+                }, $cryptos)) ?: 0
+            ];
+        });
+
+        return $manager;
+    }
+
+    /** @return MockObject|Crypto */
+    private function mockCrypto(string $symbol): Crypto
+    {
+        $crypto = $this->createMock(Crypto::class);
+
+        $crypto->method('getSymbol')->willReturn($symbol);
+        $crypto->method('getName')->willReturn($symbol);
+
+        return $crypto;
     }
 }

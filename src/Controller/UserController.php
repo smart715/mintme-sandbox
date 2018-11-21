@@ -127,7 +127,7 @@ class UserController extends AbstractController
             return $this->render('security/2fa_manager.html.twig', $parameters);
         }
 
-        $this->addFlash('error', 'Invalid two-factor authentication code.');
+        $this->addFlash('danger', 'Invalid two-factor authentication code.');
         return $this->render('security/2fa_manager.html.twig', $parameters);
     }
 

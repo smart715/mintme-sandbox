@@ -9,8 +9,7 @@ use App\Withdraw\Payment\Transaction;
 interface MapperInterface
 {
     /** @return Transaction[] */
-    public function getHistory(User $user): array;
+    public function getHistory(User $user, int $offset = 0, int $limit = 50): array;
 
-    /** @return mixed[] */
-    public function getBalance(Crypto $crypto): array;
+    public function getBalance(Crypto $crypto): ?float;
 }
