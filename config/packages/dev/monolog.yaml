@@ -4,7 +4,7 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event", '!cron']
+            channels: ["!event", '!cron', '!rabbitmq']
         console:
             type: console
             process_psr_3_messages: false
@@ -14,3 +14,8 @@ monolog:
             path: "%kernel.logs_dir%/cron.log"
             level: debug
             channels: ['cron']
+        rabbitmq:
+            type: stream
+            path: "%kernel.logs_dir%/rabbitmq.log"
+            level: debug
+            channels: ['rabbitmq']

@@ -50,15 +50,10 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faYoutubeSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
-import Toasted from 'vue-toasted';
 import gapi from 'gapi';
 import Guide from '../Guide';
 
 library.add(faYoutubeSquare);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 const HTTP_NO_CONTENT = 204;
 const HTTP_BAD_REQUEST = 400;

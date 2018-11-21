@@ -13,20 +13,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Bitcoin (BTC)</td>
-                        <td>0.123</td>
-                        <td>^</td>
-                    </tr>
-                    <tr>
-                        <td>Webchain (WEB)</td>
-                        <td>120.24353343
+                    <tr v-for="(token, name) in predefinedTokens" :key="name">
+                        <td>{{ token.fullname }} ({{ name }})</td>
+                        <td>{{ token.available }}</td>
+                        <td>
                             <font-awesome-icon
-                                icon="question"
-                                class="text-green"
+                                    icon="shopping-cart"
+                                    class="text-orange c-pointer"
+                                    @click="openWithdraw(name)"
                             />
-                            :30</td>
-                        <td>^</td>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -39,28 +35,47 @@
                 <tr>
                     <th>Name <font-awesome-icon icon="sort" /></th>
                     <th>Amount <font-awesome-icon icon="sort" /></th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="(token, name) in tokens" :key="name">
                     <td>{{ name }}</td>
                     <td>{{ token.available }}</td>
-                    <td>^</td>
                 </tr>
             </tbody>
         </table>
+        <withdraw-modal :visible="showModal" :currency="selectedCurrency" :balance-url="balanceUrl" :withdraw-url="withdrawUrl" @close="closeWithdraw" />
     </div>
 </template>
 
 <script>
+import WithdrawModal from '../modal/WithdrawModal';
+
 export default {
     name: 'Wallet',
+    components: {
+        WithdrawModal,
+    },
     props: {
         tokens: {type: Object, required: true},
+        predefinedTokens: {type: Object, required: true},
+        balanceUrl: {type: String, required: true},
+        withdrawUrl: {type: String, required: true},
     },
     data() {
-        return {};
+        return {
+            showModal: false,
+            selectedCurrency: null,
+        };
+    },
+    methods: {
+        openWithdraw: function(currency) {
+            this.showModal = true;
+            this.selectedCurrency = currency;
+        },
+        closeWithdraw: function() {
+            this.showModal = false;
+        },
     },
 };
 </script>

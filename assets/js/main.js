@@ -8,6 +8,8 @@ import {faSearch, faCog} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import VueClipboard from 'vue-clipboard2';
 import VueTippy from 'vue-tippy';
+import Vuelidate from 'vuelidate';
+import Toasted from 'vue-toasted';
 
 VueClipboard.config.autoSetContainer = true;
 
@@ -22,6 +24,11 @@ Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.use(VueBootstrap);
 Vue.use(VueClipboard);
 Vue.use(VueTippy);
+Vue.use(Vuelidate);
+Vue.use(Toasted, {
+    position: 'top-center',
+    duration: 5000,
+});
 
 Vue.options.delimiters = ['{[', ']}'];
 

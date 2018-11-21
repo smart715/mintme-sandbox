@@ -15,6 +15,9 @@ class BalanceResult
     /** @var float */
     private $freeze;
 
+    /** @var bool */
+    private $isFailed = false;
+
     private function __construct(float $abailable, float $freeze)
     {
         $this->available = $abailable;
@@ -33,7 +36,7 @@ class BalanceResult
 
     public function isFailed(): bool
     {
-        return empty($this->available) && empty($this->freeze);
+        return $this->isFailed;
     }
 
     public static function success(float $available, float $freeze): self
@@ -43,6 +46,10 @@ class BalanceResult
 
     public static function fail(): self
     {
-        return new self(0, 0);
+        $result = new self(0, 0);
+
+        $result->isFailed = true;
+
+        return $result;
     }
 }
