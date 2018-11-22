@@ -21,4 +21,9 @@ class UserRepository extends EntityRepository
             ->execute()
         ;
     }
+
+    public function findByHash(string $hash): ?User
+    {
+        return $this->findOneBy(['hash' => $hash]);
+    }
 }

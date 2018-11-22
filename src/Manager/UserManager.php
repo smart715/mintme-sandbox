@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UserManager implements UserManagerInterface
+class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserManagerInterface
 {
     /** @var UserRepository */
     private $userRepository;
@@ -14,6 +14,16 @@ class UserManager implements UserManagerInterface
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->userRepository = $entityManager->getRepository(User::class);
+    }
+
+    public function find(int $id): ?User
+    {
+        return $this->getRepository()->find($id);
+    }
+
+    public function getRepository(): UserRepository
+    {
+        return parent::getRepository();
     }
 
     public function findByEmail(string $email): ?User

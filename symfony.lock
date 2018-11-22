@@ -98,6 +98,15 @@
     "facebook/webdriver": {
         "version": "1.6.0"
     },
+    "friendsofsymfony/jsrouting-bundle": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.0",
+            "ref": "370bcf99b04c0dfd0b545745aad622d757af5e1b"
+        }
+    },
     "friendsofsymfony/rest-bundle": {
         "version": "2.2",
         "recipe": {

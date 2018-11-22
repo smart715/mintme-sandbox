@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\Uuid;
 
 class ProfileManager implements ProfileManagerInterface
 {
@@ -16,10 +17,14 @@ class ProfileManager implements ProfileManagerInterface
     /** @var UserRepository */
     private $userRepository;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->profileRepository = $entityManager->getRepository(Profile::class);
         $this->userRepository = $entityManager->getRepository(User::class);
+        $this->em = $entityManager;
     }
 
     /**
@@ -59,6 +64,25 @@ class ProfileManager implements ProfileManagerInterface
         return null === $existedProfile || $profile === $existedProfile
                 ? strtolower($route)
                 : $this->generateUniqueUrl($route);
+    }
+
+    public function createHash(User $user, bool $hash = true): User
+    {
+        false === $hash
+            ? $user->setHash(null)
+            : $user->setHash(hash('sha256', Uuid::uuid4()->toString()));
+        $this->em->persist($user);
+        $this->em->flush();
+        return $user;
+    }
+
+    public function findProfileByHash(?string $hash): ?User
+    {
+        if (null == $hash || '' === $hash) {
+            return null;
+        }
+
+        return $this->userRepository->findByHash($hash);
     }
 
     private function generateUniqueUrl(string $prefix): string

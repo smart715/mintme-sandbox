@@ -16,13 +16,13 @@ interface BalanceHandlerInterface
      * @throws FetchException
      * @throws BalanceException
      */
-    public function deposit(User $user, Token $token, int $amount): void;
+    public function deposit(User $user, Token $token, float $amount): void;
 
     /**
      * @throws FetchException
      * @throws BalanceException
      */
-    public function withdraw(User $user, Token $token, int $amount): void;
+    public function withdraw(User $user, Token $token, float $amount): void;
 
     public function summary(Token $token): SummaryResult;
     public function balance(User $user, Token $token): BalanceResult;

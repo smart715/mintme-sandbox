@@ -1,13 +1,23 @@
 <template>
     <div class="pb-3">
         <div class="table-responsive">
-            <b-table
-                :items="history"
+            <confirm-modal
+                :visible="confirmModal"
+                v-on:close="switchConfirmModal"
+                v-on:confirm="removeOrder"
+            >
+                <div>
+                    Are you sure that you want to remove {{ this.currentRow.name }}
+                    with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
+                </div>
+            </confirm-modal>
+            <b-table ref="table"
+                :items="getHistory"
                 :fields="fields"
                 :current-page="currentPage"
                 :per-page="perPage">
                 <template slot="action" slot-scope="row">
-                    <a>
+                    <a @click="removeOrderModal(row.item)">
                         <font-awesome-icon
                             icon="times"
                             class="text-danger" />
@@ -25,14 +35,42 @@
     </div>
 </template>
 <script>
+import ConfirmModal from '../modal/ConfirmModal';
+import WebSocket from '../../js/websocket';
+import axios from 'axios';
+import Toasted from 'vue-toasted';
+import Routing from '../../js/routing';
+
+
+const METHOD_AUTH = 12345;
+const METHOD_ORDER_QUERY = 54321;
+const METHOD_ORDER_SUBSCRIBE = 12878;
+
+Vue.use(WebSocket);
+Vue.use(Toasted);
+
 export default {
     name: 'ActiveOrders',
+    components: {
+        ConfirmModal,
+    },
+    props: {
+        hash: String,
+        markets: Array,
+        websocket_url: String,
+    },
     data() {
         return {
+            currentRow: {},
+            actionUrl: '',
             history: [],
             currentPage: 1,
             perPage: 10,
             pageOptions: [10, 20, 30],
+            confirmModal: false,
+            tokenName: null,
+            amount: null,
+            price: null,
             fields: {
                 date: {
                     label: 'Date',
@@ -69,26 +107,98 @@ export default {
             },
         };
     },
+    methods: {
+        getHistory: function() {
+          return this.history;
+        },
+        removeOrderModal: function(row) {
+            this.currentRow = row;
+            this.actionUrl = row.action;
+            this.confirmModal = !this.confirmModal;
+        },
+        switchConfirmModal: function() {
+            this.confirmModal = !this.confirmModal;
+        },
+        removeOrder: function() {
+            axios.get(this.actionUrl)
+                .catch(() => {
+                    this.$toasted.show('Service unavailable, try again later');
+                });
+        },
+        getOrders: function() {
+            this.markets.forEach((token) => {
+                if (token !== null) {
+                    this.wsClient.send(JSON.stringify({
+                        'method': 'order.query',
+                        'params': [token, 0, 100],
+                        'id': METHOD_ORDER_QUERY,
+                    }));
+                }
+            });
+        },
+        subscribe: function() {
+            this.wsClient.send(JSON.stringify({
+                'method': 'order.subscribe',
+                'params': this.markets.filter(Boolean).join(','),
+                'id': METHOD_ORDER_SUBSCRIBE,
+            }));
+        },
+        parseOrders: function(orders) {
+            orders.forEach((order) => {
+                this.history.push({
+                    date: new Date(order.ctime).toDateString(),
+                    type: (1 === order.type) ? 'Deposit' : 'Withdraw',
+                    name: order.market,
+                    amount: order.amount,
+                    price: order.price,
+                    total: (order.price * order.amount + order.maker_fee),
+                    free: order.maker_fee,
+                    action: Routing.generate('order_cancel', {
+                        market: order.market, orderid: order.id,
+                    }),
+                    id: order.id,
+                });
+            });
+            this.$refs.table.refresh();
+        },
+        deleteHistoryOrder: function(id) {
+            delete this.history.filter((item) => item.id === id)[0];
+            this.$refs.table.refresh();
+        },
+    },
+    mounted() {
+        this.wsClient = this.$socket(this.websocket_url);
+        this.wsClient.onmessage = (result) => {
+            let response = JSON.parse(result.data);
+            switch (response.id) {
+                case METHOD_AUTH:
+                    if (response.error === null) {
+                        this.getOrders();
+                    }
+                    break;
+                case METHOD_ORDER_QUERY:
+                    this.parseOrders(response.result.records);
+                    this.subscribe();
+                    break;
+                case null:
+                    if (response.method === 'order.update') {
+                        this.deleteHistoryOrder(response.params[1].id);
+                    }
+                    break;
+            }
+        };
+        this.wsClient.onopen = () => {
+            this.wsClient.send(JSON.stringify({
+                method: 'server.auth',
+                params: [this.hash, 'auth_api'],
+                id: METHOD_AUTH,
+            }));
+        };
+    },
     computed: {
         totalRows: function() {
             return this.history.length;
         },
     },
-    created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
-            this.history.push({
-                date: '12-12-1970',
-                type: (i % 2 === 0) ? 'Deposit' : 'Withdraw',
-                name: (i % 2 === 0) ? '[Token]' : 'Webchain (WEB)',
-                amount: Math.floor(Math.random() * 99) + 10,
-                price: Math.floor(Math.random() * 99) + 10,
-                total: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                free: Math.floor(Math.random() * 99) + 10,
-                action: '',
-            });
-        }
-    },
 };
 </script>
-

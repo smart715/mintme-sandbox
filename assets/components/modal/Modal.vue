@@ -1,5 +1,5 @@
 <template>
-    <b-modal :visible="visible" :size="size" hide-footer>
+    <b-modal :visible="visible" :size="size" @hidden="closeModal" hide-footer>
         <div slot="modal-header">
             <div class="cancel-button">
                 <div class="inner">

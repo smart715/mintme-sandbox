@@ -173,7 +173,7 @@ class TokenAPIController extends FOSRestController
             $balance = $balanceHandler->balance($this->getUser(), $token);
 
             if ($balance->isFailed()) {
-                return $this->view('Exchanger connection lost. Try again.', Response::HTTP_BAD_REQUEST);
+                return $this->view('Service unavailable now. Try later', Response::HTTP_BAD_REQUEST);
             }
 
             $releasedAmount = $balance->getAvailable() / 100 * $request->get('released');
@@ -238,12 +238,12 @@ class TokenAPIController extends FOSRestController
     public function fetchBalanceToken(string $tokenName, BalanceHandlerInterface $balanceHandler): View
     {
         $user = $this->getUser();
-        $token = Token::WEB_SYMBOL === $tokenName
-            ? Token::getWeb()
-            : $this->tokenManager->findByName($tokenName);
+        $token = $this->tokenManager->findByName($tokenName);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist.');
+            return $this->view([
+                'error' => 'Can\'t find a valid token',
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $balance = $balanceHandler->balance($user, $token);
@@ -251,7 +251,7 @@ class TokenAPIController extends FOSRestController
         if ($balance->isFailed()) {
             return $this->view([
                 'error' => 'Exchanger connection lost. Try to reload page.',
-            ], Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->view($this->tokenManager->getRealBalance($token, $balance));

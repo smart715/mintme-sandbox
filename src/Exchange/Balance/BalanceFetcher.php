@@ -28,7 +28,7 @@ class BalanceFetcher implements BalanceFetcherInterface
         $this->random = $randomNumber;
     }
 
-    public function update(int $userId, string $tokenName, int $amount, string $type): void
+    public function update(int $userId, string $tokenName, float $amount, string $type): void
     {
         $responce = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
             $userId,
@@ -72,6 +72,10 @@ class BalanceFetcher implements BalanceFetcherInterface
 
     public function balance(int $userId, array $tokenNames): BalanceResultContainer
     {
+        if (!$tokenNames) {
+            return BalanceResultContainer::fail();
+        }
+
         try {
             $response = $this->jsonRpc->send(
                 self::BALANCE_METHOD,

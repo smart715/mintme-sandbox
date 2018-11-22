@@ -152,7 +152,7 @@ class TokenController extends AbstractController
             } catch (\Throwable $exception) {
                 $this->em->remove($token);
                 $this->em->flush();
-                $this->addFlash('error', 'Exchanger connection lost. Try again.');
+                $this->addFlash('danger', 'Exchanger connection lost. Try again.');
             }
         }
 

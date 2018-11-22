@@ -57,6 +57,8 @@ class Trader implements TraderInterface
                 (string) $this->config->getTakerFeeRate(),
                 (string) $this->config->getMakerFeeRate(),
                 '',
+                0,
+                "0",
             ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);

@@ -24,3 +24,5 @@ public/build
 .vscode
 .dockerignore
 Dockerfile
+
+aware-connector.sh

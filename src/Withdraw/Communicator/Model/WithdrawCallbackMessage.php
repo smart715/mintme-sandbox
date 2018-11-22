@@ -13,27 +13,32 @@ class WithdrawCallbackMessage
     /** @var string */
     private $transactionHash;
 
-    /** @var string */
-    private $transactionKey;
-
     /** @var int */
     private $retries;
+
+    /** @var string */
+    private $crypto;
+
+    /** @var float */
+    private $amount;
 
     private function __construct(
         int $id,
         string $status,
         string $transactionHash,
-        string $transactionKey,
-        int $retries
+        int $retries,
+        string $crypto,
+        float $amount
     ) {
         $this->id = $id;
         $this->status = $status;
         $this->transactionHash = $transactionHash;
-        $this->transactionKey = $transactionKey;
         $this->retries = $retries;
+        $this->crypto = $crypto;
+        $this->amount = $amount;
     }
 
-    public function getPaymentId(): int
+    public function getUserId(): int
     {
         return $this->id;
     }
@@ -48,14 +53,19 @@ class WithdrawCallbackMessage
         return $this->transactionHash;
     }
 
-    public function getTransactionKey(): string
-    {
-        return $this->transactionKey;
-    }
-
     public function getRetriesCount(): int
     {
         return $this->retries;
+    }
+
+    public function getCrypto(): string
+    {
+        return $this->crypto;
+    }
+
+    public function getAmount(): float
+    {
+        return $this->amount;
     }
 
     public static function parse(array $data): self
@@ -64,8 +74,9 @@ class WithdrawCallbackMessage
             $data['id'],
             $data['status'],
             $data['tx_hash'],
-            $data['tx_key'],
-            $data['retries'] ?? 0
+            $data['retries'] ?? 0,
+            $data['crypto'],
+            $data['amount']
         );
     }
 
@@ -75,19 +86,21 @@ class WithdrawCallbackMessage
             $this->id,
             $this->status,
             $this->transactionHash,
-            $this->transactionKey,
-            $this->retries + 1
+            $this->retries + 1,
+            $this->crypto,
+            $this->amount
         );
     }
 
     public function toArray(): array
     {
         return [
-            'id' => $this->getPaymentId(),
+            'id' => $this->getUserId(),
             'status' => $this->getStatus(),
             'tx_hash' => $this->getTransactionHash(),
-            'tx_key' => $this->getTransactionKey(),
             'retries' => $this->getRetriesCount(),
+            'crypto' => $this->getCrypto(),
+            'amount' => $this->getAmount(),
         ];
     }
 }

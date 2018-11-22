@@ -8,6 +8,6 @@ use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 
 interface CommunicatorInterface
 {
-    public function sendWithdrawRequest(User $user, string $balance, string $address, Crypto $crypto): void;
+    public function sendWithdrawRequest(User $user, float $balance, string $address, Crypto $crypto): void;
     public function sendRetryMessage(WithdrawCallbackMessage $message): void;
 }

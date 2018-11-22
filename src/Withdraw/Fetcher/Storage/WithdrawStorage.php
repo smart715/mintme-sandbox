@@ -22,20 +22,22 @@ class WithdrawStorage implements StorageAdapterInterface
     }
 
     /** {@inheritdoc} */
-    public function requestHistory(int $id): array
+    public function requestHistory(int $id, int $offset, int $limit): array
     {
         return $this->sendRequest(self::RPC_HISTORY, [
             'id' => $id,
             'service' => $this->service,
+            'offset' => $offset,
+            'limit' => $limit,
         ]);
     }
 
     /** {@inheritdoc} */
-    public function requestBalance(string $symbol): array
+    public function requestBalance(string $symbol): ?float
     {
         return $this->sendRequest(self::RPC_BALANCE, [
             'crypto' => $symbol,
-        ]);
+        ])['balance'] ?? 0;
     }
 
     private function sendRequest(string $method, array $params): array
