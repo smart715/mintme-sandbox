@@ -8,6 +8,12 @@ interface CryptoManagerInterface
 {
     public function findBySymbol(string $symbol): ?Crypto;
 
+    /**
+     * @param array $symbols
+     * @return array
+     */
+    public function findBySymbols(array $symbols): array;
+
     /** @return Crypto[] */
     public function findAll(): array;
 }

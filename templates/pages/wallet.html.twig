@@ -26,7 +26,11 @@
                             <deposit-withdraw-history></deposit-withdraw-history>
                         </b-tab>
                         <b-tab title="Active Orders" >
-                            <active-orders></active-orders>
+                            <active-orders
+                                :hash="{{ hash | json_encode }}"
+                                :markets="{{ markets | json_encode }}"
+                                :websocket_url="{{ global_websocket_url | json_encode }}"
+                            ></active-orders>
                         </b-tab>
                     </b-tabs>
                 </template>
