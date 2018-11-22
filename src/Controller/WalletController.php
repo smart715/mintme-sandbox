@@ -48,7 +48,7 @@ class WalletController extends AbstractController
     }
 
     /**
-     * @param string[] $cryptos
+     * @param Crypto[] $cryptos
      * @return Market[]
      */
     private function createMarkets(Token $token, array $cryptos): array
