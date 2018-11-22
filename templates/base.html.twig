@@ -12,9 +12,9 @@
             {% block pagestyles %}{% endblock %}
         {% endblock %}
     </head>
-    <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
+    <body class="h-100vh {% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div class="content-wrapper {% block contentclass %}{% endblock %}">
+            <div class="content-wrapper gradient-bg  {% block contentclass %}{% endblock %}">
                 <div class="content">
                     {% block header %}
                         <div class="header-white">
