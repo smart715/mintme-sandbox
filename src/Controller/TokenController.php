@@ -8,9 +8,9 @@ use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
-use App\Manager\OrderManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Order\OrderListInterface;
 use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
@@ -43,8 +43,8 @@ class TokenController extends AbstractController
     /** @var TraderInterface */
     protected $trader;
 
-    /** @var OrderManagerInterface */
-    protected $orderManager;
+    /** @var OrderListInterface */
+    protected $orderList;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -52,7 +52,7 @@ class TokenController extends AbstractController
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         MarketManagerInterface $marketManager,
-        OrderManagerInterface $orderManager,
+        OrderListInterface $orderList,
         TraderInterface $trader
     ) {
         $this->em = $em;
@@ -61,7 +61,7 @@ class TokenController extends AbstractController
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
         $this->trader = $trader;
-        $this->orderManager = $orderManager;
+        $this->orderList = $orderList;
     }
 
     /**
@@ -97,13 +97,13 @@ class TokenController extends AbstractController
         $isOwner = $token === $this->tokenManager->getOwnToken();
 
         $pendingSellOrders = $market
-            ? $this->orderManager->getSellPendingOrdersList($this->getUser(), $market)
+            ? $this->orderList->getSellPendingOrdersList($this->getUser(), $market)
             : [];
         $pendingBuyOrders = $market
-            ? $this->orderManager->getBuyPendingOrdersList($this->getUser(), $market)
+            ? $this->orderList->getBuyPendingOrdersList($this->getUser(), $market)
             : [];
         $ordersHistory = $market
-            ? $this->orderManager->getOrdersHistory($market)
+            ? $this->orderList->getOrdersHistory($market)
             : [];
 
         return $this->render('pages/token.html.twig', [

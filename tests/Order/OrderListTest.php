@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Tests\Manager;
+namespace App\Tests\Order;
 
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
-use App\Manager\OrderManager;
 use App\Manager\UserManager;
+use App\Order\OrderList;
 use PHPUnit\Framework\TestCase;
 
-class OrderManagerTest extends TestCase
+class OrderListTest extends TestCase
 {
     public function testGetPendingOrdersListWithoutOwner(): void
     {
-        $pendingOrders = $this->getOrderManagerForPendingOrders()->getPendingOrdersList(
+        $pendingOrders = $this->getOrderListForPendingOrders()->getPendingOrdersList(
             $this->mockUser(1, 'firstName1', 'lastName1', ''),
             $this->mockMarket(),
             'sell'
@@ -80,7 +80,7 @@ class OrderManagerTest extends TestCase
 
     public function testGetPendingOrdersListWithOwner(): void
     {
-        $pendingOrders = $this->getOrderManagerForPendingOrders()->getPendingOrdersList(
+        $pendingOrders = $this->getOrderListForPendingOrders()->getPendingOrdersList(
             $this->mockUser(12, 'firstName12', 'lastName12', ''),
             $this->mockMarket(),
             'sell'
@@ -145,7 +145,7 @@ class OrderManagerTest extends TestCase
 
     public function testGetOrdersHistory(): void
     {
-        $pendingOrders = $this->getOrderManagerForOrdersHistory()->getOrdersHistory($this->mockMarket());
+        $pendingOrders = $this->getOrderListForOrdersHistory()->getOrdersHistory($this->mockMarket());
 
         $this->assertEquals(count($pendingOrders), 2);
 
@@ -208,7 +208,7 @@ class OrderManagerTest extends TestCase
         );
     }
 
-    private function getOrderManagerForPendingOrders(): OrderManager
+    private function getOrderListForPendingOrders(): OrderList
     {
         $ordersData = [
             [
@@ -229,13 +229,13 @@ class OrderManagerTest extends TestCase
             $this->mockUser(21, 'firstName21', 'lastName21', 'profileUrl21'),
         ];
 
-        return new OrderManager(
+        return new OrderList(
             $this->mockMarketFetcher($ordersData),
             $this->mockUserManager($users)
         );
     }
 
-    private function getOrderManagerForOrdersHistory(): OrderManager
+    private function getOrderListForOrdersHistory(): OrderList
     {
         $ordersData = [
             [
@@ -260,7 +260,7 @@ class OrderManagerTest extends TestCase
             $this->mockUser(32, 'firstName32', 'lastName32', 'profileUrl32'),
         ];
 
-        return new OrderManager(
+        return new OrderList(
             $this->mockMarketFetcher($ordersData),
             $this->mockUserManager($users)
         );

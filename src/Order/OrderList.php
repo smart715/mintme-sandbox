@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Manager;
+namespace App\Order;
 
 use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
-use App\Order\OrderInfo;
-use App\Order\OrdersUsers;
+use App\Manager\UserManager;
+use App\Order\Model\OrderInfo;
 
-class OrderManager implements OrderManagerInterface
+class OrderList implements OrderListInterface
 {
     /** @var MarketFetcher */
     private $marketFetcher;
@@ -26,28 +26,31 @@ class OrderManager implements OrderManagerInterface
         $this->userManager = $userManager;
     }
 
+    /** {@inheritdoc} */
     public function getSellPendingOrdersList(?User $currentUser, Market $market): array
     {
         return $this->getPendingOrdersList($currentUser, $market, self::SELL_SIDE);
     }
 
+    /** {@inheritdoc} */
     public function getBuyPendingOrdersList(?User $currentUser, Market $market): array
     {
         return $this->getPendingOrdersList($currentUser, $market, self::BUY_SIDE);
     }
 
+    /** {@inheritdoc} */
     public function getPendingOrdersList(?User $currentUser, Market $market, string $side): array
     {
         $pendingOrders = $this->getAllPendingOrders($market, $side);
 
         $pendingOrdersUsers = $this->mapUsersById(
             $this->userManager->findByIds(
-                $this->ordersUsers($pendingOrders)->getMakerIds()
+                $this->getMakerIds($pendingOrders)
             )
         );
 
         return array_map(function (Order $pendingOrder) use ($pendingOrdersUsers, $currentUser) {
-            return $this->orderInfo(
+            return new OrderInfo(
                 $pendingOrder,
                 $pendingOrdersUsers[$pendingOrder->getMakerId()],
                 null,
@@ -56,6 +59,7 @@ class OrderManager implements OrderManagerInterface
         }, $pendingOrders);
     }
 
+    /** {@inheritdoc} */
     public function getAllPendingOrders(Market $market, string $side): array
     {
         $allPendingOrders = [];
@@ -71,18 +75,19 @@ class OrderManager implements OrderManagerInterface
         return $allPendingOrders;
     }
 
+    /** {@inheritdoc} */
     public function getOrdersHistory(Market $market, int $offset = 0, int $limit = 20): array
     {
         $executedOrders = $this->marketFetcher->getExecutedOrders($market, $offset, $limit);
 
         $executedOrdersUsers = $this->mapUsersById(
             $this->userManager->findByIds(
-                $this->ordersUsers($executedOrders)->getAllIds()
+                $this->getUserIds($executedOrders)
             )
         );
 
         return array_map(function (Order $executedOrder) use ($executedOrdersUsers) {
-            return $this->orderInfo(
+            return new OrderInfo(
                 $executedOrder,
                 $executedOrdersUsers[$executedOrder->getMakerId()],
                 $executedOrdersUsers[$executedOrder->getTakerId()],
@@ -91,6 +96,7 @@ class OrderManager implements OrderManagerInterface
         }, $executedOrders);
     }
 
+    /** @param User[] $users */
     private function mapUsersById(array $users): array
     {
         return array_column(
@@ -105,13 +111,35 @@ class OrderManager implements OrderManagerInterface
         );
     }
 
-    private function orderInfo(Order $order, User $makerUser, ?User $takerUser, ?User $currentUser): OrderInfo
+    /** @param OrderInfo[] $orders */
+    private function getMakerIds(array $orders): array
     {
-        return new OrderInfo($order, $makerUser, $takerUser, $currentUser);
+        return array_unique(
+            array_map(function (Order $order) {
+                if ($order->getMakerId()) {
+                    return $order->getMakerId();
+                }
+            }, $orders)
+        );
     }
 
-    private function ordersUsers(array $orders): OrdersUsers
+    /** @param OrderInfo[] $orders */
+    private function getTakerIds(array $orders): array
     {
-        return new OrdersUsers($orders);
+        return array_unique(
+            array_map(function (Order $order) {
+                if ($order->getTakerId()) {
+                    return $order->getTakerId();
+                }
+            }, $orders)
+        );
+    }
+
+    /** @param OrderInfo[] $orders */
+    private function getUserIds(array $orders): array
+    {
+        return array_unique(
+            array_merge($this->getMakerIds($orders), $this->getTakerIds($orders))
+        );
     }
 }

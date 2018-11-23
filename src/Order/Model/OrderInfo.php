@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Order;
+namespace App\Order\Model;
 
 use App\Entity\User;
 use App\Exchange\Order;
