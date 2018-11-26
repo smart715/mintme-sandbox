@@ -44,7 +44,12 @@
                 </tr>
             </tbody>
         </table>
-        <withdraw-modal :visible="showModal" :currency="selectedCurrency" :balance-url="balanceUrl" :withdraw-url="withdrawUrl" @close="closeWithdraw" />
+        <withdraw-modal
+            :visible="showModal"
+            :currency="selectedCurrency"
+            :balance-url="balanceUrl"
+            :withdraw-url="withdrawUrl"
+            @close="closeWithdraw" />
     </div>
 </template>
 
