@@ -1,8 +1,27 @@
 {% extends "@FOSUser/layout.html.twig" %}
 
 {% trans_default_domain 'FOSUserBundle' %}
+{% block messageClass %}d-none{% endblock %}
 
-{% block fos_user_content %}{% endblock fos_user_content %}
-
-
-
+{% block fos_user_content %}
+    <div class="container">
+        <div class="row align-items-center d-flex justify-content-center">
+            <div class="col-xs-12 notification">
+                <div class="bell"></div>
+                <div class="cloud  mx-auto text-center">
+                    <div>
+                        <p class="font-bold title">Congrats {{ user.username }}</p>
+                        <p>your account is now activated</p>
+                        <p class="mt-1">
+                            {% if targetUrl is empty %}
+                                <a href="{{ path('trading') }}" class="link">Go to Trading</a>
+                            {% else %}
+                                <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock fos_user_content %}
