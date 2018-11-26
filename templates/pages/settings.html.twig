@@ -3,6 +3,7 @@
 {% block title %}MINTME | Settings{% endblock %}
 
 {% block bodyclass %}profile{% endblock %}
+{% block messageContainer %}{% endblock %}
 
 {% block content %}
     <div id="profile" class="container">
@@ -11,6 +12,15 @@
                 <div class="card">
                     <div class="card-header">Account settings</div>
                     <div class="card-body m-0">
+                        <div class="{% block messageClass %}{% endblock %}">
+                            {% for label, messages in app.flashes %}
+                                {% for message in messages %}
+                                    <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
                         <div>
                             {{ form_start(emailForm) }}
                             {{ form_rest(emailForm) }}
