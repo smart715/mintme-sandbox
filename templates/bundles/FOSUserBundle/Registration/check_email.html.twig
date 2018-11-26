@@ -1,14 +1,23 @@
 {% extends "@FOSUser/layout.html.twig" %}
 
 {% trans_default_domain 'FOSUserBundle' %}
+{% block messageClass %}d-none{% endblock %}
 
 {% block fos_user_content %}
-    <div class="container">
-        <div class="row py-3">
-            <div class="alert alert-success col text-center">
-                <p>{{ 'registration.check_email'|trans({'%email%': user.email}) }}</p>
-		        <p>Do not forget to check your spam folder</p>
+    <div class="container ">
+        <div class="row align-items-center d-flex justify-content-center">
+            <div class="col-xs-12 notification">
+                <div class="bell"></div>
+                <div class="cloud  mx-auto text-center">
+                    <div>
+                        <p>An email has been sent to</p>
+                        <p class="font-bold title">{{ user.username }}</p>
+                        <p>it contains an activation link you must click to activate your account</p>
+                        <p>Do not forget to check your spam folder</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
 {% endblock fos_user_content %}

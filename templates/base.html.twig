@@ -14,7 +14,7 @@
     </head>
     <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div class="content-wrapper {% block contentclass %}{% endblock %}">
+            <div class="content-wrapper c">
                 <div class="content">
                     {% block header %}
                         <div class="header-white">
@@ -25,13 +25,17 @@
                     {% endblock %}
                     {% block main %}
                         <div class="pt-5 contents-wrapper">
-                            {% for label, messages in app.flashes %}
-                                {% for message in messages %}
-                                    <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-                            {% endfor %}
+                            {% block messageContainer %}
+                                <div class="{% block messageClass %}{% endblock %}">
+                                    {% for label, messages in app.flashes %}
+                                        {% for message in messages %}
+                                            <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
+                                                {{ message }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            {% endblock %}
                             {% block content %}{% endblock %}
                         </div>
                     {% endblock %}

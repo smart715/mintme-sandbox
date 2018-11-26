@@ -46,7 +46,12 @@
                                 </div>
                                 <div class="pb-1">Please describe goals milestones plans promises</div>
 
-                                <textarea class="form-control" v-model="newDescription"></textarea>
+                                <limited-textarea
+                                    class="form-control"
+                                    :value="newDescription"
+                                    max="150"
+                                    @get-value="getValue">
+                                </limited-textarea>
                             </div>
                         </template>
                     </div>
@@ -62,6 +67,7 @@ import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
+import LimitedTextarea from '../../LimitedTextarea';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
 
@@ -85,6 +91,7 @@ export default {
     components: {
         FontAwesomeIcon,
         Guide,
+        LimitedTextarea,
     },
     data() {
         return {
@@ -95,6 +102,9 @@ export default {
         };
     },
     methods: {
+        getValue: function(newValue) {
+            this.newDescription = newValue;
+        },
         editDescription: function() {
             if (this.icon === 'check') {
                 return this.doEditDescription();
