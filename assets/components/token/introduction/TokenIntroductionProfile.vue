@@ -73,23 +73,39 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="col-12 pt-3 text-right">
                         <b-dropdown id="share" text="Share" variant="primary">
-                            <b-dropdown-item
-                                href="#"
-                                target="_blank">
-                                Facebook
-                            </b-dropdown-item>
-                            <b-dropdown-item
-                                href="#"
-                                target="_blank">
-                                LinkedIn
-                            </b-dropdown-item>
-                            <b-dropdown-item
-                                href="#"
-                                target="_blank">
-                                YouTube
-                            </b-dropdown-item>
+                            <social-sharing :url="profileUrl"
+                                            title="MINTME"
+                                            description="Check my new cryptocurrency."
+                                            quote="Check my new token."
+                                            hashtags="mintme"
+                                            inline-template>
+                                <div>
+                                    <network class="d-block text-center" network="email">
+                                        <i class="fa fa-envelope"></i> Email
+                                    </network>
+                                    <network class="d-block text-center" network="facebook">
+                                        <i class="fa fa-facebook"></i> Facebook
+                                    </network>
+                                    <network class="d-block text-center" network="linkedin">
+                                        <i class="fa fa-linkedin"></i> LinkedIn
+                                    </network>
+                                    <network class="d-block text-center" network="googleplus">
+                                        <i class="fa fa-google-plus"></i> Google +
+                                    </network>
+                                    <network class="d-block text-center" network="reddit">
+                                        <i class="fa fa-reddit"></i> Reddit
+                                    </network>
+                                    <network class="d-block text-center" network="telegram">
+                                        <i class="fa fa-telegram"></i> Telegram
+                                    </network>
+                                    <network class="d-block text-center" network="twitter">
+                                        <i class="fa fa-twitter"></i> Twitter
+                                    </network>
+                                </div>
+                            </social-sharing>
                         </b-dropdown>
                     </div>
                 </div>
@@ -148,6 +164,9 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
+let SocialSharing = require('vue-social-sharing');
+
+Vue.use(SocialSharing);
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -169,6 +188,7 @@ export default {
         updateUrl: String,
         csrfToken: String,
         editable: Boolean,
+        profileUrl: String,
     },
     components: {
         bDropdown,

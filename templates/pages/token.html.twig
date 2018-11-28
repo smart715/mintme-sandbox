@@ -45,7 +45,9 @@
                                 youtube-channel-id="{{ token.youtubeChannelId }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
-                                :editable="{{ isOwner ? 'true' : 'false' }}">
+                                :editable="{{ isOwner ? 'true' : 'false' }}"
+                                profile-url="{{ absolute_url(path('token_show', { 'name': token.name})) }}"
+                            >
                             </token-introduction-profile>
 
                             <token-introduction-statistics
