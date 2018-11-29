@@ -42,22 +42,22 @@ class WalletAPIController extends FOSRestController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-//        try {
+        try {
             $wallet->withdraw(
                 $this->getUser(),
                 new Address($request->get('address')),
                 new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
                 $crypto
             );
-//        } catch (NotEnoughUserAmountException $exception) {
-//            return $this->view([
-//                'error' => 'Not enough balance to withdraw',
-//            ], Response::HTTP_BAD_REQUEST);
-//        } catch (\Throwable $exception) {
-//            return $this->view([
-//                'error' => $exception->getMessage(),
-//            ], Response::HTTP_BAD_REQUEST);
-//        }
+        } catch (NotEnoughUserAmountException $exception) {
+            return $this->view([
+                'error' => 'Not enough balance to withdraw',
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $exception) {
+            return $this->view([
+                'error' => 'Service unavailable now. Try later',
+            ], Response::HTTP_BAD_REQUEST);
+        }
 
         return $this->view();
     }
