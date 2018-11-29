@@ -43,13 +43,13 @@ class BalanceHandler implements BalanceHandlerInterface
     /** {@inheritdoc} */
     public function deposit(User $user, Token $token, Money $amount): void
     {
-        $this->update($user, $token, $this->moneyWrapper->format($amount), 'deposit');
+        $this->update($user, $token, $amount, 'deposit');
     }
 
     /** {@inheritdoc} */
     public function withdraw(User $user, Token $token, Money $amount): void
     {
-        $this->update($user, $token, $this->moneyWrapper->format($amount->negative()), 'withdraw');
+        $this->update($user, $token, $amount->negative(), 'withdraw');
     }
 
     public function summary(Token $token): SummaryResult
@@ -78,9 +78,14 @@ class BalanceHandler implements BalanceHandlerInterface
      * @throws FetchException
      * @throws BalanceException
      */
-    private function update(User $user, Token $token, string $amount, string $type): void
+    private function update(User $user, Token $token, Money $amount, string $type): void
     {
-        $this->balanceFetcher->update($user->getId(), $this->converter->convert($token), $amount, $type);
+        $this->balanceFetcher->update(
+            $user->getId(),
+            $this->converter->convert($token),
+            $this->moneyWrapper->format($amount),
+            $type
+        );
 
         if (!in_array($token, $user->getRelatedTokens()) && $token->getId()) {
             $user->addRelatedToken($token);

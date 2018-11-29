@@ -40,16 +40,6 @@ final class MoneyWrapper implements MoneyWrapperInterface
         return (new DecimalMoneyParser($this->getRepository()))->parse($value, $symbol);
     }
 
-    public function getBase(string $value, string $symbol): Money
-    {
-        $currency = new Currency($symbol);
-
-        return new Money(
-            bcmul($value, bcpow('10', (string)$this->getRepository()->subunitFor($currency))),
-            $currency
-        );
-    }
-
     private function fetchCurrencies(): array
     {
         $currencies = [];

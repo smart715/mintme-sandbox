@@ -3,13 +3,14 @@
 namespace App\Withdraw\Payment;
 
 use App\Entity\Crypto;
+use Money\Money;
 
 class Transaction
 {
     /** @var \DateTime */
     private $date;
 
-    /** @var float */
+    /** @var Money */
     private $amount;
 
     /** @var float */
@@ -29,7 +30,7 @@ class Transaction
 
     public function __construct(
         \DateTime $date,
-        float $amount,
+        Money $amount,
         float $fee,
         Status $status,
         string $hash,
@@ -60,7 +61,7 @@ class Transaction
         return $this->date;
     }
 
-    public function getAmount(): float
+    public function getAmount(): Money
     {
         return $this->amount;
     }

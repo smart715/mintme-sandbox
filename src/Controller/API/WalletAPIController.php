@@ -7,6 +7,7 @@ use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use App\Withdraw\WithdrawGatewayInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -28,7 +29,8 @@ class WalletAPIController extends FOSRestController
     public function withdraw(
         ParamFetcherInterface $request,
         WalletInterface $wallet,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        MoneyWrapperInterface $moneyWrapper
     ): View {
         $crypto = $cryptoManager->findBySymbol(
             $request->get('crypto')
@@ -44,7 +46,7 @@ class WalletAPIController extends FOSRestController
             $wallet->withdraw(
                 $this->getUser(),
                 new Address($request->get('address')),
-                new Amount($request->get('amount')),
+                new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
                 $crypto
             );
         } catch (NotEnoughUserAmountException $exception) {
