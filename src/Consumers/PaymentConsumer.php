@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -26,16 +27,21 @@ class PaymentConsumer implements ConsumerInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
         CryptoManagerInterface $cryptoManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
         $this->cryptoManager = $cryptoManager;
         $this->logger = $logger;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
@@ -59,10 +65,13 @@ class PaymentConsumer implements ConsumerInterface
                     return true;
                 }
 
-                $this->balanceHandler->withdraw(
+                $this->balanceHandler->deposit(
                     $user,
                     Token::getFromCrypto($crypto),
-                    $clbResult->getAmount()
+                    $this->moneyWrapper->parse(
+                        $clbResult->getAmount(),
+                        $crypto->getSymbol()
+                    )
                 );
                 $this->logger->info('[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back');
             } catch (\Throwable $exception) {

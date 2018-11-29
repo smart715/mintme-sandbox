@@ -11,8 +11,11 @@ use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
 use App\Repository\UserRepository;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 
 class Trader implements TraderInterface
 {
@@ -34,14 +37,19 @@ class Trader implements TraderInterface
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         JsonRpcInterface $jsonRpc,
         LimitOrderConfig $config,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
         $this->entityManager = $entityManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -52,8 +60,8 @@ class Trader implements TraderInterface
                 $order->getMakerId(),
                 $order->getMarket()->getHiddenName(),
                 $order->getSide(),
-                $order->getAmount(),
-                $order->getPrice(),
+                $this->moneyWrapper->format($order->getAmount()),
+                $this->moneyWrapper->format($order->getPrice()),
                 (string) $this->config->getTakerFeeRate(),
                 (string) $this->config->getMakerFeeRate(),
                 '',
@@ -189,9 +197,15 @@ class Trader implements TraderInterface
             $user->getId(),
             null,
             $market,
-            $orderData['amount'],
+            new Money(
+                $orderData['amount'],
+                new Currency($market->getCurrencySymbol())
+            ),
             $orderData['side'],
-            $orderData['price'],
+            new Money(
+                $orderData['price'],
+                new Currency($market->getCurrencySymbol())
+            ),
             $status,
             $orderData['mtime']
         );

@@ -32,6 +32,12 @@ class Crypto
      */
     protected $symbol;
 
+    /**
+     * @ORM\Column(type="integer")
+     * @var int
+     */
+    protected $subunit;
+
     public function getName(): string
     {
         return $this->name;
@@ -40,5 +46,10 @@ class Crypto
     public function getSymbol(): string
     {
         return $this->symbol;
+    }
+
+    public function getSubunit(): int
+    {
+        return $this->subunit;
     }
 }

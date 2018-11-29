@@ -9,6 +9,7 @@ use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use App\Withdraw\Fetcher\Mapper\MapperInterface;
 use App\Withdraw\Payment\Status;
 use App\Withdraw\Payment\Transaction;
+use Money\Money;
 
 class CryptoWithdrawGateway implements WithdrawGatewayInterface
 {
@@ -24,7 +25,7 @@ class CryptoWithdrawGateway implements WithdrawGatewayInterface
         $this->mapper = $mapper;
     }
 
-    public function withdraw(User $user, float $balance, string $address, Crypto $crypto): void
+    public function withdraw(User $user, Money $balance, string $address, Crypto $crypto): void
     {
         $this->communicator->sendWithdrawRequest($user, $balance, $address, $crypto);
     }
@@ -41,7 +42,7 @@ class CryptoWithdrawGateway implements WithdrawGatewayInterface
     }
 
     /** {@inheritdoc} */
-    public function getBalance(Crypto $crypto): ?float
+    public function getBalance(Crypto $crypto): Money
     {
         return $this->mapper->getBalance($crypto);
     }

@@ -11,6 +11,8 @@ use App\Manager\MarketManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Verify\WebsiteVerifierInterface;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -103,8 +105,11 @@ class TokenController extends AbstractController
     }
 
     /** @Route(name="token_create") */
-    public function create(Request $request, BalanceHandlerInterface $balanceHandler): Response
-    {
+    public function create(
+        Request $request,
+        BalanceHandlerInterface $balanceHandler,
+        MoneyWrapperInterface $moneyWrapper
+    ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken();
         }
@@ -123,13 +128,16 @@ class TokenController extends AbstractController
             }
 
             try {
-                $balanceHandler->withdraw(
+                $balanceHandler->deposit(
                     $this->getUser(),
                     $token,
-                    $this->getParameter('token_quantity')
+                    $moneyWrapper->getBase(
+                        $this->getParameter('token_quantity'),
+                        MoneyWrapper::TOK_SYMBOL
+                    )
                 );
 
-                return $this->redirectToOwnToken(); //FIXME: redirecto to introduction token page
+                return $this->redirectToOwnToken();
             } catch (\Throwable $exception) {
                 $this->em->remove($token);
                 $this->em->flush();

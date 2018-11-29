@@ -6,6 +6,8 @@ use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Market;
 use App\Exchange\Order;
+use Money\Currency;
+use Money\Money;
 
 class MarketFetcher
 {
@@ -80,9 +82,15 @@ class MarketFetcher
                 $orderData['user'],
                 null,
                 $market,
-                $orderData['amount'],
+                new Money(
+                    $orderData['amount'],
+                    new Currency($market->getCurrencySymbol())
+                ),
                 $orderData['side'],
-                $orderData['price'],
+                new Money(
+                    $orderData['price'],
+                    new Currency($market->getCurrencySymbol())
+                ),
                 Order::PENDING_STATUS,
                 $orderData['mtime']
             );
@@ -98,9 +106,15 @@ class MarketFetcher
                 $orderData['maker'],
                 $orderData['taker'],
                 $market,
-                $orderData['amount'],
+                new Money(
+                    $orderData['amount'],
+                    new Currency($market->getCurrencySymbol())
+                ),
                 Order::SIDE_MAP[$orderData['type']],
-                $orderData['price'],
+                new Money(
+                    $orderData['price'],
+                    new Currency($market->getCurrencySymbol())
+                ),
                 ORDER::FINISHED_STATUS,
                 $orderData['time']
             );

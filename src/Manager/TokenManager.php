@@ -92,8 +92,8 @@ class TokenManager implements TokenManagerInterface
         }
 
         return BalanceResult::success(
-            $balanceResult->getAvailable() - $token->getLockIn()->getFrozenAmount(),
-            $balanceResult->getFreeze() + $token->getLockIn()->getFrozenAmount()
+            $balanceResult->getAvailable()->subtract($token->getLockIn()->getFrozenAmount()),
+            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount())
         );
     }
 
