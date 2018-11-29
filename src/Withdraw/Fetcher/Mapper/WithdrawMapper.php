@@ -8,6 +8,8 @@ use App\Manager\CryptoManagerInterface;
 use App\Withdraw\Fetcher\Storage\StorageAdapterInterface;
 use App\Withdraw\Payment\Status;
 use App\Withdraw\Payment\Transaction;
+use Money\Currency;
+use Money\Money;
 
 class WithdrawMapper implements MapperInterface
 {
@@ -45,8 +47,11 @@ class WithdrawMapper implements MapperInterface
         }, $this->storage->requestHistory($user->getId(), $offset, $limit));
     }
 
-    public function getBalance(Crypto $crypto): ?float
+    public function getBalance(Crypto $crypto): Money
     {
-        return $this->storage->requestBalance($crypto->getSymbol());
+        return new Money(
+            $this->storage->requestBalance($crypto->getSymbol()),
+            new Currency($crypto->getSymbol())
+        );
     }
 }

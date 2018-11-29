@@ -13,7 +13,7 @@ interface BalanceFetcherInterface
      * @throws FetchException
      * @throws BalanceException
      */
-    public function update(int $userId, string $tokenName, float $amount, string $type): void;
+    public function update(int $userId, string $tokenName, string $amount, string $type): void;
 
     public function summary(string $tokenName): SummaryResult;
     public function balance(int $userId, array $tokenName): BalanceResultContainer;

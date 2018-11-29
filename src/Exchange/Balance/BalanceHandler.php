@@ -10,7 +10,9 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
 use App\Utils\TokenNameConverterInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Money;
 
 class BalanceHandler implements BalanceHandlerInterface
 {
@@ -23,26 +25,31 @@ class BalanceHandler implements BalanceHandlerInterface
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         TokenNameConverterInterface $converter,
         BalanceFetcherInterface $balanceFetcher,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->converter = $converter;
         $this->balanceFetcher = $balanceFetcher;
         $this->entityManager = $entityManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
-    public function deposit(User $user, Token $token, float $amount): void
+    public function deposit(User $user, Token $token, Money $amount): void
     {
-        $this->update($user, $token, -abs($amount), 'deposit');
+        $this->update($user, $token, $this->moneyWrapper->format($amount), 'deposit');
     }
 
     /** {@inheritdoc} */
-    public function withdraw(User $user, Token $token, float $amount): void
+    public function withdraw(User $user, Token $token, Money $amount): void
     {
-        $this->update($user, $token, $amount, 'withdraw');
+        $this->update($user, $token, $this->moneyWrapper->format($amount->negative()), 'withdraw');
     }
 
     public function summary(Token $token): SummaryResult
@@ -71,7 +78,7 @@ class BalanceHandler implements BalanceHandlerInterface
      * @throws FetchException
      * @throws BalanceException
      */
-    private function update(User $user, Token $token, float $amount, string $type): void
+    private function update(User $user, Token $token, string $amount, string $type): void
     {
         $this->balanceFetcher->update($user->getId(), $this->converter->convert($token), $amount, $type);
 

@@ -2,34 +2,36 @@
 
 namespace App\Exchange\Balance\Model;
 
+use Money\Currency;
+use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class BalanceResult
 {
     /**
-     * @var float
+     * @var Money
      * @Groups({"API"})
      */
     private $available;
 
-    /** @var float */
+    /** @var Money */
     private $freeze;
 
     /** @var bool */
     private $isFailed = false;
 
-    private function __construct(float $abailable, float $freeze)
+    private function __construct(Money $abailable, Money $freeze)
     {
         $this->available = $abailable;
         $this->freeze = $freeze;
     }
 
-    public function getAvailable(): float
+    public function getAvailable(): Money
     {
         return $this->available;
     }
 
-    public function getFreeze(): float
+    public function getFreeze(): Money
     {
         return $this->freeze;
     }
@@ -39,14 +41,17 @@ class BalanceResult
         return $this->isFailed;
     }
 
-    public static function success(float $available, float $freeze): self
+    public static function success(Money $available, Money $freeze): self
     {
         return new self($available, $freeze);
     }
 
-    public static function fail(): self
+    public static function fail(string $symbol): self
     {
-        $result = new self(0, 0);
+        $result = new self(
+            new Money(0, new Currency($symbol)),
+            new Money(0, new Currency($symbol))
+        );
 
         $result->isFailed = true;
 
