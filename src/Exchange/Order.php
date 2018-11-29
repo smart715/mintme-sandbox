@@ -2,7 +2,7 @@
 
 namespace App\Exchange;
 
-use App\Entity\User;
+use Money\Money;
 
 class Order
 {
@@ -31,10 +31,10 @@ class Order
     /** @var Market */
     private $market;
 
-    /** @var string */
+    /** @var Money */
     private $amount;
 
-    /** @var string */
+    /** @var Money */
     private $price;
 
     /** @var int */
@@ -51,9 +51,9 @@ class Order
         int $makerId,
         ?int $takerId,
         Market $market,
-        string $amount,
+        Money $amount,
         int $side,
-        string $price,
+        Money $price,
         string $status,
         ?int $timestamp = null
     ) {
@@ -88,12 +88,12 @@ class Order
         return $this->market;
     }
 
-    public function getAmount(): string
+    public function getAmount(): Money
     {
         return $this->amount;
     }
 
-    public function getPrice(): string
+    public function getPrice(): Money
     {
         return $this->price;
     }

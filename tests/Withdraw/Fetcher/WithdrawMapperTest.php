@@ -45,7 +45,7 @@ class WithdrawMapperTest extends TestCase
         $mapper = new WithdrawMapper($storage, $this->mockCryptoManager($this->mockCrypto()));
         $balance = $mapper->getBalance($this->mockCrypto());
 
-        $this->assertEquals($data[0], $balance);
+        $this->assertEquals($data[0], $balance->getAmount());
     }
 
     /** @return MockObject|CryptoManagerInterface */

@@ -3,14 +3,9 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
-use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Market;
-use App\Exchange\Order;
-use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\MarketManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,7 +13,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
@@ -35,19 +29,14 @@ class TokenAPIController extends FOSRestController
     /** @var CryptoManagerInterface */
     protected $cryptoManager;
 
-    /** @var MarketManagerInterface */
-    protected $marketManager;
-
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
-        CryptoManagerInterface $cryptoManager,
-        MarketManagerInterface $marketManager
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->em = $entityManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
-        $this->marketManager = $marketManager;
     }
 
     /**
@@ -176,59 +165,14 @@ class TokenAPIController extends FOSRestController
                 return $this->view('Service unavailable now. Try later', Response::HTTP_BAD_REQUEST);
             }
 
-            $releasedAmount = $balance->getAvailable() / 100 * $request->get('released');
-            $lock->setAmountToRelease($balance->getAvailable() - $releasedAmount);
+            $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
+            $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount));
         }
 
         $this->em->persist($lock);
         $this->em->flush();
 
         return $this->view($lock);
-    }
-
-    /**
-     * @Rest\View()
-     * @Rest\Post("/{tokenName}/place-order", name="token_place_order")
-     * @Rest\RequestParam(name="tokenName", allowBlank=false)
-     * @Rest\RequestParam(name="priceInput", allowBlank=false)
-     * @Rest\RequestParam(name="amountInput", allowBlank=false)
-     * @Rest\RequestParam(name="action", allowBlank=false)
-     */
-    public function placeOrder(ParamFetcherInterface $request, TraderInterface $trader): View
-    {
-        $token = $this->tokenManager->findByName($request->get('tokenName'));
-        $crypto = $this->cryptoManager->findBySymbol('WEB');
-        
-        if (null === $token || null === $crypto) {
-            throw $this->createNotFoundException('Token or Crypto not found.');
-        }
-
-        $market = $this->marketManager->getMarket($crypto, $token);
-
-        if (null === $market) {
-            throw $this->createNotFoundException('Market not found.');
-        }
-        
-        $order = new Order(
-            null,
-            $this->getUser()->getId(),
-            null,
-            $market,
-            $request->get('amountInput'),
-            Order::SIDE_MAP[$request->get('action')],
-            $request->get('priceInput'),
-            Order::PENDING_STATUS
-        );
-
-        $tradeResult = $trader->placeOrder($order);
-
-        return $this->view(
-            [
-                'result' => $tradeResult->getResult(),
-                'message' => $tradeResult->getMessage(),
-            ],
-            Response::HTTP_ACCEPTED
-        );
     }
 
     /**

@@ -2,21 +2,23 @@
 
 namespace App\Wallet\Model;
 
+use Money\Money;
+
 class Amount
 {
-    /** @var float */
+    /** @var Money */
     private $amount;
 
-    public function __construct(float $amount)
+    public function __construct(Money $amount)
     {
-        if ($amount <= 0) {
+        if ($amount->isNegative() || $amount->isZero()) {
             throw new \InvalidArgumentException('Incorrect amount');
         }
 
         $this->amount = $amount;
     }
 
-    public function getAmount(): float
+    public function getAmount(): Money
     {
         return $this->amount;
     }

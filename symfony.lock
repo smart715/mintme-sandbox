@@ -155,6 +155,9 @@
     "lcobucci/jwt": {
         "version": "3.2.4"
     },
+    "moneyphp/money": {
+        "version": "v3.1.3"
+    },
     "monolog/monolog": {
         "version": "1.23.0"
     },

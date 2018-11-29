@@ -9,6 +9,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
+use Money\Money;
 
 interface BalanceHandlerInterface
 {
@@ -16,13 +17,13 @@ interface BalanceHandlerInterface
      * @throws FetchException
      * @throws BalanceException
      */
-    public function deposit(User $user, Token $token, float $amount): void;
+    public function deposit(User $user, Token $token, Money $amount): void;
 
     /**
      * @throws FetchException
      * @throws BalanceException
      */
-    public function withdraw(User $user, Token $token, float $amount): void;
+    public function withdraw(User $user, Token $token, Money $amount): void;
 
     public function summary(Token $token): SummaryResult;
     public function balance(User $user, Token $token): BalanceResult;

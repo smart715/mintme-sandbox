@@ -12,6 +12,9 @@ use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Utils\RandomNumber;
 use App\Utils\TokenNameConverterInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -34,7 +37,8 @@ class BalanceFetcherTest extends TestCase
 
         $handler = new BalanceFetcher(
             $rpc,
-            $this->mockRandom(21)
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper()
         );
 
         $result = $handler->balance(
@@ -43,8 +47,8 @@ class BalanceFetcherTest extends TestCase
         )->get('TOK999');
 
         $this->assertFalse($result->isFailed());
-        $this->assertEquals(1000000, $result->getAvailable());
-        $this->assertEquals(100, $result->getFreeze());
+        $this->assertEquals('1000000', $result->getAvailable()->getAmount());
+        $this->assertEquals('100', $result->getFreeze()->getAmount());
     }
 
     public function testBalanceWithException(): void
@@ -54,7 +58,8 @@ class BalanceFetcherTest extends TestCase
 
         $handler = new BalanceFetcher(
             $rpc,
-            $this->mockRandom(21)
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper()
         );
 
         $result = $handler->balance(1, ['TOK999'])->get('TOK999');
@@ -81,7 +86,8 @@ class BalanceFetcherTest extends TestCase
 
         $handler = new BalanceFetcher(
             $rpc,
-            $this->mockRandom(21)
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper()
         );
 
         $result = $handler->summary('TOK999');
@@ -101,7 +107,8 @@ class BalanceFetcherTest extends TestCase
 
         $handler = new BalanceFetcher(
             $rpc,
-            $this->mockRandom(21)
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper()
         );
 
         $result = $handler->summary('TOK999');
@@ -121,7 +128,8 @@ class BalanceFetcherTest extends TestCase
 
         $handler = new BalanceFetcher(
             $rpc,
-            $this->mockRandom(21)
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper()
         );
 
         $result = $handler->summary('TOK999');
@@ -136,12 +144,13 @@ class BalanceFetcherTest extends TestCase
 
         $handler = new BalanceFetcher(
             $rpc,
-            $this->mockRandom(21)
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper()
         );
 
         $this->expectException(BalanceException::class);
 
-        $handler->update(1, 'TOK999', 1000000, 'withdraw');
+        $handler->update(1, 'TOK999', '1000000', 'withdraw');
     }
 
     public function testUpdate(): void
@@ -154,10 +163,23 @@ class BalanceFetcherTest extends TestCase
 
         $handler = new BalanceFetcher(
             $rpc,
-            $this->mockRandom(21)
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper()
         );
 
-        $handler->update(1, 'TOK999', 1000000, 'withdraw');
+        $handler->update(1, 'TOK999', '1000000', 'withdraw');
+    }
+
+    /** @return MockObject|MoneyWrapperInterface */
+    private function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        $wrapper = $this->createMock(MoneyWrapperInterface::class);
+
+        $wrapper->method('parse')->willReturnCallback(function (string $amount, string $symbol) {
+            return new Money($amount, new Currency($symbol));
+        });
+
+        return $wrapper;
     }
 
     /** @return MockObject|JsonRpcResponse */
