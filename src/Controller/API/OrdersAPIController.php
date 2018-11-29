@@ -111,12 +111,12 @@ class OrdersAPIController extends FOSRestController
             $this->getUser()->getId(),
             null,
             $market,
-            $moneyWrapper->getBase(
+            $moneyWrapper->parse(
                 $request->get('amountInput'),
                 MoneyWrapper::TOK_SYMBOL
             ),
             Order::SIDE_MAP[$request->get('action')],
-            $moneyWrapper->getBase(
+            $moneyWrapper->parse(
                 $request->get('priceInput'),
                 $crypto->getSymbol()
             ),

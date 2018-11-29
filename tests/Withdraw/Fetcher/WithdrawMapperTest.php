@@ -5,9 +5,13 @@ namespace App\Tests\Withdraw\Fetcher;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Withdraw\Fetcher\Mapper\WithdrawMapper;
 use App\Withdraw\Fetcher\Storage\StorageAdapterInterface;
 use App\Withdraw\Payment\Transaction;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -15,6 +19,7 @@ class WithdrawMapperTest extends TestCase
 {
     public function testGetHistory(): void
     {
+        $amount = '21';
         $data = [
             [
                 'transactionHash' => '123456',
@@ -23,11 +28,15 @@ class WithdrawMapperTest extends TestCase
                 'crypto' => 'web',
                 'fee' => 0.1,
                 'walletAddress' => '1234567890',
-                'amount' => 21,
+                'amount' => $amount,
             ],
         ];
         $storage = $this->mockStorageAdapter($data);
-        $mapper = new WithdrawMapper($storage, $this->mockCryptoManager($this->mockCrypto($data[0]['crypto'])));
+        $mapper = new WithdrawMapper(
+            $storage,
+            $this->mockCryptoManager($this->mockCrypto($data[0]['crypto'])),
+            $this->mockMoneyWrapper($amount)
+        );
         $history = $mapper->getHistory($this->mockUser());
         /** @var Transaction $transaction */
         $transaction = $history[0];
@@ -36,16 +45,32 @@ class WithdrawMapperTest extends TestCase
         $this->assertEquals($data[0]['createdDate'], $transaction->getDate()->getTimestamp());
         $this->assertEquals($data[0]['status'], $transaction->getStatus()->getStatusCode());
         $this->assertEquals($data[0]['crypto'], $transaction->getCrypto()->getSymbol());
+        $this->assertEquals($data[0]['amount'], $transaction->getAmount()->getAmount());
     }
 
     public function testGetBalance(): void
     {
-        $data = [ 123.0 ];
+        $amount = '123';
+        $data = [ $amount ];
         $storage = $this->mockStorageAdapter($data);
-        $mapper = new WithdrawMapper($storage, $this->mockCryptoManager($this->mockCrypto()));
+        $mapper = new WithdrawMapper(
+            $storage,
+            $this->mockCryptoManager($this->mockCrypto()),
+            $this->mockMoneyWrapper($amount)
+        );
         $balance = $mapper->getBalance($this->mockCrypto());
 
         $this->assertEquals($data[0], $balance->getAmount());
+    }
+
+    /** @return MockObject|MoneyWrapperInterface */
+    private function mockMoneyWrapper(string $data): MoneyWrapperInterface
+    {
+        $moneyWrapper = $this->createMock(MoneyWrapperInterface::class);
+
+        $moneyWrapper->method('parse')->willReturn(new Money($data, new Currency(MoneyWrapper::TOK_SYMBOL)));
+
+        return $moneyWrapper;
     }
 
     /** @return MockObject|CryptoManagerInterface */

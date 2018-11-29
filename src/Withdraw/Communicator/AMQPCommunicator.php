@@ -4,6 +4,7 @@ namespace App\Withdraw\Communicator;
 
 use App\Entity\Crypto;
 use App\Entity\User;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
@@ -19,6 +20,9 @@ class AMQPCommunicator implements CommunicatorInterface
     /** @var ProducerInterface */
     private $paymentRetryProducer;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     /** @var string */
     private $service;
 
@@ -28,11 +32,13 @@ class AMQPCommunicator implements CommunicatorInterface
     public function __construct(
         ProducerInterface $paymentProducer,
         ProducerInterface $paymentRetryProducer,
+        MoneyWrapperInterface $moneyWrapper,
         string $service,
         float $fee
     ) {
         $this->paymentProducer = $paymentProducer;
         $this->paymentRetryProducer = $paymentRetryProducer;
+        $this->moneyWrapper = $moneyWrapper;
         $this->service = $service;
         $this->fee = $fee;
     }
@@ -40,7 +46,7 @@ class AMQPCommunicator implements CommunicatorInterface
     public function sendWithdrawRequest(User $user, Money $balance, string $address, Crypto $crypto): void
     {
         $this->paymentProducer->publish(
-            $this->createPayload($user->getId(), $balance->getAmount(), $address, $crypto->getSymbol()),
+            $this->createPayload($user->getId(), $this->moneyWrapper->format($balance), $address, $crypto->getSymbol()),
             '',
             $this->createMessageOptions()
         );

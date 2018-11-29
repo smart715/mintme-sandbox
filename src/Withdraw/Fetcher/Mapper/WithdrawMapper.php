@@ -5,10 +5,10 @@ namespace App\Withdraw\Fetcher\Mapper;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Withdraw\Fetcher\Storage\StorageAdapterInterface;
 use App\Withdraw\Payment\Status;
 use App\Withdraw\Payment\Transaction;
-use Money\Currency;
 use Money\Money;
 
 class WithdrawMapper implements MapperInterface
@@ -19,12 +19,17 @@ class WithdrawMapper implements MapperInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         StorageAdapterInterface $storage,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
@@ -33,7 +38,7 @@ class WithdrawMapper implements MapperInterface
         return array_map(function (array $transaction) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['createdDate']),
-                $transaction['amount'],
+                $this->moneyWrapper->parse($transaction['amount'], $transaction['crypto']),
                 $transaction['fee'],
                 Status::fromString(
                     $transaction['status']
@@ -49,9 +54,9 @@ class WithdrawMapper implements MapperInterface
 
     public function getBalance(Crypto $crypto): Money
     {
-        return new Money(
+        return $this->moneyWrapper->parse(
             $this->storage->requestBalance($crypto->getSymbol()),
-            new Currency($crypto->getSymbol())
+            $crypto->getSymbol()
         );
     }
 }

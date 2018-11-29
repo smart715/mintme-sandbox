@@ -37,7 +37,7 @@ class Wallet implements WalletInterface
             throw new NotEnoughUserAmountException();
         }
 
-        if ($this->withdrawGateway->getBalance($crypto) < $amount->getAmount()) {
+        if ($this->withdrawGateway->getBalance($crypto)->lessThan($amount->getAmount())) {
             throw new NotEnoughAmountException();
         }
 
@@ -47,6 +47,7 @@ class Wallet implements WalletInterface
             $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $crypto);
         } catch (\Throwable $exception) {
             $this->balanceHandler->deposit($user, $token, $amount->getAmount());
+            throw new \Exception();
         }
     }
 }

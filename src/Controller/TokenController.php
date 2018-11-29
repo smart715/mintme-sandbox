@@ -131,7 +131,7 @@ class TokenController extends AbstractController
                 $balanceHandler->deposit(
                     $this->getUser(),
                     $token,
-                    $moneyWrapper->getBase(
+                    $moneyWrapper->parse(
                         $this->getParameter('token_quantity'),
                         MoneyWrapper::TOK_SYMBOL
                     )
