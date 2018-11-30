@@ -25,6 +25,7 @@
     "karma-es6-shim": "^1.0.0",
     "locutus": "^2.0.9",
     "url-parse": "^1.4.3",
+    "v-autocomplete": "^1.8.2",
     "vue-chartjs": "^3.3.2",
     "vue-clipboard2": "^0.2.1",
     "vue-range-slider": "^0.6.0",
