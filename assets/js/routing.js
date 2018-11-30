@@ -1,1 +1,5 @@
-module.exports = window.Routing;
+export default {
+    install(Vue, options) {
+        Vue.prototype.$routing = window.Routing;
+    },
+};

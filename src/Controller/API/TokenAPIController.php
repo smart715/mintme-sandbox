@@ -204,7 +204,7 @@ class TokenAPIController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\GET("/search/", name="api_token_search")
+     * @Rest\GET("/search", name="api_token_search")
      * @Rest\QueryParam(name="tokenName", allowBlank=false)
      */
     public function tokenSearch(ParamFetcherInterface $request): View

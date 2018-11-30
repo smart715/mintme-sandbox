@@ -17,11 +17,10 @@ class TokenRepository extends EntityRepository
     public function findTokensByPattern(string $pattern): array
     {
         return $this->createQueryBuilder('token')
-            ->andwhere('token.name LIKE :like')
-            ->orwhere('token.name LIKE :space_like')
+            ->where('LOWER(token.name) LIKE LOWER(:like)')
             ->setParameter('like', "$pattern%")
-            ->setParameter('space_like', " $pattern%")
             ->orderBy('token.name', 'ASC')
+            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;

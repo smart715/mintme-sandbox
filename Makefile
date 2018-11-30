@@ -12,6 +12,7 @@ karma:
 	npm run unit
 
 syntax_check:
+	php bin/console cache:warmup
 	./vendor/bin/phplint
 	./vendor/bin/phpcs -n
 	./vendor/bin/phpstan analyse

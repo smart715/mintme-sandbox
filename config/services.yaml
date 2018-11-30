@@ -1,6 +1,6 @@
 parameters:
-    locale: 'en'
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    locale: 'en'
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.

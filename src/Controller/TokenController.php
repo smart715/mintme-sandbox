@@ -71,7 +71,8 @@ class TokenController extends AbstractController
      *     name="token_show",
      *     defaults={"tab" = "trade"},
      *     methods={"GET"},
-     *     requirements={"tab" = "trade|intro"}
+     *     requirements={"tab" = "trade|intro"},
+     *     options={"expose"=true}
      * )
      */
     public function show(string $name, ?string $tab, NormalizerInterface $normalizer): Response

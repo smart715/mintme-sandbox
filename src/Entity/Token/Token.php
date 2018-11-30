@@ -7,6 +7,7 @@ use App\Entity\Profile;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -32,6 +33,7 @@ class Token
      * @Assert\NotBlank()
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
      * @Assert\Length(min = 4, max = 255)
+     * @Groups({"API"})
      * @var string|null
      */
     protected $name;
