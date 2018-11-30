@@ -14,7 +14,7 @@ parameters:
     tmpDir: "%rootDir%/../../../phpstan"
 
     symfony:
-        container_xml_path: %rootDir%/../../../var/cache/test/srcApp_KernelTestDebugContainer.xml
+        container_xml_path: %rootDir%/../../../var/cache/dev/srcApp_KernelDevDebugContainer.php
 
     excludes_analyse:
         - "%rootDir%/../../../src/Migrations/*"
