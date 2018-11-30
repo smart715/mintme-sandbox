@@ -10,6 +10,9 @@ import VueClipboard from 'vue-clipboard2';
 import VueTippy from 'vue-tippy';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
+import Autocomplete from 'v-autocomplete';
+import axios from 'axios';
+import Routing from './routing';
 
 VueClipboard.config.autoSetContainer = true;
 
@@ -19,7 +22,6 @@ window.Vue = require('vue');
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
-
 
 Vue.use(VueBootstrap);
 Vue.use(VueClipboard);
@@ -41,6 +43,31 @@ imagesContext.keys().forEach(imagesContext);
 
 new Vue({
     el: '#navbar',
+    data() {
+        return {
+            items: [],
+        };
+    },
+    components: {
+        Autocomplete,
+    },
+    methods: {
+        searchUpdate: function(value) {
+            axios.get(
+                this.$refs.tokenSearch.dataset.searchUrl,
+                {params: {tokenName: value}}
+            ).then((response) => {
+                this.items = response.data.map((token) => {
+                    return token.name;
+                });
+            }).catch((error) => {
+                console.log('error: ', error);
+            });
+        },
+        searchSelected: function(value) {
+            location.href = Routing.generate('token_show', {name: value});
+        },
+    },
 });
 
 new Vue({
