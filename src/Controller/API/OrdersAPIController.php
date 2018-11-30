@@ -48,7 +48,7 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     *  @Rest\Get("/cancel/{market}/{orderid}", name="order_cancel")
+     *  @Rest\Get("/cancel/{market}/{orderid}", name="order_cancel", options={"expose"=true})
      *  @Rest\View()
      */
     public function cancelOrder(String $market, int $orderid): View

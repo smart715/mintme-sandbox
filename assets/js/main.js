@@ -10,9 +10,9 @@ import VueClipboard from 'vue-clipboard2';
 import VueTippy from 'vue-tippy';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
-import Autocomplete from 'v-autocomplete';
-import axios from 'axios';
+import Axios from './axios';
 import Routing from './routing';
+import TokenSearcher from '../components/token/TokenSearcher';
 
 VueClipboard.config.autoSetContainer = true;
 
@@ -23,6 +23,8 @@ window.Vue = require('vue');
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 
+Vue.use(Axios);
+Vue.use(Routing);
 Vue.use(VueBootstrap);
 Vue.use(VueClipboard);
 Vue.use(VueTippy);
@@ -49,24 +51,7 @@ new Vue({
         };
     },
     components: {
-        Autocomplete,
-    },
-    methods: {
-        searchUpdate: function(value) {
-            axios.get(
-                this.$refs.tokenSearch.dataset.searchUrl,
-                {params: {tokenName: value}}
-            ).then((response) => {
-                this.items = response.data.map((token) => {
-                    return token.name;
-                });
-            }).catch((error) => {
-                console.log('error: ', error);
-            });
-        },
-        searchSelected: function(value) {
-            location.href = Routing.generate('token_show', {name: value});
-        },
+        TokenSearcher,
     },
 });
 
