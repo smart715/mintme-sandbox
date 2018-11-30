@@ -43,7 +43,7 @@ class TokenManager implements TokenManagerInterface
             strtoupper($name),
             array_map(
                 function (Crypto $crypto) {
-                        return $crypto->getSymbol();
+                    return $crypto->getSymbol();
                 },
                 $this->cryptoManager->findAll()
             )
@@ -109,5 +109,11 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
+    }
+
+    /** {@inheritdoc} */
+    public function getTokensByPattern(string $pattern): array
+    {
+        return $this->repository->findTokensByPattern($pattern);
     }
 }

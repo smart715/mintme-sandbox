@@ -10,6 +10,7 @@ use App\Manager\TokenManagerInterface;
 use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -199,5 +200,17 @@ class TokenAPIController extends FOSRestController
         }
 
         return $this->view($this->tokenManager->getRealBalance($token, $balance));
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\GET("/search/", name="api_token_search")
+     * @Rest\QueryParam(name="tokenName", allowBlank=false)
+     */
+    public function tokenSearch(ParamFetcherInterface $request): View
+    {
+        return $this->view($this->tokenManager->getTokensByPattern(
+            $request->get('tokenName')
+        ));
     }
 }

@@ -8,7 +8,18 @@
             <b-navbar-nav class="ml-auto">
                 <li class="search nav-item align-self-start align-self-lg-center py-3 py-lg-0 pr-0 pr-md-3">
                     <div class="input-group">
-                        <input placeholder="Search for token... Use token name or wallet address" class="search-input form-control" type="search" aria-label="Search">
+                        <div ref="tokenSearch" data-search-url="{{ path('api_token_search') }}">
+                            <autocomplete
+                                input-class="search-input form-control"
+                                placeholder="Search for token... Use token name or wallet address"
+                                @update-items="searchUpdate"
+                                @item-selected="searchSelected"
+                                :items="items"
+                                :min-len="3"
+                                :wait="500"
+                            >
+                            </autocomplete>
+                        </div>
                         <div class="input-group-append">
                             <span class="input-group-text">
                                 <font-awesome-icon icon="search"></font-awesome-icon>
