@@ -38,7 +38,8 @@
         "symfony/templating": "^4.1",
         "symfony/translation": "^4.1",
         "symfony/twig-bundle": "^4.1",
-        "symfony/yaml": "^4.1"
+        "symfony/yaml": "^4.1",
+        "vasek-purchart/doctrine-date-time-immutable-types": "^1.0"
     },
     "require-dev": {
         "overtrue/phplint": "^1.1",

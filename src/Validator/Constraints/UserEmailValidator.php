@@ -22,7 +22,7 @@ class UserEmailValidator extends ConstraintValidator
     }
 
     /** {@inheritdoc} */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         $user = $this->userManager->findUserByEmail($value ?? '');
         if (!is_null($user) && $this->user !== $user) {

@@ -6,7 +6,7 @@ use App\Entity\Profile;
 use App\Form\AddProfileType;
 use App\Form\EditProfileType;
 use App\Manager\ProfileManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /** @Route("/profile") */
-class ProfileController extends Controller
+class ProfileController extends AbstractController
 {
     /** @Route("/{pageUrl}", name="profile-view") */
     public function profileView(
