@@ -45,7 +45,7 @@ class PaymentConsumer implements ConsumerInterface
     }
 
     /** {@inheritdoc} */
-    public function execute(AMQPMessage $msg)
+    public function execute(AMQPMessage $msg): bool
     {
         $clbResult = WithdrawCallbackMessage::parse(
             json_decode($msg->body, true)

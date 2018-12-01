@@ -208,7 +208,6 @@ class TokenController extends AbstractController
         $token = $this->tokenManager->getOwnToken();
 
         if (null === $token) {
-            //FIXME: return "token not exist" template instead
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 

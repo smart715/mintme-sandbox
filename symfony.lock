@@ -527,6 +527,9 @@
     "twig/twig": {
         "version": "v2.5.0"
     },
+    "vasek-purchart/doctrine-date-time-immutable-types": {
+        "version": "1.0"
+    },
     "willdurand/jsonp-callback-validator": {
         "version": "v1.1.0"
     },

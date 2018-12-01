@@ -37,7 +37,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
      *
      * @param BalanceResultContainer $object
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = array()): array
     {
         $result = [];
         $data = $object->getAll();
@@ -60,7 +60,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof BalanceResultContainer;
     }

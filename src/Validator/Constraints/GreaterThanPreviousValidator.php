@@ -17,7 +17,7 @@ class GreaterThanPreviousValidator extends ConstraintValidator
     }
 
     /** {@inheritdoc} */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$this->isGreaterThanPrevious($this->context->getObject(), $value)) {
             $this->context->buildViolation($constraint->message)->addViolation();

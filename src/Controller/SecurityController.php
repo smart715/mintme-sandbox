@@ -27,6 +27,7 @@ class SecurityController extends FOSSecurityController
         $this->container = $container;
         parent::__construct($tokenManager);
     }
+
     /** @Route("/login", name="login") */
     public function loginAction(Request $request): Response
     {
