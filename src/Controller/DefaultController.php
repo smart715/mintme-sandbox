@@ -15,4 +15,12 @@ class DefaultController extends AbstractController
     {
         return $this->render('pages/index.html.twig');
     }
+
+    /**
+     * @Route("/error500", name="error500")
+     */
+    public function error500(): Response
+    {
+        throw new \Exception('Exception to test 500 error page in production');
+    }
 }
