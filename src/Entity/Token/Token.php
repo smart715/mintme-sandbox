@@ -88,17 +88,17 @@ class Token
      */
     protected $lockIn;
 
-    /** @var string|null */
-    protected $fullname;
+    /** @var Crypto|null */
+    protected $crypto;
 
-    public function getFullname(): ?string
+    public function getCrypto(): ?Crypto
     {
-        return $this->fullname;
+        return $this->crypto;
     }
 
-    public function setFullname(string $name): self
+    public function setCrypto(?Crypto $crypto): self
     {
-        $this->fullname = $name;
+        $this->crypto = $crypto;
 
         return $this;
     }

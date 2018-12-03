@@ -88,7 +88,6 @@ services:
             $paymentProducer: '@old_sound_rabbit_mq.payment_producer'
             $paymentRetryProducer: '@old_sound_rabbit_mq.payment_retry_producer'
             $service: '%service%'
-            $fee: '%withdraw_fee%'
 
     FOS\UserBundle\Form\Factory\FormFactory:
         arguments:

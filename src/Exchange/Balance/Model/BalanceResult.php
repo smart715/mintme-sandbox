@@ -10,7 +10,7 @@ class BalanceResult
 {
     /**
      * @var Money
-     * @Groups({"API"})
+     * @Groups({"Default", "API"})
      */
     private $available;
 

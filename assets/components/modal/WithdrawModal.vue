@@ -45,7 +45,7 @@
                     <label>
                         Amount {{ currency }}:
                     </label>
-                    <span class="float-right">{{ maxAmount }}</span>
+                    <span class="float-right">{{ fullAmount }}</span>
                 </div>
                 <div class="pt-3">
                     <button
@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import axios from 'axios';
 import {required, minLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
@@ -87,7 +88,8 @@ export default {
     props: {
         visible: Boolean,
         currency: String,
-        balanceUrl: String,
+        precision: Number,
+        fee: String,
         withdrawUrl: String,
     },
     data() {
@@ -97,6 +99,17 @@ export default {
             maxAmount: 0,
             address: '',
         };
+    },
+    computed: {
+        fullAmount: function() {
+            Decimal.set({precision: 36});
+
+            let amount = new Decimal(
+                new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
+            );
+
+            return amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toFixed(this.precision);
+        },
     },
     methods: {
         closeModal: function() {
@@ -130,10 +143,12 @@ export default {
             this.closeModal();
         },
         fetchMaxAmount: function() {
-            return axios.get(this.balanceUrl.replace('currency', this.currency));
+            return axios.get(this.$routing.generate('fetch_balance_token', {tokenName: this.currency}));
         },
         setMaxAmount: function() {
-            this.amount = this.maxAmount;
+            let amount = new Decimal(this.maxAmount);
+            this.amount = amount.greaterThan(this.fee) ?
+                amount.sub(this.fee).toFixed(this.precision) : 0;
         },
     },
     watch: {
@@ -145,7 +160,7 @@ export default {
 
             this.fetchMaxAmount()
                 .then((response) => {
-                    this.maxAmount = response.data['available'];
+                    this.maxAmount = response.data.available;
                     this.formLoaded = true;
                 })
                 .catch((error) => {
@@ -159,7 +174,9 @@ export default {
             amount: {
                 required,
                 decimal,
-                maxValue: maxValue(this.maxAmount),
+                maxValue: maxValue(
+                    new Decimal(this.maxAmount).sub(this.fee).toDP(this.precision)
+                ),
                 minValue: minValue(0.00001),
             },
             address: {

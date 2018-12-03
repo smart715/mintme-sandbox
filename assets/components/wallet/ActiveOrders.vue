@@ -42,6 +42,8 @@ const METHOD_AUTH = 12345;
 const METHOD_ORDER_QUERY = 54321;
 const METHOD_ORDER_SUBSCRIBE = 12878;
 
+Vue.use(WebSocket);
+
 export default {
     name: 'ActiveOrders',
     components: {

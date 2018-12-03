@@ -30,7 +30,7 @@ class TokenManagerTest extends TestCase
             $this->mockCryptoManager([$this->mockCrypto($name)])
         );
 
-        $this->assertEquals($name, $tokenManager->findByName($name)->getFullname());
+        $this->assertEquals($name, $tokenManager->findByName($name)->getCrypto()->getName());
         $this->assertEquals($name, $tokenManager->findByName($name)->getName());
         $this->assertNotSame($tokenManager->findByName($name), $tokenManager->findByName($name));
     }

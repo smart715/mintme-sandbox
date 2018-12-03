@@ -11,6 +11,8 @@ use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Withdraw\WithdrawGatewayInterface;
+use Money\Currency;
+use Money\Money;
 
 class Wallet implements WalletInterface
 {
@@ -33,11 +35,13 @@ class Wallet implements WalletInterface
     {
         $token = Token::getFromCrypto($crypto);
 
-        if ($this->balanceHandler->balance($user, $token)->getAvailable()->lessThan($amount->getAmount())) {
+        if ($this->balanceHandler->balance($user, $token)->getAvailable()->lessThan(
+            $amount->getAmount()->add($crypto->getFee())
+        )) {
             throw new NotEnoughUserAmountException();
         }
 
-        if ($this->withdrawGateway->getBalance($crypto)->lessThan($amount->getAmount())) {
+        if ($this->withdrawGateway->getBalance($crypto)->lessThan($amount->getAmount()->add($crypto->getFee()))) {
             throw new NotEnoughAmountException();
         }
 

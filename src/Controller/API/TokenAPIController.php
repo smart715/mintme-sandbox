@@ -178,7 +178,12 @@ class TokenAPIController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{tokenName}/balance", name="fetch_balance_token", requirements={"tokenName"="[a-zA-Z0-9]+"})
+     * @Rest\Get(
+     *     "/{tokenName}/balance",
+     *     name="fetch_balance_token",
+     *     options={"expose"=true},
+     *     requirements={"tokenName"="[a-zA-Z0-9]+"}
+     *     )
      */
     public function fetchBalanceToken(string $tokenName, BalanceHandlerInterface $balanceHandler): View
     {
