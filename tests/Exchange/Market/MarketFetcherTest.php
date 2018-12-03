@@ -8,6 +8,10 @@ use App\Communications\JsonRpcResponse;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
+use App\Wallet\Money\MoneyWrapper;
+use Money\Currency;
+use Money\Money;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MarketFetcherTest extends TestCase
@@ -141,11 +145,20 @@ class MarketFetcherTest extends TestCase
         );
     }
 
+    /** @return MockObject|Market */
     private function createMarket(): Market
     {
         $market = $this->createMock(Market::class);
+
         $market->method('getHiddenName')->willReturn('TOK000000000001WEB');
+        $market->method('getCurrencySymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+
         return $market;
+    }
+
+    private function createMoney(int $value): Money
+    {
+        return new Money($value, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     private function getPendingResult(int $side): array
@@ -180,9 +193,9 @@ class MarketFetcherTest extends TestCase
                 1,
                 null,
                 $this->createMarket(),
-                '10',
+                $this->createMoney(10),
                 $side,
-                '1',
+                $this->createMoney(1),
                 Order::PENDING_STATUS,
                 1492697636
             ),
@@ -212,9 +225,9 @@ class MarketFetcherTest extends TestCase
                 1,
                 2,
                 $this->createMarket(),
-                '10',
+                $this->createMoney(10),
                 1,
-                '1',
+                $this->createMoney(1),
                 Order::FINISHED_STATUS,
                 1492697636
             ),

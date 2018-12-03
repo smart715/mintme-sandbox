@@ -43,7 +43,7 @@ class TokenManager implements TokenManagerInterface
             strtoupper($name),
             array_map(
                 function (Crypto $crypto) {
-                        return $crypto->getSymbol();
+                    return $crypto->getSymbol();
                 },
                 $this->cryptoManager->findAll()
             )
@@ -52,8 +52,8 @@ class TokenManager implements TokenManagerInterface
             return $this->repository->findByName($name);
         }
 
-        return (new Token())->setName(strtoupper($name))->setFullname(
-            $this->cryptoManager->findBySymbol(strtoupper($name))->getName()
+        return (new Token())->setName(strtoupper($name))->setCrypto(
+            $this->cryptoManager->findBySymbol(strtoupper($name))
         );
     }
 
@@ -62,7 +62,7 @@ class TokenManager implements TokenManagerInterface
     {
         return array_map(
             function (Crypto $crypto) {
-                return Token::getFromCrypto($crypto)->setFullname($crypto->getName());
+                return Token::getFromCrypto($crypto)->setCrypto($crypto);
             },
             $this->cryptoManager->findAll()
         );
@@ -92,8 +92,8 @@ class TokenManager implements TokenManagerInterface
         }
 
         return BalanceResult::success(
-            $balanceResult->getAvailable() - $token->getLockIn()->getFrozenAmount(),
-            $balanceResult->getFreeze() + $token->getLockIn()->getFrozenAmount()
+            $balanceResult->getAvailable()->subtract($token->getLockIn()->getFrozenAmount()),
+            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount())
         );
     }
 
@@ -109,5 +109,11 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
+    }
+
+    /** {@inheritdoc} */
+    public function getTokensByPattern(string $pattern): array
+    {
+        return $this->repository->findTokensByPattern($pattern);
     }
 }

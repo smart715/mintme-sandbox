@@ -7,6 +7,7 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Repository\TokenRepository;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -22,14 +23,19 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     /** @var TokenManagerInterface */
     private $tokenManager;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         ObjectNormalizer $normalizer,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->entityManager = $entityManager;
         $this->normalizer = $normalizer;
         $this->tokenManager = $tokenManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /**
@@ -37,7 +43,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
      *
      * @param BalanceResultContainer $object
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = array()): array
     {
         $result = [];
         $data = $object->getAll();
@@ -51,7 +57,14 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
             );
 
             $result[$token->getName()] = $this->normalizer->normalize($result[$token->getName()], $format, $context);
-            $result[$token->getName()]['fullname'] = $token->getFullname();
+
+            if ($token->getCrypto()) {
+                $result[$token->getName()]['fullname'] = $token->getCrypto()->getName();
+                $result[$token->getName()]['precision'] = $token->getCrypto()->getSubunit();
+                $result[$token->getName()]['fee'] = $this->moneyWrapper->format(
+                    $token->getCrypto()->getFee()
+                );
+            }
         });
 
         return $result;
@@ -60,7 +73,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof BalanceResultContainer;
     }

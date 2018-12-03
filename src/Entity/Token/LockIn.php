@@ -3,7 +3,10 @@
 namespace App\Entity\Token;
 
 use App\Validator\Constraints\GreaterThanPrevious;
+use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
+use Money\Currency;
+use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -27,16 +30,16 @@ class LockIn
     protected $releasePeriod = 10;
 
     /**
-     * @ORM\Column(type="float")
-     * @var float
+     * @ORM\Column(type="bigint")
+     * @var string
      */
     protected $amountToRelease;
 
     /**
-     * @ORM\Column(type="float")
-     * @var float
+     * @ORM\Column(type="bigint")
+     * @var string
      */
-    protected $frozenAmount = 0;
+    protected $frozenAmount = '0';
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", inversedBy="lockIn")
@@ -65,25 +68,29 @@ class LockIn
     /**
      * @Groups({"Default", "API"})
      */
-    public function getHourlyRate(): float
+    public function getHourlyRate(): Money
     {
-        return $this->amountToRelease / $this->releasePeriod / 365 / 24;
+        $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+        return $money->divide($this->releasePeriod)->divide(365 * 24);
     }
 
     /**
      * @Groups({"Default", "API"})
      */
-    public function getReleasedAmount(): float
+    public function getReleasedAmount(): Money
     {
-        return $this->amountToRelease - $this->frozenAmount;
+        $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+        return $money->subtract($this->getFrozenAmount());
     }
 
     /**
      * @Groups({"Default", "API"})
      */
-    public function getFrozenAmount(): float
+    public function getFrozenAmount(): Money
     {
-        return $this->frozenAmount;
+        return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     public function setReleasePeriod(int $releasePeriod): self
@@ -93,21 +100,19 @@ class LockIn
         return $this;
     }
 
-    public function setAmountToRelease(float $amount): self
+    public function setAmountToRelease(Money $amount): self
     {
-        $this->amountToRelease =  $amount;
-        $this->frozenAmount = $amount;
+        $this->amountToRelease =  $amount->getAmount();
+        $this->frozenAmount = $amount->getAmount();
 
         return $this;
     }
 
     public function updateFrozenAmount(): self
     {
-        if ($this->getHourlyRate() > $this->getFrozenAmount()) {
-            $this->frozenAmount = 0;
-        } else {
-            $this->frozenAmount -= $this->getHourlyRate();
-        }
+        $this->frozenAmount = $this->getHourlyRate()->greaterThan($this->getFrozenAmount())
+            ? '0'
+            : $this->getFrozenAmount()->subtract($this->getHourlyRate())->getAmount();
 
         return $this;
     }

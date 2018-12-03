@@ -18,7 +18,7 @@ class PaymentProducer extends Producer
     private const QUEUE_IS_NOWAIT       = false;
 
     /** {@inheritdoc} */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array(), ?array $headers = null)
+    public function publish($msgBody, $routingKey = '', $additionalProperties = array(), ?array $headers = null): void
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();

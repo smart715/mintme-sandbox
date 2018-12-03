@@ -14,17 +14,12 @@ class BalanceResultContainer implements \IteratorAggregate
 
     public function getAll(): array
     {
-        return array_map(function (array $balance) {
-            return BalanceResult::success(
-                (float)$balance['available'],
-                (float)$balance['freeze']
-            );
-        }, $this->balances);
+        return $this->balances;
     }
 
-    public function get(string $name): BalanceResult
+    public function get(string $symbol): BalanceResult
     {
-        return $this->getAll()[$name] ?? BalanceResult::fail();
+        return $this->getAll()[$symbol] ?? BalanceResult::fail($symbol);
     }
 
     public static function success(array $balances): self

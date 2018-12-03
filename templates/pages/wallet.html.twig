@@ -15,7 +15,6 @@
                             <wallet
                                 :tokens="{{ tokens | json_encode }}"
                                 :predefined-tokens="{{ predefinedTokens | json_encode }}"
-                                balance-url="{{ path('fetch_balance_token', {'tokenName' : 'currency'}) }}"
                                 withdraw-url="{{ path('withdraw') }}">
                             </wallet>
                         </b-tab>

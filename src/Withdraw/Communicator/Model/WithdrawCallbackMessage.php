@@ -19,7 +19,7 @@ class WithdrawCallbackMessage
     /** @var string */
     private $crypto;
 
-    /** @var float */
+    /** @var string */
     private $amount;
 
     private function __construct(
@@ -28,7 +28,7 @@ class WithdrawCallbackMessage
         string $transactionHash,
         int $retries,
         string $crypto,
-        float $amount
+        string $amount
     ) {
         $this->id = $id;
         $this->status = $status;
@@ -63,7 +63,7 @@ class WithdrawCallbackMessage
         return $this->crypto;
     }
 
-    public function getAmount(): float
+    public function getAmount(): string
     {
         return $this->amount;
     }

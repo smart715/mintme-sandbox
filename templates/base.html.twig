@@ -14,7 +14,7 @@
     </head>
     <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div class="content-wrapper c">
+            <div class="content-wrapper {% block contentclass %}{% endblock %}">
                 <div class="content">
                     {% block header %}
                         <div class="header-white">
@@ -46,6 +46,8 @@
             </div>
         {% endblock %}
         {% block javascripts %}
+            <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+            <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
             <script src="{{ asset('build/main.js') }}"></script>
             {% block pagescripts %}{% endblock %}
         {% endblock %}

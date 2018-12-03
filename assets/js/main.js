@@ -10,6 +10,9 @@ import VueClipboard from 'vue-clipboard2';
 import VueTippy from 'vue-tippy';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
+import Axios from './axios';
+import Routing from './routing';
+import TokenSearcher from '../components/token/TokenSearcher';
 
 VueClipboard.config.autoSetContainer = true;
 
@@ -20,7 +23,8 @@ window.Vue = require('vue');
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 
-
+Vue.use(Axios);
+Vue.use(Routing);
 Vue.use(VueBootstrap);
 Vue.use(VueClipboard);
 Vue.use(VueTippy);
@@ -41,6 +45,14 @@ imagesContext.keys().forEach(imagesContext);
 
 new Vue({
     el: '#navbar',
+    data() {
+        return {
+            items: [],
+        };
+    },
+    components: {
+        TokenSearcher,
+    },
 });
 
 new Vue({

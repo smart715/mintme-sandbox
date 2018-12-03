@@ -5,8 +5,10 @@ namespace App\Exchange\Balance;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Exchange\Balance\Model\BalanceResultFactory;
 use App\Exchange\Balance\Model\SummaryResult;
 use App\Utils\RandomNumberInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 
 class BalanceFetcher implements BalanceFetcherInterface
 {
@@ -20,22 +22,27 @@ class BalanceFetcher implements BalanceFetcherInterface
     /** @var RandomNumberInterface */
     private $random;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         JsonRpcInterface $jsonRpc,
-        RandomNumberInterface $randomNumber
+        RandomNumberInterface $randomNumber,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->random = $randomNumber;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function update(int $userId, string $tokenName, float $amount, string $type): void
+    public function update(int $userId, string $tokenName, string $amount, string $type): void
     {
         $responce = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
             $userId,
             $tokenName,
             $type,
             $this->random->getNumber(),
-            (string)$amount,
+            $amount,
             [ 'extra' => 1 ],
         ]);
 
@@ -91,8 +98,6 @@ class BalanceFetcher implements BalanceFetcherInterface
 
         $result = $response->getResult();
 
-        return BalanceResultContainer::success(
-            $result
-        );
+        return (new BalanceResultFactory($result, $this->moneyWrapper))->create();
     }
 }

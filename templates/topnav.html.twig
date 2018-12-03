@@ -7,14 +7,7 @@
         <b-collapse is-nav="is-nav" id="topnav_collapse">
             <b-navbar-nav class="ml-auto">
                 <li class="search nav-item align-self-start align-self-lg-center py-3 py-lg-0 pr-0 pr-md-3">
-                    <div class="input-group">
-                        <input placeholder="Search for token... Use token name or wallet address" class="search-input form-control" type="search" aria-label="Search">
-                        <div class="input-group-append">
-                            <span class="input-group-text">
-                                <font-awesome-icon icon="search"></font-awesome-icon>
-                            </span>
-                        </div>
-                    </div>
+                    <token-searcher search-url="{{ path('api_token_search') }}"></token-searcher>
                 </li>
                 <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
                     <span class="icon-token float-left mr-1"></span>
@@ -56,3 +49,9 @@
         </b-collapse>
     </div>
 </b-navbar>
+<script>
+    import TokenSearcher from "../assets/components/token/TokenSearcher";
+    export default {
+        components: {TokenSearcher}
+    }
+</script>

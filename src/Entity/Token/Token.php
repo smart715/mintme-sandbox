@@ -7,6 +7,7 @@ use App\Entity\Profile;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -32,6 +33,7 @@ class Token
      * @Assert\NotBlank()
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
      * @Assert\Length(min = 4, max = 255)
+     * @Groups({"API"})
      * @var string|null
      */
     protected $name;
@@ -86,17 +88,17 @@ class Token
      */
     protected $lockIn;
 
-    /** @var string|null */
-    protected $fullname;
+    /** @var Crypto|null */
+    protected $crypto;
 
-    public function getFullname(): ?string
+    public function getCrypto(): ?Crypto
     {
-        return $this->fullname;
+        return $this->crypto;
     }
 
-    public function setFullname(string $name): self
+    public function setCrypto(?Crypto $crypto): self
     {
-        $this->fullname = $name;
+        $this->crypto = $crypto;
 
         return $this;
     }

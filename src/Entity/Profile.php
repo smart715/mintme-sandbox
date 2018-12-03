@@ -70,8 +70,8 @@ class Profile
     protected $description;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * @var DateTime|null
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable|null
      */
     protected $nameChangedDate;
 
@@ -121,12 +121,12 @@ class Profile
     /** @ORM\PrePersist() */
     public function updateNameChangedDate(): self
     {
-        $this->nameChangedDate = new DateTime('+1 month');
+        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
 
         return $this;
     }
 
-    public function getNameChangedDate(): ?DateTime
+    public function getNameChangedDate(): ?\DateTimeImmutable
     {
         return $this->nameChangedDate;
     }

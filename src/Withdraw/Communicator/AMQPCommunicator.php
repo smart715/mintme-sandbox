@@ -4,7 +4,9 @@ namespace App\Withdraw\Communicator;
 
 use App\Entity\Crypto;
 use App\Entity\User;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
+use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -18,28 +20,34 @@ class AMQPCommunicator implements CommunicatorInterface
     /** @var ProducerInterface */
     private $paymentRetryProducer;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     /** @var string */
     private $service;
-
-    /** @var float */
-    private $fee;
 
     public function __construct(
         ProducerInterface $paymentProducer,
         ProducerInterface $paymentRetryProducer,
-        string $service,
-        float $fee
+        MoneyWrapperInterface $moneyWrapper,
+        string $service
     ) {
         $this->paymentProducer = $paymentProducer;
         $this->paymentRetryProducer = $paymentRetryProducer;
+        $this->moneyWrapper = $moneyWrapper;
         $this->service = $service;
-        $this->fee = $fee;
     }
 
-    public function sendWithdrawRequest(User $user, float $balance, string $address, Crypto $crypto): void
+    public function sendWithdrawRequest(User $user, Money $balance, string $address, Crypto $crypto): void
     {
         $this->paymentProducer->publish(
-            $this->createPayload($user->getId(), (string)$balance, $address, $crypto->getSymbol()),
+            $this->createPayload(
+                $user->getId(),
+                $this->moneyWrapper->format($balance),
+                $address,
+                $crypto->getSymbol(),
+                $this->moneyWrapper->format($crypto->getFee())
+            ),
             '',
             $this->createMessageOptions()
         );
@@ -56,15 +64,15 @@ class AMQPCommunicator implements CommunicatorInterface
         );
     }
 
-    private function createPayload(int $id, string $amount, string $recipient, string $crypto): string
+    private function createPayload(int $id, string $amount, string $recipient, string $crypto, string $fee): string
     {
         return json_encode([
             'id' => $id,
             'amount' => $amount,
             'recipient' => $recipient,
             'crypto' => $crypto,
+            'fee' => $fee,
             'service' => $this->service,
-            'fee' => $this->fee,
         ]) ?: '';
     }
 

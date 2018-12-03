@@ -12,4 +12,17 @@ class TokenRepository extends EntityRepository
     {
         return $this->findOneBy(['name' => $name]);
     }
+
+    /** @return Token[] */
+    public function findTokensByPattern(string $pattern): array
+    {
+        return $this->createQueryBuilder('token')
+            ->where('LOWER(token.name) LIKE LOWER(:like)')
+            ->setParameter('like', "$pattern%")
+            ->orderBy('token.name', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

@@ -33,7 +33,7 @@ class WithdrawStorage implements StorageAdapterInterface
     }
 
     /** {@inheritdoc} */
-    public function requestBalance(string $symbol): ?float
+    public function requestBalance(string $symbol): string
     {
         return $this->sendRequest(self::RPC_BALANCE, [
             'crypto' => $symbol,

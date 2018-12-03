@@ -19,4 +19,7 @@ interface TokenManagerInterface
     public function findAllPredefined(): array;
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult;
+
+    /** @return Token[] */
+    public function getTokensByPattern(string $pattern): array;
 }

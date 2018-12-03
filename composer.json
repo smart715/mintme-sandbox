@@ -5,6 +5,7 @@
     "license": "proprietary",
     "require": {
         "php": "^7.2.2",
+        "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
@@ -17,6 +18,7 @@
         "fzaninotto/faker": "^1.8",
         "graze/guzzle-jsonrpc": "^3.2",
         "incenteev/composer-parameter-handler": "^2.1",
+        "moneyphp/money": "^3.1",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "pragmarx/random": "^0.2.2",
         "ramsey/uuid": "^3.8",
@@ -34,8 +36,10 @@
         "symfony/serializer": "^4.1",
         "symfony/swiftmailer-bundle": "^3.2",
         "symfony/templating": "^4.1",
+        "symfony/translation": "^4.1",
         "symfony/twig-bundle": "^4.1",
-        "symfony/yaml": "^4.1"
+        "symfony/yaml": "^4.1",
+        "vasek-purchart/doctrine-date-time-immutable-types": "^1.0"
     },
     "require-dev": {
         "overtrue/phplint": "^1.1",
