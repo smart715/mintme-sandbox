@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}404 - Page not found{% endblock %}
+
+{% block bodyclass %}errorpage{% endblock %}
+
+{% block content %}
+    <div class="container top-4">
+        <div class="row text-center">
+            <div class="col">
+                <div class="error-code errors">404</div>
+                <div class="error-text errors">Page not found</div>
+                <p class="error-msg">
+                    The requested page couldn't be located. Checkout for any URL misspelling or
+                    <a href="{{ path('homepage') }}" class="backlink">return to the homepage</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
