@@ -42,8 +42,12 @@ class WalletController extends AbstractController
         return $this->render('pages/wallet.html.twig', [
             'markets' => $markets,
             'hash' => $this->getUser()->getHash(),
-            'tokens' => $normalizer->normalize($tokens),
-            'predefinedTokens' => $normalizer->normalize($predefinedTokens),
+            'tokens' => $normalizer->normalize($tokens, null, [
+                'groups' => [ 'Default' ],
+            ]),
+            'predefinedTokens' => $normalizer->normalize($predefinedTokens, null, [
+                'groups' => [ 'Default' ],
+            ]),
         ]);
     }
 

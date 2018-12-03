@@ -20,7 +20,7 @@
                             <font-awesome-icon
                                     icon="shopping-cart"
                                     class="text-orange c-pointer"
-                                    @click="openWithdraw(name)"
+                                    @click="openWithdraw(name, token.fee, token.precision)"
                             />
                         </td>
                     </tr>
@@ -47,7 +47,8 @@
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
-            :balance-url="balanceUrl"
+            :fee="fee"
+            :precision="precision"
             :withdraw-url="withdrawUrl"
             @close="closeWithdraw" />
     </div>
@@ -64,19 +65,22 @@ export default {
     props: {
         tokens: {type: Object, required: true},
         predefinedTokens: {type: Object, required: true},
-        balanceUrl: {type: String, required: true},
         withdrawUrl: {type: String, required: true},
     },
     data() {
         return {
             showModal: false,
             selectedCurrency: null,
+            fee: 0,
+            precision: 8,
         };
     },
     methods: {
-        openWithdraw: function(currency) {
+        openWithdraw: function(currency, fee, precision) {
             this.showModal = true;
             this.selectedCurrency = currency;
+            this.fee = fee;
+            this.precision = precision;
         },
         closeWithdraw: function() {
             this.showModal = false;

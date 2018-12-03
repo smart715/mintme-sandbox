@@ -52,8 +52,8 @@ class TokenManager implements TokenManagerInterface
             return $this->repository->findByName($name);
         }
 
-        return (new Token())->setName(strtoupper($name))->setFullname(
-            $this->cryptoManager->findBySymbol(strtoupper($name))->getName()
+        return (new Token())->setName(strtoupper($name))->setCrypto(
+            $this->cryptoManager->findBySymbol(strtoupper($name))
         );
     }
 
@@ -62,7 +62,7 @@ class TokenManager implements TokenManagerInterface
     {
         return array_map(
             function (Crypto $crypto) {
-                return Token::getFromCrypto($crypto)->setFullname($crypto->getName());
+                return Token::getFromCrypto($crypto)->setCrypto($crypto);
             },
             $this->cryptoManager->findAll()
         );
