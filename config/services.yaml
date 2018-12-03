@@ -122,7 +122,7 @@ services:
 
     App\Manager\UserManager:
         arguments:
-            - "@fos_user.util.password_updater"
-            - "@fos_user.util.canonical_fields_updater"
-            - "@doctrine.orm.entity_manager"
-            - "%fos_user.model.user.class%"
+        - "@fos_user.util.password_updater"
+        - "@fos_user.util.canonical_fields_updater"
+        - "@doctrine.orm.entity_manager"
+        - "%fos_user.model.user.class%"
