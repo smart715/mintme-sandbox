@@ -1,0 +1,27 @@
+sonata_classification:
+    class:
+        tag:            App\Entity\Classification\Tag
+        category:       App\Entity\Classification\Category
+        context:        App\Entity\Classification\Context
+        collection:     App\Entity\Classification\Collection
+        media:          App\Entity\Media\Media
+
+    admin:
+        tag:
+            class:        Sonata\ClassificationBundle\Admin\TagAdmin
+            controller:   SonataAdminBundle:CRUD
+        category:
+            class:        Sonata\ClassificationBundle\Admin\CategoryAdmin
+            controller:   SonataAdminBundle:CRUD
+        collection:
+            class:        Sonata\ClassificationBundle\Admin\CollectionAdmin
+            controller:   SonataAdminBundle:CRUD
+        context:
+            class:        Sonata\ClassificationBundle\Admin\ContextAdmin
+            controller:   SonataAdminBundle:CRUD
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    SonataClassificationBundle: ~
