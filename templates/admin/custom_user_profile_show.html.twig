@@ -1,0 +1,216 @@
+{% extends 'SonataAdminBundle:CRUD:base_show.html.twig' %}
+
+{% block title %}
+{% spaceless %}
+    {{ "title_show"|trans({'%name%': admin.toString(user)|truncate(30) }, 'SonataAdminBundle') }}
+{% endspaceless %}
+{% endblock %}
+
+{% block show %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h4 class="box-title">
+                        Profile
+                    </h4>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table">
+                        <tr class="sonata-ba-view-container">
+                            <th>Email</th>
+                            <td>{{ profile.email }}</td>
+                        </tr>
+                    </table>
+                    <table class="table text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Crypto</th>
+                                <th>Total Hashes</th>
+                                <th>Hash Rate</th>
+                                <th>Pending Reward</th>
+                                <th>Total Reward</th>
+                                <th>Wallet Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for crypto, stats in profileStats %}
+                            <tr>
+                                <th>{{ crypto|upper }}</th>
+                                <td>{{ stats.totalHashes }}</td>
+                                <td>{{ stats.hashRate|number_format(2) }}</td>
+                                <td>{{ stats.pendingReward|toXMR }} {{ crypto|upper }}</td>
+                                <td>{{ stats.totalReward|toXMR }} {{ crypto|upper }}</td>
+                                <td>{{ profileWallets[crypto] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h4 class="box-title">
+                        Sites
+                    </h4>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Hashes</th>
+                                <th>Hash Rate</th>
+                                <th>Reward</th>
+                                <th>Key</th>
+                                <th>Crypto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if sites is empty %}
+                                <tr>
+                                    <td class="text-center" colspan="5">
+                                        <em>No sites were added yet</em>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                {% for site in sites %}
+                                    <tr>
+                                        <td>{{ site.name }}</td>
+                                        <td>{{ site.hashes }}</td>
+                                        <td>{{ site.hashRate|number_format(2) }}</td>
+                                        <td>{{ site.reward|toXMR }} {{ site.crypto|upper }}</td>
+                                        <td>{{ site.key }}</td>
+                                        <td>{{ site.crypto|upper }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h4 class="box-title">
+                        Payments
+                    </h4>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table">
+                        <tr class="sonata-ba-view-container">
+                            <th>Total Paid</th>
+                            <td>
+                                {% for crypto, paidReward in paidPayoutRewards %}
+                                    {{ paidReward|toXMR }} {{ crypto|upper }} {{ loop.last ? '' : '|' }}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr class="sonata-ba-view-container">
+                            <th>Total Pending</th>
+                            <td>
+                                {% for crypto, pendingReward in pendingPayoutRewards %}
+                                    {{ pendingReward|toXMR }} {{ crypto|upper }} {{ loop.last ? '' : '|' }}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                                <th>ID</th>
+                                <th>Private Key</th>
+                                <th>Wallet Address</th>
+                                <th>Crypto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if payments is empty %}
+                                <tr>
+                                    <td class="text-center" colspan="8"><em>No payouts were issued yet</em></td>
+                                </tr>
+                            {% else %}
+                                {% for payment in payments %}
+                                    <tr>
+                                        <td>{{ payment.date|date('d.m.Y H:i:s') }}</td>
+                                        <td>{{ payment.amount|toXMR }} {{ payment.crypto|upper }}</td>
+                                        <td>{{ payment.fee|toXMR }} {{ payment.crypto|upper }}</td>
+                                        <td>{{ payment.status|capitalize }}</td>
+                                        <td>{{ payment.id }}</td>
+                                        <td>{{ payment.privateKey }}</td>
+                                        <td>{{ payment.walletAddress }}</td>
+                                        <td>{{ payment.crypto|upper }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h4 class="box-title">
+                        Referral Program
+                    </h4>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table">
+                        <tr class="sonata-ba-view-container">
+                            <th>Referenced by</th>
+                            {% if referencer is null %}
+                                <td><em>No referencer</em></td>
+                            {% else %}
+                                <td><a href="{{ path('admin_app_user_show', {'id': referencer.id}) }}">{{ referencer.email }}</a></td>
+                            {% endif %}
+                        </tr>
+                        <tr class="sonata-ba-view-container">
+                            <th>Total earned</th>
+                            <td>
+                                {% for crypto, referralIncome in referralIncomes %}
+                                    {{ referralIncome|toXMR }} {{ crypto|upper }} {{ loop.last ? '' : '|' }}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Referral</th>
+                                <th>Outcome</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if referrals is empty %}
+                                <tr>
+                                    <td class="text-center" colspan="4"><em>This profile doesn't have referrals yet.</em></td>
+                                </tr>
+                            {% else %}
+                                {% for referral in referrals %}
+                                    <tr>
+                                        <td><a href="{{ path('admin_app_user_show', {'id': referral.id}) }}">{{ referral.email }}</a></td>
+                                        <td>
+                                            {% for crypto, outcome in referral.outcomes %}
+                                                {{ outcome|toXMR }} {{ crypto|upper }} {{ loop.last ? '' : '|' }}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block show_groups %}{% endblock %}
