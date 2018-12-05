@@ -19,7 +19,7 @@
                             </wallet>
                         </b-tab>
                         <b-tab title="Trading History" >
-                            <trading-history></trading-history>
+                            <trading-history  :executed-history="{{ executedHistory | json_encode }}"></trading-history>
                         </b-tab>
                         <b-tab title="Deposit/Withdraw History" >
                             <deposit-withdraw-history></deposit-withdraw-history>
