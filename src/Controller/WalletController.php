@@ -6,9 +6,12 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketFetcher;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,16 +24,30 @@ class WalletController extends AbstractController
      * @Route(name="wallet")
      */
     public function wallet(
-        CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager,
         BalanceHandler $balanceHandler,
-        NormalizerInterface $normalizer
+        MarketFetcher $marketFetcher,
+        CryptoManagerInterface $cryptoManager,
+        MarketManagerInterface $marketManager,
+        TokenManagerInterface $tokenManager,
+        NormalizerInterface $normalizer,
+        MoneyWrapperInterface $moneyWrapper
     ): Response {
         $tokens = $balanceHandler->balances(
             $this->getUser(),
             $this->getUser()->getRelatedTokens()
         );
-
+        
+        $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $token = $this->getUser()->getProfile()->getToken();
+        
+        $market = $webCrypto && $token
+            ? $marketManager->getMarket($webCrypto, $token)
+            : null;
+           
+        $executedHistory = $market
+            ? $marketFetcher->getUserExecutedHistory($this->getUser()->getId(), $market, $moneyWrapper)
+            : null;
+            
         $predefinedTokens = $balanceHandler->balances(
             $this->getUser(),
             $tokenManager->findAllPredefined()
@@ -38,10 +55,10 @@ class WalletController extends AbstractController
 
         $ownToken = $tokenManager->getOwnToken();
         $markets = $ownToken ? $this->createMarkets($ownToken, $cryptoManager->findAll()) : [];
-
         return $this->render('pages/wallet.html.twig', [
             'markets' => $markets,
             'hash' => $this->getUser()->getHash(),
+            'executedHistory' => $normalizer->normalize($executedHistory),
             'tokens' => $normalizer->normalize($tokens, null, [
                 'groups' => [ 'Default' ],
             ]),
