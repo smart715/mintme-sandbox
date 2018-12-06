@@ -22,7 +22,5 @@ public/build
 /phpstan
 
 .vscode
-.dockerignore
-Dockerfile
 
 aware-connector.sh
