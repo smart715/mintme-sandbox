@@ -2,40 +2,34 @@
 
 namespace App\Entity\Media;
 
+use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Sonata\MediaBundle\Entity\BaseMedia;
-use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 
+/**
+ * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
+ * @ORM\Table(name="media__media")
+ * @Serializer\ExclusionPolicy("all")
+ * @Serializer\XmlRoot(name="_media")
+ */
 class Media extends BaseMedia
 {
-
-    /** @var int $id */
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Groups({"sonata_api_read","sonata_api_write","sonata_search"})
+     * @Serializer\Since(version="1.0")
+     * @Serializer\Type(name="integer")
+     * @Serializer\SerializedName("id")
+     * @Serializer\XmlAttributeMap
+     * @Serializer\Expose
+     * @var int|null
+     */
     protected $id;
 
-    /**
-     * Get id
-     *
-     * @return int $id
-     */
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getProviderStatus(): int
-    {
-        if (!$this->providerStatus) {
-            $this->setProviderStatus($this::STATUS_ERROR);
-        }
-
-        return $this->providerStatus;
-    }
-
-    public function getProviderReference(): string
-    {
-        if (!$this->providerReference) {
-            $this->setProviderReference(ProviderNotFoundException::class);
-        }
-
-        return $this->providerReference;
     }
 }
