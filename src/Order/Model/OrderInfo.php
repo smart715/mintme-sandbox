@@ -71,12 +71,12 @@ class OrderInfo implements OrderInfoInterface
 
     public function getAmount(): float
     {
-        return floatval($this->order->getAmount());
+        return $this->order->getAmount()->getAmount();
     }
 
     public function getPrice(): float
     {
-        return floatval($this->order->getPrice());
+        return $this->order->getPrice()->getAmount();
     }
 
     public function getTotal(): float

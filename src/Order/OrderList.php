@@ -8,6 +8,7 @@ use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
 use App\Manager\UserManager;
 use App\Order\Model\OrderInfo;
+use App\Wallet\Money\MoneyWrapperInterface;
 
 class OrderList implements OrderListInterface
 {
@@ -17,13 +18,17 @@ class OrderList implements OrderListInterface
     /** @var UserManager */
     private $userManager;
 
-    private const SELL_SIDE = 'sell';
-    private const BUY_SIDE = 'buy';
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
 
-    public function __construct(MarketFetcher $marketFetcher, UserManager $userManager)
+    private const SELL_SIDE = 1;
+    private const BUY_SIDE = 2;
+
+    public function __construct(MarketFetcher $marketFetcher, UserManager $userManager, MoneyWrapperInterface $moneyWrapper)
     {
         $this->marketFetcher = $marketFetcher;
         $this->userManager = $userManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
@@ -39,7 +44,7 @@ class OrderList implements OrderListInterface
     }
 
     /** {@inheritdoc} */
-    public function getPendingOrdersList(?User $currentUser, Market $market, string $side): array
+    public function getPendingOrdersList(?User $currentUser, Market $market, int $side): array
     {
         $pendingOrders = $this->getAllPendingOrders($market, $side);
 

@@ -15,7 +15,7 @@ interface OrderListInterface
     public function getBuyPendingOrdersList(User $user, Market $market): array;
 
     /** @return OrderInfo[] */
-    public function getPendingOrdersList(User $user, Market $market, string $side): array;
+    public function getPendingOrdersList(User $user, Market $market, int $side): array;
 
     /** @return OrderInfo[] */
     public function getAllPendingOrders(Market $market, string $side): array;

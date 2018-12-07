@@ -31,10 +31,10 @@ class Order
     /** @var Market */
     private $market;
 
-    /** @var Money */
+    /** @var string */
     private $amount;
 
-    /** @var Money */
+    /** @var string */
     private $price;
 
     /** @var int */

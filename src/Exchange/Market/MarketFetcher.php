@@ -6,21 +6,26 @@ use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Market;
 use App\Exchange\Order;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 
 class MarketFetcher
 {
-    private const SELL = 'sell';
-    private const BUY = 'buy';
+    private const SELL = 1;
+    private const BUY = 2;
     private const PENDING_ORDERS_METHOD = 'order.book';
     private const EXECUTED_ORDERS_METHOD = 'market.deals';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
 
-    public function __construct(JsonRpcInterface $jsonRpc)
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
+    public function __construct(JsonRpcInterface $jsonRpc, MoneyWrapperInterface $moneyWrapper)
     {
+        $this->moneyWrapper = $moneyWrapper;
         $this->jsonRpc = $jsonRpc;
     }
 
@@ -53,7 +58,7 @@ class MarketFetcher
         return $this->parseExecutedOrders($response->getResult(), $market);
     }
 
-    public function getPendingOrders(Market $market, int $offset, int $limit, string $side): array
+    public function getPendingOrders(Market $market, int $offset, int $limit, int $side): array
     {
         try {
             $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
@@ -76,42 +81,44 @@ class MarketFetcher
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
-        return array_map(static function (array $orderData) use ($market) {
+        $moneyWrapper = $this->moneyWrapper;
+        return array_map(static function (array $orderData) use ($market, $moneyWrapper) {
             return new Order(
                 $orderData['id'],
                 $orderData['user'],
                 null,
                 $market,
-                new Money(
+                $moneyWrapper->parse(
                     $orderData['amount'],
                     new Currency($market->getCurrencySymbol())
                 ),
                 $orderData['side'],
-                new Money(
+                $moneyWrapper->parse(
                     $orderData['price'],
                     new Currency($market->getCurrencySymbol())
                 ),
                 Order::PENDING_STATUS,
                 $orderData['mtime']
             );
-        }, $result);
+        }, $result['orders']);
     }
 
     /** @return Order[] */
     private function parseExecutedOrders(array $result, Market $market): array
     {
-        return array_map(static function (array $orderData) use ($market) {
+        $moneyWrapper = $this->moneyWrapper;
+        return array_map(static function (array $orderData) use ($market, $moneyWrapper) {
             return new Order(
                 $orderData['id'],
-                $orderData['maker'],
-                $orderData['taker'],
+                $orderData['maker_id'],
+                $orderData['taker_id'],
                 $market,
-                new Money(
+                $moneyWrapper->parse(
                     $orderData['amount'],
                     new Currency($market->getCurrencySymbol())
                 ),
                 Order::SIDE_MAP[$orderData['type']],
-                new Money(
+                $moneyWrapper->parse(
                     $orderData['price'],
                     new Currency($market->getCurrencySymbol())
                 ),
