@@ -59,6 +59,9 @@ Vue.use(WebSocket);
 export default {
     name: 'TokenTrade',
     props: {
+        ordersHistory: String,
+        pendingBuyOrders: String,
+        pendingSellOrders: String,
         websocketUrl: String,
         loginUrl: String,
         signupUrl: String,
@@ -68,9 +71,6 @@ export default {
         placeOrderUrl: String,
         fetchBalanceWebUrl: String,
         fetchBalanceTokenUrl: String,
-        ordersHistory: String,
-        pendingBuyOrders: String,
-        pendingSellOrders: String,
     },
     data() {
         return {

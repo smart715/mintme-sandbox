@@ -61,10 +61,10 @@ export default {
         let orders = JSON.parse(this.buyOrders);
         orders.forEach( (order) => {
             this.orders.push({
-               price: order.price,
-               amount: order.amount,
-               sum_web: order.total,
-               trader: order.FirstName + order.LastName,
+                price: order.price,
+                amount: order.amount,
+                sum_web: order.total,
+                trader: order.makerFirstName + ' ' + order.makerLastName,
             });
         });
     },
