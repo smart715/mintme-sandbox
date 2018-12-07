@@ -28,6 +28,19 @@ api_controllers:
     resource: ../src/Controller/API/
     type: rest
 
+news:
+    resource: '@SonataNewsBundle/Resources/config/routing/news.xml'
+    prefix: /news
+
+admin:
+    resource: '@SonataAdminBundle/Resources/config/routing/sonata_admin.xml'
+    prefix: /admin
+
+_sonata_admin:
+    resource: .
+    type: sonata_admin
+    prefix: /admin
+
 controllers:
     resource: ../src/Controller/
     type: annotation

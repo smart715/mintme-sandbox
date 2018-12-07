@@ -1,0 +1,29 @@
+sonata_admin:
+    title: 'mintme'
+    security:
+        handler: sonata.admin.security.handler.role
+    dashboard:
+        blocks:
+            # display a dashboard block
+            - { position: left, type: sonata.admin.block.admin_list }
+
+        groups:
+
+            sonata.admin.group.content:
+                label: News
+                items:
+                    - sonata.news.admin.post
+                    - sonata.news.admin.comment
+
+            sonata.admin.group.media:
+                label: Resources
+                items:
+                    - sonata.media.admin.media
+                    - sonata.media.admin.gallery
+
+            sonata.admin.group.classification:
+                label: Classification
+                items:
+                    - sonata.classification.admin.tag
+                    - sonata.classification.admin.collection
+                    - sonata.classification.admin.context

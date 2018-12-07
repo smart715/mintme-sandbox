@@ -117,11 +117,26 @@ services:
     App\Serializer\BalanceResultContainerNormalizer:
         tags: ['serializer.normalizer']
 
+
+    # SonataAdminBundle Registered Admin Classes
+    # =======================================
+    admin.user:
+        class: App\Admin\UserAdmin
+        arguments:
+            - null
+            - App\Entity\User
+            - App\Controller\UserAdminCRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: User }
+        public: true
+        calls:
+             - [init, ['@fos_user.user_manager', '@App\Manager\ProfileManagerInterface']]
+
     payment_consumer: '@App\Consumers\PaymentConsumer'
 
     App\Manager\UserManager:
         arguments:
-        - "@fos_user.util.password_updater"
-        - "@fos_user.util.canonical_fields_updater"
-        - "@doctrine.orm.entity_manager"
-        - "%fos_user.model.user.class%"
+            - "@fos_user.util.password_updater"
+            - "@fos_user.util.canonical_fields_updater"
+            - "@doctrine.orm.entity_manager"
+            - "%fos_user.model.user.class%"

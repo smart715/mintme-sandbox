@@ -1,0 +1,38 @@
+sonata_news:
+    class:
+        post:       App\Entity\News\Post
+        comment:    App\Entity\News\Comment
+        tag:        App\Entity\Classification\Tag
+        collection: App\Entity\Classification\Collection
+        user:       App\Entity\User
+        media:      App\Entity\Media\Media
+
+    admin:
+        post:
+            class:       App\Admin\PostAdmin
+            controller:  SonataAdminBundle:CRUD
+        comment:
+            class:       Sonata\NewsBundle\Admin\CommentAdmin
+            controller:  SonataNewsBundle:CommentAdmin
+
+    title: Mintme news
+    link: /news
+    description: mintme news
+    salt: 'secureToken'
+    permalink_generator: sonata.news.permalink.collection
+
+    # comment options
+    comment:
+        notification:
+            emails: [ swiftmailer.username ]
+            from: swiftmailer.username
+            template: 'SonataNewsBundle:Mail:comment_notification.txt.twig'
+
+
+# Enable Doctrine to map the provided entities
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    SonataNewsBundle: ~

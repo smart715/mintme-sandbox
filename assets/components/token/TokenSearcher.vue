@@ -7,7 +7,8 @@
                     v-model="item"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
-                    @item-selected="searchSelected"
+                    @item-clicked="onItemClicked"
+                    @change="onInputChange"
                     :items="items"
                     :min-len="1"
             >
@@ -15,7 +16,7 @@
         </div>
         <div class="input-group-append">
             <span class="input-group-text">
-                <font-awesome-icon class="c-pointer" @click="searchSelected" icon="search"></font-awesome-icon>
+                <font-awesome-icon class="c-pointer" @click="redirectToToken" icon="search"></font-awesome-icon>
             </span>
         </div>
     </div>
@@ -35,6 +36,7 @@ export default {
     data() {
         return {
             item: '',
+            input: '',
             items: [],
         };
     },
@@ -51,8 +53,15 @@ export default {
                 console.error('Service timeout');
             });
         },
-        searchSelected: function() {
-            location.href = this.$routing.generate('token_show', {name: this.item}, true);
+        redirectToToken: function() {
+            location.href = this.$routing.generate('token_show', {name: this.input}, true);
+        },
+        onItemClicked: function(val) {
+            this.input = val;
+            this.redirectToToken();
+        },
+        onInputChange: function(val) {
+            this.input = val;
         },
     },
 };

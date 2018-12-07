@@ -1,0 +1,27 @@
+{% block share %}
+    <div class="col-12 mb-1 text-center">
+        <ul class="list-inline">
+            <li title="Share over twitter" class="list-inline-item">
+                <a href="https://twitter.com/intent/tweet?text={{ url }}" target="_blank">
+                    <font-awesome-layers class="fa-2x">
+                        <font-awesome-icon :icon="['fab','twitter-square']"></font-awesome-icon> 
+                    </font-awesome-layers>
+                </a>
+            </li>
+            <li title="Share over Reddit" class="list-inline-item">
+                <a href="http://www.reddit.com/submit?url={{ url }}" target="_blank">
+                    <font-awesome-layers class="fa-2x">
+                        <font-awesome-icon :icon="['fab','reddit-square']"></font-awesome-icon> 
+                    </font-awesome-layers>
+                </a>
+            </li>
+            <li title="Share over google plus" class="list-inline-item">
+                <a href="https://plus.google.com/share?url={{ url }}" target="_blank">
+                    <font-awesome-layers class="fa-2x">
+                        <font-awesome-icon :icon="['fab','google-plus-square']"></font-awesome-icon> 
+                    </font-awesome-layers>
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
