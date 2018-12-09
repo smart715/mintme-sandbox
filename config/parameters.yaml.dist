@@ -26,3 +26,6 @@ parameters:
 
     # Permanent quantity of each token asset
     token_quantity: 1000000
+
+    deposit_rpc: 'http://localhost:3000'
+    deposit_response_timeout_seconds: 10

@@ -18,10 +18,19 @@
                         <td>{{ token.available }}</td>
                         <td>
                             <font-awesome-icon
-                                    icon="shopping-cart"
-                                    class="text-orange c-pointer"
-                                    @click="openWithdraw(name, token.fee, token.precision)"
+                                :title="withdrawTooltip"
+                                v-tippy="tooltipOptions"
+                                icon="shopping-cart"
+                                class="text-orange c-pointer"
+                                @click="openWithdraw(name, token.fee, token.precision)"
                             />
+                            <font-awesome-icon
+                                :title="depositTooltip"
+                                v-tippy="tooltipOptions"
+                                icon="piggy-bank"
+                                class="text-orange c-pointer"
+                                @click="openDeposit(name)"
+                                size="1x"/>
                         </td>
                     </tr>
                 </tbody>
@@ -50,27 +59,48 @@
             :fee="fee"
             :precision="precision"
             :withdraw-url="withdrawUrl"
-            @close="closeWithdraw" />
+            @close="closeWithdraw"
+        />
+        <deposit-modal
+            :address="depositAddress"
+            :visible="showDepositModal"
+            :description="depositDescription"
+            @close="closeDeposit()"
+        />
     </div>
 </template>
 
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
+import DepositModal from '../modal/DepositModal';
 
 export default {
     name: 'Wallet',
     components: {
         WithdrawModal,
+        DepositModal,
     },
     props: {
         tokens: {type: Object, required: true},
         predefinedTokens: {type: Object, required: true},
         withdrawUrl: {type: String, required: true},
+        depositAddresses: {type: Object},
     },
     data() {
         return {
             showModal: false,
             selectedCurrency: null,
+            depositAddress: null,
+            depositDescription: null,
+            showDepositModal: null,
+            tooltipOptions: {
+                placement: 'bottom',
+                arrow: true,
+                trigger: 'mouseenter',
+                delay: [100, 200],
+            },
+            depositTooltip: 'Deposit!',
+            withdrawTooltip: 'Withdraw!',
             fee: 0,
             precision: 8,
         };
@@ -84,6 +114,14 @@ export default {
         },
         closeWithdraw: function() {
             this.showModal = false;
+        },
+        openDeposit: function(currency) {
+            this.depositAddress = this.depositAddresses[currency];
+            this.depositDescription = `Send ${currency}s to the address above.`;
+            this.showDepositModal = true;
+        },
+        closeDeposit: function() {
+            this.showDepositModal = false;
         },
     },
 };

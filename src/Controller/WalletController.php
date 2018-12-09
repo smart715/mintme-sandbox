@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Deposit\DepositGatewayCommunicatorInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandler;
@@ -27,6 +28,7 @@ class WalletController extends AbstractController
         BalanceHandler $balanceHandler,
         MarketFetcher $marketFetcher,
         CryptoManagerInterface $cryptoManager,
+        DepositGatewayCommunicatorInterface $depositCommunicator,
         MarketManagerInterface $marketManager,
         TokenManagerInterface $tokenManager,
         NormalizerInterface $normalizer,
@@ -53,6 +55,17 @@ class WalletController extends AbstractController
             $tokenManager->findAllPredefined()
         );
 
+        try {
+            $depositAddresses = $depositCommunicator->getDepositCredentials(
+                $this->getUser()->getId(),
+                $tokenManager->findAllPredefined()
+            )->toArray();
+        } catch (\Throwable $e) {
+            $depositAddresses = $depositCommunicator->getUnavailableCredentials(
+                $tokenManager->findAllPredefined()
+            )->toArray();
+        }
+        
         $ownToken = $tokenManager->getOwnToken();
         $markets = $ownToken ? $this->createMarkets($ownToken, $cryptoManager->findAll()) : [];
         return $this->render('pages/wallet.html.twig', [
@@ -65,6 +78,7 @@ class WalletController extends AbstractController
             'predefinedTokens' => $normalizer->normalize($predefinedTokens, null, [
                 'groups' => [ 'Default' ],
             ]),
+            'depositAddresses' => $depositAddresses,
         ]);
     }
 
