@@ -13,6 +13,7 @@
                         <b-tab title="Wallet" active v-cloak>
                             {{ include("loader.html.twig") }}
                             <wallet
+                                :deposit-addresses="{{depositAddresses | json_encode}}"
                                 :tokens="{{ tokens | json_encode }}"
                                 :predefined-tokens="{{ predefinedTokens | json_encode }}"
                                 withdraw-url="{{ path('withdraw') }}">
