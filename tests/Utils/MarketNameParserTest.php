@@ -21,11 +21,11 @@ class MarketNameParserTest extends TestCase
     public function parserProvider(): array
     {
         return [
-            ['WEB', '000000000001', 'TOK000000000001WEB'],
-            ['WEB', '000000000002', 'TOK000000000002WEB'],
-            ['WEB', '000000000003', 'TOK000000000003WEB'],
-            ['WEB', '000000000004', 'TOK000000000004WEB'],
-            ['WEB', '000000000005', 'TOK000000000005WEB'],
+            ['WEB', 'TOK000000000001', 'TOK000000000001WEB'],
+            ['WEB', 'TOK000000000002', 'TOK000000000002WEB'],
+            ['WEB', 'TOK000000000003', 'TOK000000000003WEB'],
+            ['WEB', 'TOK000000000004', 'TOK000000000004WEB'],
+            ['WEB', 'TOK000000000005', 'TOK000000000005WEB'],
         ];
     }
 }

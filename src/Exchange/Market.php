@@ -4,6 +4,7 @@ namespace App\Exchange;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class Market
 {
@@ -19,6 +20,7 @@ class Market
         $this->token = $token;
     }
 
+    /** @Groups({"Default"}) */
     public function getHiddenName(): string
     {
         $cryptoSymbol = strtoupper($this->crypto->getSymbol());
@@ -27,11 +29,13 @@ class Market
         return $tokenName.$cryptoSymbol;
     }
 
+    /** @Groups({"Default"}) */
     public function getCurrencySymbol(): string
     {
         return $this->crypto->getSymbol();
     }
 
+    /** @Groups({"Default"}) */
     public function getTokenName(): ?string
     {
         return $this->token->getName();

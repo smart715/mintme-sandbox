@@ -4,15 +4,15 @@ namespace App\Controller;
 
 use App\Deposit\DepositGatewayCommunicatorInterface;
 use App\Entity\Crypto;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Market;
-use App\Exchange\Market\MarketFetcher;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
-use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,13 +26,12 @@ class WalletController extends AbstractController
      */
     public function wallet(
         BalanceHandler $balanceHandler,
-        MarketFetcher $marketFetcher,
+        MarketHandlerInterface $marketHandler,
         CryptoManagerInterface $cryptoManager,
         DepositGatewayCommunicatorInterface $depositCommunicator,
         MarketManagerInterface $marketManager,
         TokenManagerInterface $tokenManager,
-        NormalizerInterface $normalizer,
-        MoneyWrapperInterface $moneyWrapper
+        NormalizerInterface $normalizer
     ): Response {
         $tokens = $balanceHandler->balances(
             $this->getUser(),
@@ -40,14 +39,27 @@ class WalletController extends AbstractController
         );
         
         $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $token = $this->getUser()->getProfile()->getToken();
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        /** @var Profile|null $profile */
+        $profile = $user->getProfile();
+
+        $token = $profile
+            ? $profile->getToken()
+            : null;
         
         $market = $webCrypto && $token
             ? $marketManager->getMarket($webCrypto, $token)
             : null;
            
         $executedHistory = $market
-            ? $marketFetcher->getUserExecutedHistory($this->getUser()->getId(), $market, $moneyWrapper)
+            ? $marketHandler->getUserExecutedHistory($user, $marketManager->getUserRelatedMarkets($user))
+            : null;
+
+        $orders = $market
+            ? $marketHandler->getPendingOrdersByUser($user, $marketManager->getUserRelatedMarkets($user))
             : null;
             
         $predefinedTokens = $balanceHandler->balances(
@@ -68,7 +80,11 @@ class WalletController extends AbstractController
         
         $ownToken = $tokenManager->getOwnToken();
         $markets = $ownToken ? $this->createMarkets($ownToken, $cryptoManager->findAll()) : [];
+
         return $this->render('pages/wallet.html.twig', [
+            'orders' => $normalizer->normalize($orders, null, [
+                'groups' => [ 'Default' ],
+            ]),
             'markets' => $markets,
             'hash' => $this->getUser()->getHash(),
             'executedHistory' => $normalizer->normalize($executedHistory),

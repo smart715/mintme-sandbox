@@ -37,6 +37,14 @@ class TokenManager implements TokenManagerInterface
         $this->cryptoManager = $cryptoManager;
     }
 
+    public function findByHiddenName(string $name): ?Token
+    {
+        $id = (int) filter_var($name, FILTER_SANITIZE_NUMBER_INT);
+
+        return $this->repository->find($id);
+    }
+
+
     public function findByName(string $name): ?Token
     {
         if (!in_array(

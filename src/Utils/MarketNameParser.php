@@ -12,6 +12,6 @@ class MarketNameParser implements MarketNameParserInterface
 
     public function parseName(string $market): string
     {
-        return substr($market, 3, -3);
+        return substr($market, 0, -3);
     }
 }

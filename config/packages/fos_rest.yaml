@@ -5,6 +5,8 @@ fos_rest:
     routing_loader: true
     view:
         view_response_listener:  true
+    service:
+        serializer: fos_rest.serializer.symfony
     serializer:
         groups: ['API']
     format_listener:
