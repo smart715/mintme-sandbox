@@ -89,7 +89,7 @@ export default {
         visible: Boolean,
         currency: String,
         precision: Number,
-        fee: String,
+        fee: Number,
         withdrawUrl: String,
     },
     data() {

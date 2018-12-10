@@ -24,14 +24,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql zip bcmath pcntl sockets gd
 
-COPY . /var/www/html/panel
-
 WORKDIR /var/www/html/panel
 
-RUN npm i
-RUN npm run dev
-
-RUN echo 'pm = static' >> /usr/local/etc/php-fpm.d/www.conf
-RUN echo 'pm.max_children = 1' >> /usr/local/etc/php-fpm.d/www.conf
 
 

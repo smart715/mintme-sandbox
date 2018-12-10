@@ -9,6 +9,7 @@ use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
 use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -33,8 +34,8 @@ class MarketFetcherTest extends TestCase
 
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
-            $sellOrders,
-            $marketFetcher->getPendingSellOrders($this->createMarket())
+            $rpcResult,
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
         );
     }
 
@@ -55,7 +56,7 @@ class MarketFetcherTest extends TestCase
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
             [],
-            $marketFetcher->getPendingSellOrders($this->createMarket())
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
         );
     }
 
@@ -76,8 +77,8 @@ class MarketFetcherTest extends TestCase
 
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
-            $buyOrders,
-            $marketFetcher->getPendingBuyOrders($this->createMarket())
+            $rpcResult,
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
         );
     }
 
@@ -98,7 +99,7 @@ class MarketFetcherTest extends TestCase
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
             [],
-            $marketFetcher->getPendingBuyOrders($this->createMarket())
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
         );
     }
 
@@ -119,8 +120,8 @@ class MarketFetcherTest extends TestCase
 
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
-            $orders,
-            $marketFetcher->getExecutedOrders($this->createMarket())
+            $rpcResult,
+            $marketFetcher->getExecutedOrders('TOK000000000001WEB')
         );
     }
 
@@ -141,7 +142,7 @@ class MarketFetcherTest extends TestCase
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
             [],
-            $marketFetcher->getExecutedOrders($this->createMarket())
+            $marketFetcher->getExecutedOrders('TOK000000000001WEB')
         );
     }
 
@@ -169,7 +170,7 @@ class MarketFetcherTest extends TestCase
                 'type' => 1,
                 'side' => $side,
                 'ctime' => 1492616173.355293,
-                'mtime' => 1492697636.238869,
+                'mtime' => 1492697636.0,
                 'user' => 1,
                 'market' => 'TOK000000000001WEB',
                 'price' => '1',
@@ -188,7 +189,8 @@ class MarketFetcherTest extends TestCase
     private function getPendingOrders(int $side): array
     {
         return [
-            new Order(
+            [
+                [],
                 1,
                 1,
                 null,
@@ -197,8 +199,8 @@ class MarketFetcherTest extends TestCase
                 $side,
                 $this->createMoney(1),
                 Order::PENDING_STATUS,
-                1492697636
-            ),
+                1492697636,
+            ],
         ];
     }
 
@@ -207,7 +209,7 @@ class MarketFetcherTest extends TestCase
         return [
             [
                 'id' => 1,
-                'time' => 1492697636.238869,
+                'time' => 1492697636.0,
                 'type' => 'sell',
                 'amount' => '10',
                 'price' => '1',

@@ -27,9 +27,9 @@
                         </b-tab>
                         <b-tab title="Active Orders" >
                             <active-orders
-                                :hash="{{ hash | json_encode }}"
-                                :markets="{{ markets | json_encode }}"
-                                :websocket_url="{{ global_websocket_url | json_encode }}"
+                                hash="{{ hash }}"
+                                websocket_url="{{ global_websocket_url }}"
+                                :orders="{{ orders | json_encode }}"
                             ></active-orders>
                         </b-tab>
                     </b-tabs>

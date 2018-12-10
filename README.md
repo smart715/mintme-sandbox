@@ -15,7 +15,7 @@ The panel has configurable taker/maker fees and default token quantity parameter
 Requirements:
 -------------
 
-* [php](https://secure.php.net/downloads.php) 7.2.2+ with following extensions (mysqli, pdo, pdo_mysql, zip, bcmath, pcntl, sockets, gd) and composer
+* [php](https://secure.php.net/downloads.php) 7.2.2+ with following extensions (mysqli, pdo, pdo_mysql, zip, bcmath, pcntl, sockets, gd, xml) and composer
 * a webserver (you can use [symfony's](https://packagist.org/packages/symfony/web-server-bundle) from dev composer dependencies)
 * [nodejs](https://nodejs.org/) 8+, npm 5.6+
 * [mysql](https://www.mysql.com/downloads/) 5.6 or compatible DBMS

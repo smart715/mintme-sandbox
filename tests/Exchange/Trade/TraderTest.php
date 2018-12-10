@@ -368,7 +368,7 @@ class TraderTest extends TestCase
                 [
                     'id' => 2,
                     'ctime' => 1492616173.355293,
-                    'mtime' => 1492697636.238869,
+                    'mtime' => 1492697636.0,
                     'market' => 'TOK000000000001WEB',
                     'user' => 1,
                     'type' => 1,

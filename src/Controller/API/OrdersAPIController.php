@@ -16,6 +16,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use http\Exception\InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,29 +55,30 @@ class OrdersAPIController extends FOSRestController
     public function cancelOrder(String $market, int $orderid): View
     {
         $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
-        $token = $this->tokenManager->findByName($this->marketParser->parseName($market));
-        if (null !== $token && null !== $crypto) {
-            $market = new Market($crypto, $token);
-            $order = new Order(
-                $orderid,
-                $this->getUser()->getId(),
-                null,
-                $market,
-                new Money('0', new Currency($crypto->getSymbol())),
-                1,
-                new Money('0', new Currency($crypto->getSymbol())),
-                "",
-                null
-            );
+        $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
 
-            $tradeResult = $this->trader->cancelOrder($order);
-
-            return $this->view([
-                'result' => $tradeResult->getResult(),
-                'message' => $tradeResult->getMessage(),
-            ]);
+        if (!$token || !$crypto) {
+            throw new \InvalidArgumentException();
         }
-        return $this->error();
+
+        $market = new Market($crypto, $token);
+        $order = new Order(
+            $orderid,
+            $this->getUser()->getId(),
+            null,
+            $market,
+            new Money('0', new Currency($crypto->getSymbol())),
+            1,
+            new Money('0', new Currency($crypto->getSymbol())),
+            ""
+        );
+
+        $tradeResult = $this->trader->cancelOrder($order);
+
+        return $this->view([
+            'result' => $tradeResult->getResult(),
+            'message' => $tradeResult->getMessage(),
+        ]);
     }
 
     /**
@@ -120,7 +122,10 @@ class OrdersAPIController extends FOSRestController
                 $request->get('priceInput'),
                 $crypto->getSymbol()
             ),
-            Order::PENDING_STATUS
+            Order::PENDING_STATUS,
+            Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
+                ? $this->getParameter('maker_fee_rate')
+                : $this->getParameter('taker_fee_rate')
         );
 
         $tradeResult = $trader->placeOrder($order);
@@ -131,21 +136,6 @@ class OrdersAPIController extends FOSRestController
                 'message' => $tradeResult->getMessage(),
             ],
             Response::HTTP_ACCEPTED
-        );
-    }
-
-    private function error(): View
-    {
-        return $this->view(
-            [
-                "error" =>
-                    [
-                        "code" => 5,
-                        "message" => "service timeout",
-                    ],
-                "result" => null,
-                "id" => 0,
-            ]
         );
     }
 }

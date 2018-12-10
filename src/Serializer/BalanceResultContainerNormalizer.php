@@ -14,8 +14,6 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class BalanceResultContainerNormalizer implements NormalizerInterface
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
 
     /** @var ObjectNormalizer */
     private $normalizer;
@@ -27,12 +25,10 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     private $moneyWrapper;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
         ObjectNormalizer $normalizer,
         TokenManagerInterface $tokenManager,
         MoneyWrapperInterface $moneyWrapper
     ) {
-        $this->entityManager = $entityManager;
         $this->normalizer = $normalizer;
         $this->tokenManager = $tokenManager;
         $this->moneyWrapper = $moneyWrapper;
@@ -49,7 +45,11 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
         $data = $object->getAll();
 
         array_walk($data, function (BalanceResult $balanceResult, string $key) use (&$result, $format, $context): void {
-            $token = $this->getTokenFromHiddenName($key);
+            $token = $this->tokenManager->findByName($key) ?? $this->tokenManager->findByHiddenName($key);
+
+            if (!$token) {
+                return;
+            }
 
             $result[$token->getName()] = $this->tokenManager->getRealBalance(
                 $token,
@@ -76,21 +76,5 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof BalanceResultContainer;
-    }
-
-    private function getTokenFromHiddenName(string $name): Token
-    {
-        return $this->tokenManager->findByName($name) ??
-            $this->getTokenRepository()->find($this->getIdFromName($name));
-    }
-
-    private function getIdFromName(string $name): int
-    {
-        return (int) filter_var($name, FILTER_SANITIZE_NUMBER_INT);
-    }
-
-    private function getTokenRepository(): TokenRepository
-    {
-        return $this->entityManager->getRepository(Token::class);
     }
 }
