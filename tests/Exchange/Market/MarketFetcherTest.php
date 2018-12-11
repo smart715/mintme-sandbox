@@ -9,6 +9,7 @@ use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
 use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -16,6 +17,14 @@ use PHPUnit\Framework\TestCase;
 
 class MarketFetcherTest extends TestCase
 {
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
+    public function test__construct(MoneyWrapperInterface $moneyWrapper)
+    {
+        $this->moneyWrapper = $moneyWrapper;
+    }
+
     /** @dataProvider pendingSellOrdersProvider */
     public function testGetPendingSellOrders(bool $hasError, array $rpcResult, array $sellOrders): void
     {
@@ -31,7 +40,7 @@ class MarketFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->moneyWrapper);
         $this->assertEquals(
             $sellOrders,
             $marketFetcher->getPendingSellOrders($this->createMarket())
@@ -52,7 +61,7 @@ class MarketFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->moneyWrapper);
         $this->assertEquals(
             [],
             $marketFetcher->getPendingSellOrders($this->createMarket())
@@ -74,7 +83,7 @@ class MarketFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->moneyWrapper);
         $this->assertEquals(
             $buyOrders,
             $marketFetcher->getPendingBuyOrders($this->createMarket())
@@ -95,7 +104,7 @@ class MarketFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->moneyWrapper);
         $this->assertEquals(
             [],
             $marketFetcher->getPendingBuyOrders($this->createMarket())
@@ -117,7 +126,7 @@ class MarketFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->moneyWrapper);
         $this->assertEquals(
             $orders,
             $marketFetcher->getExecutedOrders($this->createMarket())
@@ -138,7 +147,7 @@ class MarketFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->moneyWrapper);
         $this->assertEquals(
             [],
             $marketFetcher->getExecutedOrders($this->createMarket())
