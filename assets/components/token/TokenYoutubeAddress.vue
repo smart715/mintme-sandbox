@@ -98,15 +98,11 @@ export default {
         },
         addChannel: function() {
             this.signInYoutube()
-                .then(() => {
-                    return this.getChannelId();
-                })
-                .then((channelId) => {
+                .then(() => this.getChannelId().then((channelId) => {
                     axios.patch(this.updateUrl, {
                         youtubeChannelId: channelId,
                         _csrf_token: this.csrfToken,
-                    })
-                    .then((response) => {
+                    }).then((response) => {
                         if (response.status === HTTP_NO_CONTENT) {
                             this.currentChannelId = channelId;
                             this.$toasted.success(`Youtube channel saved as https://youtube.com/channel/${channelId}`);
@@ -118,10 +114,14 @@ export default {
                             this.$toasted.error('An error has ocurred, please try again later');
                         }
                     });
-                });
+                }));
         },
         signInYoutube: function() {
-            return gapi.auth2.getAuthInstance().signIn();
+            let options = new gapi.auth2.SigninOptionsBuilder();
+
+            options.setPrompt('select_account');
+
+            return gapi.auth2.getAuthInstance().signIn(options);
         },
         getChannelId: function() {
             return new Promise((resolve, reject) => {

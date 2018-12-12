@@ -48,7 +48,7 @@
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
                                 :editable="{{ isOwner ? 'true' : 'false' }}"
-                                profile-url="{{ absolute_url(path('token_show', { 'name': token.name})) }}"
+                                profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
                             >
                             </token-introduction-profile>
 
