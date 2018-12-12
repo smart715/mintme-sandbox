@@ -14,13 +14,13 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div
+                    <div v-if="balance"
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
                         >
                         Your Tokens:
                         <span class="text-primary">
-                            {{tokenBalance}}
+                            {{ immutableBalance }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -36,7 +36,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div
+                    <div v-if="balance"
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
@@ -153,100 +153,98 @@
 import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
+import AuthSocketMixin from '../../../mixins/authsocket';
 
 export default {
-  name: 'TokenTradeSellOrder',
-  components: {
-      Guide,
-      OrderModal,
-  },
-  props: {
-      containerClass: String,
-      websocketUrl: String,
-      loginUrl: String,
-      signupUrl: String,
-      loggedIn: Boolean,
-      tokenName: String,
-      placeOrderUrl: String,
-      marketName: String,
-      sell: Object,
-      fetchBalanceTokenUrl: String,
-  },
-  data() {
-    return {
-        sellPrice: 0,
-        sellAmount: 0,
-        useMarketPrice: false,
-        action: 'sell',
-        tokenBalance: '',
-        showModal: false,
-        modalSuccess: false,
-    };
-  },
-  methods: {
-    placeOrder: function() {
-        if (this.sellPrice && this.sellAmount) {
-        let data = {
-            tokenName: this.tokenName,
-            amountInput: this.sellAmount,
-            priceInput: this.sellPrice,
-            marketPrice: this.useMarketPrice,
-            action: this.action,
+    name: 'TokenTradeSellOrder',
+    components: {
+        Guide,
+        OrderModal,
+    },
+    mixins: [AuthSocketMixin],
+    props: {
+        containerClass: String,
+        loginUrl: String,
+        signupUrl: String,
+        loggedIn: Boolean,
+        tokenName: String,
+        placeOrderUrl: String,
+        marketName: Object,
+        sell: Object,
+        balance: String,
+        tokenHiddenName: String,
+    },
+    data() {
+        return {
+            immutableBalance: this.balance,
+            sellPrice: 0,
+            sellAmount: 0,
+            useMarketPrice: false,
+            action: 'sell',
+            showModal: false,
+            modalSuccess: false,
         };
-        axios.post(this.placeOrderUrl, data)
-        .then( (response) => {
-           this.showModalAction(response.data.result);
-           this.updateBalance();
-        })
-        .catch( (error) => {
-            this.showModalAction();
-        });
-    }
+    },
+    methods: {
+        placeOrder: function() {
+            if (this.sellPrice && this.sellAmount) {
+            let data = {
+                tokenName: this.tokenName,
+                amountInput: this.sellAmount,
+                priceInput: this.sellPrice,
+                marketPrice: this.useMarketPrice,
+                action: this.action,
+            };
+            axios.post(this.placeOrderUrl, data)
+                .then((response) => this.showModalAction(response.data.result))
+                .catch((error) => this.showModalAction());
+        }
     },
     showModalAction: function(result) {
         this.modalSuccess = 1 === result;
         this.showModal = true;
     },
-    updateBalance: function() {
-        axios.get(this.fetchBalanceTokenUrl)
-        .then((response) => {
-          return this.tokenBalance = response.data['available'];
-        })
-        .catch((error) => {
-            if (400 === error.response.status) {
-                this.$toasted.error(error.response.data.error);
-            } else {
-                this.$toasted.error('Connection problem. Try again later.');
-            }
-        });
     },
-  },
-  computed: {
-    totalPrice: function() {
-        return this.sellPrice * this.sellAmount;
+    computed: {
+        totalPrice: function() {
+            return this.sellPrice * this.sellAmount;
+        },
+        market: function() {
+            return JSON.parse(this.marketName);
+        },
+        amount: function() {
+            return this.sell.amount || null;
+        },
+        price: function() {
+            return this.sell.price || null;
+        },
+        fieldsValid: function() {
+            return Boolean(this.sellPrice && this.sellAmount);
+        },
     },
-    market: function() {
-        return JSON.parse(this.marketName);
-    },
-    amount: function() {
-        return this.sell.amount || null;
-    },
-    price: function() {
-        return this.sell.price || null;
-    },
-    fieldsValid: function() {
-        return Boolean(this.sellPrice && this.sellAmount);
-    },
-  },
-  watch: {
+    watch: {
       useMarketPrice: function() {
           if (this.useMarketPrice) {
               this.sellPrice = this.price || 0;
           }
       },
-  },
-  mounted: function() {
-        this.updateBalance();
+    },
+    mounted: function() {
+        if (!this.balance) {
+            return;
+        }
+
+        this.authorize(() => {
+              this.wsClient.send(JSON.stringify({
+                  'method': 'asset.subscribe',
+                  'params': [this.tokenHiddenName],
+                  'id': parseInt(Math.random()),
+              }));
+        }, (response) => {
+          if ('asset.update' === response.method) {
+              this.immutableBalance = response.params[0][this.tokenHiddenName].available;
+          }
+        });
     },
 };
 </script>

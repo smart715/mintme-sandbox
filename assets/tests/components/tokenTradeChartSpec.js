@@ -37,7 +37,7 @@ describe('TokenTradeChart', () => {
                 const market = JSON.stringify({
                     hiddenName: 'TOK000000000001WEB',
                     tokenName: 'tok1',
-                    currncySymbol: 'WEB',
+                    currencySymbol: 'WEB',
                 });
                 const vm = mount(TokenTradeChart, {
                     propsData: {

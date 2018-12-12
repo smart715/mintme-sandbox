@@ -10,6 +10,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\TokenNameConverterInterface;
 use App\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -69,8 +70,13 @@ class TokenController extends AbstractController
      *     options={"expose"=true}
      * )
      */
-    public function show(string $name, ?string $tab, NormalizerInterface $normalizer): Response
-    {
+    public function show(
+        string $name,
+        ?string $tab,
+        BalanceHandlerInterface $balanceHandler,
+        TokenNameConverterInterface $tokenNameConverter,
+        NormalizerInterface $normalizer
+    ): Response {
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
@@ -79,29 +85,30 @@ class TokenController extends AbstractController
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
-        $market = $webCrypto
-            ? $this->marketManager->getMarket($webCrypto, $token)
-            : null;
+        $market = $webCrypto ?
+            $this->marketManager->getMarket($webCrypto, $token) :
+            null;
 
-        $marketName = $market
-            ? [
-                'hiddenName' => $market->getHiddenName(),
-                'tokenName' => $market->getTokenName(),
-                'currncySymbol' => $market->getCurrencySymbol(),
-            ]
-            : [];
+        $balances = $this->getUser() && $webCrypto ?
+            $balanceHandler->balances($this->getUser(), [$token, Token::getFromCrypto($webCrypto)]) :
+            [];
 
-        $isOwner = $token === $this->tokenManager->getOwnToken();
+        $hash = $this->getUser()
+            ? $this->getUser()->getHash()
+            : '';
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
-            'stats' => $normalizer->normalize($token->getLockIn(), null, [
-                'groups' => [ 'Default' ],
-            ]),
+            'stats' => $normalizer->normalize($token->getLockIn(), null, ['groups' => [ 'Default' ]]),
+            'hash' => $hash,
             'profile' => $token->getProfile(),
-            'isOwner' => $isOwner,
+            'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
-            'marketName' => $marketName,
+            'marketName' => $normalizer->normalize($market, null, ['groups' => ['Default']]),
+            'balances' => $normalizer->normalize($balances),
+            'tokenHiddenName' => $market ?
+                $tokenNameConverter->convert($token) :
+                '',
         ]);
     }
 
