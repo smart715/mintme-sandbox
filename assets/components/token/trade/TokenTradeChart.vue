@@ -89,7 +89,7 @@ export default {
     props: {
         websocketUrl: String,
         containerClass: String,
-        marketName: String,
+        marketName: Object,
     },
     data() {
         return {
@@ -153,7 +153,7 @@ export default {
     },
     computed: {
         market: function() {
-            return JSON.parse(this.marketName);
+            return this.marketName;
         },
         chartInitValues: function() {
             let values = [];

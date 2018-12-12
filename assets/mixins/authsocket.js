@@ -6,7 +6,7 @@ Vue.use(WebSocket);
 
 export default {
     props: {
-        websocket_url: String,
+        websocketUrl: String,
         hash: String,
     },
     data() {
@@ -15,7 +15,7 @@ export default {
         };
     },
     created: function() {
-        this.wsClient = this.$socket(this.websocket_url);
+        this.wsClient = this.$socket(this.websocketUrl);
         this.wsClient.onopen = () => {
             this.wsClient.send(JSON.stringify({
                 method: 'server.auth',
