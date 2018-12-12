@@ -11,7 +11,7 @@
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
             </confirm-modal>
-            <b-table ref="table"
+            <b-table v-if="hasOrders" ref="table"
                 :items="getHistory"
                 :fields="fields"
                 :current-page="currentPage"
@@ -22,8 +22,11 @@
                     </a>
                 </template>
             </b-table>
+            <div v-if="!hasOrders">
+                <h4 class="text-center p-5">No orders was added yet</h4>
+            </div>
         </div>
-        <div class="row justify-content-center">
+        <div v-if="hasOrders" class="row justify-content-center">
             <b-pagination
                 :total-rows="totalRows"
                 :per-page="perPage"
@@ -45,6 +48,7 @@ export default {
         ConfirmModal,
     },
     props: {
+        markets: Array,
         orders: Object,
     },
     data() {
@@ -75,11 +79,11 @@ export default {
         totalRows: function() {
             return this.ordersList.length;
         },
-        markets: function() {
-            return Object.values(this.orders).map((order) => order.market);
-        },
         marketNames: function() {
             return this.markets.map((market) => market.hiddenName);
+        },
+        hasOrders: function() {
+            return this.ordersList.length > 0;
         },
     },
     mounted: function() {

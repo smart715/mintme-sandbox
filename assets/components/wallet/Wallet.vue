@@ -74,6 +74,7 @@
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
 import AuthSocketMixin from '../../mixins/authsocket';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'Wallet',
@@ -156,13 +157,19 @@ export default {
 
                 Object.keys(this.immutablePTokens).forEach((token) => {
                     if (oTokenName === this.immutablePTokens[token].hiddenName) {
-                        this.immutablePTokens[token].available = oToken.available;
+                        this.immutablePTokens[token].available = Decimal.sub(
+                            oToken.available,
+                            this.immutablePTokens[token].frozen
+                        ).toFixed(this.immutablePTokens[token].precision);
                     }
                 });
 
                 Object.keys(this.immutableTokens).forEach((token) => {
                     if (oTokenName === this.immutableTokens[token].hiddenName) {
-                        this.immutableTokens[token].available = oToken.available;
+                        this.immutableTokens[token].available = Decimal.sub(
+                            oToken.available,
+                            this.immutableTokens[token].frozen
+                        ).toFixed(12);
                     }
                 });
             });

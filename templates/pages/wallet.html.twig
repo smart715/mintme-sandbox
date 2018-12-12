@@ -31,6 +31,7 @@
                             <active-orders
                                 hash="{{ hash }}"
                                 websocket-url="{{ global_websocket_url }}"
+                                :markets="{{ markets | json_encode }}"
                                 :orders="{{ orders | json_encode }}"
                             ></active-orders>
                         </b-tab>

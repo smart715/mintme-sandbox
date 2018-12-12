@@ -56,11 +56,11 @@ class WalletController extends AbstractController
            
         $executedHistory = $market
             ? $marketHandler->getUserExecutedHistory($user, $marketManager->getUserRelatedMarkets($user))
-            : null;
+            : [];
 
         $orders = $market
             ? $marketHandler->getPendingOrdersByUser($user, $marketManager->getUserRelatedMarkets($user))
-            : null;
+            : [];
             
         $predefinedTokens = $balanceHandler->balances(
             $this->getUser(),
@@ -77,15 +77,14 @@ class WalletController extends AbstractController
                 $tokenManager->findAllPredefined()
             )->toArray();
         }
-        
-        $ownToken = $tokenManager->getOwnToken();
-        $markets = $ownToken ? $this->createMarkets($ownToken, $cryptoManager->findAll()) : [];
 
         return $this->render('pages/wallet.html.twig', [
             'orders' => $normalizer->normalize($orders, null, [
                 'groups' => [ 'Default' ],
             ]),
-            'markets' => $markets,
+            'markets' => $normalizer->normalize($marketManager->getUserRelatedMarkets($this->getUser()), null, [
+                'groups' => [ 'Default' ],
+            ]),
             'hash' => $this->getUser()->getHash(),
             'executedHistory' => $normalizer->normalize($executedHistory),
             'tokens' => $normalizer->normalize($tokens, null, [
@@ -96,18 +95,5 @@ class WalletController extends AbstractController
             ]),
             'depositAddresses' => $depositAddresses,
         ]);
-    }
-
-    /**
-     * @param Crypto[] $cryptos
-     * @return Market[]
-     */
-    private function createMarkets(Token $token, array $cryptos): array
-    {
-        return array_map(function (Crypto $crypto) use ($token) {
-            return null !== $token
-                ? (new Market($crypto, $token))->getHiddenName()
-                : null;
-        }, $cryptos);
     }
 }
