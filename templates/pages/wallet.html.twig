@@ -13,6 +13,8 @@
                         <b-tab title="Wallet" active v-cloak>
                             {{ include("loader.html.twig") }}
                             <wallet
+                                hash="{{ hash }}"
+                                websocket-url="{{ global_websocket_url }}"
                                 :deposit-addresses="{{depositAddresses | json_encode}}"
                                 :tokens="{{ tokens | json_encode }}"
                                 :predefined-tokens="{{ predefinedTokens | json_encode }}"

@@ -7,6 +7,7 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Repository\TokenRepository;
+use App\Utils\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -24,14 +25,19 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var TokenNameConverterInterface */
+    private $tokenNameConverter;
+
     public function __construct(
         ObjectNormalizer $normalizer,
         TokenManagerInterface $tokenManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        TokenNameConverterInterface $tokenNameConverter
     ) {
         $this->normalizer = $normalizer;
         $this->tokenManager = $tokenManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->tokenNameConverter = $tokenNameConverter;
     }
 
     /**
@@ -57,6 +63,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
             );
 
             $result[$token->getName()] = $this->normalizer->normalize($result[$token->getName()], $format, $context);
+            $result[$token->getName()]['hiddenName'] = $this->tokenNameConverter->convert($token);
 
             if ($token->getCrypto()) {
                 $result[$token->getName()]['fullname'] = $token->getCrypto()->getName();

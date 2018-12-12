@@ -6,8 +6,8 @@ Vue.use(WebSocket);
 
 export default {
     props: {
-        websocketUrl: String,
-        hash: String,
+        websocketUrl: {type: String, required: true},
+        hash: {type: String, required: true},
     },
     data() {
         return {
