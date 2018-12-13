@@ -27,8 +27,8 @@ class MarketManagerTest extends TestCase
         $cryptoManager = $this->mockCryptoManager($cryptos);
         $tokenManager = $this->mockTokenManager($tokens);
 
-        $marketManager = new MarketManager();
-        $markets = $marketManager->getAllMarkets($cryptoManager, $tokenManager);
+        $marketManager = new MarketManager($cryptoManager, $tokenManager);
+        $markets = $marketManager->getAllMarkets();
 
         $this->assertEquals(6, count($markets));
 

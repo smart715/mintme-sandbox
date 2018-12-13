@@ -3,6 +3,7 @@
         <token-trade-buy-order
             container-class="buy-order col-12 col-md-6 col-lg-4"
             :websocket-url="websocketUrl"
+            :hash="hash"
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
@@ -10,11 +11,12 @@
             :buy="buy"
             :token-name="tokenName"
             :place-order-url="placeOrderUrl"
-            :fetch-balance-web-url="fetchBalanceWebUrl"
+            :balance="webBalance"
         />
         <token-trade-sell-order
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
             :websocket-url="websocketUrl"
+            :hash="hash"
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
@@ -22,7 +24,8 @@
             :sell="sell"
             :token-name="tokenName"
             :place-order-url="placeOrderUrl"
-            :fetch-balance-token-url="fetchBalanceTokenUrl"
+            :balance="tokenBalance"
+            :token-hidden-name="tokenHiddenName"
         />
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
@@ -58,19 +61,29 @@ Vue.use(WebSocket);
 
 export default {
     name: 'TokenTrade',
+    components: {
+        TokenTradeBuyOrder,
+        TokenTradeSellOrder,
+        TokenTradeChart,
+        TokenTradeBuyOrders,
+        TokenTradeSellOrders,
+        TokenTradeTradeHistory,
+        OrderModal,
+    },
     props: {
         ordersHistory: String,
         pendingBuyOrders: String,
         pendingSellOrders: String,
         websocketUrl: String,
+        hash: String,
         loginUrl: String,
         signupUrl: String,
-        marketName: String,
+        marketName: Object,
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        fetchBalanceWebUrl: String,
-        fetchBalanceTokenUrl: String,
+        balances: Object,
+        tokenHiddenName: String,
     },
     data() {
         return {
@@ -88,7 +101,13 @@ export default {
     },
     computed: {
         market: function() {
-            return JSON.parse(this.marketName);
+            return this.marketName;
+        },
+        tokenBalance: function() {
+            return this.balances[this.tokenName] ? this.balances[this.tokenName].available : '';
+        },
+        webBalance: function() {
+            return this.balances['WEB'] ? this.balances['WEB'].available : '';
         },
     },
     mounted() {
@@ -108,15 +127,6 @@ export default {
                 this.wsClient.send(request);
             };
         }
-    },
-    components: {
-        TokenTradeBuyOrder,
-        TokenTradeSellOrder,
-        TokenTradeChart,
-        TokenTradeBuyOrders,
-        TokenTradeSellOrders,
-        TokenTradeTradeHistory,
-        OrderModal,
     },
     methods: {
         updateMarketData: function(marketData) {

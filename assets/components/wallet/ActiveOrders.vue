@@ -3,29 +3,30 @@
         <div class="table-responsive">
             <confirm-modal
                 :visible="confirmModal"
-                v-on:close="switchConfirmModal"
-                v-on:confirm="removeOrder"
+                @close="switchConfirmModal(false)"
+                @confirm="removeOrder"
             >
                 <div>
                     Are you sure that you want to remove {{ this.currentRow.name }}
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
             </confirm-modal>
-            <b-table ref="table"
+            <b-table v-if="hasOrders" ref="table"
                 :items="getHistory"
                 :fields="fields"
                 :current-page="currentPage"
                 :per-page="perPage">
                 <template slot="action" slot-scope="row">
                     <a @click="removeOrderModal(row.item)">
-                        <font-awesome-icon
-                            icon="times"
-                            class="text-danger" />
+                        <font-awesome-icon icon="times" class="text-danger c-pointer" />
                     </a>
                 </template>
             </b-table>
+            <div v-if="!hasOrders">
+                <h4 class="text-center p-5">No orders was added yet</h4>
+            </div>
         </div>
-        <div class="row justify-content-center">
+        <div v-if="hasOrders" class="row justify-content-center">
             <b-pagination
                 :total-rows="totalRows"
                 :per-page="perPage"
@@ -35,31 +36,25 @@
     </div>
 </template>
 <script>
+import AuthSocketMixin from '../../mixins/authsocket';
 import ConfirmModal from '../modal/ConfirmModal';
-import WebSocket from '../../js/websocket';
-
-const METHOD_AUTH = 12345;
-const METHOD_ORDER_QUERY = 54321;
-const METHOD_ORDER_SUBSCRIBE = 12878;
-
-Vue.use(WebSocket);
+import Decimal from 'decimal.js';
+import {WSAPI} from '../../js/utils/constants';
 
 export default {
     name: 'ActiveOrders',
+    mixins: [AuthSocketMixin],
     components: {
         ConfirmModal,
-        WebSocket,
     },
     props: {
-        hash: String,
         markets: Array,
-        websocket_url: String,
+        orders: Object,
     },
     data() {
         return {
             currentRow: {},
             actionUrl: '',
-            history: [],
             currentPage: 1,
             perPage: 10,
             pageOptions: [10, 20, 30],
@@ -67,133 +62,101 @@ export default {
             tokenName: null,
             amount: null,
             price: null,
+            ordersList: Object.values(this.orders),
             fields: {
-                date: {
-                    label: 'Date',
-                    sortable: true,
-                },
-                type: {
-                    label: 'Type',
-                    sortable: true,
-                },
-                name: {
-                    label: 'Address',
-                    sortable: true,
-                },
-                amount: {
-                    label: 'Amount',
-                    sortable: true,
-                },
-                price: {
-                    label: 'Price',
-                    sortable: true,
-                },
-                total: {
-                    label: 'Total cost',
-                    sortable: true,
-                },
-                free: {
-                    label: 'Free',
-                    sortable: true,
-                },
-                action: {
-                    label: 'Action',
-                    sortable: false,
-                },
+                date: {label: 'Date', sortable: true},
+                type: {label: 'Type', sortable: true},
+                name: {label: 'Name', sortable: true},
+                amount: {label: 'Amount', sortable: true},
+                price: {label: 'Price', sortable: true},
+                total: {label: 'Total cost', sortable: true},
+                fee: {label: 'Fee', sortable: true},
+                action: {label: 'Action', sortable: false},
             },
-        };
-    },
-    methods: {
-        getHistory: function() {
-          return this.history;
-        },
-        removeOrderModal: function(row) {
-            this.currentRow = row;
-            this.actionUrl = row.action;
-            this.confirmModal = !this.confirmModal;
-        },
-        switchConfirmModal: function() {
-            this.confirmModal = !this.confirmModal;
-        },
-        removeOrder: function() {
-            this.$axios.get(this.actionUrl)
-                .catch(() => {
-                    this.$toasted.show('Service unavailable, try again later');
-                });
-        },
-        getOrders: function() {
-            this.markets.forEach((token) => {
-                if (token !== null) {
-                    this.wsClient.send(JSON.stringify({
-                        'method': 'order.query',
-                        'params': [token, 0, 100],
-                        'id': METHOD_ORDER_QUERY,
-                    }));
-                }
-            });
-        },
-        subscribe: function() {
-            this.wsClient.send(JSON.stringify({
-                'method': 'order.subscribe',
-                'params': this.markets.filter(Boolean).join(','),
-                'id': METHOD_ORDER_SUBSCRIBE,
-            }));
-        },
-        parseOrders: function(orders) {
-            orders.forEach((order) => {
-                this.history.push({
-                    date: new Date(order.ctime).toDateString(),
-                    type: (1 === order.type) ? 'Deposit' : 'Withdraw',
-                    name: order.market,
-                    amount: order.amount,
-                    price: order.price,
-                    total: (order.price * order.amount + order.maker_fee),
-                    free: order.maker_fee,
-                    action: this.$routing.generate('order_cancel', {
-                        market: order.market, orderid: order.id,
-                    }),
-                    id: order.id,
-                });
-            });
-            this.$refs.table.refresh();
-        },
-        deleteHistoryOrder: function(id) {
-            delete this.history.filter((item) => item.id === id)[0];
-            this.$refs.table.refresh();
-        },
-    },
-    mounted() {
-        this.wsClient = this.$socket(this.websocket_url);
-        this.wsClient.onmessage = (result) => {
-            let response = JSON.parse(result.data);
-            switch (response.id) {
-                case METHOD_AUTH:
-                    if (response.error === null) {
-                        this.getOrders();
-                    }
-                    break;
-                case METHOD_ORDER_QUERY:
-                    this.parseOrders(response.result.records);
-                    this.subscribe();
-                    break;
-                case null:
-                    if (response.method === 'order.update') {
-                        this.deleteHistoryOrder(response.params[1].id);
-                    }
-                    break;
-            }
-        };
-        this.wsClient.onopen = () => {
-            this.wsClient.send(JSON.stringify({
-                method: 'server.auth',
-                params: [this.hash, 'auth_api'],
-                id: METHOD_AUTH,
-            }));
         };
     },
     computed: {
         totalRows: function() {
-            return this.history.length;
+            return this.ordersList.length;
+        },
+        marketNames: function() {
+            return this.markets.map((market) => market.hiddenName);
+        },
+        hasOrders: function() {
+            return this.ordersList.length > 0;
+        },
+    },
+    mounted: function() {
+        this.authorize(() => {
+            this.wsClient.send(JSON.stringify({
+                'method': 'order.subscribe',
+                'params': this.marketNames,
+                'id': parseInt(Math.random()),
+            }));
+        }, (response) => {
+            if ('order.update' === response.method) {
+                let data = response.params[1];
+                let order = this.ordersList.find((order) => data.id === order.id);
+
+                switch (response.params[0]) {
+                    case WSAPI.order.status.PUT:
+                        this.ordersList.push({
+                            amount: data.amount,
+                            price: data.price,
+                            fee: WSAPI.order.type.SELL === data.type ? data.maker_fee : data.taker_fee,
+                            id: data.id,
+                            side: data.type,
+                            timestamp: data.mtime,
+                            market: this.getMarketFromName(data.market),
+                        });
+                        break;
+                    case WSAPI.order.status.UPDATE:
+                        order.amount = data.amount;
+                        order.price = data.amount;
+                        order.timestamp = data.mtime;
+                        break;
+                    case WSAPI.order.status.FINISH:
+                        this.ordersList.splice(this.ordersList.indexOf(order), 1);
+                        break;
+                }
+
+                this.$refs.table.refresh();
+            }
+        });
+    },
+    methods: {
+        getHistory: function() {
+            return this.ordersList.map((order) => {
+                return {
+                    date: new Date(order.timestamp * 1000).toDateString(),
+                    type: WSAPI.order.type.SELL === order.side ? 'Sell' : 'Buy',
+                    name: order.market.tokenName + '/' + order.market.currencySymbol,
+                    amount: order.amount,
+                    price: order.price,
+                    total: new Decimal(order.price).mul(order.amount).add(order.fee).toString(),
+                    fee: order.fee,
+                    action: this.$routing.generate('order_cancel', {
+                        market: order.market.hiddenName, orderid: order.id,
+                    }),
+                    id: order.id,
+                };
+            });
+        },
+        removeOrderModal: function(row) {
+            this.currentRow = row;
+            this.actionUrl = row.action;
+            this.switchConfirmModal(true);
+        },
+        switchConfirmModal: function(val) {
+            this.confirmModal = val;
+        },
+        removeOrder: function() {
+            this.$axios.get(this.actionUrl).catch(() => {
+                this.$toasted.show('Service unavailable, try again later');
+            });
+        },
+        getMarketFromName: function(name) {
+            return this.markets.find((market) => market.hiddenName === name);
         },
     },
 };

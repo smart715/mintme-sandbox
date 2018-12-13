@@ -19,18 +19,32 @@
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %} v-cloak>
                         {{ include("loader.html.twig") }}
-                        <token-trade orders-history="{{ ordersHistory | json_encode }}"
-                                     pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
-                                     pending-sell-orders="{{ pendingSellOrders | json_encode }}"
-                                     websocket-url="{{ global_websocket_url }}"
-                                     login-url="{{ path('fos_user_security_login') }}"
-                                     signup-url="{{ path('fos_user_registration_register') }}"
-                                     market-name="{{ marketName | json_encode }}"
-                                     :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                     token-name= "{{ token.name }}"
-                                     place-order-url= "{{ path('token_place_order', {'tokenName' : token.name}) }}"
-                                     fetch-balance-web-url= "{{ path('fetch_balance_token', {'tokenName' : 'WEB'}) }}"
-                                     fetch-balance-token-url= "{{ path('fetch_balance_token', {'tokenName' : token.name}) }}">
+                        <token-trade
+                                orders-history="{{ ordersHistory | json_encode }}"
+                                pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
+                                pending-sell-orders="{{ pendingSellOrders | json_encode }}"
+                                websocket-url="{{ global_websocket_url }}"
+                                hash="{{ hash }}"
+                                login-url="{{ path('fos_user_security_login') }}"
+                                signup-url="{{ path('fos_user_registration_register') }}"
+                                :market-name="{{ marketName | json_encode }}"
+                                :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                token-name= "{{ token.name }}"
+                                place-order-url= "{{ path('token_place_order', {'tokenName' : token.name}) }}"
+                                token-hidden-name="{{ tokenHiddenName }}"
+                                :balances="{{ balances | json_encode }}">
+                        </token-trade>
+                        <token-trade
+                            websocket-url="{{ global_websocket_url }}"
+                            hash="{{ hash }}"
+                            login-url="{{ path('fos_user_security_login') }}"
+                            signup-url="{{ path('fos_user_registration_register') }}"
+                            :market-name="{{ marketName | json_encode }}"
+                            :logged-in="{{ app.user ? 'true' : 'false' }}"
+                            token-name= "{{ token.name }}"
+                            place-order-url= "{{ path('token_place_order', {'tokenName' : token.name}) }}"
+                            token-hidden-name="{{ tokenHiddenName }}"
+                            :balances="{{ balances | json_encode }}">
                         </token-trade>
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %} v-cloak>
@@ -49,7 +63,7 @@
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
                                 :editable="{{ isOwner ? 'true' : 'false' }}"
-                                profile-url="{{ absolute_url(path('token_show', { 'name': token.name})) }}"
+                                profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
                             >
                             </token-introduction-profile>
 

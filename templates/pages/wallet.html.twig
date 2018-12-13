@@ -13,6 +13,9 @@
                         <b-tab title="Wallet" active v-cloak>
                             {{ include("loader.html.twig") }}
                             <wallet
+                                hash="{{ hash }}"
+                                websocket-url="{{ global_websocket_url }}"
+                                :deposit-addresses="{{depositAddresses | json_encode}}"
                                 :tokens="{{ tokens | json_encode }}"
                                 :predefined-tokens="{{ predefinedTokens | json_encode }}"
                                 withdraw-url="{{ path('withdraw') }}">
@@ -26,9 +29,10 @@
                         </b-tab>
                         <b-tab title="Active Orders" >
                             <active-orders
-                                :hash="{{ hash | json_encode }}"
+                                hash="{{ hash }}"
+                                websocket-url="{{ global_websocket_url }}"
                                 :markets="{{ markets | json_encode }}"
-                                :websocket_url="{{ global_websocket_url | json_encode }}"
+                                :orders="{{ orders | json_encode }}"
                             ></active-orders>
                         </b-tab>
                     </b-tabs>

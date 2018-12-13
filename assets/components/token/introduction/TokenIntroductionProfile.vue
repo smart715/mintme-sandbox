@@ -16,8 +16,8 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
-                        <a href="#" target="_blank">
-                            linktotokencreatorprofile.com
+                        <a :href="profileUrl" target="_blank">
+                            {{ profileUrl }}
                         </a>
                         <div class="pt-4">
                             <div class="pb-1">
@@ -132,10 +132,10 @@
                                     <li>
                                         Check if file was uploaded successfully by visiting
                                         <a
-                                            :href="parsedWebsite+'/mintme.html'"
+                                            :href="siteRequestUrl"
                                             target="_blank"
                                             rel="nofollow">
-                                            {{ parsedWebsite }}/mintme.html
+                                            {{ siteRequestUrl }}
                                     </a>
                                 </li>
                                 <li>Click confirm below</li>
@@ -161,6 +161,7 @@ import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {isValidUrl} from '../../../js/utils';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
@@ -207,10 +208,28 @@ export default {
             showConfirmWebsiteModal: false,
             showWebsiteError: false,
             parsedWebsite: '',
+            websitePath: '/mintme.html',
         };
+    },
+    computed: {
+        siteRequestUrl: function() {
+              return this.parsedWebsite + '/mintme.html';
+        },
     },
     methods: {
         editUrls: function() {
+            if (this.editingUrls && this.newWebsite.length && this.newWebsite !== this.websiteUrl) {
+                this.checkWebsiteUrl();
+            }
+
+            if (this.showWebsiteError && !this.newWebsite.length) {
+                this.showWebsiteError = false;
+            }
+
+            if (this.showWebsiteError) {
+                return;
+            }
+
             this.editingUrls = !this.editingUrls;
             this.icon = this.editingUrls ? 'check' : 'edit';
         },
@@ -220,8 +239,8 @@ export default {
                 this.showWebsiteError = true;
                 return;
             }
-            let parsedUrl = parse(this.newWebsite, true);
-            this.parsedWebsite = parsedUrl.origin + rtrim(parsedUrl.pathname, '/');
+
+            this.parsedWebsite = this.newWebsite.replace(/\/+$/, '');
             this.showConfirmWebsiteModal = true;
         },
         confirmWebsite: function() {
