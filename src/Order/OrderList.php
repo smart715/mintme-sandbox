@@ -4,7 +4,6 @@ namespace App\Order;
 
 use App\Entity\User;
 use App\Exchange\Market;
-use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
 use App\Manager\UserManager;
 use App\Order\Model\OrderInfo;
@@ -12,8 +11,8 @@ use App\Wallet\Money\MoneyWrapperInterface;
 
 class OrderList implements OrderListInterface
 {
-    /** @var MarketFetcher */
-    private $marketFetcher;
+    /** @var Market\MarketHandlerInterface */
+    private $marketHandler;
 
     /** @var UserManager */
     private $userManager;
@@ -21,12 +20,15 @@ class OrderList implements OrderListInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    private const SELL_SIDE = 1;
-    private const BUY_SIDE = 2;
+    private const SELL_SIDE = 'sell';
+    private const BUY_SIDE = 'buy';
 
-    public function __construct(MarketFetcher $marketFetcher, UserManager $userManager, MoneyWrapperInterface $moneyWrapper)
-    {
-        $this->marketFetcher = $marketFetcher;
+    public function __construct(
+        Market\MarketHandlerInterface $marketHandler,
+        UserManager $userManager,
+        MoneyWrapperInterface $moneyWrapper
+    ) {
+        $this->marketHandler= $marketHandler;
         $this->userManager = $userManager;
         $this->moneyWrapper = $moneyWrapper;
     }
@@ -44,7 +46,7 @@ class OrderList implements OrderListInterface
     }
 
     /** {@inheritdoc} */
-    public function getPendingOrdersList(?User $currentUser, Market $market, int $side): array
+    public function getPendingOrdersList(?User $currentUser, Market $market, string $side): array
     {
         $pendingOrders = $this->getAllPendingOrders($market, $side);
 
@@ -72,7 +74,9 @@ class OrderList implements OrderListInterface
         $step = 0;
 
         do {
-            $pendingOrders = $this->marketFetcher->getPendingOrders($market, $step * $rows, $rows, $side);
+            $side === 'sell'
+                ? $pendingOrders = $this->marketHandler->getPendingSellOrders($market, $step * $rows, $rows)
+                : $pendingOrders = $this->marketHandler->getPendingBuyOrders($market, $step * $rows, $rows);
             $allPendingOrders = array_merge($allPendingOrders, $pendingOrders);
             ++$step;
         } while ($rows === count($pendingOrders));
@@ -83,7 +87,7 @@ class OrderList implements OrderListInterface
     /** {@inheritdoc} */
     public function getOrdersHistory(Market $market, int $offset = 0, int $limit = 20): array
     {
-        $executedOrders = $this->marketFetcher->getExecutedOrders($market, $offset, $limit);
+        $executedOrders = $this->marketHandler->getExecutedOrders($market, $offset, $limit);
 
         $executedOrdersUsers = $this->mapUsersById(
             $this->userManager->findByIds(

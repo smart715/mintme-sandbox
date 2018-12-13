@@ -63,6 +63,7 @@ class TokenController extends AbstractController
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
+        $this->orderList = $orderList;
         $this->trader = $trader;
     }
 
@@ -124,7 +125,6 @@ class TokenController extends AbstractController
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
-            'marketName' => $marketName,
             'pendingSellOrders' => $normalizer->normalize($pendingSellOrders),
             'pendingBuyOrders' => $normalizer->normalize($pendingBuyOrders),
             'ordersHistory' => $normalizer->normalize($ordersHistory),
