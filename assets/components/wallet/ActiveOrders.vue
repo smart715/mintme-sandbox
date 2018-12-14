@@ -40,6 +40,7 @@ import AuthSocketMixin from '../../mixins/authsocket';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../js/utils/constants';
+import {toMoney} from '../../js/utils';
 
 export default {
     name: 'ActiveOrders',
@@ -111,9 +112,11 @@ export default {
                         });
                         break;
                     case WSAPI.order.status.UPDATE:
+                        let index = this.ordersList.indexOf(order);
                         order.amount = data.amount;
                         order.price = data.amount;
                         order.timestamp = data.mtime;
+                        this.ordersList[index] = order;
                         break;
                     case WSAPI.order.status.FINISH:
                         this.ordersList.splice(this.ordersList.indexOf(order), 1);
@@ -131,10 +134,10 @@ export default {
                     date: new Date(order.timestamp * 1000).toDateString(),
                     type: WSAPI.order.type.SELL === order.side ? 'Sell' : 'Buy',
                     name: order.market.tokenName + '/' + order.market.currencySymbol,
-                    amount: order.amount,
-                    price: order.price,
-                    total: new Decimal(order.price).mul(order.amount).add(order.fee).toString(),
-                    fee: order.fee,
+                    amount: toMoney(order.amount),
+                    price: toMoney(order.price),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).add(order.fee).toString()),
+                    fee: toMoney(order.fee),
                     action: this.$routing.generate('order_cancel', {
                         market: order.market.hiddenName, orderid: order.id,
                     }),

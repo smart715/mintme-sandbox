@@ -28,57 +28,56 @@
 
 <script>
 import {Decimal} from 'decimal.js';
+import {toMoney} from '../../js/utils';
+import {WSAPI} from '../../js/utils/constants';
+
 export default {
     name: 'TradingHistory',
     props: {
-        executedHistory: {type: Array, required: true},
+        executedHistory: {type: Object, required: true},
     },
     data() {
         return {
             currentPage: 1,
             perPage: 10,
             fields: {
-                timestamp: {
-                    label: 'Date',
-                    sortable: true,
-                },
-                side: {
-                    label: 'Type',
-                    sortable: true,
-                },
+                timestamp: {label: 'Date', sortable: true},
+                side: {label: 'Type', sortable: true},
                 market: {
                     label: 'Name',
                     sortable: true,
+                    formatter: (market) => market.tokenName + '/' + market.currencySymbol,
                 },
                 amount: {
                     label: 'Amount',
                     sortable: true,
+                    formatter: (value) => toMoney(value),
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
+                    formatter: (value) => toMoney(value),
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
                     formatter: (value, key, item) => {
-                        let a = new Decimal(item.amount);
-                        let p = new Decimal(item.price);
-                        let tWF = a.times(p);
+                        let tWF = new Decimal(item.amount).times(item.price);
                         let f = new Decimal(item.fee);
-                        return tWF.plus(f).toDP(12);
+                        return toMoney(tWF.add(f).toString());
                     },
                 },
                 fee: {
                     label: 'Fee',
                     sortable: true,
+                    formatter: (value) => toMoney(value),
                 },
             },
         };
     },
     computed: {
         history: function() {
-            return this.executedHistory;
+            return Object.values(this.executedHistory);
         },
         totalRows: function() {
             return this.history.length;
@@ -89,11 +88,10 @@ export default {
     },
     methods: {
         getDate: function(timestamp) {
-           let d = new Date(timestamp * 1000);
-           return d.toLocaleFormat('d-m-Y');
+           return new Date(timestamp * 1000).toDateString();
         },
         getType: function(type) {
-           return (type === 1) ? 'Sell' : 'Buy';
+           return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';
         },
     },
 };

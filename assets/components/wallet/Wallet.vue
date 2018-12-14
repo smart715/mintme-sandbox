@@ -15,14 +15,14 @@
                 <tbody>
                     <tr v-for="(token, name) in immutablePTokens" :key="name">
                         <td>{{ token.fullname }} ({{ name }})</td>
-                        <td>{{ token.available }}</td>
+                        <td>{{ token.available | toMoney }}</td>
                         <td>
                             <font-awesome-icon
                                 :title="withdrawTooltip"
                                 v-tippy="tooltipOptions"
                                 icon="shopping-cart"
                                 class="text-orange c-pointer"
-                                @click="openWithdraw(name, token.fee, token.precision)"
+                                @click="openWithdraw(name, token.fee)"
                             />
                             <font-awesome-icon
                                 :title="depositTooltip"
@@ -49,7 +49,7 @@
             <tbody>
                 <tr v-for="(token, name) in immutableTokens" :key="name">
                     <td>{{ name }}</td>
-                    <td>{{ token.available }}</td>
+                    <td>{{ token.available | toMoney }}</td>
                 </tr>
             </tbody>
         </table>
@@ -57,7 +57,6 @@
             :visible="showModal"
             :currency="selectedCurrency"
             :fee="fee"
-            :precision="precision"
             :withdraw-url="withdrawUrl"
             @close="closeWithdraw"
         />
@@ -75,6 +74,7 @@ import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
 import AuthSocketMixin from '../../mixins/authsocket';
 import Decimal from 'decimal.js';
+import {toMoney} from '../../js/utils';
 
 export default {
     name: 'Wallet',
@@ -107,7 +107,6 @@ export default {
             depositTooltip: 'Deposit!',
             withdrawTooltip: 'Withdraw!',
             fee: 0,
-            precision: 8,
         };
     },
     computed: {
@@ -134,11 +133,10 @@ export default {
         });
     },
     methods: {
-        openWithdraw: function(currency, fee, precision) {
+        openWithdraw: function(currency, fee) {
             this.showModal = true;
             this.selectedCurrency = currency;
             this.fee = fee;
-            this.precision = precision;
         },
         closeWithdraw: function() {
             this.showModal = false;
@@ -160,7 +158,7 @@ export default {
                         this.immutablePTokens[token].available = Decimal.sub(
                             oToken.available,
                             this.immutablePTokens[token].frozen
-                        ).toFixed(this.immutablePTokens[token].precision);
+                        ).toString();
                     }
                 });
 
@@ -169,10 +167,15 @@ export default {
                         this.immutableTokens[token].available = Decimal.sub(
                             oToken.available,
                             this.immutableTokens[token].frozen
-                        ).toFixed(12);
+                        ).toString();
                     }
                 });
             });
+        },
+    },
+    filters: {
+        toMoney: function(val) {
+            return toMoney(val);
         },
     },
 };

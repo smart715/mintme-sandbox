@@ -20,7 +20,7 @@
                         >
                         Your Tokens:
                         <span class="text-primary">
-                            {{ immutableBalance }}
+                            {{ immutableBalance | toMoney  }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -108,7 +108,7 @@
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: {{totalPrice}} WEB
+                        Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon
                                 icon="question"
@@ -154,6 +154,8 @@ import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
 import AuthSocketMixin from '../../../mixins/authsocket';
+import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenTradeSellOrder',
@@ -188,26 +190,26 @@ export default {
     methods: {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
-            let data = {
-                tokenName: this.tokenName,
-                amountInput: this.sellAmount,
-                priceInput: this.sellPrice,
-                marketPrice: this.useMarketPrice,
-                action: this.action,
-            };
-            axios.post(this.placeOrderUrl, data)
-                .then((response) => this.showModalAction(response.data.result))
-                .catch((error) => this.showModalAction());
-        }
-    },
-    showModalAction: function(result) {
-        this.modalSuccess = 1 === result;
-        this.showModal = true;
-    },
+                let data = {
+                    tokenName: this.tokenName,
+                    amountInput: toMoney(this.sellAmount),
+                    priceInput: toMoney(this.sellPrice),
+                    marketPrice: this.useMarketPrice,
+                    action: this.action,
+                };
+                axios.post(this.placeOrderUrl, data)
+                    .then((response) => this.showModalAction(response.data.result))
+                    .catch((error) => this.showModalAction());
+            }
+        },
+        showModalAction: function(result) {
+            this.modalSuccess = 1 === result;
+            this.showModal = true;
+        },
     },
     computed: {
         totalPrice: function() {
-            return this.sellPrice * this.sellAmount;
+            return new Decimal(this.sellPrice || 0).times(this.sellAmount || 0).toString();
         },
         market: function() {
             return JSON.parse(this.marketName);
@@ -245,6 +247,11 @@ export default {
               this.immutableBalance = response.params[0][this.tokenHiddenName].available;
           }
         });
+    },
+    filters: {
+        toMoney: function(val) {
+            return toMoney(val);
+        },
     },
 };
 </script>

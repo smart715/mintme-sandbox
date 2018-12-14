@@ -19,7 +19,7 @@
                         pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0">
                         Your WEB:
                         <span class="text-primary">
-                            {{ immutableBalance }}
+                            {{ immutableBalance | toMoney }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -108,7 +108,7 @@
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: {{totalPrice}} WEB
+                        Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon
                                 icon="question"
@@ -152,6 +152,8 @@ import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
 import AuthSocketMixin from '../../../mixins/authsocket';
+import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenTradeBuyOrder',
@@ -187,8 +189,8 @@ export default {
             if (this.buyPrice && this.buyAmount) {
                 let data = {
                     tokenName: this.tokenName,
-                    amountInput: this.buyAmount,
-                    priceInput: this.buyPrice,
+                    amountInput: toMoney(this.buyAmount),
+                    priceInput: toMoney(this.buyPrice),
                     marketPrice: this.useMarketPrice,
                     action: this.action,
                 };
@@ -205,7 +207,7 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return this.buyPrice * this.buyAmount;
+            return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
         },
         amount: function() {
             return this.buy.amount || null;
@@ -240,6 +242,11 @@ export default {
               this.immutableBalance = response.params[0][this.marketName.currencySymbol].available;
             }
         });
+    },
+    filters: {
+        toMoney: function(val) {
+            return toMoney(val);
+        },
     },
 };
 </script>
