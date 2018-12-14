@@ -25,6 +25,7 @@
     "karma-es5-shim": "0.0.4",
     "karma-es6-shim": "^1.0.0",
     "locutus": "^2.0.9",
+    "offline-plugin": "^5.0.6",
     "url-parse": "^1.4.3",
     "v-autocomplete": "^1.8.2",
     "vue-chartjs": "^3.3.2",
