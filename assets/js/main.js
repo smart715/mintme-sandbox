@@ -13,6 +13,9 @@ import Toasted from 'vue-toasted';
 import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from '../components/token/TokenSearcher';
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+
+OfflinePluginRuntime.install();
 
 VueClipboard.config.autoSetContainer = true;
 
