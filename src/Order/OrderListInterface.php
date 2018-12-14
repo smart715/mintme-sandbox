@@ -4,6 +4,7 @@ namespace App\Order;
 
 use App\Entity\User;
 use App\Exchange\Market;
+use App\Exchange\Order;
 use App\Order\Model\OrderInfo;
 
 interface OrderListInterface
@@ -17,7 +18,7 @@ interface OrderListInterface
     /** @return OrderInfo[] */
     public function getPendingOrdersList(User $user, Market $market, string $side): array;
 
-    /** @return OrderInfo[] */
+    /** @return Order[] */
     public function getAllPendingOrders(Market $market, string $side): array;
 
     /** @return OrderInfo[] */

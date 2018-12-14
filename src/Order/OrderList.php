@@ -17,20 +17,15 @@ class OrderList implements OrderListInterface
     /** @var UserManager */
     private $userManager;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
     private const SELL_SIDE = 'sell';
     private const BUY_SIDE = 'buy';
 
     public function __construct(
         Market\MarketHandlerInterface $marketHandler,
-        UserManager $userManager,
-        MoneyWrapperInterface $moneyWrapper
+        UserManager $userManager
     ) {
         $this->marketHandler= $marketHandler;
         $this->userManager = $userManager;
-        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
@@ -120,7 +115,7 @@ class OrderList implements OrderListInterface
         );
     }
 
-    /** @param OrderInfo[] $orders */
+    /** @param Order[] $orders */
     private function getMakerIds(array $orders): array
     {
         return array_unique(
@@ -132,7 +127,7 @@ class OrderList implements OrderListInterface
         );
     }
 
-    /** @param OrderInfo[] $orders */
+    /** @param Order[] $orders */
     private function getTakerIds(array $orders): array
     {
         return array_unique(
@@ -144,7 +139,7 @@ class OrderList implements OrderListInterface
         );
     }
 
-    /** @param OrderInfo[] $orders */
+    /** @param Order[] $orders */
     private function getUserIds(array $orders): array
     {
         return array_unique(

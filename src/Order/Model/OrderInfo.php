@@ -4,6 +4,7 @@ namespace App\Order\Model;
 
 use App\Entity\User;
 use App\Exchange\Order;
+use App\Wallet\Money\MoneyWrapperInterface;
 
 class OrderInfo implements OrderInfoInterface
 {
@@ -69,19 +70,19 @@ class OrderInfo implements OrderInfoInterface
             : null;
     }
 
-    public function getAmount(): float
+    public function getAmount(): string
     {
         return $this->order->getAmount()->getAmount();
     }
 
-    public function getPrice(): float
+    public function getPrice(): string
     {
         return $this->order->getPrice()->getAmount();
     }
 
-    public function getTotal(): float
+    public function getTotal(): string
     {
-        return $this->getAmount() * $this->getPrice();
+        return $this->order->getAmount()->multiply($this->order->getPrice()->getAmount())->getAmount();
     }
 
     public function makerIsOwner(): bool

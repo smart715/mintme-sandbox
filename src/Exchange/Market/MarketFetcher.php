@@ -4,13 +4,6 @@ namespace App\Exchange\Market;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
-use App\Entity\User;
-use App\Exchange\Deal;
-use App\Exchange\Market;
-use App\Exchange\Order;
-use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Currency;
-use Money\Money;
 
 class MarketFetcher implements MarketFetcherInterface
 {

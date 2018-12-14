@@ -16,11 +16,11 @@ interface OrderInfoInterface
 
     public function getTakerProfileUrl(): ?string;
 
-    public function getAmount(): float;
+    public function getAmount(): string;
 
-    public function getPrice(): float;
+    public function getPrice(): string;
 
-    public function getTotal(): float;
+    public function getTotal(): string;
 
     public function makerIsOwner(): bool;
 
