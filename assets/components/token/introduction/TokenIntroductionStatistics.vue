@@ -29,7 +29,7 @@
                             Profile Statistics
                         </div>
                         <div class="pb-1">
-                            Wallet on exchange: xxx
+                            Wallet on exchange: {{ walletBalance }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -45,7 +45,7 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Active orders: xxx
+                            Active orders: {{ activeOrdersSum }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -61,7 +61,7 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Withdrawn: xxx
+                            Withdrawn: {{ withdrawBalance }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -77,7 +77,7 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Sold on the market: xxx
+                            Sold on the market: {{ soldOrdersSum }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -180,8 +180,10 @@
 </template>
 
 <script>
+import {Decimal} from 'decimal.js';
 import ReleasePeriodComponent from './TokenIntroductionReleasePeriod';
 import Guide from '../../Guide';
+import {toMoney} from '../../../js/utils';
 
 const defaultValue = 'xxx';
 
@@ -192,6 +194,10 @@ export default {
         Guide,
     },
     props: {
+        tokens: {type: Object, required: true},
+        pendingSellOrders: {type: Array, required: true},
+        executedOrders: {type: Array, required: true},
+        predefinedTokens: {type: Object, required: true},
         releasePeriodRoute: String,
         csrf: String,
         containerClass: String,
@@ -227,6 +233,46 @@ export default {
         },
         statsPeriod: function() {
             return !this.releasedDisabled ? 10 : this.stats.releasePeriod;
+        },
+        walletBalance: function() {
+            let available = new Decimal(0);
+            for (let key in this.tokens) {
+                if (this.tokens.hasOwnProperty(key)) {
+                    let amount = new Decimal(this.tokens[key]['available']);
+                    available = available.plus(amount);
+                }
+            }
+            return toMoney(available.toString());
+        },
+        withdrawBalance: function() {
+            let available = new Decimal(0);
+            for (let key in this.predefinedTokens) {
+                if (this.predefinedTokens.hasOwnProperty(key)) {
+                    let amount = new Decimal(this.predefinedTokens[key]['available']);
+                    available = available.plus(amount);
+                }
+            }
+            return toMoney(available.toString());
+        },
+        activeOrdersSum: function() {
+            let sum = new Decimal(0);
+            for (let key in this.pendingSellOrders) {
+                if (this.pendingSellOrders.hasOwnProperty(key)) {
+                    let amount = new Decimal(this.pendingSellOrders[key]['amount']);
+                    sum = sum.plus(amount);
+                }
+            }
+            return toMoney(sum.toString());
+        },
+        soldOrdersSum: function() {
+            let sum = new Decimal(0);
+            for (let key in this.executedOrders) {
+                if (this.executedOrders.hasOwnProperty(key) && parseInt(this.executedOrders[key]['side']) === 1) {
+                    let amount = new Decimal(this.executedOrders[key]['amount']);
+                    sum = sum.plus(amount);
+                }
+            }
+            return toMoney(sum.toString());
         },
     },
 };
