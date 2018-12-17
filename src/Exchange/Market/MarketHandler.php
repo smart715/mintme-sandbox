@@ -120,8 +120,8 @@ class MarketHandler implements MarketHandlerInterface
         return array_map(function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
-                $orderData['maker'],
-                $orderData['taker'],
+                array_key_exists('maker_id', $orderData) ? $orderData['maker_id'] : 0,
+                array_key_exists('taker_id', $orderData) ? $orderData['taker_id'] : 0,
                 $market,
                 $this->moneyWrapper->parse(
                     $orderData['amount'],
@@ -133,7 +133,7 @@ class MarketHandler implements MarketHandlerInterface
                     $market->getCurrencySymbol()
                 ),
                 Order::FINISHED_STATUS,
-                $orderData['maker_fee'],
+                array_key_exists('fee', $orderData) ? $orderData['fee'] : 0,
                 $orderData['time']
             );
         }, $result);
