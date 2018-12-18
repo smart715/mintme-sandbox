@@ -131,7 +131,6 @@ class TokenController extends AbstractController
             'executedOrders' => $normalizer->normalize($executedOrders, null, [
                 'groups' => [ 'Default' ],
             ]),
-
             'stats' => $normalizer->normalize($token->getLockIn(), null, ['groups' => [ 'Default' ]]),
             'hash' => $hash,
             'profile' => $token->getProfile(),

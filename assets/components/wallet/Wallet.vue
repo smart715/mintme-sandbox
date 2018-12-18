@@ -4,52 +4,61 @@
             Balance
         </div>
         <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name <font-awesome-icon icon="sort" /></th>
-                        <th>Amount <font-awesome-icon icon="sort" /></th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(token, name) in immutablePTokens" :key="name">
-                        <td>{{ token.fullname }} ({{ name }})</td>
-                        <td>{{ token.available | toMoney }}</td>
-                        <td>
-                            <font-awesome-icon
-                                :title="withdrawTooltip"
-                                v-tippy="tooltipOptions"
-                                icon="shopping-cart"
-                                class="text-orange c-pointer"
-                                @click="openWithdraw(name, token.fee)"
-                            />
-                            <font-awesome-icon
-                                :title="depositTooltip"
-                                v-tippy="tooltipOptions"
-                                icon="piggy-bank"
-                                class="text-orange c-pointer"
-                                @click="openDeposit(name)"
-                                size="1x"/>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <b-table hover :items="predefinedItems" :fields="predefinedTokenFields">
+                <template slot="name" slot-scope="data">
+                    {{ data.item.fullname }} ({{ data.item.name }})
+                </template>
+                <template slot="available" slot-scope="data">
+                    {{ data.value | toMoney }}
+                </template>
+                <template slot="action" slot-scope="data">
+                    <font-awesome-icon
+                            :title="withdrawTooltip"
+                            v-tippy="tooltipOptions"
+                            icon="shopping-cart"
+                            class="text-orange c-pointer"
+                            @click="openWithdraw(data.item.name, data.item.fee)"
+                    />
+                    <font-awesome-icon
+                            :title="depositTooltip"
+                            v-tippy="tooltipOptions"
+                            icon="piggy-bank"
+                            class="text-orange c-pointer"
+                            @click="openDeposit(data.item.name)"
+                            size="1x"/>
+                </template>
+            </b-table>
         </div>
         <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
             Web tokens you own
         </div>
-        <table class="table table-orange-hover">
+        <div v-if="hasTokens" class="table-responsive">
+            <b-table hover :items="items" :fields="tokenFields">
+                <template slot="name" slot-scope="data">
+                    {{ data.item.name }}
+                </template>
+                <template slot="available" slot-scope="data">
+                    {{ data.value | toMoney }}
+                </template>
+            </b-table>
+        </div>
+        <table v-if="!hasTokens" class="table table-hover">
             <thead>
                 <tr>
-                    <th>Name <font-awesome-icon icon="sort" /></th>
-                    <th>Amount <font-awesome-icon icon="sort" /></th>
+                    <th>Name</th>
+                    <th>Amount</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(token, name) in immutableTokens" :key="name">
-                    <td>{{ name }}</td>
-                    <td>{{ token.available | toMoney }}</td>
+                <tr>
+                    <td colspan="2">Create <a :href="createTokenUrl">own token</a></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        You have not bought tokens yet. Find favorite content creators or
+                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
+                        Start trading now.
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -88,6 +97,8 @@ export default {
         predefinedTokens: {type: Object, required: true},
         withdrawUrl: {type: String, required: true},
         depositAddresses: {type: Object},
+        createTokenUrl: String,
+        tradingUrl: String,
     },
     data() {
         return {
@@ -107,9 +118,21 @@ export default {
             depositTooltip: 'Deposit!',
             withdrawTooltip: 'Withdraw!',
             fee: 0,
+            predefinedTokenFields: {
+                name: {label: 'Name', sortable: true},
+                available: {label: 'Amount', sortable: true},
+                action: {label: 'Actions', sortable: false},
+            },
+            tokenFields: {
+                name: {label: 'Name', sortable: true},
+                available: {label: 'Amount', sortable: true},
+            },
         };
     },
     computed: {
+        hasTokens: function() {
+            return Object.values(this.tokens).length > 0;
+        },
         allTokens: function() {
             return Object.assign({}, this.tokens || {}, this.predefinedTokens || {});
         },
@@ -117,6 +140,12 @@ export default {
             return Object.values(this.allTokens).map((token) => {
                 return token.hiddenName;
             });
+        },
+        predefinedItems: function() {
+            return this.tokensToArray(this.predefinedTokens);
+        },
+        items: function() {
+            return this.tokensToArray(this.tokens);
         },
     },
     mounted: function() {
@@ -171,6 +200,13 @@ export default {
                     }
                 });
             });
+        },
+        tokensToArray: function(tokens) {
+            Object.keys(tokens).map(function(key) {
+                tokens[key].name = key;
+            });
+
+            return Object.values(tokens);
         },
     },
     filters: {
