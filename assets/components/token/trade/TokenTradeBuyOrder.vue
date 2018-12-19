@@ -19,7 +19,7 @@
                         pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0">
                         Your WEB:
                         <span class="text-primary">
-                            {{ immutableBalance }}
+                            {{ immutableBalance | toMoney }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
@@ -41,6 +41,7 @@
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model="useMarketPrice"
+                                step="0.00000001"
                                 type="checkbox"
                                 id="buy-price"
                                 class="custom-control-input"
@@ -86,6 +87,7 @@
                         </label>
                         <input
                             v-model.number="buyPrice"
+                            step="0.00000001"
                             type="number"
                             id="buy-price-input"
                             class="form-control"
@@ -101,6 +103,7 @@
                         </label>
                         <input
                             v-model.number="buyAmount"
+                            step="0.00000001"
                             type="number"
                             id="buy-price-amount"
                             class="form-control"
@@ -108,7 +111,7 @@
                         >
                     </div>
                     <div class="col-12 pt-3">
-                        Total Price: {{totalPrice}} WEB
+                        Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon
                                 icon="question"
@@ -125,9 +128,9 @@
                     </div>
                     <div class="col-12 pt-4 text-center">
                         <button @click="placeOrder"
-                        v-if="loggedIn"
-                        class="btn btn-primary"
-                        :disabled="fieldsValid">
+                            v-if="loggedIn"
+                            class="btn btn-primary"
+                            :disabled="!fieldsValid">
                             Create buy order
                         </button>
                         <template v-else>
@@ -152,6 +155,8 @@ import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
 import AuthSocketMixin from '../../../mixins/authsocket';
+import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenTradeBuyOrder',
@@ -187,8 +192,8 @@ export default {
             if (this.buyPrice && this.buyAmount) {
                 let data = {
                     tokenName: this.tokenName,
-                    amountInput: this.buyAmount,
-                    priceInput: this.buyPrice,
+                    amountInput: toMoney(this.buyAmount),
+                    priceInput: toMoney(this.buyPrice),
                     marketPrice: this.useMarketPrice,
                     action: this.action,
                 };
@@ -205,7 +210,7 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return this.buyPrice * this.buyAmount;
+            return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
         },
         amount: function() {
             return this.buy.amount || null;
@@ -214,7 +219,7 @@ export default {
             return this.buy.price || null;
         },
         fieldsValid: function() {
-            return this.buyPrice && this.buyAmount;
+            return this.buyPrice > 0 && this.buyAmount > 0;
         },
     },
     watch: {
@@ -240,6 +245,11 @@ export default {
               this.immutableBalance = response.params[0][this.marketName.currencySymbol].available;
             }
         });
+    },
+    filters: {
+        toMoney: function(val) {
+            return toMoney(val);
+        },
     },
 };
 </script>

@@ -18,6 +18,8 @@
                                 :deposit-addresses="{{depositAddresses | json_encode}}"
                                 :tokens="{{ tokens | json_encode }}"
                                 :predefined-tokens="{{ predefinedTokens | json_encode }}"
+                                create-token-url="{{ path('token_create') }}"
+                                trading-url="{{ path('trading') }}"
                                 withdraw-url="{{ path('withdraw') }}">
                             </wallet>
                         </b-tab>

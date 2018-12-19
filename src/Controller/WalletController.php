@@ -86,7 +86,9 @@ class WalletController extends AbstractController
                 'groups' => [ 'Default' ],
             ]),
             'hash' => $this->getUser()->getHash(),
-            'executedHistory' => $normalizer->normalize($executedHistory),
+            'executedHistory' => $normalizer->normalize($executedHistory, null, [
+                'groups' => [ 'Default' ],
+            ]),
             'tokens' => $normalizer->normalize($tokens, null, [
                 'groups' => [ 'Default' ],
             ]),

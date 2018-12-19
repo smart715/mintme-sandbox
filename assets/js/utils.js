@@ -1,3 +1,6 @@
+import Decimal from 'decimal.js';
+import {GENERAL} from './utils/constants';
+
 /**
  * Checks that given url is valid
  * @param {string} url
@@ -64,4 +67,12 @@ export function deepFlatten(object) {
     });
 
     return flat;
+}
+
+/**
+ * @param {string|int|float} val
+ * @return {string}
+ */
+export function toMoney(val) {
+    return new Decimal(val).toFixed(GENERAL.precision);
 }

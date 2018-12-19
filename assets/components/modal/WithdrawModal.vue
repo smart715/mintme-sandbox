@@ -45,7 +45,7 @@
                     <label>
                         Amount {{ currency }}:
                     </label>
-                    <span class="float-right">{{ fullAmount }}</span>
+                    <span class="float-right">{{ fullAmount | toMoney }}</span>
                 </div>
                 <div class="pt-3">
                     <button
@@ -79,6 +79,7 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import axios from 'axios';
 import {required, minLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
+import {toMoney} from '../../js/utils';
 
 export default {
     name: 'WithdrawModal',
@@ -88,7 +89,6 @@ export default {
     props: {
         visible: Boolean,
         currency: String,
-        precision: Number,
         fee: Number,
         withdrawUrl: String,
     },
@@ -108,7 +108,7 @@ export default {
                 new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
             );
 
-            return amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toFixed(this.precision);
+            return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString());
         },
     },
     methods: {
@@ -148,7 +148,7 @@ export default {
         setMaxAmount: function() {
             let amount = new Decimal(this.maxAmount);
             this.amount = amount.greaterThan(this.fee) ?
-                amount.sub(this.fee).toFixed(this.precision) : 0;
+                toMoney(amount.sub(this.fee).toString()) : toMoney(0);
         },
     },
     watch: {
@@ -175,7 +175,7 @@ export default {
                 required,
                 decimal,
                 maxValue: maxValue(
-                    new Decimal(this.maxAmount).sub(this.fee).toDP(this.precision)
+                    toMoney(new Decimal(this.maxAmount).sub(this.fee).toString())
                 ),
                 minValue: minValue(0.00001),
             },
@@ -185,6 +185,11 @@ export default {
                 minLength: minLength(1),
             },
         };
+    },
+    filters: {
+        toMoney: function(val) {
+            return toMoney(val);
+        },
     },
 };
 </script>

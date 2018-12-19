@@ -23,7 +23,7 @@
                 </template>
             </b-table>
             <div v-if="!hasOrders">
-                <h4 class="text-center p-5">No orders was added yet</h4>
+                <h4 class="text-center p-5">No order was added yet</h4>
             </div>
         </div>
         <div v-if="hasOrders" class="row justify-content-center">
@@ -40,6 +40,7 @@ import AuthSocketMixin from '../../mixins/authsocket';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../js/utils/constants';
+import {toMoney} from '../../js/utils';
 
 export default {
     name: 'ActiveOrders',
@@ -103,23 +104,28 @@ export default {
                         this.ordersList.push({
                             amount: data.amount,
                             price: data.price,
-                            fee: WSAPI.order.type.SELL === data.type ? data.maker_fee : data.taker_fee,
+                            fee: WSAPI.order.type.SELL === parseInt(data.type) ? data.maker_fee : data.taker_fee,
                             id: data.id,
-                            side: data.type,
+                            side: data.side,
                             timestamp: data.mtime,
                             market: this.getMarketFromName(data.market),
                         });
                         break;
                     case WSAPI.order.status.UPDATE:
+                        let index = this.ordersList.indexOf(order);
                         order.amount = data.amount;
                         order.price = data.amount;
                         order.timestamp = data.mtime;
+                        this.ordersList[index] = order;
                         break;
                     case WSAPI.order.status.FINISH:
                         this.ordersList.splice(this.ordersList.indexOf(order), 1);
                         break;
                 }
 
+                this.ordersList.sort(function(a, b) {
+                    return a.timestamp < b.timestamp;
+                });
                 this.$refs.table.refresh();
             }
         });
@@ -129,12 +135,12 @@ export default {
             return this.ordersList.map((order) => {
                 return {
                     date: new Date(order.timestamp * 1000).toDateString(),
-                    type: WSAPI.order.type.SELL === order.side ? 'Sell' : 'Buy',
+                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
                     name: order.market.tokenName + '/' + order.market.currencySymbol,
-                    amount: order.amount,
-                    price: order.price,
-                    total: new Decimal(order.price).mul(order.amount).add(order.fee).toString(),
-                    fee: order.fee,
+                    amount: toMoney(order.amount),
+                    price: toMoney(order.price),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    fee: order.fee * 100 + '%',
                     action: this.$routing.generate('order_cancel', {
                         market: order.market.hiddenName, orderid: order.id,
                     }),

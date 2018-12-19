@@ -3,6 +3,7 @@
 namespace App\Exchange;
 
 use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class Deal
 {
@@ -41,7 +42,7 @@ class Deal
     /** @var int|null */
     private $dealOrderId;
     
-    /** @var string */
+    /** @var Market */
     private $market;
 
     public function __construct(
@@ -55,7 +56,7 @@ class Deal
         ?Money $deal,
         Money $fee,
         ?int $dealOrderId,
-        string $market
+        Market $market
     ) {
         $this->id = $id;
         $this->timestamp = $timestamp;
@@ -74,10 +75,12 @@ class Deal
     {
         return $this->id;
     }
+
     public function getDeal(): ?Money
     {
         return $this->deal;
     }
+
     public function getDealOrderId(): ?int
     {
         return $this->dealOrderId;
@@ -93,31 +96,37 @@ class Deal
         return $this->role;
     }
 
-    public function getMarket(): string
+    /** @Groups({"Default"}) */
+    public function getMarket(): Market
     {
         return $this->market;
     }
 
+    /** @Groups({"Default"}) */
     public function getAmount(): Money
     {
         return $this->amount;
     }
 
+    /** @Groups({"Default"}) */
     public function getPrice(): Money
     {
         return $this->price;
     }
 
+    /** @Groups({"Default"}) */
     public function getSide(): int
     {
         return $this->side;
     }
 
+    /** @Groups({"Default"}) */
     public function getFee(): Money
     {
         return $this->fee;
     }
 
+    /** @Groups({"Default"}) */
     public function getTimestamp(): ?float
     {
         return $this->timestamp;

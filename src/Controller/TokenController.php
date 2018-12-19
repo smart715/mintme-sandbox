@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
@@ -81,7 +82,8 @@ class TokenController extends AbstractController
         ?string $tab,
         BalanceHandlerInterface $balanceHandler,
         TokenNameConverterInterface $tokenNameConverter,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        MarketHandlerInterface $marketHandler
     ): Response {
         $token = $this->tokenManager->findByName($name);
 
@@ -103,6 +105,24 @@ class TokenController extends AbstractController
             ? $this->getUser()->getHash()
             : '';
 
+        $tokens = $balanceHandler->balances(
+            $this->getUser(),
+            $this->getUser()->getRelatedTokens()
+        );
+
+        $pendingSellOrders = $market
+            ? $marketHandler->getPendingSellOrders($market)
+            : [];
+
+        $executedOrders = $market
+            ? $marketHandler->getExecutedOrders($market)
+            : [];
+
+        $predefinedTokens = $balanceHandler->balances(
+            $this->getUser(),
+            $this->tokenManager->findAllPredefined()
+        );
+
         $pendingSellOrders = $market
             ? $this->orderList->getSellPendingOrdersList($this->getUser(), $market)
             : [];
@@ -115,6 +135,18 @@ class TokenController extends AbstractController
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
+            'tokens' => $normalizer->normalize($tokens, null, [
+                'groups' => [ 'Default' ],
+            ]),
+            'predefinedTokens' => $normalizer->normalize($predefinedTokens, null, [
+                'groups' => [ 'Default' ],
+            ]),
+            'pendingSellOrders' => $normalizer->normalize($pendingSellOrders, null, [
+                'groups' => [ 'Default' ],
+            ]),
+            'executedOrders' => $normalizer->normalize($executedOrders, null, [
+                'groups' => [ 'Default' ],
+            ]),
             'stats' => $normalizer->normalize($token->getLockIn(), null, ['groups' => [ 'Default' ]]),
             'hash' => $hash,
             'profile' => $token->getProfile(),

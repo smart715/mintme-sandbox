@@ -1,3 +1,7 @@
+export const GENERAL = {
+    precision: 8,
+};
+
 export const WSAPI = {
     order: {
         status: {

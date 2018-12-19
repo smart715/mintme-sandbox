@@ -54,7 +54,6 @@ class Trader implements TraderInterface
 
     public function placeOrder(Order $order): TradeResult
     {
-
         try {
             $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [
                 $order->getMakerId(),
@@ -62,8 +61,8 @@ class Trader implements TraderInterface
                 $order->getSide(),
                 $this->moneyWrapper->format($order->getAmount()),
                 $this->moneyWrapper->format($order->getPrice()),
-                (string) $this->config->getTakerFeeRate(),
-                (string) $this->config->getMakerFeeRate(),
+                (string)$this->config->getTakerFeeRate(),
+                (string)$this->config->getMakerFeeRate(),
                 '',
                 0,
                 "0",

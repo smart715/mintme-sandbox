@@ -87,7 +87,7 @@ class OrdersAPIController extends FOSRestController
      * @Rest\RequestParam(name="tokenName", allowBlank=false)
      * @Rest\RequestParam(name="priceInput", allowBlank=false)
      * @Rest\RequestParam(name="amountInput", allowBlank=false)
-     * @Rest\RequestParam(name="action", allowBlank=false)
+     * @Rest\RequestParam(name="action", allowBlank=false, requirements="(sell|buy|all)")
      */
     public function placeOrder(
         ParamFetcherInterface $request,

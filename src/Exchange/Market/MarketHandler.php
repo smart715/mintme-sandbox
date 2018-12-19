@@ -54,20 +54,20 @@ class MarketHandler implements MarketHandlerInterface
     /** {@inheritdoc} */
     public function getUserExecutedHistory(User $user, array $markets, int $offset = 0, int $limit = 100): array
     {
-        $marketOrders = array_map(function (Market $market) use ($user, $offset, $limit) {
+        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit) {
             return $this->parseDeals(
                 $this->marketFetcher->getUserExecutedHistory($user->getId(), $market->getHiddenName(), $offset, $limit),
                 $market
             );
         }, $markets);
 
-        $orders = array_merge(...$marketOrders);
+        $deals = array_merge(...$marketDeals);
 
-        uasort($orders, function (Order $lOrder, Order $rOrder) {
-            return $lOrder->getTimestamp() > $rOrder->getTimestamp();
+        uasort($deals, function (Deal $lDeal, Deal $rDeal) {
+            return $lDeal->getTimestamp() > $rDeal->getTimestamp();
         });
 
-        return $orders;
+        return $deals;
     }
 
     /** {@inheritdoc} */
@@ -111,7 +111,7 @@ class MarketHandler implements MarketHandlerInterface
                 $orderData['maker_fee'],
                 $orderData['mtime']
             );
-        }, $result['orders']);
+        }, $result);
     }
 
     /** @return Order[] */
@@ -120,8 +120,8 @@ class MarketHandler implements MarketHandlerInterface
         return array_map(function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
-                $orderData['maker_id'],
-                $orderData['taker_id'],
+                array_key_exists('maker_id', $orderData) ? $orderData['maker_id'] : 0,
+                array_key_exists('taker_id', $orderData) ? $orderData['taker_id'] : 0,
                 $market,
                 $this->moneyWrapper->parse(
                     $orderData['amount'],
@@ -132,7 +132,8 @@ class MarketHandler implements MarketHandlerInterface
                     $orderData['price'],
                     $market->getCurrencySymbol()
                 ),
-                ORDER::FINISHED_STATUS,
+                Order::FINISHED_STATUS,
+                array_key_exists('fee', $orderData) ? $orderData['fee'] : 0,
                 $orderData['time']
             );
         }, $result);
@@ -165,7 +166,7 @@ class MarketHandler implements MarketHandlerInterface
                     $market->getCurrencySymbol()
                 ),
                 $dealData['deal_order_id'],
-                $market->getHiddenName()
+                $market
             );
         }, $result['records']);
     }
