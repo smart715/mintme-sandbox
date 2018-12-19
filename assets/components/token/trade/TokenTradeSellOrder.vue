@@ -42,6 +42,7 @@
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"
+                                step="0.00000001"
                                 type="checkbox"
                                 id="sell-price"
                                 class="custom-control-input">
@@ -86,6 +87,7 @@
                         </label>
                         <input
                             v-model.number="sellPrice"
+                            step="0.00000001"
                             type="number"
                             id="sell-price-input"
                             class="form-control"
@@ -101,6 +103,7 @@
                         </label>
                         <input
                             v-model="sellAmount"
+                            step="0.00000001"
                             type="number"
                             id="sell-price-amount"
                             class="form-control"

@@ -41,6 +41,7 @@
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model="useMarketPrice"
+                                step="0.00000001"
                                 type="checkbox"
                                 id="buy-price"
                                 class="custom-control-input"
@@ -86,6 +87,7 @@
                         </label>
                         <input
                             v-model.number="buyPrice"
+                            step="0.00000001"
                             type="number"
                             id="buy-price-input"
                             class="form-control"
@@ -101,6 +103,7 @@
                         </label>
                         <input
                             v-model.number="buyAmount"
+                            step="0.00000001"
                             type="number"
                             id="buy-price-amount"
                             class="form-control"
@@ -125,9 +128,9 @@
                     </div>
                     <div class="col-12 pt-4 text-center">
                         <button @click="placeOrder"
-                        v-if="loggedIn"
-                        class="btn btn-primary"
-                        :disabled="fieldsValid">
+                            v-if="loggedIn"
+                            class="btn btn-primary"
+                            :disabled="!fieldsValid">
                             Create buy order
                         </button>
                         <template v-else>
@@ -216,7 +219,7 @@ export default {
             return this.buy.price || null;
         },
         fieldsValid: function() {
-            return this.buyPrice && this.buyAmount;
+            return this.buyPrice > 0 && this.buyAmount > 0;
         },
     },
     watch: {
