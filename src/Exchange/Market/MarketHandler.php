@@ -98,6 +98,10 @@ class MarketHandler implements MarketHandlerInterface
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
+
+        $orders = array_key_exists('orders', $result)
+            ? $result['orders']
+            : $result;
         return array_map(function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
@@ -117,7 +121,7 @@ class MarketHandler implements MarketHandlerInterface
                 $orderData['maker_fee'],
                 $orderData['mtime']
             );
-        }, $result['orders']);
+        }, $orders);
     }
 
     /** @return Order[] */
