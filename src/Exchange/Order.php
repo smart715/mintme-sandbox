@@ -2,6 +2,7 @@
 
 namespace App\Exchange;
 
+use App\Entity\User;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -23,11 +24,11 @@ class Order
     /** @var int|null */
     private $id;
 
-    /** @var int */
-    private $makerId;
+    /** @var User|null */
+    private $maker;
 
-    /** @var int|null */
-    private $takerId;
+    /** @var User|null */
+    private $taker;
 
     /** @var Market */
     private $market;
@@ -52,8 +53,8 @@ class Order
 
     public function __construct(
         ?int $id,
-        int $makerId,
-        ?int $takerId,
+        ?User $maker,
+        ?User $taker,
         Market $market,
         Money $amount,
         int $side,
@@ -63,8 +64,8 @@ class Order
         ?int $timestamp = null
     ) {
         $this->id = $id;
-        $this->makerId = $makerId;
-        $this->takerId = $takerId;
+        $this->maker = $maker;
+        $this->taker = $taker;
         $this->market = $market;
         $this->amount = $amount;
         $this->side = $side;
@@ -81,15 +82,15 @@ class Order
     }
 
     /** @Groups({"Default"}) */
-    public function getMakerId(): int
+    public function getMaker(): ?User
     {
-        return $this->makerId;
+        return $this->maker;
     }
 
     /** @Groups({"Default"}) */
-    public function getTakerId(): ?int
+    public function getTaker(): ?User
     {
-        return $this->takerId;
+        return $this->taker;
     }
 
     /** @Groups({"Default"}) */
@@ -132,5 +133,53 @@ class Order
     public function getFee(): ?float
     {
         return $this->fee;
+    }
+
+    public function getMakerId(): int
+    {
+        return $this->getMaker()->getId();
+    }
+
+    public function getTakerId(): int
+    {
+        return $this->getTaker()->getId();
+    }
+
+    /** @Groups({"Default"}) */
+    public function getMakerFirstName(): ?string
+    {
+        return null != $this->getMaker()
+            ? $this->getMaker()->getProfile()->getFirstName()
+            : null;
+    }
+
+    /** @Groups({"Default"}) */
+    public function getMakerLastName(): ?string
+    {
+        return null != $this->getMaker()
+            ? $this->getMaker()->getProfile()->getLastName()
+            : null;
+    }
+
+    /** @Groups({"Default"}) */
+    public function getTakerFirstName(): ?string
+    {
+        return null != $this->getTaker()
+            ? $this->getTaker()->getProfile()->getFirstName()
+            : null;
+    }
+
+    /** @Groups({"Default"}) */
+    public function getTakerLastName(): ?string
+    {
+        return null != $this->getTaker()
+            ? $this->getTaker()->getProfile()->getLastName()
+            : null;
+    }
+
+    /** @Groups({"Default"}) */
+    public function getTotal(): ?string
+    {
+        return $this->getAmount()->multiply($this->getPrice()->getAmount())->getAmount();
     }
 }

@@ -224,8 +224,8 @@ class MarketFetcherTest extends TestCase
         return [
             new Order(
                 1,
-                1,
-                2,
+                null,
+                null,
                 $this->createMarket(),
                 $this->createMoney(10),
                 1,

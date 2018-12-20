@@ -11,7 +11,6 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Order\OrderListInterface;
 use App\Utils\TokenNameConverterInterface;
 use App\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -47,16 +46,12 @@ class TokenController extends AbstractController
     /** @var TraderInterface */
     protected $trader;
 
-    /** @var OrderListInterface */
-    protected $orderList;
-
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         MarketManagerInterface $marketManager,
-        OrderListInterface $orderList,
         TraderInterface $trader
     ) {
         $this->em = $em;
@@ -64,7 +59,6 @@ class TokenController extends AbstractController
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
-        $this->orderList = $orderList;
         $this->trader = $trader;
     }
 
@@ -114,6 +108,10 @@ class TokenController extends AbstractController
             ? $marketHandler->getPendingSellOrders($market)
             : [];
 
+        $pendingBuyOrders = $market
+            ? $marketHandler->getPendingBuyOrders($market)
+            : [];
+
         $executedOrders = $market
             ? $marketHandler->getExecutedOrders($market)
             : [];
@@ -122,16 +120,6 @@ class TokenController extends AbstractController
             $this->getUser(),
             $this->tokenManager->findAllPredefined()
         );
-
-        $pendingSellOrders = $market
-            ? $this->orderList->getSellPendingOrdersList($this->getUser(), $market)
-            : [];
-        $pendingBuyOrders = $market
-            ? $this->orderList->getBuyPendingOrdersList($this->getUser(), $market)
-            : [];
-        $ordersHistory = $market
-            ? $this->orderList->getOrdersHistory($market)
-            : [];
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
@@ -142,6 +130,9 @@ class TokenController extends AbstractController
                 'groups' => [ 'Default' ],
             ]),
             'pendingSellOrders' => $normalizer->normalize($pendingSellOrders, null, [
+                'groups' => [ 'Default' ],
+            ]),
+            'pendingBuyOrders' => $normalizer->normalize($pendingBuyOrders, null, [
                 'groups' => [ 'Default' ],
             ]),
             'executedOrders' => $normalizer->normalize($executedOrders, null, [
@@ -157,9 +148,6 @@ class TokenController extends AbstractController
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
-            'pendingSellOrders' => $normalizer->normalize($pendingSellOrders),
-            'pendingBuyOrders' => $normalizer->normalize($pendingBuyOrders),
-            'ordersHistory' => $normalizer->normalize($ordersHistory),
         ]);
     }
 

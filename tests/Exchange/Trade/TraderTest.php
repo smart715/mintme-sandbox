@@ -325,7 +325,7 @@ class TraderTest extends TestCase
         $order->method('getSide')->willReturn(1);
         $order->method('getAmount')->willReturn($this->createMoney(10));
         $order->method('getPrice')->willReturn($this->createMoney(5));
-    
+
         return $order;
     }
 
@@ -391,7 +391,7 @@ class TraderTest extends TestCase
         return [
             new Order(
                 2,
-                1,
+                $this->createUser(),
                 null,
                 $this->createMarket(),
                 $this->createMoney(10),

@@ -193,7 +193,7 @@ class Trader implements TraderInterface
     {
         return new Order(
             $orderData['id'],
-            $user->getId(),
+            $user,
             null,
             $market,
             new Money(
