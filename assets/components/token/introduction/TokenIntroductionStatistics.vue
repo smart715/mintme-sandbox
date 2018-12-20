@@ -184,7 +184,7 @@ import {Decimal} from 'decimal.js';
 import ReleasePeriodComponent from './TokenIntroductionReleasePeriod';
 import Guide from '../../Guide';
 import {toMoney} from '../../../js/utils';
-import {WSAPI} from '../../../js/utils/constants'
+import {WSAPI} from '../../../js/utils/constants';
 
 const defaultValue = 'xxx';
 
@@ -268,7 +268,10 @@ export default {
         soldOrdersSum: function() {
             let sum = new Decimal(0);
             for (let key in this.executedOrders) {
-                if (this.executedOrders.hasOwnProperty(key) && WSAPI.order.type.SELL === parseInt(this.executedOrders[key]['side'])) {
+                if (
+                        this.executedOrders.hasOwnProperty(key) &&
+                        WSAPI.order.type.SELL === parseInt(this.executedOrders[key]['side'])
+                ) {
                     let amount = new Decimal(this.executedOrders[key]['amount']);
                     sum = sum.plus(amount);
                 }
