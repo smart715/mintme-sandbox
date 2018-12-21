@@ -42,8 +42,8 @@ class DepositCallbackMessage
     {
         return new self(
             $data['userId'],
-            $data['amount'],
-            $data['crypto']
+            $data['crypto'],
+            $data['amount']
         );
     }
 
