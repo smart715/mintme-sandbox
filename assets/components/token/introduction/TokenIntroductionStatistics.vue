@@ -198,7 +198,6 @@ export default {
         tokens: {type: Object, required: true},
         pendingSellOrders: {type: Array, required: true},
         executedOrders: {type: Array, required: true},
-        predefinedTokens: {type: Object, required: true},
         releasePeriodRoute: String,
         csrf: String,
         containerClass: String,
@@ -245,16 +244,6 @@ export default {
             }
             return toMoney(available.toString());
         },
-        withdrawBalance: function() {
-            let available = new Decimal(0);
-            for (let key in this.predefinedTokens) {
-                if (this.predefinedTokens.hasOwnProperty(key)) {
-                    let amount = new Decimal(this.predefinedTokens[key]['available']);
-                    available = available.plus(amount);
-                }
-            }
-            return toMoney(available.toString());
-        },
         activeOrdersSum: function() {
             let sum = new Decimal(0);
             for (let key in this.pendingSellOrders) {
@@ -264,6 +253,9 @@ export default {
                 }
             }
             return toMoney(sum.toString());
+        },
+        withdrawBalance: function() {
+            return toMoney(0);
         },
         soldOrdersSum: function() {
             let sum = new Decimal(0);
