@@ -9,8 +9,6 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Currency;
-use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -53,7 +51,6 @@ class DepositConsumer implements ConsumerInterface
             json_decode($msg->body, true)
         );
 
-        
         /** @var User $user */
         $user = $this->userManager->find($clbResult->getUserId());
 
