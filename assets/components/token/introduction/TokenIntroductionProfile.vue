@@ -82,27 +82,27 @@
                                             quote="Check my new token."
                                             hashtags="mintme"
                                             inline-template>
-                                <div>
-                                    <network class="d-block text-center" network="email">
-                                        <i class="fa fa-envelope"></i> Email
+                                <div class="px-2">
+                                    <network class="d-block c-pointer" network="email">
+                                        <font-awesome-icon icon="envelope"></font-awesome-icon> Email
                                     </network>
-                                    <network class="d-block text-center" network="facebook">
-                                        <i class="fa fa-facebook"></i> Facebook
+                                    <network class="d-block c-pointer" network="facebook">
+                                        <font-awesome-icon :icon="['fab', 'facebook']"></font-awesome-icon> Facebook
                                     </network>
-                                    <network class="d-block text-center" network="linkedin">
-                                        <i class="fa fa-linkedin"></i> LinkedIn
+                                    <network class="d-block c-pointer" network="linkedin">
+                                        <font-awesome-icon :icon="['fab', 'linkedin']"></font-awesome-icon> LinkedIn
                                     </network>
-                                    <network class="d-block text-center" network="googleplus">
-                                        <i class="fa fa-google-plus"></i> Google +
+                                    <network class="d-block c-pointer" network="googleplus">
+                                        <font-awesome-icon :icon="['fab', 'google-plus']"></font-awesome-icon> Google +
                                     </network>
-                                    <network class="d-block text-center" network="reddit">
-                                        <i class="fa fa-reddit"></i> Reddit
+                                    <network class="d-block c-pointer" network="reddit">
+                                        <font-awesome-icon :icon="['fab', 'reddit']"></font-awesome-icon> Reddit
                                     </network>
-                                    <network class="d-block text-center" network="telegram">
-                                        <i class="fa fa-telegram"></i> Telegram
+                                    <network class="d-block c-pointer" network="telegram">
+                                        <font-awesome-icon :icon="['fab', 'telegram']"></font-awesome-icon> Telegram
                                     </network>
-                                    <network class="d-block text-center" network="twitter">
-                                        <i class="fa fa-twitter"></i> Twitter
+                                    <network class="d-block c-pointer" network="twitter">
+                                        <font-awesome-icon :icon="['fab', 'twitter']"></font-awesome-icon> Twitter
                                     </network>
                                 </div>
                             </social-sharing>

@@ -46,6 +46,8 @@ class TokenAPIController extends FOSRestController
      * @Rest\RequestParam(name="_csrf_token", allowBlank=false)
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
+     * @Rest\RequestParam(name="facebookUrl", nullable=true)
+     * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
      */
     public function update(ParamFetcherInterface $request, string $name): View
     {
