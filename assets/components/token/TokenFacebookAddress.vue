@@ -126,10 +126,10 @@ export default {
     computed: {
         selectedUrl: function() {
             if (this.pages.length) {
-return this.pages[0].link;
-} else {
-return '';
-}
+                return this.pages[0].link;
+            } else {
+                return '';
+            }
         },
         currentAddressEncoded: function() {
             return encodeURIComponent(this.currentAddress);
@@ -177,8 +177,8 @@ return '';
             })
             .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
-                    this.currentFacebook = this.selectedFacebookUrl;
-                    this.$toasted.success(`Facebook paged saved as ${this.currentFacebook}`);
+                    this.currentAddress = this.selectedUrl;
+                    this.$toasted.success(`Facebook paged saved as ${this.currentAddress}`);
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
@@ -201,4 +201,5 @@ return '';
         width: 100%
         white-space: nowrap
         overflow: hidden
-        text-overflow: ellipsis</style>
+        text-overflow: ellipsis
+</style>
