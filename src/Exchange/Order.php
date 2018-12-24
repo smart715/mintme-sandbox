@@ -135,16 +135,6 @@ class Order
         return $this->fee;
     }
 
-    public function getMakerId(): int
-    {
-        return $this->getMaker()->getId();
-    }
-
-    public function getTakerId(): int
-    {
-        return $this->getTaker()->getId();
-    }
-
     /** @Groups({"Default"}) */
     public function getMakerFirstName(): ?string
     {
