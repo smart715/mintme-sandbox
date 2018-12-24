@@ -17,8 +17,8 @@ parameters:
 
     verify_timeout_seconds: 10
 
-    youtube_client_id: 0123456789-abcdef0123456789.apps.googleusercontent.com
-    facebook_app_id: 0123456789
+    youtube_client_id: 616023022148-v4dh8b26ugmn351udmgmt4ntab62437c.apps.googleusercontent.com
+    facebook_app_id: 308376513111821
 
     version: 'V1.0.0'
 

@@ -116,17 +116,9 @@ class TokenController extends AbstractController
             ? $marketHandler->getExecutedOrders($market)
             : [];
 
-        $predefinedTokens = $balanceHandler->balances(
-            $this->getUser(),
-            $this->tokenManager->findAllPredefined()
-        );
-
         return $this->render('pages/token.html.twig', [
             'token' => $token,
             'tokens' => $normalizer->normalize($tokens, null, [
-                'groups' => [ 'Default' ],
-            ]),
-            'predefinedTokens' => $normalizer->normalize($predefinedTokens, null, [
                 'groups' => [ 'Default' ],
             ]),
             'pendingSellOrders' => $normalizer->normalize($pendingSellOrders, null, [
