@@ -125,7 +125,9 @@ class OrdersAPIController extends FOSRestController
             Order::PENDING_STATUS,
             Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
                 ? $this->getParameter('maker_fee_rate')
-                : $this->getParameter('taker_fee_rate')
+                : $this->getParameter('taker_fee_rate'),
+            null,
+            $this->getUser()->getReferral()
         );
 
         $tradeResult = $trader->placeOrder($order);

@@ -9,11 +9,14 @@ use App\Form\TwoFactorType;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Utils\MailerDispatcherInterface;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Form\Type\ResettingFormType;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -50,42 +53,31 @@ class UserController extends AbstractController
         ]);
     }
 
-    private function getPasswordForm(Request $request): FormInterface
+    /**
+     * @Route("/referral-program", name="referral-program")
+     */
+    public function referralProgram(): Response
     {
-        $user = $this->getUser();
-        $passwordForm = $this->createForm(ResettingFormType::class, $user);
-        $passwordForm->handleRequest($request);
-
-        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
-            $this->userManager->updatePassword($user);
-            $this->userManager->updateUser($user);
-            $this->addFlash('success', 'Password was updated successfully');
-        }
-
-        return $passwordForm;
+        return $this->render('pages/referral.html.twig', [
+            'hash' => $this->getUser()->getReferralCode(),
+            'referralPercentage' => $this->getParameter('referral_fee') * 100,
+            'referralsCount' => count($this->getUser()->getReferrals()),
+            'prelaunchDate' => $this->getParameter('prelaunch_datetime')
+        ]);
     }
 
-    private function getEmailForm(Request $request): FormInterface
+    /**
+     * @Rest\Route("/invite/{code}", name="register-referral")
+     */
+    public function registerReferral(string $code): Response
     {
-        $user = $this->getUser();
-        $email = new EmailModel($user->getEmail());
-        $emailForm = $this->createForm(EditEmailType::class, $email);
-        $emailForm->handleRequest($request);
+        $response = $this->redirectToRoute('fos_user_registration_register');
 
-        if ($emailForm->isSubmitted() && $emailForm->isValid() && $user->getEmail() !== $email->getEmail()) {
-            // Create temporary user with new email and use him in email sender.
-            // Set new email as temporary for user
-            $tmpUser = clone $user;
-            $tmpUser->setEmail($email->getEmail());
-            $user->setTempEmail($email->getEmail());
-            $this->mailDispatcher->sendEmailConfirmation($tmpUser);
-            $user->setConfirmationToken($tmpUser->getConfirmationToken());
-            $this->userManager->updateUser($user);
+        $response->headers->setCookie(
+            new Cookie('referral-code', $code)
+        );
 
-            $this->addFlash('success', 'Confirmation email was sent to your new address');
-        }
-
-        return $emailForm;
+        return $response;
     }
 
     /** @Route("/settings/2fa", name="two_factor_auth")*/
@@ -129,6 +121,44 @@ class UserController extends AbstractController
 
         $this->addFlash('danger', 'Invalid two-factor authentication code.');
         return $this->render('security/2fa_manager.html.twig', $parameters);
+    }
+
+    private function getPasswordForm(Request $request): FormInterface
+    {
+        $user = $this->getUser();
+        $passwordForm = $this->createForm(ResettingFormType::class, $user);
+        $passwordForm->handleRequest($request);
+
+        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
+            $this->userManager->updatePassword($user);
+            $this->userManager->updateUser($user);
+            $this->addFlash('success', 'Password was updated successfully');
+        }
+
+        return $passwordForm;
+    }
+
+    private function getEmailForm(Request $request): FormInterface
+    {
+        $user = $this->getUser();
+        $email = new EmailModel($user->getEmail());
+        $emailForm = $this->createForm(EditEmailType::class, $email);
+        $emailForm->handleRequest($request);
+
+        if ($emailForm->isSubmitted() && $emailForm->isValid() && $user->getEmail() !== $email->getEmail()) {
+            // Create temporary user with new email and use him in email sender.
+            // Set new email as temporary for user
+            $tmpUser = clone $user;
+            $tmpUser->setEmail($email->getEmail());
+            $user->setTempEmail($email->getEmail());
+            $this->mailDispatcher->sendEmailConfirmation($tmpUser);
+            $user->setConfirmationToken($tmpUser->getConfirmationToken());
+            $this->userManager->updateUser($user);
+
+            $this->addFlash('success', 'Confirmation email was sent to your new address');
+        }
+
+        return $emailForm;
     }
 
     private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager, User $user): array

@@ -16,6 +16,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class Trader implements TraderInterface
 {
@@ -40,16 +41,21 @@ class Trader implements TraderInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var ParameterBagInterface */
+    private $parameterBag;
+
     public function __construct(
         JsonRpcInterface $jsonRpc,
         LimitOrderConfig $config,
         EntityManagerInterface $entityManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        ParameterBagInterface $parameterBag
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->parameterBag = $parameterBag;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -64,8 +70,8 @@ class Trader implements TraderInterface
                 (string)$this->config->getTakerFeeRate(),
                 (string)$this->config->getMakerFeeRate(),
                 '',
-                0,
-                "0",
+                !$this->isPrelaunchFinished() ? $order->getReferralId() : 0,
+                (string)($this->parameterBag->get('referral_fee')),
             ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);
@@ -168,6 +174,14 @@ class Trader implements TraderInterface
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $response->getResult()['records']);
+    }
+
+    private function isPrelaunchFinished(): bool
+    {
+        return \DateTimeImmutable::createFromFormat(
+            'Y-m-d H:i:s',
+            $this->parameterBag->get('prelaunch_datetime')
+        )->getTimestamp() < (new \DateTimeImmutable())->getTimestamp();
     }
 
     /**

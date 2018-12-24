@@ -103,7 +103,7 @@ class TokenController extends AbstractController
             $this->getUser(),
             $this->getUser()->getRelatedTokens()
         );
-                 
+
         $pendingSellOrders = $market
             ? $marketHandler->getPendingSellOrders($market)
             : [];

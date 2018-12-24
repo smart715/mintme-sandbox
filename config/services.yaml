@@ -1,4 +1,5 @@
 parameters:
+    service: 'mintme'
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     locale: 'en'
 
@@ -158,3 +159,7 @@ services:
             - "@fos_user.util.canonical_fields_updater"
             - "@doctrine.orm.entity_manager"
             - "%fos_user.model.user.class%"
+
+    App\EventListener\RegistrationCompletedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.completed }
