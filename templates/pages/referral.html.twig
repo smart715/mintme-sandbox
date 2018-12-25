@@ -26,8 +26,8 @@
                                 </div>
                                 <div class="col-12 mb-1 text-center" id="referral-link-text">
                                     <code class="p-2">
-                                        <span id="code-referral"> {{ absolute_url(path('register_referral', { referralCode: referralCode })) }} </span>
-                                        <copy-link class="code-copy" id="code-copy-btn" data-clipboard-action="copy" data-clipboard-target="#code-referral">
+                                        <span> {{ absolute_url(path('register_referral', { referralCode: referralCode })) }} </span>
+                                        <copy-link class="code-copy" id="code-copy-btn" content-to-copy="{{ absolute_url(path('register_referral', { referralCode: referralCode })) }}">
                                            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                                         </copy-link>
                                     </code>

@@ -1,18 +1,20 @@
 <template>
-    <a  class="copy-link" :title="tooltipMessage" v-tippy="tooltipOptions">
+    <a
+        v-clipboard:copy="contentToCopy"
+        :title="tooltipMessage"
+        v-tippy="tooltipOptions"
+        v-clipboard:success="onCopy"
+        v-clipboard:error="onError">
         <slot>Copy to clipboard</slot>
     </a>
 </template>
 
 <script>
-import ClipboardJS from 'clipboard';
-import VueTippy from 'vue-tippy';
-Vue.use(VueTippy);
-
-let clipboard = new ClipboardJS('.copy-link');
-
 export default {
     name: 'CopyLink',
+    props: {
+        contentToCopy: String,
+    },
     data() {
         return {
             tooltipMessage: '',
@@ -24,13 +26,13 @@ export default {
             },
         };
     },
-    created: function() {
-        clipboard.on('success', () => {
+    methods: {
+        onCopy: function(e) {
             this.tooltipMessage = 'Copied!';
-        });
-        clipboard.on('error', () => {
+        },
+        onError: function(e) {
             this.tooltipMessage = 'Press Ctrl+C to copy';
-        });
+        },
     },
 };
 </script>
