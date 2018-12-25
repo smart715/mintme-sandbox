@@ -14,7 +14,7 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         return $this->getRepository()->find($id);
     }
     
-    public function findByReferralCode(string $referralCode): ?User
+    public function findByReferralCode(?string $referralCode): ?User
     {
         return $this->getRepository()->findByReferralCode($referralCode);
     }
@@ -36,6 +36,9 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         
         if (!is_null($referrer) && $userId !== $referrer->getId()) {
             $user->referenceBy($referrer);
+        }
+        if (null === $user) {
+            return null;
         }
         $user->setReferralCode($user->getReferralCode());
         $entityManager->persist($user);

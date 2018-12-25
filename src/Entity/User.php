@@ -98,11 +98,11 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @var string
+     * @var string|null
      */
     private $referralCode;
     
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -254,7 +254,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this->referralCode;
     }
 
-    public function setReferralCode(string $referralCode): self
+    public function setReferralCode(?string $referralCode): self
     {
         $this->referralCode = $referralCode;
 
