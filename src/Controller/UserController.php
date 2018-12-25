@@ -162,7 +162,7 @@ class UserController extends AbstractController
      * @Route("/referral", name="referral")
      */
     public function referral(UserManagerInterface $userManager): Response
-    {echo($this->getUser()->getReferralCode()); exit;
+    {
         if (null  === $this->getUser()) {
             return $this->redirect('/login');
         }
