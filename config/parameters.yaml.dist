@@ -25,6 +25,7 @@ parameters:
     token_quantity: 1000000
 
     # Datetime to finish prelaunch period. Format `Y-m-d H:i:s`
-    prelaunch_datetime: '2019-01-12 10:00:00'
+    prelaunch_start_datetime: '2019-01-12 10:00:00'
+    prelaunch_finish_datetime: '2019-01-12 10:00:00'
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5

@@ -10,7 +10,9 @@ use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
+use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Repository\UserRepository;
+use App\Utils\DateTime;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,21 +43,26 @@ class Trader implements TraderInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var ParameterBagInterface */
-    private $parameterBag;
+    /** @var PrelaunchConfig */
+    private $prelaunchConfig;
+
+    /** @var DateTime */
+    private $time;
 
     public function __construct(
         JsonRpcInterface $jsonRpc,
         LimitOrderConfig $config,
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
-        ParameterBagInterface $parameterBag
+        PrelaunchConfig $prelaunchConfig,
+        DateTime $time
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
-        $this->parameterBag = $parameterBag;
+        $this->prelaunchConfig = $prelaunchConfig;
+        $this->time = $time;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -71,7 +78,7 @@ class Trader implements TraderInterface
                 (string)$this->config->getMakerFeeRate(),
                 '',
                 !$this->isPrelaunchFinished() ? $order->getReferralId() : 0,
-                (string)($this->parameterBag->get('referral_fee')),
+                (string)($this->prelaunchConfig->getReferralFee()),
             ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);
@@ -178,10 +185,7 @@ class Trader implements TraderInterface
 
     private function isPrelaunchFinished(): bool
     {
-        return \DateTimeImmutable::createFromFormat(
-            'Y-m-d H:i:s',
-            $this->parameterBag->get('prelaunch_datetime')
-        )->getTimestamp() < (new \DateTimeImmutable())->getTimestamp();
+        return $this->prelaunchConfig->getFinishDate()->getTimestamp() < $this->time->now()->getTimestamp();
     }
 
     /**

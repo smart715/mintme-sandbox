@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
 use App\Form\TwoFactorType;
@@ -56,13 +57,13 @@ class UserController extends AbstractController
     /**
      * @Route("/referral-program", name="referral-program")
      */
-    public function referralProgram(): Response
+    public function referralProgram(PrelaunchConfig $prelaunchConfig): Response
     {
         return $this->render('pages/referral.html.twig', [
-            'hash' => $this->getUser()->getReferralCode(),
-            'referralPercentage' => $this->getParameter('referral_fee') * 100,
+            'referralCode' => $this->getUser()->getReferralCode(),
+            'referralPercentage' => $prelaunchConfig->getReferralFee() * 100,
             'referralsCount' => count($this->getUser()->getReferrals()),
-            'prelaunchDate' => $this->getParameter('prelaunch_datetime')
+            'prelaunchDate' => $prelaunchConfig->getStartDate()->format('d.m.Y')
         ]);
     }
 

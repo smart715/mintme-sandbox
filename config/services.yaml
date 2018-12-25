@@ -163,3 +163,9 @@ services:
     App\EventListener\RegistrationCompletedListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed }
+
+    App\Exchange\Trade\Config\PrelaunchConfig:
+        arguments:
+            - "%prelaunch_start_datetime%"
+            - "%prelaunch_finish_datetime%"
+            - "%referral_fee%"

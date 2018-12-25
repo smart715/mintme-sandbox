@@ -2,8 +2,6 @@
 
 {% block tittle %}Referral Program{% endblock %}
 
-{% set referralUrl = absolute_url(path('register-referral', { 'code': hash })) %}
-
 {% block content %}
     <div id="referral-program" class="container">
         <div class="row">
@@ -13,21 +11,22 @@
                         Referral Code
                     </div>
                     <div class="card-body">
-                        <p>When you refer someone, YOU WILL GET {{ referralPercentage }}% of his trading fees!</p>
-                        <p>How to get started? It's very easy!</p>
-                        <p>Below is unique link to registration. If a user registers via the link, you will get {{ referralPercentage }}% of his trading fees!</p>
-                        <p class="my-2">
+                        <p>
+                            When you refer someone, YOU WILL GET {{ referralPercentage }}% of his trading fees!<br />
+                            How to get started? It's very easy!<br />
+                            Below is unique link to registration. If a user registers via the link, you will get {{ referralPercentage }}% of his trading fees!
+                        </p>
+                        <p>
                             This {{ referralPercentage }}% goes from our pocket, so neither you nor the referred person lose anything!
                         </p>
-                        <p class="mb-1 text-center">Share this registration link to your friends:</p>
+                        <p class="mb-1 text-center text-grey font-bold">Share this registration link to your friends:</p>
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-auto">
-                                    <code>
-                                        <span>{{ referralUrl }}</span>
-                                        <copy-link content-to-copy="{{ referralUrl }}">
-                                            <font-awesome-icon :icon="['far', 'copy']">
-                                            </font-awesome-icon>
+                                    <code class="p-2">
+                                        <span id="code-referral"> {{ absolute_url(path('register-referral', { code: referralCode })) }} </span>
+                                        <copy-link class="code-copy" id="code-copy-btn" data-clipboard-action="copy" data-clipboard-target="#code-referral">
+                                            <font-awesome-icon class="c-pointer" :icon="['far', 'copy']"></font-awesome-icon>
                                         </copy-link>
                                     </code>
                                 </div>
