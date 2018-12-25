@@ -11,6 +11,13 @@ use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
+use App\Repository\UserRepository;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TraderTest extends TestCase
@@ -19,18 +26,25 @@ class TraderTest extends TestCase
     public function testPlaceOrder(bool $hasError, array $error, int $tradeResult): void
     {
         $method = 'order.put_limit';
-        $params = [1, 'TOK000000000001WEB', 1, '10', '5', 0.01, 0.01, ''];
+        $params = [1, 'TOK000000000001WEB', 1, '10', '5', '0.01', '0.01', '', 0, '0'];
 
         $jsonResponse = $this->createMock(JsonRpcResponse::class);
         $jsonResponse->method('hasError')->willReturn($hasError);
         $jsonResponse->method('getError')->willReturn($error);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createOrderConfig(),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
+
         $this->assertEquals(
             $tradeResult,
             $trader->placeOrder($this->createOrder())->getResult()
@@ -48,14 +62,21 @@ class TraderTest extends TestCase
 
     public function testPlaceOrderException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createMock(LimitOrderConfig::class),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
+
         $this->assertEquals(
             TradeResult::FAILED,
-            $trader->placeOrder($this->createMock(Order::class))->getResult()
+            $trader->placeOrder($this->createOrder())->getResult()
         );
     }
 
@@ -69,12 +90,19 @@ class TraderTest extends TestCase
         $jsonResponse->method('hasError')->willReturn($hasError);
         $jsonResponse->method('getError')->willReturn($error);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createOrderConfig(),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
+
         $this->assertEquals(
             $tradeResult,
             $trader->cancelOrder($this->createOrder())->getResult()
@@ -93,11 +121,18 @@ class TraderTest extends TestCase
 
     public function testCancelOrderException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createMock(LimitOrderConfig::class),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
+
         $this->assertEquals(
             TradeResult::FAILED,
             $trader->cancelOrder($this->createMock(Order::class))->getResult()
@@ -119,12 +154,19 @@ class TraderTest extends TestCase
         $jsonResponse->method('getError')->willReturn($error);
         $jsonResponse->method('getResult')->willReturn($result);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createOrderConfig(),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
+
         $this->assertEquals(
             $finishedOrders,
             $trader->getFinishedOrders(
@@ -145,11 +187,18 @@ class TraderTest extends TestCase
 
     public function testGetFinishedOrdersException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createMock(LimitOrderConfig::class),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
+
         $this->assertEquals(
             [],
             $trader->getFinishedOrders(
@@ -174,12 +223,19 @@ class TraderTest extends TestCase
         $jsonResponse->method('getError')->willReturn($error);
         $jsonResponse->method('getResult')->willReturn($result);
 
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new Trader($jsonRpc, $this->createOrderConfig());
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createOrderConfig(),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
+
         $this->assertEquals(
             $pendingOrders,
             $trader->getPendingOrders(
@@ -200,11 +256,17 @@ class TraderTest extends TestCase
 
     public function testGetPendingOrdersException(): void
     {
+        /** @var MockObject|JsonRpcInterface $jsonRpc */
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new Trader($jsonRpc, $this->createMock(LimitOrderConfig::class));
+        $trader = new Trader(
+            $jsonRpc,
+            $this->createMock(LimitOrderConfig::class),
+            $this->mockEntityManager(),
+            $this->createMoneyWrapper()
+        );
         $this->assertEquals(
             [],
             $trader->getPendingOrders(
@@ -214,6 +276,35 @@ class TraderTest extends TestCase
         );
     }
 
+    /** @return MockObject|MoneyWrapperInterface */
+    private function createMoneyWrapper(): MoneyWrapperInterface
+    {
+        $wrapper = $this->createMock(MoneyWrapperInterface::class);
+
+        $wrapper->method('format')->willReturnCallback(function (Money $money) {
+            return $money->getAmount();
+        });
+
+        return $wrapper;
+    }
+
+    /** @return MockObject|EntityManagerInterface */
+    private function mockEntityManager(): EntityManagerInterface
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $em->method('getRepository')->with(User::class)->willReturn($this->mockUserRepo());
+
+        return $em;
+    }
+
+    /** @return MockObject|UserRepository */
+    private function mockUserRepo(): UserRepository
+    {
+        return $this->createMock(UserRepository::class);
+    }
+
+    /** @return MockObject|LimitOrderConfig */
     private function createOrderConfig(): LimitOrderConfig
     {
         $orderConfig = $this->createMock(LimitOrderConfig::class);
@@ -222,6 +313,7 @@ class TraderTest extends TestCase
         return $orderConfig;
     }
 
+    /** @return MockObject|Order */
     private function createOrder(): Order
     {
         $market = $this->createMarket();
@@ -231,12 +323,13 @@ class TraderTest extends TestCase
         $order->method('getMakerId')->willReturn(1);
         $order->method('getMarket')->willReturn($market);
         $order->method('getSide')->willReturn(1);
-        $order->method('getAmount')->willReturn('10');
-        $order->method('getPrice')->willReturn('5');
+        $order->method('getAmount')->willReturn($this->createMoney(10));
+        $order->method('getPrice')->willReturn($this->createMoney(5));
     
         return $order;
     }
 
+    /** @return MockObject|User */
     private function createUser(): User
     {
         $user = $this->createMock(User::class);
@@ -244,11 +337,25 @@ class TraderTest extends TestCase
         return $user;
     }
 
+    /** @return MockObject|Market */
     private function createMarket(): Market
     {
         $market = $this->createMock(Market::class);
+
         $market->method('getHiddenName')->willReturn('TOK000000000001WEB');
+        $market->method('getCurrencySymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+
         return $market;
+    }
+
+    /**
+     * Can't mock final class
+     *
+     * @return Money
+     */
+    private function createMoney(int $amount): Money
+    {
+        return new Money($amount, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     private function getRawOrders(): array
@@ -261,7 +368,7 @@ class TraderTest extends TestCase
                 [
                     'id' => 2,
                     'ctime' => 1492616173.355293,
-                    'mtime' => 1492697636.238869,
+                    'mtime' => 1492697636.0,
                     'market' => 'TOK000000000001WEB',
                     'user' => 1,
                     'type' => 1,
@@ -287,9 +394,9 @@ class TraderTest extends TestCase
                 1,
                 null,
                 $this->createMarket(),
-                '10',
+                $this->createMoney(10),
                 1,
-                '5',
+                $this->createMoney(5),
                 $status,
                 1492697636
             ),

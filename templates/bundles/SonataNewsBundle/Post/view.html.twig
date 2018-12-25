@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+{% spaceless %}
+    {{ post.title }} | Mintme
+{% endspaceless %}
+{% endblock %}
+{% block metaDescription %}{{ post.abstract }}{% endblock %}
+
+{% block contentClass %}blog{% endblock %}
+
+{% block content %}
+    <div class="py-4">
+        {{ include("@SonataNews/Post/view_content.html.twig") }}
+    </div>
+{% endblock %}

@@ -6,7 +6,7 @@
     {% if error %}
         <div class="p-2 mb-4 bg-danger text-white">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
-    <form action="{{ path("fos_user_security_check") }}" method="post">
+    <form action="{{ path("login") }}" method="post">
         <div class="form-group row">
             <div class="col-md-12">
                 <label for="inputEmail" class="d-block">Email:</label>
@@ -19,6 +19,10 @@
                 <input type="password" name="_password" required="required" id="inputPassword" class="form-control">
             </div>
         </div>
+        {% if form_errors(form)|length > 0 %}
+            <div class="bg-danger text-white">{{ form_errors(form) }}</div>
+        {% endif %}
+        {{ form_widget(form) }}
         <div class="form-group row my-1">
             <div class="col-md-12">
                 <label class="custom-control custom-checkbox">

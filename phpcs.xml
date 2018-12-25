@@ -34,12 +34,22 @@
             <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit" />
             <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment" />
             <exclude name="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
+            <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses" />
+            <exclude name="SlevomatCodingStandard.ControlStructures.ControlStructureSpacing" />
+            <exclude name="SlevomatCodingStandard.Functions.UnusedParameter" />
+            <exclude name="SlevomatCodingStandard.Operators.RequireOnlyStandaloneIncrementAndDecrementOperators" />
+            <exclude name="SlevomatCodingStandard.Functions.UnusedParameter" />
+            <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses" />
+            <exclude name="SlevomatCodingStandard.Functions.StaticClosure" />
     </rule>
+
     <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration">
         <properties>
             <property name="allAnnotationsAreUseful" value="true" />
         </properties>
     </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses" />
+
     <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses">
         <properties>
             <property name="caseSensitive" value="false"/>
@@ -60,6 +70,7 @@
 				@View,
 				@Rest\RequestParam,
 				@Rest\QueryParam,
+				@ORM\PrePersist
 			"/>
         </properties>
         <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableParameterTypeHintSpecification"/>

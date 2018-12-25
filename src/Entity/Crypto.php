@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Money\Currency;
+use Money\Money;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -32,6 +34,18 @@ class Crypto
      */
     protected $symbol;
 
+    /**
+     * @ORM\Column(type="integer")
+     * @var int
+     */
+    protected $subunit;
+
+    /**
+     * @ORM\Column(type="bigint")
+     * @var string
+     */
+    protected $fee;
+
     public function getName(): string
     {
         return $this->name;
@@ -40,5 +54,15 @@ class Crypto
     public function getSymbol(): string
     {
         return $this->symbol;
+    }
+
+    public function getSubunit(): int
+    {
+        return $this->subunit;
+    }
+
+    public function getFee(): Money
+    {
+        return new Money($this->fee, new Currency($this->getSymbol()));
     }
 }

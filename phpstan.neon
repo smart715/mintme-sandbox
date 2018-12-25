@@ -14,7 +14,7 @@ parameters:
     tmpDir: "%rootDir%/../../../phpstan"
 
     symfony:
-        container_xml_path: %rootDir%/../../../var/cache/dev/srcDevDebugProjectContainer.xml
+        container_xml_path: %rootDir%/../../../var/cache/dev/srcApp_KernelDevDebugContainer.xml
 
     excludes_analyse:
         - "%rootDir%/../../../src/Migrations/*"
@@ -25,4 +25,5 @@ parameters:
 
     ignoreErrors:
         - '#Cannot call method (.*) on (.*)\|null\.#'
-        - '#Property (.+)Repository \((.+)Repository\) does not accept Doctrine\\ORM\\EntityRepository(.+).#'
+        - '#Property (.+) \((.+)Repository\) does not accept Doctrine\\ORM\\EntityRepository(.+).#'
+        - '#Method (.*)Repository\(\) should return (.*)Repository but returns (.*).#'

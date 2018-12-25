@@ -18,14 +18,35 @@ security:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
                 default_target_path: /
+            two_factor:
+                auth_form_path: 2fa_login
+                check_path: 2fa_login_check
+                default_target_path: /trading
+                always_use_default_target_path: false
 
     role_hierarchy:
+        ROLE_ADMIN_NEWS_ADMIN:
+            - ROLE_SONATA_NEWS_ADMIN_POST_ALL
+            - ROLE_SONATA_NEWS_ADMIN_COMMENT_ALL
+            - ROLE_SONATA_MEDIA_ADMIN_MEDIA_ALL
+            - ROLE_SONATA_CLASSIFICATION_ADMIN_TAG_ALL
+            - ROLE_SONATA_CLASSIFICATION_ADMIN_COLLECTION_ALL
+            - ROLE_SONATA_CLASSIFICATION_ADMIN_CONTEXT_ALL
         ROLE_ADMIN:       ROLE_USER
-        ROLE_SUPER_ADMIN: ROLE_ADMIN
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/profile, role: ROLE_USER }
+        - { path: ^/token/[a-zA-Z0-9]+, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/token$, role: ROLE_USER }
+        - { path: ^/profile$, role: ROLE_USER }
+        - { path: ^/settings, role: ROLE_USER }
+        - { path: ^/wallet, role: ROLE_USER }
+        - { path: ^/api/wallet, role: ROLE_USER }
+        - { path: ^/api/token/[a-zA-Z0-9]+/balance, role: ROLE_USER }
+        - { path: ^/2fa, role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+, role: ROLE_USER }
         - { path: ^/referral, role: ROLE_USER }

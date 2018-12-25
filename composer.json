@@ -5,15 +5,35 @@
     "license": "proprietary",
     "require": {
         "php": "^7.2.2",
+        "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-json": "*",
+        "cron/cron-bundle": "^2.0",
+        "doctrine/doctrine-fixtures-bundle": "^3.0",
         "excelwebzone/recaptcha-bundle": "^1.5",
+        "friendsofsymfony/jsrouting-bundle": "^2.2",
+        "friendsofsymfony/rest-bundle": "^2.3",
+        "friendsofsymfony/ckeditor-bundle": "^1.1",
         "friendsofsymfony/user-bundle": "^2.1",
+        "fzaninotto/faker": "^1.8",
         "graze/guzzle-jsonrpc": "^3.2",
         "incenteev/composer-parameter-handler": "^2.1",
+        "moneyphp/money": "^3.1",
+        "php-amqplib/rabbitmq-bundle": "^1.14",
+        "pragmarx/random": "^0.2.2",
         "ramsey/uuid": "^3.8",
+        "scheb/two-factor-bundle": "^3.12",
         "sensio/framework-extra-bundle": "^5.2",
         "sensiolabs/security-checker": "^4.1",
+        "sonata-project/admin-bundle": "^3.31",
+        "sonata-project/block-bundle": "^3.12",
+        "sonata-project/classification-bundle": "^3.6",
+        "sonata-project/doctrine-orm-admin-bundle": "^3.4",
+        "sonata-project/media-bundle": "^3.10",
+        "sonata-project/news-bundle": "^3.5",
+        "sonata-project/formatter-bundle": "^3.4",
+        "sonata-project/intl-bundle": "^2.4",
         "symfony/asset": "^4.1",
         "symfony/console": "^4.1",
         "symfony/flex": "^1.0",
@@ -22,10 +42,13 @@
         "symfony/monolog-bundle": "^3.3",
         "symfony/orm-pack": "^1.0",
         "symfony/security-bundle": "^4.1",
+        "symfony/serializer": "^4.1",
         "symfony/swiftmailer-bundle": "^3.2",
         "symfony/templating": "^4.1",
+        "symfony/translation": "^4.1",
         "symfony/twig-bundle": "^4.1",
-        "symfony/yaml": "^4.1"
+        "symfony/yaml": "^4.1",
+        "vasek-purchart/doctrine-date-time-immutable-types": "^1.0"
     },
     "require-dev": {
         "overtrue/phplint": "^1.1",
@@ -64,7 +87,8 @@
         "symfony/polyfill-iconv": "*",
         "symfony/polyfill-php71": "*",
         "symfony/polyfill-php70": "*",
-        "symfony/polyfill-php56": "*"
+        "symfony/polyfill-php56": "*",
+        "egeloen/ckeditor-bundle": "*"
     },
     "scripts": {
         "symfony-scripts": [
@@ -72,6 +96,7 @@
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
+            "ckeditor:install --clear=drop": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "security-checker security:check": "script"
         },

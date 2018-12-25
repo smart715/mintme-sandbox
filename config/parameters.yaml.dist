@@ -1,10 +1,36 @@
 # Business configuration variables will go here
 parameters:
-    locale: en
-    viabtc_rpc: 'abc104.abchosting.org:8080'
+    # Don't change this value.
+    # It's a routing key to this project on withdraw gateway
+    service: 'mintme'
+
+    locale: 'en'
+
+    viabtc_rpc: 'http://localhost:8080'
     viabtc_response_timeout_seconds: 10
+
+    withdraw_rpc: 'http://localhost:8081'
+    withdraw_response_timeout_seconds: 10
+
     taker_fee_rate: 0.1
     maker_fee_rate: 0.01
+
+    verify_timeout_seconds: 10
+
+    youtube_client_id: 616023022148-v4dh8b26ugmn351udmgmt4ntab62437c.apps.googleusercontent.com
+    facebook_app_id: 308376513111821
+
+    version: 'V1.0.0'
+
+    websocket_url: 'ws://mintme.abchosting.org:8364'
+
+    # Permanent quantity of each token asset
+    token_quantity: 1000000
+
+    deposit_rpc: 'http://localhost:3000'
+    deposit_response_timeout_seconds: 10
+
+    prelaunch: true
     mintme_launch_date: 'October 15, 2019 00:00:00'
     users_count_refresh_rate_seconds: 60
     referral_percentage: 50

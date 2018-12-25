@@ -2,13 +2,21 @@
     <div class="pb-3">
         <div class="table-responsive">
             <b-table
+                v-if="hasHistory"
                 :items="history"
                 :fields="fields"
                 :current-page="currentPage"
                 :per-page="perPage">
+                 <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
+                 <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
             </b-table>
+            <div v-if="!hasHistory">
+                <h4 class="text-center p-5">No deal was made yet</h4>
+            </div>
         </div>
-        <div class="row justify-content-center">
+        <div
+            class="row justify-content-center"
+            v-if="hasHistory">
             <b-pagination
                 :total-rows="totalRows"
                 :per-page="perPage"
@@ -19,63 +27,72 @@
 </template>
 
 <script>
+import {Decimal} from 'decimal.js';
+import {toMoney} from '../../js/utils';
+import {WSAPI} from '../../js/utils/constants';
+
 export default {
     name: 'TradingHistory',
+    props: {
+        executedHistory: {type: Object, required: true},
+    },
     data() {
         return {
-            history: [],
             currentPage: 1,
             perPage: 10,
             fields: {
-                date: {
-                    label: 'Date',
-                    sortable: true,
-                },
-                type: {
-                    label: 'Type',
-                    sortable: true,
-                },
-                name: {
+                timestamp: {label: 'Date', sortable: true},
+                side: {label: 'Type', sortable: true},
+                market: {
                     label: 'Name',
                     sortable: true,
+                    formatter: (market) => market.tokenName + '/' + market.currencySymbol,
                 },
                 amount: {
                     label: 'Amount',
                     sortable: true,
+                    formatter: (value) => toMoney(value),
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
+                    formatter: (value) => toMoney(value),
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
+                    formatter: (value, key, item) => {
+                        let tWF = new Decimal(item.amount).times(item.price);
+                        let f = new Decimal(item.fee);
+                        return toMoney(tWF.add(f).toString());
+                    },
                 },
-                free: {
-                    label: 'Free',
+                fee: {
+                    label: 'Fee',
                     sortable: true,
+                    formatter: (value) => toMoney(value),
                 },
             },
         };
     },
     computed: {
+        history: function() {
+            return Object.values(this.executedHistory);
+        },
         totalRows: function() {
             return this.history.length;
         },
+        hasHistory: function() {
+            return (this.totalRows > 0);
+        },
     },
-    created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
-            this.history.push({
-                date: '12-12-1970',
-                type: (i % 2 === 0) ? 'Buy' : 'Sell',
-                name: 'Webchain (WEB)',
-                amount: Math.floor(Math.random() * 99) + 10,
-                price: Math.floor(Math.random() * 99) + 10,
-                total: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                free: Math.floor(Math.random() * 99) + 10,
-            });
-        }
+    methods: {
+        getDate: function(timestamp) {
+           return new Date(timestamp * 1000).toDateString();
+        },
+        getType: function(type) {
+           return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';
+        },
     },
 };
 </script>

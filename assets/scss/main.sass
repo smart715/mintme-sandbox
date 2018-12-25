@@ -10,6 +10,7 @@
 @import 'home-page'
 @import 'token-page'
 @import 'profile-view-page'
+@import 'errorpages'
 
 html
   @include font-scale(sm)
@@ -19,12 +20,14 @@ html
 *, *:before, *:after
   box-sizing: inherit
 
-
 body
   color: $body-text-color
   font-family: $lato-font
   height: 100%
   width: 100%
+
+a
+  color: $primary
 
 .content-wrapper
   height: 100%
@@ -34,9 +37,6 @@ body
   .content
     display: table-row
     height: 100%
-
-a
-  color: $primary
 
 .text-yellow
   color: $theme-yellow
@@ -95,7 +95,7 @@ label
   color: $white
 
 .gradient-bg
-  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-300, $gradiant-blue-100, white) 
+  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100) fixed
 
 .contents-wrapper
   @include media-breakpoint-down(sm)
@@ -178,13 +178,6 @@ label
       padding: 1.25rem 0
       background: none
 
-.sorting
-  background: url('../img/sort_both.png') no-repeat right center
-.sorting_asc
-  background: url('../img/sort_asc.png') no-repeat right center
-.sorting_desc
-  background: url('../img/sort_desc.png') no-repeat right center
-
 .modal-content
   border-top-width: 20px
   border-top-style: solid
@@ -193,52 +186,66 @@ label
     display: block
     border-bottom: none
     .cancel-button
-      top: -3.5em
-      right: -2.5em
+      top: -60.5px
+      right: -28px
       position: relative
       float: right
       border-top-width: 5px
       border-top-style: solid
       border-top-color: $theme-green
-      background: $white
+      background: $theme-green
       opacity: 1
-      height: 80px
-      width: 80px
+      height: 70px
+      width: 70px
       border-radius: 50%
       .inner
         background: $white
         color: $theme-green
         vertical-align: middle
         text-align: center
-        height: 73px
-        width: 73px
+        height: 65px
+        width: 65px
         border-radius: 50%
-        top: -0.02em
-        right: -0.02em
+        top: -4px
+        right: -5px
         position: relative
-        font-size: 50px
+        font-size: 45px
         a:hover
           cursor: pointer
           color: $black
   .modal-body
     margin-top: -50px
 
-code
-  background-color: $theme-light-grey
+.input-custom-padding
+  padding-right: 75px
+
+.btn-input
+  position: relative
+  right: 5px
+  top: -38px
+  height: 34px
+  padding-top: 5px
+  padding-bottom: 5px
+
+.wallet-code
   color: $theme-dark-grey
+  @include font-scale(sm)
 
-.code-copy
-  font-size: 1.4em
-  color: $theme-light-grey
-  cursor: pointer
-  :hover
-    color: $theme-grey
+.modal.modal-alert
+  .modal-content
+    border-top: 1rem solid $modal-alert-border-color
 
-.bg-grey
-  background-color: $theme-grey
+.modal.show
+  display: block
+  background-color: rgba(0, 0, 0, .5)
 
-.text-grey
-  color: $theme-dark-grey
+.modal-dialog
+  @extend .modal-dialog-centered
+
+.alert.alert-danger
+  border-color: $red
+  background-color: $red
+  color: $white
 
 .notification
   .bell
@@ -250,16 +257,10 @@ code
     background: url('../img/cloud.png') no-repeat 
     background-size: 100% 100%
     padding: 5rem
-    
-    span
-      @include font-scale(sm)
     .title
       @include font-scale(lg)
-      font-weight: bold
-    a
+    .link
       @include font-scale(xs)
-    @include media-breakpoint-down(xs)
-      background: none
 
 .v-cloak--block
   display: none
@@ -276,6 +277,3 @@ code
 
   & > *:not(.v-cloak--inline)
     display: none
-
-.alert-none
-  display: none

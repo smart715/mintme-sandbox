@@ -30,17 +30,17 @@ class RegistrationInitializedListener
 
     public function onFosuserRegistrationInitialize(GetResponseUserEvent $event): void
     {
-        $this->redirectToReferralIfAuthenticated($event);
+        $this->redirectToProfileIfAuthenticated($event);
     }
     
-    private function redirectToReferralIfAuthenticated(GetResponseUserEvent $event): void
+    private function redirectToProfileIfAuthenticated(GetResponseUserEvent $event): void
     {
         if (!$this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             return;
         }
 
         $event->setResponse(new RedirectResponse(
-            $this->router->generate('referral')
+            $this->router->generate('profile')
         ));
     }
 }

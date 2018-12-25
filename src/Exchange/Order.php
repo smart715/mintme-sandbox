@@ -2,27 +2,28 @@
 
 namespace App\Exchange;
 
-use App\Entity\User;
+use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class Order
 {
     public const ALL_SIDE = 0;
     public const SELL_SIDE = 1;
     public const BUY_SIDE = 2;
-
+    
     public const SIDE_MAP = [
         'all' => self::ALL_SIDE,
         'sell' => self::SELL_SIDE,
         'buy' => self::BUY_SIDE,
     ];
-
+    
     public const FINISHED_STATUS = 'finished';
     public const PENDING_STATUS = 'pending';
 
     /** @var int|null */
     private $id;
 
-    /** @var int|null */
+    /** @var int */
     private $makerId;
 
     /** @var int|null */
@@ -31,10 +32,10 @@ class Order
     /** @var Market */
     private $market;
 
-    /** @var string */
+    /** @var Money */
     private $amount;
 
-    /** @var string */
+    /** @var Money */
     private $price;
 
     /** @var int */
@@ -43,18 +44,22 @@ class Order
     /** @var string */
     private $status;
 
+    /** @var float|null */
+    private $fee;
+
     /** @var int|null */
     private $timestamp;
 
     public function __construct(
         ?int $id,
-        ?int $makerId,
+        int $makerId,
         ?int $takerId,
         Market $market,
-        string $amount,
+        Money $amount,
         int $side,
-        string $price,
+        Money $price,
         string $status,
+        ?float $fee = null,
         ?int $timestamp = null
     ) {
         $this->id = $id;
@@ -65,51 +70,67 @@ class Order
         $this->side = $side;
         $this->price = $price;
         $this->status = $status;
+        $this->fee = $fee;
         $this->timestamp = $timestamp;
     }
 
+    /** @Groups({"Default"}) */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getMakerId(): ?int
+    /** @Groups({"Default"}) */
+    public function getMakerId(): int
     {
         return $this->makerId;
     }
 
+    /** @Groups({"Default"}) */
     public function getTakerId(): ?int
     {
         return $this->takerId;
     }
 
+    /** @Groups({"Default"}) */
     public function getMarket(): Market
     {
         return $this->market;
     }
 
-    public function getAmount(): string
+    /** @Groups({"Default"}) */
+    public function getAmount(): Money
     {
         return $this->amount;
     }
 
-    public function getPrice(): string
+    /** @Groups({"Default"}) */
+    public function getPrice(): Money
     {
         return $this->price;
     }
 
+    /** @Groups({"Default"}) */
     public function getSide(): int
     {
         return $this->side;
     }
 
+    /** @Groups({"Default"}) */
     public function getStatus(): string
     {
         return $this->status;
     }
 
+    /** @Groups({"Default"}) */
     public function getTimestamp(): ?int
     {
         return $this->timestamp;
+    }
+
+    /** @Groups({"Default"}) */
+    public function getFee(): ?float
+    {
+        return $this->fee;
     }
 }

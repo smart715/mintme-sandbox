@@ -8,6 +8,11 @@ use App\Communications\JsonRpcResponse;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Currency;
+use Money\Money;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MarketFetcherTest extends TestCase
@@ -24,13 +29,13 @@ class MarketFetcherTest extends TestCase
 
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
-            $sellOrders,
-            $marketFetcher->getPendingSellOrders($this->createMarket())
+            $rpcResult,
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
         );
     }
 
@@ -51,7 +56,7 @@ class MarketFetcherTest extends TestCase
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
             [],
-            $marketFetcher->getPendingSellOrders($this->createMarket())
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
         );
     }
 
@@ -67,13 +72,13 @@ class MarketFetcherTest extends TestCase
 
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
-            $buyOrders,
-            $marketFetcher->getPendingBuyOrders($this->createMarket())
+            $rpcResult,
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
         );
     }
 
@@ -94,7 +99,7 @@ class MarketFetcherTest extends TestCase
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
             [],
-            $marketFetcher->getPendingBuyOrders($this->createMarket())
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
         );
     }
 
@@ -110,13 +115,13 @@ class MarketFetcherTest extends TestCase
 
         $jsonRpc = $this->createMock(JsonRpcInterface::class);
         $jsonRpc->method('send')
-            ->with($this->equalTo($method), $this->equalTo([$params]))
+            ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
-            $orders,
-            $marketFetcher->getExecutedOrders($this->createMarket())
+            $rpcResult,
+            $marketFetcher->getExecutedOrders('TOK000000000001WEB')
         );
     }
 
@@ -137,15 +142,24 @@ class MarketFetcherTest extends TestCase
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
             [],
-            $marketFetcher->getExecutedOrders($this->createMarket())
+            $marketFetcher->getExecutedOrders('TOK000000000001WEB')
         );
     }
 
+    /** @return MockObject|Market */
     private function createMarket(): Market
     {
         $market = $this->createMock(Market::class);
+
         $market->method('getHiddenName')->willReturn('TOK000000000001WEB');
+        $market->method('getCurrencySymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+
         return $market;
+    }
+
+    private function createMoney(int $value): Money
+    {
+        return new Money($value, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     private function getPendingResult(int $side): array
@@ -156,7 +170,7 @@ class MarketFetcherTest extends TestCase
                 'type' => 1,
                 'side' => $side,
                 'ctime' => 1492616173.355293,
-                'mtime' => 1492697636.238869,
+                'mtime' => 1492697636.0,
                 'user' => 1,
                 'market' => 'TOK000000000001WEB',
                 'price' => '1',
@@ -175,17 +189,18 @@ class MarketFetcherTest extends TestCase
     private function getPendingOrders(int $side): array
     {
         return [
-            new Order(
+            [
+                [],
                 1,
                 1,
                 null,
                 $this->createMarket(),
-                '10',
+                $this->createMoney(10),
                 $side,
-                '1',
+                $this->createMoney(1),
                 Order::PENDING_STATUS,
-                1492697636
-            ),
+                1492697636,
+            ],
         ];
     }
 
@@ -194,7 +209,7 @@ class MarketFetcherTest extends TestCase
         return [
             [
                 'id' => 1,
-                'time' => 1492697636.238869,
+                'time' => 1492697636.0,
                 'type' => 'sell',
                 'amount' => '10',
                 'price' => '1',
@@ -212,9 +227,9 @@ class MarketFetcherTest extends TestCase
                 1,
                 2,
                 $this->createMarket(),
-                '10',
+                $this->createMoney(10),
                 1,
-                '1',
+                $this->createMoney(1),
                 Order::FINISHED_STATUS,
                 1492697636
             ),

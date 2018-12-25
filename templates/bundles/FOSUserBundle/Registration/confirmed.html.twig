@@ -1,9 +1,7 @@
 {% extends "@FOSUser/layout.html.twig" %}
 
 {% trans_default_domain 'FOSUserBundle' %}
-
-{% block messagesClass %} alert-none {% endblock %}
-{% block contentClass %}signup-confirmed py-4{% endblock %}
+{% block messageClass %}d-none{% endblock %}
 
 {% block fos_user_content %}
     <div class="container">
@@ -12,13 +10,18 @@
                 <div class="bell"></div>
                 <div class="cloud  mx-auto text-center">
                     <div>
-                        <span class="font-weight title">Congrats {{ user.username }}</span><br/>
-                        <span>your account is now activated</span><br/>
+                        <p class="font-bold title">Congrats {{ user.username }}</p>
+                        <p>your account is now activated</p>
                         <p class="mt-1">
                             {% if targetUrl is empty %}
-                                <a href="{{ path('referral') }}">Go to Referral Program</a>
+                                {% if prelaunch %}
+                                    <a href="{{ path('referral') }}" class="link">Go to Referral</a>
+                                {% endif %}
+                                {% if not prelaunch %}
+                                    <a href="{{ path('trading') }}" class="link">Go to Trading</a>
+                                {% endif %}
                             {% else %}
-                                <a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a>
+                                <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>
                             {% endif %}
                         </p>
                     </div>

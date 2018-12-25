@@ -1,17 +1,24 @@
-import TokenTrade from '../components/token/TokenTrade';
-import TokenIntroduction from '../components/token/TokenIntroduction';
-import TokenDataForm from '../components/token/TokenDataForm';
 import Tabs from 'bootstrap-vue/es/components';
+import TokenTrade from '../components/token/trade/TokenTrade';
+import TokenIntroductionProfile from '../components/token/introduction/TokenIntroductionProfile';
+import TokenIntroductionStatistics from '../components/token/introduction/TokenIntroductionStatistics';
+import TokenIntroductionDescription from '../components/token/introduction/TokenIntroductionDescription';
+import TokenName from '../components/token/TokenName';
 
 new Vue({
   el: '#token',
   data() {
-    return {};
+    return {
+      tabIndex: 0,
+      editingName: false,
+    };
   },
   components: {
     TokenTrade,
-    TokenIntroduction,
-    TokenDataForm,
+    TokenIntroductionProfile,
+    TokenIntroductionStatistics,
+    TokenIntroductionDescription,
+    TokenName,
     Tabs,
   },
 });

@@ -18,6 +18,8 @@
       text-transform: uppercase
       background: linear-gradient(180deg, $gradiant-blue-200, $gradiant-blue-400)
   .features
+    h1
+      @include font-scale(md)
     .card
       max-width: 29rem
       &.feature-1, &.feature-3
@@ -31,30 +33,58 @@
           margin-right: 1rem
         @include media-breakpoint-down(xs)
           margin: 1.5rem 0 0
-      
+      &.feature-1
+        @include media-breakpoint-down(lg)
+          margin-top: 2rem
       &.feature-2, &.feature-4
+        margin-top: 4rem
         margin-left: 7rem
+        @include media-breakpoint-down(lg)
+          margin-left: 4rem
+        @include media-breakpoint-down(md)
+          margin-left: 1rem
+          margin-top: 3rem
+        @include media-breakpoint-down(sm)
+          margin-left: .5rem
+        @include media-breakpoint-down(xs)
+          margin: 1.5rem 0 0
     .contents
-      height: 5rem
+      height: 7rem
       overflow-y: auto
     &.top
-      padding-top: 5px
+      padding-top: 9rem
       @include media-breakpoint-down(md)
-        padding-top: 6px
+        padding-top: 6rem
       @include media-breakpoint-down(sm)
-        padding-top: 5px
+        padding-top: 4rem
     &.bottom
-      padding-top: 12px
+      padding-top: 5rem
       padding-bottom: 10rem
       @include media-breakpoint-down(md)
-        padding-top: 12px
+        padding-top: 3rem
         padding-bottom: 7rem
       @include media-breakpoint-down(sm)
-        padding-top: 12px
+        padding-top: 2rem
         padding-bottom: 3rem
       @include media-breakpoint-down(xs)
         padding-top: 0
         padding-bottom: 1rem
+  .flower-bg
+    background: url(../img/coin-flower.png) no-repeat
+    background-size: 48rem
+    background-position: top 2.5rem center
+    @include media-breakpoint-down(lg)
+      background-size: 42rem
+      background-position: top 6rem center
+    @include media-breakpoint-down(md)
+      background-size: 38rem
+      background-position: top 13rem center
+    @include media-breakpoint-down(sm)
+      background-size: 30rem
+      background-position: top 18rem center
+    @include media-breakpoint-down(xs)
+      background-size: 40rem
+      background-position: top 21rem center
 
 .count-down
   align-items: center
@@ -89,5 +119,3 @@
       font-size: 1.8rem
     .text
       font-size: 0.8rem
-  
-

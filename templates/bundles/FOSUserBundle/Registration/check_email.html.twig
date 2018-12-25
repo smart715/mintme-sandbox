@@ -1,7 +1,8 @@
 {% extends "@FOSUser/layout.html.twig" %}
 
 {% trans_default_domain 'FOSUserBundle' %}
-{% block messagesClass %} alert-none {% endblock %}
+{% block messageClass %}d-none{% endblock %}
+
 {% block fos_user_content %}
     <div class="container ">
         <div class="row align-items-center d-flex justify-content-center">
@@ -9,14 +10,14 @@
                 <div class="bell"></div>
                 <div class="cloud  mx-auto text-center">
                     <div>
-                        <span>An email has been sent to</span><br/>
-                        <span class="font-weight title">{{ user.username }}</span><br/>
-                        <span>it contains an activation link </span>
-                        <span>you must click to activate your account</span><br/>
-                        <span>Do not forget to check your spam folder</span>
+                        <p>An email has been sent to</p>
+                        <p class="font-bold title">{{ user.username }}</p>
+                        <p>it contains an activation link you must click to activate your account</p>
+                        <p>Do not forget to check your spam folder</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 {% endblock fos_user_content %}

@@ -10,17 +10,32 @@
             <div class="col">
                 <template>
                     <b-tabs class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
-                        <b-tab title="Wallet" active>
-                            <wallet></wallet>
+                        <b-tab title="Wallet" active v-cloak>
+                            {{ include("loader.html.twig") }}
+                            <wallet
+                                hash="{{ hash }}"
+                                websocket-url="{{ global_websocket_url }}"
+                                :deposit-addresses="{{depositAddresses | json_encode}}"
+                                :tokens="{{ tokens | json_encode }}"
+                                :predefined-tokens="{{ predefinedTokens | json_encode }}"
+                                create-token-url="{{ path('token_create') }}"
+                                trading-url="{{ path('trading') }}"
+                                withdraw-url="{{ path('withdraw') }}">
+                            </wallet>
                         </b-tab>
                         <b-tab title="Trading History" >
-                            <trading-history></trading-history>
+                            <trading-history  :executed-history="{{ executedHistory | json_encode }}"></trading-history>
                         </b-tab>
                         <b-tab title="Deposit/Withdraw History" >
                             <deposit-withdraw-history></deposit-withdraw-history>
                         </b-tab>
                         <b-tab title="Active Orders" >
-                            <active-orders></active-orders>
+                            <active-orders
+                                hash="{{ hash }}"
+                                websocket-url="{{ global_websocket_url }}"
+                                :markets="{{ markets | json_encode }}"
+                                :orders="{{ orders | json_encode }}"
+                            ></active-orders>
                         </b-tab>
                     </b-tabs>
                 </template>

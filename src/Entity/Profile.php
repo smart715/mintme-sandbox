@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Uuid;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Profile
 {
@@ -28,6 +28,7 @@ class Profile
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @ProfilePeriodLock()
+     * @Groups({"default"})
      * @var string|null
      */
     protected $firstName;
@@ -36,7 +37,9 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Length(min="2")
      * @ProfilePeriodLock()
+     * @Groups({"default"})
      * @var string|null
      */
     protected $lastName;
@@ -44,6 +47,8 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Length(min="2")
+     * @Groups({"default"})
      * @var string|null
      */
     protected $city;
@@ -51,19 +56,22 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
+     * @Assert\Length(min="2")
+     * @Groups({"default"})
      * @var string|null
      */
     protected $country;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Groups({"default"})
      * @var string|null
      */
     protected $description;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * @var DateTime|null
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable|null
      */
     protected $nameChangedDate;
 
@@ -72,9 +80,9 @@ class Profile
      * @var User
      */
     protected $user;
-    
+
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token", mappedBy="profile", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
      * @var Token|null
      */
     protected $token;
@@ -82,11 +90,22 @@ class Profile
     /** @var bool */
     private $isChangesLocked = false;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    private $page_url;
+
     public function __construct(User $user)
     {
         $this->user = $user;
     }
-    
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
     public function isChangesLocked(): bool
     {
         return $this->isChangesLocked;
@@ -99,28 +118,24 @@ class Profile
         return $this;
     }
 
-    public function setNameChangedDate(?DateTime $nameChangedDate): void
+    /** @ORM\PrePersist() */
+    public function updateNameChangedDate(): self
     {
-        $this->nameChangedDate = $nameChangedDate;
-    }
-
-    public function getNameChangedDate(): ?DateTime
-    {
-        return $this->nameChangedDate;
-    }
-
-    public function setToken(?Token $token): self
-    {
-        $this->token = $token;
+        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
 
         return $this;
     }
 
-    public function getId(): ?int
+    public function getNameChangedDate(): ?\DateTimeImmutable
+    {
+        return $this->nameChangedDate;
+    }
+
+    public function getId(): int
     {
         return $this->id;
     }
-    
+
     public function getFirstName(): ?string
     {
         return $this->firstName;
@@ -167,17 +182,39 @@ class Profile
         return $this;
     }
 
-    public function setFirstName(?string $firstName): self
+    public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function setLastName(?string $lastName): self
+    public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
 
         return $this;
+    }
+
+    public function getPageUrl(): ?string
+    {
+        return $this->page_url;
+    }
+
+    public function setPageUrl(?string $page_url): self
+    {
+        $this->page_url = $page_url;
+
+        return $this;
+    }
+
+    public function getUserEmail(): string
+    {
+        return $this->user->getEmail();
+    }
+
+    public function getToken(): ?Token
+    {
+        return $this->token;
     }
 }

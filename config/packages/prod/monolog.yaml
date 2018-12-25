@@ -1,9 +1,15 @@
 monolog:
     handlers:
+        cron:
+            type: stream
+            path: "%kernel.logs_dir%/cron.log"
+            level: info
+            channels: ['cron']
         main:
             type: fingers_crossed
             action_level: error
             handler: nested
+            channels: ['!cron', '!rabbitmq']
             excluded_404s:
                 # regex: exclude all 404 errors from the logs
                 - ^/
@@ -15,3 +21,8 @@ monolog:
             type: console
             process_psr_3_messages: false
             channels: ["!event", "!doctrine"]
+        rabbitmq:
+            type: stream
+            path: "%kernel.logs_dir%/rabbitmq.log"
+            level: debug
+            channels: ['rabbitmq']

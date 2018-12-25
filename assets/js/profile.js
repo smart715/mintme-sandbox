@@ -1,4 +1,14 @@
+import LimitedTextarea from '../components/LimitedTextarea.vue';
 new Vue({
     el: '#profile',
-    components: {},
+    data: {
+        showEditForm: false,
+    },
+    mounted: function() {
+        this.showEditForm = this.$refs.editFormShowFirst.value;
+    },
+    components: {
+        LimitedTextarea,
+    },
 });
+

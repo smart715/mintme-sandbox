@@ -1,0 +1,86 @@
+sonata_media:
+    class:
+        media:             App\Entity\Media\Media
+        gallery:           App\Entity\Media\Gallery
+        gallery_has_media: App\Entity\Media\GalleryHasMedia
+        category:          App\Entity\Classification\Category
+
+    db_driver:       doctrine_orm
+    force_disable_category: true
+  
+    default_context: default
+    contexts:
+        default:
+            download:
+                mode: http # X-Sendfile | http
+            providers:
+                - sonata.media.provider.dailymotion
+                - sonata.media.provider.youtube
+                - sonata.media.provider.image
+                - sonata.media.provider.file
+                - sonata.media.provider.vimeo
+
+            formats:
+                small: { width: 100, quality: 100}
+                big:   { width: 970 , quality: 100}
+
+        news:
+            providers:
+                - sonata.media.provider.image
+
+            formats:
+                abstract: { width: 100, quality: 100}
+                wide:     { width: 750, quality: 100}
+
+        sonata_collection:
+            providers:
+              - sonata.media.provider.image
+
+            formats:
+                preview: { width: 100, quality: 100}
+                wide:    { width: 820, quality: 100}
+
+        sonata_category:
+            providers:
+              - sonata.media.provider.image
+
+            formats:
+                preview: { width: 100, quality: 100}
+                wide:    { width: 820, quality: 100}
+
+        product_catalog:
+            providers:
+                - sonata.media.provider.image
+
+            formats:
+                preview:   { width: 100, quality: 100}
+                small:     { width: 300, quality: 100}
+                large:     { width: 750, quality: 100}
+
+    cdn:
+        # define the public base url for the uploaded media
+        server:
+            path:  '/uploads/media'
+
+    filesystem:
+        # define where the uploaded file will be stored
+        local:
+            directory:  '%kernel.root_dir%/../public/uploads/media'
+            create:     true
+
+    providers:
+        # ...
+        file:
+            # the resizer must be set to false, otherwhise this can delete icon files from the fs
+            resizer:    false
+        image:
+           thumbnail: sonata.media.thumbnail.format
+
+
+# Enable Doctrine to map the provided entities
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    SonataMediaBundle: ~

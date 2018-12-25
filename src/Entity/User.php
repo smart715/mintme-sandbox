@@ -2,19 +2,21 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use Ramsey\Uuid\Uuid;
+use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity
- * @UniqueEntity("email")
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User extends BaseUser
+class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 {
     /**
      * @ORM\Id
@@ -23,6 +25,12 @@ class User extends BaseUser
      * @var int
      */
     protected $id;
+
+    /**
+     * @ORM\Column(name="hash", type="string", nullable=true)
+     * @var string|null
+     */
+    protected $hash;
 
     /** @var string */
     protected $username;
@@ -60,6 +68,23 @@ class User extends BaseUser
     protected $profile;
     
     /**
+     * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist"})
+     * @var GoogleAuthenticatorEntry
+     */
+    protected $googleAuthenticatorEntry;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token")
+     * @ORM\JoinTable(name="user_tokens",
+     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="token_id", referencedColumnName="id")}
+     * )
+     * @var ArrayCollection
+     */
+    protected $relatedTokens;
+    
+     
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="referencedUsers")
      * @var User|null
      */
@@ -82,6 +107,30 @@ class User extends BaseUser
         return $this->id;
     }
 
+    /** @return Token[] */
+    public function getRelatedTokens(): array
+    {
+        return $this->relatedTokens->toArray();
+    }
+
+    public function addRelatedToken(Token $token): self
+    {
+        $this->relatedTokens->add($token);
+
+        return $this;
+    }
+
+    public function removeRelatedToken(Token $token): self
+    {
+        $this->relatedTokens->removeElement($token);
+
+        return $this;
+    }
+
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
 
     public function getTempEmail(): ?string
     {
@@ -95,9 +144,11 @@ class User extends BaseUser
         return $this;
     }
 
-    public function setProfile(Profile $profile): void
+    public function setProfile(Profile $profile): self
     {
         $this->profile = $profile;
+
+        return $this;
     }
 
     /** {@inheritdoc} */
@@ -105,6 +156,81 @@ class User extends BaseUser
     {
         $this->username = $email;
         return parent::setEmail($email);
+    }
+    
+    public function isGoogleAuthenticatorEnabled(): bool
+    {
+        return null !== $this->googleAuthenticatorEntry;
+    }
+
+    public function getGoogleAuthenticatorUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function getGoogleAuthenticatorSecret(): string
+    {
+        $googleAuth = $this->googleAuthenticatorEntry;
+
+        return null !== $googleAuth && null !==  $googleAuth->getSecret()
+            ? $googleAuth->getSecret()
+            : '';
+    }
+
+    public function isBackupCode(string $code): bool
+    {
+        $googleAuth = $this->googleAuthenticatorEntry;
+        return null !== $googleAuth
+            ? in_array($code, $googleAuth->getBackupCodes())
+            : false;
+    }
+    
+    public function invalidateBackupCode(string $code): void
+    {
+        if (null !== $this->googleAuthenticatorEntry) {
+            $this->googleAuthenticatorEntry->invalidateBackupCode($code);
+        }
+    }
+
+    public function getGoogleAuthenticatorBackupCodes(): array
+    {
+        $googleAuth = $this->googleAuthenticatorEntry;
+        return null !== $googleAuth ? $googleAuth->getBackupCodes() : [];
+    }
+
+    public function setGoogleAuthenticatorSecret(string $secret): void
+    {
+        $this->getGoogleAuthenticatorEntry()->setSecret($secret);
+    }
+
+    public function setGoogleAuthenticatorBackupCodes(array $codes): void
+    {
+        $this->getGoogleAuthenticatorEntry()->setBackupCodes($codes);
+    }
+
+    private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
+    {
+        if (null === $this->googleAuthenticatorEntry) {
+            $this->googleAuthenticatorEntry = new GoogleAuthenticatorEntry();
+        } elseif (null !== $this->googleAuthenticatorEntry
+            && $this !== $this->googleAuthenticatorEntry->getUser()
+        ) {
+            $this->googleAuthenticatorEntry->setUser($this);
+        }
+        
+        return $this->googleAuthenticatorEntry;
+    }
+
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    public function setHash(?string $hash): self
+    {
+        $this->hash = $hash;
+
+        return $this;
     }
     
     public function getReferencerId(): ?int
@@ -121,8 +247,9 @@ class User extends BaseUser
 
     public function getReferralCode(): ?string
     {
-        if (empty($this->referralCode))
+        if (empty($this->referralCode)) {
             $this->generateReferralCode();
+        }
 
         return $this->referralCode;
     }

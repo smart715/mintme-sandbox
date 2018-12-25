@@ -12,9 +12,9 @@
             {% block pagestyles %}{% endblock %}
         {% endblock %}
     </head>
-    <body class="h-100vh {% block bodyclass %}{% endblock %}">
+    <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div class="content-wrapper gradient-bg {% block contentclass %}{% endblock %}">
+            <div class="content-wrapper {% block contentclass %}{% endblock %}">
                 <div class="content">
                     {% block header %}
                         <div class="header-white">
@@ -25,8 +25,8 @@
                     {% endblock %}
                     {% block main %}
                         <div class="pt-5 contents-wrapper">
-                            {% block messagesContent %}
-                                <div class="{% block messagesClass %} {% endblock %}">
+                            {% block messageContainer %}
+                                <div class="{% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
                                             <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
@@ -46,6 +46,8 @@
             </div>
         {% endblock %}
         {% block javascripts %}
+            <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+            <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
             <script src="{{ asset('build/main.js') }}"></script>
             {% block pagescripts %}{% endblock %}
         {% endblock %}

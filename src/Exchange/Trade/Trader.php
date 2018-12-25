@@ -4,11 +4,18 @@ namespace App\Exchange\Trade;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
+use App\Repository\UserRepository;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 
 class Trader implements TraderInterface
 {
@@ -27,27 +34,39 @@ class Trader implements TraderInterface
     /** @var LimitOrderConfig */
     private $config;
 
-    public function __construct(JsonRpcInterface $jsonRpc, LimitOrderConfig $config)
-    {
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
+    public function __construct(
+        JsonRpcInterface $jsonRpc,
+        LimitOrderConfig $config,
+        EntityManagerInterface $entityManager,
+        MoneyWrapperInterface $moneyWrapper
+    ) {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
+        $this->entityManager = $entityManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function placeOrder(Order $order): TradeResult
     {
-        $params = [
-            $order->getMakerId(),
-            $order->getMarket()->getHiddenName(),
-            $order->getSide(),
-            $order->getAmount(),
-            $order->getPrice(),
-            (string) $this->config->getTakerFeeRate(),
-            (string) $this->config->getMakerFeeRate(),
-            '',
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [
+                $order->getMakerId(),
+                $order->getMarket()->getHiddenName(),
+                $order->getSide(),
+                $this->moneyWrapper->format($order->getAmount()),
+                $this->moneyWrapper->format($order->getPrice()),
+                (string)$this->config->getTakerFeeRate(),
+                (string)$this->config->getMakerFeeRate(),
+                '',
+                0,
+                "0",
+            ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);
         }
@@ -58,19 +77,26 @@ class Trader implements TraderInterface
                 : new TradeResult(TradeResult::FAILED);
         }
 
+        $maker = $this->getUserRepository()->find($order->getMakerId());
+        $taker = $this->getUserRepository()->find($order->getTakerId() ?? 0);
+
+        $token = $order->getMarket()->getToken();
+
+        if (null !== $token) {
+            $this->updateUsers([$maker, $taker], $token);
+        }
+
         return new TradeResult(TradeResult::SUCCESS);
     }
 
     public function cancelOrder(Order $order): TradeResult
     {
-        $params = [
-            $order->getMakerId(),
-            $order->getMarket()->getHiddenName(),
-            $order->getId(),
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::CANCEL_ORDER_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::CANCEL_ORDER_METHOD, [
+                $order->getMakerId(),
+                $order->getMarket()->getHiddenName(),
+                $order->getId(),
+            ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);
         }
@@ -90,18 +116,16 @@ class Trader implements TraderInterface
         $options = new OrderFilterConfig();
         $options->merge($filterOptions);
 
-        $params = [
-            $user->getId(),
-            $market->getHiddenName(),
-            $options['start_time'],
-            $options['end_time'],
-            $options['offset'],
-            $options['limit'],
-            Order::SIDE_MAP[$options['side']],
-        ];
-
         try {
-            $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [
+                $user->getId(),
+                $market->getHiddenName(),
+                $options['start_time'],
+                $options['end_time'],
+                $options['offset'],
+                $options['limit'],
+                Order::SIDE_MAP[$options['side']],
+            ]);
         } catch (FetchException $e) {
             return [];
         }
@@ -110,11 +134,9 @@ class Trader implements TraderInterface
             return [];
         }
 
-        $orders = array_map(function (array $rawOrder) use ($user, $market) {
+        return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::FINISHED_STATUS);
         }, $response->getResult()['records']);
-
-        return $orders;
     }
 
     /**
@@ -134,7 +156,7 @@ class Trader implements TraderInterface
         ];
 
         try {
-            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [$params]);
+            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, $params);
         } catch (FetchException $e) {
             return [];
         }
@@ -143,11 +165,28 @@ class Trader implements TraderInterface
             return [];
         }
 
-        $orders = array_map(function (array $rawOrder) use ($user, $market) {
+        return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $response->getResult()['records']);
+    }
 
-        return $orders;
+    /**
+     * @param User[] $users
+     */
+    private function updateUsers(array $users, Token $token): void
+    {
+        foreach ($users as $user) {
+            if (null !== $user && !in_array($token, $user->getRelatedTokens())) {
+                $user->addRelatedToken($token);
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
+    private function getUserRepository(): UserRepository
+    {
+        return $this->entityManager->getRepository(User::class);
     }
 
     private function createOrder(array $orderData, User $user, Market $market, string $status): Order
@@ -157,9 +196,15 @@ class Trader implements TraderInterface
             $user->getId(),
             null,
             $market,
-            $orderData['amount'],
+            new Money(
+                $orderData['amount'],
+                new Currency($market->getCurrencySymbol())
+            ),
             $orderData['side'],
-            $orderData['price'],
+            new Money(
+                $orderData['price'],
+                new Currency($market->getCurrencySymbol())
+            ),
             $status,
             $orderData['mtime']
         );
@@ -172,10 +217,8 @@ class Trader implements TraderInterface
             self::USER_NOT_MATCH_CODE => TradeResult::USER_NOT_MATCH,
         ];
 
-        $result = array_key_exists($errorCode, $errorMapping)
+        return array_key_exists($errorCode, $errorMapping)
             ? new TradeResult($errorMapping[$errorCode])
             : new TradeResult(TradeResult::FAILED);
-
-        return $result;
     }
 }

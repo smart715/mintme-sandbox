@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends Controller
+class DefaultController extends AbstractController
 {
     /**
      * @Route("/", name="homepage")
@@ -17,64 +17,10 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/trading", name="trading")
+     * @Route("/error500", name="error500")
      */
-    public function trading(): Response
+    public function error500(): Response
     {
-        return $this->render('pages/trading.html.twig');
-    }
-
-    /**
-     * @Route("/wallet", name="wallet")
-     */
-    public function wallet(): Response
-    {
-        return $this->render('pages/wallet.html.twig');
-    }
-
-    /**
-     * @Route("/profile", name="profile")
-     */
-    public function profile(): Response
-    {
-        return $this->render('pages/profile.html.twig');
-    }
-
-    /**
-     * @Route("/profile/{name}", name="profile_view")
-     */
-    public function profileView(String $name): Response
-    {
-        return $this->render('pages/profile_view.html.twig', [
-            'name' => $name,
-        ]);
-    }
-
-    /**
-     * @Route("/token/{name}/{tab}", name="token")
-     */
-    public function token(?String $name = null, ?String $tab = null): Response
-    {
-        // FIXME: This is for view test only.
-        $tokenName = $name;
-        $action = 'invest';
-        $tab = strtolower(strval($tab));
-        $name = strtolower(strval($name));
-        if (empty($name) && empty($tab)) {
-            $action = 'edit';
-            if (empty($tokenName))
-                $tokenName = 'Dummy Token Name';
-        } elseif (!empty($tab)) {
-            if ('invest' === $tab || 'intro' === $tab)
-                $action = $tab;
-        } elseif ('new' === $name) {
-            $action = 'new';
-            $tokenName = null;
-        }
-
-        return $this->render('pages/token.html.twig', [
-            'tokenName' => $tokenName,
-            'action' => $action,
-        ]);
+        throw new \Exception('Exception to test 500 error page in production');
     }
 }

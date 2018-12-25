@@ -4,11 +4,20 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityRepository;
-use FOS\UserBundle\Model\UserInterface;
 
 class UserRepository extends EntityRepository
 {
-    public function findReferrer(string $referralCode): ?User
+    public function findByEmail(string $email): ?User
+    {
+        return $this->findOneBy(['email' => $email]);
+    }
+
+    public function findByHash(string $hash): ?User
+    {
+        return $this->findOneBy(['hash' => $hash]);
+    }
+    
+    public function findByReferralCode(string $referralCode): ?User
     {
         return $this->findOneBy([ 'referralCode' => $referralCode ]);
     }

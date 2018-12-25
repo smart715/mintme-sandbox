@@ -1,5 +1,6 @@
 @import "~bootstrap/scss/mixins"
 @import "variables"
+@import '~v-autocomplete/dist/v-autocomplete.css'
 
 .top-navbar
   a
@@ -19,19 +20,31 @@
       width: 100%
   .search-input
     background-color: $theme-light-blue
-    color: darken($primary, 10%)
-    border-color: darken($primary, 10%)
+    color: $primary
+    border-color: lighten($primary, 10%)
     padding: .375rem .75rem
     min-width: 25rem
+    transition: min-width .25s ease
+    &:focus
+      min-width: 28rem
+      transition: min-width .5s ease
+      box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
+      @include media-breakpoint-down(lg)
+        min-width: 14rem
+    &::placeholder
+      color: lighten($primary, 5%)
+      opacity: 1
     @include media-breakpoint-down(lg)
       min-width: 12rem
-    @include media-breakpoint-down(md)
-      min-width: auto
-    &::placeholder
-      color: darken($primary, 10%)
-      opacity: 1
-    &:focus
-      box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
+      &:focus
+        min-width: 16rem
+  .v-autocomplete-list
+    background-color: $theme-light-blue
+    width: 100%
+    z-index: 2
+    .v-autocomplete-list-item
+      padding: .125rem .5rem
+      color: $primary
   .input-group-text
     background: none
     border: none

@@ -2,7 +2,8 @@
 
 namespace App\EventListener;
 
-use App\Manager\UserReferralManagerInterface;
+use App\Manager\UserManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 
 /**
@@ -13,15 +14,19 @@ use FOS\UserBundle\Event\FilterUserResponseEvent;
  */
 class RegistrationCompletedListener
 {
-    /** @var UserReferralManagerInterface */
-    private $userReferralManager;
+    /** @var UserManagerInterface */
+    private $userManager;
 
     /** @var FilterUserResponseEvent $event */
     private $event;
 
-    public function __construct(UserReferralManagerInterface $userReferralManager)
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(UserManagerInterface $userManager, EntityManagerInterface $entityManager)
     {
-        $this->userReferralManager = $userReferralManager;
+        $this->userManager = $userManager;
+        $this->entityManager = $entityManager;
     }
 
     public function onFosuserRegistrationCompleted(FilterUserResponseEvent $event): void
@@ -32,14 +37,17 @@ class RegistrationCompletedListener
 
     private function addReferralcode(): void
     {
-        $userId = $userId = $this->event->getUser()->getId();
-
-        if (!is_null($this->extractReferralCode()))
-            $this->userReferralManager->createUserReferral(
+        $userId = $this->event->getUser()->getId();
+        $entityManager = $this->entityManager;
+        if (!is_null($this->extractReferralCode())) {
+            $this->userManager->createUserReferral(
+                $entityManager,
                 $userId,
                 $this->extractReferralCode()
             );
-        else $this->userReferralManager->createUserReferral($userId, null);
+        } else {
+            $this->userManager->createUserReferral($entityManager, $userId, null);
+        }
     }
 
     private function extractReferralCode(): ?string

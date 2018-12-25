@@ -2,36 +2,36 @@
 
 {% block title %}Profile{% endblock %}
 
+{% block pagestyles %}
+    <link rel="stylesheet" href="{{ asset('build/profile-view.css') }}">
+{% endblock %}
+
+{% block bodyclass %}profile-view{% endblock %}
+
 {% block content %}
-    <div id="profile" class="container">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-xs-12 col-lg-10 col-xl-6">
                 <div class="card">
-                    <div class="card-header">Plant your profile</div>
-                    <div class="card-body m-0">
+                    <div class="card-header">
+                        Plant your profile
+                    </div>
+                    <div class="card-body">
                         <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="first-name">First name:</label>
-                                    <input type="text" id="first-name" name="first_name" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label for="last-name">Last name:</label>
-                                    <input type="text" id="last-name" name="last_name" class="form-control">
-                                </div>
+                            <div class="col-12">
+                                {{ form_start(form) }}
+                                {{ form_widget(form) }}
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-primary">Save</button>
-                                    <a href="#" class="btn btn-link">Cancel</a>
+                                    <input type="submit" class="btn btn-primary px-4" value="Create profile">
+                                    <a href="{{ path('trading') }}" class="ml-3" >Cancel</a>
                                 </div>
+                                {{ form_end(form) }}
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block pagescripts %}
-    <script src="{{ asset('build/profile.js') }}"></script>
 {% endblock %}

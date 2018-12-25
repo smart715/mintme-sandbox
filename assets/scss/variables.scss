@@ -19,15 +19,15 @@ $border-radius: 0;
 $primary: #007ab9;
 
 $body-text-color: #1a1a1a;
-$gradiant-blue-50: #8AC2FD;
 $gradiant-blue-100: #90c7ff;
 $gradiant-blue-200: #29abe2;
-$gradiant-blue-300: #4E97FD;
+$gradiant-blue-300: #4693fd;
 $gradiant-blue-400: #0071bc;
 $theme-light-blue: #bedeff;
 $theme-yellow: #be8817;
 $theme-orange: #f7931e;
 $theme-green: #8dc63f;
+$red: #fe6e43;
 $color-tabs: $primary;
 $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
@@ -37,7 +37,7 @@ $color-linkedin: #0077b5;
 $theme-light-grey: #ededed;
 $theme-dark-grey: #666666;
 $theme-grey: #cccccc;
-
+$modal-alert-border-color: #4ecb22;
 
 // Forms
 $input-bg: #e6e6e6;
@@ -54,3 +54,10 @@ $card-header-bg-color: $primary;
 // Pagination
 $pagination-color: $primary;
 $pagination-border-width: 0;
+
+// Modal
+$modal-content-border-radius: $border-radius;
+$modal-content-border-width: 0;
+
+// Sizing
+$sizes: (70: 70%);

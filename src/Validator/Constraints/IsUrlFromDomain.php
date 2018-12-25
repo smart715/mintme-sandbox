@@ -3,7 +3,6 @@
 namespace App\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @Annotation
@@ -14,7 +13,7 @@ class IsUrlFromDomain extends Constraint
     public $domain;
 
     /** @var string */
-    public $message = 'The string "{{ string }}" is not a valid {{ domain }} url.';
+    public $message = 'The string "{{ string }}" is not a valid url.';
 
     /**
      * {@inheritdoc}

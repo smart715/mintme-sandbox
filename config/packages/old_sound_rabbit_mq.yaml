@@ -1,0 +1,22 @@
+old_sound_rabbit_mq:
+    connections:
+        default:
+            url: '%env(RABBITMQ_URL)%'
+
+    consumers:
+        payment:
+            connection: default
+            queue_options: {name: 'payment-callback', durable: false}
+            callback: payment_consumer
+        deposit: 
+            connection: default
+            queue_options: {name: 'deposit', durable: true}
+            callback: deposit_consumer
+
+    producers:
+        payment:
+            connection: default
+            class: App\Producer\PaymentProducer
+        payment_retry:
+            connection: default
+            class: App\Producer\RetryPaymentProducer

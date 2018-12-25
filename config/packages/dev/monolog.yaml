@@ -4,16 +4,18 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event"]
-        # uncomment to get logging in your browser
-        # you may have to allow bigger header sizes in your Web server configuration
-        #firephp:
-        #    type: firephp
-        #    level: info
-        #chromephp:
-        #    type: chromephp
-        #    level: info
+            channels: ["!event", '!cron', '!rabbitmq']
         console:
             type: console
             process_psr_3_messages: false
             channels: ["!event", "!doctrine", "!console"]
+        cron:
+            type: stream
+            path: "%kernel.logs_dir%/cron.log"
+            level: debug
+            channels: ['cron']
+        rabbitmq:
+            type: stream
+            path: "%kernel.logs_dir%/rabbitmq.log"
+            level: debug
+            channels: ['rabbitmq']
