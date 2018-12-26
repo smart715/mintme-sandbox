@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100vh">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,16 +12,15 @@
             {% block pagestyles %}{% endblock %}
         {% endblock %}
     </head>
-    <body class="h-100vh gradient-bg {% block bodyclass %}{% endblock %}">
+    <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}
             <div class="content-wrapper {% block contentclass %}{% endblock %}">
                 <div class="content">
                     {% block header %}
-                        <div class="header-white">
+                        <div>
                             {% include 'topnav.html.twig' %}
                             {% block top_showcase %}{% endblock %}
                         </div>
-                        <div class="header-bg"></div>
                     {% endblock %}
                     {% block main %}
                         <div class="pt-5 contents-wrapper">

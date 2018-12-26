@@ -1,3 +1,4 @@
+@import '~bootstrap/scss/bootstrap';
 // Change bootstrap variables to match Mintme style
 
 // Fonts
@@ -16,8 +17,9 @@ $font-scales: (
 $border-radius: 0;
 
 // Colors
-$primary: #007ab9;
+$primary: #0f2238;
 
+$black: #131313;
 $body-text-color: #1a1a1a;
 $gradiant-blue-100: #90c7ff;
 $gradiant-blue-200: #29abe2;
@@ -28,6 +30,9 @@ $theme-yellow: #be8817;
 $theme-orange: #f7931e;
 $theme-green: #8dc63f;
 $red: #fe6e43;
+$color-nav: $white;
+$color-nav-active: $gradiant-blue-400;
+$color-nav-hover: $gradiant-blue-100;
 $color-tabs: $primary;
 $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
@@ -48,8 +53,12 @@ $input-focus-border-color: $input-bg;
 $input-btn-focus-color: $input-bg;
 
 // Card
-$card-border-width: 0;
-$card-header-bg-color: $primary;
+$card-border-width: 0.6rem;
+$card-border-color: rgba(255, 255, 255, 0.25);
+$card-input-color: rgba(255, 255, 255, 0.25);
+$card-header-bg: rgba(0, 0, 0, 0.15);
+$card-body-bg: rgba(0, 0, 0, 0.15);
+$card-text-color: $white;
 
 // Pagination
 $pagination-color: $primary;
