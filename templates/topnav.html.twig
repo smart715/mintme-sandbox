@@ -6,9 +6,11 @@
         <b-navbar-toggle target="topnav_collapse" class="mt-2"></b-navbar-toggle>
         <b-collapse is-nav="is-nav" id="topnav_collapse">
             <b-navbar-nav class="ml-auto">
-                <li class="search nav-item align-self-start align-self-lg-center py-3 py-lg-0 pr-0 pr-md-3">
-                    <token-searcher search-url="{{ path('api_token_search') }}"></token-searcher>
-                </li>
+                {% if not prelaunch %}
+                    <li class="search nav-item align-self-start align-self-lg-center py-3 py-lg-0 pr-0 pr-md-3">
+                        <token-searcher search-url="{{ path('api_token_search') }}"></token-searcher>
+                    </li>
+                {% endif %}
                 {% if prelaunch %}
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral') }}">
                         Referral Program
@@ -25,10 +27,10 @@
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                         Wallet
                     </b-nav-item>
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') starts with 'sonata_news' ? 'active' : '' }}" href="{{ path('sonata_news_archive') }}">
+                        News
+                    </b-nav-item>
                 {% endif %}
-                <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') starts with 'sonata_news' ? 'active' : '' }}" href="{{ path('sonata_news_archive') }}">
-                    News
-                </b-nav-item>
                 {% if not app.user %}
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
                         Login
