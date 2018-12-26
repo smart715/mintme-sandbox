@@ -1,83 +1,33 @@
-@import "~bootstrap/scss/mixins"
 @import "variables"
 
-
 #footer
-  display: table
-  width: 100%
+  margin-top: 65px
+  position: relative
+  font-size: 1.4rem
+  background: $black
 
-  .footer-container
-    position: relative
+  @include media-breakpoint-up(md)
+    margin-top: 100px
 
-    @include font-scale(sm)
-    .bottom-links-container
-      position: absolute
-      bottom: 0
-      right: 0
-      z-index: 1
-      .bottom-links-wrapper
-        position: relative
+  &:before
+    content: ""
+    position: absolute
+    left: 0
+    top: -55px
+    width: 100%
+    height: 55px
+    background: url("../img/grass.png") repeat-x
+    background-size: auto 100%
 
-    .bottom-links
-      position: absolute
-      right: 0
-      bottom: 0
-      padding-right: 10rem
-      padding-bottom: 2rem
+  .socialmedia
+    width: 60px
+    height: 60px
 
-      @include media-breakpoint-down(lg)
-        padding-right: 6rem
-        padding-bottom: 2rem
+    &.facebook
+      background: $color-facebook
 
-      @include media-breakpoint-down(md)
-        padding-right: 0rem
-        padding-bottom: 2rem
+    &.twitter
+      background: $color-twitter
 
-      @include media-breakpoint-down(sm)
-        bottom: 8rem
-
-      @include media-breakpoint-down(xs)
-        bottom: 5rem
-
-      .link-box
-        border-right: .0625rem solid $body-text-color
-
-        &:last-child
-          border: none
-
-        .list-item:last-child
-          padding-bottom: 0 !important
-
-        a
-          color: $body-text-color
-          text-decoration: none
-
-    .social-network
-      position: absolute
-      width: 2.15%
-      height: 8.125%
-      font-size: 1.0vw
-
-      @include media-breakpoint-down(xs)
-        z-index: 2
-
-      &.facebook
-        background: $color-facebook
-        top: 36.5%
-        left: 10.5%
-
-      &.twitter
-        background: $color-twitter
-        top: 49.5%
-        left: 11%
-
-      &.linkedin
-        background: $color-linkedin
-        top: 62.5%
-        left: 11.25%
-
-    .copyright
-      position: absolute
-      left: 0
-      bottom: 0
-      @include font-scale(xs)
+    &.linkedin
+      background: $color-linkedin

@@ -1,10 +1,29 @@
 {% block form_row %}
     {% spaceless %}
-        <div class="form-group">
-            {{ form_label(form) }}
-            {{ form_errors(form) }}
-            {{ form_widget(form) }}
-        </div>
+        {% if inline is defined and inline == true %}
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-left text-lg-right"></div>
+                    <div class="col">
+                        {{ form_errors(form) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-left text-lg-right">
+                        {{ form_label(form, null, { "label_attr": { "class": "label-featured" }}) }}
+                    </div>
+                    <div class="col">
+                        {{ form_widget(form) }}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="form-group">
+                {{ form_label(form) }}
+                {{ form_errors(form) }}
+                {{ form_widget(form) }}
+            </div>
+        {% endif %}
     {% endspaceless %}
 {% endblock form_row %}
 
