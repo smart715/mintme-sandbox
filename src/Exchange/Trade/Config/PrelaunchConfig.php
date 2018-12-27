@@ -25,7 +25,7 @@ class PrelaunchConfig
 
     public function getFinishDate(): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $this->finishDate);
+        return \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $this->finishDate) ?: new \DateTimeImmutable();
     }
 
     public function isEnabled(): bool
@@ -35,7 +35,7 @@ class PrelaunchConfig
 
     public function getTradeFinishDate(): \DateTimeImmutable
     {
-        return $this->getFinishDate()->add(new \DateInterval($this->tradePeriod)) ?: $this->getFinishDate();
+        return $this->getFinishDate()->add(new \DateInterval($this->tradePeriod));
     }
 
     public function getReferralFee(): float
