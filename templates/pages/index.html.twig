@@ -20,7 +20,7 @@
                 </div>
                 {% if prelaunch %}
                     <div>
-                        <countdown end-date="{{ mintme_launch_date }}" current-date="{{ 'now'|date("Y-m-d H:i:s") }}" :disabled="false" v-cloak>
+                        <countdown end-date="{{ prelaunch.getFinishDate|date("Y-m-d H:i:s") }}" current-date="{{ 'now'|date("Y-m-d H:i:s") }}" :disabled="false" v-cloak>
                             <div slot="content">
                                 <h4>--End--</h4>
                             </div>

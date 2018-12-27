@@ -15,7 +15,7 @@
                         <p class="mt-1">
                             {% if targetUrl is empty %}
                                 {% if prelaunch %}
-                                    <a href="{{ path('referral') }}" class="link">Go to Referral</a>
+                                    <a href="{{ path('referral-program') }}" class="link text-primary">Go to Referral</a>
                                 {% endif %}
                                 {% if not prelaunch %}
                                     <a href="{{ path('trading') }}" class="link">Go to Trading</a>

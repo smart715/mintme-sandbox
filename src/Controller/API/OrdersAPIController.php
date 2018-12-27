@@ -19,9 +19,13 @@ use FOS\RestBundle\View\View;
 use http\Exception\InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
-/** @Rest\Route("/api/orders") */
+/**
+ * @Rest\Route("/api/orders")
+ * @Security(expression="is_granted('prelaunch')")
+ */
 class OrdersAPIController extends FOSRestController
 {
     /** @var TraderInterface */
@@ -125,7 +129,9 @@ class OrdersAPIController extends FOSRestController
             Order::PENDING_STATUS,
             Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
                 ? $this->getParameter('maker_fee_rate')
-                : $this->getParameter('taker_fee_rate')
+                : $this->getParameter('taker_fee_rate'),
+            null,
+            $this->getUser()->getReferral()
         );
 
         $tradeResult = $trader->placeOrder($order);

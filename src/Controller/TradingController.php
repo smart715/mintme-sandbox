@@ -6,10 +6,14 @@ use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
 use App\Manager\TokenManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Security(expression="is_granted('prelaunch')")
+ */
 class TradingController extends AbstractController
 {
     /**

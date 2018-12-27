@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use Ramsey\Uuid\Uuid;
@@ -15,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 {
@@ -27,10 +27,16 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     protected $id;
 
     /**
-     * @ORM\Column(name="hash", type="string", nullable=true)
+     * @ORM\Column(type="string", nullable=true, unique=true)
      * @var string|null
      */
     protected $hash;
+
+    /**
+     * @ORM\Column(type="string", nullable=true, unique=true)
+     * @var string|null
+     */
+    protected $referralCode;
 
     /** @var string */
     protected $username;
@@ -82,30 +88,19 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @var ArrayCollection
      */
     protected $relatedTokens;
-    
-     
+
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="referencedUsers")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
+     * @var ArrayCollection
+     */
+    protected $referrals;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="referrals")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
      * @var User|null
      */
-    private $referencer;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @var int|null
-     */
-    private $referencerId;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @var string|null
-     */
-    private $referralCode;
-    
-    public function getId(): int
-    {
-        return $this->id;
-    }
+    protected $referencer;
 
     /** @return Token[] */
     public function getRelatedTokens(): array
@@ -232,47 +227,33 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 
         return $this;
     }
-    
-    public function getReferencerId(): ?int
-    {
-        return $this->referencerId;
-    }
 
-    public function setReferencerId(?int $referencerId): self
-    {
-        $this->referencerId = $referencerId;
-
-        return $this;
-    }
-
-    public function getReferralCode(): ?string
-    {
-        if (empty($this->referralCode)) {
-            $this->generateReferralCode();
-        }
-
-        return $this->referralCode;
-    }
-
-    public function setReferralCode(?string $referralCode): self
-    {
-        $this->referralCode = $referralCode;
-
-        return $this;
-    }
-    
-    private function generateReferralCode(): void
-    {
-        $this->referralCode = Uuid::uuid4()->toString();
-    }
-    
-    public function referenceBy(User $user): void
-    {
-        $this->referencer = $user;
-    }
-    
-    public function getReferencer(): ?User
+    public function getReferrencer(): ?self
     {
         return $this->referencer;
+    }
+
+    public function setReferrencer(User $user): self
+    {
+        $this->referencer = $user;
+
+        return $this;
+    }
+
+    /** @return User[] */
+    public function getReferrals(): array
+    {
+        return $this->referrals->toArray();
+    }
+
+    public function getReferralCode(): string
+    {
+        return $this->referralCode ?? '';
+    }
+
+    /** @ORM\PrePersist() */
+    public function prePersist(): void
+    {
+        $this->referralCode = Uuid::uuid1()->toString();
     }
 }

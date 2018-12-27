@@ -14,9 +14,13 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
-/** @Rest\Route("/api/wallet") */
+/**
+ * @Rest\Route("/api/wallet")
+ * @Security(expression="is_granted('prelaunch')")
+ */
 class WalletAPIController extends FOSRestController
 {
     /**

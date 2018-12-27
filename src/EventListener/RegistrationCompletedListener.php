@@ -2,58 +2,46 @@
 
 namespace App\EventListener;
 
+use App\Entity\User;
 use App\Manager\UserManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 
-/**
- * Listener of the event "visitor submitted a valid registration form and his User is
- * saved". The purpose is to create supplementary Profile entity which will hold our
- * application-specific data, without data needed for authentication which is held by
- * User entity.
- */
 class RegistrationCompletedListener
 {
     /** @var UserManagerInterface */
     private $userManager;
 
-    /** @var FilterUserResponseEvent $event */
+    /** @var FilterUserResponseEvent|null */
     private $event;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    public function __construct(UserManagerInterface $userManager, EntityManagerInterface $entityManager)
+    public function __construct(UserManagerInterface $userManager)
     {
         $this->userManager = $userManager;
-        $this->entityManager = $entityManager;
     }
 
     public function onFosuserRegistrationCompleted(FilterUserResponseEvent $event): void
     {
         $this->event = $event;
-        $this->addReferralcode();
+        $this->updateReferral();
+        $this->event = null;
     }
 
-    private function addReferralcode(): void
+    private function updateReferral(): void
     {
-        $userId = $this->event->getUser()->getId();
-        $entityManager = $this->entityManager;
-        if (!is_null($this->extractReferralCode())) {
-            $this->userManager->createUserReferral(
-                $entityManager,
-                $userId,
-                $this->extractReferralCode()
-            );
-        } else {
-            $this->userManager->createUserReferral($entityManager, $userId, null);
+        /** @var User $user */
+        $user = $this->event->getUser();
+        $referrencer = $this->userManager->findByReferralCode($this->extractReferralCode());
+
+        if (!$referrencer) {
+            return;
         }
+
+        $user->setReferrencer($referrencer);
+        $this->userManager->updateUser($user);
     }
 
-    private function extractReferralCode(): ?string
+    private function extractReferralCode(): string
     {
-        return $this->event->getRequest()->cookies->get('referral')
-            ?? $this->event->getRequest()->getSession()->get('referral')
-            ?? null;
+        return $this->event->getRequest()->cookies->get('referral-code') ?? '';
     }
 }
