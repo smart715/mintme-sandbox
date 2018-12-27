@@ -35,7 +35,7 @@ class PrelaunchConfig
 
     public function getTradeFinishDate(): \DateTimeImmutable
     {
-       return $this->getFinishDate()->add(new \DateInterval($this->tradePeriod)) ?: $this->getFinishDate();
+        return $this->getFinishDate()->add(new \DateInterval($this->tradePeriod)) ?: $this->getFinishDate();
     }
 
     public function getReferralFee(): float
