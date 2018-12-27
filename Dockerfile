@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     iputils-ping \
-    libpng-dev
+    libpng-dev \
+    libfontconfig
 
 RUN touch /usr/local/etc/php/php.ini
 RUN echo 'memory_limit=512M' >> /usr/local/etc/php/php.ini
