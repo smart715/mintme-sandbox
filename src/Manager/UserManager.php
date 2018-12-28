@@ -17,14 +17,4 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
     {
         return parent::getRepository();
     }
-
-    public function findByEmail(string $email): ?User
-    {
-        return $this->getRepository()->findByEmail($email);
-    }
-
-    public function findByIds(array $userIds): array
-    {
-        return $this->getRepository()->findByIds($userIds);
-    }
 }

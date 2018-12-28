@@ -38,6 +38,8 @@ class MarketFetcher implements MarketFetcherInterface
             return [];
         }
 
+        dump($response->getResult());
+
         return $response->getResult();
     }
 
