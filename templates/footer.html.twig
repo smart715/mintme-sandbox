@@ -1,53 +1,21 @@
-<div id="footer">
-    <div class="footer-container">
-        <img class="img-fluid w-100" src="{{ asset('build/images/footer-main.png') }}" alt="" />
-        <div>
-            <a href="#" class="social-network facebook rounded-circle text-white d-flex align-content-center justify-content-center flex-wrap">
-                <font-awesome-icon class="align-self-center" :icon="['fab', 'facebook-f']"></font-awesome-icon>
-            </a>
-            <a href="#" class="social-network twitter rounded-circle text-white d-flex align-content-center justify-content-center flex-wrap">
-                <font-awesome-icon class="align-self-center" :icon="['fab', 'twitter']"></font-awesome-icon>
-            </a>
-            <a href="#" class="social-network linkedin rounded-circle text-white d-flex align-content-center justify-content-center flex-wrap">
-                <font-awesome-icon class="align-self-center" :icon="['fab', 'linkedin-in']"></font-awesome-icon>
-            </a>
+<div id="footer" class="container-fluid">
+    <div class="row h-100 align-content-center text-white pt-3 pb-4 px-5">
+        <div class="col-12 text-center col-lg-auto pt-1">
+            {{ version }} | Copyright 2018 - mintMe. All rights reserved
         </div>
-        <div class="bottom-links-container w-100">
-            <div class="bottom-links-wrapper w-100">
-                <div class="bottom-links text-center text-lg-right w-100">
-                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
-                            <li class="list-item pb-2 pb-lg-3">
-                                <a href="#">Company</a>
-                            </li>
-                            <li class="list-item pb-2 pb-lg-3">
-                                <a href="#">About Us</a>
-                            </li>
-                        </ul>
-                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
-                            <li class="list-item pb-2 pb-lg-3">
-                                <a href="#">Usefull Links</a>
-                            </li>
-                            <li class="list-item pb-2 pb-lg-3">
-                                <a href="#">Support</a>
-                            </li>
-                        </ul>
-                        <ul class="link-box list-unstyled d-inline-block px-2 px-sm-3 px-md-4 px-lg-5 text-left">
-                            <li class="list-item pb-2 pb-lg-3">
-                                <a href="#">Contact Us</a>
-                            </li>
-                            <li class="list-item pb-2 pb-lg-3">
-                                <a href="#">Fees</a>
-                            </li>
-                        </ul>
-                </div>
-            </div>
-        </div>
-        <div class="copyright text-center pb-sm-2 w-100">
-            <div>
-                {{ version }} |
-                Copyright 2018 - MintMe.
-                <div class="d-sm-inline">All rights reserved</div>
+        <div class="col-12 col-lg mt-4 mt-lg-auto">
+            <div class="row justify-content-center justify-content-lg-end">
+                <a href="#" aria-label="linkedin" class="col-auto d-flex text-white mx-3 rounded-circle justify-content-center socialmedia linkedin">
+                    <font-awesome-icon class="align-self-center text-center"  :icon="['fab', 'linkedin-in']"></font-awesome-icon>
+                </a>
+                <a href="#" aria-label="twitter" class="col-auto d-flex text-white mx-3 rounded-circle justify-content-center socialmedia twitter">
+                    <font-awesome-icon class="align-self-center"  :icon="['fab', 'twitter']"></font-awesome-icon>
+                </a>
+                <a href="#" aria-label="facebook" class="col-auto d-flex text-white mx-3 rounded-circle justify-content-center socialmedia facebook">
+                    <font-awesome-icon class="align-self-center text-center"  :icon="['fab', 'facebook-f']"></font-awesome-icon>
+                </a>
             </div>
         </div>
     </div>
 </div>
+

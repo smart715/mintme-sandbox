@@ -1,96 +1,242 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}MINTME{% endblock %}
+{% block title %}mintMe{% endblock %}
 
 {% block bodyclass %}homepage{% endblock %}
-{% block contentclass %}flower-bg{% endblock %}
-
-{% block top_showcase %}
-    <div class="container-fluid top-showcase">
-        <div class="row">
-            <div class="col pt-5 pb-2 text-center">
-                <div class="d-block">
-                    <span class="title text-primary">
-                        Lorem ipsum dolor sit amet, cum ullum propriae ex
-                    </span>
-                </div>
-                <div class="description pt-2 px-3 d-inline-block">
-                    Aenean Cu ludus fastidii pertinax qui. No nec augue aperiam
-                    intellegebat, vel labores fabellas te. Tale euripidis
-                </div>
-                <div class="py-4">
-                    <button class="btn btn-primary call-to-action">
-                        call to action
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
 
 {% block content %}
-    <div class="container-fluid">
-        <div class="row top features">
-            <div class="col-12 col-sm-6 text-right">
-                <div class="card d-inline-block text-left feature-1">
-                    <div class="card-body">
-                        <h1 class="text-primary">Feature 1</h1>
-                        <div class="contents">
-                            Ferri diceret hendrerit sed at, ne quo nihil vocent
-                            impedit, solet cotidieque ullamcorper eu per. Mea
-                            cu partiendo adipiscing.
+    <section id="top-showcase" class="container-fluid text-responsive pt-2 pb-5 py-sm-0">
+        <div class="row">
+            <div class="col p-0 text-center">
+                <div class="position-sm-absolute container-fluid w-100 h-100">
+                    <div class="row h-75">
+                        <div class="col d-flex justify-content-center">
+                            <div class="align-self-center pt-4 pt-md-0">
+                                <div class="title text-white">
+                                    <div>Monetize yourself</div>
+                                    <div>Invest in people</div>
+                                </div>
+                                <div class="tip pt-2 px-3 d-inline-block text-white">
+                                    Mintme revolutionizes how people help each other<br/> by allowing sides to earn
+                                </div>
+                                <div class="py-sm-4">
+                                    <a class="btn btn-register btn-register-hover-light bg-white" href="{{ path('fos_user_registration_register') }}">
+                                        Register Now
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <img class="w-100 visible-hidden d-none d-sm-block" src="{{ asset('build/images/hero_image.jpg') }}" />
             </div>
-            <div class="col-12 col-sm-6">
-                <div class="card d-inline-block feature-2">
+        </div>
+    </section>
+    <section id="description">
+        {% if prelaunch.isEnabled() %}
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <h3 class="text-center text-white text-uppercase">We are starting in</h3>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-auto">
+                        <countdown class="text-center text-white" end-date="{{ prelaunch.getFinishDate|date("Y-m-d H:i:s") }}" current-date="{{ 'now'|date("Y-m-d H:i:s") }}" :disabled="false" v-cloak>
+                            <div slot="content">
+                                <h4>--End--</h4>
+                            </div>
+                        </countdown>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="container">
+            <div class="row justify-content-center pt-md-5">
+                <div class="col">
+                    <h3 class="text-uppercase text-white text-center pt-5">how it works?</h3>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col">
+                    <p class="text-white text-center py-4">
+                        Everyone can create their own token that represent themselves or some project they are going to create. And everyone can invest in it<br />
+                        It allows people with potental to get financial support they need right from the beginning. It's also a social platform where traders can interact with token creators and other traders.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container px-5">
+            <div class="row justify-content-center text-white text-center">
+                <div class="col-md-5 card p-0">
                     <div class="card-body">
-                        <h1 class="text-primary">Feature 2</h1>
-                        <div class="contents">
-                            Ferri diceret hendrerit sed at, ne quo nihil vocent
-                            impedit, solet cotidieque ullamcorper eu per. Mea
-                            cu partiendo adipiscing. Aperiam detracto
-                            efficiantur eam ei, at nec perpetua explicari,
-                            ei meliore ullamcorper definitiones nam.
-                            His enim putant detraxit ea, aperiam splendide
-                            aliquando qui ea, cu urbanitas voluptatum vim.
-                        </div>
+                        <img class="d-block w-38 m-auto" src="{{ asset('build/images/creator_icon.png') }}" alt="">
+                        <h4 class="bg-ghost-light mx-auto mt-5 mb-3 py-2 w-75">If you are content creator</h4>
+                        <p>
+                            you make your own token with just few clicks<br/>
+                            you create order to sell it on the market<br/>
+                            you encourage people to buy your token you earn
+                        </p>
+                    </div>
+                </div>
+                <div class="col-1"></div>
+                <div class="col-md-5 card mt-4 mt-md-0 p-0">
+                    <div class="card-body">
+                        <img class="d-block w-75 m-auto" src="{{ asset('build/images/trader_iconpng.png') }}" alt="">
+                        <h4 class="bg-ghost-light mx-auto mt-5 mb-3 py-2 w-75">If you are trader</h4>
+                        <p>
+                            you search for promising token with potential for growth<br/>
+                            you buy it and help token creator<br/>
+                            if you chose well. your token should gain in value<br/>
+                            you sell it once token price went up
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row bottom features">
-            <div class="col-12 col-sm-6 text-right">
-                <div class="card d-inline-block text-left feature-3">
-                    <div class="card-body">
-                        <h1 class="text-primary">Feature 3</h1>
-                        <div class="contents">
-                            Ferri diceret hendrerit sed at, ne quo nihil vocent
-                            impedit, solet cotidieque ullamcorper eu per. Mea
-                            cu partiendo adipiscing. Aperiam detracto
-                            efficiantur eam ei, at nec perpetua explicari,
-                            ei meliore ullamcorper definitiones nam.
-                        </div>
-                    </div>
+
+        <div class="container">
+            <div class="row justify-content-center pt-5">
+                <div class="col">
+                    <h3 class="text-uppercase text-white text-center pt-5">it's very easy!</h3>
                 </div>
             </div>
-            <div class="col-12 col-sm-6">
-                <div class="card d-inline-block feature-4">
-                    <div class="card-body">
-                        <h1 class="text-primary">Feature 4</h1>
-                        <div class="contents">
-                            Ferri diceret hendrerit sed at, ne quo nihil vocent
-                            impedit, solet cotidieque ullamcorper eu per. Mea
-                            cu partiendo adipiscing. Aperiam detracto
-                            efficiantur eam ei, at nec perpetua explicari,
-                            ei meliore ullamcorper definitiones nam.
-                        </div>
-                    </div>
+
+            <div class="row justify-content-center">
+                <div class="col">
+                    <p class="text-white text-center py-4">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="container p-0">
+            <div class="row mx-0 justify-content-center text-white">
+                <div class="col text-center">
+                    <img src="{{ asset('build/images/easy_icon_01.png') }}" alt="">
+                    <p class="mt-5">
+                        Create your own token for free and<br/>
+                        convince others to<br/>
+                        invest in it
+                    </p>
+                </div>
+                <div class="col text-center">
+                    <img src="{{ asset('build/images/easy_icon_02.png') }}" alt="">
+                    <p class="mt-5">
+                        Earn and help, by buying low and selling<br/>
+                        high
+                    </p>
+                </div>
+                <div class="col text-center">
+                    <img src="{{ asset('build/images/easy_icon_03.png') }}" alt="">
+                    <p class="mt-5">
+                        Socialize with creators and other traders
+                    </p>
+                </div>
+                <div class="col text-center">
+                    <img src="{{ asset('build/images/easy_icon_04.png') }}" alt="">
+                    <p class="mt-5">
+                        Earn through our generous referral<br/>
+                        program that gives you half of our fee for<br/>
+                        every transaction that invented person will<br/>
+                        make
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="container my-5">
+            <div class="row justify-content-center text-white">
+                <div class="col-auto text-responsive">
+                    <a href="{{ path('fos_user_registration_register') }}" class="btn btn-ghost-dark btn-register btn-register-hover-dark text-white px-5 py-4 ">REGISTER NOW</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container my-3">
+            <div class="row justify-content-center pt-md-5">
+                <div class="col">
+                    <h3 class="text-uppercase text-white text-center pt-5">FAQ'S</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="container faq text-white mb-5 px-md-5 pb-5">
+            <div class="row faq-block mx-0">
+                <faq-item>
+                    <span slot="title">
+                        Are tokens created by me worth something?
+                    </span>
+                    <span slot="body">
+                        They are worth as much as you make them. You give them the value, by advertising them.
+                    </span>
+                </faq-item>
+            </div>
+            <div class="row faq-block mx-0">
+                <faq-item>
+                    <span slot="title">
+                        How can I give real value to my tokens
+                    </span>
+                    <span slot="body">
+                        You could accept for example 10 tokens as payment for 1 hour of your work. Or 100 tokens for something you made.
+                    </span>
+                </faq-item>
+            </div>
+            <div class="row faq-block mx-0">
+                <faq-item>
+                    <span slot="title">
+                        Why would I accept tokens instead of USD for my work?
+                    </span>
+                    <span slot="body">
+                        To get money when you need it. You might need tools to start earning, but you have no money to buy them, so how to start?
+                        By allowing potential customers to judge your offer and decide if you are worth their investment. If your offer will be
+                        credible, they could purchase tokens that will be worth your service, this way you first get tools needed for your work
+                        and customers get the service they needed.
+                    </span>
+                </faq-item>
+            </div>
+            <div class="row faq-block mx-0">
+                <faq-item>
+                    <span slot="title">
+                        Why would anyone beleive in me?
+                    </span>
+                    <span slot="body">
+                        You have to convince people that you are honest. People might want to speculate on value of your services, by buying them
+                        in bulk early, hoping either to use them later when they expect such token might be worth more, or simply resell it to the
+                        market for the profit. Risk is usually included in lower price when you are still unknown.
+                    </span>
+                </faq-item>
+            </div>
+            <div class="row faq-block mx-0">
+                <faq-item>
+                    <span slot="title">
+                        Do I have any guarantees when I buy other people tokens?
+                    </span>
+                    <span slot="body">
+                        No. Treat it as a lottery ticket. People are too unpredictable to give you 100% guarantees. We will provide verification tools
+                        to check if webpage or social profile they present is really theirs but we cannot guarantee those people will do what they promised.
+                        Honest token creators, hard working and keeping their word will be rewarded with big liquid market they could always get money from.
+                    </span>
+                </faq-item>
+            </div>
+            <div class="row faq-block mx-0">
+                <faq-item>
+                    <span slot="title">
+                        I don't beleive in people, I think they are all going to cheat!
+                    </span>
+                    <span slot="body">
+                        You would be surprised, there are honest people out there on this world, but we understand your opinion. Then you can still use our
+                        service as donation and treat those tokens as proof of donation. Like a souvenir. You never know, maybe one day they will get some
+                        value after all... Person who got help from you. Help he/she needed the most at the time. Help that allowed him to succeed later
+                        in life and now he wants to be generous towards all people who ever helped him. How? He can simply buy back his tokens.
+                    </span>
+                </faq-item>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 {% block pagescripts %}

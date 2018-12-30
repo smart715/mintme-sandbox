@@ -1,10 +1,8 @@
 # Business configuration variables will go here
 parameters:
-    # Don't change this value.
-    # It's a routing key to this project on withdraw gateway
-    service: 'mintme'
-
     locale: 'en'
+
+    version: 'V1.0.0'
 
     viabtc_rpc: 'http://localhost:8080'
     viabtc_response_timeout_seconds: 10
@@ -12,20 +10,25 @@ parameters:
     withdraw_rpc: 'http://localhost:8081'
     withdraw_response_timeout_seconds: 10
 
+    deposit_rpc: 'http://localhost:3000'
+    deposit_response_timeout_seconds: 10
+
+    websocket_url: 'ws://mintme.abchosting.org:8364'
+
     taker_fee_rate: 0.1
     maker_fee_rate: 0.01
 
+    # Max timeout to check user website hash
     verify_timeout_seconds: 10
-
-    youtube_client_id: 616023022148-v4dh8b26ugmn351udmgmt4ntab62437c.apps.googleusercontent.com
-    facebook_app_id: 308376513111821
-
-    version: 'V1.0.0'
-
-    websocket_url: 'ws://mintme.abchosting.org:8364'
 
     # Permanent quantity of each token asset
     token_quantity: 1000000
 
-    deposit_rpc: 'http://localhost:3000'
-    deposit_response_timeout_seconds: 10
+    # Show all hidden from prelaunch content automatically when prelaunch finishes
+    prelaunch_autostart: false
+    # Datetime to finish prelaunch period. Format `Y-m-d H:i:s`
+    prelaunch_finish_datetime: '2019-04-01 10:00:00'
+    # Set date interval in ISO_8601 format
+    prelaunch_referral_trading_period: 'P1Y'
+    # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
+    prelaunch_referral_fee: 0.5

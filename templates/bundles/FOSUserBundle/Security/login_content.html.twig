@@ -1,7 +1,9 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
 
-{% set formHeader = "Welcome" %}
+{% set formHeader = "LOGIN" %}
+{% set featured = true %}
+
 {% block formBody %}
     {% if error %}
         <div class="p-2 mb-4 bg-danger text-white">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -9,37 +11,63 @@
     <form action="{{ path("login") }}" method="post">
         <div class="form-group row">
             <div class="col-md-12">
-                <label for="inputEmail" class="d-block">Email</label>
-                <input type="email" name="_username"  value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-left text-lg-right">
+                        <label for="inputEmail" class="d-block label-featured">Email</label>
+                    </div>
+                    <div class="col">
+                        <input type="email" name="_username"  value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-md-12">
-                <label for="inputPassword" class="d-block">Password</label>
-                <input type="password" name="_password" required="required" id="inputPassword" class="form-control">
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-left text-lg-right">
+                        <label for="inputPassword" class="d-block label-featured">Password</label>
+                    </div>
+                    <div class="col">
+                        <input type="password" name="_password" required="required" id="inputPassword" class="form-control">
+                    </div>
+                </div>
             </div>
         </div>
-        {% if form_errors(form)|length > 0 %}
-            <div class="bg-danger text-white">{{ form_errors(form) }}</div>
-        {% endif %}
-        {{ form_widget(form) }}
-        <div class="form-group row my-1">
+        <div class="form-group row my-1 mb-3">
             <div class="col-md-12">
-                <label class="custom-control custom-checkbox">
-                    <input type="checkbox" id="remember_me" name="_remember_me" class="custom-control-input">
-                    <label class="custom-control-label" for="remember_me">Remember me</label>
-                </label>
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-left text-lg-right"></div>
+                    <div class="col">
+                        <label class="custom-control custom-checkbox">
+                            <input type="checkbox" id="remember_me" name="_remember_me" class="custom-control-input">
+                            <label class="custom-control-label" for="remember_me">Remember me</label>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-left text-lg-right"></div>
+                    <div class="col">
+                        {% if form_errors(form)|length > 0 %}
+                            <div class="bg-danger text-white">{{ form_errors(form) }}</div>
+                        {% endif %}
+                        {{ form_widget(form) }}
+                    </div>
+                </div>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-md-12 text-center">
-                <input type="submit" id="_submit" name="_submit" class="btn btn-primary px-4" value="Log In">
+                <input type="submit" id="_submit" name="_submit" class="btn btn-primary rounded-0 px-4" value="Log In">
                 <span class="px-2">or</span>
-                <a href="{{ path('fos_user_registration_register') }}">Sign Up</a>
+                <a class="link-light" href="{{ path('fos_user_registration_register') }}">Sign Up</a>
             </div>
         </div>
-        <div class="text-center">
-            <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
+        <div class="text-center text-white">
+            <a class="link-light" href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
         </div>
         {% if csrf_token %}
             <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />

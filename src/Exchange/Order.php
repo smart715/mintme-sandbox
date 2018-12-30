@@ -2,7 +2,6 @@
 
 namespace App\Exchange;
 
-use App\Entity\User;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -61,7 +60,8 @@ class Order
         Money $price,
         string $status,
         ?float $fee = null,
-        ?int $timestamp = null
+        ?int $timestamp = null,
+        int $referralId = 0
     ) {
         $this->id = $id;
         $this->maker = $maker;
@@ -73,6 +73,7 @@ class Order
         $this->status = $status;
         $this->fee = $fee;
         $this->timestamp = $timestamp;
+        $this->referralId = $referralId;
     }
 
     /** @Groups({"Default"}) */
@@ -143,6 +144,11 @@ class Order
     public function getFee(): ?float
     {
         return $this->fee;
+    }
+
+    public function getReferralId(): int
+    {
+        return $this->referralId;
     }
 
     /** @Groups({"Default"}) */

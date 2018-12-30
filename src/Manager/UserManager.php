@@ -17,4 +17,11 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
     {
         return parent::getRepository();
     }
+
+    public function findByReferralCode(string $code): ?User
+    {
+        return $this->getRepository()->findOneBy([
+            'referralCode' => $code,
+        ]);
+    }
 }

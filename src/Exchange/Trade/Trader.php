@@ -10,9 +10,10 @@ use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
+use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Repository\UserRepository;
+use App\Utils\DateTimeInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -40,16 +41,26 @@ class Trader implements TraderInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var PrelaunchConfig */
+    private $prelaunchConfig;
+
+    /** @var DateTimeInterface */
+    private $time;
+
     public function __construct(
         JsonRpcInterface $jsonRpc,
         LimitOrderConfig $config,
         EntityManagerInterface $entityManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        PrelaunchConfig $prelaunchConfig,
+        DateTimeInterface $time
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->prelaunchConfig = $prelaunchConfig;
+        $this->time = $time;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -64,8 +75,8 @@ class Trader implements TraderInterface
                 (string)$this->config->getTakerFeeRate(),
                 (string)$this->config->getMakerFeeRate(),
                 '',
-                0,
-                "0",
+                $this->isReferralFeeEnabled() ? $order->getReferralId() : 0,
+                $this->isReferralFeeEnabled() ? (string)$this->prelaunchConfig->getReferralFee() : '0',
             ]);
         } catch (FetchException $e) {
             return new TradeResult(TradeResult::FAILED);
@@ -168,6 +179,12 @@ class Trader implements TraderInterface
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $response->getResult()['records']);
+    }
+
+    private function isReferralFeeEnabled(): bool
+    {
+        return !$this->prelaunchConfig->isEnabled() &&
+            $this->prelaunchConfig->getTradeFinishDate()->getTimestamp() < $this->time->now()->getTimestamp();
     }
 
     /**

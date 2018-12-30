@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}403 - Forbidden{% endblock %}
+
+{% block bodyclass %}errorpage{% endblock %}
+
+{% block content %}
+    <div class="container top-4 h-100">
+        <div class="row justify-content-center align-content-center text-center text-white h-100">
+            <div class="col-auto pb-5">
+                <div class="error-code">403</div>
+                <div class="error-text pb-5">Access Forbidden</div>
+                <p class="error-msg">
+                    The requested page couldn't be accepted now.
+                    <a href="{{ path('homepage') }}">Return to the homepage</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

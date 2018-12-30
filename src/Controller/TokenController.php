@@ -17,6 +17,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,10 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-/** @Route("/token") */
+/**
+ * @Route("/token")
+ * @Security(expression="is_granted('prelaunch')")
+ */
 class TokenController extends AbstractController
 {
     /** @var EntityManagerInterface */

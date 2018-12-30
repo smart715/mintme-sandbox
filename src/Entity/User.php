@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use Ramsey\Uuid\Uuid;
 use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -13,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 {
@@ -25,10 +27,16 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     protected $id;
 
     /**
-     * @ORM\Column(name="hash", type="string", nullable=true)
+     * @ORM\Column(type="string", nullable=true, unique=true)
      * @var string|null
      */
     protected $hash;
+
+    /**
+     * @ORM\Column(type="string", nullable=true, unique=true)
+     * @var string|null
+     */
+    protected $referralCode;
 
     /** @var string */
     protected $username;
@@ -80,6 +88,19 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @var ArrayCollection
      */
     protected $relatedTokens;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
+     * @var ArrayCollection
+     */
+    protected $referrals;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="referrals")
+     * @ORM\JoinColumn(name="referencer_id", referencedColumnName="id", onDelete="SET NULL")
+     * @var User|null
+     */
+    protected $referencer;
 
     public function getId(): int
     {
@@ -210,5 +231,34 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         $this->hash = $hash;
 
         return $this;
+    }
+
+    public function getReferrencer(): ?self
+    {
+        return $this->referencer;
+    }
+
+    public function setReferrencer(User $user): self
+    {
+        $this->referencer = $user;
+
+        return $this;
+    }
+
+    /** @return User[] */
+    public function getReferrals(): array
+    {
+        return $this->referrals->toArray();
+    }
+
+    public function getReferralCode(): string
+    {
+        return $this->referralCode ?? '';
+    }
+
+    /** @ORM\PrePersist() */
+    public function prePersist(): void
+    {
+        $this->referralCode = Uuid::uuid1()->toString();
     }
 }

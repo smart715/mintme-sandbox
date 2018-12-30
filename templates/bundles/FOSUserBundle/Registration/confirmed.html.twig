@@ -14,7 +14,12 @@
                         <p>your account is now activated</p>
                         <p class="mt-1">
                             {% if targetUrl is empty %}
-                                <a href="{{ path('trading') }}" class="link">Go to Trading</a>
+                                {% if prelaunch %}
+                                    <a href="{{ path('referral-program') }}" class="link text-primary">Go to Referral</a>
+                                {% endif %}
+                                {% if not prelaunch %}
+                                    <a href="{{ path('trading') }}" class="link">Go to Trading</a>
+                                {% endif %}
                             {% else %}
                                 <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>
                             {% endif %}

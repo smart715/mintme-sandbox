@@ -12,6 +12,7 @@ Encore
     .addEntry('profile', './assets/js/profile.js')
     .addEntry('wallet', './assets/js/wallet.js')
     .addEntry('token', './assets/js/token.js')
+    .addEntry('referral', './assets/js/referral.js')
 
     .enablePostCssLoader()
 
