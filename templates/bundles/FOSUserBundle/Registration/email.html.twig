@@ -1,36 +1,50 @@
 {% trans_default_domain 'FOSUserBundle' %}
+
 {% block subject %}
-{%- autoescape false -%}
-{{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
-{%- endautoescape -%}
+  {%- autoescape false -%}
+  {{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
+  {%- endautoescape -%}
 {% endblock %}
-{% block body_text %}
-{% endblock %}
+
+{% block body_text %}{% endblock %}
+
 {% block body_html %}
-<div id="outer-container" style="background-color:#f3f3f3; width: 100%; height: 630px;">
-  <div id="background" style="position:relative;margin:auto; background-color: #2199e8; height: 630px; width:600px;">
-    <div id="header">
-      <img src="{{absolute_url(asset('pub-img/activation-mail-header.png'))}}" alt="MintMe" style="-ms-interpolation-mode: bicubic; border: none; clear: both; display: block; max-width: 100%; outline: none; text-decoration: none; width: auto;">
+  <style>
+    @media screen {
+      @font-face {
+        font-family: 'Lato';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v11/qIIYRU-oROkIk8vfvxw6QvesZW2xOQ-xsNqO47m55DA.woff) format('woff');
+      }
+
+      body {
+        font-family: "Lato", "Lucida Grande", "Lucida Sans Unicode", Tahoma, Sans-Serif;
+        background: linear-gradient(#15273a, #006284);
+        width: 100%;
+        height: 630px;
+        color: #FFFFFF;
+        text-align: center;
+      }
+    }
+  </style>
+
+  <div style="height: 530px; width: 80%; margin: 0 auto">
+    <div>
+      <img style="display: block; margin: 50px auto" src="{{absolute_url(asset('build/images/logo.png'))}}" />
     </div>
-    <div id="center" style="text-align:center; width:600px; height:300px">
-      <div style="text-align:center;">
-        <p style="font-family:Helvetica, Arial, sans-serif;font-size:28px; color:#fff; margin:0px;">Hello</p>
-        <p style="margin:0px;"><strong style="font-family:Helvetica, Arial, sans-serif; font-size:34px; color:#fff;">{{user.userName}}</strong></p>
-        <p style="font-family:Helvetica, Arial, sans-serif; font-size:28px; color:#fff; margin-top:0px;">Welcome to MintMe!</p>
-        <p style="font-family:Helvetica, Arial, sans-serif; margin-top:66px; font-size:16px; color:#fff;">To complete your registration, please follow this link:</p>
-        <div style="margin:auto; max-width:80%; background-color:#fff; padding:10px; height: 45px">
-        <p style="margin:0px"><a style="font-family:Helvetica, Arial, sans-serif; font-size:16px; text-decoration:none;" href="{{confirmationUrl}}">{{confirmationUrl}}</a></p>
-        <div>
-      </div>
+    <div style="margin: 120px auto 50px auto">
+      <h4 style="font-size: 20pt; line-height: 1">Hello, {{user.userName}}!</h4>
+      <h3 style="font-size: 28pt; line-height: 1; margin-top: -15px"><b>Welcome to MintMe!</b></h3>
     </div>
-    <div id="footer-container" style="margin-top:45px;">
-      <img src="{{absolute_url(asset('pub-img/activation-mail-footer.png'))}}" alt="MintMe Field" style="-ms-interpolation-mode: bicubic; clear: both; display: block; max-width: 100%; outline: none; text-decoration: none; width: auto;">
-      <div id="footer-text-box" style="background-color:#73b634; height: 95px; width:600px; margin:auto;"> 
-        <div style="margin:auto;">
-          <p style="font-family:Helvetica, Arial, sans-serif; color:#fff; margin-bottom: 0px; margin-top:0px; padding-top:20px;">2018. MintMe. All Rights reserved.</p>
-        </div>
-      </div>
-    </div>
+    <p>
+      To complete your registration, please follow this link:
+    </p>
+    <p>
+      <a style="color: #0c8dde; padding: auto 20px" href="{{confirmationUrl}}">{{confirmationUrl}}</a>
+    </p>
   </div>
-</div>                    
+  <footer style="height: 100px; background: #000000; display: block">
+    <p style="padding: 10px; font-size: 14pt">2018 - MintMe. All rights reserved</p>
+  </footer>
 {% endblock %}

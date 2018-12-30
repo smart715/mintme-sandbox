@@ -4,8 +4,8 @@ namespace App\Utils;
 
 class DateTime implements DateTimeInterface
 {
-    public function now(): \DateTime
+    public function now(): \DateTimeImmutable
     {
-        return new \DateTime();
+        return new \DateTimeImmutable();
     }
 }

@@ -1,87 +1,117 @@
+@import "variables"
+@import "~bootstrap/scss/mixins"
+@import "mixins"
+
 .homepage
-  .top-showcase
-    @include media-breakpoint-down(xs)
-      font-size: .875rem
-    .title
-      @include font-scale(lg)
-      font-weight: 800
-      letter-spacing: -.0625rem
-      word-spacing: -.125rem
-      text-transform: uppercase
-    .description
-      display: inline-block
-      @include font-scale(md)
-      line-height: 1.25
-    .call-to-action
-      padding: .75rem 1.5rem
-      @include font-scale(md)
-      text-transform: uppercase
-      background: linear-gradient(180deg, $gradiant-blue-200, $gradiant-blue-400)
-  .features
-    h1
-      @include font-scale(md)
-    .card
-      max-width: 29rem
-      &.feature-1, &.feature-3
-        margin-right: 9rem
-        @include media-breakpoint-down(lg)
-          margin-right: 5rem
-        @include media-breakpoint-down(md)
-          margin-top: 1rem
-          margin-right: 2rem
-        @include media-breakpoint-down(sm)
-          margin-right: 1rem
-        @include media-breakpoint-down(xs)
-          margin: 1.5rem 0 0
-      &.feature-1
-        @include media-breakpoint-down(lg)
-          margin-top: 2rem
-      &.feature-2, &.feature-4
-        margin-top: 4rem
-        margin-left: 7rem
-        @include media-breakpoint-down(lg)
-          margin-left: 4rem
-        @include media-breakpoint-down(md)
-          margin-left: 1rem
-          margin-top: 3rem
-        @include media-breakpoint-down(sm)
-          margin-left: .5rem
-        @include media-breakpoint-down(xs)
-          margin: 1.5rem 0 0
-    .contents
-      height: 7rem
-      overflow-y: auto
-    &.top
-      padding-top: 9rem
-      @include media-breakpoint-down(md)
-        padding-top: 6rem
-      @include media-breakpoint-down(sm)
-        padding-top: 4rem
-    &.bottom
-      padding-top: 5rem
-      padding-bottom: 10rem
-      @include media-breakpoint-down(md)
-        padding-top: 3rem
-        padding-bottom: 7rem
-      @include media-breakpoint-down(sm)
-        padding-top: 2rem
-        padding-bottom: 3rem
-      @include media-breakpoint-down(xs)
-        padding-top: 0
-        padding-bottom: 1rem
-  .flower-bg
-    background: url(../img/coin-flower.png) no-repeat
-    background-size: 48rem
-    background-position: top 2.5rem center
-    @include media-breakpoint-down(lg)
-      background-size: 42rem
-      background-position: top 6rem center
+  nav
+    position: relative
+    background: $navbar-sm-background
+    background-position-y: 30px
+
+    @include media-breakpoint-up(md)
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      z-index: $zindex-sticky
+      background: none
+
+  .position-sm-absolute
+    position: relative
+
+    @include media-breakpoint-up(sm)
+      position: absolute
+
+  .text-responsive
+    font-size: calc(1em + 3vw)
+
     @include media-breakpoint-down(md)
-      background-size: 38rem
-      background-position: top 13rem center
-    @include media-breakpoint-down(sm)
-      background-size: 30rem
-      background-position: top 18rem center
+      font-size: calc(1em + 1.7vw)
+
     @include media-breakpoint-down(xs)
-      background-size: 40rem
-      background-position: top 21rem center
+      font-size: 3rem
+
+  #top-showcase
+    background: $body-background-sm
+
+    @include media-breakpoint-up(sm)
+      background: url("../img/hero_image.jpg")
+      background-size: 100% 100%
+
+    // To fix chrome display issue
+    .h-100
+      @include media-breakpoint-down(xs)
+        height: auto !important
+
+    .title
+      font-family: $concord-font
+      line-height: 1.1
+
+    .tip
+      display: inline-block
+      font-size: 0.5em
+      line-height: 1.25
+
+  .btn-register
+    padding: 2% 7%
+    text-transform: uppercase
+    border-color: $white
+    color: $primary
+    font-size: 0.5em
+
+    &.btn-register-hover-light:hover
+      background: $blue !important
+      color: $white !important
+
+    &.btn-register-hover-dark:hover
+      background: $white !important
+      color: $primary !important
+
+  #description
+    margin-top: -120px
+    background: $index-description-bg
+    background-position-y: 120px
+
+    @include media-breakpoint-down(sm)
+      margin-top: 0
+      background-position-y: 0
+
+    .countdown
+      border: $ghost-light solid 2px
+
+      .countdown-list
+        margin: 4px
+
+        .countdown-item
+          padding: 10px 35px
+          background: $ghost-light
+
+          @include media-breakpoint-down(sm)
+            padding: 5px
+
+          h2
+            @include media-breakpoint-down(md)
+              @include font-scale(sm)
+
+            @include media-breakpoint-down(sm)
+              @include font-scale(xs)
+
+          &:not(:last-of-type)
+            margin-right: 3px
+
+    .faq
+      .card
+        background: transparent
+        border: none
+
+        .card-body
+          background: transparent
+
+        .card-header
+          border-bottom: 2px solid $white
+          background: transparent
+
+          a
+            text-decoration: none
+            white-space: normal
+

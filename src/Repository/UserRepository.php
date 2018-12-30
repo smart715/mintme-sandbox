@@ -16,4 +16,14 @@ class UserRepository extends EntityRepository
     {
         return $this->findOneBy(['hash' => $hash]);
     }
+    
+    public function findByReferralCode(?string $referralCode): ?User
+    {
+        return $this->findOneBy([ 'referralCode' => $referralCode ]);
+    }
+    
+    public function findReferences(?int $userId): ?array
+    {
+        return $this->findBy([ 'referencerId' => $userId ]);
+    }
 }

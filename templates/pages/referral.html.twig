@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MINTME | Settings{% endblock %}
+
+{% block bodyclass %}referral{% endblock %}
+
+{% block content %}
+    <div id="referral" class="container">
+        <div class="row justify-content-center">
+            <div class="col-xs-12 col-lg-8 p-0 card m-3">
+                <div class="card-header text-uppercase">Referral Program</div>
+                <div class="card-body text-center m-0 pt-4">
+                    <p>When you refer someone, <span class="text-bold">YOU WILL GET {{ referralPercentage }}%</span> of his trading fees!</p>
+                    <p>
+                        How to get started? it's very easy! <br />
+                        Below is unique link to registration. if a user registers via the link, you will get {{ referralPercentage }}% of his trading fees!<br />
+                        This {{ referralPercentage }}% goes from our pocket, so neither you nor the referred person lose anything!
+                    </p>
+                    <p>Share this registration link to your friends:</p>
+
+                    <div class="mt-3 mx-auto text-center">
+                        <div class="mb-1" id="referral-link-text">
+                            <code class="p-2 text-blue">
+                                <span> {{ absolute_url(path('register-referral', { code: referralCode })) }} </span>
+                                <copy-link class="code-copy c-pointer" id="code-copy-btn" content-to-copy="{{ absolute_url(path('register-referral', { code: referralCode })) }}">
+                                   <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                                </copy-link>
+                            </code>
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="row justify-content-center text-bold mt-4">
+                            <div class="col-auto p-2 mt-2">
+                                Total earned:
+                                <span>
+                                    0.00000000 <small>WEB</small>
+                                </span>
+                            </div>
+                            <div class="col-auto p-2 mt-2">
+                                Referrals:
+                                <span>
+                                    {{ referralsCount }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/referral.js') }}"></script>
+{% endblock %}

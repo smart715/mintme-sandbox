@@ -22,12 +22,12 @@
                         <div class="row" v-if="!showEditForm">
                             <div class="col-12 col-md-4">
                                 <div class="pb-1">
-                                    City: {{ profile.city }}
+                                    City: {% if profile.city is not empty %}{{ profile.city }}{% else %}Not defined{% endif %}
                                 </div>
                                 <div class="pb-1">
-                                    Country: {{ profile.country }}
+                                    Country: {% if profile.country is not empty %}{{ profile.country }}{% else %}Not defined{% endif %}
                                 </div>
-                                {% if token|length > 0 %}
+                                {% if token is not empty %}
                                     <div class="pb-1">
                                         {{ token.getName() }} created on July 2018
                                     </div>

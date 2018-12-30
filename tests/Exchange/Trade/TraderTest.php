@@ -9,9 +9,11 @@ use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
+use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
 use App\Repository\UserRepository;
+use App\Utils\DateTimeInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,7 +44,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createOrderConfig(),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
 
         $this->assertEquals(
@@ -71,7 +75,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createMock(LimitOrderConfig::class),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
 
         $this->assertEquals(
@@ -100,7 +106,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createOrderConfig(),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
 
         $this->assertEquals(
@@ -130,7 +138,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createMock(LimitOrderConfig::class),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
 
         $this->assertEquals(
@@ -164,7 +174,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createOrderConfig(),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
 
         $this->assertEquals(
@@ -196,7 +208,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createMock(LimitOrderConfig::class),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
 
         $this->assertEquals(
@@ -233,7 +247,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createOrderConfig(),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
 
         $this->assertEquals(
@@ -265,7 +281,9 @@ class TraderTest extends TestCase
             $jsonRpc,
             $this->createMock(LimitOrderConfig::class),
             $this->mockEntityManager(),
-            $this->createMoneyWrapper()
+            $this->createMoneyWrapper(),
+            $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
+            $this->createAppDateTime(new \DateTimeImmutable())
         );
         $this->assertEquals(
             [],
@@ -274,6 +292,27 @@ class TraderTest extends TestCase
                 $this->createMarket()
             )
         );
+    }
+
+    /** @return MockObject|DateTimeInterface */
+    private function createAppDateTime(\DateTimeInterface $dateTime): DateTimeInterface
+    {
+        $time = $this->createMock(DateTimeInterface::class);
+
+        $time->method('now')->willReturn($dateTime);
+
+        return $time;
+    }
+
+    /** @return MockObject|PrelaunchConfig */
+    private function createPrelaunchConfig(bool $enabled, \DateTimeInterface $dateTime): PrelaunchConfig
+    {
+        $config = $this->createMock(PrelaunchConfig::class);
+
+        $config->method('isEnabled')->willReturn($enabled);
+        $config->method('getTradeFinishDate')->willReturn($dateTime);
+
+        return $config;
     }
 
     /** @return MockObject|MoneyWrapperInterface */

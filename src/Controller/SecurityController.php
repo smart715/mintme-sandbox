@@ -34,7 +34,7 @@ class SecurityController extends FOSSecurityController
         $securityContext = $this->container->get('security.authorization_checker');
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ||
             $securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
-                return $this->redirectToRoute('profile');
+                return $this->redirectToRoute('referral-program');
         }
         
         $this->form = $this->createForm(CaptchaLoginType::class);

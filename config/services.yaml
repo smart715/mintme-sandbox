@@ -1,4 +1,5 @@
 parameters:
+    service: 'mintme'
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     locale: 'en'
 
@@ -91,7 +92,7 @@ services:
 
     App\Utils\MailerDispatcher:
         arguments:
-            $mailer: '@fos_user.mailer.default'
+            $mailer: '@fos_user.mailer.twig_swift'
 
     App\Withdraw\Communicator\AMQPCommunicator:
         arguments:
@@ -158,3 +159,17 @@ services:
             - "@fos_user.util.canonical_fields_updater"
             - "@doctrine.orm.entity_manager"
             - "%fos_user.model.user.class%"
+
+    App\EventListener\RegistrationCompletedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.completed }
+
+    App\Exchange\Trade\Config\PrelaunchConfig:
+        arguments:
+            - "%prelaunch_finish_datetime%"
+            - "%prelaunch_referral_trading_period%"
+            - "%prelaunch_referral_fee%"
+
+    App\Security\PrelaunchVoter:
+        arguments:
+            $env: "%kernel.environment%"

@@ -4,5 +4,5 @@ namespace App\Utils;
 
 interface DateTimeInterface
 {
-    public function now(): \DateTime;
+    public function now(): \DateTimeImmutable;
 }

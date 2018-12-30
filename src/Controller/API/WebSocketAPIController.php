@@ -14,9 +14,13 @@ use App\Utils\MarketNameParserInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 
-/** @Rest\Route("/api/ws") */
+/**
+ * @Rest\Route("/api/ws")
+ * @Security(expression="is_granted('prelaunch')")
+ */
 class WebSocketAPIController extends FOSRestController
 {
     /**

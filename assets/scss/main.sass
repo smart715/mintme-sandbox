@@ -11,23 +11,42 @@
 @import 'token-page'
 @import 'profile-view-page'
 @import 'errorpages'
+@import 'mixins'
+
+@include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
+
+*, *:before, *:after
+  box-sizing: inherit
 
 html
   @include font-scale(sm)
   height: 100%
   box-sizing: border-box
 
-*, *:before, *:after
-  box-sizing: inherit
-
 body
-  color: $body-text-color
+  color: $body-background
   font-family: $lato-font
-  height: 100%
-  width: 100%
+  background: $black url("../img/sky_image.jpg") no-repeat fixed
+  background-size: 100% 100%
+  height: 100vh
+
+.text-bold
+  font-weight: 800
+
+.g-recaptcha
+  height: 80px
+
+  & > div
+    position: absolute
 
 a
-  color: $primary
+  color: $color-link
+
+  &.link-light
+    color: $white
+
+  &:hover
+    color: $color-link-hover
 
 .content-wrapper
   height: 100%
@@ -38,25 +57,12 @@ a
     display: table-row
     height: 100%
 
-.text-yellow
-  color: $theme-yellow
+.faq-block
+  a:hover
+    color: white
 
-.errors
-  font-family: $cloud-font
-  font-size: 4rem
-  color: $white
-
-.text-green
-  color: $theme-green
-
-.text-orange
-  color: $theme-orange
-
-.bg-orange
-  background-color: $theme-orange
-
-.h-100vh
-  height: 100vh
+.visible-hidden
+  visibility: hidden
 
 .range-slider-fill
   background: $color-slider-range
@@ -72,45 +78,70 @@ label
   margin: 0
 
 .card
+  background: none
+  position: relative
+  color: $card-text-color
+  border: $card-border-width solid $card-border-color
+  border-radius: 0
+
   .card-header
-    background: $card-header-bg-color
-    @include font-scale(md)
+    border: none
+    background: $card-header-bg
     color: $white
     padding: .75rem 1.5rem
+    @include font-scale(md)
+
     span
       font-size: .9em
+
     .card-header-icon
       float: right
       color: $white
+
+  .card-body
+    background: $card-body-bg
+
+    input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+      background: $card-input-color
+      color: $white
+      border-radius: 0
+      border: none
+
   .card-title
     margin: 0
     @include font-scale(md)
+
   &.transparent
     background-color: transparent
+
     >.card-header
       background-color: $white
       color: inherit
 
+  &.card-featured
+    form
+      width: 100%
+      margin: auto
+
+      @include media-breakpoint-up(md)
+        width: 70%
+
+      .card-header
+        font-size: 2em
+
+      label.label-featured
+        font-size: 1.6em
+
 .btn-primary
   color: $white
 
-.gradient-bg
-  background: linear-gradient(180deg, $gradiant-blue-300, $gradiant-blue-100, $gradiant-blue-100) fixed
-
-.contents-wrapper
-  @include media-breakpoint-down(sm)
-    padding-bottom: 7rem
-
-.table
-  border: .0625rem solid $gray-400
   th
     font-weight: normal
     @include font-scale(sm)
+
   td, th
     &:first-child
       padding-left: 2rem
-  tbody
-    background: darken($gray-100, 2%)
 
 .fix-layout
   table-layout: fixed
@@ -123,29 +154,37 @@ label
     @include font-scale(md)
     align-items: stretch
     border: none
+
     .nav-item
       flex: 1 1 auto
       padding: 0
       border-left: .0625rem solid $white
+
       &:first-child
         border-left: none
+
       .nav-link
         border: none
         background-color: $color-tabs
         color: $white
         padding: .75rem 1.5rem
+
         &.disabled
           cursor: default
+
         &.active
           background: $white
           color: inherit
+
   .tab-content
     flex: 1 1 auto
     padding: 1.25rem
     background: $white
+
   &.no-padding
     .tab-content
       padding: 0
+
   &.transparent
     .nav-tabs
       position: relative
@@ -153,13 +192,16 @@ label
       background: $white
       text-align: left
       border: .0625rem solid $white
+
       .nav-item
         display: inline-block
         flex: initial
+
         .nav-link
             color: inherit
             position: relative
             background: $white
+
             &.active::after
               content: ' '
               position: absolute
@@ -168,11 +210,13 @@ label
               height: .125rem
               background-color: $color-tabs-links
               width: calc(100% - 3rem)
+
       .edit-token-profile
         position: absolute
         top: 0
         right: 0
         height: 100%
+
     .tab-content
       flex: initial
       padding: 1.25rem 0
@@ -181,10 +225,12 @@ label
 .modal-content
   border-top-width: 20px
   border-top-style: solid
-  border-top-color: $theme-green
+  border-top-color: $ghost-light
+
   .modal-header
     display: block
     border-bottom: none
+
     .cancel-button
       top: -60.5px
       right: -28px
@@ -192,15 +238,16 @@ label
       float: right
       border-top-width: 5px
       border-top-style: solid
-      border-top-color: $theme-green
-      background: $theme-green
+      border-top-color: $ghost-dark
+      background: $ghost-dark
       opacity: 1
       height: 70px
       width: 70px
       border-radius: 50%
+
       .inner
         background: $white
-        color: $theme-green
+        color: $ghost-dark
         vertical-align: middle
         text-align: center
         height: 65px
@@ -210,11 +257,20 @@ label
         right: -5px
         position: relative
         font-size: 45px
+
         a:hover
           cursor: pointer
           color: $black
+
   .modal-body
     margin-top: -50px
+
+nav.top-navbar
+    .navbar-toggler-icon
+      outline: none
+      background-image: $navbar-toogler
+      &:focus
+        outline: none
 
 .input-custom-padding
   padding-right: 75px
@@ -228,7 +284,7 @@ label
   padding-bottom: 5px
 
 .wallet-code
-  color: $theme-dark-grey
+  color: $color-wallet-code
   @include font-scale(sm)
 
 .modal.modal-alert
@@ -254,7 +310,7 @@ label
     min-height: 110px
 
   .cloud
-    background: url('../img/cloud.png') no-repeat 
+    background: url('../img/cloud.png') no-repeat
     background-size: 100% 100%
     padding: 5rem
     .title
@@ -277,3 +333,14 @@ label
 
   & > *:not(.v-cloak--inline)
     display: none
+
+.circle
+    background: #51677F
+    border-radius: 200px
+    height: 200px
+    width: 200px
+    display: table
+    img
+      vertical-align: middle
+      display: table-cell
+      width: 120px

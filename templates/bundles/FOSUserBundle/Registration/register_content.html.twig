@@ -1,18 +1,20 @@
 {% trans_default_domain 'FOSUserBundle' %}
+
 {% extends 'form.html.twig' %}
+
 {% set formHeader = "Sign Up" %}
+{% set featured = true %}
+
 {% block formBody %}
     {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
-        {{ form_widget(form) }}
-        <div class="form-group text-right">
-            <div class="d-block">
-                <!-- /// ReCAPTCHA here /// -->
-            </div>
-        </div>
+        {{ form_row(form.email, { 'inline': true }) }}
+        {{ form_row(form.plainPassword.first, { 'inline': true }) }}
+        {{ form_row(form.plainPassword.second, { 'inline': true }) }}
+        {{ form_row(form.recaptcha, { 'inline': true }) }}
         <div class="text-center">
             <input type="submit" class="btn btn-primary px-4" value="Sign Up">
             <span class="px-3">or</span>
-            <a href="{{ path('fos_user_security_login') }}">Log In</a>
+            <a class="link-light" href="{{ path('fos_user_security_login') }}">Log In</a>
         </div>
     {{ form_end(form) }}
 {% endblock %}

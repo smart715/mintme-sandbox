@@ -3,60 +3,79 @@
 @import '~v-autocomplete/dist/v-autocomplete.css'
 
 .top-navbar
+  background: transparent
+
   a
-    color: inherit
+    color: $color-nav
+
   a:hover
-    color: $gradiant-blue-400
-  .active
-    color: $theme-green
+    color: $color-nav-hover
+
+  .active a
+    color: $color-nav-active
+
   .dropdown-toggle
     border: none
+
     &::after
       display: none
+
   .navbar-toggler-icon
     background-image: $navbar-light-toggler-icon-bg
+
   .search
     @include media-breakpoint-down(md)
       width: 100%
+
   .search-input
-    background-color: $theme-light-blue
+    background-color: $ghost-light
     color: $primary
     border-color: lighten($primary, 10%)
     padding: .375rem .75rem
     min-width: 25rem
     transition: min-width .25s ease
+
     &:focus
       min-width: 28rem
       transition: min-width .5s ease
       box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
+
       @include media-breakpoint-down(lg)
         min-width: 14rem
+
     &::placeholder
       color: lighten($primary, 5%)
       opacity: 1
+
     @include media-breakpoint-down(lg)
       min-width: 12rem
+
       &:focus
         min-width: 16rem
+
   .v-autocomplete-list
-    background-color: $theme-light-blue
+    background-color: $ghost-light
     width: 100%
     z-index: 2
+
     .v-autocomplete-list-item
       padding: .125rem .5rem
       color: $primary
+
   .input-group-text
     background: none
     border: none
     font-weight: lighter
     line-height: 1.5
     font-size: 1.5rem
+
   .icon
     width: 1em
     height: 1em
     display: block
     background-size: auto 100%
     background-repeat: no-repeat
+
   .icon-token
     background-image: url('../img/token-icon.png')
     width: 1.5em
@@ -64,33 +83,42 @@
     display: block
     background-size: auto 100%
     background-repeat: no-repeat
+
   .icon-profile
     background-image: url('../img/profile-icon.png')
     @extend .icon
+
   .icon-profile-hover
     background-image: url('../img/profile-icon_hover.png')
     @extend .icon
+
   .icon-logout
     background-image: url('../img/logout-icon.png')
     @extend .icon
+
   .icon-logout-hover
     background-image: url('../img/logout-icon_hover.png')
     @extend .icon
+
   .dropdown-menu
     min-width: auto
     box-shadow: 0 0.2em 0.1em 0 rgba(215, 215, 215, 0.6)
     padding: 0.15rem
     border-radius: 5px
+
     .dropdown-item
       color: $primary
       width: auto
       border-radius: 0.2em
       transition: background-color 500ms
+
     .dropdown-item:hover, .dropdown-item:focus
       background-color: $primary
       color: white
+
       .icon-profile
         @extend .icon-profile-hover
+
       .icon-logout
         @extend .icon-logout-hover
 

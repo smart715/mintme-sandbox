@@ -50,6 +50,9 @@ class Order
     /** @var int|null */
     private $timestamp;
 
+    /** @var int */
+    private $referralId;
+
     public function __construct(
         ?int $id,
         int $makerId,
@@ -60,7 +63,8 @@ class Order
         Money $price,
         string $status,
         ?float $fee = null,
-        ?int $timestamp = null
+        ?int $timestamp = null,
+        int $referralId = 0
     ) {
         $this->id = $id;
         $this->makerId = $makerId;
@@ -72,6 +76,7 @@ class Order
         $this->status = $status;
         $this->fee = $fee;
         $this->timestamp = $timestamp;
+        $this->referralId = $referralId;
     }
 
     /** @Groups({"Default"}) */
@@ -132,5 +137,10 @@ class Order
     public function getFee(): ?float
     {
         return $this->fee;
+    }
+
+    public function getReferralId(): int
+    {
+        return $this->referralId;
     }
 }
