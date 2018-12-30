@@ -5,22 +5,27 @@ namespace App\Exchange\Trade\Config;
 class PrelaunchConfig
 {
     /** @var string */
-    public $finishDate;
+    private $finishDate;
 
     /** @var string */
-    public $tradePeriod;
+    private $tradePeriod;
 
     /** @var float */
-    public $referralFee;
+    private $referralFee;
+
+    /** @var bool */
+    private $autostart;
 
     public function __construct(
         string $finishDate,
         string $tradePeriod,
-        float $referralFee
+        float $referralFee,
+        bool $autostart
     ) {
         $this->finishDate = $finishDate;
         $this->tradePeriod = $tradePeriod;
         $this->referralFee = $referralFee;
+        $this->autostart = $autostart;
     }
 
     public function getFinishDate(): \DateTimeImmutable
@@ -31,6 +36,11 @@ class PrelaunchConfig
     public function isEnabled(): bool
     {
         return $this->getFinishDate()->getTimestamp() > (new \DateTimeImmutable())->getTimestamp();
+    }
+
+    public function isFinished(): bool
+    {
+        return $this->autostart && !$this->isEnabled();
     }
 
     public function getTradeFinishDate(): \DateTimeImmutable

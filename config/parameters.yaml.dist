@@ -24,6 +24,8 @@ parameters:
     # Permanent quantity of each token asset
     token_quantity: 1000000
 
+    # Show all hidden from prelaunch content automatically when prelaunch finishes
+    prelaunch_autostart: false
     # Datetime to finish prelaunch period. Format `Y-m-d H:i:s`
     prelaunch_finish_datetime: '2019-04-01 10:00:00'
     # Set date interval in ISO_8601 format

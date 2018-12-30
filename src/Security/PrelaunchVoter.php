@@ -33,6 +33,6 @@ class PrelaunchVoter extends Voter
             return true;
         }
 
-        return !$this->prelaunchConfig->isEnabled();
+        return $this->prelaunchConfig->isFinished();
     }
 }
