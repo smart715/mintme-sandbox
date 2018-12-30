@@ -92,7 +92,7 @@ services:
 
     App\Utils\MailerDispatcher:
         arguments:
-            $mailer: '@fos_user.mailer.default'
+            $mailer: '@fos_user.mailer.twig_swift'
 
     App\Withdraw\Communicator\AMQPCommunicator:
         arguments:
