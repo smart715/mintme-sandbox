@@ -11,24 +11,42 @@
 @import 'token-page'
 @import 'profile-view-page'
 @import 'errorpages'
+@import 'mixins'
+
+@include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
+
+*, *:before, *:after
+  box-sizing: inherit
 
 html
   @include font-scale(sm)
   height: 100%
   box-sizing: border-box
 
-*, *:before, *:after
-  box-sizing: inherit
-
 body
-  color: $body-text-color
+  color: $body-background
   font-family: $lato-font
-  background: url("../img/sky_image.jpg") no-repeat fixed
+  background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
   height: 100vh
 
+.text-bold
+  font-weight: 800
+
+.g-recaptcha
+  height: 80px
+
+  & > div
+    position: absolute
+
 a
-  color: $white
+  color: $color-link
+
+  &.link-light
+    color: $white
+
+  &:hover
+    color: $color-link-hover
 
 .content-wrapper
   height: 100%
@@ -39,22 +57,12 @@ a
     display: table-row
     height: 100%
 
-.text-yellow
-  color: $theme-yellow
+.faq-block
+  a:hover
+    color: white
 
-.errors
-  font-family: $cloud-font
-  font-size: 4rem
-  color: $white
-
-.text-green
-  color: $theme-green
-
-.text-orange
-  color: $theme-orange
-
-.bg-orange
-  background-color: $theme-orange
+.visible-hidden
+  visibility: hidden
 
 .range-slider-fill
   background: $color-slider-range
@@ -127,13 +135,6 @@ label
 .btn-primary
   color: $white
 
-.contents-wrapper
-  @include media-breakpoint-down(sm)
-    padding-bottom: 7rem
-
-.table
-  border: .0625rem solid $gray-400
-
   th
     font-weight: normal
     @include font-scale(sm)
@@ -141,9 +142,6 @@ label
   td, th
     &:first-child
       padding-left: 2rem
-
-  tbody
-    background: darken($gray-100, 2%)
 
 .fix-layout
   table-layout: fixed
@@ -227,7 +225,7 @@ label
 .modal-content
   border-top-width: 20px
   border-top-style: solid
-  border-top-color: $theme-green
+  border-top-color: $ghost-light
 
   .modal-header
     display: block
@@ -240,8 +238,8 @@ label
       float: right
       border-top-width: 5px
       border-top-style: solid
-      border-top-color: $theme-green
-      background: $theme-green
+      border-top-color: $ghost-dark
+      background: $ghost-dark
       opacity: 1
       height: 70px
       width: 70px
@@ -249,7 +247,7 @@ label
 
       .inner
         background: $white
-        color: $theme-green
+        color: $ghost-dark
         vertical-align: middle
         text-align: center
         height: 65px
@@ -267,6 +265,13 @@ label
   .modal-body
     margin-top: -50px
 
+nav.top-navbar
+    .navbar-toggler-icon
+      outline: none
+      background-image: $navbar-toogler
+      &:focus
+        outline: none
+
 .input-custom-padding
   padding-right: 75px
 
@@ -279,7 +284,7 @@ label
   padding-bottom: 5px
 
 .wallet-code
-  color: $theme-dark-grey
+  color: $color-wallet-code
   @include font-scale(sm)
 
 .modal.modal-alert
@@ -328,3 +333,14 @@ label
 
   & > *:not(.v-cloak--inline)
     display: none
+
+.circle
+    background: #51677F
+    border-radius: 200px
+    height: 200px
+    width: 200px
+    display: table
+    img
+      vertical-align: middle
+      display: table-cell
+      width: 120px

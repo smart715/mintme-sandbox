@@ -180,6 +180,6 @@ class UserController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($googleAuth);
         $entityManager->flush();
-        $this->addFlash('notice', 'You have disabled two-factor authentication!');
+        $this->addFlash('success', 'You have disabled two-factor authentication!');
     }
 }

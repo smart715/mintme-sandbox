@@ -1,22 +1,22 @@
 <template>
-    <div v-if="!isDisabled">
+    <div class="countdown" v-if="!isDisabled">
         <div class="text-center" v-if="isEndDate">
             <slot name="content">Time Up</slot>
         </div>
-        <div class="d-flex justify-content-center" v-else>
-            <div class="p-2 text-center">
+        <div class="countdown-list d-flex justify-content-center" v-else>
+            <div class="text-center countdown-item">
                 <h2>{{ days | twoDigits }}</h2>
                 <p>Days</p>
             </div>
-            <div class="p-2 text-center">
+            <div class="text-center countdown-item">
                 <h2>{{ hours | twoDigits }}</h2>
                 <p>Hours</p>
             </div>
-            <div class="p-2 text-center">
+            <div class="text-center countdown-item">
                 <h2>{{ minutes | twoDigits }}</h2>
                 <p>Minutes</p>
             </div>
-            <div class="p-2 text-center">
+            <div class="text-center countdown-item">
                 <h2>{{ seconds | twoDigits }}</h2>
                 <p>Seconds</p>
             </div>

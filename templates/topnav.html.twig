@@ -39,14 +39,29 @@
                         <span>Sign Up</span>
                     </b-nav-item>
                 {% else %}
-                    <b-nav-item-dropdown class="align-self-start align-self-lg-center" right="right">
+                    <div class="d-md-none">
+                        {% if not prelaunch %}
+                            <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'profile' ? 'active' : '' }}" href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
+                                <span>Profile</span>
+                            </b-nav-item>
+                        {% endif %}
+                        <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
+                            <span>Setting</span>
+                        </b-nav-item>
+                        <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
+                            <span>Log Out</span>
+                        </b-nav-item>
+                    </div>
+                    <b-nav-item-dropdown class="d-none d-md-block align-self-start align-self-lg-center" right="right">
                         <template slot="button-content">
                             <i class="d-block icon-profile-big"></i>
                         </template>
-                        <b-dropdown-item href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
-                            <span class="icon-profile float-left mt-1 mr-1"></span>
-                            Profile
-                        </b-dropdown-item>
+                        {% if not prelaunch %}
+                            <b-dropdown-item href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
+                                <span class="icon-profile float-left mt-1 mr-1"></span>
+                                Profile
+                            </b-dropdown-item>
+                        {% endif %}
                         <b-dropdown-item href="{{ path('settings') }}">
                             <font-awesome-icon icon="cog" class="float-left mt-1 mr-1"></font-awesome-icon>
                             Setting
@@ -61,9 +76,3 @@
         </b-collapse>
     </div>
 </b-navbar>
-<script>
-    import TokenSearcher from "../assets/components/token/TokenSearcher";
-    export default {
-        components: {TokenSearcher}
-    }
-</script>

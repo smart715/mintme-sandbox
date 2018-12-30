@@ -216,11 +216,3 @@ export default {
     },
 };
 </script>
-
-<style lang="sass">
-    @import '../../scss/variables'
-
-    .table-orange-hover
-        tr:hover
-            color: $theme-orange
-</style>
