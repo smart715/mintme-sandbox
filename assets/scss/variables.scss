@@ -1,11 +1,10 @@
-@import '~bootstrap/scss/bootstrap';
 // Change bootstrap variables to match Mintme style
 
 // Fonts
-$open-sans-font: 'Open Sans', sans-serif;
 $lato-font: 'Lato', sans-serif;
-$oxygen-font: 'Oxygen', sans-serif;
+$concord-font: 'ConcordBold';
 $cloud-font: 'AlphaCloud', sans-serif;
+
 $font-scales: (
   xs: 13px,
   sm: 16px,
@@ -17,35 +16,72 @@ $font-scales: (
 $border-radius: 0;
 
 // Colors
-$primary: #0f2238;
-
-$black: #131313;
-$body-text-color: #1a1a1a;
-$gradiant-blue-100: #90c7ff;
-$gradiant-blue-200: #29abe2;
-$gradiant-blue-300: #4693fd;
-$gradiant-blue-400: #0071bc;
-$theme-light-blue: #bedeff;
-$theme-yellow: #be8817;
-$theme-orange: #f7931e;
-$theme-green: #8dc63f;
+$ghost-dark: rgba(0, 0, 0, 0.15);
+$ghost-light: rgba(255, 255, 255, 0.25);
+$yellow: #be8817;
+$orange: #f7931e;
+$green: #8dc63f;
 $red: #fe6e43;
+$white: white;
+$black: #131313;
+$secondary: #90c7ff;
+$primary: #1b557b;
+$blue: #1da1f3;
+
+// This variable affects the `.h-*` and `.w-*` classes.
+$sizes: () !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$sizes: map-merge(
+  (
+    25: 25%,
+    38: 38%,
+    50: 50%,
+    60: 60%,
+    70: 70%,
+    75: 75%,
+    100: 100%,
+    auto: auto
+  ),
+  $sizes
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1370px
+) !default;
+
+$theme-colors: (
+  "ghost-dark": $ghost-dark,
+  "ghost-light": $ghost-light,
+  "yellow": $yellow,
+  "orange": $orange,
+  "green": $green,
+  "blue": $blue
+);
+
+$body-background: $black url("../img/sky_image.jpg") no-repeat fixed;
+$body-background-sm: linear-gradient(#184b80, #193a5d);
+$body-text-color: #1a1a1a;
 $color-nav: $white;
-$color-nav-active: $gradiant-blue-400;
-$color-nav-hover: $gradiant-blue-100;
+$color-nav-active: #0071bc;
+$color-nav-hover: $secondary;
+$color-link: $blue;
+$color-link-hover: #90c7ff;
 $color-tabs: $primary;
 $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
 $color-facebook: #3b5998;
-$color-twitter: #1da1f3;
+$color-twitter: $blue;
 $color-linkedin: #0077b5;
-$theme-light-grey: #ededed;
-$theme-dark-grey: #666666;
-$theme-grey: #cccccc;
+$color-wallet-code: #666666;
 $modal-alert-border-color: #4ecb22;
+$index-description-bg: linear-gradient(180deg, #193A5D, #193A5D, #102238, #102238, transparent, transparent) repeat-x;
 
 // Forms
-$input-bg: #e6e6e6;
+$input-bg: $ghost-light;
 $input-btn-padding-y: .5rem;
 $input-btn-padding-x: 1rem;
 $input-focus-border-color: $input-bg;
@@ -54,10 +90,10 @@ $input-btn-focus-color: $input-bg;
 
 // Card
 $card-border-width: 0.6rem;
-$card-border-color: rgba(255, 255, 255, 0.25);
-$card-input-color: rgba(255, 255, 255, 0.25);
-$card-header-bg: rgba(0, 0, 0, 0.15);
-$card-body-bg: rgba(0, 0, 0, 0.15);
+$card-border-color: $ghost-light;
+$card-input-color: $ghost-light;
+$card-header-bg: $ghost-dark;
+$card-body-bg: $ghost-dark;
 $card-text-color: $white;
 
 // Pagination
@@ -68,5 +104,5 @@ $pagination-border-width: 0;
 $modal-content-border-radius: $border-radius;
 $modal-content-border-width: 0;
 
-// Sizing
-$sizes: (70: 70%);
+$navbar-toogler: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+$navbar-sm-background: radial-gradient(#184b80, #1b4776);

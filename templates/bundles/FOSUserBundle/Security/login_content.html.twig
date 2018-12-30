@@ -63,11 +63,11 @@
             <div class="col-md-12 text-center">
                 <input type="submit" id="_submit" name="_submit" class="btn btn-primary rounded-0 px-4" value="Log In">
                 <span class="px-2">or</span>
-                <a href="{{ path('fos_user_registration_register') }}">Sign Up</a>
+                <a class="link-light" href="{{ path('fos_user_registration_register') }}">Sign Up</a>
             </div>
         </div>
-        <div class="text-center">
-            <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
+        <div class="text-center text-white">
+            <a class="link-light" href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
         </div>
         {% if csrf_token %}
             <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />

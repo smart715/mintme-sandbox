@@ -97,7 +97,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="referrals")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="referencer_id", referencedColumnName="id", onDelete="SET NULL")
      * @var User|null
      */
     protected $referencer;

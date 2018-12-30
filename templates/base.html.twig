@@ -4,6 +4,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="description" content="Mintme revolutionizes how people help each other by allowing sides to earn">
+        <meta name="keywords" content="MintMe,MINTME,crypto,exchanger,token,dapps">
+        <meta name="author" content="mintme">
+        <link rel="icon" type="img/png" href="{{ asset('build/images/favicon.png') }}">
+        <link rel="manifest" href="{{ asset('manifest.json') }}">
+        <meta name="theme-color" content="#141C29">
         <title>
             {% block title %}MINTME{% endblock %}
         </title>
@@ -17,14 +23,11 @@
             <div class="content-wrapper {% block contentclass %}{% endblock %}">
                 <div class="content">
                     {% block header %}
-                        <div>
-                            {% include 'topnav.html.twig' %}
-                            {% block top_showcase %}{% endblock %}
-                        </div>
+                        {% include 'topnav.html.twig' %}
                     {% endblock %}
                     {% block main %}
-                        <div class="pt-5 contents-wrapper">
-                            {% block messageContainer %}
+                        {% block messageContainer %}
+                            {% if app.flashes is not empty %}
                                 <div class="{% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
@@ -34,9 +37,9 @@
                                         {% endfor %}
                                     {% endfor %}
                                 </div>
-                            {% endblock %}
-                            {% block content %}{% endblock %}
-                        </div>
+                            {% endif %}
+                        {% endblock %}
+                        {% block content %}{% endblock %}
                     {% endblock %}
                 </div>
                 {% block footer %}

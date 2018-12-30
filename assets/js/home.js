@@ -1,25 +1,10 @@
-/**
- * Set description width equal to title.
- */
-function setHomepageDescriptionWidth() {
-  let homeShowcaseTitle =
-      document.querySelector('.homepage .top-showcase .title');
-  if (homeShowcaseTitle) {
-      let titleWidth = homeShowcaseTitle.offsetWidth;
-      document
-          .querySelector('.homepage .top-showcase .description')
-          .style.maxWidth = titleWidth + 'px';
-  }
-}
-
-setHomepageDescriptionWidth();
-onresize = setHomepageDescriptionWidth;
-
 import Countdown from '../components/Countdown.vue';
+import FaqItem from '../components/FaqItem';
 
 new Vue({
-    el: '#home',
+    el: '#description',
     components: {
         Countdown,
+        FaqItem,
     },
 });
