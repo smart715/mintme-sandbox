@@ -35,14 +35,17 @@
         <token-trade-buy-orders
             container-class="col-12 col-md-6 mt-3"
             :buy-orders="pendingBuyOrders"
+            :token-name="tokenName"
         />
         <token-trade-sell-orders
             container-class="col-12 col-md-6 mt-3"
             :sell-orders="pendingSellOrders"
+            :token-name="tokenName"
         />
         <token-trade-trade-history
             container-class="col-12 mt-3"
             :orders-history="ordersHistory"
+            :token-name="tokenName"
         />
     </div>
 </template>
@@ -56,7 +59,6 @@ import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
 import WebSocket from '../../../js/websocket';
 import OrderModal from '../../modal/OrderModal';
-import {WSAPI} from '../../../js/utils/constants';
 
 Vue.use(WebSocket);
 
@@ -112,46 +114,6 @@ export default {
         },
     },
     mounted() {
-        this.getProfile(1).then((result) => (console.log(result.data.firstName + ' ' + result.data.lastName)));
-        this.authorize(() => {
-            this.wsClient.send(JSON.stringify({
-                'method': 'deals.subscribe',
-                'params': this.marketNames,
-                'id': parseInt(Math.random()),
-            }));
-        }, (response) => {
-            if ('deals.update' === response.method) {
-                let data = response.params[1];
-
-                switch (response.params[0]) {
-                    case WSAPI.order.status.PUT:
-                        if (WSAPI.order.type.SELL === parseInt(data.side)) {
-                            this.pendingSellOrders.push({
-                                price: data.price,
-                                amount: data.amount,
-                                sum_web: order.total,
-                                trader: this.getProfile(data.user).then((result) =>
-                                    (result.data.firstName + ' ' + result.data.lastName)),
-                            });
-                        } else {
-                            this.pendingBuyOrders.push({
-                                price: data.price,
-                                amount: data.amount,
-                                sum_web: data.price * data.amount,
-                                trader: this.getProfile(data.user).then((result) =>
-                                    (result.data.firstName + ' ' + result.data.lastName)),
-                            });
-                        }
-                        break;
-                }
-
-                this.ordersList.sort(function(a, b) {
-                    return a.timestamp < b.timestamp;
-                });
-                this.$refs.table.refresh();
-            }
-        });
-
         if (this.websocketUrl) {
             this.wsClient = this.$socket(this.websocketUrl);
             this.wsClient.onmessage = (result) => {

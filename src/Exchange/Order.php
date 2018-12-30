@@ -2,6 +2,7 @@
 
 namespace App\Exchange;
 
+use App\Entity\User;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -49,6 +50,9 @@ class Order
 
     /** @var int|null */
     private $timestamp;
+
+    /** @var int */
+    private $referralId;
 
     public function __construct(
         ?int $id,

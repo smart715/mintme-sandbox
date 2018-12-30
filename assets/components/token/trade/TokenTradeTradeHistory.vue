@@ -12,8 +12,8 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <b-table
-                        :items="history"
+                    <b-table ref="table"
+                        :items="getOrders"
                         :fields="fields">
                         <template slot="order_maker" slot-scope="row">
                            {{ row.value }}
@@ -37,11 +37,14 @@
 </template>
 
 <script>
+import {toMoney} from '../../../js/utils';
+
 export default {
     name: 'TokenTradeTradeHistory',
     props: {
         containerClass: String,
         ordersHistory: String,
+        tokenName: String,
     },
     data() {
         return {
@@ -71,19 +74,31 @@ export default {
             },
         };
     },
-    created: function() {
-        let orders = JSON.parse(this.ordersHistory);
-        orders.forEach( (order) => {
-            this.history.push({
-                date_time: new Date(order.timestamp * 1000).toDateString(),
-                order_maker: order.makerFirstName + order.makerLastName,
-                order_trader: order.takerFirstName + order.takerLastName,
-                type: (order.side === 0) ? 'Buy' : 'Sell',
-                price_per_token: order.price,
-                token_amount: order.amount,
-                web_amount: order.total,
+    methods: {
+        getOrders: function() {
+            return this.orders.map((order) => {
+                return {
+                    date_time: new Date(order.timestamp * 1000).toDateString(),
+                    order_maker: order.makerFirstName + order.makerLastName,
+                    order_trader: order.takerFirstName + order.takerLastName,
+                    type: (order.side === 0) ? 'Buy' : 'Sell',
+                    price_per_token: toMoney(order.price),
+                    token_amount: toMoney(order.amount),
+                    web_amount: toMoney(order.total),
+                };
             });
-        });
+        },
+    },
+    mounted: function() {
+        this.orders = JSON.parse(this.ordersHistory);
+        setInterval(() => {
+            this.$axios.get(this.$routing.generate('executed_orders', {
+                tokenName: this.tokenName,
+            })).then((result) => {
+                this.orders = result.data;
+                this.$refs.table.refresh();
+            });
+        }, 10000);
     },
 };
 </script>
