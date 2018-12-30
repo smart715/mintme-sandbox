@@ -132,11 +132,6 @@ export default {
         }
     },
     methods: {
-        getProfile: function(id) {
-            return this.$axios.get(this.$routing.generate('find_by_id', {
-                id: id,
-            }));
-        },
         updateMarketData: function(marketData) {
             if (!marketData.params) {
                 return;
