@@ -17,34 +17,27 @@
         font-weight: 400;
         src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v11/qIIYRU-oROkIk8vfvxw6QvesZW2xOQ-xsNqO47m55DA.woff) format('woff');
       }
-
-      body {
-        font-family: "Lato", "Lucida Grande", "Lucida Sans Unicode", Tahoma, Sans-Serif;
-        background: linear-gradient(#15273a, #006284);
-        width: 100%;
-        height: 630px;
-        color: #FFFFFF;
-        text-align: center;
-      }
     }
   </style>
 
-  <div style="height: 530px; width: 80%; margin: 0 auto">
-    <div>
-      <img style="display: block; margin: 50px auto" src="{{absolute_url(asset('build/images/logo.png'))}}" />
+  <div style='background: linear-gradient(#15273a, #006284); height: 630px; width: 580px; color: #FFFFFF; text-align: center; font-family: "Lato", "Lucida Grande", "Lucida Sans Unicode", Tahoma, Sans-Serif;'>
+    <div style="height: 530px; width: 80%; margin: 0 auto;">
+      <div style="margin-top: 50px; margin-bottom: 50px; width: 100%">
+        <img style="display: block; margin: 0 auto" src="{{absolute_url(asset('build/images/logo.png'))}}" />
+      </div>
+      <div style="margin: 120px auto 50px auto">
+        <h4 style="color: #FFFFFF; font-size: 20pt; line-height: 1">Hello, {{user.userName}}!</h4>
+        <h3 style="color: #FFFFFF; font-size: 28pt; line-height: 1; margin-top: -15px"><b>Welcome to mintMe!</b></h3>
+      </div>
+      <p style="color: #FFFFFF; ">
+        To complete your registration, please follow this link:
+      </p>
+      <p>
+        <a style="color: #0c8dde; padding: auto 20px" href="{{confirmationUrl}}">{{confirmationUrl}}</a>
+      </p>
     </div>
-    <div style="margin: 120px auto 50px auto">
-      <h4 style="font-size: 20pt; line-height: 1">Hello, {{user.userName}}!</h4>
-      <h3 style="font-size: 28pt; line-height: 1; margin-top: -15px"><b>Welcome to mintMe!</b></h3>
-    </div>
-    <p>
-      To complete your registration, please follow this link:
-    </p>
-    <p>
-      <a style="color: #0c8dde; padding: auto 20px" href="{{confirmationUrl}}">{{confirmationUrl}}</a>
-    </p>
+    <footer style="height: 100px; background: #000000; display: block">
+      <p style="color: #FFFFFF; padding: 10px; font-size: 14pt">2018 - mintMe. All rights reserved</p>
+    </footer>
   </div>
-  <footer style="height: 100px; background: #000000; display: block">
-    <p style="padding: 10px; font-size: 14pt">2018 - mintMe. All rights reserved</p>
-  </footer>
 {% endblock %}

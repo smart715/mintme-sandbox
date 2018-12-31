@@ -1,4 +1,4 @@
 fos_user:
     registration:
         confirmation:
-            enabled: false
+            enabled: true
