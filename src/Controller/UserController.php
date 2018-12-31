@@ -44,6 +44,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/settings", name="settings")
+     * @Route("/settings/update", name="fos_user_profile_show")
      */
     public function editUser(Request $request): Response
     {

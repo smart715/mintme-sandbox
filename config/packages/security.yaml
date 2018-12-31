@@ -14,6 +14,11 @@ security:
             pattern: ^/
             logout: true
             anonymous: true
+            remember_me:
+                secret:      "%env(APP_SECRET)%"
+                lifetime: 31536000 # 365 days in seconds
+                path:     /
+                domain:   ~ # Defaults to the current domain from $_SERVER
             form_login:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
