@@ -74,13 +74,17 @@ export default {
             },
         };
     },
-    methods: {
+    computed: {
         getOrders: function() {
-            return this.orders.map((order) => {
+            return this.history.map((order) => {
                 return {
                     date_time: new Date(order.timestamp * 1000).toDateString(),
-                    order_maker: order.makerFirstName + order.makerLastName,
-                    order_trader: order.takerFirstName + order.takerLastName,
+                    order_maker: order.maker != null
+                        ? order.maker.profile.firstName + order.maker.profile.lastName
+                        : '',
+                    order_trader: order.taker != null
+                        ? order.taker.profile.firstName + order.taker.profile.lastName
+                        : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     price_per_token: toMoney(order.price),
                     token_amount: toMoney(order.amount),
@@ -90,12 +94,12 @@ export default {
         },
     },
     mounted: function() {
-        this.orders = JSON.parse(this.ordersHistory);
+        this.history = JSON.parse(this.ordersHistory);
         setInterval(() => {
             this.$axios.get(this.$routing.generate('executed_orders', {
                 tokenName: this.tokenName,
             })).then((result) => {
-                this.orders = result.data;
+                this.history = result.data;
                 this.$refs.table.refresh();
             });
         }, 10000);

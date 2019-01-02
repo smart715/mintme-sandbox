@@ -60,14 +60,14 @@ export default {
             },
         };
     },
-    methods: {
+    computed: {
         getOrders: function() {
             return this.orders.map((order) => {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sum_web: order.total,
-                    trader: order.makerFirstName + ' ' + order.makerLastName,
+                    trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
                 };
             });
         },

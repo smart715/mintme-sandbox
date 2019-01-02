@@ -156,38 +156,6 @@ class Order
     }
 
     /** @Groups({"Default"}) */
-    public function getMakerFirstName(): ?string
-    {
-        return null != $this->getMaker()
-            ? $this->getMaker()->getProfile()->getFirstName()
-            : null;
-    }
-
-    /** @Groups({"Default"}) */
-    public function getMakerLastName(): ?string
-    {
-        return null != $this->getMaker()
-            ? $this->getMaker()->getProfile()->getLastName()
-            : null;
-    }
-
-    /** @Groups({"Default"}) */
-    public function getTakerFirstName(): ?string
-    {
-        return null != $this->getTaker()
-            ? $this->getTaker()->getProfile()->getFirstName()
-            : null;
-    }
-
-    /** @Groups({"Default"}) */
-    public function getTakerLastName(): ?string
-    {
-        return null != $this->getTaker()
-            ? $this->getTaker()->getProfile()->getLastName()
-            : null;
-    }
-
-    /** @Groups({"Default"}) */
     public function getTotal(): ?string
     {
         return $this->getAmount()->multiply($this->getPrice()->getAmount())->getAmount();

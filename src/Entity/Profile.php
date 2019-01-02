@@ -28,7 +28,7 @@ class Profile
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @ProfilePeriodLock()
-     * @Groups({"default", "API"})
+     * @Groups({"default", "API", "Default"})
      * @var string|null
      */
     protected $firstName;
@@ -39,7 +39,7 @@ class Profile
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
      * @ProfilePeriodLock()
-     * @Groups({"default", "API"})
+     * @Groups({"default", "API", "Default"})
      * @var string|null
      */
     protected $lastName;
