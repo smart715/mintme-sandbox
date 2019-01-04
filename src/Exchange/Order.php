@@ -10,13 +10,13 @@ class Order
     public const ALL_SIDE = 0;
     public const SELL_SIDE = 1;
     public const BUY_SIDE = 2;
-    
+
     public const SIDE_MAP = [
         'all' => self::ALL_SIDE,
         'sell' => self::SELL_SIDE,
         'buy' => self::BUY_SIDE,
     ];
-    
+
     public const FINISHED_STATUS = 'finished';
     public const PENDING_STATUS = 'pending';
 
