@@ -23,7 +23,7 @@ class MarketFetcher implements MarketFetcherInterface
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
-    
+
     public function __construct(JsonRpcInterface $jsonRpc)
     {
         $this->jsonRpc = $jsonRpc;
@@ -47,7 +47,7 @@ class MarketFetcher implements MarketFetcherInterface
 
         return $response->getResult();
     }
-    
+
     public function getUserExecutedHistory(int $userId, string $market, int $offset = 0, int $limit = 100): array
     {
         try {
