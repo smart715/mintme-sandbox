@@ -98,16 +98,6 @@ class Order
         return $this->taker;
     }
 
-    public function getMakerId(): int
-    {
-        return $this->getMaker()->getId();
-    }
-
-    public function getTakerId(): int
-    {
-        return $this->getTaker()->getId();
-    }
-
     /** @Groups({"Default"}) */
     public function getMarket(): Market
     {
@@ -156,8 +146,8 @@ class Order
     }
 
     /** @Groups({"Default"}) */
-    public function getTotal(): ?string
+    public function getTotal(): ?Money
     {
-        return $this->getAmount()->multiply($this->getPrice()->getAmount())->getAmount();
+        return $this->getAmount()->multiply($this->getPrice()->getAmount());
     }
 }

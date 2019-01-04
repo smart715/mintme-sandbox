@@ -13,7 +13,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
                     <b-table ref="table"
-                        :items="getOrders"
+                        :items="ordersList"
                         :fields="fields">
                         <template slot="order_maker" slot-scope="row">
                            {{ row.value }}
@@ -75,7 +75,7 @@ export default {
         };
     },
     computed: {
-        getOrders: function() {
+        ordersList: function() {
             return this.history.map((order) => {
                 return {
                     date_time: new Date(order.timestamp * 1000).toDateString(),

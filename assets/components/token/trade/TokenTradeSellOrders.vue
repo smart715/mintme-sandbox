@@ -14,7 +14,7 @@
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
                     <b-table ref="table"
-                        :items="getOrders"
+                        :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
                            {{ row.value }}
@@ -60,7 +60,7 @@ export default {
         };
     },
     computed: {
-        getOrders: function() {
+        ordersList: function() {
             return this.orders.map((order) => {
                 return {
                     price: toMoney(order.price),
