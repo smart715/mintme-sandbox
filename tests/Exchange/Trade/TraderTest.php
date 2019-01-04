@@ -145,7 +145,7 @@ class TraderTest extends TestCase
 
         $this->assertEquals(
             TradeResult::FAILED,
-            $trader->cancelOrder($this->createMock(Order::class))->getResult()
+            $trader->cancelOrder($this->createOrder())->getResult()
         );
     }
 
@@ -359,7 +359,8 @@ class TraderTest extends TestCase
 
         $order = $this->createMock(Order::class);
         $order->method('getId')->willReturn(1);
-        $order->method('getMakerId')->willReturn(1);
+        $order->method('getMaker')->willReturn($this->createUser());
+        $order->method('getTaker')->willReturn($this->createUser());
         $order->method('getMarket')->willReturn($market);
         $order->method('getSide')->willReturn(1);
         $order->method('getAmount')->willReturn($this->createMoney(10));
