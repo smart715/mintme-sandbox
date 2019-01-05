@@ -32,3 +32,5 @@ parameters:
     prelaunch_referral_trading_period: 'P1Y'
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     prelaunch_referral_fee: 0.5
+
+    google_tracking_id: 'UA-2289508-20'

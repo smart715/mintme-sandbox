@@ -49,7 +49,7 @@ class TokenController extends AbstractController
 
     /** @var TraderInterface */
     protected $trader;
-        
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -102,7 +102,7 @@ class TokenController extends AbstractController
         $hash = $this->getUser()
             ? $this->getUser()->getHash()
             : '';
-        
+
         $tokens = $balanceHandler->balances(
             $this->getUser(),
             $this->getUser()->getRelatedTokens()
@@ -111,11 +111,11 @@ class TokenController extends AbstractController
         $pendingSellOrders = $market
             ? $marketHandler->getPendingSellOrders($market)
             : [];
-        
+
         $executedOrders = $market
             ? $marketHandler->getExecutedOrders($market)
             : [];
-        
+
         return $this->render('pages/token.html.twig', [
             'token' => $token,
             'tokens' => $normalizer->normalize($tokens, null, [
