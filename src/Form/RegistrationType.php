@@ -19,7 +19,7 @@ class RegistrationType extends AbstractType
                         'theme' => 'dark',
                         'size' => 'normal',
                         'type'  => 'image',
-                    ]
+                    ],
                 ],
                 'mapped' => false,
                 'constraints' => [ new RecaptchaTrue() ],
