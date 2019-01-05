@@ -176,7 +176,7 @@ class OrdersAPIController extends FOSRestController
             : [];
 
         return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ],])
+            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ]])
         );
     }
 
@@ -193,7 +193,7 @@ class OrdersAPIController extends FOSRestController
             : [];
 
         return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ],])
+            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ]])
         );
     }
 
@@ -210,7 +210,7 @@ class OrdersAPIController extends FOSRestController
             : [];
 
         return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ],])
+            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ]])
         );
     }
 

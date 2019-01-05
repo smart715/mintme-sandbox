@@ -38,6 +38,7 @@
 
 <script>
 import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenTradeTradeHistory',
@@ -88,7 +89,7 @@ export default {
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     price_per_token: toMoney(order.price),
                     token_amount: toMoney(order.amount),
-                    web_amount: toMoney(order.total),
+                    web_amount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                 };
             });
         },

@@ -32,6 +32,7 @@
 
 <script>
 import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenTradeSellOrders',
@@ -65,7 +66,7 @@ export default {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
-                    sum_web: toMoney(order.total),
+                    sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
                 };
             });

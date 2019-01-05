@@ -144,10 +144,4 @@ class Order
     {
         return $this->referralId;
     }
-
-    /** @Groups({"Default"}) */
-    public function getTotal(): ?Money
-    {
-        return $this->getAmount()->multiply($this->getPrice()->getAmount());
-    }
 }

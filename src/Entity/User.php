@@ -103,11 +103,6 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      */
     protected $referencer;
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
     /** @return Token[] */
     public function getRelatedTokens(): array
     {
