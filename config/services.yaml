@@ -174,3 +174,9 @@ services:
     App\Security\PrelaunchVoter:
         arguments:
             $env: "%kernel.environment%"
+            
+    App\EventSubscriber\LoadViewSubscriber:
+        arguments: 
+            - '@session'
+            - '@viabtc.json_rpc'
+            - '@App\Exchange\Trade\Config\PrelaunchConfig'
