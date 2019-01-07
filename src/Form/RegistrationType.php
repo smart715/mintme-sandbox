@@ -14,6 +14,13 @@ class RegistrationType extends AbstractType
         $builder
             ->remove('username')
             ->add('recaptcha', EWZRecaptchaType::class, [
+                'attr' => [
+                    'options' => [
+                        'theme' => 'dark',
+                        'size' => 'normal',
+                        'type'  => 'image',
+                    ],
+                ],
                 'mapped' => false,
                 'constraints' => [ new RecaptchaTrue() ],
                 'label' => false,

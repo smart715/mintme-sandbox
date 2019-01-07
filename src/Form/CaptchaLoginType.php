@@ -13,6 +13,13 @@ class CaptchaLoginType extends AbstractType
     {
         $builder
             ->add('recaptcha', EWZRecaptchaType::class, [
+                'attr' => [
+                    'options' => [
+                        'theme' => 'dark',
+                        'size' => 'normal',
+                        'type'  => 'image',
+                    ],
+                ],
                 'mapped' => false,
                 'constraints' => [ new RecaptchaTrue() ],
                 'label' => false,
