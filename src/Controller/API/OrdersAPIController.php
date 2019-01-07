@@ -214,7 +214,7 @@ class OrdersAPIController extends FOSRestController
         );
     }
 
-    public function getMarket(string $tokenName): ?Market
+    private function getMarket(string $tokenName): ?Market
     {
         $token = $this->tokenManager->findByName($tokenName);
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
