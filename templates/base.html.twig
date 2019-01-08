@@ -38,7 +38,7 @@
                     {% endblock %}
                     {% block main %}
                         {% block messageContainer %}
-                            {% if app.flashes is not empty %}
+                            {% if app.session.flashbag.peekAll() is not empty %}
                                 <div class="{% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
