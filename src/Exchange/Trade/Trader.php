@@ -89,7 +89,7 @@ class Trader implements TraderInterface
         }
 
         $maker = $this->getUserRepository()->find($order->getMaker()->getId());
-        $taker = $this->getUserRepository()->find($order->getTaker()->getId() ?? 0);
+        $taker = $this->getUserRepository()->find($order->getTaker() ? $order->getTaker()->getId() : 0);
 
         $token = $order->getMarket()->getToken();
 

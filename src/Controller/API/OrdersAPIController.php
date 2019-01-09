@@ -131,7 +131,7 @@ class OrdersAPIController extends FOSRestController
 
         $order = new Order(
             null,
-            $this->getUser()->getId(),
+            $this->getUser(),
             null,
             $market,
             $moneyWrapper->parse(
@@ -148,7 +148,9 @@ class OrdersAPIController extends FOSRestController
                 ? $this->getParameter('maker_fee_rate')
                 : $this->getParameter('taker_fee_rate'),
             null,
-            $this->getUser()->getReferral()
+            $this->getUser()->getReferrencer() ?
+                $this->getUser()->getReferrencer()->getId() :
+                0
         );
 
         $tradeResult = $trader->placeOrder($order);
