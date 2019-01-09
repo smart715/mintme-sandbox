@@ -12,8 +12,8 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <b-table
-                        :items="history"
+                    <b-table ref="table"
+                        :items="ordersList"
                         :fields="fields">
                         <template slot="order_maker" slot-scope="row">
                            {{ row.value }}
@@ -37,10 +37,15 @@
 </template>
 
 <script>
+import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
+
 export default {
     name: 'TokenTradeTradeHistory',
     props: {
         containerClass: String,
+        ordersHistory: String,
+        tokenName: String,
     },
     data() {
         return {
@@ -70,20 +75,35 @@ export default {
             },
         };
     },
-    created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
-            this.history.push({
-                date_time: '12-12-1970',
-                order_maker: 'John Doe',
-                order_trader: 'John Doe',
-                type: (i % 2 === 0) ? 'Buy' : 'Sell',
-                price_per_token: Math.floor(Math.random() * 99) + 1000,
-                token_amount: Math.floor(Math.random() * 99) + 10,
-                web_amount: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                free: Math.floor(Math.random() * 99) + 10,
+    computed: {
+        ordersList: function() {
+            return this.history.map((order) => {
+                return {
+                    date_time: new Date(order.timestamp * 1000).toDateString(),
+                    order_maker: order.maker != null
+                        ? order.maker.profile.firstName + order.maker.profile.lastName
+                        : '',
+                    order_trader: order.taker != null
+                        ? order.taker.profile.firstName + order.taker.profile.lastName
+                        : '',
+                    type: (order.side === 0) ? 'Buy' : 'Sell',
+                    price_per_token: toMoney(order.price),
+                    token_amount: toMoney(order.amount),
+                    web_amount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                };
             });
-        }
+        },
+    },
+    mounted: function() {
+        this.history = JSON.parse(this.ordersHistory);
+        setInterval(() => {
+            this.$axios.get(this.$routing.generate('executed_orders', {
+                tokenName: this.tokenName,
+            })).then((result) => {
+                this.history = result.data;
+                this.$refs.table.refresh();
+            });
+        }, 10000);
     },
 };
 </script>

@@ -67,7 +67,7 @@ class Trader implements TraderInterface
     {
         try {
             $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [
-                $order->getMakerId(),
+                $order->getMaker()->getId(),
                 $order->getMarket()->getHiddenName(),
                 $order->getSide(),
                 $this->moneyWrapper->format($order->getAmount()),
@@ -88,8 +88,8 @@ class Trader implements TraderInterface
                 : new TradeResult(TradeResult::FAILED);
         }
 
-        $maker = $this->getUserRepository()->find($order->getMakerId());
-        $taker = $this->getUserRepository()->find($order->getTakerId() ?? 0);
+        $maker = $this->getUserRepository()->find($order->getMaker()->getId());
+        $taker = $this->getUserRepository()->find($order->getTaker()->getId() ?? 0);
 
         $token = $order->getMarket()->getToken();
 
@@ -104,7 +104,7 @@ class Trader implements TraderInterface
     {
         try {
             $response = $this->jsonRpc->send(self::CANCEL_ORDER_METHOD, [
-                $order->getMakerId(),
+                $order->getMaker()->getId(),
                 $order->getMarket()->getHiddenName(),
                 $order->getId(),
             ]);
@@ -210,7 +210,7 @@ class Trader implements TraderInterface
     {
         return new Order(
             $orderData['id'],
-            $user->getId(),
+            $user,
             null,
             $market,
             new Money(

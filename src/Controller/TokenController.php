@@ -112,6 +112,10 @@ class TokenController extends AbstractController
             ? $marketHandler->getPendingSellOrders($market)
             : [];
 
+        $pendingBuyOrders = $market
+            ? $marketHandler->getPendingBuyOrders($market)
+            : [];
+
         $executedOrders = $market
             ? $marketHandler->getExecutedOrders($market)
             : [];
@@ -122,6 +126,9 @@ class TokenController extends AbstractController
                 'groups' => [ 'Default' ],
             ]),
             'pendingSellOrders' => $normalizer->normalize($pendingSellOrders, null, [
+                'groups' => [ 'Default' ],
+            ]),
+            'pendingBuyOrders' => $normalizer->normalize($pendingBuyOrders, null, [
                 'groups' => [ 'Default' ],
             ]),
             'executedOrders' => $normalizer->normalize($executedOrders, null, [

@@ -7,6 +7,7 @@ use App\Repository\UserRepository;
 
 class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserManagerInterface
 {
+
     public function find(int $id): ?User
     {
         return $this->getRepository()->find($id);

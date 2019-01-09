@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
 use App\Exchange\Order;
+use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 
 class MarketHandler implements MarketHandlerInterface
@@ -16,12 +17,17 @@ class MarketHandler implements MarketHandlerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var UserManagerInterface */
+    protected $userManager;
+
     public function __construct(
         MarketFetcherInterface $marketFetcher,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        UserManagerInterface $userManager
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
+        $this->userManager = $userManager;
     }
 
     /** {@inheritdoc} */
@@ -92,10 +98,14 @@ class MarketHandler implements MarketHandlerInterface
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
+        $orders = array_key_exists('orders', $result)
+            ? $result['orders']
+            : $result;
+
         return array_map(function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
-                $orderData['user'],
+                $this->userManager->find($orderData['user']),
                 null,
                 $market,
                 $this->moneyWrapper->parse(
@@ -111,7 +121,7 @@ class MarketHandler implements MarketHandlerInterface
                 $orderData['maker_fee'],
                 $orderData['mtime']
             );
-        }, $result);
+        }, $orders);
     }
 
     /** @return Order[] */
@@ -120,8 +130,12 @@ class MarketHandler implements MarketHandlerInterface
         return array_map(function (array $orderData) use ($market) {
             return new Order(
                 $orderData['id'],
-                array_key_exists('maker_id', $orderData) ? $orderData['maker_id'] : 0,
-                array_key_exists('taker_id', $orderData) ? $orderData['taker_id'] : 0,
+                array_key_exists('maker_id', $orderData)
+                    ? $this->userManager->find($orderData['maker_id'])
+                    : null,
+                array_key_exists('taker_id', $orderData)
+                    ? $this->userManager->find($orderData['taker_id'])
+                    : null,
                 $market,
                 $this->moneyWrapper->parse(
                     $orderData['amount'],

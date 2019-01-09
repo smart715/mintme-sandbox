@@ -13,8 +13,8 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <b-table
-                        :items="orders"
+                    <b-table ref="table"
+                        :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
                            {{ row.value }}
@@ -32,10 +32,15 @@
 
 >
 <script>
+import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
+
 export default {
     name: 'TokenTradeBuyOrders',
     props: {
         containerClass: String,
+        buyOrders: String,
+        tokenName: String,
     },
     data() {
         return {
@@ -56,16 +61,28 @@ export default {
             },
         };
     },
-    created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
-            this.orders.push({
-                price: Math.floor(Math.random() * 99) + 1000,
-                amount: Math.floor(Math.random() * 99) + 10,
-                sum_web: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                trader: 'John Doe',
+    computed: {
+        ordersList: function() {
+            return this.orders.map((order) => {
+                return {
+                    price: toMoney(order.price),
+                    amount: toMoney(order.amount),
+                    sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
+                };
             });
-        }
+        },
+    },
+    mounted: function() {
+        this.orders = JSON.parse(this.buyOrders);
+        setInterval(() => {
+            this.$axios.get(this.$routing.generate('pending_buy_orders', {
+                tokenName: this.tokenName,
+            })).then((result) => {
+                this.orders = result.data;
+                this.$refs.table.refresh();
+            });
+        }, 10000);
     },
 };
 </script>

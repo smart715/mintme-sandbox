@@ -21,7 +21,7 @@ class MarketFetcherTest extends TestCase
     public function testGetPendingSellOrders(bool $hasError, array $rpcResult, array $sellOrders): void
     {
         $method = 'order.book';
-        $params = ['TOK000000000001WEB', 'sell', 0, 100];
+        $params = ['TOK000000000001WEB', 1, 0, 100];
 
         $jsonResponse = $this->createMock(JsonRpcResponse::class);
         $jsonResponse->method('hasError')->willReturn($hasError);
@@ -64,7 +64,7 @@ class MarketFetcherTest extends TestCase
     public function testGetPendingBuyOrders(bool $hasError, array $rpcResult, array $buyOrders): void
     {
         $method = 'order.book';
-        $params = ['TOK000000000001WEB', 'buy', 0, 100];
+        $params = ['TOK000000000001WEB', 2, 0, 100];
 
         $jsonResponse = $this->createMock(JsonRpcResponse::class);
         $jsonResponse->method('hasError')->willReturn($hasError);
@@ -224,8 +224,8 @@ class MarketFetcherTest extends TestCase
         return [
             new Order(
                 1,
-                1,
-                2,
+                null,
+                null,
                 $this->createMarket(),
                 $this->createMoney(10),
                 1,

@@ -4,18 +4,11 @@ namespace App\Exchange\Market;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
-use App\Entity\User;
-use App\Exchange\Deal;
-use App\Exchange\Market;
-use App\Exchange\Order;
-use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Currency;
-use Money\Money;
 
 class MarketFetcher implements MarketFetcherInterface
 {
-    public const SELL = 'sell';
-    public const BUY = 'buy';
+    public const SELL = 1;
+    public const BUY = 2;
     private const BOOK_ORDERS_METHOD = 'order.book';
     private const PENDING_ORDERS_METHOD = 'order.pending';
     private const EXECUTED_ORDERS_METHOD = 'market.deals';
@@ -87,7 +80,7 @@ class MarketFetcher implements MarketFetcherInterface
         return $response->getResult()['records'];
     }
 
-    public function getPendingOrders(string $market, int $offset, int $limit, string $side): array
+    public function getPendingOrders(string $market, int $offset, int $limit, int $side): array
     {
         try {
             $response = $this->jsonRpc->send(self::BOOK_ORDERS_METHOD, [

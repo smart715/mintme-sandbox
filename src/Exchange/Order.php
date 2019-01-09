@@ -2,6 +2,7 @@
 
 namespace App\Exchange;
 
+use App\Entity\User;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -23,11 +24,11 @@ class Order
     /** @var int|null */
     private $id;
 
-    /** @var int */
-    private $makerId;
+    /** @var User|null */
+    private $maker;
 
-    /** @var int|null */
-    private $takerId;
+    /** @var User|null */
+    private $taker;
 
     /** @var Market */
     private $market;
@@ -55,8 +56,8 @@ class Order
 
     public function __construct(
         ?int $id,
-        int $makerId,
-        ?int $takerId,
+        ?User $maker,
+        ?User $taker,
         Market $market,
         Money $amount,
         int $side,
@@ -67,8 +68,8 @@ class Order
         int $referralId = 0
     ) {
         $this->id = $id;
-        $this->makerId = $makerId;
-        $this->takerId = $takerId;
+        $this->maker = $maker;
+        $this->taker = $taker;
         $this->market = $market;
         $this->amount = $amount;
         $this->side = $side;
@@ -86,15 +87,15 @@ class Order
     }
 
     /** @Groups({"Default"}) */
-    public function getMakerId(): int
+    public function getMaker(): ?User
     {
-        return $this->makerId;
+        return $this->maker;
     }
 
     /** @Groups({"Default"}) */
-    public function getTakerId(): ?int
+    public function getTaker(): ?User
     {
-        return $this->takerId;
+        return $this->taker;
     }
 
     /** @Groups({"Default"}) */

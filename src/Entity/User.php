@@ -10,6 +10,7 @@ use Ramsey\Uuid\Uuid;
 use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -61,7 +62,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      *     pattern="/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/",
      *     match=true,
      *     message="The password must contain minimum eight symbols,
-           at least one uppercase letter, a lowercase letter, and a number"
+     *     at least one uppercase letter, a lowercase letter, and a number"
      * )
      * @var string|null
      */
@@ -122,6 +123,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this;
     }
 
+    /** @Groups({"Default"}) */
     public function getProfile(): ?Profile
     {
         return $this->profile;
