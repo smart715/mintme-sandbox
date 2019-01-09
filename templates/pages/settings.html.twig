@@ -5,7 +5,7 @@
 {% block messageContainer %}{% endblock %}
 
 {% block content %}
-    <div id="profile" class="container">
+    <div id="settings" class="container">
         <div class="row justify-content-center">
             <div class="col-xs-12 col-lg-10 col-xl-6">
                 <div class="card">
@@ -21,9 +21,12 @@
                             {% endfor %}
                         </div>
                         <div>
-                            {{ form_start(emailForm) }}
+                            {{ form_start(emailForm, {'attr': {'ref': 'emailForm'}}) }}
+                            <div class="pb-1">
+                                {{ form_row(emailForm.email, {'attr': {'ref': 'email', '@keyup': 'onEmailKeyUp'}} ) }}
+                            </div>
                             {{ form_rest(emailForm) }}
-                            <button type="submit" class="btn btn-primary float-right px-5">Save</button>
+                            <button type="submit" ref ="emailButton" class="btn btn-primary float-right px-5" @click.prevent="onEmailSubmit" disabled>Save</button>
                             {{ form_end(emailForm) }}
                         </div>
                         <div class="clearfix"></div>
@@ -60,4 +63,7 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block pagescripts %}
+    <script src="{{ asset('build/settings.js') }}"></script>
 {% endblock %}
