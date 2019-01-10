@@ -28,7 +28,7 @@ class Profile
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @ProfilePeriodLock()
-     * @Groups({"default"})
+     * @Groups({"API", "Default"})
      * @var string|null
      */
     protected $firstName;
@@ -39,7 +39,7 @@ class Profile
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
      * @ProfilePeriodLock()
-     * @Groups({"default"})
+     * @Groups({"API", "Default"})
      * @var string|null
      */
     protected $lastName;
@@ -48,7 +48,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
-     * @Groups({"default"})
+     * @Groups({"Default"})
      * @var string|null
      */
     protected $city;
@@ -57,14 +57,14 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
      * @Assert\Length(min="2")
-     * @Groups({"default"})
+     * @Groups({"Default"})
      * @var string|null
      */
     protected $country;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
+     * @Groups({"Default"})
      * @var string|null
      */
     protected $description;

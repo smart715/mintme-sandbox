@@ -7,7 +7,7 @@ use App\Exchange\Order;
 interface MarketFetcherInterface
 {
     /** @return Order[] */
-    public function getPendingOrders(string $market, int $offset, int $limit, string $side): array;
+    public function getPendingOrders(string $market, int $offset, int $limit, int $side): array;
 
     /** @return Order[] */
     public function getExecutedOrders(string $market, int $offset = 0, int $limit = 100): array;

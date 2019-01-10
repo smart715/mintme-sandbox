@@ -41,7 +41,7 @@ class ProfileController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile_view.html.twig', [
                 'token' => $profile->getToken(),
-                'profile' => $normalizer->normalize($profile, null, [ 'groups' => [ 'default' ] ]),
+                'profile' => $normalizer->normalize($profile, null, [ 'groups' => [ 'Default' ] ]),
                 'form' =>  $form->createView(),
                 'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
                 'editFormShowFirst' => $session->get('editFormShowFirst') || $form->getErrors(true)->count(),
@@ -78,13 +78,13 @@ class ProfileController extends AbstractController
         $profile  = new Profile($this->getUser());
         $form = $this->createForm(AddProfileType::class, $profile);
         $form->handleRequest($request);
-        
+
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile.html.twig', [
                 'form' => $form->createView(),
             ]);
         }
-        
+
         $profile->setPageUrl($profileManager->generatePageUrl($profile));
 
         $entityManager = $this->getDoctrine()->getManager();
