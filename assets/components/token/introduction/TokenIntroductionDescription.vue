@@ -5,10 +5,11 @@
                 Description
                 <guide>
                     <template  slot="header">
-                        Description Guide
+                        Description
                     </template>
                     <template slot="body">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                        Description about the goals, milestones and promises.
+                        Everything you should know before you buy {{ name }}.
                     </template>
                 </guide>
                 <span class="card-header-icon">
@@ -37,10 +38,11 @@
                                             class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                         <template slot="header">
-                                            About your plan Guide
+                                            About your plan
                                         </template>
                                         <template slot="body">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                            Write here your plans, goals, proofs of your
+                                            identity and everything that may interest buyers.
                                         </template>
                                     </guide>
                                 </div>
@@ -83,6 +85,7 @@ const HTTP_BAD_REQUEST = 400;
 export default {
     name: 'TokenIntroductionDescription',
     props: {
+        name: String,
         description: String,
         csrfToken: String,
         updateUrl: String,

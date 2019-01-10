@@ -5,10 +5,15 @@
                 Statistics
                 <guide>
                     <div slot="header">
-                        <h5 class="font-bold">Statistics Guide</h5>
+                        <h5 class="font-bold">Statistics</h5>
                     </div>
                     <div slot="body">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                        <p>
+                            Statistics associated with {{ name }},
+                            here you can find out how token creator
+                            manage his tokens and if he set any restriction
+                            on token release.
+                        </p>
                     </div>
                 </guide>
                 <span class="card-header-icon">
@@ -37,10 +42,11 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Wallet on exchange Guide
+                                    Wallet on exchange
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    The amount of token units being held in
+                                    token creator's wallet on exchange.
                                 </template>
                             </guide>
                         </div>
@@ -53,10 +59,10 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Active orders Guide
+                                    Active orders
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    The amount of token units, that token creator currently is selling.
                                 </template>
                             </guide>
                         </div>
@@ -69,10 +75,10 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Withdrawn Guide
+                                    Withdrawn
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    The amount of token units, that token creator withdrew from exchange.
                                 </template>
                             </guide>
                         </div>
@@ -85,10 +91,10 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Sold on the market Guide
+                                    Sold on the market
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    The amount of token units currently in circulation.
                                 </template>
                             </guide>
 
@@ -107,10 +113,10 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Release period Guide
+                                    Release period
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    Total amount of time it will take to release 100% of the token.
                                 </template>
                             </guide>
                         </div>
@@ -123,10 +129,10 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Hourly installment Guide
+                                    Hourly installment
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    Amount of token released per hour.
                                 </template>
                             </guide>
                         </div>
@@ -139,10 +145,11 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Already released Guide
+                                    Already released
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    The amount of token units released to token creator
+                                    at the moment of token creation.
                                 </template>
                             </guide>
                         </div>
@@ -155,10 +162,11 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                     rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Remaining Guide
+                                    Remaining
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    Number of tokens that are circulating in
+                                    the market and in the general public's hands.
                                 </template>
                             </guide>
                         </div>
@@ -195,6 +203,7 @@ export default {
         Guide,
     },
     props: {
+        name: String,
         tokens: {type: Object, required: true},
         pendingSellOrders: {type: Array, required: true},
         executedOrders: {type: Array, required: true},

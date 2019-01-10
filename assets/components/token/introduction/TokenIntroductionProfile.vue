@@ -33,10 +33,10 @@
                                             class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                         <template  slot="header">
-                                            Web Guide
+                                            Web
                                         </template>
                                         <template slot="body">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                            Link to token creator’s website. Before adding it, we confirmed ownership.
                                         </template>
                                     </guide>
                                 </div>
