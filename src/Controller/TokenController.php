@@ -103,11 +103,10 @@ class TokenController extends AbstractController
             ? $this->getUser()->getHash()
             : '';
 
-        $tokens = $balanceHandler->balances(
-            $this->getUser(),
-            $this->getUser()->getRelatedTokens()
-        );
-
+        $tokenAuthor = $token->getProfile()->getUser();
+        
+        $tokens =  $balanceHandler->balances($tokenAuthor, $tokenAuthor->getRelatedTokens());
+        
         $pendingSellOrders = $market
             ? $marketHandler->getPendingSellOrders($market)
             : [];
