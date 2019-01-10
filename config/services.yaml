@@ -37,7 +37,7 @@ services:
         arguments:
             $url: '%viabtc_rpc%'
             $timeoutSeconds: '%viabtc_response_timeout_seconds%'
-    
+
     deposit.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
@@ -124,7 +124,7 @@ services:
             $logger: '@logger'
         tags:
             - { name: monolog.logger, channel: rabbitmq }
-    
+
     App\Consumers\DepositConsumer:
         arguments:
             $logger: '@logger'
@@ -150,7 +150,7 @@ services:
              - [init, ['@fos_user.user_manager', '@App\Manager\ProfileManagerInterface']]
 
     payment_consumer: '@App\Consumers\PaymentConsumer'
-    
+
     deposit_consumer: '@App\Consumers\DepositConsumer'
 
     App\Manager\UserManager:
@@ -174,9 +174,19 @@ services:
     App\Security\PrelaunchVoter:
         arguments:
             $env: "%kernel.environment%"
-            
+
+    App\Controller\ResettingController:
+        decorates: fos_user.resetting.controller
+        arguments:
+            - '@event_dispatcher'
+            - '@fos_user.resetting.form.factory'
+            - '@fos_user.user_manager'
+            - '@fos_user.util.token_generator'
+            - '@fos_user.mailer'
+            - '%fos_user.resetting.retry_ttl%'
+
     App\EventSubscriber\LoadViewSubscriber:
-        arguments: 
+        arguments:
             - '@session'
             - '@viabtc.json_rpc'
             - '@App\Exchange\Trade\Config\PrelaunchConfig'

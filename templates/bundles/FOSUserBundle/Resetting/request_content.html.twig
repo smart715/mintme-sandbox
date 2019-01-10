@@ -18,6 +18,19 @@
                 </div>
             </div>
         </div>
+        <div class="form-group row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-12 col-lg-2 text-left text-lg-right"></div>
+                    <div class="col">
+                        {% if form_errors(form)|length > 0 %}
+                            <div class="bg-danger text-white">{{ form_errors(form) }}</div>
+                        {% endif %}
+                        {{ form_widget(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="form-group row pt-4">
             <div class="col-md-12 text-center">
                 <input type="submit" class="btn btn-primary" value="Change password" />

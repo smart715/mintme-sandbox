@@ -6,11 +6,6 @@
                 <div class="small text-center">
                     <div class="pt-2">
                         Last price: {{ marketStatus.last }}
-                        <font-awesome-icon
-                            icon="question"
-                            class="ml-1 mb-1 bg-primary text-white
-                                   rounded-circle square blue-question"
-                        />
                         <guide>
                             <font-awesome-icon
                                 icon="question"
@@ -18,10 +13,10 @@
                                 class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"/>
                             <template slot="header">
-                                Last price Guide
+                                Last price
                             </template>
                             <template slot="body">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                Price per one {currency2} for last transaction.
                             </template>
                         </guide>
                     </div>
@@ -36,10 +31,10 @@
                                         class="ml-1 mb-1 bg-primary text-white
                                                rounded-circle square blue-question"/>
                                     <template slot="header">
-                                        24h change Guide
+                                        24h change
                                     </template>
                                     <template slot="body">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                        Price change in last 24h
                                     </template>
                                 </guide>
                             </div>
@@ -55,10 +50,10 @@
                                         class="ml-1 mb-1 bg-primary text-white
                                                rounded-circle square blue-question"/>
                                     <template slot="header">
-                                        24h volume Guide
+                                        24h volume
                                     </template>
                                     <template slot="body">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                        The amount of {currency1} that has been traded in the last 24 hours.
                                     </template>
                                 </guide>
                             </div>
