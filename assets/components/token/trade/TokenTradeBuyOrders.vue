@@ -5,10 +5,14 @@
                 Buy Orders
                 <span class="card-header-icon">
                     Total: xxxWEB
-                    <font-awesome-icon
-                        icon="question"
-                        class="ml-1 mb-1 p-1 h4 bg-orange rounded-circle square"
-                    />
+                    <guide>
+                        <template slot="header">
+                            Buy Orders
+                        </template>
+                        <template slot="body">
+                            List of all active buy orders for {currency2}.
+                        </template>
+                    </guide>
                 </span>
             </div>
             <div class="card-body p-0">
@@ -32,6 +36,7 @@
 
 >
 <script>
+import Guide from '../../Guide';
 import {toMoney} from '../../../js/utils';
 import Decimal from 'decimal.js';
 
@@ -41,6 +46,9 @@ export default {
         containerClass: String,
         buyOrders: String,
         tokenName: String,
+    },
+    components: {
+        Guide,
     },
     data() {
         return {

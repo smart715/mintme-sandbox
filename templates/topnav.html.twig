@@ -10,12 +10,6 @@
                     <li class="search nav-item align-self-start align-self-lg-center py-3 py-lg-0 pr-0 pr-md-3">
                         <token-searcher search-url="{{ path('api_token_search') }}"></token-searcher>
                     </li>
-                {% else %}
-                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
-                        Referral Program
-                    </b-nav-item>
-                {% endif %}
-                {% if prelaunch.isFinished() %}
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
                         <span class="icon-token float-left mr-1"></span>
                         <span>My Token</span>
@@ -26,8 +20,15 @@
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                         Wallet
                     </b-nav-item>
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
+                        Referral Program
+                    </b-nav-item>
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') starts with 'sonata_news' ? 'active' : '' }}" href="{{ path('sonata_news_archive') }}">
                         News
+                    </b-nav-item>
+                {% else %}
+                    <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
+                        Referral Program
                     </b-nav-item>
                 {% endif %}
                 {% if not app.user %}

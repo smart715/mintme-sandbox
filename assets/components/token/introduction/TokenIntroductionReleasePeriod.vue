@@ -3,10 +3,22 @@
         <b-col cols="12" class="statistic-description mb-2">
             <div>
                 Token release period:
-                <font-awesome-icon
+                <guide>
+                    <font-awesome-icon
                         icon="question"
-                        class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"
-                />
+                        slot='icon'
+                        class="ml-1 mb-1 bg-primary text-white
+                                    rounded-circle square blue-question"/>
+                    <template slot="header">
+                        Token Release Period
+                    </template>
+                    <template slot="body">
+                        Period it will take for the full release of your newly created token,
+                        something similar to escrow. Mintme acts as 3rd party that ensure
+                        you won’t flood market with all of your tokens which could lower price
+                        significantly, because unlocking all tokens take time. It’s released hourly
+                    </template>
+                </guide>
             </div>
             <div>
                 explanation about token release period. Three maybe four sentences. how it works.
@@ -69,6 +81,7 @@
 import vueSlider from 'vue-slider-component';
 import axios from 'axios';
 import {deepFlatten} from '../../../js/utils';
+import Guide from '../../Guide';
 
 export default {
     name: 'TokenIntroductionReleasePeriod',
@@ -85,6 +98,7 @@ export default {
     },
     components: {
         vueSlider,
+        Guide,
     },
     methods: {
         cancelAction: function() {

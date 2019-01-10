@@ -56,6 +56,7 @@
                             </token-introduction-profile>
 
                             <token-introduction-statistics
+                                name="{{ token.name }}"
                                 container-class="col-12 col-md-6 mt-3 mt-md-0"
                                 :editable="{{ isOwner ? 'true' : 'false' }}"
                                 csrf="{{ csrf_token('update-token') }}"
@@ -71,6 +72,7 @@
                         <div class="row">
                             <token-introduction-description
                                 class="col-12 mt-3 mt-3"
+                                name="{{ token.name }}"
                                 description="{{ token.description }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
