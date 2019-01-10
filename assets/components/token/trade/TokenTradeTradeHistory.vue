@@ -4,10 +4,14 @@
             <div class="card-header">
                 Trade History
                 <span class="card-header-icon">
-                    <font-awesome-icon
-                        icon="question"
-                        class="ml-1 mb-1 p-1 h4 bg-orange rounded-circle square"
-                    />
+                    <guide>
+                        <template slot="header">
+                            Trade History
+                        </template>
+                        <template slot="body">
+                            List of last closed orders for {currency2}.
+                        </template>
+                    </guide>
                 </span>
             </div>
             <div class="card-body p-0">
@@ -37,6 +41,7 @@
 </template>
 
 <script>
+import Guide from '../../Guide';
 import {toMoney} from '../../../js/utils';
 import Decimal from 'decimal.js';
 
@@ -46,6 +51,9 @@ export default {
         containerClass: String,
         ordersHistory: String,
         tokenName: String,
+    },
+    components: {
+        Guide,
     },
     data() {
         return {

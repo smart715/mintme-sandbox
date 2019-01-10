@@ -5,10 +5,10 @@
                 Sell Order
                 <guide>
                     <template slot="header">
-                        Sell Order Guide
+                        Sell Order
                     </template>
                     <template slot="body">
-                        Lorem psum dolor sit amet, consectetur adipisicing elit.
+                        Form used to create  an order so you can sell {currency2} or make offer.
                     </template>
                 </guide>
             </div>
@@ -28,10 +28,10 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Your Tokens Guide
+                                    Your Tokens
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    Your {currency2} balance.
                                 </template>
                             </guide>
                         </span>
@@ -57,10 +57,11 @@
                                         class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                     <template slot="header">
-                                        Market Price Guide
+                                        Market Price
                                     </template>
                                     <template slot="body">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                        Checking this box fetches current best market price
+                                        for which you can sell {currency2}.
                                     </template>
                                 </guide>
                             </label>
@@ -78,10 +79,10 @@
                                     class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                 <template slot="header">
-                                    Price in WEB Guide
+                                    Price in WEB
                                 </template>
                                 <template slot="body">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    The price at which you want to sell one {currency2}.
                                 </template>
                             </guide>
                         </label>
@@ -119,10 +120,10 @@
                                 class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"/>
                             <template slot="header">
-                                Total Price Guide
+                                Total Price
                             </template>
                             <template slot="body">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                Total amount to pay, including exchange fee.
                             </template>
                         </guide>
                     </div>
