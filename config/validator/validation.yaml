@@ -1,0 +1,7 @@
+App\Form\Model\EditEmail:
+    properties:
+        email:
+            - NotBlank: ~
+            - Email:
+                message: 'Invalid email address.'
+            - App\Validator\Constraints\UserEmail: ~
