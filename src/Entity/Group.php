@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Entity\User;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Sonata\UserBundle\Entity\BaseGroup as BaseGroup;
+use Sonata\UserBundle\Entity\BaseGroup;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\News\PostRepository")
@@ -24,13 +24,11 @@ class Group extends BaseGroup
      * @Serializer\SerializedName("id")
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
+     * @var int
      */
     protected $id;
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

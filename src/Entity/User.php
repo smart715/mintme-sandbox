@@ -6,16 +6,17 @@ use App\Entity\Token\Token;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use JMS\Serializer\Annotation as Serializer;
 use Ramsey\Uuid\Uuid;
 use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @ORM\Table(name="user")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_group")
  */
