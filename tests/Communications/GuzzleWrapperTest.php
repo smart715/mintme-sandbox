@@ -12,6 +12,7 @@ use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
 
 class GuzzleWrapperTest extends TestCase
 {
@@ -29,7 +30,13 @@ class GuzzleWrapperTest extends TestCase
             ->with($this->equalTo($url), $this->equalTo(['timeout' => $timeout]))
             ->willReturn($client);
 
-        $wrapper = new GuzzleWrapper($this->getRandomNumber(), $clientFactory, $url, $timeout);
+        $wrapper = new GuzzleWrapper(
+            $this->getRandomNumber(),
+            $clientFactory,
+            $this->getLoggerMock(),
+            $url,
+            $timeout
+        );
 
         for ($i = 0; $i < 5; $i++) {
             $wrapper->send('stubmethod', [['stubparam1', 'stubparam2']]);
@@ -53,7 +60,13 @@ class GuzzleWrapperTest extends TestCase
             ->with($url, ['timeout' => $timeout])
             ->willReturn($client);
 
-        $wrapper = new GuzzleWrapper($this->getRandomNumber(), $clientFactory, $url, $timeout);
+        $wrapper = new GuzzleWrapper(
+            $this->getRandomNumber(),
+            $clientFactory,
+            $this->getLoggerMock(),
+            $url,
+            $timeout
+        );
         $this->assertInstanceOf(JsonRpcResponse::class, $wrapper->send($method, $params));
     }
 
@@ -73,7 +86,13 @@ class GuzzleWrapperTest extends TestCase
             ->with($url, ['timeout' => $timeout])
             ->willReturn($clientMock);
 
-        $wrapper = new GuzzleWrapper($this->getRandomNumber(), $clientFactory, $url, $timeout);
+        $wrapper = new GuzzleWrapper(
+            $this->getRandomNumber(),
+            $clientFactory,
+            $this->getLoggerMock(),
+            $url,
+            $timeout
+        );
 
         $this->expectException(\Throwable::class);
         $wrapper->send($method, $params);
@@ -84,6 +103,12 @@ class GuzzleWrapperTest extends TestCase
         $streamMock = $this->createMock(StreamInterface::class);
         $streamMock->method('getContents')->willReturn($content);
         return $streamMock;
+    }
+
+    /** @return MockObject|LoggerInterface */
+    private function getLoggerMock(): LoggerInterface
+    {
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
