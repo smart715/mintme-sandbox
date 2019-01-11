@@ -7,6 +7,7 @@ use App\Utils\RandomNumberInterface;
 use Exception;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class GuzzleWrapper implements JsonRpcInterface
 {
@@ -25,14 +26,19 @@ class GuzzleWrapper implements JsonRpcInterface
     /** @var RandomNumberInterface */
     private $random;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         RandomNumberInterface $randomNumber,
         Factory\RpcClientFactoryInterface $clientFactory,
+        LoggerInterface $logger,
         string $url,
         int $timeoutSeconds
     ) {
         $this->clientFactory = $clientFactory;
         $this->url = $url;
+        $this->logger = $logger;
         $this->timeoutSeconds = $timeoutSeconds;
         $this->random = $randomNumber;
     }
@@ -44,6 +50,10 @@ class GuzzleWrapper implements JsonRpcInterface
             $response = $this->sendRequest($methodName, $requestParams);
             return $this->parseResponse($response);
         } catch (\Throwable $e) {
+            $this->logger->error(
+                "Failed to get response from '$this->url' with method '$methodName'. Error: "
+                . $e->getCode() .". ". $e->getMessage()
+            );
             throw new FetchException($e->getMessage(), $e->getCode());
         }
     }
