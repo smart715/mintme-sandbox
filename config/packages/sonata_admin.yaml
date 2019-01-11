@@ -9,6 +9,11 @@ sonata_admin:
 
         groups:
 
+            usergroup:
+                label: Users Administration
+                items:
+                    - admin.user
+
             sonata.admin.group.content:
                 label: News
                 items:
