@@ -9,13 +9,15 @@ use FOS\UserBundle\Model\User as BaseUser;
 use Ramsey\Uuid\Uuid;
 use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @Serializer\ExclusionPolicy("all")
+ * @Serializer\XmlRoot(name="_group")
  */
 class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 {
@@ -23,6 +25,12 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Groups({"sonata_api_read","sonata_api_write","sonata_search"})
+     * @Serializer\Since(version="1.0")
+     * @Serializer\Type(name="integer")
+     * @Serializer\SerializedName("id")
+     * @Serializer\XmlAttributeMap
+     * @Serializer\Expose
      * @var int
      */
     protected $id;
