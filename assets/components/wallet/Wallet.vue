@@ -17,7 +17,7 @@
                             v-tippy="tooltipOptions"
                             icon="shopping-cart"
                             class="text-orange c-pointer"
-                            @click="openWithdraw(data.item.name, data.item.fee)"
+                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)"
                     />
                     <font-awesome-icon
                             :title="depositTooltip"
@@ -67,6 +67,7 @@
             :currency="selectedCurrency"
             :fee="fee"
             :withdraw-url="withdrawUrl"
+            :max-amount="amount"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -93,8 +94,8 @@ export default {
         DepositModal,
     },
     props: {
-        tokens: {type: Object, required: true},
-        predefinedTokens: {type: Object, required: true},
+        tokens: {type: Array, default: () => []},
+        predefinedTokens: {type: Array, default: () => []},
         withdrawUrl: {type: String, required: true},
         depositAddresses: {type: Object},
         createTokenUrl: String,
@@ -117,7 +118,8 @@ export default {
             },
             depositTooltip: 'Deposit!',
             withdrawTooltip: 'Withdraw!',
-            fee: 0,
+            fee: '0',
+            amount: '0',
             predefinedTokenFields: {
                 name: {label: 'Name', sortable: true},
                 available: {label: 'Amount', sortable: true},
@@ -162,10 +164,11 @@ export default {
         });
     },
     methods: {
-        openWithdraw: function(currency, fee) {
+        openWithdraw: function(currency, fee, amount) {
             this.showModal = true;
             this.selectedCurrency = currency;
             this.fee = fee;
+            this.amount = toMoney(amount);
         },
         closeWithdraw: function() {
             this.showModal = false;

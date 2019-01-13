@@ -2,7 +2,7 @@
     <modal
         :visible="visible"
         @close="closeModal">
-        <template slot="body" v-if="formLoaded">
+        <template slot="body">
             <div class="text-center">
                 <h3>WITHDRAW({{ currency }})</h3>
                 <div class="col-12 pt-3">
@@ -62,15 +62,6 @@
                 </div>
             </div>
         </template>
-        <template slot="body" v-else>
-            <div class="row mb-3">
-                <div class="col text-center">
-                    <font-awesome-layers class="fa-3x">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width  />
-                    </font-awesome-layers>
-                </div>
-            </div>
-        </template>
     </modal>
 </template>
 
@@ -89,14 +80,13 @@ export default {
     props: {
         visible: Boolean,
         currency: String,
-        fee: Number,
+        fee: String,
         withdrawUrl: String,
+        maxAmount: String,
     },
     data() {
         return {
-            formLoaded: false,
             amount: 0,
-            maxAmount: 0,
             address: '',
         };
     },
@@ -142,31 +132,10 @@ export default {
             this.$emit('cancel');
             this.closeModal();
         },
-        fetchMaxAmount: function() {
-            return axios.get(this.$routing.generate('fetch_balance_token', {tokenName: this.currency}));
-        },
         setMaxAmount: function() {
             let amount = new Decimal(this.maxAmount);
             this.amount = amount.greaterThan(this.fee) ?
                 toMoney(amount.sub(this.fee).toString()) : toMoney(0);
-        },
-    },
-    watch: {
-        visible: function(value) {
-            if (!value) {
-                this.formLoaded = false;
-                return;
-            }
-
-            this.fetchMaxAmount()
-                .then((response) => {
-                    this.maxAmount = response.data.available;
-                    this.formLoaded = true;
-                })
-                .catch((error) => {
-                    this.$emit('close');
-                    this.$toasted.error('Service unavailable now. Try later');
-                });
         },
     },
     validations() {
