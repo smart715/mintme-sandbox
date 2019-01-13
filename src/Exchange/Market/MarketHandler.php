@@ -109,7 +109,7 @@ class MarketHandler implements MarketHandlerInterface
                 null,
                 $market,
                 $this->moneyWrapper->parse(
-                    $orderData['amount'],
+                    $orderData['left'],
                     $market->getCurrencySymbol()
                 ),
                 $orderData['side'],
