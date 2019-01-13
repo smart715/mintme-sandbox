@@ -50,7 +50,7 @@ export default {
     },
     props: {
         markets: Array,
-        orders: Object,
+        orders: {type: Array, default: () => []},
     },
     data() {
         return {
@@ -112,13 +112,21 @@ export default {
                         });
                         break;
                     case WSAPI.order.status.UPDATE:
+                        if (typeof order === 'undefined') {
+                            return;
+                        }
+
                         let index = this.ordersList.indexOf(order);
-                        order.amount = data.amount;
-                        order.price = data.amount;
+                        order.amount = data.left;
+                        order.price = data.price;
                         order.timestamp = data.mtime;
                         this.ordersList[index] = order;
                         break;
                     case WSAPI.order.status.FINISH:
+                        if (typeof order === 'undefined') {
+                            return;
+                        }
+
                         this.ordersList.splice(this.ordersList.indexOf(order), 1);
                         break;
                 }
