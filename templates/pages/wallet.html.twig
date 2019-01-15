@@ -27,7 +27,8 @@
                             <trading-history  :executed-history="{{ executedHistory | json_encode }}"></trading-history>
                         </b-tab>
                         <b-tab title="Deposit/Withdraw History" >
-                            <deposit-withdraw-history></deposit-withdraw-history>
+                            {{ include("loader.html.twig") }}
+                            <deposit-withdraw-history :init-history="{{ depositWithdrawHistory | json_encode }}" />
                         </b-tab>
                         <b-tab title="Active Orders" >
                             <active-orders

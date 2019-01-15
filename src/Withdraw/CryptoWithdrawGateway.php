@@ -7,8 +7,6 @@ use App\Entity\User;
 use App\Withdraw\Communicator\CommunicatorInterface;
 use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use App\Withdraw\Fetcher\Mapper\MapperInterface;
-use App\Withdraw\Payment\Status;
-use App\Withdraw\Payment\Transaction;
 use Money\Money;
 
 class CryptoWithdrawGateway implements WithdrawGatewayInterface
