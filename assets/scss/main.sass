@@ -12,6 +12,7 @@
 @import 'profile-view-page'
 @import 'errorpages'
 @import 'mixins'
+@import 'wallet'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
@@ -302,6 +303,10 @@ nav.top-navbar
   border-color: $red
   background-color: $red
   color: $white
+
+.empty-table
+  .b-table-has-details
+    display: none
 
 .notification
   .bell

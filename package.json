@@ -24,6 +24,7 @@
     "gapi": "0.0.3",
     "karma-es5-shim": "0.0.4",
     "karma-es6-shim": "^1.0.0",
+    "moment": "^2.22.2",
     "locutus": "^2.0.10",
     "offline-plugin": "^5.0.6",
     "url-parse": "^1.4.4",

@@ -13,6 +13,7 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Wallet\WalletInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class WalletController extends AbstractController
 {
+    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 20;
+
     /**
      * @Route(name="wallet")
      */
@@ -35,13 +38,15 @@ class WalletController extends AbstractController
         DepositGatewayCommunicatorInterface $depositCommunicator,
         MarketManagerInterface $marketManager,
         TokenManagerInterface $tokenManager,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        WalletInterface $wallet
     ): Response {
+
         $tokens = $balanceHandler->balances(
             $this->getUser(),
             $this->getUser()->getRelatedTokens()
         );
-        
+
         $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
         /** @var User $user */
@@ -53,11 +58,11 @@ class WalletController extends AbstractController
         $token = $profile
             ? $profile->getToken()
             : null;
-        
+
         $market = $webCrypto && $token
             ? $marketManager->getMarket($webCrypto, $token)
             : null;
-           
+
         $executedHistory = $market
             ? $marketHandler->getUserExecutedHistory($user, $marketManager->getUserRelatedMarkets($user))
             : [];
@@ -65,22 +70,11 @@ class WalletController extends AbstractController
         $orders = $market
             ? $marketHandler->getPendingOrdersByUser($user, $marketManager->getUserRelatedMarkets($user))
             : [];
-            
+
         $predefinedTokens = $balanceHandler->balances(
             $this->getUser(),
             $tokenManager->findAllPredefined()
         );
-
-        try {
-            $depositAddresses = $depositCommunicator->getDepositCredentials(
-                $this->getUser()->getId(),
-                $tokenManager->findAllPredefined()
-            )->toArray();
-        } catch (\Throwable $e) {
-            $depositAddresses = $depositCommunicator->getUnavailableCredentials(
-                $tokenManager->findAllPredefined()
-            )->toArray();
-        }
 
         return $this->render('pages/wallet.html.twig', [
             'orders' => $normalizer->normalize($orders, null, [
@@ -99,7 +93,13 @@ class WalletController extends AbstractController
             'predefinedTokens' => $normalizer->normalize($predefinedTokens, null, [
                 'groups' => [ 'Default' ],
             ]),
-            'depositAddresses' => $depositAddresses,
+            'depositAddresses' => $depositCommunicator->getDepositCredentials(
+                $this->getUser()->getId(),
+                $tokenManager->findAllPredefined()
+            )->toArray(),
+            'depositWithdrawHistory' => $normalizer->normalize(
+                $wallet->getWithdrawDepositHistory($this->getUser(), 0, self::DEPOSIT_WITHDRAW_HISTORY_LIMIT)
+            ),
         ]);
     }
 }
