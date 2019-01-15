@@ -32,8 +32,19 @@ Installation
 7. Build frontend: `npm install` and `npm run dev` (or `npm run prod` in staging/production). Re-run `npm run dev` after making changes to frontend to reflect them in your local webserver;
 8. Check if everything's up by visiting your page in the web browser, and you are done!
 
-You also need to run `php bin/console cron:start` to lounch cron operations to update users lock-in and
-`php bin/console rabbitmq:consumer payment &` to listen for failed payouts to return amount quantity.
+You also need to run 
+```
+php bin/console cron:start
+```
+to launch cron operations to update users lock-in,
+```
+php bin/console rabbitmq:consumer payment &
+``` 
+to listen for failed payouts to pay amount quantity back to user and
+```
+php bin/console rabbitmq:consumer deposit &
+```
+to listen for incoming deposits.
 
 Contribution
 ------------

@@ -5,11 +5,11 @@ namespace App\Tests\Withdraw\Fetcher;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Wallet\Model\Transaction;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Withdraw\Fetcher\Mapper\WithdrawMapper;
 use App\Withdraw\Fetcher\Storage\StorageAdapterInterface;
-use App\Withdraw\Payment\Transaction;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -97,11 +97,11 @@ class WithdrawMapperTest extends TestCase
     /** @return Crypto|MockObject */
     public function mockCrypto(string $symbol = 'web'): Crypto
     {
-        $user = $this->createMock(Crypto::class);
+        $crypto = $this->createMock(Crypto::class);
 
-        $user->method('getSymbol')->willReturn('web');
+        $crypto->method('getSymbol')->willReturn($symbol);
 
-        return $user;
+        return $crypto;
     }
 
     /** @return User|MockObject */

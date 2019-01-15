@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Withdraw\Payment\Exception;
+namespace App\Wallet\Model\Exception;
 
 class StatusException extends \Exception
 {
- 
+
 }

@@ -4,20 +4,20 @@
             <div class="card-header">
                 Buy Orders
                 <span class="card-header-icon">
-                    Total: xxxWEB
+                    Total: {{ total }} WEB
                     <guide>
                         <template slot="header">
                             Buy Orders
                         </template>
                         <template slot="body">
-                            List of all active buy orders for {currency2}.
+                            List of all active buy orders for {{ tokenName }}.
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <b-table ref="table"
+                    <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
@@ -28,13 +28,15 @@
                                alt="avatar">
                         </template>
                     </b-table>
+                    <div v-if="!hasOrders">
+                        <h4 class="text-center p-5">No order was added yet</h4>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
->
 <script>
 import Guide from '../../Guide';
 import {toMoney} from '../../../js/utils';
@@ -70,6 +72,9 @@ export default {
         };
     },
     computed: {
+        total: function() {
+            return toMoney(this.orders.reduce((sum, order) => parseFloat(order.price) + sum, 0));
+        },
         ordersList: function() {
             return this.orders.map((order) => {
                 return {
@@ -79,6 +84,9 @@ export default {
                     trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
                 };
             });
+        },
+        hasOrders: function() {
+              return this.orders.length > 0;
         },
     },
     mounted: function() {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Withdraw\Payment;
+namespace App\Wallet\Model;
 
-use App\Withdraw\Payment\Exception\StatusException;
+use App\Wallet\Model\Exception\StatusException;
 
 class Status
 {

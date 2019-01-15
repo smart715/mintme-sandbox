@@ -4,20 +4,20 @@
             <div class="card-header">
                 Sell Orders
                 <span class="card-header-icon">
-                    Total: xxxToken
+                    Total: {{ total }} {{ tokenName }}
                     <guide>
                         <template slot="header">
                             Sell Orders
                         </template>
                         <template slot="body">
-                            List of all active sell orders for {currency2}.
+                            List of all active sell orders for {{ tokenName }}.
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <b-table ref="table"
+                    <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
@@ -28,6 +28,9 @@
                                alt="avatar">
                         </template>
                     </b-table>
+                    <div v-if="!hasOrders">
+                        <h4 class="text-center p-5">No order was added yet</h4>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,6 +72,9 @@ export default {
         };
     },
     computed: {
+        total: function() {
+            return toMoney(this.orders.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
+        },
         ordersList: function() {
             return this.orders.map((order) => {
                 return {
@@ -78,6 +84,9 @@ export default {
                     trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
                 };
             });
+        },
+        hasOrders: function() {
+            return this.orders.length > 0;
         },
     },
     mounted: function() {
