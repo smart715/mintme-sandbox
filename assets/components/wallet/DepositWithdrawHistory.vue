@@ -1,31 +1,33 @@
 <template>
     <div class="pb-3">
-        <div class="table-responsive">
+        <div class="table-responsive deposit-withdraw-history" @scroll.passive="loadMore">
             <b-table
-                :items="history"
+                :items="sanitizedHistory"
                 :fields="fields"
-                :current-page="currentPage"
-                :per-page="perPage">
+                :class="{'empty-table': noHistory}"
+                ref="table"
+            >
+            <template slot="row-details" slot-scope="row">
+                No transaction was made yet
+            </template>
             </b-table>
-        </div>
-        <div class="row justify-content-center">
-            <b-pagination
-                :total-rows="totalRows"
-                :per-page="perPage"
-                v-model="currentPage"
-                class="my-0" />
         </div>
     </div>
 </template>
 
 <script>
+import moment from 'moment';
+import axios from 'axios';
+import Routing from '../../js/routing.js';
+import {toMoney} from '../../js/utils';
+
 export default {
     name: 'DepositWithdrawHistory',
+    props: {
+        initHistory: Array,
+    },
     data() {
         return {
-            history: [],
-            currentPage: 1,
-            perPage: 10,
             fields: {
                 date: {
                     label: 'Date',
@@ -35,7 +37,11 @@ export default {
                     label: 'Type',
                     sortable: true,
                 },
-                address: {
+                crypto: {
+                    label: 'Name',
+                    sortable: true,
+                },
+                toAddress: {
                     label: 'Address',
                     sortable: true,
                 },
@@ -43,39 +49,80 @@ export default {
                     label: 'Amount',
                     sortable: true,
                 },
-                price: {
-                    label: 'Price',
+                status: {
+                    label: 'Status',
                     sortable: true,
                 },
-                total: {
-                    label: 'Total cost',
-                    sortable: true,
-                },
-                free: {
-                    label: 'Free',
+                fee: {
+                    label: 'Fee',
                     sortable: true,
                 },
             },
+            history: {
+                data: this.initHistory,
+                dateFormat: 'MM-DD-YYYY',
+            },
+            currentPage: 1,
+            canRequestNextPage: true,
         };
     },
     computed: {
-        totalRows: function() {
-            return this.history.length;
+        sanitizedHistory: function() {
+            return this.sanitizeHistory(this.history.data);
+        },
+        noHistory: function() {
+            return this.history.data[0] && this.history.data[0]._showDetails;
         },
     },
-    created: function() {
-        // TODO: This is a dummy simulator.
-        for (let i = 0; i < 100; i++) {
-            this.history.push({
-                date: '12-12-1970',
-                type: (i % 2 === 0) ? 'Deposit' : 'Withdraw',
-                address: '0xe1f05911dba854fwc...',
-                amount: Math.floor(Math.random() * 99) + 10,
-                price: Math.floor(Math.random() * 99) + 10,
-                total: Math.floor(Math.random() * 99) + 10 + 'WEB',
-                free: Math.floor(Math.random() * 99) + 10,
+    methods: {
+        addDetailsForEmptyMessageToHistory: function(historyData) {
+            if (0 === historyData.length) {
+                historyData.push({_showDetails: true});
+            }
+            return historyData;
+        },
+        getHistory: function() {
+            if (this.canRequestNextPage) {
+                this.canRequestNextPage = false;
+                axios.get(
+                    Routing.generate('api_history', {page: page})
+                ).then((response) => {
+                    if (response.data.length > 0) {
+                        this.history.data = this.history.data.concat(response.data);
+                        this.canRequestNextPage = true;
+                        this.currentPage++;
+                    }
+                }).catch((error) => { });
+            }
+        },
+        sanitizeHistory: function(historyData) {
+            historyData.forEach((item, index) => {
+                historyData[index]['date'] = item.date
+                    ? moment(item.date).format(this.history.dateFormat)
+                    : null;
+                historyData[index]['amount'] = item.amount
+                    ? toMoney(item.amount)
+                    : null;
+                historyData[index]['crypto'] = item.crypto.symbol
+                    ? item.crypto.symbol
+                    : null;
+                historyData[index]['status'] = item.status.statusCode
+                    ? item.status.statusCode
+                    : null;
+                historyData[index]['type'] = item.type.typeCode
+                    ? item.type.typeCode
+                    : null;
+                historyData[index]['fee'] = item.fee
+                    ? toMoney(item.fee)
+                    : null;
             });
-        }
+            return historyData;
+        },
+        loadMore: function(evt) {
+            if (this.$refs.table.$el.offsetHeight - evt.target.offsetHeight - evt.target.scrollTop < 150) {
+                this.getHistory();
+            }
+        },
     },
 };
 </script>

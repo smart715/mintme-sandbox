@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Manager\CryptoManagerInterface;
+use App\Verify\WebsiteVerifierInterface;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
@@ -11,10 +12,12 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use App\Withdraw\WithdrawGatewayInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -23,6 +26,29 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class WalletAPIController extends FOSRestController
 {
+    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 5;
+
+    /**
+     * @Rest\View()
+     * @Rest\GET("/history/{page}", name="api_history", requirements={"page"="^[1-9]\d*$"})
+     */
+    public function getDepositWithdrawHistory(
+        int $page,
+        ParamFetcherInterface $request,
+        WalletInterface $wallet
+    ): View {
+
+        $depositWithdrawHistory = $wallet
+            ->getWithdrawDepositHistory(
+                $this->getUser(),
+                $page - 1,
+                self::DEPOSIT_WITHDRAW_HISTORY_LIMIT
+            )
+        ;
+
+        return $this->view($depositWithdrawHistory);
+    }
+
     /**
      * @Rest\View()
      * @Rest\Post("/withdraw", name="withdraw")
