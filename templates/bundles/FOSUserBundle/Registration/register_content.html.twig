@@ -7,8 +7,8 @@
 
 {% block formBody %}
     {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
-        {{ form_row(form.email, { 'inline': true }) }}
-        {{ form_row(form.plainPassword.first, { 'inline': true, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$'} }) }}
+        {{ form_row(form.email, { 'inline': true, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$'} }) }}
+        {{ form_row(form.plainPassword.first, { 'inline': true }) }}
         {{ form_row(form.plainPassword.second, { 'inline': true }) }}
         {{ form_row(form.recaptcha, { 'inline': true }) }}
         <div class="text-center">
