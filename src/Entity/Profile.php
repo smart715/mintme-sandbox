@@ -27,6 +27,8 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
@@ -38,6 +40,7 @@ class Profile
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
@@ -57,6 +60,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
      * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @Groups({"Default"})
      * @var string|null
      */
