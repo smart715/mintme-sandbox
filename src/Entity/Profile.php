@@ -179,8 +179,9 @@ class Profile
 
     public function getCountry(): ?string
     {
-        if($this->country)
+        if ($this->country) {
             return Intl::getRegionBundle()->getCountryName($this->country);
+        }
         return $this->country;
     }
 
