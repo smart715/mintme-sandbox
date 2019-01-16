@@ -9,7 +9,7 @@
                     </template>
                     <template slot="body">
                         Form used to create  an order so you can
-                        buy {currency2} or make offer.
+                        buy {{ currency }} or make offer.
                     </template>
                 </guide>
             </div>
@@ -31,7 +31,7 @@
                                     Your WEB
                                 </template>
                                 <template slot="body">
-                                    Your {currency1} balance.
+                                    Your {{ currency }} balance.
                                 </template>
                             </guide>
                         </span>
@@ -62,7 +62,7 @@
                                     </template>
                                     <template slot="body">
                                         Checking this box fetches current best market price
-                                        for which you can buy {currency2}.
+                                        for which you can buy {{ currency }}.
                                     </template>
                                 </guide>
                             </label>
@@ -83,7 +83,7 @@
                                     Price in WEB
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to but one {currency2}.
+                                    The price at which you want to but one {{ currency }}.
                                 </template>
                             </guide>
                         </label>
@@ -177,6 +177,7 @@ export default {
         marketName: Object,
         buy: Object,
         balance: String,
+        currency: String,
     },
     data() {
         return {
