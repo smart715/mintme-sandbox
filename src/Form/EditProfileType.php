@@ -20,6 +20,8 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
+                    'pattern' => '[^\d]+',
+                    'title' => 'shouldn\'t contain numbers',
                 ],
             ])
             ->add('lastName', TextType::class, [
@@ -27,6 +29,8 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
+                    'pattern' => '[^\d]+',
+                    'title' => 'shouldn\'t contain numbers',
                 ],
             ])
             ->add('city', TextType::class, [
