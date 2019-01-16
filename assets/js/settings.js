@@ -6,7 +6,6 @@ new Vue({
     },
     mounted: function() {
         this.initialEmail = this.$refs.email.value;
-        console.log(this.initialEmail);
     },
     methods: {
         onEmailSubmit: function() {
