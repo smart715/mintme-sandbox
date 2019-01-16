@@ -54,6 +54,11 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     /**
      * @Assert\NotBlank()
      * @Assert\Email()
+     * @Assert\Regex(
+     *     pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
+     *     match=true,
+     *     message="Invalid email address."
+     * )
      * @var string
      */
     protected $email;
