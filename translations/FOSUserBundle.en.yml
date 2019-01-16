@@ -8,8 +8,6 @@ form:
     group_name: 'Group name'
     username: 'Username:'
     email: 'Email:'
-    email:
-        invalid: 'Invalid email address.'
     current_password: 'Current password:'
     password: 'Password:'
     password_confirmation: 'Repeat password:'
