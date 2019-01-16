@@ -5,9 +5,10 @@
 {% set featured = true %}
 
 {% block formBody %}
-    <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
+    {{ form_start(form, {'method': 'post', 'action': path('fos_user_resetting_send_email'), 'attr': {'class': 'fos_user_resetting_request'}}) }}
         <div class="form-group row">
             <div class="col-md-12">
+            {{ form_row(form.email, {'attr': {'class': 'form-control form-control-md'}}) }}
                 <div class="row">
                     <div class="col-12 col-lg-2 text-left text-lg-right">
                         <label for="inputEmail" class="d-block label-featured">Email</label>
@@ -36,5 +37,5 @@
                 <input type="submit" class="btn btn-primary" value="Change password" />
             </div>
         </div>
-    </form>
+    {{ form_end(form) }}
 {% endblock %}
