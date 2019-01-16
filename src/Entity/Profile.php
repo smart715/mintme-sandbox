@@ -26,7 +26,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Regex(pattern="/^[^\d]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @ProfilePeriodLock()
@@ -38,7 +38,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Regex(pattern="/^[^\d]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @ProfilePeriodLock()
@@ -51,6 +51,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Regex(pattern="/^[^\d]+$/u")
      * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @Groups({"Default"})
      * @var string|null
      */
@@ -118,7 +119,7 @@ class Profile
 
     public function lockChanges(): self
     {
-        $this->isChangesLocked = true;
+//        $this->isChangesLocked = true;
 
         return $this;
     }
@@ -126,7 +127,7 @@ class Profile
     /** @ORM\PrePersist() */
     public function updateNameChangedDate(): self
     {
-        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
+//        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
 
         return $this;
     }
@@ -189,14 +190,14 @@ class Profile
 
     public function setFirstName(string $firstName): self
     {
-        $this->firstName = $firstName;
+        $this->firstName = $this->removeDoubleSpaces($firstName);
 
         return $this;
     }
 
     public function setLastName(string $lastName): self
     {
-        $this->lastName = $lastName;
+        $this->lastName = $this->removeDoubleSpaces($lastName);
 
         return $this;
     }
@@ -221,5 +222,9 @@ class Profile
     public function getToken(): ?Token
     {
         return $this->token;
+    }
+
+    protected function removeDoubleSpaces($text) {
+        return preg_replace('/\s+/', ' ', $this);
     }
 }
