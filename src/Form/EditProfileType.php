@@ -17,9 +17,15 @@ class EditProfileType extends AbstractType
         $builder
             ->add('firstName', TextType::class, [ 'label' => 'First Name' ])
             ->add('lastName', TextType::class, [ 'label' => 'Last Name' ])
-            ->add('city', TextType::class, [ 'label' => 'City' ])
+            ->add('city', TextType::class, [
+                'label' => 'City',
+                'attr' => [
+                    'pattern' => '[^\d]+',
+                    'title' => 'shouldn\'t contain numbers',
+                ]
+            ])
             ->add('country', CountryType::class, [ 'label' => 'Country' ])
-            ->add('description', TextareaType::class, [ 'label' => 'Description', 'attr' => ['maxlength' => 150] ]);
+            ->add('description', TextareaType::class, [ 'label' => 'Description', 'attr' => [ 'maxlength' => 150 ] ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -46,7 +46,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Regex(pattern="/^[^\d]+$/u")
      * @Assert\Length(min="2")
      * @Groups({"Default"})
      * @var string|null
