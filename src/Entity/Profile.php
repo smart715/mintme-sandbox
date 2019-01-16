@@ -119,15 +119,15 @@ class Profile
 
     public function lockChanges(): self
     {
-//        $this->isChangesLocked = true;
+        $this->isChangesLocked = true;
 
         return $this;
     }
 
-    /** @ORM\PrePersist() */
+    /** @ORM\PreUpdate() */
     public function updateNameChangedDate(): self
     {
-//        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
+        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
 
         return $this;
     }
