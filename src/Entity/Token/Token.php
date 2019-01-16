@@ -91,6 +91,12 @@ class Token
     /** @var Crypto|null */
     protected $crypto;
 
+    /**
+     * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
+     * @var \DateTime
+     */
+    protected $createdAt;
+
     public function getCrypto(): ?Crypto
     {
         return $this->crypto;
@@ -205,5 +211,10 @@ class Token
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());
+    }
+
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
     }
 }
