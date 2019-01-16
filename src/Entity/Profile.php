@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -178,7 +179,7 @@ class Profile
 
     public function getCountry(): ?string
     {
-        return $this->country;
+        return Intl::getRegionBundle()->getCountryName($this->country);
     }
 
     public function setCountry(?string $country): self
