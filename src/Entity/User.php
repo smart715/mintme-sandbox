@@ -33,6 +33,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
+     * @Groups({"Default"})
      */
     protected $id;
 

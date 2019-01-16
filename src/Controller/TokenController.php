@@ -104,9 +104,9 @@ class TokenController extends AbstractController
             : '';
 
         $tokenAuthor = $token->getProfile()->getUser();
-        
+
         $tokens =  $balanceHandler->balances($tokenAuthor, $tokenAuthor->getRelatedTokens());
-        
+
         $pendingSellOrders = $market
             ? $marketHandler->getPendingSellOrders($market)
             : [];

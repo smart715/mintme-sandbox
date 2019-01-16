@@ -20,18 +20,22 @@
                         :items="ordersList"
                         :fields="fields">
                         <template slot="order_maker" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
+                            <a :href="row.item.maker_url">
+                                {{ row.value }}
+                                <img
+                                    src="../../../img/avatar.png"
+                                    class="float-right"
+                                    alt="avatar">
+                            </a>
                         </template>
                         <template slot="order_trader" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
+                            <a :href="row.item.taker_url">
+                                {{ row.value }}
+                                <img
+                                    src="../../../img/avatar.png"
+                                    class="float-right"
+                                    alt="avatar">
+                            </a>
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
@@ -99,6 +103,12 @@ export default {
                         : '',
                     order_trader: order.taker != null
                         ? order.taker.profile.firstName + order.taker.profile.lastName
+                        : '',
+                    maker_url: order.maker != null
+                        ? this.$routing.generate('token_show', { name: order.maker.profile.token.name })
+                        : '',
+                    taker_url: order.taker != null
+                        ? this.$routing.generate('token_show', { name: order.taker.profile.token.name })
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     price_per_token: toMoney(order.price),

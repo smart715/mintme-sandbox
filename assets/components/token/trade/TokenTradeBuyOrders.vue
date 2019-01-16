@@ -21,11 +21,20 @@
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
+                            <a :href="row.item.trader_url">
+                                <a
+                                        v-if="row.item.cancel_order_url"
+                                        :href="row.item.cancel_order_url">
+                                    <font-awesome-icon icon="times" class="text-danger c-pointer" />
+                                </a>
+                                <span v-else>
+                                    {{ row.value }}
+                                </span>
+                                <img
+                                        src="../../../img/avatar.png"
+                                        class="float-right"
+                                        alt="avatar">
+                            </a>
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
@@ -48,6 +57,7 @@ export default {
         containerClass: String,
         buyOrders: String,
         tokenName: String,
+        userId: Number,
     },
     components: {
         Guide,
@@ -82,6 +92,14 @@ export default {
                     amount: toMoney(order.amount),
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
+                    trader_url: this.$routing.generate('token_show', {
+                        name: order.maker.profile.token.name,
+                    }),
+                    cancel_order_url: order.maker.id === this.userId
+                        ? this.$routing.generate('order_cancel', {
+                            market: order.market.hiddenName, orderid: order.id,
+                        })
+                        : null,
                 };
             });
         },

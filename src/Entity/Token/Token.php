@@ -33,7 +33,7 @@ class Token
      * @Assert\NotBlank()
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
      * @Assert\Length(min = 4, max = 255)
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      * @var string|null
      */
     protected $name;

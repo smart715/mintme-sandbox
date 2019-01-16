@@ -36,11 +36,13 @@
             container-class="col-12 col-md-6 mt-3"
             :buy-orders="pendingBuyOrders"
             :token-name="tokenName"
+            :user-id="userId"
         />
         <token-trade-sell-orders
             container-class="col-12 col-md-6 mt-3"
             :sell-orders="pendingSellOrders"
             :token-name="tokenName"
+            :user-id="userId"
         />
         <token-trade-trade-history
             container-class="col-12 mt-3"
@@ -87,6 +89,7 @@ export default {
         placeOrderUrl: String,
         balances: Object,
         tokenHiddenName: String,
+        userId: Number,
     },
     data() {
         return {

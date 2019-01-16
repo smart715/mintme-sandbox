@@ -32,7 +32,8 @@
                                 token-name= "{{ token.name }}"
                                 place-order-url= "{{ path('token_place_order', {'tokenName' : token.name}) }}"
                                 token-hidden-name="{{ tokenHiddenName }}"
-                                :balances="{{ balances | json_encode }}">
+                                :balances="{{ balances | json_encode }}"
+                                :user-id="{{ app.user ? app.user.id : 0 }}">
                         </token-trade>
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %} v-cloak>
