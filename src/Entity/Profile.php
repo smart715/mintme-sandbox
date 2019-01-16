@@ -179,7 +179,9 @@ class Profile
 
     public function getCountry(): ?string
     {
-        return Intl::getRegionBundle()->getCountryName($this->country);
+        if($this->country)
+            return Intl::getRegionBundle()->getCountryName($this->country);
+        return $this->country;
     }
 
     public function setCountry(?string $country): self
@@ -225,8 +227,8 @@ class Profile
         return $this->token;
     }
 
-    protected function removeDoubleSpaces(string $text): string
+    protected function removeDoubleSpaces(string $text): ?string
     {
-        return (string) preg_replace('/\s+/', ' ', $text);
+        return preg_replace('/\s+/', ' ', $text);
     }
 }
