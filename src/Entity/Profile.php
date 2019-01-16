@@ -224,7 +224,8 @@ class Profile
         return $this->token;
     }
 
-    protected function removeDoubleSpaces($text) {
+    protected function removeDoubleSpaces(string $text): string
+    {
         return preg_replace('/\s+/', ' ', $text);
     }
 }
