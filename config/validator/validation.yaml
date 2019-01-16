@@ -1,4 +1,4 @@
-App\Form\Model\EditEmail:
+App\Form\Model\EmailModel:
     properties:
         email:
             - NotBlank: ~
