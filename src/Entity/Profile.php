@@ -64,6 +64,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Length(max="150")
      * @Groups({"Default"})
      * @var string|null
      */

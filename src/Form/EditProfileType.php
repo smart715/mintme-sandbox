@@ -19,7 +19,7 @@ class EditProfileType extends AbstractType
             ->add('lastName', TextType::class, [ 'label' => 'Last Name' ])
             ->add('city', TextType::class, [ 'label' => 'City' ])
             ->add('country', CountryType::class, [ 'label' => 'Country' ])
-            ->add('description', TextareaType::class, [ 'label' => 'Description', 'attr' => ['max' => 150] ]);
+            ->add('description', TextareaType::class, [ 'label' => 'Description', 'attr' => ['maxlength' => 150] ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
