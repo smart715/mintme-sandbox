@@ -31,6 +31,7 @@ class EditProfileType extends AbstractType
             ])
             ->add('city', TextType::class, [
                 'label' => 'City',
+                'required' => false,
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -39,7 +40,13 @@ class EditProfileType extends AbstractType
                 ],
             ])
             ->add('country', CountryType::class, [ 'label' => 'Country' ])
-            ->add('description', TextareaType::class, [ 'label' => 'Description', 'attr' => [ 'maxlength' => 150 ] ]);
+            ->add('description', TextareaType::class, [
+                'label' => 'Description',
+                'required' => false,
+                'attr' => [
+                    'maxlength' => 150,
+                ],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
