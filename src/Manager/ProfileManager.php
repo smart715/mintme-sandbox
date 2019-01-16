@@ -54,6 +54,7 @@ class ProfileManager implements ProfileManagerInterface
     public function generatePageUrl(Profile $profile): string
     {
         $route = $profile->getFirstName() . '.' . $profile->getLastName();
+        $route = str_replace(' ', '-', $route);
 
         if ('.' === substr($route, 0, 1)) {
             throw new \Exception('Can\'t generate profile link for empty profile');
