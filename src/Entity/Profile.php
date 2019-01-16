@@ -225,6 +225,6 @@ class Profile
     }
 
     protected function removeDoubleSpaces($text) {
-        return preg_replace('/\s+/', ' ', $this);
+        return preg_replace('/\s+/', ' ', $text);
     }
 }
