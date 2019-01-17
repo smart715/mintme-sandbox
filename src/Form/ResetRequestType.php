@@ -15,7 +15,7 @@ class ResetRequestType extends AbstractType
     {
         $builder
             ->add('username', EmailType::class, [
-                'label' => 'Email', 'attr' => array('pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'),
+                'label' => false, 'attr' => array('pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$', 'autofocus' => 'true'),
                 'constraints' => [ new Email(['message' => 'Invalid email address.', 'checkMX' => true]) ],
             ])
             ->add('recaptcha', EWZRecaptchaType::class, [

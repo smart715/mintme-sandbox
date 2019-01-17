@@ -10,10 +10,10 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-12 col-lg-2 text-left text-lg-right">
-                        <label for="inputEmail" class="d-block label-featured">Email</label>
+                        <label for="username" class="d-block label-featured">Email</label>
                     </div>
                     <div class="col">
-                        {{ form_row(form.username, { 'class': 'form-control form-control-md', 'autofocus' }) }}
+                        {{ form_row(form.username, { 'class': 'form-control form-control-md' }) }}
                     </div>
                 </div>
             </div>
@@ -38,9 +38,3 @@
         </div>
     {{ form_end(form) }}
 {% endblock %}
-
-
-
-
-
-username
