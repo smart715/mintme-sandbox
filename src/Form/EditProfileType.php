@@ -20,8 +20,8 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[^\d]+',
-                    'title' => 'shouldn\'t contain numbers',
+                    'pattern' => '[A-Za-z\s-]+',
+                    'title' => 'not valid name',
                 ],
             ])
             ->add('lastName', TextType::class, [
@@ -29,8 +29,8 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[^\d]+',
-                    'title' => 'shouldn\'t contain numbers',
+                    'pattern' => '[A-Za-z\s-]+',
+                    'title' => 'not valid name',
                 ],
             ])
             ->add('city', TextType::class, [
@@ -39,8 +39,8 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[^\d]+',
-                    'title' => 'shouldn\'t contain numbers',
+                    'pattern' => '[A-Za-z\s-]+',
+                    'title' => 'not valid city',
                 ],
             ])
             ->add('country', CountryType::class, [ 'label' => 'Country' ])
