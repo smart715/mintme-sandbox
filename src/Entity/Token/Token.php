@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
  * @UniqueEntity("name")
  * @UniqueEntity("address")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Token
 {
@@ -92,7 +93,7 @@ class Token
     protected $crypto;
 
     /**
-     * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
+     * @ORM\Column(type="datetime")
      * @var \DateTime
      */
     protected $createdAt;
@@ -216,5 +217,13 @@ class Token
     public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
+    }
+
+    /** @ORM\PrePersist() */
+    public function setCreatedAtValue(): self
+    {
+        $this->createdAt = new \DateTime();
+
+        return $this;
     }
 }
