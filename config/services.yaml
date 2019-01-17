@@ -50,6 +50,10 @@ services:
             $url: '%withdraw_rpc%'
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
 
+    App\Deposit\DepositGatewayCommunicator:
+        arguments:
+            $jsonRpc: '@deposit.json_rpc'
+
     App\Exchange\Trade\Config\LimitOrderConfig:
         arguments:
             $takerFeeRate: '%taker_fee_rate%'
@@ -71,10 +75,6 @@ services:
     App\Exchange\Balance\BalanceFetcher:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
-
-    App\Deposit\DepositGatewayCommunicator:
-        arguments:
-            $jsonRpc: '@deposit.json_rpc'
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 

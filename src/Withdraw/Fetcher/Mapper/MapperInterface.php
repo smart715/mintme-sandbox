@@ -4,7 +4,7 @@ namespace App\Withdraw\Fetcher\Mapper;
 
 use App\Entity\Crypto;
 use App\Entity\User;
-use App\Withdraw\Payment\Transaction;
+use App\Wallet\Model\Transaction;
 use Money\Money;
 
 interface MapperInterface
