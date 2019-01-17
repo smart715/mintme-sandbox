@@ -32,7 +32,7 @@ class ProfileController extends AbstractController
         $profile = $profileManager->getProfileByPageUrl($pageUrl);
 
         if (null === $profile) {
-            throw new NotFoundHttpException();
+            return $this->render('pages/profile_404.html.twig');
         }
 
         $form = $this->createForm(EditProfileType::class, $profile);
