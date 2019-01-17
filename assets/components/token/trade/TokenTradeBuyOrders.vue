@@ -1,6 +1,16 @@
 <template>
     <div :class="containerClass">
         <div class="card">
+            <confirm-modal
+                    :visible="confirmModal"
+                    @close="switchConfirmModal(false)"
+                    @confirm="removeOrder"
+            >
+                <div>
+                    Are you sure that you want to remove order
+                    with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
+                </div>
+            </confirm-modal>
             <div class="card-header">
                 Buy Orders
                 <span class="card-header-icon">
@@ -21,20 +31,18 @@
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
-                            <a :href="row.item.trader_url">
                                 <a
-                                        v-if="row.item.cancel_order_url"
-                                        :href="row.item.cancel_order_url">
-                                    <font-awesome-icon icon="times" class="text-danger c-pointer" />
+                                    @click="removeOrderModal(row.item)"
+                                    v-if="row.item.cancel_order_url">
+                                        <font-awesome-icon icon="times" class="text-danger c-pointer" />
                                 </a>
-                                <span v-else>
-                                    {{ row.value }}
-                                </span>
-                                <img
+                                <a :href="row.item.trader_url">
+                                    <span v-if="!row.item.cancel_order_url">{{ row.value }}</span>
+                                    <img
                                         src="../../../img/avatar.png"
                                         class="float-right"
                                         alt="avatar">
-                            </a>
+                                </a>
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
@@ -47,6 +55,7 @@
 </template>
 
 <script>
+import ConfirmModal from '../../modal/ConfirmModal';
 import Guide from '../../Guide';
 import {toMoney} from '../../../js/utils';
 import Decimal from 'decimal.js';
@@ -61,9 +70,13 @@ export default {
     },
     components: {
         Guide,
+        ConfirmModal,
     },
     data() {
         return {
+            confirmModal: false,
+            currentRow: {},
+            actionUrl: '',
             orders: [],
             fields: {
                 price: {
@@ -117,6 +130,21 @@ export default {
                 this.$refs.table.refresh();
             });
         }, 10000);
+    },
+    methods: {
+        removeOrderModal: function(row) {
+            this.currentRow = row;
+            this.actionUrl = row.cancel_order_url;
+            this.switchConfirmModal(true);
+        },
+        switchConfirmModal: function(val) {
+            this.confirmModal = val;
+        },
+        removeOrder: function() {
+            this.$axios.get(this.actionUrl).catch(() => {
+                this.$toasted.show('Service unavailable, try again later');
+            });
+        },
     },
 };
 </script>
