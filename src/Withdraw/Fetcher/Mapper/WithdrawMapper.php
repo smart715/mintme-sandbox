@@ -5,10 +5,11 @@ namespace App\Withdraw\Fetcher\Mapper;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Wallet\Model\Status;
+use App\Wallet\Model\Transaction;
+use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Withdraw\Fetcher\Storage\StorageAdapterInterface;
-use App\Withdraw\Payment\Status;
-use App\Withdraw\Payment\Transaction;
 use Money\Money;
 
 class WithdrawMapper implements MapperInterface
@@ -38,16 +39,18 @@ class WithdrawMapper implements MapperInterface
         return array_map(function (array $transaction) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['createdDate']),
+                $transaction['transactionHash'],
+                null,
+                $transaction['walletAddress'],
                 $this->moneyWrapper->parse($transaction['amount'], $transaction['crypto']),
-                $transaction['fee'],
+                $this->moneyWrapper->parse($transaction['fee'], $transaction['crypto']),
+                $this->cryptoManager->findBySymbol(
+                    strtoupper($transaction['crypto'])
+                ),
                 Status::fromString(
                     $transaction['status']
                 ),
-                $transaction['transactionHash'],
-                $transaction['walletAddress'],
-                $this->cryptoManager->findBySymbol(
-                    strtoupper($transaction['crypto'])
-                )
+                Type::fromString(Type::WITHDRAW)
             );
         }, $this->storage->requestHistory($user->getId(), $offset, $limit));
     }

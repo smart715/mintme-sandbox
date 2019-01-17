@@ -9,14 +9,14 @@
                             Trade History
                         </template>
                         <template slot="body">
-                            List of last closed orders for {currency2}.
+                            List of last closed orders for {{ tokenName }}.
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
-                    <b-table ref="table"
+                    <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
                         <template slot="order_maker" slot-scope="row">
@@ -34,6 +34,9 @@
                                alt="avatar">
                         </template>
                     </b-table>
+                    <div v-if="!hasOrders">
+                        <h4 class="text-center p-5">No deal was made yet</h4>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,6 +87,9 @@ export default {
         };
     },
     computed: {
+        hasOrders: function() {
+            return this.ordersList.length > 0;
+        },
         ordersList: function() {
             return this.history.map((order) => {
                 return {
