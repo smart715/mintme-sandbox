@@ -103,6 +103,7 @@ export default {
     },
     methods: {
         closeModal: function() {
+            this.$v.$reset();
             this.amount = 0;
             this.address = '';
             this.$emit('close');
