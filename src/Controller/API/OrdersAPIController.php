@@ -85,7 +85,7 @@ class OrdersAPIController extends FOSRestController
         $market = new Market($crypto, $token);
         $order = new Order(
             $orderid,
-            $this->getUser()->getId(),
+            $this->getUser(),
             null,
             $market,
             new Money('0', new Currency($crypto->getSymbol())),
