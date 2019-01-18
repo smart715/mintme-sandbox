@@ -227,47 +227,17 @@ label
       background: none
 
 .modal-content
-  border-top-width: 20px
-  border-top-style: solid
-  border-top-color: $ghost-light
-
+  background: $secondary
   .modal-header
-    display: block
-    border-bottom: none
-
-    .cancel-button
-      top: -60.5px
-      right: -28px
-      position: relative
-      float: right
-      border-top-width: 5px
-      border-top-style: solid
-      border-top-color: $ghost-dark
-      background: $ghost-dark
-      opacity: 1
-      height: 70px
-      width: 70px
-      border-radius: 50%
-
-      .inner
-        background: $white
-        color: $ghost-dark
-        vertical-align: middle
-        text-align: center
-        height: 65px
-        width: 65px
-        border-radius: 50%
-        top: -4px
-        right: -5px
-        position: relative
-        font-size: 45px
-
-        a:hover
-          cursor: pointer
-          color: $black
-
-  .modal-body
-    margin-top: -50px
+    border-bottom: 8px solid $primary
+    padding: 0px
+    div
+      width: 100%
+    .modal-close
+      font-size: 3rem
+      color: $white
+  .modal-title
+    font-size: 1.6rem
 
 nav.top-navbar
     .navbar-toggler-icon
@@ -347,3 +317,5 @@ nav.top-navbar
       vertical-align: middle
       display: table-cell
       width: 120px
+
+

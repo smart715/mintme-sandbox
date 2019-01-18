@@ -4,10 +4,14 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <div class="mb-5">
+                <div class="mt-3">
                     <img src="../../img/are-you-sure.png"/>
-                    <slot><h3>ARE YOU SURE?</h3></slot>
                 </div>
+                <slot>
+                    <p class="text-white modal-title pt-3 pb-4 text-uppercase">
+                        ARE YOU SURE?
+                    </p>
+                </slot>
                 <button
                     class="btn btn-primary"
                     @click="onConfirm">

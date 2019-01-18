@@ -1,11 +1,9 @@
 <template>
     <b-modal :visible="visible" :size="size" @hidden="closeModal" hide-footer>
         <div slot="modal-header">
-            <div class="cancel-button">
-                <div class="inner">
-                    <a @click="closeModal()">&times;</a>
-                </div>
-            </div>
+            <a class="modal-close float-right pr-2" @click="closeModal()">
+                <font-awesome-icon icon="times" slot='icon'/>
+            </a>
         </div>
         <div class="modal-body">
             <slot name="body"></slot>

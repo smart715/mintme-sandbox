@@ -4,11 +4,11 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3 class="font-weight-bold">{{ title }}</h3>
-                <div class="my-5">
+                <div class="mt-3">
                     <img v-if="this.type" src="../../img/order-created.png"/>
                     <img v-if="!this.type" src="../../img/order-failed.png"/>
                 </div>
+                <p class="text-white modal-title pt-3 pb-4 text-uppercase">{{ title }}</p>
                 <button
                     class="btn btn-primary px-5"
                     @click="closeModal()">
