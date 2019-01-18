@@ -1,11 +1,11 @@
 <div class="container">
-    <div class="row py-3 justify-content-center">
+    <div class="row pt-5 pb-3 justify-content-center">
         <div class="col-md-8 {% if featured is not defined or featured != true %}col-xs-12 col-lg-10 col-xl-6{% endif %}">
-            <div class="card {% if featured is defined and featured == true %}card-featured{% endif %}">
+            <div class="card pt-3 {% if featured is defined and featured == true %}card-featured{% endif %}">
                 <div class="card-header">
                     {{ formHeader }}
                 </div>
-                <div class="card-body">
+                <div class="card-body py-5">
                     {% block formBody %}
                         {{ form(form) }}
                     {% endblock %}

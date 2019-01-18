@@ -18,15 +18,16 @@ $border-radius: 0;
 // Colors
 $ghost-dark: rgba(0, 0, 0, 0.15);
 $ghost-light: rgba(255, 255, 255, 0.25);
-$grey-light: #4C596A;
+$grey-light: #8A96A4;
+$grey-dark: #4C596A;
 $yellow: #be8817;
 $orange: #f7931e;
 $green: #8dc63f;
 $red: #fe6e43;
 $white: white;
 $black: #131313;
-$secondary: #90c7ff;
-$primary: #1b557b;
+$secondary: #152D47;
+$primary: #0E3B58;
 $blue: #1da1f3;
 
 // This variable affects the `.h-*` and `.w-*` classes.
@@ -82,7 +83,7 @@ $modal-alert-border-color: #4ecb22;
 $index-description-bg: linear-gradient(180deg, #193A5D, #193A5D, #102238, #102238, transparent, transparent) repeat-x;
 
 // Forms
-$input-bg: $ghost-light;
+$input-bg: $grey-light;
 $input-btn-padding-y: .5rem;
 $input-btn-padding-x: 1rem;
 $input-focus-border-color: $input-bg;
@@ -92,9 +93,9 @@ $input-btn-focus-color: $input-bg;
 // Card
 $card-border-width: 0.6rem;
 $card-border-color: $ghost-light;
-$card-input-color: $ghost-light;
-$card-header-bg: $ghost-dark;
-$card-body-bg: $ghost-dark;
+$card-input-color: $grey-light;
+$card-header-bg: $primary;
+$card-body-bg: $secondary;
 $card-text-color: $white;
 
 // Pagination
