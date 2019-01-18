@@ -23,19 +23,18 @@
                         <p class="text">your account is now activated</p>
                         <p class="mt-1">
                             {% if targetUrl is empty %}
-                                {% if prelaunch %}
-                                    <a href="{{ path('referral-program') }}" class="link">Go to Referral</a>
-                                {% endif %}
-                                {% if not prelaunch %}
+                                {% if prelaunch.isFinished() %}
                                     <a href="{{ path('trading') }}" class="link">Go to Trading</a>
+                                {% else %}
+                                    <a href="{{ path('referral-program') }}" class="link">Go to Referral</a>
                                 {% endif %}
                             {% else %}
                                 <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>
-                            {% endif %}
-                        </p>
+                                {% endif %}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-{% endblock fos_user_content %}
+            {% endblock fos_user_content %}
