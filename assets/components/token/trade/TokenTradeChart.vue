@@ -16,7 +16,7 @@
                                 Last price
                             </template>
                             <template slot="body">
-                                Price per one {currency2} for last transaction.
+                                Price per one {{ currency }} for last transaction.
                             </template>
                         </guide>
                     </div>
@@ -53,7 +53,7 @@
                                         24h volume
                                     </template>
                                     <template slot="body">
-                                        The amount of {currency1} that has been traded in the last 24 hours.
+                                        The amount of {{ currency }} that has been traded in the last 24 hours.
                                     </template>
                                 </guide>
                             </div>
@@ -85,6 +85,7 @@ export default {
         websocketUrl: String,
         containerClass: String,
         marketName: Object,
+        currency: String,
     },
     data() {
         return {

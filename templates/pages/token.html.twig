@@ -25,6 +25,7 @@
                                 pending-sell-orders="{{ pendingSellOrders | json_encode }}"
                                 websocket-url="{{ global_websocket_url }}"
                                 hash="{{ hash }}"
+                                currency="{{ currency }}"
                                 login-url="{{ path('fos_user_security_login') }}"
                                 signup-url="{{ path('fos_user_registration_register') }}"
                                 :market-name="{{ marketName | json_encode }}"
