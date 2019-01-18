@@ -146,27 +146,29 @@ export default {
 
             const marketDealsInfo = marketData.params[1];
 
-            marketDealsInfo.forEach((deal) => {
-                // Pending order.
-                if (!deal.taker_id) {
-                    const price = parseFloat(deal.price);
-                    const amount = parseFloat(deal.amount);
-                    switch (deal.type) {
-                        case 'buy':
-                            if (price > this.sell.price) {
-                                this.sell.price = price;
-                                this.sell.amount = amount;
-                            }
-                            break;
-                        case 'sell':
-                            if (0 === this.buy.price || price < this.buy.price) {
-                                this.buy.price = price;
-                                this.buy.amount = amount;
-                            }
-                            break;
+            if (Array.isArray(marketDealsInfo)) {
+                marketDealsInfo.forEach((deal) => {
+                    // Pending order.
+                    if (!deal.taker_id) {
+                        const price = parseFloat(deal.price);
+                        const amount = parseFloat(deal.amount);
+                        switch (deal.type) {
+                            case 'buy':
+                                if (price > this.sell.price) {
+                                    this.sell.price = price;
+                                    this.sell.amount = amount;
+                                }
+                                break;
+                            case 'sell':
+                                if (0 === this.buy.price || price < this.buy.price) {
+                                    this.buy.price = price;
+                                    this.buy.amount = amount;
+                                }
+                                break;
+                        }
                     }
-                }
-            });
+                });
+            }
         },
     },
     watch: {
