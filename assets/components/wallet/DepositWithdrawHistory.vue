@@ -2,15 +2,16 @@
     <div class="pb-3">
         <div class="table-responsive deposit-withdraw-history" @scroll.passive="loadMore">
             <b-table
+                v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
                 ref="table"
             >
-            <template slot="row-details" slot-scope="row">
-                No transaction was made yet
-            </template>
             </b-table>
+            <div v-if="noHistory">
+                <h4 class="text-center p-5">No transactions were added yet</h4>
+            </div>
         </div>
     </div>
 </template>
@@ -71,7 +72,7 @@ export default {
             return this.sanitizeHistory(this.history.data);
         },
         noHistory: function() {
-            return this.history.data[0] && this.history.data[0]._showDetails;
+            return this.history.data.length === 0;
         },
     },
     methods: {
