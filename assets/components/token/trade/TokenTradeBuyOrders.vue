@@ -96,7 +96,7 @@ export default {
     },
     computed: {
         total: function() {
-            return toMoney(this.orders.reduce((sum, order) => parseFloat(order.price) + sum, 0));
+            return toMoney(this.orders.reduce((sum, order) => parseFloat(order.sum_web) + sum, 0));
         },
         ordersList: function() {
             return this.orders.map((order) => {

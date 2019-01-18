@@ -4,6 +4,7 @@
             container-class="buy-order col-12 col-md-6 col-lg-4"
             :websocket-url="websocketUrl"
             :hash="hash"
+            :currency="currency"
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
@@ -17,6 +18,7 @@
             container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
             :websocket-url="websocketUrl"
             :hash="hash"
+            :currency="currency"
             :login-url="loginUrl"
             :signup-url="signupUrl"
             :logged-in="loggedIn"
@@ -30,6 +32,7 @@
         <token-trade-chart
             container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
             :websocket-url="websocketUrl"
+            :currency="currency"
             :market-name="marketName"
         />
         <token-trade-buy-orders
@@ -81,6 +84,7 @@ export default {
         pendingSellOrders: String,
         websocketUrl: String,
         hash: String,
+        currency: String,
         loginUrl: String,
         signupUrl: String,
         marketName: Object,

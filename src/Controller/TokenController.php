@@ -121,6 +121,7 @@ class TokenController extends AbstractController
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
+            'currency' => Token::WEB_SYMBOL,
             'tokens' => $normalizer->normalize($tokens, null, [
                 'groups' => [ 'Default' ],
             ]),
