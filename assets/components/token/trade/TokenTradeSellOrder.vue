@@ -8,7 +8,7 @@
                         Sell Order
                     </template>
                     <template slot="body">
-                        Form used to create  an order so you can sell {currency2} or make offer.
+                        Form used to create  an order so you can sell {{ currency }} or make offer.
                     </template>
                 </guide>
             </div>
@@ -31,7 +31,7 @@
                                     Your Tokens
                                 </template>
                                 <template slot="body">
-                                    Your {currency2} balance.
+                                    Your {{ currency }} balance.
                                 </template>
                             </guide>
                         </span>
@@ -61,7 +61,7 @@
                                     </template>
                                     <template slot="body">
                                         Checking this box fetches current best market price
-                                        for which you can sell {currency2}.
+                                        for which you can sell {{ currency }}.
                                     </template>
                                 </guide>
                             </label>
@@ -82,7 +82,7 @@
                                     Price in WEB
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {currency2}.
+                                    The price at which you want to sell one {{ currency }}.
                                 </template>
                             </guide>
                         </label>
@@ -179,6 +179,7 @@ export default {
         sell: Object,
         balance: String,
         tokenHiddenName: String,
+        currency: String,
     },
     data() {
         return {
