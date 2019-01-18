@@ -95,6 +95,9 @@ label
     span
       font-size: .9em
 
+    .card-header-description
+      font-size: .7em
+
     .card-header-icon
       float: right
       color: $white
@@ -309,19 +312,14 @@ nav.top-navbar
     display: none
 
 .notification
-  .bell
-    background: url('../img/bell.png') no-repeat center
-    background-size: 100px
-    min-height: 110px
-
-  .cloud
-    background: url('../img/cloud.png') no-repeat
-    background-size: 100% 100%
-    padding: 5rem
-    .title
-      @include font-scale(lg)
-    .link
-      @include font-scale(xs)
+  .title
+    font-size: 2em
+    font-weight: 800
+  .text
+    font-size: 1.5em
+  .link
+    font-size: 1.2em
+    color: $blue
 
 .v-cloak--block
   display: none

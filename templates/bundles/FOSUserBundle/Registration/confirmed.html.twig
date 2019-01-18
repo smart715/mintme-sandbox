@@ -5,17 +5,26 @@
 
 {% block fos_user_content %}
     <div class="container">
-        <div class="row align-items-center d-flex justify-content-center">
-            <div class="col-xs-12 notification">
-                <div class="bell"></div>
-                <div class="cloud  mx-auto text-center">
-                    <div>
-                        <p class="font-bold title">Congrats {{ user.username }}</p>
-                        <p>your account is now activated</p>
+        <div class="row pt-5 pb-3 justify-content-center notification">
+            <div class="col-md-8">
+                <div class="card pt-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">Congrats!</div>
+                            <div class="col-md-6 card-header-description text-md-right">
+                                <span class="align-middle">
+                                    The user has been created successfully!
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body py-5 text-center">
+                        <h1 class="title">{{ user.username }}</h1>
+                        <p class="text">your account is now activated</p>
                         <p class="mt-1">
                             {% if targetUrl is empty %}
                                 {% if prelaunch %}
-                                    <a href="{{ path('referral-program') }}" class="link text-primary">Go to Referral</a>
+                                    <a href="{{ path('referral-program') }}" class="link">Go to Referral</a>
                                 {% endif %}
                                 {% if not prelaunch %}
                                     <a href="{{ path('trading') }}" class="link">Go to Trading</a>
