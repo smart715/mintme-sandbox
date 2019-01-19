@@ -16,7 +16,7 @@ class AddProfileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstName', TextType::class, [ 'label' => 'First Name' ])
-            ->add('lastName', TextType::class, [ 'label' => 'Last Name' ]);
+            ->add('firstName', TextType::class, [ 'label' => 'First Name:' ])
+            ->add('lastName', TextType::class, [ 'label' => 'Last Name:' ]);
     }
 }

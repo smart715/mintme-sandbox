@@ -15,11 +15,11 @@ class EditProfileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstName', TextType::class, [ 'label' => 'First Name' ])
-            ->add('lastName', TextType::class, [ 'label' => 'Last Name' ])
-            ->add('city', TextType::class, [ 'label' => 'City' ])
-            ->add('country', CountryType::class, [ 'label' => 'Country' ])
-            ->add('description', TextareaType::class, [ 'label' => 'Description', 'attr' => ['max' => 150] ]);
+            ->add('firstName', TextType::class, [ 'label' => 'First Name:' ])
+            ->add('lastName', TextType::class, [ 'label' => 'Last Name:' ])
+            ->add('city', TextType::class, [ 'label' => 'City:' ])
+            ->add('country', CountryType::class, [ 'label' => 'Country:' ])
+            ->add('description', TextareaType::class, [ 'label' => 'Description:', 'attr' => ['max' => 150] ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
