@@ -22,23 +22,25 @@
                         <div class="pt-4">
                             <div class="pb-1">
                                 <div v-if="!editingUrls">
-                                    Web:
-                                    <a :href="this.currentWebsite" target="_blank" rel="nofollow">
-                                        {{ this.currentWebsite }}
-                                    </a>
-                                    <guide>
-                                        <font-awesome-icon
-                                            icon="question"
-                                            slot='icon'
-                                            class="ml-1 mb-1 bg-primary text-white
+                                    <div v-if="currentWebsite">
+                                        Web:
+                                        <a :href="this.currentWebsite" target="_blank" rel="nofollow">
+                                            {{ this.currentWebsite }}
+                                        </a>
+                                        <guide>
+                                            <font-awesome-icon
+                                                    icon="question"
+                                                    slot='icon'
+                                                    class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
-                                        <template  slot="header">
-                                            Web
-                                        </template>
-                                        <template slot="body">
-                                            Link to token creator’s website. Before adding it, we confirmed ownership.
-                                        </template>
-                                    </guide>
+                                            <template  slot="header">
+                                                Web
+                                            </template>
+                                            <template slot="body">
+                                                Link to token creator’s website. Before adding it, we confirmed ownership.
+                                            </template>
+                                        </guide>
+                                    </div>
                                 </div>
                                 <div class="form-group" v-else>
                                     <label for="website-err">Website address:</label>
@@ -54,7 +56,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="pb-1">
+                            <div class="pb-1" v-if="facebookUrl">
                                 <token-facebook-address
                                     :app-id="facebookAppId"
                                     :editing="editingUrls"
@@ -62,7 +64,7 @@
                                     :update-url="updateUrl"
                                     :csrfToken="csrfToken"/>
                             </div>
-                            <div>
+                            <div v-if="youtubeChannelId">
                                 <token-youtube-address
                                     :client-id="youtubeClientId"
                                     :editable="editable"
