@@ -154,7 +154,7 @@ class TokenController extends AbstractController
         MoneyWrapperInterface $moneyWrapper
     ): Response {
         if ($this->isTokenCreated()) {
-            //return $this->redirectToOwnToken();
+            return $this->redirectToOwnToken();
         }
 
         $token = new Token();
