@@ -139,16 +139,22 @@ label
       label.label-featured
         font-size: 1.2em
 
+
 .btn-primary
   color: $white
 
+.table
   th
-    font-weight: normal
-    @include font-scale(sm)
+      border-top: none
+      border-bottom: 1px solid #dee2e6
+      font-weight: normal
+      @include font-scale(sm)
 
   td, th
     &:first-child
       padding-left: 2rem
+
+  
 
 .fix-layout
   table-layout: fixed
@@ -329,10 +335,3 @@ nav.top-navbar
     .page-link 
       background: none
 
-.table
-  thead
-    tr
-      border: none
-      th
-        border-top: none
-        border-bottom: 1px solid #dee2e6
