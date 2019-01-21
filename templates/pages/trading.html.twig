@@ -5,23 +5,21 @@
 {% block bodyclass %}trading{% endblock %}
 
 {% block content %}
-    <div id="trading" class="container">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Trading
-                    </div>
-                    <div class="card-body" v-cloak>
-                        {{ include("loader.html.twig") }}
-                        <trading websocket-url="{{ global_websocket_url }}"
-                                 market-names="{{ marketNames | json_encode }}"
-                        >
-                            <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-                                Top {{ marketNames | length }} tokens
-                            </div>
-                        </trading>
-                    </div>
+    <div id="trading" class="container-fluid px-4 pt-5 pb-3 ">
+        <div class=" px-2">
+            <div class="card">
+                <div class="card-header">
+                    Trading
+                </div>
+                <div class="card-body" v-cloak>
+                    {{ include("loader.html.twig") }}
+                    <trading websocket-url="{{ global_websocket_url }}"
+                             market-names="{{ marketNames | json_encode }}"
+                             >
+                        <div slot="title" class="card-title font-weight-bold pt-1 pb-1">
+                            Top {{ marketNames | length }} tokens
+                        </div>
+                    </trading>
                 </div>
             </div>
         </div>
