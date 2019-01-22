@@ -3,19 +3,17 @@
         <div class="card">
             <div class="card-header">
                 {{ this.profileName }}
-                <span class="card-header-icon">
-                    <font-awesome-icon
-                        v-if="editable"
-                        class="icon float-right c-pointer"
-                        size="2x"
-                        :icon="icon"
-                        transform="shrink-4 up-1.5"
-                        @click="editUrls"/>
-                </span>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
+                       <font-awesome-icon
+                                v-if="editable"
+                                class="icon float-right c-pointer"
+                                size="1x"
+                                :icon="icon"
+                                transform="shrink-4 up-1.5"
+                                @click="editUrls"/>
                         <a :href="profileUrl" target="_blank">
                             {{ profileUrl }}
                         </a>
@@ -27,11 +25,6 @@
                                         {{ this.currentWebsite }}
                                     </a>
                                     <guide>
-                                        <font-awesome-icon
-                                            icon="question"
-                                            slot='icon'
-                                            class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                         <template  slot="header">
                                             Web
                                         </template>
@@ -77,11 +70,11 @@
                     <div class="col-12 pt-3 text-right">
                         <b-dropdown id="share" text="Share" variant="primary">
                             <social-sharing :url="profileUrl"
-                                            title="MINTME"
-                                            description="Check my new cryptocurrency."
-                                            quote="Check my new token."
-                                            hashtags="mintme"
-                                            inline-template>
+                                title="MINTME"
+                                description="Check my new cryptocurrency."
+                                quote="Check my new token."
+                                hashtags="mintme"
+                                inline-template>
                                 <div class="px-2">
                                     <network class="d-block c-pointer" network="email">
                                         <font-awesome-icon icon="envelope"></font-awesome-icon> Email
@@ -136,21 +129,21 @@
                                             target="_blank"
                                             rel="nofollow">
                                             {{ siteRequestUrl }}
-                                    </a>
-                                </li>
-                                <li>Click confirm below</li>
-                            </ol>
-                        </div>
-                        <div class="col-12 text-center">
-                            <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
-                            <button class="btn btn-default" @click="showConfirmWebsiteModal = false">Cancel</button>
+                                        </a>
+                                    </li>
+                                    <li>Click confirm below</li>
+                                </ol>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
+                                <button class="btn btn-default" @click="showConfirmWebsiteModal = false">Cancel</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>

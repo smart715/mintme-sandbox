@@ -3,85 +3,86 @@
         <div v-show="!editing">
             <div class="d-flex">
                 <div class="display-text">
-                    Facebook:
+                    Facebook: 
                     <a :href="currentAddress" target="_blank" rel="nofollow">
                         {{ currentAddress }}
                     </a>
-                    <guide>
-                        <font-awesome-icon
-                            icon="question"
-                            slot='icon'
-                            class="ml-1 mb-1 bg-primary text-white
-                            rounded-circle square blue-question"/>
-                        <template slot="header">
-                            Facebook
-                        </template>
-                        <template slot="body">
-                            Link to token creator’s Facebook.
-                            Before adding it, we confirmed ownership.
-                        </template>
-                    </guide>
-                </div>
-                <div
-                    class="fb-share-button"
-                    data-href="https://developers.facebook.com/docs/plugins/"
-                    data-layout="button_count"
-                    data-size="small"
-                    data-mobile-iframe="true">
-                    <a
-                        target="_blank"
-                        :href="'https://www.facebook.com/sharer/sharer.php?u='
-                        +currentAddressEncoded+'&amp;src=sdkpreparse'"
-                        class="fb-xfbml-parse-ignore">
-                        Share
+                    <div
+                        class="fb-share-button"
+                        data-href="https://developers.facebook.com/docs/plugins/"
+                        data-layout="button_count"
+                        data-size="small"
+                        data-mobile-iframe="true">
+                        <a
+                            target="_blank"
+                            :href="'https://www.facebook.com/sharer/sharer.php?u='
+                            +currentAddressEncoded+'&amp;src=sdkpreparse'"
+                            class="fb-xfbml-parse-ignore">
+                            Share
                     </a>
                 </div>
+                <guide>
+                    <font-awesome-icon
+                        icon="question"
+                        slot='icon'
+                        class="ml-1 bg-primary text-white
+                        rounded-circle square blue-question"/>
+                    <template slot="header">
+                        Facebook
+                    </template>
+                    <template slot="body">
+                        Link to token creator’s Facebook.
+                        Before adding it, we confirmed ownership.
+                    </template>
+                </guide>
             </div>
+
         </div>
-        <div v-show="editing">
-            <div class="col-lg-6 col-md-9 d-block mx-0 my-1 p-0">
-                <button class="btn btn-primary btn-block" @click="addPage">
-                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
+    </div>
+    <div v-show="editing">
+        <div class="col-lg-6 col-md-9 d-block mx-0 my-1 p-0">
+            <button class="btn btn-primary btn-block custom-social-btn" @click="addPage">
+                <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
                     Add Facebook address
+        </button>
+    </div>
+</div>
+
+<div class="modal" :class="{ show: showConfirmModal }" tabindex="-1" role="dialog">
+     <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Facebook Confirmation</h5>
+                <button type="button" class="close" aria-label="Close" @click="showConfirmModal = false">
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-        </div>
-
-        <div class="modal" :class="{ show: showConfirmModal }" tabindex="-1" role="dialog">
-             <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Facebook Confirmation</h5>
-                        <button type="button" class="close" aria-label="Close" @click="showConfirmModal = false">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="select-fb-pages">Select Facebook page to show:</label>
-                                    <select v-model="selectedUrl" class="form-control" id="select-fb-pages">
-                                        <option
-                                            v-for="(page, index) in pages"
-                                            :selected="index === 0 ? 'selected' : ''"
-                                            :key="page.id"
-                                            :value="page.link">
-                                            {{ page.name }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12 text-center">
-                                <button class="btn btn-primary" @click="savePage">Confirm</button>
-                                <button class="btn btn-default" @click="showConfirmModal = false">Cancel</button>
-                            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="select-fb-pages">Select Facebook page to show:</label>
+                            <select v-model="selectedUrl" class="form-control" id="select-fb-pages">
+                                <option
+                                    v-for="(page, index) in pages"
+                                    :selected="index === 0 ? 'selected' : ''"
+                                    :key="page.id"
+                                    :value="page.link">
+                                    {{ page.name }}
+                                </option>
+                            </select>
                         </div>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button class="btn btn-primary" @click="savePage">Confirm</button>
+                        <button class="btn btn-default" @click="showConfirmModal = false">Cancel</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+</div>
 </template>
 
 <script>

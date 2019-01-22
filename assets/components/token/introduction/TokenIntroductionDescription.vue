@@ -12,7 +12,12 @@
                         Everything you should know before you buy {{ name }}.
                     </template>
                 </guide>
-                <span class="card-header-icon">
+                
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable"
                         class="icon float-right c-pointer"
@@ -22,10 +27,6 @@
                         @click="editDescription"
                     />
                 </span>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12">
                         <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">

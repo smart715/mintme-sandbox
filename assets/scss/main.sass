@@ -172,9 +172,8 @@ label
       flex: 1 1 auto
       padding: 0
       border-left: .0625rem solid $white
-
-      &:first-child
-        border-left: none
+      border: none
+      color: $white
 
       .nav-link
         border: none
@@ -202,9 +201,9 @@ label
     .nav-tabs
       position: relative
       display: block
-      background: $white
+      background: $secondary
       text-align: left
-      border: .0625rem solid $white
+      border: none
 
       .nav-item
         display: inline-block
@@ -213,7 +212,7 @@ label
         .nav-link
             color: inherit
             position: relative
-            background: $white
+            background: $secondary
 
             &.active::after
               content: ' '
@@ -335,3 +334,16 @@ nav.top-navbar
     .page-link 
       background: none
 
+.custom-social-btn
+  padding: 2px 4px 2px 2px
+  word-spacing: 7px
+  text-align: left
+
+.blue-question
+  background: $color-tooltip
+  padding: .125rem
+  font-size: .675em
+  vertical-align: middle
+
+.icon
+  font-size: 1.175rem

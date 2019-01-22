@@ -22,11 +22,6 @@
                         <span class="text-primary">
                             {{ immutableBalance | toMoney }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Your WEB
                                 </template>
@@ -52,11 +47,6 @@
                                 for="buy-price">
                                 Market Price
                                 <guide>
-                                    <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                     <template slot="header">
                                         Market Price
                                     </template>
@@ -74,11 +64,6 @@
                             class="text-primary">
                             Price in WEB:
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Price in WEB
                                 </template>
@@ -115,11 +100,6 @@
                     <div class="col-12 pt-3">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
-                            <font-awesome-icon
-                                icon="question"
-                                slot='icon'
-                                class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                             <template slot="header">
                                 Total Price
                             </template>

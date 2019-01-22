@@ -7,11 +7,6 @@
                     <div class="pt-2">
                         Last price: {{ marketStatus.last }}
                         <guide>
-                            <font-awesome-icon
-                                icon="question"
-                                slot='icon'
-                                class="ml-1 mb-1 bg-primary text-white
-                                       rounded-circle square blue-question"/>
                             <template slot="header">
                                 Last price
                             </template>
@@ -25,11 +20,6 @@
                             <div>
                                 24h change
                                 <guide>
-                                    <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                               rounded-circle square blue-question"/>
                                     <template slot="header">
                                         24h change
                                     </template>
@@ -44,11 +34,6 @@
                             <div>
                                 24h volume
                                 <guide>
-                                    <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                               rounded-circle square blue-question"/>
                                     <template slot="header">
                                         24h volume
                                     </template>
