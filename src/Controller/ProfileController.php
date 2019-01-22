@@ -44,7 +44,7 @@ class ProfileController extends AbstractController
                 'profile' => $normalizer->normalize($profile, null, [ 'groups' => [ 'Default' ] ]),
                 'form' =>  $form->createView(),
                 'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
-                'editFormShowFirst' => !! $form->getErrors(true)->count(),
+                'editFormShowFirst' => $request->get('edit') || $form->getErrors(true)->count(),
             ]);
         }
 
@@ -89,6 +89,6 @@ class ProfileController extends AbstractController
         $entityManager->persist($profile);
         $entityManager->flush();
 
-        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl(), 'edit' => 1 ]);
     }
 }
