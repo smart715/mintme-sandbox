@@ -2,7 +2,11 @@
     <div>
         <template v-if="editable">
             <input type="text" v-model="newName" v-if="editingName">
-            <font-awesome-icon class="icon c-pointer align-middle" :icon="icon" transform="shrink-4 up-1.5" @click="editName" />
+            <font-awesome-icon
+                class="icon c-pointer align-middle"
+                :icon="icon"
+                transform="shrink-4 up-1.5"
+                @click="editName" />
         </template>
         <span v-if="!editingName">{{ currentName }}</span>
     </div>

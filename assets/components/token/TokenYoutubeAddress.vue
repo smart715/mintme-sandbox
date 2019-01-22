@@ -3,7 +3,7 @@
         <div v-show="!editing">
             <div class="d-flex">
                 <div class="display-text">
-                    Youtube: 
+                    Youtube:
                     <a
                         v-if="currentChannelId"
                         :href="'https://www.youtube.com/channel/'+this.currentChannelId"

@@ -12,7 +12,7 @@
                         Everything you should know before you buy {{ name }}.
                     </template>
                 </guide>
-                
+
             </div>
             <div class="card-body">
                 <div class="row">

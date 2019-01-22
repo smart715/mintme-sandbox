@@ -3,7 +3,7 @@
         <div v-show="!editing">
             <div class="d-flex">
                 <div class="display-text">
-                    Facebook: 
+                    Facebook:
                     <a :href="currentAddress" target="_blank" rel="nofollow">
                         {{ currentAddress }}
                     </a>
