@@ -1,40 +1,48 @@
 <template>
     <div>
-        <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
+        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Balance
         </div>
         <div class="table-responsive">
-            <b-table hover :items="predefinedItems" :fields="predefinedTokenFields">
-                <template slot="name" slot-scope="data">
+            <b-table hover :items="predefinedItems" :fields="predefinedTokenFields" class="wallet-table">
+                     <template slot="name" slot-scope="data">
                     {{ data.item.fullname }} ({{ data.item.name }})
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney }}
                 </template>
                 <template slot="action" slot-scope="data">
-                    <font-awesome-icon
+                    <div class="d-inline text-center float-left">
+                        <font-awesome-icon
                             :title="withdrawTooltip"
                             v-tippy="tooltipOptions"
                             icon="shopping-cart"
-                            class="text-orange c-pointer"
+                            class="text-white c-pointer"
                             @click="openWithdraw(data.item.name, data.item.fee, data.item.available)"
-                    />
-                    <font-awesome-icon
+                            />
+                        <br/>
+                        <span class="text-sm">Deposit</span>
+                    </div>
+                    <div class="d-inline text-center float-left pl-2">
+                        <font-awesome-icon
                             :title="depositTooltip"
                             v-tippy="tooltipOptions"
                             icon="piggy-bank"
-                            class="text-orange c-pointer"
+                            class="text-white c-pointer"
                             @click="openDeposit(data.item.name)"
                             size="1x"/>
+                        <br/>
+                        <span class="text-sm">Withdraw</span>
+                    </div>
                 </template>
             </b-table>
         </div>
-        <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
+        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Web tokens you own
         </div>
         <div v-if="hasTokens" class="table-responsive">
-            <b-table hover :items="items" :fields="tokenFields">
-                <template slot="name" slot-scope="data">
+            <b-table hover :items="items" :fields="tokenFields" class="wallet-table">
+                     <template slot="name" slot-scope="data">
                     {{ data.item.name }}
                 </template>
                 <template slot="available" slot-scope="data">
@@ -69,13 +77,13 @@
             :withdraw-url="withdrawUrl"
             :max-amount="amount"
             @close="closeWithdraw"
-        />
+            />
         <deposit-modal
             :address="depositAddress"
             :visible="showDepositModal"
             :description="depositDescription"
             @close="closeDeposit()"
-        />
+            />
     </div>
 </template>
 

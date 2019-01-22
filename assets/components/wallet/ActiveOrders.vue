@@ -1,5 +1,5 @@
 <template>
-    <div class="pb-3">
+    <div class="p-3">
         <div class="table-responsive">
             <confirm-modal
                 :visible="confirmModal"

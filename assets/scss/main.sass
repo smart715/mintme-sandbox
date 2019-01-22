@@ -144,13 +144,16 @@ label
   color: $white
 
 .table
-  th
+  thead
+    th
       border-top: none
       border-bottom: 1px solid #dee2e6
       font-weight: normal
       @include font-scale(sm)
+      &:first-child
+        padding-left: 2rem
 
-  td, th
+  td
     &:first-child
       padding-left: 2rem
 
@@ -185,13 +188,13 @@ label
           cursor: default
 
         &.active
-          background: $white
-          color: inherit
+          background: $secondary
+          color: $white
 
   .tab-content
     flex: 1 1 auto
     padding: 1.25rem
-    background: $white
+    background: $secondary
 
   &.no-padding
     .tab-content
