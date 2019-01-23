@@ -18,7 +18,7 @@
                 :per-page="perPage">
                 <template slot="action" slot-scope="row">
                     <a @click="removeOrderModal(row.item)">
-                        <font-awesome-icon icon="times" class="text-danger c-pointer" />
+                        <span class="icon-cancel c-pointer"></span>
                     </a>
                 </template>
             </b-table>

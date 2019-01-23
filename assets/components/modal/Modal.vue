@@ -1,8 +1,8 @@
 <template>
     <b-modal :visible="visible" :size="size" @hidden="closeModal" hide-footer>
         <div slot="modal-header">
-            <a class="modal-close float-right pr-2" @click="closeModal()">
-                <font-awesome-icon icon="times" slot='icon'/>
+            <a class="modal-close float-right pr-2 c-pointer" @click="closeModal()">
+                &times;
             </a>
         </div>
         <div class="modal-body">
