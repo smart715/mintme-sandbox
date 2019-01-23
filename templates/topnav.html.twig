@@ -11,6 +11,7 @@
                         <token-searcher search-url="{{ path('api_token_search') }}"></token-searcher>
                     </li>
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
+                        <span class="icon-token float-left mt-1 mr-1"></span>
                         <span>My Token</span>
                     </b-nav-item>
                     <b-nav-item class="align-self-start align-self-lg-center {{ app.request.get('_route') == 'trading' ? 'active' : '' }}" href="{{ path('trading') }}">

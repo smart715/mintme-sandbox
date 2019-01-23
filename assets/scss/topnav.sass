@@ -68,13 +68,6 @@
     border: none
     font-weight: lighter
     font-size: 1.3rem
-        
-  .icon
-    width: 1em
-    height: 1em
-    display: block
-    background-size: auto 100%
-    background-repeat: no-repeat
 
   .icon-profile
     background-image: url('../img/profile-icon.png')
@@ -113,6 +106,13 @@
 
       .icon-logout
         @extend .icon-logout-hover
+
+  .icon-token
+    background-image: url('../img/token-icon.png')
+    @extend .icon
+    &:hover
+      background-image: url('../img/token-icon_hover.png')
+
 
 .icon-profile-big
   width: 2.5em

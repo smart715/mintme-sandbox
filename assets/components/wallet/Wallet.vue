@@ -13,25 +13,17 @@
                 </template>
                 <template slot="action" slot-scope="data">
                     <div class="d-inline text-center float-left">
-                        <font-awesome-icon
-                            :title="withdrawTooltip"
-                            v-tippy="tooltipOptions"
-                            icon="shopping-cart"
-                            class="text-white c-pointer"
-                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)"
-                            />
-                        <br/>
+                        <span
+                            class="icon-deposit c-pointer mx-auto"
+                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                        </span>
                         <span class="text-sm">Deposit</span>
                     </div>
                     <div class="d-inline text-center float-left pl-2">
-                        <font-awesome-icon
-                            :title="depositTooltip"
-                            v-tippy="tooltipOptions"
-                            icon="piggy-bank"
-                            class="text-white c-pointer"
-                            @click="openDeposit(data.item.name)"
-                            size="1x"/>
-                        <br/>
+                        <span
+                            class="icon-withdraw c-pointer mx-auto"
+                            @click="openDeposit(data.item.name)">
+                        </span>
                         <span class="text-sm">Withdraw</span>
                     </div>
                 </template>
