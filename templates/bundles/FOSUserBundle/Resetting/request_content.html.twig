@@ -6,18 +6,7 @@
 
 {% block formBody %}
     <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
-        <div class="form-group row">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-12 col-lg-2 text-left text-lg-right">
-                        <label for="inputEmail" class="d-block label-featured">Email</label>
-                    </div>
-                    <div class="col">
-                        {{ form_row(form.username) }}
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ form_row(form.username, { 'inline': true }) }}
         <div class="form-group row">
             <div class="col-md-12">
                 <div class="row">
