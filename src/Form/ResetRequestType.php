@@ -23,7 +23,7 @@ class ResetRequestType extends AbstractType
     {
         $builder
             ->add('username', EmailType::class, [
-                'label' => false, 'attr' => array('pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'),
+                'label' => 'Email', 'attr' => array('pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'),
                 'constraints' => [new Email(['message' => 'Invalid email address.', 'checkMX' => true]) ],
             ])
         
