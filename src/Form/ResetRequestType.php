@@ -47,5 +47,4 @@ class ResetRequestType extends AbstractType
     {
         return '';
     }
-
 }
