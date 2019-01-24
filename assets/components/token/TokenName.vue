@@ -3,7 +3,7 @@
         <template v-if="editable">
             <input type="text" v-model="newName" v-if="editingName">
             <font-awesome-icon
-                class="icon c-pointer align-middle"
+                class="icon-edit c-pointer align-middle"
                 :icon="icon"
                 transform="shrink-4 up-1.5"
                 @click="editName" />

@@ -20,8 +20,7 @@
                         <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable"
-                        class="icon float-right c-pointer"
-                        size="2x"
+                        class="float-right c-pointer icon-edit"
                         :icon="icon"
                         transform="shrink-4 up-1.5"
                         @click="editDescription"
@@ -33,11 +32,6 @@
                                 <div class="pb-1">
                                     About your plan
                                     <guide>
-                                        <font-awesome-icon
-                                            icon="question"
-                                            slot='icon'
-                                            class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                         <template slot="header">
                                             About your plan
                                         </template>

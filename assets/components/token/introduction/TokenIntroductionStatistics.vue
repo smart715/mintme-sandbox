@@ -22,8 +22,7 @@
                 <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable && !showSettings"
-                        class="icon float-right c-pointer"
-                        size="2x"
+                        class="float-right c-pointer icon-edit"
                         icon="edit"
                         transform="shrink-4 up-1.5"
                         @click="switchAction"

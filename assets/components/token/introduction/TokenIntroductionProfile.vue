@@ -9,9 +9,8 @@
                     <div class="col-12">
                        <font-awesome-icon
                                 v-if="editable"
-                                class="icon float-right c-pointer"
-                                size="1x"
-                                :icon="icon"
+                                class="icon-edit float-right c-pointer"
+                               :icon="icon"
                                 transform="shrink-4 up-1.5"
                                 @click="editUrls"/>
                         <a :href="profileUrl" target="_blank">
