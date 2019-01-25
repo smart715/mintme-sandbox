@@ -156,13 +156,13 @@
 import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
-import AuthSocketMixin from '../../../mixins/authsocket';
+import WebSocketMixin from '../../../js/mixins/websocket';
 import {toMoney} from '../../../js/utils';
 import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenTradeBuyOrder',
-    mixins: [AuthSocketMixin],
+    mixins: [WebSocketMixin],
     components: {
         Guide,
         OrderModal,
@@ -237,17 +237,24 @@ export default {
             return;
         }
 
-        this.authorize(() => {
-            this.wsClient.send(JSON.stringify({
-              'method': 'asset.subscribe',
-              'params': [this.marketName.currencySymbol],
-              'id': parseInt(Math.random()),
-            }));
-        }, (response) => {
-            if ('asset.update' === response.method) {
-              this.immutableBalance = response.params[0][this.marketName.currencySymbol].available;
-            }
-        });
+        this.authorize()
+            .then(() => {
+                this.addMessageHandler((response) => {
+                    if ('asset.update' === response.method) {
+                        this.immutableBalance = response.params[0][this.marketName.currencySymbol].available;
+                    }
+                });
+                this.sendMessage(JSON.stringify({
+                    method: 'asset.subscribe',
+                    params: [this.marketName.currencySymbol],
+                    id: parseInt(Math.random()),
+                }));
+            })
+            .catch(() => {
+                this.$toasted.error(
+                    'Can not connect to internal services'
+                );
+            });
     },
     filters: {
         toMoney: function(val) {

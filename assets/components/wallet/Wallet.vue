@@ -82,13 +82,13 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import AuthSocketMixin from '../../mixins/authsocket';
+import WebSocketMixin from '../../js/mixins/websocket';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../js/utils';
 
 export default {
     name: 'Wallet',
-    mixins: [AuthSocketMixin],
+    mixins: [WebSocketMixin],
     components: {
         WithdrawModal,
         DepositModal,
@@ -151,17 +151,24 @@ export default {
         },
     },
     mounted: function() {
-        this.authorize(() => {
-            this.wsClient.send(JSON.stringify({
-                'method': 'asset.subscribe',
-                'params': this.allTokensName,
-                'id': parseInt(Math.random()),
-            }));
-        }, (response) => {
-            if ('asset.update' === response.method) {
-                this.updateBalances(response.params[0]);
-            }
-        });
+        this.authorize()
+            .then(() => {
+                this.addMessageHandler((response) => {
+                    if ('asset.update' === response.method) {
+                        this.updateBalances(response.params[0]);
+                    }
+                });
+                this.sendMessage(JSON.stringify({
+                    method: 'asset.subscribe',
+                    params: this.allTokensName,
+                    id: parseInt(Math.random()),
+                }));
+            })
+            .catch(() => {
+                this.$toasted.error(
+                    'Can not connect to internal services'
+                );
+            });
     },
     methods: {
         openWithdraw: function(currency, fee, amount) {
