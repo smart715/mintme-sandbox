@@ -4,6 +4,7 @@ import TokenIntroductionProfile from '../components/token/introduction/TokenIntr
 import TokenIntroductionStatistics from '../components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from '../components/token/introduction/TokenIntroductionDescription';
 import TokenName from '../components/token/TokenName';
+import store from './storage';
 
 new Vue({
   el: '#token',
@@ -21,4 +22,5 @@ new Vue({
     TokenName,
     Tabs,
   },
+  store,
 });
