@@ -20,12 +20,4 @@ export default {
             this.$data._chart.update();
         },
     },
-    watch: {
-        'data.datasets.data': {
-            handler() {
-                this.updateLineChart();
-            },
-            deep: true,
-        },
-    },
 };

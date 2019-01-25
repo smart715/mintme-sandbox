@@ -79,7 +79,7 @@ describe('TokenTrade', () => {
 
         describe(':buy', () => {
             context('when fetch markets deal from server', () => {
-                vm.wsResult = websocketResult;
+                vm.updateMarketData(websocketResult);
 
                 it('should set with minimum price of pending markets', (done) => {
                     Vue.nextTick(() => {
@@ -95,7 +95,7 @@ describe('TokenTrade', () => {
 
         describe(':sell', () => {
             context('when fetch markets deal from server', () => {
-                vm.wsResult = websocketResult;
+                vm.updateMarketData(websocketResult);
 
                 it('should set with maximum price of pending markets', (done) => {
                     Vue.nextTick(() => {
