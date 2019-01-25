@@ -60,13 +60,12 @@ import TokenTradeChart from './TokenTradeChart';
 import TokenTradeBuyOrders from './TokenTradeBuyOrders';
 import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
-import WebSocket from '../../../js/websocket';
 import OrderModal from '../../modal/OrderModal';
-
-Vue.use(WebSocket);
+import WebSocketMixin from '../../../js/mixins/websocket';
 
 export default {
     name: 'TokenTrade',
+    mixins: [WebSocketMixin],
     components: {
         TokenTradeBuyOrder,
         TokenTradeSellOrder,
@@ -94,8 +93,6 @@ export default {
     },
     data() {
         return {
-            wsClient: null,
-            wsResult: {},
             buy: {
                 amount: 0,
                 price: 0,
@@ -118,22 +115,19 @@ export default {
         },
     },
     mounted() {
-        if (this.websocketUrl) {
-            this.wsClient = this.$socket(this.websocketUrl);
-            this.wsClient.onmessage = (result) => {
-                if (typeof result.data === 'string') {
-                    this.wsResult = JSON.parse(result.data);
-                }
-            };
-            this.wsClient.onopen = () => {
-                const request = JSON.stringify({
-                    method: 'deals.subscribe',
-                    params: [this.market.hiddenName],
-                    id: parseInt(Math.random().toString().replace('0.', '')),
-                });
-                this.wsClient.send(request);
-            };
-        }
+        this.addMessageHandler((result) => {
+            if ('state.update' === result.method) {
+                this.updateMarketData(result);
+            }
+        });
+        this.addOnOpenHandler(() => {
+            const request = JSON.stringify({
+                method: 'deals.subscribe',
+                params: [this.market.hiddenName],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            });
+            this.sendMessage(request);
+        });
     },
     methods: {
         updateMarketData: function(marketData) {
@@ -166,14 +160,6 @@ export default {
                     }
                 });
             }
-        },
-    },
-    watch: {
-        wsResult: {
-            handler(value) {
-                this.updateMarketData(value);
-            },
-            deep: true,
         },
     },
 };
