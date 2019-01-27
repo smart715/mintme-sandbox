@@ -31,7 +31,7 @@
                 <div v-if="!showSettings" class="row">
                     <div class="col">
                         <div class="font-weight-bold pb-4">
-                            Profile Statistics
+                            Token balance:
                         </div>
                         <div class="pb-1">
                             Wallet on exchange: {{ walletBalance }}
@@ -82,7 +82,7 @@
                     </div>
                     <div class="col">
                         <div class="font-weight-bold pb-4">
-                            Token Release Statistics
+                            Token release:
                         </div>
                         <div class="pb-1">
                             Release period: {{ stats.releasePeriod }}
