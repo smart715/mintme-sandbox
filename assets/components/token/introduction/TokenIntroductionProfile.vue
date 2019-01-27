@@ -2,7 +2,7 @@
     <div>
         <div class="card">
             <div class="card-header">
-                {{ this.profileName }}
+                {{ profileName }}
                 <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable"
