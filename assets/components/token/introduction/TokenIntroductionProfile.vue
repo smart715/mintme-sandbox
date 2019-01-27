@@ -24,8 +24,8 @@
                                 <div v-if="!editingUrls">
                                     <div v-if="currentWebsite">
                                         Web:
-                                        <a :href="this.currentWebsite" target="_blank" rel="nofollow">
-                                            {{ this.currentWebsite }}
+                                        <a :href="currentWebsite" target="_blank" rel="nofollow">
+                                            {{ currentWebsite }}
                                         </a>
                                         <guide>
                                             <font-awesome-icon
