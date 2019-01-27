@@ -154,7 +154,7 @@ class TokenController extends AbstractController
         MoneyWrapperInterface $moneyWrapper
     ): Response {
         if ($this->isTokenCreated()) {
-            return $this->redirectToOwnToken();
+            return $this->redirectToOwnToken('trade');
         }
 
         $token = new Token();
@@ -180,7 +180,7 @@ class TokenController extends AbstractController
                     )
                 );
 
-                return $this->redirectToOwnToken();
+                return $this->redirectToOwnToken('intro');
             } catch (\Throwable $exception) {
                 $this->em->remove($token);
                 $this->em->flush();
@@ -189,7 +189,7 @@ class TokenController extends AbstractController
         }
 
         return $this->render('pages/token_creation.html.twig', [
-            'formHeader' => 'Plant your own token',
+            'formHeader' => 'Create your own token',
             'form' => $form->createView(),
             'profileCreated' => $this->isProfileCreated(),
         ]);
@@ -226,7 +226,7 @@ class TokenController extends AbstractController
         return $response;
     }
 
-    private function redirectToOwnToken(): RedirectResponse
+    private function redirectToOwnToken(string $showtab): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 
@@ -236,9 +236,10 @@ class TokenController extends AbstractController
 
         return $this->redirectToRoute('token_show', [
             'name' => $token->getName(),
+            'tab' => $showtab,
         ]);
     }
-
+    
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();

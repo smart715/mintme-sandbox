@@ -51,7 +51,7 @@
                                 <limited-textarea
                                     class="form-control"
                                     :value="newDescription"
-                                    max="150"
+                                    max="20000"
                                     @get-value="getValue">
                                 </limited-textarea>
                             </div>
