@@ -7,7 +7,18 @@
 {% block formBody %}
     <form action="{{ path("login") }}" method="post">
         {% if error %}
-            <div class="p-2 mb-4 bg-danger text-white">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        <div class="form-group row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-12 col-lg-4 text-left text-lg-right">
+                        <span>&#32;</span>
+                    </div>
+                    <div class="col">
+                        <div class="p-2 mb-4 bg-danger text-white">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
         <div class="form-group row">
             <div class="col-md-12">
