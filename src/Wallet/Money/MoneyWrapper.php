@@ -37,26 +37,15 @@ final class MoneyWrapper implements MoneyWrapperInterface
 
     public function convertToDecimalIfNotation(string $notation): string
     {
-        if (preg_match('/^(?<sign>[-]?)(?<number>\d+)e(?<direction>[-]?)(?<point>\d+)$/u', $notation, $matches)) {
-            $number = $matches['number'];
-            $point = $matches['point'];
-            $sign = $matches['sign'];
-            $direction = $matches['direction'];
-            $zerosCount = $direction
-                ? $point - strlen($number)
-                : $point;
-            $zeros = str_repeat('0', $zerosCount);
-            return $direction
-                ? $sign . '0.' . $zeros . $number
-                : $sign . $number . $zeros . '.0';
-        }
-        return $notation;
+        return number_format(floatval($notation), 0, '', '');
     }
 
     public function parse(string $value, string $symbol): Money
     {
-        $value = $this->convertToDecimalIfNotation($value);
-        return (new DecimalMoneyParser($this->getRepository()))->parse($value, $symbol);
+        return (new DecimalMoneyParser($this->getRepository()))->parse(
+            $this->convertToDecimalIfNotation($value),
+            $symbol
+        );
     }
 
     private function fetchCurrencies(): array
