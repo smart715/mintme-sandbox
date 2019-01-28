@@ -24,18 +24,14 @@ class MarketFetcher implements MarketFetcherInterface
 
     public function getExecutedOrders(string $market, int $offset = 0, int $limit = 100): array
     {
-        try {
-            $response = $this->jsonRpc->send(self::EXECUTED_ORDERS_METHOD, [
-                $market,
-                $limit,
-                $offset,
-            ]);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::EXECUTED_ORDERS_METHOD, [
+            $market,
+            $limit,
+            $offset,
+        ]);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException();
         }
 
         return $response->getResult();
@@ -43,38 +39,30 @@ class MarketFetcher implements MarketFetcherInterface
 
     public function getUserExecutedHistory(int $userId, string $market, int $offset = 0, int $limit = 100): array
     {
-        try {
-            $response = $this->jsonRpc->send(self::USER_EXECUTED_HISTORY, [
-                $userId,
-                $market,
-                $offset,
-                $limit,
-            ]);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::USER_EXECUTED_HISTORY, [
+            $userId,
+            $market,
+            $offset,
+            $limit,
+        ]);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException();
         }
         return $response->getResult();
     }
 
     public function getPendingOrdersByUser(int $userId, string $market, int $offset = 0, int $limit = 100): array
     {
-        try {
-            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
-                $userId,
-                $market,
-                $offset,
-                $limit,
-            ]);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
+            $userId,
+            $market,
+            $offset,
+            $limit,
+        ]);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException();
         }
 
         return $response->getResult()['records'];
@@ -82,19 +70,15 @@ class MarketFetcher implements MarketFetcherInterface
 
     public function getPendingOrders(string $market, int $offset, int $limit, int $side): array
     {
-        try {
-            $response = $this->jsonRpc->send(self::BOOK_ORDERS_METHOD, [
-                $market,
-                $side,
-                $offset,
-                $limit,
-            ]);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::BOOK_ORDERS_METHOD, [
+            $market,
+            $side,
+            $offset,
+            $limit,
+        ]);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException();
         }
         return $response->getResult();
     }

@@ -49,7 +49,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                     ]
                 );
                 $credentials[$token->getName()] = $response->hasError() ?
-                    "Address unavailable.":
+                    "Address unavailable." :
                     $response->getResult();
             }
         } catch (FetchException $e) {
@@ -78,18 +78,14 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
     /** {@inheritdoc} */
     public function getTransactions(User $user, int $offset, int $limit): array
     {
-        try {
-            $response = $this->jsonRpc->send(
-                self::GET_TRANSACTIONS_METHOD,
-                [
-                    'user_id' => $user->getId(),
-                    "offset" => $offset,
-                    "limit" => $limit,
-                ]
-            );
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(
+            self::GET_TRANSACTIONS_METHOD,
+            [
+                'user_id' => $user->getId(),
+                "offset" => $offset,
+                "limit" => $limit,
+            ]
+        );
 
         return $this->parseTransactions($response->getResult());
     }

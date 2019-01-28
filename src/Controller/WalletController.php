@@ -42,10 +42,18 @@ class WalletController extends AbstractController
         WalletInterface $wallet
     ): Response {
 
-        $tokens = $balanceHandler->balances(
-            $this->getUser(),
-            $this->getUser()->getRelatedTokens()
-        );
+        try {
+            $tokens = $balanceHandler->balances(
+                $this->getUser(),
+                $this->getUser()->getRelatedTokens()
+            );
+            $predefinedTokens = $balanceHandler->balances(
+                $this->getUser(),
+                $tokenManager->findAllPredefined()
+            );
+        } catch (\Throwable $exception) {
+            $token = false;
+        }
 
         $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
@@ -63,18 +71,30 @@ class WalletController extends AbstractController
             ? $marketManager->getMarket($webCrypto, $token)
             : null;
 
-        $executedHistory = $market
-            ? $marketHandler->getUserExecutedHistory($user, $marketManager->getUserRelatedMarkets($user))
-            : [];
+        $executedHistory = [];
+        $orders = [];
 
-        $orders = $market
-            ? $marketHandler->getPendingOrdersByUser($user, $marketManager->getUserRelatedMarkets($user))
-            : [];
+        if ($market) {
+            try {
+                $executedHistory = $marketHandler->getUserExecutedHistory($user, $marketManager->getUserRelatedMarkets($user));
+                $orders = $marketHandler->getPendingOrdersByUser($user, $marketManager->getUserRelatedMarkets($user));
+            } catch (\Throwable $exception) {
+                $executedHistory = false;
+            }
+            try {
+                $orders = $marketHandler->getPendingOrdersByUser($user, $marketManager->getUserRelatedMarkets($user));
+            } catch (\Throwable $exception) {
+                $orders = false;
+            }
+        }
 
-        $predefinedTokens = $balanceHandler->balances(
-            $this->getUser(),
-            $tokenManager->findAllPredefined()
-        );
+        try {
+            $depositWithdrawHistory = $normalizer->normalize(
+                $wallet->getWithdrawDepositHistory($this->getUser(), 0, self::DEPOSIT_WITHDRAW_HISTORY_LIMIT)
+            );
+        } catch (\Throwable $exception) {
+            $depositWithdrawHistory = false;
+        }
 
         return $this->render('pages/wallet.html.twig', [
             'orders' => $normalizer->normalize($orders, null, [
@@ -97,9 +117,7 @@ class WalletController extends AbstractController
                 $this->getUser()->getId(),
                 $tokenManager->findAllPredefined()
             )->toArray(),
-            'depositWithdrawHistory' => $normalizer->normalize(
-                $wallet->getWithdrawDepositHistory($this->getUser(), 0, self::DEPOSIT_WITHDRAW_HISTORY_LIMIT)
-            ),
+            'depositWithdrawHistory' => $depositWithdrawHistory,
         ]);
     }
 }

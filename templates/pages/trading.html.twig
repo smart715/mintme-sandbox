@@ -13,7 +13,7 @@
                         Trading
                     </div>
                     <div class="card-body" v-cloak>
-                        {{ include("loader.html.twig") }}
+                        {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                         <trading websocket-url="{{ global_websocket_url }}"
                                  market-names="{{ marketNames | json_encode }}"
                         >

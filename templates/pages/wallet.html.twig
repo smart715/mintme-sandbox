@@ -11,32 +11,49 @@
                 <template>
                     <b-tabs class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
                         <b-tab title="Wallet" active v-cloak>
-                            {{ include("loader.html.twig") }}
-                            <wallet
-                                hash="{{ hash }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                :deposit-addresses="{{depositAddresses | json_encode}}"
-                                :tokens="{{ tokens | json_encode }}"
-                                :predefined-tokens="{{ predefinedTokens | json_encode }}"
-                                create-token-url="{{ path('token_create') }}"
-                                trading-url="{{ path('trading') }}"
-                                withdraw-url="{{ path('withdraw') }}">
-                            </wallet>
+                            {% if tokens == false %}
+                                {{ include("loader.html.twig", {vCloak:''}) }}
+                            {% else %}
+                                {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
+                                <wallet
+                                    hash="{{ hash }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    :deposit-addresses="{{ depositAddresses | json_encode }}"
+                                    :tokens="{{ tokens | json_encode }}"
+                                    :predefined-tokens="{{ predefinedTokens | json_encode }}"
+                                    create-token-url="{{ path('token_create') }}"
+                                    trading-url="{{ path('trading') }}"
+                                    withdraw-url="{{ path('withdraw') }}">
+                                </wallet>
+                            {% endif %}
                         </b-tab>
-                        <b-tab title="Trading History" >
-                            <trading-history  :executed-history="{{ executedHistory | json_encode }}"></trading-history>
+                        <b-tab title="Trading History">
+                            {% if executedHistory == false %}
+                                {{ include("loader.html.twig", {vCloak:''}) }}
+                            {% else %}
+                                <trading-history
+                                    :executed-history="{{ executedHistory | json_encode }}"></trading-history>
+                            {% endif %}
                         </b-tab>
-                        <b-tab title="Deposit/Withdraw History" >
-                            {{ include("loader.html.twig") }}
-                            <deposit-withdraw-history :init-history="{{ depositWithdrawHistory | json_encode }}" />
+                        <b-tab title="Deposit/Withdraw History">
+                            {% if depositWithdrawHistory == false %}
+                                {{ include("loader.html.twig", {vCloak:''}) }}
+                            {% else %}
+                                {{ include("loader.html.twig", {vCloak:'v-cloak--block'}) }}
+                                <deposit-withdraw-history :init-history="{{ depositWithdrawHistory | json_encode }}"/>
+                            {% endif %}
                         </b-tab>
-                        <b-tab title="Active Orders" >
-                            <active-orders
-                                hash="{{ hash }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                :markets="{{ markets | json_encode }}"
-                                :orders="{{ orders | json_encode }}"
-                            ></active-orders>
+                        <b-tab title="Active Orders">
+                            {% if orders == false %}
+                                {{ include("loader.html.twig", {vCloak:''}) }}
+                            {% else %}
+                                <active-orders
+                                    hash="{{ hash }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    :markets="{{ markets | json_encode }}"
+                                    :orders="{{ orders | json_encode }}"
+                                ></active-orders>
+                            {% endif %}
                         </b-tab>
                     </b-tabs>
                 </template>

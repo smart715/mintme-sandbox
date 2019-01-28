@@ -43,7 +43,7 @@ class BalanceFetcher implements BalanceFetcherInterface
             $type,
             $this->random->getNumber(),
             $amount,
-            [ 'extra' => 1 ],
+            ['extra' => 1],
         ]);
 
         if ($responce->hasError()) {
@@ -53,16 +53,12 @@ class BalanceFetcher implements BalanceFetcherInterface
 
     public function summary(string $tokenName): SummaryResult
     {
-        try {
-            $response = $this->jsonRpc->send(self::SUMMARY_METHOD, [
-                $tokenName,
-            ]);
-        } catch (\Throwable $exception) {
-            return SummaryResult::fail();
-        }
+        $response = $this->jsonRpc->send(self::SUMMARY_METHOD, [
+            $tokenName,
+        ]);
 
         if ($response->hasError()) {
-            return SummaryResult::fail();
+            throw new BalanceException();
         }
 
         $result = $response->getResult();
@@ -80,20 +76,15 @@ class BalanceFetcher implements BalanceFetcherInterface
     public function balance(int $userId, array $tokenNames): BalanceResultContainer
     {
         if (!$tokenNames) {
-            return BalanceResultContainer::fail();
+            throw new BalanceException('Failed to get the balance. No token name');
         }
-
-        try {
-            $response = $this->jsonRpc->send(
-                self::BALANCE_METHOD,
-                array_merge([ $userId ], $tokenNames)
-            );
-        } catch (\Throwable $exception) {
-            return BalanceResultContainer::fail();
-        }
+        $response = $this->jsonRpc->send(
+            self::BALANCE_METHOD,
+            array_merge([$userId], $tokenNames)
+        );
 
         if ($response->hasError()) {
-            return BalanceResultContainer::fail();
+            throw new BalanceException($response->getError()['message']);
         }
 
         $result = $response->getResult();
