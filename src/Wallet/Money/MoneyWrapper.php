@@ -35,9 +35,17 @@ final class MoneyWrapper implements MoneyWrapperInterface
         return (new DecimalMoneyFormatter($this->getRepository()))->format($money);
     }
 
+    public function convertToDecimalIfNotation(string $notation): string
+    {
+        return number_format(floatval($notation), 0, '', '');
+    }
+
     public function parse(string $value, string $symbol): Money
     {
-        return (new DecimalMoneyParser($this->getRepository()))->parse($value, $symbol);
+        return (new DecimalMoneyParser($this->getRepository()))->parse(
+            $this->convertToDecimalIfNotation($value),
+            $symbol
+        );
     }
 
     private function fetchCurrencies(): array
