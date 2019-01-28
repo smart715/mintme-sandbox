@@ -6,9 +6,11 @@ use App\Deposit\DepositGatewayCommunicator;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManager;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Wallet;
 use App\Withdraw\WithdrawGatewayInterface;
 use DateTime;
@@ -16,6 +18,18 @@ use PHPUnit\Framework\TestCase;
 
 class WalletTest extends TestCase
 {
+    public function testConvertToDecimalIfNotation(): void
+    {
+        $moneyWrapper = new MoneyWrapper($this->createMock(CryptoManager::class));
+        $this->assertEquals('0.0000001', $moneyWrapper->convertToDecimalIfNotation('1e-7'));
+        $this->assertEquals('0.0000022', $moneyWrapper->convertToDecimalIfNotation('22e-7'));
+        $this->assertEquals('-0.0000022', $moneyWrapper->convertToDecimalIfNotation('-22e-7'));
+        $this->assertEquals('10000000.0', $moneyWrapper->convertToDecimalIfNotation('1e7'));
+        $this->assertEquals('220000000.0', $moneyWrapper->convertToDecimalIfNotation('22e7'));
+        $this->assertEquals('-220000000.0', $moneyWrapper->convertToDecimalIfNotation('-22e7'));
+        $this->assertEquals('2.0005', $moneyWrapper->convertToDecimalIfNotation('2.0005'));
+    }
+
     public function testGetWithdrawDepositHistory(): void
     {
         $depositTransactions = [
