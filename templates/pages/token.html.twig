@@ -18,7 +18,7 @@
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %} v-cloak>
-                        {% if balances == false OR executedOrders == false %}
+                        {% if balances == false or executedOrders == false %}
                         {{ include("loader.html.twig", {vCloak: ''}) }}
                         {% else %}
                         {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}

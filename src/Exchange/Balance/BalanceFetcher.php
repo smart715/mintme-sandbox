@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Balance;
 
+use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResultContainer;
@@ -58,7 +59,7 @@ class BalanceFetcher implements BalanceFetcherInterface
         ]);
 
         if ($response->hasError()) {
-            throw new BalanceException();
+            throw new BalanceException($response->getError()['message'] ?? 'get error response');
         }
 
         $result = $response->getResult();
@@ -84,7 +85,7 @@ class BalanceFetcher implements BalanceFetcherInterface
         );
 
         if ($response->hasError()) {
-            throw new BalanceException($response->getError()['message']);
+            throw new BalanceException($response->getError()['message'] ?? 'get error response');
         }
 
         $result = $response->getResult();

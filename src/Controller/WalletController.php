@@ -52,7 +52,8 @@ class WalletController extends AbstractController
                 $tokenManager->findAllPredefined()
             );
         } catch (\Throwable $exception) {
-            $token = false;
+            $tokens = false;
+            $predefinedTokens = false;
         }
 
         $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
