@@ -78,6 +78,7 @@ export default {
             currentRow: {},
             actionUrl: '',
             orders: [],
+            unfilteredOrders: [],
             fields: {
                 price: {
                     label: 'Price',
@@ -121,12 +122,12 @@ export default {
         },
     },
     mounted: function() {
-        this.orders = JSON.parse(this.buyOrders);
+        this.groupOrders(JSON.parse(this.buyOrders));
         setInterval(() => {
             this.$axios.get(this.$routing.generate('pending_buy_orders', {
                 tokenName: this.tokenName,
             })).then((result) => {
-                this.orders = result.data;
+                this.groupOrders(result.data);
                 this.$refs.table.refresh();
             });
         }, 10000);
@@ -144,6 +145,44 @@ export default {
             this.$axios.get(this.actionUrl).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
             });
+        },
+        groupOrders: function(orders) {
+            let grouped = {};
+console.log(orders);
+            orders.forEach( (item, i, arr) => {
+                let price = item.price;
+
+                if (arr[i-1] !== undefined && arr[i-1].price === arr[i].price) {
+                    if (grouped[price] === undefined) {
+                        grouped[price] = [];
+                    }
+                    grouped[price].push(item);
+                } else {
+                    grouped[price] = [];
+                    grouped[price].push(item);
+                }
+            });
+console.log(grouped);
+            grouped.sort(function() {
+                ;
+            })
+            this.unfilteredOrders = grouped;
+            this.filterOrdersList(grouped);
+        },
+        filterOrdersList: function(orders) {
+            let filtered = [];
+            for ( let item in orders ) {
+                if (orders.hasOwnProperty(item)) {
+                    let amount = 0;
+                    orders[item].forEach((order) => {
+                        amount += parseFloat(order.amount);
+                    });
+
+                    orders[item][0].amount = amount;
+                    filtered.push(orders[item][0]);
+                }
+            }
+            this.orders = filtered;
         },
     },
 };
