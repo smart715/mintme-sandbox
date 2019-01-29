@@ -1,4 +1,5 @@
 import '../scss/main.sass';
+import Vue from 'vue';
 import VueBootstrap from 'bootstrap-vue';
 import fontawesome from '@fortawesome/fontawesome';
 import fas from '@fortawesome/fontawesome-free-solid';
@@ -21,7 +22,7 @@ VueClipboard.config.autoSetContainer = true;
 
 fontawesome.library.add(fas, far, fab, faSearch, faCog);
 
-window.Vue = require('vue');
+window.Vue = Vue;
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);

@@ -36,7 +36,7 @@
     </div>
 </template>
 <script>
-import AuthSocketMixin from '../../mixins/authsocket';
+import WebSocketMixin from '../../js/mixins/websocket';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../js/utils/constants';
@@ -44,7 +44,7 @@ import {toMoney} from '../../js/utils';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [AuthSocketMixin],
+    mixins: [WebSocketMixin],
     components: {
         ConfirmModal,
     },
@@ -88,55 +88,64 @@ export default {
         },
     },
     mounted: function() {
-        this.authorize(() => {
-            this.wsClient.send(JSON.stringify({
-                'method': 'order.subscribe',
-                'params': this.marketNames,
-                'id': parseInt(Math.random()),
-            }));
-        }, (response) => {
-            if ('order.update' === response.method) {
-                let data = response.params[1];
-                let order = this.ordersList.find((order) => data.id === order.id);
+        this.authorize()
+            .then(() => {
+                this.sendMessage(JSON.stringify({
+                    method: 'order.subscribe',
+                    params: this.marketNames,
+                    id: parseInt(Math.random()),
+                }));
 
-                switch (response.params[0]) {
-                    case WSAPI.order.status.PUT:
-                        this.ordersList.push({
-                            amount: data.amount,
-                            price: data.price,
-                            fee: WSAPI.order.type.SELL === parseInt(data.type) ? data.maker_fee : data.taker_fee,
-                            id: data.id,
-                            side: data.side,
-                            timestamp: data.mtime,
-                            market: this.getMarketFromName(data.market),
+                this.addMessageHandler((response) => {
+                    if ('order.update' === response.method) {
+                        let data = response.params[1];
+                        let order = this.ordersList.find((order) => data.id === order.id);
+
+                        switch (response.params[0]) {
+                            case WSAPI.order.status.PUT:
+                                this.ordersList.push({
+                                    amount: data.amount,
+                                    price: data.price,
+                                    fee: WSAPI.order.type.SELL === parseInt(data.type)
+                                        ? data.maker_fee : data.taker_fee,
+                                    id: data.id,
+                                    side: data.side,
+                                    timestamp: data.mtime,
+                                    market: this.getMarketFromName(data.market),
+                                });
+                                break;
+                            case WSAPI.order.status.UPDATE:
+                                if (typeof order === 'undefined') {
+                                    return;
+                                }
+
+                                let index = this.ordersList.indexOf(order);
+                                order.amount = data.left;
+                                order.price = data.price;
+                                order.timestamp = data.mtime;
+                                this.ordersList[index] = order;
+                                break;
+                            case WSAPI.order.status.FINISH:
+                                if (typeof order === 'undefined') {
+                                    return;
+                                }
+
+                                this.ordersList.splice(this.ordersList.indexOf(order), 1);
+                                break;
+                        }
+
+                        this.ordersList.sort((a, b) => {
+                            return a.timestamp < b.timestamp;
                         });
-                        break;
-                    case WSAPI.order.status.UPDATE:
-                        if (typeof order === 'undefined') {
-                            return;
-                        }
-
-                        let index = this.ordersList.indexOf(order);
-                        order.amount = data.left;
-                        order.price = data.price;
-                        order.timestamp = data.mtime;
-                        this.ordersList[index] = order;
-                        break;
-                    case WSAPI.order.status.FINISH:
-                        if (typeof order === 'undefined') {
-                            return;
-                        }
-
-                        this.ordersList.splice(this.ordersList.indexOf(order), 1);
-                        break;
-                }
-
-                this.ordersList.sort(function(a, b) {
-                    return a.timestamp < b.timestamp;
+                        this.$refs.table.refresh();
+                    }
                 });
-                this.$refs.table.refresh();
-            }
-        });
+            })
+            .catch(() => {
+                this.$toasted.error(
+                    'Can not connect to internal services'
+                );
+            });
     },
     methods: {
         getHistory: function() {

@@ -32,9 +32,9 @@ Installation
 7. Build frontend: `npm install` and `npm run dev` (or `npm run prod` in staging/production). Re-run `npm run dev` after making changes to frontend to reflect them in your local webserver;
 8. Check if everything's up by visiting your page in the web browser, and you are done!
 
-You also need to run 
+You also need to add this to crontab jobs 
 ```
-php bin/console cron:start
+* * * * * /path/to/symfony/install/app/console cron:run 1>> /dev/null 2>&1
 ```
 to launch cron operations to update users lock-in,
 ```

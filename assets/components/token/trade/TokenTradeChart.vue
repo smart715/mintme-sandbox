@@ -59,13 +59,12 @@
 
 <script>
 import LineChart from '../../../js/line-chart';
-import WebSocket from '../../../js/websocket';
 import Guide from '../../Guide';
-
-Vue.use(WebSocket);
+import WebSocketMixin from '../../../js/mixins/websocket';
 
 export default {
     name: 'TokenTradeChart',
+    mixins: [WebSocketMixin],
     props: {
         websocketUrl: String,
         containerClass: String,
@@ -79,8 +78,8 @@ export default {
                 datasets: [
                     {
                         borderWidth: 0,
-                        borderColor: 'transparent',
-                        backgroundColor: '#8ec63f',
+                        borderColor: 'white',
+                        backgroundColor: '#4d40c6',
                         radius: 0,
                         data: [],
                         lineTension: 0,
@@ -123,8 +122,6 @@ export default {
                 },
             },
             chartXAxesPoints: 10,
-            wsClient: null,
-            wsResult: {},
             marketStatus: {
                 volume: 0,
                 last: 0,
@@ -138,11 +135,11 @@ export default {
         },
         chartInitValues: function() {
             let values = [];
-            let i = 0;
-            while (i < this.chartXAxesPoints) {
+
+            for (let i = 0; i < this.chartXAxesPoints; i++) {
                 values.push(0);
-                ++i;
             }
+
             return values;
         },
     },
@@ -152,20 +149,19 @@ export default {
         this.chartData.datasets[0].data = this.chartInitValues;
 
         if (this.websocketUrl) {
-            this.wsClient = this.$socket(this.websocketUrl);
-            this.wsClient.onmessage = (result) => {
-                if (typeof result.data === 'string') {
-                    this.wsResult = JSON.parse(result.data);
+            this.addMessageHandler((result) => {
+                if (result.method === 'state.update') {
+                    this.updateMarketData(result);
                 }
-            };
-            this.wsClient.onopen = () => {
+            });
+            this.addOnOpenHandler(() => {
                 const request = JSON.stringify({
                     method: 'state.subscribe',
                     params: [this.market.hiddenName],
                     id: parseInt(Math.random().toString().replace('0.', '')),
                 });
-                this.wsClient.send(request);
-            };
+                this.sendMessage(request);
+            });
         }
     },
     methods: {
@@ -198,14 +194,6 @@ export default {
     components: {
         LineChart,
         Guide,
-    },
-    watch: {
-        wsResult: {
-            handler(value) {
-                this.updateMarketData(value);
-            },
-            deep: true,
-        },
     },
 };
 </script>

@@ -2,35 +2,43 @@
     <div>
         <div class="card">
             <div class="card-header">
-                {{ this.profileName }}
+                {{ profileName }}
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
-                       <font-awesome-icon
-                                v-if="editable"
-                                class="icon-edit float-right c-pointer"
-                               :icon="icon"
-                                transform="shrink-4 up-1.5"
-                                @click="editUrls"/>
+                        <font-awesome-icon
+                            v-if="editable"
+                            class="icon-edit float-right c-pointer"
+                            :icon="icon"
+                            transform="shrink-4 up-1.5"
+                            @click="editUrls"/>
+
                         <a :href="profileUrl" target="_blank">
                             {{ profileUrl }}
                         </a>
                         <div class="pt-4">
                             <div class="pb-1">
                                 <div v-if="!editingUrls">
-                                    Web:
-                                    <a :href="this.currentWebsite" target="_blank" rel="nofollow">
-                                        {{ this.currentWebsite }}
-                                    </a>
-                                    <guide>
-                                        <template  slot="header">
-                                            Web
-                                        </template>
-                                        <template slot="body">
-                                            Link to token creator’s website. Before adding it, we confirmed ownership.
-                                        </template>
-                                    </guide>
+                                    <div v-if="currentWebsite">
+                                        Web:
+                                        <a :href="currentWebsite" target="_blank" rel="nofollow">
+                                            {{ currentWebsite }}
+                                        </a>
+                                        <guide>
+                                            <font-awesome-icon
+                                                icon="question"
+                                                slot='icon'
+                                                class="ml-1 mb-1 bg-primary text-white
+                                                rounded-circle square blue-question"/>
+                                            <template  slot="header">
+                                                Web
+                                            </template>
+                                            <template slot="body">
+                                                Link to token creator’s website. Before adding it, we confirmed ownership.
+                                            </template>
+                                        </guide>
+                                    </div>
                                 </div>
                                 <div class="form-group" v-else>
                                     <label for="website-err">Website address:</label>
@@ -46,7 +54,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="pb-1">
+                            <div class="pb-1" v-if="facebookUrl">
                                 <token-facebook-address
                                     :app-id="facebookAppId"
                                     :editing="editingUrls"
@@ -54,7 +62,7 @@
                                     :update-url="updateUrl"
                                     :csrfToken="csrfToken"/>
                             </div>
-                            <div>
+                            <div v-if="youtubeChannelId">
                                 <token-youtube-address
                                     :client-id="youtubeClientId"
                                     :editable="editable"

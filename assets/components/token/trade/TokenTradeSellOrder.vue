@@ -137,7 +137,7 @@
 import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
-import AuthSocketMixin from '../../../mixins/authsocket';
+import WebSocketMixin from '../../../js/mixins/websocket';
 import {toMoney} from '../../../js/utils';
 import Decimal from 'decimal.js';
 
@@ -147,7 +147,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [AuthSocketMixin],
+    mixins: [WebSocketMixin],
     props: {
         containerClass: String,
         loginUrl: String,
@@ -222,10 +222,10 @@ export default {
         }
 
         this.authorize(() => {
-              this.wsClient.send(JSON.stringify({
-                  'method': 'asset.subscribe',
-                  'params': [this.tokenHiddenName],
-                  'id': parseInt(Math.random()),
+              this.sendMessage(JSON.stringify({
+                  method: 'asset.subscribe',
+                  params: [this.tokenHiddenName],
+                  id: parseInt(Math.random()),
               }));
         }, (response) => {
           if ('asset.update' === response.method) {

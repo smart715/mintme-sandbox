@@ -20,16 +20,14 @@
 </template>
 
 <script>
-import WebSocket from '../../js/websocket';
-
-Vue.use(WebSocket);
+import WebSocketMixin from '../../js/mixins/websocket';
 
 export default {
     name: 'Trading',
+    mixins: [WebSocketMixin],
     props: {
         tableContainerClass: String,
         tableClass: String,
-        websocketUrl: String,
         marketNames: String,
     },
     data() {
@@ -59,8 +57,6 @@ export default {
             marketsOnTop: [
                 {token: 'WEB', currency: 'BTC'},
             ],
-            wsClient: null,
-            wsResult: {},
         };
     },
     computed: {
@@ -82,12 +78,15 @@ export default {
             tokens.sort((first, second) => {
                 let firstVolume = parseFloat(first.volume);
                 let secondVolume = parseFloat(second.volume);
+
                 if (firstVolume > secondVolume) {
                     return -1;
                 }
+
                 if (firstVolume < secondVolume) {
                     return 1;
                 }
+
                 return 0;
             });
 
@@ -96,20 +95,19 @@ export default {
     },
     mounted() {
         if (this.websocketUrl) {
-            this.wsClient = this.$socket(this.websocketUrl);
-            this.wsClient.onmessage = (result) => {
-                if (typeof result.data === 'string') {
-                    this.wsResult = JSON.parse(result.data);
-                }
-            };
-            this.wsClient.onopen = () => {
+            this.addOnOpenHandler(() => {
                 const request = JSON.stringify({
                     method: 'state.subscribe',
                     params: this.marketsHiddenNames,
                     id: parseInt(Math.random().toString().replace('0.', '')),
                 });
-                this.wsClient.send(request);
-            };
+                this.sendMessage(request);
+            });
+            this.addMessageHandler((result) => {
+                if ('state.update' === result.method) {
+                    this.sanitizeMarket(result);
+                }
+            });
         }
     },
     methods: {
@@ -171,14 +169,6 @@ export default {
                 }
             });
             return index;
-        },
-    },
-    watch: {
-        wsResult: {
-            handler(value) {
-                this.sanitizeMarket(value);
-            },
-            deep: true,
         },
     },
 };
