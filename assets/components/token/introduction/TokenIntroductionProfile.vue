@@ -9,11 +9,11 @@
                     <div class="col-12">
                         <font-awesome-icon
                             v-if="editable"
-                            class="icon-edit float-right c-pointer"
+                            class="icon float-right c-pointer"
+                            size="2x"
                             :icon="icon"
                             transform="shrink-4 up-1.5"
                             @click="editUrls"/>
-
                         <a :href="profileUrl" target="_blank">
                             {{ profileUrl }}
                         </a>
