@@ -4,7 +4,13 @@
             Balance
         </div>
         <div class="table-responsive">
-            <b-table hover :items="predefinedItems" :fields="predefinedTokenFields">
+            <font-awesome-icon
+                    icon="circle-notch"
+                    spin class="loading-spinner"
+                    fixed-width
+                    v-if="showLoadingIconP"
+            />
+            <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template slot="name" slot-scope="data">
                     {{ data.item.fullname }} ({{ data.item.name }})
                 </template>
@@ -32,6 +38,12 @@
         <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
             Web tokens you own
         </div>
+        <font-awesome-icon
+                icon="circle-notch"
+                spin class="loading-spinner"
+                fixed-width
+                v-if="showLoadingIcon"
+        />
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template slot="name" slot-scope="data">
@@ -42,7 +54,7 @@
                 </template>
             </b-table>
         </div>
-        <table v-if="!hasTokens" class="table table-hover">
+        <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -94,8 +106,8 @@ export default {
         DepositModal,
     },
     props: {
-        tokens: {type: Array, default: () => []},
-        predefinedTokens: {type: Array, default: () => []},
+        tokens: {type: [Array , Boolean], default: () => []},
+        predefinedTokens: {type: [Array , Boolean], default: () => []},
         withdrawUrl: {type: String, required: true},
         depositAddresses: {type: Object},
         createTokenUrl: String,
@@ -144,10 +156,16 @@ export default {
             });
         },
         predefinedItems: function() {
-            return this.tokensToArray(this.predefinedTokens);
+            return this.tokensToArray(this.immutablePTokens);
         },
         items: function() {
-            return this.tokensToArray(this.tokens);
+            return this.tokensToArray(this.immutableTokens);
+        },
+        showLoadingIconP: function() {
+            return (this.immutablePTokens === false);
+        },
+        showLoadingIcon: function() {
+            return (this.immutableTokens === false);
         },
     },
     mounted: function() {

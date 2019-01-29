@@ -11,6 +11,12 @@
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
             </confirm-modal>
+            <font-awesome-icon
+                    icon="circle-notch"
+                    spin class="loading-spinner"
+                    fixed-width
+                    v-if="showLoadingIcon"
+            />
             <b-table v-if="hasOrders" ref="table"
                 :items="getHistory"
                 :fields="fields"
@@ -22,7 +28,7 @@
                     </a>
                 </template>
             </b-table>
-            <div v-if="!hasOrders">
+            <div v-if="!hasOrders && !showLoadingIcon">
                 <h4 class="text-center p-5">No order was added yet</h4>
             </div>
         </div>
@@ -50,7 +56,7 @@ export default {
     },
     props: {
         markets: Array,
-        orders: {type: Array, default: () => []},
+        orders: {type: [Array, Boolean] , default: () => []},
     },
     data() {
         return {
@@ -85,6 +91,9 @@ export default {
         },
         hasOrders: function() {
             return this.ordersList.length > 0;
+        },
+        showLoadingIcon: function() {
+            return (this.order === false && !this.hasOrders());
         },
     },
     mounted: function() {

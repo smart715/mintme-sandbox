@@ -47,12 +47,16 @@ class WalletController extends AbstractController
                 $this->getUser(),
                 $this->getUser()->getRelatedTokens()
             );
+        } catch (\Throwable $exception) {
+            $tokens = false;
+        }
+
+        try {
             $predefinedTokens = $balanceHandler->balances(
                 $this->getUser(),
                 $tokenManager->findAllPredefined()
             );
         } catch (\Throwable $exception) {
-            $tokens = false;
             $predefinedTokens = false;
         }
 

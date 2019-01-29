@@ -46,7 +46,7 @@ class WithdrawStorage implements StorageAdapterInterface
         $response = $this->jsonRpc->send($method, $params);
 
         if ($response->hasError()) {
-            throw new Exception($response->getError()['message'] ?? '');
+            throw new \Exception($response->getError()['message'] ?? '');
         }
 
         return $response->getResult();
