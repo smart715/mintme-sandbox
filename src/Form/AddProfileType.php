@@ -21,7 +21,7 @@ class AddProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[A-Za-z\s-]+',
+                    'pattern' => '[A-Za-z\s-\']+',
                     'title' => 'not valid name',
                 ],
             ])
@@ -30,7 +30,7 @@ class AddProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[A-Za-z\s-]+',
+                    'pattern' => '[A-Za-z\s-\']+',
                     'title' => 'not valid name',
                 ],
             ]);
