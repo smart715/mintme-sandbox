@@ -53,15 +53,21 @@
 
       &:focus
         min-width: 16rem
+  .v-autocomplete
+    .v-autocomplete-list
+      background-color: $secondary
+      width: 100%
+      z-index: 2
 
-  .v-autocomplete-list
-    background-color: $ghost-light
-    width: 100%
-    z-index: 2
+      .v-autocomplete-list-item
+        padding: .125rem .5rem
+        background-color: $secondary
+        color: $white
+        &:hover
+          background-color: $primary
 
-    .v-autocomplete-list-item
-      padding: .125rem .5rem
-      color: $primary
+      .v-autocomplete-item-active
+        background-color: $primary
 
   .input-group-text
     background: none

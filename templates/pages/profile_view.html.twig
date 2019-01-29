@@ -14,7 +14,7 @@
 
                         {%- if (canEdit == true) -%}
                             <a @click="showEditForm = true" class="float-right">
-                                <font-awesome-icon icon="edit" class="c-pointer ml-2"></font-awesome-icon>
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2  icon-edit" v-if="!showEditForm"></font-awesome-icon>
                             </a>
                         {%- endif -%}
                     </div>
