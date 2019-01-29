@@ -168,15 +168,34 @@ export default {
             let filtered = [];
             for ( let item in orders ) {
                 if (orders.hasOwnProperty(item)) {
-                    let amount = 0;
-                    orders[item].forEach((order) => {
-                        amount += parseFloat(order.amount);
+                    orders[item].forEach((order, i, arr) => {
+                        if (arr[i-1] !== undefined) {
+                            if (arr[i-1].maker.id === order.maker.id) {
+                                order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
+                                delete orders[item][i-1];
+                            }
+                        }
                     });
 
-                    orders[item][0].amount = amount;
-                    filtered.push(orders[item][0]);
+                orders[item].sort((first, second) => {
+                    let firstOrder = parseFloat(first.amount);
+                    let secondOrder = parseFloat(second.amount);
+
+                    if (firstOrder < secondOrder) {
+                        return 1;
+                    }
+
+                    if (firstOrder > secondOrder) {
+                        return -1;
+                    }
+
+                    return 0;
+                });
+
+                filtered.push(orders[item][0]);
                 }
             }
+            console.log(orders);
             this.orders = filtered;
         },
     },
