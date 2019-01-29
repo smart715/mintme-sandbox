@@ -148,7 +148,6 @@ export default {
         },
         groupOrders: function(orders) {
             let grouped = {};
-console.log(orders);
             orders.forEach( (item, i, arr) => {
                 let price = item.price;
 
@@ -162,10 +161,6 @@ console.log(orders);
                     grouped[price].push(item);
                 }
             });
-console.log(grouped);
-            grouped.sort(function() {
-                ;
-            })
             this.unfilteredOrders = grouped;
             this.filterOrdersList(grouped);
         },
