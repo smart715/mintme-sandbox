@@ -78,7 +78,6 @@ class WalletController extends AbstractController
         if ($market) {
             try {
                 $executedHistory = $marketHandler->getUserExecutedHistory($user, $marketManager->getUserRelatedMarkets($user));
-                $orders = $marketHandler->getPendingOrdersByUser($user, $marketManager->getUserRelatedMarkets($user));
             } catch (\Throwable $exception) {
                 $executedHistory = false;
             }

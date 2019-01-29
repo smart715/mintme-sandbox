@@ -19,50 +19,50 @@
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %} v-cloak>
                         {% if balances == false or executedOrders == false %}
-                        {{ include("loader.html.twig", {vCloak: ''}) }}
-                        {% else %}
-                        {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                        <token-trade
-                            orders-history="{{ executedOrders | json_encode }}"
-                            pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
-                            pending-sell-orders="{{ pendingSellOrders | json_encode }}"
-                            websocket-url="{{ global_websocket_url }}"
-                            hash="{{ hash }}"
-                            currency="{{ currency }}"
-                            login-url="{{ path('fos_user_security_login') }}"
-                            signup-url="{{ path('fos_user_registration_register') }}"
-                            :market-name="{{ marketName | json_encode }}"
-                            :logged-in="{{ app.user ? 'true' : 'false' }}"
-                            token-name="{{ token.name }}"
-                            place-order-url="{{ path('token_place_order', {'tokenName' : token.name}) }}"
-                            token-hidden-name="{{ tokenHiddenName }}"
-                            :balances="{{ balances | json_encode }}">
-                        </token-trade>
-                        {% endif %}
-                    </b-tab>
-                    <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %} v-cloak>
-                        {% if tokens == false %}
                             {{ include("loader.html.twig", {vCloak: ''}) }}
                         {% else %}
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                            <div class="row">
-                                <token-introduction-profile
-                                    class="col-12 col-md-6"
-                                    youtube-client-id="{{ global_youtube_client_id }}"
-                                    facebook-app-id="{{ global_facebook_app_id }}"
-                                    confirm-website-file-url="{{ path('token_website_confirmation', {'name': token.name}) }}"
-                                    confirm-website-url="{{ path('token_website_confirm', {'name': token.name}) }}"
-                                    profile-name="{{ profile.firstName }} {{ profile.lastName }}"
-                                    website-url="{{ token.websiteUrl }}"
-                                    facebook-url="{{ token.facebookUrl }}"
-                                    youtube-channel-id="{{ token.youtubeChannelId }}"
-                                    update-url="{{ path('token_update', {'name': token.name}) }}"
-                                    csrf-token="{{ csrf_token('update-token') }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
-                                >
-                                </token-introduction-profile>
+                            <token-trade
+                                orders-history="{{ executedOrders | json_encode }}"
+                                pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
+                                pending-sell-orders="{{ pendingSellOrders | json_encode }}"
+                                websocket-url="{{ global_websocket_url }}"
+                                hash="{{ hash }}"
+                                currency="{{ currency }}"
+                                login-url="{{ path('fos_user_security_login') }}"
+                                signup-url="{{ path('fos_user_registration_register') }}"
+                                :market-name="{{ marketName | json_encode }}"
+                                :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                token-name="{{ token.name }}"
+                                place-order-url="{{ path('token_place_order', {'tokenName' : token.name}) }}"
+                                token-hidden-name="{{ tokenHiddenName }}"
+                                :balances="{{ balances | json_encode }}">
+                            </token-trade>
+                        {% endif %}
+                    </b-tab>
+                    <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %} v-cloak>
+                        {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
+                        <div class="row">
+                            <token-introduction-profile
+                                class="col-12 col-md-6"
+                                youtube-client-id="{{ global_youtube_client_id }}"
+                                facebook-app-id="{{ global_facebook_app_id }}"
+                                confirm-website-file-url="{{ path('token_website_confirmation', {'name': token.name}) }}"
+                                confirm-website-url="{{ path('token_website_confirm', {'name': token.name}) }}"
+                                profile-name="{{ profile.firstName }} {{ profile.lastName }}"
+                                website-url="{{ token.websiteUrl }}"
+                                facebook-url="{{ token.facebookUrl }}"
+                                youtube-channel-id="{{ token.youtubeChannelId }}"
+                                update-url="{{ path('token_update', {'name': token.name}) }}"
+                                csrf-token="{{ csrf_token('update-token') }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}"
+                                profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
+                            >
+                            </token-introduction-profile>
 
+                            {% if tokens == false %}
+                                {{ include("loader.html.twig", {vCloak: ''}) }}
+                            {% else %}
                                 <token-introduction-statistics
                                     name="{{ token.name }}"
                                     container-class="col-12 col-md-6 mt-3 mt-md-0"
@@ -76,18 +76,18 @@
                                     {% endif %}
                                     release-period-route="{{ path('lock_in', {'name': token.name}) }}">
                                 </token-introduction-statistics>
-                            </div>
-                            <div class="row">
-                                <token-introduction-description
-                                    class="col-12 mt-3 mt-3"
-                                    name="{{ token.name }}"
-                                    description="{{ token.description }}"
-                                    csrf-token="{{ csrf_token('update-token') }}"
-                                    update-url="{{ path('token_update', {'name': token.name}) }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}">
-                                </token-introduction-description>
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            <token-introduction-description
+                                class="col-12 mt-3 mt-3"
+                                name="{{ token.name }}"
+                                description="{{ token.description }}"
+                                csrf-token="{{ csrf_token('update-token') }}"
+                                update-url="{{ path('token_update', {'name': token.name}) }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}">
+                            </token-introduction-description>
+                        </div>
                     </b-tab>
                 </b-tabs>
             </div>
