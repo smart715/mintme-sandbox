@@ -18,18 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 class WalletTest extends TestCase
 {
-    public function testConvertToDecimalIfNotation(): void
-    {
-        $moneyWrapper = new MoneyWrapper($this->createMock(CryptoManager::class));
-        $this->assertEquals('0.0000001', $moneyWrapper->convertToDecimalIfNotation('1e-7'));
-        $this->assertEquals('0.0000022', $moneyWrapper->convertToDecimalIfNotation('22e-7'));
-        $this->assertEquals('-0.0000022', $moneyWrapper->convertToDecimalIfNotation('-22e-7'));
-        $this->assertEquals('10000000.0', $moneyWrapper->convertToDecimalIfNotation('1e7'));
-        $this->assertEquals('220000000.0', $moneyWrapper->convertToDecimalIfNotation('22e7'));
-        $this->assertEquals('-220000000.0', $moneyWrapper->convertToDecimalIfNotation('-22e7'));
-        $this->assertEquals('2.0005', $moneyWrapper->convertToDecimalIfNotation('2.0005'));
-    }
-
     public function testGetWithdrawDepositHistory(): void
     {
         $depositTransactions = [

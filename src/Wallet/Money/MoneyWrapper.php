@@ -35,15 +35,20 @@ final class MoneyWrapper implements MoneyWrapperInterface
         return (new DecimalMoneyFormatter($this->getRepository()))->format($money);
     }
 
-    public function convertToDecimalIfNotation(string $notation): string
+    private function convertToDecimalIfNotation(string $notation, string $symbol): string
     {
-        return number_format(floatval($notation), 0, '', '');
+        $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) ) [eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';
+        if (preg_match($regEx, $notation, $matches)) {
+            bcscale($this->getRepository()->subunitFor(new Currency($symbol)));
+            return bcmul($matches['left'], bcpow('10', $matches['right']));
+        }
+        return $notation;
     }
 
     public function parse(string $value, string $symbol): Money
     {
         return (new DecimalMoneyParser($this->getRepository()))->parse(
-            $this->convertToDecimalIfNotation($value),
+            $this->convertToDecimalIfNotation($value, $symbol),
             $symbol
         );
     }
