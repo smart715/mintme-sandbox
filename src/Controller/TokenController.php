@@ -123,10 +123,18 @@ class TokenController extends AbstractController
         if ($market) {
             try {
                 $executedOrders = $marketHandler->getExecutedOrders($market);
-                $pendingSellOrders = $marketHandler->getPendingSellOrders($market);
-                $pendingBuyOrders = $marketHandler->getPendingBuyOrders($market);
             } catch (\Throwable $exception) {
                 $executedOrders = false;
+            }
+            try {
+                $pendingSellOrders = $marketHandler->getPendingSellOrders($market);
+            } catch (\Throwable $exception) {
+                $pendingSellOrders = false;
+            }
+            try {
+                $pendingBuyOrders = $marketHandler->getPendingBuyOrders($market);
+            } catch (\Throwable $exception) {
+                $pendingBuyOrders = false;
             }
         }
 

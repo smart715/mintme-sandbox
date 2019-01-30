@@ -114,7 +114,7 @@ export default {
             });
         },
         showLoadingIcon: function() {
-            return (this.history === false);
+            return (this.ordersHistory === false && !this.hasOrders());
         },
     },
     mounted: function() {
@@ -125,7 +125,7 @@ export default {
             })).then((result) => {
                 this.history = result.data;
                 this.$refs.table.refresh();
-            });
+            }).catch((error) => { });
         }, 10000);
     },
 };

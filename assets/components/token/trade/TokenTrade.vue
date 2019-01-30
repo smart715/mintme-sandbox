@@ -77,8 +77,8 @@ export default {
     },
     props: {
         ordersHistory: [String, Boolean],
-        pendingBuyOrders: String,
-        pendingSellOrders: String,
+        pendingBuyOrders: [String, Boolean],
+        pendingSellOrders: [String, Boolean],
         websocketUrl: String,
         hash: String,
         currency: String,
@@ -88,7 +88,7 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        balances: [String, Boolean],
+        balances: [Object, Boolean],
         tokenHiddenName: String,
     },
     data() {

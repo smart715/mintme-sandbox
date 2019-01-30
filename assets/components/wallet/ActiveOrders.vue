@@ -93,7 +93,7 @@ export default {
             return this.ordersList.length > 0;
         },
         showLoadingIcon: function() {
-            return (this.order === false && !this.hasOrders());
+            return (this.orders === false && !this.hasOrders());
         },
     },
     mounted: function() {
