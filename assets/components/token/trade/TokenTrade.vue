@@ -37,12 +37,12 @@
         />
         <token-trade-buy-orders
             container-class="col-12 col-md-6 mt-3"
-            :buy-orders="pendingBuyOrders"
+            :buy-orders="buyOrders"
             :token-name="tokenName"
         />
         <token-trade-sell-orders
             container-class="col-12 col-md-6 mt-3"
-            :sell-orders="pendingSellOrders"
+            :sell-orders="sellOrders"
             :token-name="tokenName"
         />
         <token-trade-trade-history
@@ -101,6 +101,8 @@ export default {
                 amount: 0,
                 price: 0,
             },
+            buyOrders: [],
+            sellOrders: [],
         };
     },
     computed: {
@@ -115,6 +117,16 @@ export default {
         },
     },
     mounted() {
+        this.buyOrders = JSON.parse(this.pendingBuyOrders);
+        this.sellOrders = JSON.parse(this.pendingSellOrders);
+        setInterval(() => {
+            this.$axios.get(this.$routing.generate('pending_orders', {
+                tokenName: this.tokenName,
+            })).then((result) => {
+                this.buyOrders = result.data.buy;
+                this.sellOrders = result.data.sell;
+            });
+        }, 10000);
         this.addMessageHandler((result) => {
             if ('state.update' === result.method) {
                 this.updateMarketData(result);
