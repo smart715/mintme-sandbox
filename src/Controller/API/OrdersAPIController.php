@@ -166,7 +166,7 @@ class OrdersAPIController extends FOSRestController
 
 
     /**
-     *  @Rest\Get("/pending-buy/{tokenName}", name="pending_buy_orders", options={"expose"=true})
+     *  @Rest\Get("/pending/{tokenName}", name="pending_orders", options={"expose"=true})
      *  @Rest\View()
      */
     public function getPendingBuyOrder(String $tokenName): View
@@ -174,28 +174,16 @@ class OrdersAPIController extends FOSRestController
         $market = $this->getMarket($tokenName);
 
         $pendingBuyOrders = $market
-            ? $this->marketHandler->getPendingBuyOrders($market)
+            ? ['buy' => $this->marketHandler->getPendingBuyOrders($market)]
             : [];
 
-        return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ]])
-        );
-    }
-
-    /**
-     *  @Rest\Get("/pending-sell/{tokenName}", name="pending_sell_orders", options={"expose"=true})
-     *  @Rest\View()
-     */
-    public function getPendingSellOrder(String $tokenName): View
-    {
-        $market = $this->getMarket($tokenName);
-
-        $pendingBuyOrders = $market
-            ? $this->marketHandler->getPendingSellOrders($market)
+        $pendingSellOrders = $market
+            ? ['sell' => $this->marketHandler->getPendingSellOrders($market)]
             : [];
 
+        $orders = array_merge($pendingBuyOrders, $pendingSellOrders);
         return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ]])
+            $this->normalizer->normalize($orders, null, ['groups' => [ 'Default' ]])
         );
     }
 
