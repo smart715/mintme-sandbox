@@ -46,7 +46,7 @@ export default {
     name: 'TokenTradeSellOrders',
     props: {
         containerClass: String,
-        sellOrders: String,
+        sellOrders: Array,
         tokenName: String,
     },
     components: {
@@ -54,7 +54,6 @@ export default {
     },
     data() {
         return {
-            orders: [],
             fields: {
                 price: {
                     label: 'Price',
@@ -73,10 +72,10 @@ export default {
     },
     computed: {
         total: function() {
-            return toMoney(this.orders.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
+            return toMoney(this.sellOrders.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
         },
         ordersList: function() {
-            return this.orders.map((order) => {
+            return this.sellOrders.map((order) => {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
@@ -86,19 +85,8 @@ export default {
             });
         },
         hasOrders: function() {
-            return this.orders.length > 0;
+            return this.sellOrders.length > 0;
         },
-    },
-    mounted: function() {
-        this.orders = JSON.parse(this.sellOrders);
-        setInterval(() => {
-            this.$axios.get(this.$routing.generate('pending_sell_orders', {
-                tokenName: this.tokenName,
-            })).then((result) => {
-                this.orders = result.data;
-                this.$refs.table.refresh();
-            });
-        }, 10000);
     },
 };
 </script>
