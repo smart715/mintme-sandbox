@@ -19,7 +19,7 @@
                         pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
                         >
                         Your Tokens:
-                        <span class="text-primary">
+                        <span class="text-white">
                             {{ immutableBalance | toMoney  }}
                             <guide>
                                 <template slot="header">
@@ -60,7 +60,7 @@
                     <div class="col-12 pt-3">
                         <label
                             for="sell-price-input"
-                            class="text-primary">
+                            class="text-white">
                             Price in WEB:
                             <guide>
                                 <template slot="header">
@@ -84,7 +84,7 @@
                     <div class="col-12 pt-3">
                         <label
                             for="sell-price-amount"
-                            class="text-primary">
+                            class="text-white">
                             Amount:
                         </label>
                         <input
