@@ -114,6 +114,7 @@ export default {
                             market: order.market.hiddenName, orderid: order.id,
                         })
                         : null,
+                    trader_id: order.maker.id,
                 };
             });
         },
@@ -137,31 +138,43 @@ export default {
             this.currentRow = row;
             this.actionUrl = row.cancel_order_url;
             this.switchConfirmModal(true);
+
+            let orders = [];
+            console.log(this.unfilteredOrders);
+            this.unfilteredOrders[this.currentRow.price].forEach( (order) => {
+                if(order.maker.id === this.currentRow.trader_id) {
+                    orders.push([order.market.hiddenName, order.id]);
+                }
+            });
+            console.log(JSON.stringify(orders));
         },
         switchConfirmModal: function(val) {
             this.confirmModal = val;
         },
         removeOrder: function() {
+            let orders = [];
+            this.cancelOrdersPrice[this.currentRow.price].forEach( (order) => {
+                 if(order.maker.id === this.currentRow.trader_id) {
+                     orders.push(order);
+                 }
+            });
+
             this.$axios.get(this.actionUrl).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
             });
         },
         groupOrders: function(orders) {
             let grouped = {};
+            console.log(orders);
             orders.forEach( (item, i, arr) => {
-                let price = item.price;
-
-                if (arr[i-1] !== undefined && arr[i-1].price === arr[i].price) {
-                    if (grouped[price] === undefined) {
-                        grouped[price] = [];
-                    }
-                    grouped[price].push(item);
-                } else {
+                let price = toMoney(item.price);
+                if (grouped[price] === undefined) {
                     grouped[price] = [];
-                    grouped[price].push(item);
                 }
+                grouped[price].push(item);
             });
             this.unfilteredOrders = grouped;
+            console.log(grouped);
             this.filterOrdersList(grouped);
         },
         filterOrdersList: function(orders) {
@@ -195,7 +208,7 @@ export default {
                 filtered.push(orders[item][0]);
                 }
             }
-            console.log(orders);
+            // console.log(orders);
             this.orders = filtered;
         },
     },

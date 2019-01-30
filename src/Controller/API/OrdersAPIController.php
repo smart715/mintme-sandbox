@@ -103,6 +103,43 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
+     *  @Rest\Get("/cancel_orders/{orders}", name="orders_cancel", options={"expose"=true})
+     *  @Rest\View()
+     */
+    public function cancelOrders(string $orders): View
+    {
+//        dump(json_decode($orders));
+        foreach (json_decode($orders) as $order) {
+            dump($order[0]);
+            $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($order[0]));
+            $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($order[0]));
+
+            if (!$token || !$crypto) {
+                throw new \InvalidArgumentException();
+            }
+
+            $market = new Market($crypto, $token);
+            $order = new Order(
+                $order[1],
+                $this->getUser(),
+                null,
+                $market,
+                new Money('0', new Currency($crypto->getSymbol())),
+                1,
+                new Money('0', new Currency($crypto->getSymbol())),
+                ""
+            );
+
+            $tradeResult = $this->trader->cancelOrder($order);
+        }
+
+        return $this->view([
+            'result' => $tradeResult->getResult(),
+            'message' => $tradeResult->getMessage(),
+        ]);
+    }
+
+    /**
      * @Rest\View()
      * @Rest\Post("/{tokenName}/place-order", name="token_place_order")
      * @Rest\RequestParam(name="tokenName", allowBlank=false)
