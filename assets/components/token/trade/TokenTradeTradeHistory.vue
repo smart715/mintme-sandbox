@@ -58,7 +58,7 @@ export default {
     name: 'TokenTradeTradeHistory',
     props: {
         containerClass: String,
-        ordersHistory: [String , Boolean],
+        ordersHistory: [String, Boolean],
         tokenName: String,
     },
     components: {

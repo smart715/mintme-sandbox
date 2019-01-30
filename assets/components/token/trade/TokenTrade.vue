@@ -76,7 +76,7 @@ export default {
         OrderModal,
     },
     props: {
-        ordersHistory: [String , Boolean],
+        ordersHistory: [String,Boolean],
         pendingBuyOrders: String,
         pendingSellOrders: String,
         websocketUrl: String,
@@ -88,7 +88,7 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        balances: [String , Boolean],
+        balances: [String, Boolean],
         tokenHiddenName: String,
     },
     data() {
