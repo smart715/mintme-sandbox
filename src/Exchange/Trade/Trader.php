@@ -54,7 +54,8 @@ class Trader implements TraderInterface
         MoneyWrapperInterface $moneyWrapper,
         PrelaunchConfig $prelaunchConfig,
         DateTimeInterface $time
-    ) {
+    )
+    {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
         $this->entityManager = $entityManager;
@@ -127,22 +128,18 @@ class Trader implements TraderInterface
         $options = new OrderFilterConfig();
         $options->merge($filterOptions);
 
-        try {
-            $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [
-                $user->getId(),
-                $market->getHiddenName(),
-                $options['start_time'],
-                $options['end_time'],
-                $options['offset'],
-                $options['limit'],
-                Order::SIDE_MAP[$options['side']],
-            ]);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [
+            $user->getId(),
+            $market->getHiddenName(),
+            $options['start_time'],
+            $options['end_time'],
+            $options['offset'],
+            $options['limit'],
+            Order::SIDE_MAP[$options['side']],
+        ]);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException($response->getError()['message'] ?? '');
         }
 
         return array_map(function (array $rawOrder) use ($user, $market) {
@@ -166,14 +163,10 @@ class Trader implements TraderInterface
             Order::SIDE_MAP[$options['side']],
         ];
 
-        try {
-            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, $params);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, $params);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException($response->getError()['message'] ?? '');
         }
 
         return array_map(function (array $rawOrder) use ($user, $market) {

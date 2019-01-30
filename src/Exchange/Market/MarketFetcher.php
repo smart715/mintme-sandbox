@@ -31,7 +31,7 @@ class MarketFetcher implements MarketFetcherInterface
         ]);
 
         if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? 'get error response');
+            throw new FetchException($response->getError()['message'] ?? '');
         }
 
         return $response->getResult();
@@ -47,7 +47,7 @@ class MarketFetcher implements MarketFetcherInterface
         ]);
 
         if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? 'get error response');
+            throw new FetchException($response->getError()['message'] ?? '');
         }
         return $response->getResult();
     }
@@ -62,7 +62,7 @@ class MarketFetcher implements MarketFetcherInterface
         ]);
 
         if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? 'get error response');
+            throw new FetchException($response->getError()['message'] ?? '');
         }
 
         return $response->getResult()['records'];
@@ -78,7 +78,7 @@ class MarketFetcher implements MarketFetcherInterface
         ]);
 
         if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? 'get error response');
+            throw new FetchException($response->getError()['message'] ?? '');
         }
         return $response->getResult();
     }
