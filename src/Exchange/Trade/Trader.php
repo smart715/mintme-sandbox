@@ -54,8 +54,7 @@ class Trader implements TraderInterface
         MoneyWrapperInterface $moneyWrapper,
         PrelaunchConfig $prelaunchConfig,
         DateTimeInterface $time
-    )
-    {
+    ) {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
         $this->entityManager = $entityManager;

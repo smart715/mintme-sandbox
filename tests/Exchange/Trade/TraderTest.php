@@ -155,8 +155,7 @@ class TraderTest extends TestCase
         array $error,
         ?array $result,
         array $finishedOrders
-    ): void
-    {
+    ): void {
         $method = 'order.finished';
         $params = [1, 'TOK000000000001WEB', 0, 0, 100, 100, 1];
 
@@ -180,7 +179,7 @@ class TraderTest extends TestCase
             $this->createAppDateTime(new \DateTimeImmutable())
         );
 
-        if($hasError) {
+        if ($hasError) {
             $this->expectException(FetchException::class);
         }
 
@@ -232,8 +231,7 @@ class TraderTest extends TestCase
         array $error,
         ?array $result,
         array $pendingOrders
-    ): void
-    {
+    ): void {
         $method = 'order.pending';
         $params = [1, 'TOK000000000001WEB', 100, 100, 1];
 
@@ -257,7 +255,7 @@ class TraderTest extends TestCase
             $this->createAppDateTime(new \DateTimeImmutable())
         );
 
-        if($hasError) {
+        if ($hasError) {
             $this->expectException(FetchException::class);
         }
 
