@@ -56,7 +56,7 @@ export default {
     },
     props: {
         markets: Array,
-        orders: {type: [Array, Boolean] , default: () => []},
+        orders: {type: [Array, Boolean], default: () => []},
     },
     data() {
         return {
