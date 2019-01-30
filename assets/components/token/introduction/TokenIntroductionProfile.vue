@@ -9,7 +9,7 @@
                     <div class="col-12">
                         <font-awesome-icon
                             v-if="editable"
-                            class="edit-icon float-right c-pointer"
+                            class="icon-edit float-right c-pointer"
                             :icon="icon"
                             transform="shrink-4 up-1.5"
                             @click="editUrls"/>
