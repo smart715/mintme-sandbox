@@ -16,6 +16,12 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
+                    <font-awesome-icon
+                            icon="circle-notch"
+                            spin class="loading-spinner"
+                            fixed-width
+                            v-if="showLoadingIcon"
+                    />
                     <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
@@ -34,7 +40,7 @@
                                alt="avatar">
                         </template>
                     </b-table>
-                    <div v-if="!hasOrders">
+                    <div v-if="!hasOrders && !showLoadingIcon">
                         <h4 class="text-center p-5">No deal was made yet</h4>
                     </div>
                 </div>
@@ -52,7 +58,7 @@ export default {
     name: 'TokenTradeTradeHistory',
     props: {
         containerClass: String,
-        ordersHistory: String,
+        ordersHistory: [String , Boolean],
         tokenName: String,
     },
     components: {
@@ -106,6 +112,9 @@ export default {
                     web_amount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                 };
             });
+        },
+        showLoadingIcon: function() {
+            return (this.history === false);
         },
     },
     mounted: function() {

@@ -14,12 +14,18 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div v-if="balance"
+                    <div
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
                         >
                         Your Tokens:
-                        <span class="text-primary">
+                        <font-awesome-icon
+                                icon="circle-notch"
+                                spin class="loading-spinner"
+                                fixed-width
+                                v-if="showLoadingIcon"
+                        />
+                        <span v-else class="text-primary">
                             {{ immutableBalance | toMoney  }}
                             <guide>
                                 <font-awesome-icon
@@ -36,7 +42,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div v-if="balance"
+                    <div v-if="!showLoadingIcon"
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
@@ -177,7 +183,7 @@ export default {
         placeOrderUrl: String,
         marketName: Object,
         sell: Object,
-        balance: String,
+        balance: [String, Boolean],
         tokenHiddenName: String,
         currency: String,
     },
@@ -227,6 +233,9 @@ export default {
         },
         fieldsValid: function() {
             return Boolean(this.sellPrice && this.sellAmount);
+        },
+        showLoadingIcon: function() {
+            return (this.immutableBalance === false);
         },
     },
     watch: {

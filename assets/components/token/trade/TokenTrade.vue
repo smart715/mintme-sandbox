@@ -76,7 +76,7 @@ export default {
         OrderModal,
     },
     props: {
-        ordersHistory: String,
+        ordersHistory: [String , Boolean],
         pendingBuyOrders: String,
         pendingSellOrders: String,
         websocketUrl: String,
@@ -88,7 +88,7 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        balances: Object,
+        balances: [String , Boolean],
         tokenHiddenName: String,
     },
     data() {
@@ -108,10 +108,10 @@ export default {
             return this.marketName;
         },
         tokenBalance: function() {
-            return this.balances[this.tokenName] ? this.balances[this.tokenName].available : '';
+            return this.balances[this.tokenName] ? this.balances[this.tokenName].available : false;
         },
         webBalance: function() {
-            return this.balances['WEB'] ? this.balances['WEB'].available : '';
+            return this.balances['WEB'] ? this.balances['WEB'].available : false;
         },
     },
     mounted() {

@@ -18,27 +18,23 @@
                 </token-name>
                 <b-tabs class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %} v-cloak>
-                        {% if balances == false or executedOrders == false %}
-                            {{ include("loader.html.twig", {vCloak: ''}) }}
-                        {% else %}
-                            {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                            <token-trade
-                                orders-history="{{ executedOrders | json_encode }}"
-                                pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
-                                pending-sell-orders="{{ pendingSellOrders | json_encode }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                hash="{{ hash }}"
-                                currency="{{ currency }}"
-                                login-url="{{ path('fos_user_security_login') }}"
-                                signup-url="{{ path('fos_user_registration_register') }}"
-                                :market-name="{{ marketName | json_encode }}"
-                                :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                token-name="{{ token.name }}"
-                                place-order-url="{{ path('token_place_order', {'tokenName' : token.name}) }}"
-                                token-hidden-name="{{ tokenHiddenName }}"
-                                :balances="{{ balances | json_encode }}">
-                            </token-trade>
-                        {% endif %}
+                        {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
+                        <token-trade
+                            orders-history="{{ executedOrders | json_encode }}"
+                            pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
+                            pending-sell-orders="{{ pendingSellOrders | json_encode }}"
+                            websocket-url="{{ global_websocket_url }}"
+                            hash="{{ hash }}"
+                            currency="{{ currency }}"
+                            login-url="{{ path('fos_user_security_login') }}"
+                            signup-url="{{ path('fos_user_registration_register') }}"
+                            :market-name="{{ marketName | json_encode }}"
+                            :logged-in="{{ app.user ? 'true' : 'false' }}"
+                            token-name="{{ token.name }}"
+                            place-order-url="{{ path('token_place_order', {'tokenName' : token.name}) }}"
+                            token-hidden-name="{{ tokenHiddenName }}"
+                            :balances="{{ balances | json_encode }}">
+                        </token-trade>
                     </b-tab>
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %} v-cloak>
                         {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}

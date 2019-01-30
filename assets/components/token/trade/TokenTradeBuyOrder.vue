@@ -15,11 +15,17 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div v-if="balance"
+                    <div
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0">
                         Your WEB:
-                        <span class="text-primary">
+                        <font-awesome-icon
+                                icon="circle-notch"
+                                spin class="loading-spinner"
+                                fixed-width
+                                v-if="showLoadingIcon"
+                        />
+                        <span v-else class="text-primary">
                             {{ immutableBalance | toMoney }}
                             <guide>
                                 <font-awesome-icon
@@ -36,7 +42,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div v-if="balance"
+                    <div v-if="!showLoadingIcon"
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
@@ -176,7 +182,7 @@ export default {
         placeOrderUrl: String,
         marketName: Object,
         buy: Object,
-        balance: String,
+        balance: [String, Boolean],
         currency: String,
     },
     data() {
@@ -223,6 +229,9 @@ export default {
         },
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
+        },
+        showLoadingIcon: function() {
+            return (this.immutableBalance === false);
         },
     },
     watch: {

@@ -106,8 +106,8 @@ export default {
         DepositModal,
     },
     props: {
-        tokens: {type: [Array, Boolean], default: () => []},
-        predefinedTokens: {type: [Array, Boolean], default: () => []},
+        tokens: {type: [Object, Boolean], default: () => []},
+        predefinedTokens: {type: [Object, Boolean], default: () => []},
         withdrawUrl: {type: String, required: true},
         depositAddresses: {type: Object},
         createTokenUrl: String,

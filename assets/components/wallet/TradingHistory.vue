@@ -34,7 +34,7 @@ import {WSAPI} from '../../js/utils/constants';
 export default {
     name: 'TradingHistory',
     props: {
-        executedHistory: {type: Array, default: () => []},
+        executedHistory: {type: Object, default: () => []},
     },
     data() {
         return {
