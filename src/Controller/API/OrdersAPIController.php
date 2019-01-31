@@ -108,9 +108,7 @@ class OrdersAPIController extends FOSRestController
      */
     public function cancelOrders(string $orders): View
     {
-//        dump(json_decode($orders));
         foreach (json_decode($orders) as $order) {
-            dump($order[0]);
             $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($order[0]));
             $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($order[0]));
 
@@ -132,10 +130,10 @@ class OrdersAPIController extends FOSRestController
 
             $tradeResult = $this->trader->cancelOrder($order);
         }
-
+        /** @TODO Make return great again! AND REMOVE CANCEL PREVIOUS ORDER METHOD*/
         return $this->view([
-            'result' => $tradeResult->getResult(),
-            'message' => $tradeResult->getMessage(),
+            'result' => 'Good',
+            'message' => 'Placed',
         ]);
     }
 

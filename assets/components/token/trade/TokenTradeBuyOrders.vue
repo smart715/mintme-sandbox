@@ -148,12 +148,16 @@ export default {
         removeOrder: function() {
             let orders = [];
             this.unfilteredOrders.forEach( (order) => {
-                 if (toMoney(order.price) === row.price && order.maker.id === this.currentRow.trader_id) {
-                     orders.push([order.price]);
+                 if (toMoney(order.price) === this.currentRow.price && order.maker.id === this.currentRow.trader_id) {
+                     orders.push([order.market.hiddenName, order.id]);
                  }
             });
 
-            this.$axios.get(this.actionUrl).catch(() => {
+            this.$axios.get(
+                this.$routing.generate('orders_cancel', {
+                    orders: JSON.stringify(orders),
+                })
+            ).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
             });
         },
@@ -174,11 +178,13 @@ export default {
                 if (orders.hasOwnProperty(item)) {
                     orders[item].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
+                            /*@TODO
+                            try to use arr.reduce
+                             */
                             order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
                             delete orders[item][i-1];
                         }
                     });
-
                 orders[item].sort((first, second) => {
                     let firstOrder = parseFloat(first.amount);
                     let secondOrder = parseFloat(second.amount);
@@ -193,11 +199,9 @@ export default {
 
                     return 0;
                 });
-
                 filtered.push(orders[item][0]);
                 }
             }
-            // console.log(orders);
             this.orders = filtered;
         },
     },
