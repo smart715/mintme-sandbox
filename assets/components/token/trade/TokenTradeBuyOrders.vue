@@ -3,7 +3,13 @@
         <div class="card">
             <div class="card-header">
                 Buy Orders
-                <span class="card-header-icon">
+                <font-awesome-icon
+                        icon="circle-notch"
+                        spin class="loading-spinner"
+                        fixed-width
+                        v-if="showLoadingIcon"
+                />
+                <span v-else class="card-header-icon">
                     Total: {{ total }} WEB
                     <guide>
                         <template slot="header">
@@ -28,7 +34,7 @@
                                alt="avatar">
                         </template>
                     </b-table>
-                    <div v-if="!hasOrders">
+                    <div v-if="!hasOrders && !showLoadingIcon">
                         <h4 class="text-center p-5">No order was added yet</h4>
                     </div>
                 </div>
@@ -46,7 +52,7 @@ export default {
     name: 'TokenTradeBuyOrders',
     props: {
         containerClass: String,
-        buyOrders: Array,
+        buyOrders: [Array, Boolean],
         tokenName: String,
     },
     components: {
@@ -75,17 +81,20 @@ export default {
             return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sum_web) + sum, 0));
         },
         ordersList: function() {
-            return this.buyOrders.map((order) => {
+            return this.buyOrders != false ? this.buyOrders.map((order) => {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
                 };
-            });
+            }) : [];
         },
         hasOrders: function() {
               return this.buyOrders.length > 0;
+        },
+        showLoadingIcon: function() {
+            return (this.buyOrders === false);
         },
     },
 };

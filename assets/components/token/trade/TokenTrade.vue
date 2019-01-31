@@ -125,7 +125,7 @@ export default {
             })).then((result) => {
                 this.buyOrders = result.data.buy;
                 this.sellOrders = result.data.sell;
-            });
+            }).catch((error) => { });
         }, 10000);
         this.addMessageHandler((result) => {
             if ('state.update' === result.method) {

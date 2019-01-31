@@ -118,7 +118,13 @@
                             min="0"
                         >
                     </div>
-                    <div class="col-12 pt-3">
+                    <font-awesome-icon
+                            icon="circle-notch"
+                            spin class="loading-spinner"
+                            fixed-width
+                            v-if="showLoadingIcon"
+                    />
+                    <div v-else class="col-12 pt-3">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon

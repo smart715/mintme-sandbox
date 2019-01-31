@@ -93,7 +93,7 @@ export default {
             return this.ordersList.length > 0;
         },
         showLoadingIcon: function() {
-            return (this.orders === false && !this.hasOrders());
+            return (this.orders === false && !this.hasOrders);
         },
     },
     mounted: function() {
@@ -146,7 +146,6 @@ export default {
                         this.ordersList.sort((a, b) => {
                             return a.timestamp < b.timestamp;
                         });
-                        this.$refs.table.refresh();
                     }
                 });
             })

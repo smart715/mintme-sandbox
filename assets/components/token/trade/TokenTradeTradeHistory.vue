@@ -97,7 +97,7 @@ export default {
             return this.ordersList.length > 0;
         },
         ordersList: function() {
-            return this.history.map((order) => {
+            return this.history != false ? this.history.map((order) => {
                 return {
                     date_time: new Date(order.timestamp * 1000).toDateString(),
                     order_maker: order.maker != null
@@ -111,10 +111,10 @@ export default {
                     token_amount: toMoney(order.amount),
                     web_amount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                 };
-            });
+            }) : [];
         },
         showLoadingIcon: function() {
-            return (this.ordersHistory === false && !this.hasOrders());
+            return (this.ordersHistory == "false" && !this.hasOrders);
         },
     },
     mounted: function() {
@@ -124,7 +124,6 @@ export default {
                 tokenName: this.tokenName,
             })).then((result) => {
                 this.history = result.data;
-                this.$refs.table.refresh();
             }).catch((error) => { });
         }, 10000);
     },
