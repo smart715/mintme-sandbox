@@ -8,14 +8,7 @@
     <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
         <div class="form-group row">
             <div class="col-md-12">
-                <div class="row">
-                    <div class="col-12 col-lg-2 text-left text-lg-right">
-                        <label for="username" class="d-block label-featured resetlabel">Email</label>
-                    </div>
-                    <div class="col">
-                        {{ form_row(form.username, { 'inline': true, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'class': 'form-control form-control-md', 'autofocus': 'autofocus'} }) }}
-                    </div>
-                </div>
+                {{ form_row(form.username, { 'inline': true, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'class': 'form-control form-control-md', 'autofocus': 'autofocus'} }) }}
             </div>
         </div>
 
