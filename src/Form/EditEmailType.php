@@ -14,7 +14,7 @@ class EditEmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, [ 'label' => 'Email:', 'required' => true, 'attr' => array('pattern' => '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$') ]);
+            ->add('email', EmailType::class, [ 'label' => 'Email:', 'required' => true ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
