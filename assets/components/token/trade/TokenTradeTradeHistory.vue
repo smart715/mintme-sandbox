@@ -114,7 +114,7 @@ export default {
             }) : [];
         },
         showLoadingIcon: function() {
-            return (this.ordersHistory == "false" && !this.hasOrders);
+            return (this.ordersHistory == 'false' && !this.hasOrders);
         },
     },
     mounted: function() {
