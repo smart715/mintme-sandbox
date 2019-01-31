@@ -6,7 +6,18 @@
 
 {% block formBody %}
     <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
-        {{ form_row(form.username, { 'inline': true, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required', 'autofocus': 'autofocus'} }) }}
+        <div class="form-group row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-12 col-lg-2 text-left text-lg-right">
+                        <label for="inputEmail" class="d-block label-featured">Email</label>
+                    </div>
+                    <div class="col">
+                        <input type="email" name="username" required="required" id="email" class="form-control form-control-md" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" autofocus>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="form-group row">
             <div class="col-md-12">
                 <div class="row">
