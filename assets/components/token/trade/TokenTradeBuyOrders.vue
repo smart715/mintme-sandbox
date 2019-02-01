@@ -8,7 +8,7 @@
             >
                 <ul>
                     You want to delete these orders:
-                    <li v-for="order in this.removeOrders">
+                    <li v-for="order in this.removeOrders" :key="order.id">
                         Price {{ order.price }} Amount {{ order.amount }}
                     </li>
                     Are you sure?
@@ -190,9 +190,7 @@ export default {
                 if (orders.hasOwnProperty(item)) {
                     orders[item].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
-                            /*@TODO
-                            try to use arr.reduce
-                             */
+                            /* @TODO try to use arr.reduce */
                             order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
                             delete orders[item][i-1];
                         }
