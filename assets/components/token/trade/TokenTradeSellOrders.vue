@@ -109,7 +109,7 @@ export default {
                         name: order.maker.profile.token.name,
                     }),
                     cancel_order_url: order.maker.id === this.userId
-                        ? this.$routing.generate('order_cancel', {
+                        ? this.$routing.generate('orders_cancel', {
                             market: order.market.hiddenName, orderid: order.id,
                           })
                         : null,

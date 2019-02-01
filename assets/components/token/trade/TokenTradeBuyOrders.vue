@@ -6,10 +6,13 @@
                     @close="switchConfirmModal(false)"
                     @confirm="removeOrder"
             >
-                <div>
-                    Are you sure that you want to remove order
-                    with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
-                </div>
+                <ul>
+                    You want to delete these orders:
+                    <li v-for="order in this.removeOrders">
+                        Price {{ order.price }} Amount {{ order.amount }}
+                    </li>
+                    Are you sure?
+                </ul>
             </confirm-modal>
             <div class="card-header">
                 Buy Orders
@@ -79,6 +82,7 @@ export default {
             actionUrl: '',
             orders: [],
             unfilteredOrders: [],
+            removeOrders: [],
             fields: {
                 price: {
                     label: 'Price',
@@ -110,8 +114,8 @@ export default {
                         name: order.maker.profile.token.name,
                     }),
                     cancel_order_url: order.maker.id === this.userId
-                        ? this.$routing.generate('order_cancel', {
-                            market: order.market.hiddenName, orderid: order.id,
+                        ? this.$routing.generate('orders_cancel', {
+                            orders: [order.market.hiddenName, order.id],
                         })
                         : null,
                     trader_id: order.maker.id,
@@ -138,7 +142,15 @@ export default {
     },
     methods: {
         removeOrderModal: function(row) {
+            this.removeOrders = [];
             this.currentRow = row;
+            JSON.parse(this.buyOrders).forEach( (order, i, orders) => {
+                if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
+                    order.price = toMoney(order.price);
+                    order.amount = toMoney(order.amount);
+                    this.removeOrders.push(order);
+                }
+            });
             this.actionUrl = row.cancel_order_url;
             this.switchConfirmModal(true);
         },
