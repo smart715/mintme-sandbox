@@ -70,44 +70,15 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     *  @Rest\Get("/cancel/{market}/{orderid}", name="order_cancel", options={"expose"=true})
-     *  @Rest\View()
-     */
-    public function cancelOrder(String $market, int $orderid): View
-    {
-        $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
-        $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
-
-        if (!$token || !$crypto) {
-            throw new \InvalidArgumentException();
-        }
-
-        $market = new Market($crypto, $token);
-        $order = new Order(
-            $orderid,
-            $this->getUser(),
-            null,
-            $market,
-            new Money('0', new Currency($crypto->getSymbol())),
-            1,
-            new Money('0', new Currency($crypto->getSymbol())),
-            ""
-        );
-
-        $tradeResult = $this->trader->cancelOrder($order);
-
-        return $this->view([
-            'result' => $tradeResult->getResult(),
-            'message' => $tradeResult->getMessage(),
-        ]);
-    }
-
-    /**
-     *  @Rest\Get("/cancel_orders/{orders}", name="orders_cancel", options={"expose"=true})
+     *  @Rest\Get("/cancel/{orders}", name="orders_cancel", options={"expose"=true})
      *  @Rest\View()
      */
     public function cancelOrders(string $orders): View
     {
+        $response = [
+                'result' => [],
+                'message' => [],
+            ];
         foreach (json_decode($orders) as $order) {
             $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($order[0]));
             $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($order[0]));
@@ -129,11 +100,13 @@ class OrdersAPIController extends FOSRestController
             );
 
             $tradeResult = $this->trader->cancelOrder($order);
+            array_push($response['result'], $tradeResult->getResult());
+            array_push($response['message'], $tradeResult->getMessage());
         }
         /** @TODO Make return great again! AND REMOVE CANCEL PREVIOUS ORDER METHOD*/
         return $this->view([
-            'result' => 'Good',
-            'message' => 'Placed',
+            'result' => $response['result'],
+            'message' => $response['message'],
         ]);
     }
 
