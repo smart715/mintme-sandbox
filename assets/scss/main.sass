@@ -89,11 +89,10 @@ label
     border: none
     background: $card-header-bg
     color: $white
-    padding: .75rem 1.5rem
-    @include font-scale(md)
+    padding: .75rem 1.35rem
 
     span
-      font-size: .9em
+      font-size: .7em
 
     .card-header-description
       font-size: .7em
@@ -110,9 +109,10 @@ label
       color: $white
       border-radius: 0
       border: none
+      height: calc(2.0rem + 2px);
 
     label
-      padding-bottom: .6em
+      padding-bottom: .3em
 
   .card-title
     margin: 0
@@ -127,17 +127,12 @@ label
 
   &.card-featured
     form
-      width: 100%
       margin: auto
-
-      @include media-breakpoint-up(md)
-        width: 60%
-
       .card-header
         font-size: 2em
 
       label.label-featured
-        font-size: 1.2em
+        font-size: 1.1em
 
 
 .btn-primary
