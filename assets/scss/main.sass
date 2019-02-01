@@ -104,6 +104,11 @@ label
   .card-body
     background: $card-body-bg
 
+    form
+      margin: auto
+      .card-header
+        font-size: 2em
+
     input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
       background: $card-input-color
       color: $white
@@ -124,16 +129,6 @@ label
     >.card-header
       background-color: $white
       color: inherit
-
-  &.card-featured
-    form
-      margin: auto
-      .card-header
-        font-size: 2em
-
-      label.label-featured
-        font-size: 1.1em
-
 
 .btn-primary
   color: $white
