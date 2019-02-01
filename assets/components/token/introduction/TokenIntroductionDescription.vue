@@ -3,7 +3,7 @@
         <div class="card h-100">
             <div class="card-header">
                 Description
-                <guide>
+                <guide class="float-right">
                     <template  slot="header">
                         Description
                     </template>

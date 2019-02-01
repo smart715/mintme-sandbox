@@ -32,7 +32,7 @@
                 {{ include("loader.html.twig") }}
                 <div class="row">
                     <token-introduction-profile
-                        class="col-12 col-md-6"
+                        class="col-12 col-lg-4"
                         youtube-client-id="{{ global_youtube_client_id }}"
                         facebook-app-id="{{ global_facebook_app_id }}"
                         confirm-website-file-url="{{ path('token_website_confirmation', {'name': token.name}) }}"
@@ -50,7 +50,7 @@
 
                     <token-introduction-statistics
                         name="{{ token.name }}"
-                        container-class="col-12 col-md-6 mt-3 mt-md-0"
+                        container-class="col-12 col-lg-4"
                         :editable="{{ isOwner ? 'true' : 'false' }}"
                         csrf="{{ csrf_token('update-token') }}"
                         :tokens="{{ tokens | json_encode }}"
@@ -61,10 +61,8 @@
                         {% endif %}
                         release-period-route="{{ path('lock_in', {'name': token.name}) }}">
                     </token-introduction-statistics>
-                </div>
-                <div class="row">
                     <token-introduction-description
-                        class="col-12 mt-3 mt-3"
+                        class="col-12 col-lg-4"
                         name="{{ token.name }}"
                         description="{{ token.description }}"
                         csrf-token="{{ csrf_token('update-token') }}"

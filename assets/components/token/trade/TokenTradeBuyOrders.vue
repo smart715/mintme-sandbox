@@ -29,7 +29,7 @@
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
-                        <h4 class="text-center p-5">No order was added yet</h4>
+                        <p class="text-center p-5">No order was added yet</p>
                     </div>
                 </div>
             </div>
