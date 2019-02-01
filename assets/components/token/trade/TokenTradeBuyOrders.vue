@@ -36,11 +36,11 @@
                         <template slot="trader" slot-scope="row">
                                 <a
                                     @click="removeOrderModal(row.item)"
-                                    v-if="row.item.cancel_order_url">
+                                    v-if="row.item.trader_id">
                                         <font-awesome-icon icon="times" class="text-danger c-pointer" />
                                 </a>
                                 <a :href="row.item.trader_url">
-                                    <span v-if="!row.item.cancel_order_url">{{ row.value }}</span>
+                                    <span v-if="!row.item.trader_id">{{ row.value }}</span>
                                     <img
                                         src="../../../img/avatar.png"
                                         class="float-right"
@@ -81,7 +81,6 @@ export default {
             currentRow: {},
             actionUrl: '',
             orders: [],
-            unfilteredOrders: [],
             removeOrders: [],
             fields: {
                 price: {
@@ -104,7 +103,7 @@ export default {
             return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sum_web) + sum, 0));
         },
         ordersList: function() {
-            return this.buyOrders.map((order) => {
+            return this.orders.map((order) => {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
@@ -113,12 +112,7 @@ export default {
                     trader_url: this.$routing.generate('token_show', {
                         name: order.maker.profile.token.name,
                     }),
-                    cancel_order_url: order.maker.id === this.userId
-                        ? this.$routing.generate('orders_cancel', {
-                            orders: [order.market.hiddenName, order.id],
-                        })
-                        : null,
-                    trader_id: order.maker.id,
+                    trader_id: order.maker.id === this.userId ? this.userId : null,
                 };
             });
         },
@@ -126,19 +120,21 @@ export default {
               return this.buyOrders.length > 0;
         },
     },
-    mounted: function() {
-        let orders = JSON.parse(this.buyOrders);
-        this.unfilteredOrders = orders;
-        this.groupByPrice(orders);
+    watch: {
+        buyOrders: function(val) {
+            this.groupByPrice(val);
+        },
     },
     methods: {
         removeOrderModal: function(row) {
             this.removeOrders = [];
             this.currentRow = row;
-            JSON.parse(this.buyOrders).forEach( (order, i, orders) => {
+            this.buyOrders.forEach( (order, i, orders) => {
                 if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
                     order.price = toMoney(order.price);
-                    order.amount = toMoney(order.amount);
+                    order.amount = order[i-1] !== undefined
+                        ? toMoney(order.amount) - toMoney(orders[i-1].amount)
+                        : toMoney(order.amount);
                     this.removeOrders.push(order);
                 }
             });
@@ -150,7 +146,7 @@ export default {
         },
         removeOrder: function() {
             let orders = [];
-            this.unfilteredOrders.forEach( (order) => {
+            this.buyOrders.forEach( (order) => {
                  if (toMoney(order.price) === this.currentRow.price && order.maker.id === this.currentRow.trader_id) {
                      orders.push([order.market.hiddenName, order.id]);
                  }
@@ -181,7 +177,6 @@ export default {
                 if (orders.hasOwnProperty(item)) {
                     orders[item].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
-                            /* @TODO try to use arr.reduce */
                             order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
                             delete orders[item][i-1];
                         }
