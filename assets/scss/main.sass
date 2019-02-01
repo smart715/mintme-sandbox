@@ -89,7 +89,7 @@ label
     border: none
     background: $card-header-bg
     color: $white
-    padding: .75rem 1.35rem
+    padding: .45rem 1.35rem
     font-size: 1.2em
 
     span
@@ -104,16 +104,18 @@ label
 
   .card-body
     background: $card-body-bg
+    form
+      .form-group
+        margin-bottom: .5rem
+        input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+          background: $card-input-color
+          color: $white
+          border-radius: 0
+          border: none
+          height: calc(2.0rem + 2px)
 
-    input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
-      background: $card-input-color
-      color: $white
-      border-radius: 0
-      border: none
-      height: calc(2.0rem + 2px)
-
-    label
-      padding-bottom: .3em
+        label
+          padding-bottom: .3em
 
   &.transparent
     background-color: transparent
