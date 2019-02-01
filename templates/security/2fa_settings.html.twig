@@ -1,6 +1,6 @@
 <div class="container">
-    <div class="row  pt-5 pb-3 justify-content-center">
-        <div class="col-md-8">
+    <div class="row  pt-5 justify-content-center">
+        <div class="col-lg-4 col-md-6">
             <div class="card">
                 {% if not isTwoFactor %}
                     <div class="card-header">
@@ -8,22 +8,20 @@
                     </div>
                     <div class=" card-body">
                         <div class='row'>
-                            <div class="col-12 pb-3 text-white text-left">
+                            <div class="col-12 pb-2 text-white text-center">
                                 Download the Google Authenticator application from
                                 <a class="text-blue" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">App Store</a> or
                                 <a class="text-blue" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
                             </div>
-                        </div>
-                        <div class="row py-3 justify-content-center align-content-center text-center">
-                            <div class="col-md-3">
-                                <div><img src="{{ imgUrl }}" alt="QR Code" class="img-thumbnail img-fluid"></div>
+                            <div class="col-12 pb-2">
+                                <div><img src="{{ imgUrl }}" alt="QR Code" class="img-thumbnail img-fluid img-barcode"></div>
                             </div>
-                            <div class="col-md-7 text-sm">
-                                <div class="text-left text-black px-3 pb-3 pt-0 text-white">
+                            <div class="col-12 text-sm">
+                                <div class="text-center text-white pb-2">
                                     Can't scan the code?
                                     To add the entry manually, provide the following details to the application on your phone.
                                 </div>
-                                <div class="responsive">
+                                <div class="responsive mx-auto">
                                     <table class="table text-white">
                                         <tbody>
                                             <tr class= "py-1">
@@ -62,9 +60,9 @@
                     </div>
                 {% endif %}
 
-                <div class="text-center card-body mp-5">
-                    <div class="row justify-content-center">
-                        <div class="col-6">
+                <div class="text-center card-body">
+                    <div class="row">
+                        <div class="col-12">
                             {% block formBody %}{{ form(form) }}{% endblock %}
                         </div>
                     </div>
