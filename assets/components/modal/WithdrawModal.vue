@@ -43,7 +43,7 @@
                 </div>
                 <div class="col-12 pt-3 text-center">
                     <label>
-                        Amount {{ currency }}: 
+                        Amount {{ currency }}:
                     </label>
                     <span>{{ fullAmount | toMoney }}</span>
                 </div>

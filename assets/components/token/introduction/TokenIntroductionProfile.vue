@@ -34,7 +34,8 @@
                                                 Web
                                             </template>
                                             <template slot="body">
-                                                Link to token creator’s website. Before adding it, we confirmed ownership.
+                                                Link to token creator’s website.
+                                                Before adding it, we confirmed ownership.
                                             </template>
                                         </guide>
                                     </div>
