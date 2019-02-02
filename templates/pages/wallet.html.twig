@@ -5,9 +5,9 @@
 {% block bodyclass %}wallet{% endblock %}
 
 {% block content %}
-    <div id="wallet" class="container-fluid px-4 pt-5 pb-3 ">
-        <div class="row">
-            <div class="col text-white">
+    <div id="wallet" class="container-fluid px-4 ">
+        <div class="row  pt-5 justify-content-center">
+            <div class="col-12 text-white">
                 <template>
                     <b-tabs class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
                         <b-tab title="Wallet" active v-cloak>

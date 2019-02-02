@@ -11,7 +11,7 @@
                  <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
             </b-table>
             <div v-if="!hasHistory">
-                <h4 class="text-center p-5">No deal was made yet</h4>
+                <p class="text-center p-5">No deal was made yet</p>
             </div>
         </div>
         <div

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <div id="token" class="container-fluid px-4 pt-5 pb-3 ">
+    <div id="token" class="container-fluid px-4 pt-5 ">
         <b-tabs class="tabs-theme transparent" v-model="tabIndex">
             <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %} v-cloak>
                 {{ include("loader.html.twig") }}

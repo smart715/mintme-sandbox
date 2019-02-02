@@ -10,7 +10,7 @@
             >
             </b-table>
             <div v-if="noHistory">
-                <h4 class="text-center p-5">No transactions were added yet</h4>
+                <p class="text-center p-5">No transactions were added yet</p>
             </div>
         </div>
     </div>
