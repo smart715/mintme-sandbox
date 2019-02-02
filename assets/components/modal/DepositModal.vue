@@ -5,7 +5,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3>DEPOSIT</h3>
+                <h3 class="modal-title">DEPOSIT</h3>
                 <div class="col-12 pt-3">
                     <code class="wallet-code" id="walletaddress">
                         <span>

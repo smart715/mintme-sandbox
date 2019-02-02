@@ -4,7 +4,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3>WITHDRAW({{ currency }})</h3>
+                <h3 class="modal-title">WITHDRAW({{ currency }})</h3>
                 <div class="col-12 pt-3">
                     <label for="address" class="d-block text-left">
                         Address:
@@ -31,7 +31,7 @@
                             :class="{ 'is-invalid': $v.amount.$error }"
                             class="form-control text-left input-custom-padding">
                         <button
-                            class="btn btn-primary btn-input"
+                            class="btn btn-primary btn-input mt-1"
                             type="button"
                             @click="setMaxAmount">
                             All
@@ -41,11 +41,11 @@
                         You can't set bigger amount than your own balance. Amount must be decimal.
                     </div>
                 </div>
-                <div class="col-12 pt-3 text-left">
+                <div class="col-12 pt-3 text-center">
                     <label>
-                        Amount {{ currency }}:
+                        Amount {{ currency }}: 
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney }}</span>
+                    <span>{{ fullAmount | toMoney }}</span>
                 </div>
                 <div class="pt-3">
                     <button

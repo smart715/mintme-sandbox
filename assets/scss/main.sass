@@ -77,7 +77,21 @@ a
 
 label
   margin: 0
+  padding-bottom: .3em
 
+.form-group
+  margin-bottom: .5rem
+
+input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+  background: $card-input-color
+  color: $white
+  border-radius: 0
+  border: none
+  height: calc(2.0rem + 2px)
+    
+textarea
+  height: auto
+      
 .card
   background: none
   position: relative
@@ -90,7 +104,7 @@ label
     background: $card-header-bg
     color: $white
     padding: .45rem 1.35rem
-    font-size: 1.2em
+    font-size: 1.2rem
 
     .card-header-description
       font-size: .7em
@@ -101,21 +115,6 @@ label
 
   .card-body
     background: $card-body-bg
-    .form-group
-      margin-bottom: .5rem
-
-    input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
-      background: $card-input-color
-      color: $white
-      border-radius: 0
-      border: none
-      height: calc(2.0rem + 2px)
-    
-    textarea
-      height: auto
-
-    label
-      padding-bottom: .3em
 
   &.transparent
     background-color: transparent
@@ -141,8 +140,6 @@ label
     &:first-child
       padding-left: 2rem
 
-  
-
 .fix-layout
   table-layout: fixed
 
@@ -166,7 +163,7 @@ label
         background-color: $color-tabs
         color: $white
         padding: .45rem 1.35rem
-        font-size: 1.2em
+        font-size: 1.2rem
 
         &.disabled
           cursor: default
@@ -233,7 +230,7 @@ label
       color: $white
       font-weight: lighter;
   .modal-title
-    font-size: 1.6rem
+    font-size: 1.2rem
 
 nav.top-navbar
     .navbar-toggler-icon
@@ -248,10 +245,10 @@ nav.top-navbar
 .btn-input
   position: relative
   right: 5px
-  top: -38px
-  height: 34px
-  padding-top: 5px
-  padding-bottom: 5px
+  top: -36px
+  height: 30px
+  padding-top: 3px
+  padding-bottom: 3px
 
 .wallet-code
   color: $color-wallet-code
@@ -341,7 +338,7 @@ nav.top-navbar
   background-repeat: no-repeat
 
 .icon-edit
-  font-size: 1.3rem
+  font-size: 1.2rem
 
 .img-barcode
   width: 120px
