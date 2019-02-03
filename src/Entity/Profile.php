@@ -27,7 +27,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-z\s-']+$/u")
+     * @Assert\Regex(pattern="/^[A-Za-z\s-'‘’]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @ProfilePeriodLock()
@@ -39,7 +39,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-z\s-']+$/u")
+     * @Assert\Regex(pattern="/^[A-Za-z\s-'‘’]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @ProfilePeriodLock()
