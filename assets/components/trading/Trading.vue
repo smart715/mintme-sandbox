@@ -28,7 +28,7 @@ export default {
     props: {
         tableContainerClass: String,
         tableClass: String,
-        marketNames: String,
+        markets: String,
     },
     data() {
         return {
@@ -61,13 +61,13 @@ export default {
     },
     computed: {
         totalRows: function() {
-            return this.markets.length;
+            return this.marketsInfo.length;
         },
-        markets: function() {
-            return JSON.parse(this.marketNames);
+        marketsInfo: function() {
+            return JSON.parse(this.markets);
         },
         marketsHiddenNames: function() {
-            return Object.keys(this.markets);
+            return Object.keys(this.marketsInfo);
         },
         tokens: function() {
             let tokens = [];
@@ -94,6 +94,23 @@ export default {
         },
     },
     mounted() {
+        let markets = {};
+        for (let market in this.marketsInfo) {
+            if (this.marketsInfo.hasOwnProperty(market)) {
+                markets[market] = this.getSanitizedMarket(
+                    this.marketsInfo[market].cryptoSymbol,
+                    this.marketsInfo[market].tokenName,
+                    this.getPercentage(
+                        parseFloat(this.marketsInfo[market].last),
+                        parseFloat(this.marketsInfo[market].open)
+                    ),
+                    parseFloat(this.marketsInfo[market].last),
+                    parseFloat(this.marketsInfo[market].volume)
+                );
+            }
+        }
+        this.sanitizedMarkets = markets;
+
         if (this.websocketUrl) {
             this.addOnOpenHandler(() => {
                 const request = JSON.stringify({
@@ -115,19 +132,16 @@ export default {
             if (!marketData.params) {
                 return;
             }
-
             const marketName = marketData.params[0];
             const marketInfo = marketData.params[1];
 
             const marketOpenPrice = parseFloat(marketInfo.open);
             const marketLastPrice = parseFloat(marketInfo.last);
-            const makretVolume = parseFloat(marketInfo.volume);
+            const marketVolume = parseFloat(marketInfo.volume);
+            const changePercentage = this.getPercentage(marketLastPrice, marketOpenPrice);
 
-            const priceDiff = marketLastPrice - marketOpenPrice;
-            const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-
-            const marketCurrency = this.markets[marketName][1];
-            const marketToken = this.markets[marketName][0];
+            const marketCurrency = this.marketsInfo[marketName].cryptoSymbol;
+            const marketToken = this.marketsInfo[marketName].tokenName;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -137,7 +151,7 @@ export default {
                     marketCurrency,
                     changePercentage,
                     marketLastPrice,
-                    makretVolume
+                    marketVolume
                 );
             } else {
                 this.$set(
@@ -148,7 +162,7 @@ export default {
                         marketToken,
                         changePercentage,
                         marketLastPrice,
-                        makretVolume
+                        marketVolume
                     )
                 );
             }
@@ -169,6 +183,9 @@ export default {
                 }
             });
             return index;
+        },
+        getPercentage: function(lastPrice, openPrice) {
+            return openPrice ? (lastPrice - openPrice) * 100 / openPrice : 0;
         },
     },
 };
