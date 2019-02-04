@@ -10,7 +10,7 @@ stages:
   - update-repository
   - tests
   - build-sites
-  - clean-unused-sites 
+  - clean-unused-sites
   - auto-merge
 
 update_repository_redmine_training.abchosting.org:
@@ -33,15 +33,23 @@ tests_php:
     - composer install
     - make phpunit
     - make syntax_check
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-php"
+    paths:
+      - vendor/
   tags:
     - mintme.abchosting.org
 
 tests_assets:
   stage: tests
   script:
-    - npm install
+    - npm ci
     - make syntax_check_assets
     - make karma
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-npm"
+    paths:
+      - node_modules/
   tags:
     - mintme.abchosting.org
 
@@ -82,4 +90,3 @@ auto_merge_release_branch:
     - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
     - master
   allow_failure: true
-
