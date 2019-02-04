@@ -133,17 +133,22 @@ textarea
 .table
   thead
     th
-      border-top: none
-      border-bottom: 1px solid #dee2e6
+      border: none
       font-weight: normal
-      @include font-scale(sm)
       &:first-child
         padding-left: 2rem
 
+  tbody
+    tr
+      &:nth-child(odd)
+        background-color: #00334E
+        border: none
+
   td
+    border: none
     &:first-child
       padding-left: 2rem
-
+  
 .fix-layout
   table-layout: fixed
 
