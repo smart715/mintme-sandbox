@@ -91,6 +91,10 @@ input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
     
 textarea
   height: auto
+  border: none
+
+.custom-select, .form-control
+  border: none
       
 .card
   background: none
@@ -154,8 +158,7 @@ textarea
     .nav-item
       flex: 1 1 auto
       padding: 0
-      border-left: .0625rem solid $white
-      border: none
+      border: none      
       color: $white
 
       .nav-link
@@ -164,6 +167,7 @@ textarea
         color: $white
         padding: .45rem 1.35rem
         font-size: 1.2rem
+        line-height: 2.2rem
 
         &.disabled
           cursor: default
@@ -350,4 +354,3 @@ nav.top-navbar
       -webkit-transform: scale(0.7)
       transform-origin: 0 0
       -webkit-transform-origin: 0 0
-

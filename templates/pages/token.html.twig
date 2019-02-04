@@ -50,7 +50,7 @@
 
                     <token-introduction-statistics
                         name="{{ token.name }}"
-                        container-class="col-12 col-lg-4"
+                        container-class="col-12 col-lg-4 mt-3 mt-md-0"
                         :editable="{{ isOwner ? 'true' : 'false' }}"
                         csrf="{{ csrf_token('update-token') }}"
                         :tokens="{{ tokens | json_encode }}"
@@ -62,7 +62,7 @@
                         release-period-route="{{ path('lock_in', {'name': token.name}) }}">
                     </token-introduction-statistics>
                     <token-introduction-description
-                        class="col-12 col-lg-4"
+                        class="col-12 col-lg-4 mt-3 mt-md-0"
                         name="{{ token.name }}"
                         description="{{ token.description }}"
                         csrf-token="{{ csrf_token('update-token') }}"
