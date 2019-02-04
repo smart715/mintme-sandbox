@@ -4,6 +4,7 @@ namespace App\Exchange\Market;
 
 use App\Entity\User;
 use App\Exchange\Market;
+use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 
 interface MarketHandlerInterface
@@ -28,4 +29,10 @@ interface MarketHandlerInterface
      * @return Order[]
      */
     public function getPendingOrdersByUser(User $user, array $markets, int $offset = 0, int $limit = 100): array;
+
+    /**
+     * @param Market[] $markets
+     * @return MarketInfo[]
+     */
+    public function getMarketsInfo(array $markets): array;
 }
