@@ -20,7 +20,7 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[A-Za-z\s-\'‘’`´]+',
+                    'pattern' => "[A-Za-z]+[A-Za-z\s'‘’`´-]*",
                     'title' => 'not valid name',
                 ],
             ])
@@ -29,7 +29,7 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[A-Za-z\s-\'‘’`´]+',
+                    'pattern' => "[A-Za-z]+[A-Za-z\s'‘’`´-]*",
                     'title' => 'not valid name',
                 ],
             ])
