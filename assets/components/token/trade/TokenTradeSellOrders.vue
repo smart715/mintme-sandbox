@@ -6,10 +6,13 @@
                     @close="switchConfirmModal(false)"
                     @confirm="removeOrder"
             >
-                <div>
-                    Are you sure that you want to remove order
-                    with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
-                </div>
+                <ul>
+                    You want to delete these orders:
+                    <li v-for="order in this.removeOrders" :key="order.id">
+                        Price {{ order.price }} Amount {{ order.amount }}
+                    </li>
+                    Are you sure?
+                </ul>
             </confirm-modal>
             <div class="card-header">
                 Sell Orders
@@ -31,18 +34,18 @@
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
-                                <a
+                            <a
                                     @click="removeOrderModal(row.item)"
-                                    v-if="row.item.cancel_order_url">
-                                        <font-awesome-icon icon="times" class="text-danger c-pointer" />
-                                </a>
-                                <a :href="row.item.trader_url">
-                                    <span v-if="!row.item.cancel_order_url">{{ row.value }}</span>
-                                    <img
+                                    v-if="row.item.trader_id">
+                                <font-awesome-icon icon="times" class="text-danger c-pointer" />
+                            </a>
+                            <a :href="row.item.trader_url">
+                                <span v-if="!row.item.trader_id">{{ row.value }}</span>
+                                <img
                                         src="../../../img/avatar.png"
                                         class="float-right"
                                         alt="avatar">
-                                </a>
+                            </a>
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
@@ -78,6 +81,7 @@ export default {
             currentRow: {},
             actionUrl: '',
             orders: [],
+            removeOrders: [],
             fields: {
                 price: {
                     label: 'Price',
@@ -99,7 +103,7 @@ export default {
             return toMoney(this.sellOrders.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
         },
         ordersList: function() {
-            return this.sellOrders.map((order) => {
+            return this.orders.map((order) => {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
@@ -108,11 +112,7 @@ export default {
                     trader_url: this.$routing.generate('token_show', {
                         name: order.maker.profile.token.name,
                     }),
-                    cancel_order_url: order.maker.id === this.userId
-                        ? this.$routing.generate('orders_cancel', {
-                            market: order.market.hiddenName, orderid: order.id,
-                          })
-                        : null,
+                    trader_id: order.maker.id === this.userId ? this.userId : null,
                 };
             });
         },
@@ -122,7 +122,17 @@ export default {
     },
     methods: {
         removeOrderModal: function(row) {
+            this.removeOrders = [];
             this.currentRow = row;
+            this.sellOrders.forEach( (order, i, orders) => {
+                if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
+                    order.price = toMoney(order.price);
+                    order.amount = order[i-1] !== undefined
+                        ? toMoney(order.amount) - toMoney(orders[i-1].amount)
+                        : toMoney(order.amount);
+                    this.removeOrders.push(order);
+                }
+            });
             this.actionUrl = row.cancel_order_url;
             this.switchConfirmModal(true);
         },
@@ -130,9 +140,65 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            this.$axios.get(this.actionUrl).catch(() => {
+            let orders = [];
+            this.sellOrders.forEach( (order) => {
+                if (toMoney(order.price) === this.currentRow.price && order.maker.id === this.currentRow.trader_id) {
+                    orders.push([order.market.hiddenName, order.id]);
+                }
+            });
+
+            this.$axios.get(
+                this.$routing.generate('orders_cancel', {
+                    orders: JSON.stringify(orders),
+                })
+            ).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
             });
+        },
+        groupByPrice: function(orders) {
+            let grouped = [];
+            orders.forEach( (item) => {
+                let price = toMoney(item.price);
+                if (grouped[price] === undefined) {
+                    grouped[price] = [];
+                }
+                grouped[price].push(item);
+            });
+            this.filterByAmount(grouped);
+        },
+        filterByAmount: function(orders) {
+            let filtered = [];
+            for (let item in orders) {
+                if (orders.hasOwnProperty(item)) {
+                    orders[item].forEach((order, i, arr) => {
+                        if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
+                            order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
+                            delete orders[item][i-1];
+                        }
+                    });
+                    orders[item].sort((first, second) => {
+                        let firstOrder = parseFloat(first.amount);
+                        let secondOrder = parseFloat(second.amount);
+
+                        if (firstOrder < secondOrder) {
+                            return 1;
+                        }
+
+                        if (firstOrder > secondOrder) {
+                            return -1;
+                        }
+
+                        return 0;
+                    });
+                    filtered.push(orders[item][0]);
+                }
+            }
+            this.orders = filtered;
+        },
+    },
+    watch: {
+        sellOrders: function(val) {
+            this.groupByPrice(val);
         },
     },
 };

@@ -120,11 +120,6 @@ export default {
               return this.buyOrders.length > 0;
         },
     },
-    watch: {
-        buyOrders: function(val) {
-            this.groupByPrice(val);
-        },
-    },
     methods: {
         removeOrderModal: function(row) {
             this.removeOrders = [];
@@ -199,6 +194,11 @@ export default {
                 }
             }
             this.orders = filtered;
+        },
+    },
+    watch: {
+        buyOrders: function(val) {
+            this.groupByPrice(val);
         },
     },
 };
