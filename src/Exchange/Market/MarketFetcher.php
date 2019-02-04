@@ -13,6 +13,7 @@ class MarketFetcher implements MarketFetcherInterface
     private const PENDING_ORDERS_METHOD = 'order.pending';
     private const EXECUTED_ORDERS_METHOD = 'market.deals';
     private const USER_EXECUTED_HISTORY = 'market.user_deals';
+    private const MARKET_STATUS = 'market.status';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -20,6 +21,24 @@ class MarketFetcher implements MarketFetcherInterface
     public function __construct(JsonRpcInterface $jsonRpc)
     {
         $this->jsonRpc = $jsonRpc;
+    }
+
+    public function getMarketInfo(string $market, int $period = 86400): array
+    {
+        try {
+            $response = $this->jsonRpc->send(self::MARKET_STATUS, [
+                $market,
+                $period,
+            ]);
+        } catch (FetchException $e) {
+            return [];
+        }
+
+        if ($response->hasError()) {
+            return [];
+        }
+
+        return $response->getResult();
     }
 
     public function getExecutedOrders(string $market, int $offset = 0, int $limit = 100): array
