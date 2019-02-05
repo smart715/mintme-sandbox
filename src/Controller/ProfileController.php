@@ -41,7 +41,7 @@ class ProfileController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile_view.html.twig', [
                 'token' => $profile->getToken(),
-                'profile' => $normalizer->normalize($profile, null, [ 'groups' => [ 'Default' ] ]),
+                'profile' => $profile,
                 'form' =>  $form->createView(),
                 'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
                 'editFormShowFirst' => !! $form->getErrors(true)->count(),

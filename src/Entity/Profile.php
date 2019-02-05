@@ -177,11 +177,15 @@ class Profile
         return $this;
     }
 
-    public function getCountry(): ?string
+    public function getCountryFillName(): ?string
     {
         if ($this->country) {
             return Intl::getRegionBundle()->getCountryName($this->country);
         }
+    }
+
+    public function getCountry(): ?string
+    {
         return $this->country;
     }
 
