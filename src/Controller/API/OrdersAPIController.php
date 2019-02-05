@@ -103,7 +103,6 @@ class OrdersAPIController extends FOSRestController
             array_push($response['result'], $tradeResult->getResult());
             array_push($response['message'], $tradeResult->getMessage());
         }
-        /** @TODO Make return great again! AND REMOVE CANCEL PREVIOUS ORDER METHOD*/
         return $this->view([
             'result' => $response['result'],
             'message' => $response['message'],
