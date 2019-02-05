@@ -5,6 +5,7 @@ namespace App\Exchange\Market;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
+use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -183,5 +184,50 @@ class MarketHandler implements MarketHandlerInterface
                 $market
             );
         }, $result['records']);
+    }
+
+    /**
+     * @param  Market[] $markets
+     * @return MarketInfo[]
+     */
+    public function getMarketsInfo(array $markets): array
+    {
+        $marketsInfo = [];
+        foreach ($markets as $market) {
+            $result = $this->marketFetcher->getMarketInfo($market->getHiddenName());
+            if (!$result) {
+                break;
+            }
+            $marketsInfo[$market->getHiddenName()] = new MarketInfo(
+                $market->getCurrencySymbol(),
+                $market->getToken()->getName(),
+                $this->moneyWrapper->parse(
+                    $result['last'],
+                    $market->getCurrencySymbol()
+                ),
+                $this->moneyWrapper->parse(
+                    $result['volume'],
+                    $market->getCurrencySymbol()
+                ),
+                $this->moneyWrapper->parse(
+                    $result['open'],
+                    $market->getCurrencySymbol()
+                ),
+                $this->moneyWrapper->parse(
+                    $result['close'],
+                    $market->getCurrencySymbol()
+                ),
+                $this->moneyWrapper->parse(
+                    $result['high'],
+                    $market->getCurrencySymbol()
+                ),
+                $this->moneyWrapper->parse(
+                    $result['low'],
+                    $market->getCurrencySymbol()
+                ),
+                $result['deal']
+            );
+        }
+        return $marketsInfo;
     }
 }
