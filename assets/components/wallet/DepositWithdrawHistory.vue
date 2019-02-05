@@ -1,5 +1,5 @@
 <template>
-    <div class="p-3">
+    <div class="p-0">
         <div class="table-responsive deposit-withdraw-history" @scroll.passive="loadMore">
             <b-table
                 v-if="!noHistory"

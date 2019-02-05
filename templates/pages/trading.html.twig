@@ -15,10 +15,9 @@
                     <div class="card-body p-0" v-cloak>
                         {{ include("loader.html.twig") }}
                         <trading websocket-url="{{ global_websocket_url }}"
-                                 market-names="{{ marketNames | json_encode }}"
-                                 >
-                            <div slot="title" class="card-title font-weight-bold pt-1 pb-1 pl-4">
-                                Top {{ marketNames | length }} tokens
+                                 markets="{{ markets | json_encode }}">
+                            <div slot="title" class="card-title font-weight-bold pl-4 pt-3 pb-1">
+                                Top {{ markets | length }} tokens
                             </div>
                         </trading>
                     </div>

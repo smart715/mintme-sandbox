@@ -1,5 +1,5 @@
 <template>
-    <div class="p-3">
+    <div class="p-0">
         <div class="table-responsive">
             <b-table
                 v-if="hasHistory"
