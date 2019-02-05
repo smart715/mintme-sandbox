@@ -17,7 +17,7 @@
                 <div class="row">
                     <div v-if="balance"
                         class="col-12 col-sm-6 col-md-12 col-xl-6
-                        pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0">
+                        pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your WEB:
                         <span class="text-white">
                             {{ immutableBalance | toMoney }}
@@ -58,7 +58,7 @@
                             </label>
                         </label>
                     </div>
-                    <div class="col-12 pt-3">
+                    <div class="col-12 pt-2">
                         <label
                             for="buy-price-input"
                             class="text-white">
@@ -82,7 +82,7 @@
                             min="0"
                         >
                     </div>
-                    <div class="col-12 pt-3">
+                    <div class="col-12 pt-2">
                         <label
                             for="buy-price-amount"
                             class="text-white">
@@ -97,7 +97,7 @@
                             min="0"
                         >
                     </div>
-                    <div class="col-12 pt-3">
+                    <div class="col-12 pt-2">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <template slot="header">
@@ -108,7 +108,7 @@
                             </template>
                         </guide>
                     </div>
-                    <div class="col-12 pt-4 text-center">
+                    <div class="col-12 pt-3 text-center">
                         <button @click="placeOrder"
                             v-if="loggedIn"
                             class="btn btn-primary"
