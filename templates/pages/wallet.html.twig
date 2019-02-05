@@ -33,7 +33,7 @@
                             {% endif %}
                         </b-tab>
                         <b-tab title="Deposit/Withdraw History">
-                            {% if depositWithdrawHistory == false %}
+                            {% if depositWithdrawHistory is same as(false) %}
                                 {{ include("loader.html.twig", {vCloak:''}) }}
                             {% else %}
                                 {{ include("loader.html.twig", {vCloak:'v-cloak--block'}) }}

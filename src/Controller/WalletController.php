@@ -93,9 +93,7 @@ class WalletController extends AbstractController
         }
 
         try {
-            $depositWithdrawHistory = $normalizer->normalize(
-                $wallet->getWithdrawDepositHistory($this->getUser(), 0, self::DEPOSIT_WITHDRAW_HISTORY_LIMIT)
-            );
+            $depositWithdrawHistory = $wallet->getWithdrawDepositHistory($this->getUser(), 0, self::DEPOSIT_WITHDRAW_HISTORY_LIMIT);
         } catch (\Throwable $exception) {
             $depositWithdrawHistory = false;
         }
@@ -121,7 +119,7 @@ class WalletController extends AbstractController
                 $this->getUser()->getId(),
                 $tokenManager->findAllPredefined()
             )->toArray(),
-            'depositWithdrawHistory' => $depositWithdrawHistory,
+            'depositWithdrawHistory' => $normalizer->normalize($depositWithdrawHistory),
         ]);
     }
 }
