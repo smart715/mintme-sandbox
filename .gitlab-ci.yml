@@ -34,8 +34,9 @@ tests_php:
     - make phpunit
     - make syntax_check
   cache:
-    key: "$CI_COMMIT_REF_SLUG-php"
+    key: "$CI_COMMIT_REF_SLUG"
     paths:
+      - node_modules/
       - vendor/
   tags:
     - mintme.abchosting.org
@@ -47,9 +48,10 @@ tests_assets:
     - make syntax_check_assets
     - make karma
   cache:
-    key: "$CI_COMMIT_REF_SLUG-npm"
+    key: "$CI_COMMIT_REF_SLUG"
     paths:
       - node_modules/
+      - vendor/
   tags:
     - mintme.abchosting.org
 
@@ -58,6 +60,11 @@ build_mintme_sites:
   script:
     - SRC=$(pwd)
     - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - vendor/
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
