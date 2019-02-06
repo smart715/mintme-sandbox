@@ -8,6 +8,14 @@
     <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
         <div class="form-group row">
             <div class="col-md-12">
+                {% if form_errors(form.username)|length > 0 %}
+                    <div class="row">
+                        <div class="col-12 col-lg-2 text-left text-lg-right"></div>
+                        <div class="col">
+                            <div class="bg-danger text-white">{{ form_errors(form.username) }}</div>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="row">
                     <div class="col-12 col-lg-2 text-left text-lg-right">
                         <label for="inputEmail" class="d-block label-featured">Email</label>
