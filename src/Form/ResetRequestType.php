@@ -2,13 +2,14 @@
 
 namespace App\Form;
 
+use App\Entity\User;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ResetRequestType extends AbstractType
 {
@@ -24,7 +25,7 @@ class ResetRequestType extends AbstractType
         $builder
             ->add('username', EmailType::class, [
                 'label' => false,
-                'constraints' => [new Email() ],
+                'constraints' => [ 'email', new email() ],
             ])
         
             ->add('recaptcha', EWZRecaptchaType::class, [
