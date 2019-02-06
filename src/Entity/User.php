@@ -48,7 +48,14 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      */
     protected $referralCode;
 
-    /** @var string */
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Email(
+     *     message = "Invalid email address.",
+     *     checkMX = true
+     * )
+     * @var string
+     */
     protected $username;
 
     /**
