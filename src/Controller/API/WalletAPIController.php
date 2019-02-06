@@ -2,9 +2,9 @@
 
 namespace App\Controller\API;
 
+use App\Deposit\DepositGatewayCommunicatorInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Verify\WebsiteVerifierInterface;
-use App\Wallet\Exception\NotEnoughAmountException;
+use App\Manager\TokenManagerInterface;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
@@ -91,4 +91,23 @@ class WalletAPIController extends FOSRestController
 
         return $this->view();
     }
+
+
+    /**
+     * @Rest\View()
+     * @Rest\GET("/addresses", name="deposit_addresses")
+     */
+    public function getDepositAddresses(
+        DepositGatewayCommunicatorInterface $depositCommunicator,
+        TokenManagerInterface $tokenManager
+    ): View {
+
+        $depositAddresses = $depositCommunicator->getDepositCredentials(
+            $this->getUser()->getId(),
+            $tokenManager->findAllPredefined()
+        )->toArray();
+
+        return $this->view($depositAddresses);
+    }
+
 }

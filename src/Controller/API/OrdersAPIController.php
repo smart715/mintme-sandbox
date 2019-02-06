@@ -13,14 +13,11 @@ use App\Manager\TokenManagerInterface;
 use App\Utils\MarketNameParserInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use http\Exception\InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -59,7 +56,8 @@ class OrdersAPIController extends FOSRestController
         MarketHandlerInterface $marketHandler,
         MarketManagerInterface $marketManager,
         NormalizerInterface $normalizer
-    ) {
+    )
+    {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
@@ -70,8 +68,8 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     *  @Rest\Get("/cancel/{market}/{orderid}", name="order_cancel", options={"expose"=true})
-     *  @Rest\View()
+     * @Rest\Get("/cancel/{market}/{orderid}", name="order_cancel", options={"expose"=true})
+     * @Rest\View()
      */
     public function cancelOrder(String $market, int $orderid): View
     {
@@ -115,7 +113,8 @@ class OrdersAPIController extends FOSRestController
         TraderInterface $trader,
         MarketManagerInterface $marketManager,
         MoneyWrapperInterface $moneyWrapper
-    ): View {
+    ): View
+    {
         $token = $this->tokenManager->findByName($request->get('tokenName'));
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
@@ -166,8 +165,8 @@ class OrdersAPIController extends FOSRestController
 
 
     /**
-     *  @Rest\Get("/pending/{tokenName}", name="pending_orders", options={"expose"=true})
-     *  @Rest\View()
+     * @Rest\Get("/pending/{tokenName}", name="pending_orders", options={"expose"=true})
+     * @Rest\View()
      */
     public function getPendingBuyOrder(String $tokenName): View
     {
@@ -183,13 +182,13 @@ class OrdersAPIController extends FOSRestController
 
         $orders = array_merge($pendingBuyOrders, $pendingSellOrders);
         return $this->view(
-            $this->normalizer->normalize($orders, null, ['groups' => [ 'Default' ]])
+            $this->normalizer->normalize($orders, null, ['groups' => ['Default']])
         );
     }
 
     /**
-     *  @Rest\Get("/executed/{tokenName}", name="executed_orders", options={"expose"=true})
-     *  @Rest\View()
+     * @Rest\Get("/executed/{tokenName}", name="executed_orders", options={"expose"=true})
+     * @Rest\View()
      */
     public function getExecutedOrders(String $tokenName): View
     {
@@ -200,7 +199,48 @@ class OrdersAPIController extends FOSRestController
             : [];
 
         return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ]])
+            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => ['Default']])
+        );
+    }
+
+    /**
+     * @Rest\Get("/executed", name="executed_user_orders", options={"expose"=true})
+     * @Rest\View()
+     */
+    public function getExecutedUserOrders(): View
+    {
+        $user = $this->getUser();
+
+        $executedUserOrders =
+            $this->marketHandler->getUserExecutedHistory(
+                $user,
+                $this->marketManager->getUserRelatedMarkets($user)
+            );
+
+        return $this->view(
+            $this->normalizer->normalize($executedUserOrders, null, [
+                'groups' => ['Default'],
+            ])
+        );
+    }
+
+    /**
+     * @Rest\Get("/pending", name="orders", options={"expose"=true})
+     * @Rest\View()
+     */
+    public function getUserOrders(): View
+    {
+        $user = $this->getUser();
+
+        $orders = $this->marketHandler->getPendingOrdersByUser(
+            $user,
+            $this->marketManager->getUserRelatedMarkets($user)
+        );
+
+        return $this->view(
+            $this->normalizer->normalize($orders, null, [
+                'groups' => ['Default'],
+            ])
         );
     }
 

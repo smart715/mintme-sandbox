@@ -16,11 +16,12 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @Rest\Route("/api/token")
+ * @Rest\Route("/api/tokens")
  * @Security(expression="is_granted('prelaunch')")
  */
 class TokenAPIController extends FOSRestController
@@ -223,5 +224,33 @@ class TokenAPIController extends FOSRestController
         return $this->view($this->tokenManager->getTokensByPattern(
             $request->get('tokenName')
         ));
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\GET("/", name="tokens")
+     */
+    public function getTokens(
+        BalanceHandlerInterface $balanceHandler,
+        NormalizerInterface $normalizer
+    ): View
+    {
+        $tokens = $balanceHandler->balances(
+            $this->getUser(),
+            $this->getUser()->getRelatedTokens()
+        );
+        $predefinedTokens = $balanceHandler->balances(
+            $this->getUser(),
+            $this->tokenManager->findAllPredefined()
+        );
+
+        return $this->view([
+            'common' => $normalizer->normalize($tokens, null, [
+                'groups' => ['Default'],
+            ]),
+            'predefined' => $normalizer->normalize($predefinedTokens, null, [
+                'groups' => ['Default'],
+            ]),
+        ]);
     }
 }

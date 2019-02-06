@@ -39,34 +39,19 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
     public function getDepositCredentials(int $userId, array $predefinedTokens): DepositCredentials
     {
         $credentials = [];
-        try {
-            foreach ($predefinedTokens as $token) {
-                $response = $this->jsonRpc->send(
-                    self::GET_DEPOSIT_CREDENTIALS_METHOD,
-                    [
-                        'user_id' => $userId,
-                        "currency" => $token->getName(),
-                    ]
-                );
-                $credentials[$token->getName()] = $response->hasError() ?
-                    "Address unavailable." :
-                    $response->getResult();
-            }
-        } catch (FetchException $e) {
-            return $this->getUnavailableCredentials($predefinedTokens);
-        }
-
-        return new DepositCredentials($credentials);
-    }
-
-    public function getUnavailableCredentials(array $predefinedTokens): DepositCredentials
-    {
-        $unavailableCredentials = [];
         foreach ($predefinedTokens as $token) {
-            $unavailableCredentials[$token->getName()] = 'Address unavailable.';
+            $response = $this->jsonRpc->send(
+                self::GET_DEPOSIT_CREDENTIALS_METHOD,
+                [
+                    'user_id' => $userId,
+                    "currency" => $token->getName(),
+                ]
+            );
+            $credentials[$token->getName()] = $response->hasError() ?
+                "Address unavailable." :
+                $response->getResult();
         }
-
-        return new DepositCredentials($unavailableCredentials);
+        return new DepositCredentials($credentials);
     }
 
     /** {@inheritdoc} */
