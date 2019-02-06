@@ -2,24 +2,17 @@
 
 namespace App\Form;
 
+use App\Form\Model\UsernameModel;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResetRequestType extends AbstractType
 {
-    /**
-     * @Assert\NotBlank()
-     * @Assert\Email(
-     *     message = "Invalid email address.",
-     *     checkMX = true
-     * )
-     * @var string
-     */
-     protected $username;
-     
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -39,9 +32,8 @@ class ResetRequestType extends AbstractType
         ;
     }
 
-    public function setUsername($username)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $this->username = $username;
-        return parent::setUsername($username);
+        $resolver->setDefault('data_class', UsernameModel::class);
     }
 }
