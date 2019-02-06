@@ -5,7 +5,7 @@ namespace App\Form\Model;
 use App\Validator\Constraints\UserEmail;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class EmailModel
+class UsernameModel
 {
     /**
      * @var string|null
