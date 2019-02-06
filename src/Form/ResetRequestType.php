@@ -12,6 +12,15 @@ use Symfony\Component\Validator\Constraints\Email;
 
 class ResetRequestType extends AbstractType
 {
+
+    /**
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email.",
+     *     checkMX = true
+     * )
+     */
+    protected $email;
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -24,7 +33,7 @@ class ResetRequestType extends AbstractType
         $builder
             ->add('username', EmailType::class, [
                 'label' => false,
-                'constraints' => [new Email(['message' => 'Invalid email address.', 'checkMX' => true]) ],
+                'constraints' => [new Email($email) ],
             ])
         
             ->add('recaptcha', EWZRecaptchaType::class, [
