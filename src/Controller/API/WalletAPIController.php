@@ -109,5 +109,4 @@ class WalletAPIController extends FOSRestController
 
         return $this->view($depositAddresses);
     }
-
 }

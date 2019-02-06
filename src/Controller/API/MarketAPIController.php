@@ -3,14 +3,11 @@
 namespace App\Controller\API;
 
 use App\Manager\MarketManagerInterface;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Request\ParamFetcherInterface;
+use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
 
 /**
  * @Rest\Route("/api/markets")
@@ -21,7 +18,7 @@ class MarketAPIController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\GET("/", name="markets", options={"expose"=true})
+     * @Rest\Get("/", name="markets")
      */
     public function getMarkets(
         MarketManagerInterface $marketManager,
@@ -34,5 +31,4 @@ class MarketAPIController extends FOSRestController
 
         return $this->view($markets);
     }
-
 }

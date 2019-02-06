@@ -233,8 +233,7 @@ class TokenAPIController extends FOSRestController
     public function getTokens(
         BalanceHandlerInterface $balanceHandler,
         NormalizerInterface $normalizer
-    ): View
-    {
+    ): View {
         $tokens = $balanceHandler->balances(
             $this->getUser(),
             $this->getUser()->getRelatedTokens()
