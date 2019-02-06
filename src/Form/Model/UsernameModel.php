@@ -14,5 +14,20 @@ class UsernameModel
      *     checkMX = true
      * )
      */
-    private $username;
+    protected $username;
+
+    public function __construct(string $username)
+    {
+        $this->username = $username;
+    }
+
+    public function getUsername(): string
+    {
+        return (string)$this->username;
+    }
+
+    public function setUsername(?string $username): void
+    {
+        $this->username = $username;
+    }
 }
