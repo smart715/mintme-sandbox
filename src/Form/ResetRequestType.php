@@ -15,7 +15,7 @@ class ResetRequestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, [ 'label' => 'Email:' ])
+            ->add('email', EmailType::class, [ 'label' => false ])
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'attr' => [
                     'options' => [
