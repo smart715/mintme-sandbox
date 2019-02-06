@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Form\Model\EmailModel;
+use App\Form\Model\UsernameModel;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
@@ -37,6 +37,6 @@ class ResetRequestType extends AbstractType
     
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', EmailModel::class);
+        $resolver->setDefault('data_class', UsernameModel::class);
     }
 }
