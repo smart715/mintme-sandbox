@@ -23,12 +23,12 @@ class UsernameModel
         $this->username = $username;
     }
 
-    public function getusername(): string
+    public function getUsername(): string
     {
         return (string)$this->username;
     }
 
-    public function setusername(?string $username): void
+    public function setUsername(?string $username): void
     {
         $this->username = $username;
     }
