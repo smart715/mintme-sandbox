@@ -127,9 +127,7 @@ export default {
             this.sellOrders.forEach( (order, i, orders) => {
                 if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
                     order.price = toMoney(order.price);
-                    order.amount = order[i-1] !== undefined
-                        ? toMoney(order.amount) - toMoney(orders[i-1].amount)
-                        : toMoney(order.amount);
+                    order.amount = toMoney(order.amount);
                     this.removeOrders.push(order);
                 }
             });
@@ -157,7 +155,7 @@ export default {
         },
         groupByPrice: function(orders) {
             let grouped = [];
-            orders.forEach( (item) => {
+            JSON.parse(JSON.stringify(orders)).forEach( (item) => {
                 let price = toMoney(item.price);
                 if (grouped[price] === undefined) {
                     grouped[price] = [];
