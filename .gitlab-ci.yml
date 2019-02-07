@@ -10,7 +10,7 @@ stages:
   - update-repository
   - tests
   - build-sites
-  - clean-unused-sites 
+  - clean-unused-sites
   - auto-merge
 
 update_repository_redmine_training.abchosting.org:
@@ -33,15 +33,25 @@ tests_php:
     - composer install
     - make phpunit
     - make syntax_check
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - vendor/
   tags:
     - mintme.abchosting.org
 
 tests_assets:
   stage: tests
   script:
-    - npm install
+    - npm ci
     - make syntax_check_assets
     - make karma
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - vendor/
   tags:
     - mintme.abchosting.org
 
@@ -50,6 +60,11 @@ build_mintme_sites:
   script:
     - SRC=$(pwd)
     - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - vendor/
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
@@ -82,4 +97,3 @@ auto_merge_release_branch:
     - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
     - master
   allow_failure: true
-
