@@ -76,12 +76,3 @@ export function deepFlatten(object) {
 export function toMoney(val) {
     return new Decimal(val).toFixed(GENERAL.precision);
 }
-
-/**
- * @param {string} address
- * @return {boolean} whether is valid or not
- */
-export function isValidEmail(address) {
-    let regex = /^\S+@\S+$/;
-    return regex.test(address);
-}
