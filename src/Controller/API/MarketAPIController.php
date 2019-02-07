@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -18,15 +19,27 @@ class MarketAPIController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/", name="markets")
+     * @Rest\Get("/", name="markets", options={"expose"=true})
      */
     public function getMarkets(
-        MarketManagerInterface $marketManager,
-        NormalizerInterface $normalizer
+        MarketManagerInterface $marketManager
     ): View {
 
         $markets = $marketManager->getUserRelatedMarkets($this->getUser());
 
         return $this->view($markets);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/info", name="markets_info", options={"expose"=true})
+     */
+    public function getMarketsInfo(
+        MarketManagerInterface $marketManager,
+        MarketHandlerInterface $marketHandler
+    ): Response {
+        $marketsInfo = $marketHandler->getMarketsInfo($marketManager->getAllMarkets());
+
+        return $this->view($marketsInfo);
     }
 }
