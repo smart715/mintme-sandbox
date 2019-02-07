@@ -173,10 +173,21 @@ export default {
                     orders[item].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
                             order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
-                            delete orders[item][i-1];
                         }
                     });
-                orders[item].sort((first, second) => first.amount < second.amount);
+                    orders[item].sort((first, second) => {
+                        let firstOrder = parseFloat(first.amount);
+                        let secondOrder = parseFloat(second.amount);
+                        if (firstOrder < secondOrder) {
+                            return 1;
+                        }
+
+                        if (firstOrder > secondOrder) {
+                            return -1;
+                        }
+
+                        return 0;
+                    });
                 filtered.push(orders[item][0]);
                 }
             }
