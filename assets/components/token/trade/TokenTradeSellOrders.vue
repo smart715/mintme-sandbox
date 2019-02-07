@@ -165,7 +165,7 @@ export default {
             this.filterByAmount(grouped);
         },
         filterByAmount: function(orders) {
-            let filtered = [];
+            this.orders = [];
             for (let item in orders) {
                 if (orders.hasOwnProperty(item)) {
                     orders[item].forEach((order, i, arr) => {
@@ -188,10 +188,9 @@ export default {
 
                         return 0;
                     });
-                    filtered.push(orders[item][0]);
+                    this.orders.push(orders[item][0]);
                 }
             }
-            this.orders = filtered;
         },
     },
     watch: {
