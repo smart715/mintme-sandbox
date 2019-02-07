@@ -214,9 +214,9 @@ class Token
         return (new self())->setName($crypto->getSymbol());
     }
 
-    public function getCreatedAt(): \DateTime
+    public function getCreated(): \DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->created;
     }
 
     /** @ORM\PrePersist() */
