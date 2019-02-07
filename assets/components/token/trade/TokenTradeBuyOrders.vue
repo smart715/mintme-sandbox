@@ -124,7 +124,7 @@ export default {
         removeOrderModal: function(row) {
             this.removeOrders = [];
             this.currentRow = row;
-            this.buyOrders.forEach( (order, i, orders) => {
+            this.buyOrders.forEach( (order) => {
                 if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
                     order.price = toMoney(order.price);
                     order.amount = toMoney(order.amount);
@@ -138,16 +138,13 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            let orders = [];
-            this.buyOrders.forEach( (order) => {
-                 if (toMoney(order.price) === this.currentRow.price && order.maker.id === this.currentRow.trader_id) {
-                     orders.push([order.market.hiddenName, order.id]);
-                 }
-            });
-
             this.$axios.get(
                 this.$routing.generate('orders_cancel', {
-                    orders: JSON.stringify(orders),
+                    orders: JSON.stringify(
+                        this.removeOrders.map((order) => {
+                            return [order.market.hiddenName, order.id];
+                        })
+                    ),
                 })
             ).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
