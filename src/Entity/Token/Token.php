@@ -93,10 +93,10 @@ class Token
     protected $crypto;
 
     /**
-     * @ORM\Column(type="datetime")
-     * @var \DateTime
+     * @ORM\Column(type="datetime_immutable")
+     * @var \DateTimeImmutable
      */
-    protected $createdAt;
+    protected $created;
 
     public function getCrypto(): ?Crypto
     {
@@ -220,9 +220,9 @@ class Token
     }
 
     /** @ORM\PrePersist() */
-    public function setCreatedAtValue(): self
+    public function setCreatedValue(): self
     {
-        $this->createdAt = new \DateTime();
+        $this->created = new \DateTimeImmutable();
 
         return $this;
     }

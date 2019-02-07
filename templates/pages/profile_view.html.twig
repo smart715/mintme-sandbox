@@ -34,7 +34,7 @@
                                 {% if token is not empty %}
                                     <div class="pb-1">
                                         <a href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
-                                        created on {{ token.getCreatedAt().format('d M Y') }}
+                                        created on {{ token.getCreated().format('d M Y') }}
                                     </div>
                                 {% endif %}
                             </div>
