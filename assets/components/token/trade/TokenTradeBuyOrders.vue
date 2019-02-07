@@ -79,7 +79,6 @@ export default {
         return {
             confirmModal: false,
             currentRow: {},
-            actionUrl: '',
             orders: [],
             removeOrders: [],
             fields: {
@@ -131,7 +130,6 @@ export default {
                     this.removeOrders.push(order);
                 }
             });
-            this.actionUrl = row.cancel_order_url;
             this.switchConfirmModal(true);
         },
         switchConfirmModal: function(val) {
@@ -171,17 +169,9 @@ export default {
                         }
                     });
                     orders[item].sort((first, second) => {
-                        let firstOrder = parseFloat(first.amount);
-                        let secondOrder = parseFloat(second.amount);
-                        if (firstOrder < secondOrder) {
-                            return 1;
-                        }
-
-                        if (firstOrder > secondOrder) {
+                        if (parseFloat(first.amount) > parseFloat(second.amount)) {
                             return -1;
                         }
-
-                        return 0;
                     });
                 this.orders.push(orders[item][0]);
                 }
