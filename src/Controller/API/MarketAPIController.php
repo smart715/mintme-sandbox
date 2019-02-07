@@ -25,9 +25,7 @@ class MarketAPIController extends FOSRestController
         NormalizerInterface $normalizer
     ): View {
 
-        $markets = $normalizer->normalize($marketManager->getUserRelatedMarkets($this->getUser()), null, [
-            'groups' => ['Default'],
-        ]);
+        $markets = $marketManager->getUserRelatedMarkets($this->getUser());
 
         return $this->view($markets);
     }

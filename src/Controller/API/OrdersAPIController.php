@@ -21,7 +21,6 @@ use Money\Currency;
 use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Rest\Route("/api/orders")
@@ -47,17 +46,13 @@ class OrdersAPIController extends FOSRestController
     /** @var MarketManagerInterface */
     private $marketManager;
 
-    /** @var NormalizerInterface */
-    protected $normalizer;
-
     public function __construct(
         TraderInterface $trader,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         MarketNameParserInterface $marketParser,
         MarketHandlerInterface $marketHandler,
-        MarketManagerInterface $marketManager,
-        NormalizerInterface $normalizer
+        MarketManagerInterface $marketManager
     ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
@@ -65,7 +60,6 @@ class OrdersAPIController extends FOSRestController
         $this->marketParser = $marketParser;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
-        $this->normalizer = $normalizer;
     }
 
     /**
@@ -165,7 +159,7 @@ class OrdersAPIController extends FOSRestController
 
 
     /**
-     * @Rest\Get("/pending/{tokenName}", name="pending_orders", options={"expose"=true})
+     * @Rest\Get("/{tokenName}/pending", name="pending_orders", options={"expose"=true})
      * @Rest\View()
      */
     public function getPendingBuyOrder(String $tokenName): View
@@ -181,13 +175,11 @@ class OrdersAPIController extends FOSRestController
             : [];
 
         $orders = array_merge($pendingBuyOrders, $pendingSellOrders);
-        return $this->view(
-            $this->normalizer->normalize($orders, null, ['groups' => ['Default']])
-        );
+        return $this->view($orders);
     }
 
     /**
-     * @Rest\Get("/executed/{tokenName}", name="executed_orders", options={"expose"=true})
+     * @Rest\Get("/{tokenName}/executed", name="executed_orders", options={"expose"=true})
      * @Rest\View()
      */
     public function getExecutedOrders(String $tokenName): View
@@ -198,9 +190,7 @@ class OrdersAPIController extends FOSRestController
             ? $this->marketHandler->getExecutedOrders($market)
             : [];
 
-        return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => ['Default']])
-        );
+        return $this->view($pendingBuyOrders);
     }
 
     /**
@@ -217,11 +207,7 @@ class OrdersAPIController extends FOSRestController
                 $this->marketManager->getUserRelatedMarkets($user)
             );
 
-        return $this->view(
-            $this->normalizer->normalize($executedUserOrders, null, [
-                'groups' => ['Default'],
-            ])
-        );
+        return $this->view($executedUserOrders);
     }
 
     /**
@@ -237,11 +223,7 @@ class OrdersAPIController extends FOSRestController
             $this->marketManager->getUserRelatedMarkets($user)
         );
 
-        return $this->view(
-            $this->normalizer->normalize($orders, null, [
-                'groups' => ['Default'],
-            ])
-        );
+        return $this->view($orders);
     }
 
     private function getMarket(string $tokenName): ?Market
