@@ -231,8 +231,7 @@ class TokenAPIController extends FOSRestController
      * @Rest\GET("/", name="tokens")
      */
     public function getTokens(
-        BalanceHandlerInterface $balanceHandler,
-        NormalizerInterface $normalizer
+        BalanceHandlerInterface $balanceHandler
     ): View {
         $tokens = $balanceHandler->balances(
             $this->getUser(),
@@ -244,12 +243,8 @@ class TokenAPIController extends FOSRestController
         );
 
         return $this->view([
-            'common' => $normalizer->normalize($tokens, null, [
-                'groups' => ['Default'],
-            ]),
-            'predefined' => $normalizer->normalize($predefinedTokens, null, [
-                'groups' => ['Default'],
-            ]),
+            'common' => $tokens,
+            'predefined' => $predefinedTokens,
         ]);
     }
 }
