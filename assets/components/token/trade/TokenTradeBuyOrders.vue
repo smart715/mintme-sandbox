@@ -176,20 +176,7 @@ export default {
                             delete orders[item][i-1];
                         }
                     });
-                orders[item].sort((first, second) => {
-                    let firstOrder = parseFloat(first.amount);
-                    let secondOrder = parseFloat(second.amount);
-
-                    if (firstOrder < secondOrder) {
-                        return 1;
-                    }
-
-                    if (firstOrder > secondOrder) {
-                        return -1;
-                    }
-
-                    return 0;
-                });
+                orders[item].sort((first, second) => first.amount < second.amount);
                 filtered.push(orders[item][0]);
                 }
             }
