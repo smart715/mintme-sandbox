@@ -37,7 +37,7 @@ class MarketAPIController extends FOSRestController
     public function getMarketsInfo(
         MarketManagerInterface $marketManager,
         MarketHandlerInterface $marketHandler
-    ): Response {
+    ): View {
         $marketsInfo = $marketHandler->getMarketsInfo($marketManager->getAllMarkets());
 
         return $this->view($marketsInfo);
