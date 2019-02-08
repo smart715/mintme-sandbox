@@ -149,6 +149,7 @@ export default {
             });
         },
         groupByPrice: function(orders) {
+            this.orders = [];
             let grouped = [];
             JSON.parse(JSON.stringify(orders)).forEach( (item) => {
                 let price = toMoney(item.price);
@@ -157,23 +158,19 @@ export default {
                 }
                 grouped[price].push(item);
             });
-            this.filterByAmount(grouped);
-        },
-        filterByAmount: function(orders) {
-            this.orders = [];
-            for (let item in orders) {
-                if (orders.hasOwnProperty(item)) {
-                    orders[item].forEach((order, i, arr) => {
+            for (let orders in grouped) {
+                if (grouped.hasOwnProperty(orders)) {
+                    grouped[orders].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
                             order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
                         }
                     });
-                    orders[item].sort((first, second) => {
+                    grouped[orders].sort((first, second) => {
                         if (parseFloat(first.amount) > parseFloat(second.amount)) {
                             return -1;
                         }
                     });
-                    this.orders.push(orders[item][0]);
+                    this.orders.push(grouped[orders][0]);
                 }
             }
         },
