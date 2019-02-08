@@ -1,15 +1,10 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card">
             <div class="card-header">
                 Buy Orders
-                <font-awesome-icon
-                        icon="circle-notch"
-                        spin class="loading-spinner"
-                        fixed-width
-                        v-if="showLoadingIcon"
-                />
-                <span v-else class="card-header-icon">
+                <template v-if="loaded">
+                <span class="card-header-icon">
                     Total: {{ total }} WEB
                     <guide>
                         <template slot="header">
@@ -20,9 +15,14 @@
                         </template>
                     </guide>
                 </span>
+                </template>
+                <template v-else>
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                </template>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
+                    <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
@@ -34,9 +34,13 @@
                                alt="avatar">
                         </template>
                     </b-table>
-                    <div v-if="!hasOrders && !showLoadingIcon">
+                    <div v-if="!hasOrders">
                         <h4 class="text-center p-5">No order was added yet</h4>
                     </div>
+                    </template>
+                    <template v-else>
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </template>
                 </div>
             </div>
         </div>
@@ -51,8 +55,7 @@ import Decimal from 'decimal.js';
 export default {
     name: 'TokenTradeBuyOrders',
     props: {
-        containerClass: String,
-        buyOrders: [Array, Boolean],
+        buyOrders: [Array, Object],
         tokenName: String,
     },
     components: {
@@ -81,20 +84,20 @@ export default {
             return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sum_web) + sum, 0));
         },
         ordersList: function() {
-            return this.buyOrders != false ? this.buyOrders.map((order) => {
+            return this.buyOrders.map((order) => {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
                 };
-            }) : [];
+            });
         },
         hasOrders: function() {
               return this.buyOrders.length > 0;
         },
-        showLoadingIcon: function() {
-            return (this.buyOrders === false);
+        loaded: function() {
+            return this.buyOrders !== null;
         },
     },
 };

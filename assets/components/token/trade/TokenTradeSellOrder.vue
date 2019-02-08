@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card h-100">
             <div class="card-header text-center">
                 Sell Order
@@ -14,18 +14,11 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
-                        pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
+                    <div v-if="immutableBalance"
+                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
                         >
                         Your Tokens:
-                        <font-awesome-icon
-                                icon="circle-notch"
-                                spin class="loading-spinner"
-                                fixed-width
-                                v-if="showLoadingIcon"
-                        />
-                        <span v-else class="text-primary">
+                        <span class="text-primary">
                             {{ immutableBalance | toMoney  }}
                             <guide>
                                 <font-awesome-icon
@@ -42,9 +35,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div v-if="!showLoadingIcon"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
-                        text-sm-right text-md-left text-xl-right">
+                    <div class="col-12 col-sm-6 col-md-12 col-xl-6 text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"
@@ -117,13 +108,7 @@
                             min="0"
                         >
                     </div>
-                    <font-awesome-icon
-                            icon="circle-notch"
-                            spin class="loading-spinner"
-                            fixed-width
-                            v-if="showLoadingIcon"
-                    />
-                    <div v-else class="col-12 pt-3">
+                    <div class="col-12 pt-3">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon
@@ -166,7 +151,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
@@ -181,7 +165,6 @@ export default {
     },
     mixins: [WebSocketMixin],
     props: {
-        containerClass: String,
         loginUrl: String,
         signupUrl: String,
         loggedIn: Boolean,
@@ -208,13 +191,13 @@ export default {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 let data = {
-                    tokenName: this.tokenName,
-                    amountInput: toMoney(this.sellAmount),
-                    priceInput: toMoney(this.sellPrice),
-                    marketPrice: this.useMarketPrice,
-                    action: this.action,
+                    'tokenName': this.tokenName,
+                    'amountInput': toMoney(this.sellAmount),
+                    'priceInput': toMoney(this.sellPrice),
+                    'marketPrice': this.useMarketPrice,
+                    'action': this.action,
                 };
-                axios.post(this.placeOrderUrl, data)
+                this.$axios.single.post(this.placeOrderUrl, data)
                     .then((response) => this.showModalAction(response.data.result))
                     .catch((error) => this.showModalAction());
             }
@@ -240,9 +223,6 @@ export default {
         fieldsValid: function() {
             return Boolean(this.sellPrice && this.sellAmount);
         },
-        showLoadingIcon: function() {
-            return (this.immutableBalance === false);
-        },
     },
     watch: {
       useMarketPrice: function() {
@@ -252,21 +232,36 @@ export default {
       },
     },
     mounted: function() {
-        if (!this.balance) {
+        if (!this.immutableBalance) {
             return;
         }
 
-        this.authorize(() => {
-              this.sendMessage(JSON.stringify({
-                  method: 'asset.subscribe',
-                  params: [this.tokenHiddenName],
-                  id: parseInt(Math.random()),
-              }));
-        }, (response) => {
-          if ('asset.update' === response.method) {
-              this.immutableBalance = response.params[0][this.tokenHiddenName].available;
-          }
-        });
+        this.authorize()
+            .then(() => {
+                this.addMessageHandler((response) => {
+                    if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.tokenHiddenName)) {
+                        this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.tokenName}))
+                            .then((res) => {
+                                this.immutableBalance =
+                                    new Decimal(response.params[0][this.tokenHiddenName].available).sub(
+                                        res.data.frozenAmount
+                                    );
+                            })
+                            .catch(() => {});
+                    }
+                });
+
+                this.sendMessage(JSON.stringify({
+                    method: 'asset.subscribe',
+                    params: [this.tokenHiddenName],
+                    id: parseInt(Math.random()),
+                }));
+            })
+            .catch(() => {
+                this.$toasted.error(
+                    'Can not connect to internal services'
+                );
+            });
     },
     filters: {
         toMoney: function(val) {

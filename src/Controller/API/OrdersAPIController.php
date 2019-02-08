@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -21,6 +22,7 @@ use Money\Currency;
 use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @Rest\Route("/api/orders")
@@ -68,6 +70,10 @@ class OrdersAPIController extends FOSRestController
      */
     public function cancelOrder(String $market, int $orderid): View
     {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
         $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
         $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
 
@@ -109,6 +115,10 @@ class OrdersAPIController extends FOSRestController
         MarketManagerInterface $marketManager,
         MoneyWrapperInterface $moneyWrapper
     ): View {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
         $token = $this->tokenManager->findByName($request->get('tokenName'));
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
@@ -161,8 +171,9 @@ class OrdersAPIController extends FOSRestController
     /**
      * @Rest\Get("/{tokenName}/pending", name="pending_orders", options={"expose"=true})
      * @Rest\View()
+     * @return mixed[]
      */
-    public function getPendingBuyOrder(String $tokenName): View
+    public function getPendingOrders(String $tokenName): array
     {
         $market = $this->getMarket($tokenName);
 
@@ -174,56 +185,65 @@ class OrdersAPIController extends FOSRestController
             ? ['sell' => $this->marketHandler->getPendingSellOrders($market)]
             : [];
 
-        $orders = array_merge($pendingBuyOrders, $pendingSellOrders);
-        return $this->view($orders);
+        return array_merge($pendingBuyOrders, $pendingSellOrders);
     }
 
     /**
      * @Rest\Get("/{tokenName}/executed", name="executed_orders", options={"expose"=true})
      * @Rest\View()
+     * @return Order[]
      */
-    public function getExecutedOrders(String $tokenName): View
+    public function getExecutedOrders(String $tokenName): array
     {
         $market = $this->getMarket($tokenName);
 
-        $pendingBuyOrders = $market
+        return $market
             ? $this->marketHandler->getExecutedOrders($market)
             : [];
-
-        return $this->view($pendingBuyOrders);
     }
 
     /**
      * @Rest\Get("/executed", name="executed_user_orders", options={"expose"=true})
      * @Rest\View()
+     * @return Order[]
      */
-    public function getExecutedUserOrders(): View
+    public function getExecutedUserOrders(): array
     {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
         $user = $this->getUser();
+        $markets = $this->marketManager->getUserRelatedMarkets($user);
 
-        $executedUserOrders =
-            $this->marketHandler->getUserExecutedHistory(
-                $user,
-                $this->marketManager->getUserRelatedMarkets($user)
-            );
+        if (!$markets) {
+            return [];
+        }
 
-        return $this->view($executedUserOrders);
+        return $this->marketHandler->getUserExecutedHistory(
+            $user,
+            $markets
+        );
     }
 
     /**
      * @Rest\Get("/pending", name="orders", options={"expose"=true})
      * @Rest\View()
+     * @return Order[]
      */
-    public function getUserOrders(): View
+    public function getPendingUserOrders(): array
     {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
+        /** @var User $user */
         $user = $this->getUser();
 
-        $orders = $this->marketHandler->getPendingOrdersByUser(
+        return $this->marketHandler->getPendingOrdersByUser(
             $user,
             $this->marketManager->getUserRelatedMarkets($user)
         );
-
-        return $this->view($orders);
     }
 
     private function getMarket(string $tokenName): ?Market

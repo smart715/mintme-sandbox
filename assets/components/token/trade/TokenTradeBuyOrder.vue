@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card h-100">
             <div class="card-header text-center">
                 Buy Order
@@ -15,24 +15,16 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
-                        pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0">
+                    <div v-if="immutableBalance"
+                         class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0">
                         Your WEB:
-                        <font-awesome-icon
-                                icon="circle-notch"
-                                spin class="loading-spinner"
-                                fixed-width
-                                v-if="showLoadingIcon"
-                        />
-                        <span v-else class="text-primary">
+                        <span class="text-primary">
                             {{ immutableBalance | toMoney }}
                             <guide>
                                 <font-awesome-icon
                                     icon="question"
                                     slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
+                                    class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Your WEB
                                 </template>
@@ -42,7 +34,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div v-if="!showLoadingIcon"
+                    <div
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
@@ -61,8 +53,7 @@
                                     <font-awesome-icon
                                         icon="question"
                                         slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
+                                        class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
                                     <template slot="header">
                                         Market Price
                                     </template>
@@ -83,8 +74,7 @@
                                 <font-awesome-icon
                                     icon="question"
                                     slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
+                                    class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Price in WEB
                                 </template>
@@ -118,13 +108,7 @@
                             min="0"
                         >
                     </div>
-                    <font-awesome-icon
-                            icon="circle-notch"
-                            spin class="loading-spinner"
-                            fixed-width
-                            v-if="showLoadingIcon"
-                    />
-                    <div v-else class="col-12 pt-3">
+                    <div class="col-12 pt-3">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon
@@ -165,7 +149,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
@@ -180,7 +163,6 @@ export default {
         OrderModal,
     },
     props: {
-        containerClass: String,
         loginUrl: String,
         signupUrl: String,
         loggedIn: Boolean,
@@ -206,14 +188,14 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 let data = {
-                    tokenName: this.tokenName,
-                    amountInput: toMoney(this.buyAmount),
-                    priceInput: toMoney(this.buyPrice),
-                    marketPrice: this.useMarketPrice,
-                    action: this.action,
+                    'tokenName': this.tokenName,
+                    'amountInput': toMoney(this.buyAmount),
+                    'priceInput': toMoney(this.buyPrice),
+                    'marketPrice': this.useMarketPrice,
+                    'action': this.action,
                 };
 
-                axios.post(this.placeOrderUrl, data)
+                this.$axios.single.post(this.placeOrderUrl, data)
                     .then((response) => this.showModalAction(response.data.result))
                     .catch((error) => this.showModalAction());
             }
@@ -236,9 +218,6 @@ export default {
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
         },
-        showLoadingIcon: function() {
-            return (this.immutableBalance === false);
-        },
     },
     watch: {
       useMarketPrice: function() {
@@ -255,7 +234,10 @@ export default {
         this.authorize()
             .then(() => {
                 this.addMessageHandler((response) => {
-                    if ('asset.update' === response.method) {
+                    if (
+                        'asset.update' === response.method &&
+                        response.params[0].hasOwnProperty(this.marketName.currencySymbol)
+                    ) {
                         this.immutableBalance = response.params[0][this.marketName.currencySymbol].available;
                     }
                 });

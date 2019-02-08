@@ -85,7 +85,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
@@ -172,7 +171,7 @@ export default {
             }, {scope: 'pages_show_list'});
         },
         savePage: function() {
-            axios.patch(this.updateUrl, {
+            this.$axios.single.patch(this.updateUrl, {
                 facebookUrl: this.selectedUrl,
                 _csrf_token: this.csrfToken,
             })

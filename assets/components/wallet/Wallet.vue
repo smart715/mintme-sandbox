@@ -106,17 +106,15 @@ export default {
         DepositModal,
     },
     props: {
-        tokens: {type: [Object, Boolean], default: () => []},
-        predefinedTokens: {type: [Object, Boolean], default: () => []},
         withdrawUrl: {type: String, required: true},
-        depositAddresses: {type: Object},
         createTokenUrl: String,
         tradingUrl: String,
     },
     data() {
         return {
-            immutableTokens: this.tokens,
-            immutablePTokens: this.predefinedTokens,
+            tokens: null,
+            predefinedTokens: null,
+            depositAddresses: {},
             showModal: false,
             selectedCurrency: null,
             depositAddress: null,
@@ -145,7 +143,7 @@ export default {
     },
     computed: {
         hasTokens: function() {
-            return Object.values(this.tokens).length > 0;
+            return Object.values(this.tokens || {}).length > 0;
         },
         allTokens: function() {
             return Object.assign({}, this.tokens || {}, this.predefinedTokens || {});
@@ -156,36 +154,53 @@ export default {
             });
         },
         predefinedItems: function() {
-            return this.tokensToArray(this.immutablePTokens);
+            return this.tokensToArray(this.predefinedTokens || {});
         },
         items: function() {
-            return this.tokensToArray(this.immutableTokens);
+            return this.tokensToArray(this.tokens || {});
         },
         showLoadingIconP: function() {
-            return (this.immutablePTokens === false);
+            return (this.predefinedTokens === null);
         },
         showLoadingIcon: function() {
-            return (this.immutableTokens === false);
+            return (this.tokens === null);
         },
     },
     mounted: function() {
-        this.authorize()
+        this.$axios.retry.get(this.$routing.generate('tokens'))
+            .then((res) => {
+                let tokensData = res.data;
+                this.tokens = tokensData.common;
+                this.predefinedTokens = tokensData.predefined;
+            })
             .then(() => {
-                this.addMessageHandler((response) => {
-                    if ('asset.update' === response.method) {
-                        this.updateBalances(response.params[0]);
-                    }
-                });
-                this.sendMessage(JSON.stringify({
-                    method: 'asset.subscribe',
-                    params: this.allTokensName,
-                    id: parseInt(Math.random()),
-                }));
+                this.authorize()
+                    .then(() => {
+                        this.addMessageHandler((response) => {
+                            if ('asset.update' === response.method) {
+                                this.updateBalances(response.params[0]);
+                            }
+                        });
+                        this.sendMessage(JSON.stringify({
+                            method: 'asset.subscribe',
+                            params: this.allTokensName,
+                            id: parseInt(Math.random()),
+                        }));
+                    })
+                    .catch((err) => {
+                        this.$toasted.error(
+                            'Can not connect to internal services'
+                        );
+                    });
             })
             .catch(() => {
-                this.$toasted.error(
-                    'Can not connect to internal services'
-                );
+                this.$toasted.error('Can not update tokens now. Try again later.');
+            });
+
+        this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
+            .then((res) => this.depositAddresses = res.data)
+            .catch(() => {
+                this.$toasted.error('Can not update deposit data now. Try again later.');
             });
     },
     methods: {
@@ -199,7 +214,7 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency) {
-            this.depositAddress = this.depositAddresses[currency];
+            this.depositAddress = this.depositAddresses[currency] || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.showDepositModal = true;
         },
@@ -210,20 +225,20 @@ export default {
             Object.keys(data).forEach((oTokenName) => {
                 let oToken = data[oTokenName];
 
-                Object.keys(this.immutablePTokens).forEach((token) => {
-                    if (oTokenName === this.immutablePTokens[token].hiddenName) {
-                        this.immutablePTokens[token].available = Decimal.sub(
+                Object.keys(this.predefinedTokens).forEach((token) => {
+                    if (oTokenName === this.predefinedTokens[token].hiddenName) {
+                        this.predefinedTokens[token].available = Decimal.sub(
                             oToken.available,
-                            this.immutablePTokens[token].frozen
+                            this.predefinedTokens[token].frozen
                         ).toString();
                     }
                 });
 
-                Object.keys(this.immutableTokens).forEach((token) => {
-                    if (oTokenName === this.immutableTokens[token].hiddenName) {
-                        this.immutableTokens[token].available = Decimal.sub(
+                Object.keys(this.tokens).forEach((token) => {
+                    if (oTokenName === this.tokens[token].hiddenName) {
+                        this.tokens[token].available = Decimal.sub(
                             oToken.available,
-                            this.immutableTokens[token].frozen
+                            this.tokens[token].frozen
                         ).toString();
                     }
                 });

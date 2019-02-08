@@ -77,7 +77,7 @@ class BalanceFetcher implements BalanceFetcherInterface
     public function balance(int $userId, array $tokenNames): BalanceResultContainer
     {
         if (!$tokenNames) {
-            throw new BalanceException('Failed to get the balance. No token name');
+            throw new BalanceException('Failed to get the balance. No token name', BalanceException::EMPTY);
         }
         $response = $this->jsonRpc->send(
             self::BALANCE_METHOD,
