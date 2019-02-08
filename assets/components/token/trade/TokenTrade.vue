@@ -1,55 +1,63 @@
 <template>
     <div class="row">
-        <token-trade-buy-order
-            container-class="buy-order col-12 col-md-6 col-lg-4"
-            :websocket-url="websocketUrl"
-            :hash="hash"
-            :currency="currency"
-            :login-url="loginUrl"
-            :signup-url="signupUrl"
-            :logged-in="loggedIn"
-            :market-name="marketName"
-            :buy="buy"
-            :token-name="tokenName"
-            :place-order-url="placeOrderUrl"
-            :balance="webBalance"
-        />
-        <token-trade-sell-order
-            container-class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4"
-            :websocket-url="websocketUrl"
-            :hash="hash"
-            :currency="currency"
-            :login-url="loginUrl"
-            :signup-url="signupUrl"
-            :logged-in="loggedIn"
-            :market-name="marketName"
-            :sell="sell"
-            :token-name="tokenName"
-            :place-order-url="placeOrderUrl"
-            :balance="tokenBalance"
-            :token-hidden-name="tokenHiddenName"
-        />
+        <div class="buy-order col-12 col-md-6 col-lg-4">
+            <token-trade-buy-order
+                v-if="balanceLoaded"
+                :websocket-url="websocketUrl"
+                :hash="hash"
+                :currency="currency"
+                :login-url="loginUrl"
+                :signup-url="signupUrl"
+                :logged-in="loggedIn"
+                :market-name="marketName"
+                :buy="buy"
+                :token-name="tokenName"
+                :place-order-url="placeOrderUrl"
+                :balance="webBalance"
+            />
+            <template v-else>
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3" size="5x" />
+            </template>
+        </div>
+        <div class="sell-order mt-3 mt-md-0 col-12 col-md-6 col-lg-4">
+            <token-trade-sell-order
+                v-if="balanceLoaded"
+                :websocket-url="websocketUrl"
+                :hash="hash"
+                :currency="currency"
+                :login-url="loginUrl"
+                :signup-url="signupUrl"
+                :logged-in="loggedIn"
+                :market-name="marketName"
+                :sell="sell"
+                :token-name="tokenName"
+                :place-order-url="placeOrderUrl"
+                :balance="tokenBalance"
+                :token-hidden-name="tokenHiddenName"
+            />
+            <template v-else>
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3" size="5x" />
+            </template>
+        </div>
         <token-trade-chart
-            container-class="chart mt-3 mt-lg-0 col-12 col-lg-4"
+            class="chart mt-3 mt-lg-0 col-12 col-lg-4"
             :websocket-url="websocketUrl"
             :currency="currency"
             :market-name="marketName"
         />
-        <token-trade-buy-orders
-            container-class="col-12 col-md-6 mt-3"
-            :buy-orders="buyOrders"
-            :token-name="tokenName"
-        />
-        <token-trade-sell-orders
-            container-class="col-12 col-md-6 mt-3"
-            :sell-orders="sellOrders"
-            :token-name="tokenName"
-        />
-        <token-trade-trade-history
-            container-class="col-12 mt-3"
-            :orders-history="ordersHistory"
-            :token-name="tokenName"
-        />
+        <div class="col-12 col-md-6 mt-3">
+            <token-trade-buy-orders v-if="ordersLoaded" :buy-orders="buyOrders" :token-name="tokenName" />
+            <template v-else>
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3" size="5x" />
+            </template>
+        </div>
+        <div class="col-12 col-md-6 mt-3">
+            <token-trade-sell-orders v-if="ordersLoaded" :sell-orders="sellOrders" :token-name="tokenName" />
+            <template v-else>
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3" size="5x" />
+            </template>
+        </div>
+        <token-trade-trade-history class="col-12 mt-3" :token-name="tokenName" />
     </div>
 </template>
 
@@ -76,9 +84,6 @@ export default {
         OrderModal,
     },
     props: {
-        ordersHistory: [String, Boolean],
-        pendingBuyOrders: [String, Boolean],
-        pendingSellOrders: [String, Boolean],
         websocketUrl: String,
         hash: String,
         currency: String,
@@ -88,11 +93,12 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        balances: [Object, Boolean],
         tokenHiddenName: String,
     },
     data() {
         return {
+            pendingBuyOrders: null,
+            pendingSellOrders: null,
             buy: {
                 amount: 0,
                 price: 0,
@@ -101,8 +107,9 @@ export default {
                 amount: 0,
                 price: 0,
             },
-            buyOrders: [],
-            sellOrders: [],
+            buyOrders: null,
+            sellOrders: null,
+            balances: null,
         };
     },
     computed: {
@@ -115,18 +122,27 @@ export default {
         webBalance: function() {
             return this.balances['WEB'] ? this.balances['WEB'].available : false;
         },
+        balanceLoaded: function() {
+            return this.balances !== null;
+        },
+        ordersLoaded: function() {
+            return this.buyOrders !== null && this.sellOrders !== null;
+        },
     },
     mounted() {
-        this.buyOrders = JSON.parse(this.pendingBuyOrders);
-        this.sellOrders = JSON.parse(this.pendingSellOrders);
-        setInterval(() => {
-            this.$axios.get(this.$routing.generate('pending_orders', {
-                tokenName: this.tokenName,
-            })).then((result) => {
-                this.buyOrders = result.data.buy;
-                this.sellOrders = result.data.sell;
-            }).catch((error) => { });
-        }, 10000);
+        this.$axios.retry.get(this.$routing.generate('tokens'))
+            .then((res) => this.balances = {...res.data.common, ...res.data.predefined})
+            .catch((err) => {
+                if (401 === err.response.status) {
+                    this.balances = false;
+                } else {
+                    this.$toasted.error('Can not load current balance. try again later.');
+                }
+            });
+
+        this.updateOrders();
+        this.$store.state.interval.make(this.updateOrders, 10000);
+
         this.addMessageHandler((result) => {
             if ('state.update' === result.method) {
                 this.updateMarketData(result);
@@ -142,6 +158,14 @@ export default {
         });
     },
     methods: {
+        updateOrders: function() {
+            this.$axios.single.get(this.$routing.generate('pending_orders', {
+                'tokenName': this.tokenName,
+            })).then((result) => {
+                this.buyOrders = result.data.buy;
+                this.sellOrders = result.data.sell;
+            }).catch((error) => { });
+        },
         updateMarketData: function(marketData) {
             if (!marketData.params) {
                 return;

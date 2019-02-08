@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Exception\BalanceException;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -16,6 +17,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
@@ -24,7 +26,7 @@ use Symfony\Component\Validator\Validation;
  * @Rest\Route("/api/tokens")
  * @Security(expression="is_granted('prelaunch')")
  */
-class TokenAPIController extends FOSRestController
+class TokensAPIController extends FOSRestController
 {
     /** @var EntityManagerInterface */
     private $em;
@@ -185,38 +187,22 @@ class TokenAPIController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get(
-     *     "/{tokenName}/balance",
-     *     name="fetch_balance_token",
-     *     options={"expose"=true},
-     *     requirements={"tokenName"="[a-zA-Z0-9]+"}
-     *     )
+     * @Rest\Get("/{name}/lock-period", name="lock-period", options={"expose"=true})
      */
-    public function fetchBalanceToken(string $tokenName, BalanceHandlerInterface $balanceHandler): View
+    public function lockPeriod(string $name): View
     {
-        $user = $this->getUser();
-        $token = $this->tokenManager->findByName($tokenName);
+        $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            return $this->view([
-                'error' => 'Can\'t find a valid token',
-            ], Response::HTTP_BAD_REQUEST);
+            throw $this->createNotFoundException('Token does not exist');
         }
 
-        $balance = $balanceHandler->balance($user, $token);
-
-        if ($balance->isFailed()) {
-            return $this->view([
-                'error' => 'Exchanger connection lost. Try to reload page.',
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        return $this->view($this->tokenManager->getRealBalance($token, $balance));
+        return $this->view($token->getLockIn());
     }
 
     /**
      * @Rest\View()
-     * @Rest\GET("/search", name="api_token_search")
+     * @Rest\Get("/search", name="token_search", options={"expose"=true})
      * @Rest\QueryParam(name="tokenName", allowBlank=false)
      */
     public function tokenSearch(ParamFetcherInterface $request): View
@@ -228,23 +214,33 @@ class TokenAPIController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\GET("/", name="tokens")
+     * @Rest\Get(name="tokens", options={"expose"=true})
      */
-    public function getTokens(
-        BalanceHandlerInterface $balanceHandler
-    ): View {
-        $tokens = $balanceHandler->balances(
-            $this->getUser(),
-            $this->getUser()->getRelatedTokens()
-        );
-        $predefinedTokens = $balanceHandler->balances(
-            $this->getUser(),
-            $this->tokenManager->findAllPredefined()
-        );
+    public function getTokens(BalanceHandlerInterface $balanceHandler): View
+    {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
+        try {
+            $common = $balanceHandler->balances(
+                $this->getUser(),
+                $this->getUser()->getRelatedTokens()
+            );
+        } catch (BalanceException $exception) {
+            if (BalanceException::EMPTY == $exception->getCode()) {
+                $common = [];
+            } else {
+                return $this->view(null, 500);
+            }
+        }
 
         return $this->view([
-            'common' => $tokens,
-            'predefined' => $predefinedTokens,
+            'common' => $common,
+            'predefined' => $balanceHandler->balances(
+                $this->getUser(),
+                $this->tokenManager->findAllPredefined()
+            ),
         ]);
     }
 }

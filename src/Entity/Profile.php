@@ -48,7 +48,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Regex(pattern="/^\w+$/")
      * @Assert\Length(min="2")
-     * @Groups({"Default"})
+     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $city;
@@ -57,14 +57,14 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
      * @Assert\Length(min="2")
-     * @Groups({"Default"})
+     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $country;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Groups({"Default"})
+     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $description;
