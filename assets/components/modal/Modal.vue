@@ -1,6 +1,7 @@
 <template>
     <b-modal :visible="visible" :size="size" @hidden="closeModal" hide-footer>
         <div slot="modal-header">
+            <slot name="header"></slot>
             <a class="modal-close float-right pr-2 c-pointer" @click="closeModal()">
                 &times;
             </a>

@@ -7,7 +7,7 @@
 {% block content %}
     <div class="container" id="profile">
         <div class="row  pt-5 justify-content-center">
-            <div class="col-md-8">
+            <div class="col-12 col-lg-4 col-md-6">
                 <div class="card">
                     <div class="card-header">
                         <span>{{ profile.firstName }} {{ profile.lastName }} </span>
@@ -20,7 +20,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row" v-if="!showEditForm">
-                            <div class="col-12 col-md-4">
+                            <div class="col-12">
                                 <div class="pb-1">
                                     City: {% if profile.city is not empty %}{{ profile.city }}{% else %}Not defined{% endif %}
                                 </div>
@@ -33,7 +33,7 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            <div class="col-12 col-md-8 pt-3 pt-md-0 description">
+                            <div class="col-12 pt-3">
                                 <div>{{ profile.description }}</div>
                             </div>
                         </div>
@@ -41,7 +41,7 @@
                         <div v-if="showEditForm" v-cloak>
                             {{ form_start(form) }}
                             <div class="row mb-3">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12">
                                     <div class="pb-1">
                                         {{ form_row(form.firstName) }}
                                     </div>
@@ -55,13 +55,13 @@
                                         {{ form_row(form.country) }}
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-8 pt-3 pt-md-0 description">
+                                <div class="col-12 pt-3  ">
                                     <div>
                                         {{ form_row(form.description) }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="text-right">
+                            <div class="text-left">
                                 <input type="submit" class="btn btn-primary" value="Save">
                                 <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
                             </div>

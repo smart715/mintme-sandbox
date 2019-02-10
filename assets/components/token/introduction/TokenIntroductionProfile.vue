@@ -8,11 +8,11 @@
                 <div class="row">
                     <div class="col-12">
                         <font-awesome-icon
-                            v-if="editable"
+                            v-if="showEditIcon"
                             class="icon-edit float-right c-pointer"
-                            :icon="icon"
+                            icon="edit"
                             transform="shrink-4 up-1.5"
-                            @click="editUrls"/>
+                            @click="editingUrls = true"/>
                         <a :href="profileUrl" target="_blank">
                             {{ profileUrl }}
                         </a>
@@ -25,11 +25,6 @@
                                             {{ currentWebsite }}
                                         </a>
                                         <guide>
-                                            <font-awesome-icon
-                                                icon="question"
-                                                slot='icon'
-                                                class="ml-1 mb-1 bg-primary text-white
-                                                rounded-circle square blue-question"/>
                                             <template  slot="header">
                                                 Web
                                             </template>
@@ -54,7 +49,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="pb-1" v-if="facebookUrl">
+                            <div class="pb-1">
                                 <token-facebook-address
                                     :app-id="facebookAppId"
                                     :editing="editingUrls"
@@ -62,7 +57,7 @@
                                     :update-url="updateUrl"
                                     :csrfToken="csrfToken"/>
                             </div>
-                            <div v-if="youtubeChannelId">
+                            <div class="pb-2">
                                 <token-youtube-address
                                     :client-id="youtubeClientId"
                                     :editable="editable"
@@ -74,7 +69,7 @@
                         </div>
                     </div>
 
-                    <div class="col-12 pt-3 text-right">
+                    <div class="col-12 pt-3 text-left" v-if="!editingUrls">
                         <b-dropdown id="share" text="Share" variant="primary">
                             <social-sharing :url="profileUrl"
                                 title="MINTME"
@@ -108,48 +103,47 @@
                             </social-sharing>
                         </b-dropdown>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal" :class="{ show: showConfirmWebsiteModal }" tabindex="-1" role="dialog">
-             <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Website Confirmation</h5>
-                        <button type="button" class="close" aria-label="Close" @click="showConfirmWebsiteModal = false">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <ol>
-                                    <li>
-                                        Download
-                                        <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
-                                    </li>
-                                    <li>Upload the file to {{ parsedWebsite }}</li>
-                                    <li>
-                                        Check if file was uploaded successfully by visiting
-                                        <a
-                                            :href="siteRequestUrl"
-                                            target="_blank"
-                                            rel="nofollow">
-                                            {{ siteRequestUrl }}
-                                        </a>
-                                    </li>
-                                    <li>Click confirm below</li>
-                                </ol>
-                            </div>
-                            <div class="col-12 text-center">
-                                <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
-                                <button class="btn btn-default" @click="showConfirmWebsiteModal = false">Cancel</button>
-                            </div>
-                        </div>
+                    <div class="col-md-12 text-left" v-if="editingUrls">
+                        <input type="submit" class="btn btn-primary" value="Save"  @click="editUrls"/>
+                        <a class="pl-3 c-pointer" @click="editingUrls = false">Cancel</a>
                     </div>
                 </div>
             </div>
         </div>
+        <modal
+            :visible="showConfirmWebsiteModal"
+            @close="closeModal">
+            <template slot="header">
+                <h5 class="modal-title">Website Confirmation</h5>
+            </template>
+            <template slot="body">
+                <div class="row">
+                    <div class="col-12">
+                        <ol>
+                            <li>
+                                Download
+                                <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
+                            </li>
+                            <li>Upload the file to {{ parsedWebsite }}</li>
+                            <li>
+                                Check if file was uploaded successfully by visiting
+                                <a
+                                    :href="siteRequestUrl"
+                                    target="_blank"
+                                    rel="nofollow">
+                                    {{ siteRequestUrl }}
+                                </a>
+                            </li>
+                            <li>Click confirm below</li>
+                        </ol>
+                    </div>
+                    <div class="col-12 text-left">
+                        <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
+                        <a class="pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
+                    </div>
+                </div>
+            </template>
+        </modal>
     </div>
 </template>
 
@@ -159,17 +153,18 @@ import TokenYoutubeAddress from '../TokenYoutubeAddress';
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown';
 import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
+import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isValidUrl} from '../../../js/utils';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
+import Modal from '../../modal/Modal';
 let SocialSharing = require('vue-social-sharing');
 
 Vue.use(SocialSharing);
 
-library.add(faEdit, faCheck);
+library.add(faEdit);
 Vue.use(Toasted, {
     position: 'top-center',
     duration: 5000,
@@ -198,13 +193,13 @@ export default {
         TokenFacebookAddress,
         TokenYoutubeAddress,
         Guide,
+        Modal,
     },
     data() {
         return {
             editingUrls: false,
             currentWebsite: this.websiteUrl,
             newWebsite: this.websiteUrl,
-            icon: 'edit',
             showConfirmWebsiteModal: false,
             showWebsiteError: false,
             parsedWebsite: '',
@@ -215,10 +210,13 @@ export default {
         siteRequestUrl: function() {
               return this.parsedWebsite + '/mintme.html';
         },
+        showEditIcon: function() {
+              return !this.editingUrls && this.editable;
+        },
     },
     methods: {
         editUrls: function() {
-            if (this.editingUrls && this.newWebsite.length && this.newWebsite !== this.websiteUrl) {
+            if (this.newWebsite.length && this.newWebsite !== this.websiteUrl) {
                 this.checkWebsiteUrl();
             }
 
@@ -229,9 +227,6 @@ export default {
             if (this.showWebsiteError) {
                 return;
             }
-
-            this.editingUrls = !this.editingUrls;
-            this.icon = this.editingUrls ? 'check' : 'edit';
         },
         checkWebsiteUrl: function() {
             this.showWebsiteError = false;

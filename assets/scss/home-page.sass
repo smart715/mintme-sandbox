@@ -58,6 +58,8 @@
     border-color: $white
     color: $primary
     font-size: 0.5em
+    @include media-breakpoint-up(md)
+      padding: .7% 3%
 
     &.btn-register-hover-light:hover
       background: $blue !important
@@ -114,8 +116,3 @@
           a
             text-decoration: none
             white-space: normal
-
-.top-navbar
-  .search-input
-    background-color: $ghost-light
-

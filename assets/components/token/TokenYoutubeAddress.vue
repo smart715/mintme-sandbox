@@ -10,40 +10,36 @@
                         target="_blank"
                         rel="nofollow">
                         https://www.youtube.com/channel/{{ this.currentChannelId }}
-                </a>
-                <div
-                    v-if="currentChannelId"
-                    class="g-ytsubscribe"
-                    :data-channelid="currentChannelId"
-                    data-layout="default"
-                    data-count="default">
+                    </a>
+                    <div
+                        v-if="currentChannelId"
+                        class="g-ytsubscribe"
+                        :data-channelid="currentChannelId"
+                        data-layout="default"
+                        data-count="default">
+                    </div>
+                    <guide>
+                        <template slot="header">
+                            Youtube
+                        </template>
+                        <template slot="body">
+                            Link to token creator’s YouTube. Before adding it, we confirmed ownership.
+                        </template>
+                    </guide>
                 </div>
-                <guide>
-                    <font-awesome-icon
-                        icon="question"
-                        slot='icon'
-                        class="ml-1 bg-primary text-white
-                        rounded-circle square blue-question"/>
-                    <template slot="header">
-                        Youtube
-                    </template>
-                    <template slot="body">
-                        Link to token creator’s YouTube. Before adding it, we confirmed ownership.
-                    </template>
-                </guide>
             </div>
-
+        </div>
+        <div v-show="editing">
+            <div class="d-block mx-0 my-1 p-0">
+                <a class="c-pointer" @click="addChannel">
+                    <font-awesome-icon
+                        :icon="{prefix: 'fab', iconName: 'youtube-square'}"
+                        size="lg"/>
+                    Add Youtube channel
+                </a>
+            </div>
         </div>
     </div>
-    <div v-show="editing">
-        <div class="col-lg-6 col-md-9  d-block mx-0 my-1 p-0">
-            <button class="btn btn-primary btn-block custom-social-btn" @click="addChannel">
-                <font-awesome-icon :icon="{prefix: 'fab', iconName: 'youtube-square'}" size="lg"/>
-                    Add Youtube channel
-        </button>
-    </div>
-</div>
-</div>
 </template>
 
 <script>

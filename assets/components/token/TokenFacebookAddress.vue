@@ -19,45 +19,35 @@
                             +currentAddressEncoded+'&amp;src=sdkpreparse'"
                             class="fb-xfbml-parse-ignore">
                             Share
-                    </a>
+                        </a>
+                    </div>
+                    <guide>
+                        <template slot="header">
+                            Facebook
+                        </template>
+                        <template slot="body">
+                            Link to token creator’s Facebook.
+                            Before adding it, we confirmed ownership.
+                        </template>
+                    </guide>
                 </div>
-                <guide>
-                    <font-awesome-icon
-                        icon="question"
-                        slot='icon'
-                        class="ml-1 bg-primary text-white
-                        rounded-circle square blue-question"/>
-                    <template slot="header">
-                        Facebook
-                    </template>
-                    <template slot="body">
-                        Link to token creator’s Facebook.
-                        Before adding it, we confirmed ownership.
-                    </template>
-                </guide>
             </div>
-
         </div>
-    </div>
-    <div v-show="editing">
-        <div class="col-lg-6 col-md-9 d-block mx-0 my-1 p-0">
-            <button class="btn btn-primary btn-block custom-social-btn" @click="addPage">
-                <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
+        <div v-show="editing">
+            <div class=" d-block mx-0 my-1 p-0">
+                <a class="c-pointer" @click="addPage">
+                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
                     Add Facebook address
-        </button>
-    </div>
-</div>
-
-<div class="modal" :class="{ show: showConfirmModal }" tabindex="-1" role="dialog">
-     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Facebook Confirmation</h5>
-                <button type="button" class="close" aria-label="Close" @click="showConfirmModal = false">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                </a>
             </div>
-            <div class="modal-body">
+        </div>
+        <modal
+            :visible="showConfirmModal"
+            @close="closeModal">
+            <template slot="header">
+                <h5 class="modal-title">Facebook Confirmation</h5>
+            </template>
+            <template slot="body">
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
@@ -75,14 +65,12 @@
                     </div>
                     <div class="col-12 text-center">
                         <button class="btn btn-primary" @click="savePage">Confirm</button>
-                        <button class="btn btn-default" @click="showConfirmModal = false">Cancel</button>
+                        <a class="c-pointer pl-3" @click="showConfirmModal = false">Cancel</a>
                     </div>
                 </div>
-            </div>
-        </div>
+            </template>
+        </modal>
     </div>
-</div>
-</div>
 </template>
 
 <script>
@@ -92,7 +80,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../Guide';
-
+import Modal from '../modal/Modal';
 library.add(faFacebookSquare);
 Vue.use(Toasted, {
     position: 'top-center',
@@ -114,6 +102,7 @@ export default {
     components: {
         FontAwesomeIcon,
         Guide,
+        Modal,
     },
     created: function() {
         this.loadFacebookSdk();

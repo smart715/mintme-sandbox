@@ -18,14 +18,13 @@
                 <div class="row">
                     <div class="col-12">
                         <span class="card-header-icon">
-                    <font-awesome-icon
-                        v-if="editable"
-                        class="float-right c-pointer icon-edit"
-                        :icon="icon"
-                        transform="shrink-4 up-1.5"
-                        @click="editDescription"
-                    />
-                </span>
+                            <font-awesome-icon
+                                v-if="showEditIcon"
+                                class="float-right c-pointer icon-edit"
+                                icon="edit"
+                                transform="shrink-4 up-1.5"
+                                @click="editingDescription = true"/>
+                        </span>
                         <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
@@ -49,6 +48,10 @@
                                     max="20000"
                                     @get-value="getValue">
                                 </limited-textarea>
+                                <div class="text-left pt-3">
+                                    <button class="btn btn-primary" @click="editDescription">Save</button>
+                                    <a class="pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -61,14 +64,13 @@
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
-import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import LimitedTextarea from '../../LimitedTextarea';
 import axios from 'axios';
 import Toasted from 'vue-toasted';
 
-library.add(faEdit, faCheck);
+library.add(faEdit);
 Vue.use(Toasted, {
     position: 'top-center',
     duration: 5000,
@@ -94,24 +96,21 @@ export default {
     data() {
         return {
             editingDescription: false,
-            icon: 'edit',
             currentDescription: this.description,
             newDescription: this.description,
         };
+    },
+    computed: {
+        showEditIcon: function() {
+            return !this.editingDescription && this.editable;
+        },
     },
     methods: {
         getValue: function(newValue) {
             this.newDescription = newValue;
         },
         editDescription: function() {
-            if (this.icon === 'check') {
-                return this.doEditDescription();
-            }
-            if (!this.editable) {
-                return;
-            }
-            this.editingDescription = !this.editingDescription;
-            this.icon = 'check';
+            return this.doEditDescription();
         },
         doEditDescription: function() {
             axios.patch(this.updateUrl, {

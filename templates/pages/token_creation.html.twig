@@ -3,7 +3,7 @@
 {% block title %}mintMe | Token Creation{% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div class="container" id="token">
         <div class="row pt-5 justify-content-center">
             <div class="col-lg-4 col-md-6">
                 <div class="card">
@@ -15,7 +15,7 @@
                         {{ form_widget(form) }}
 
                         <div class="form-group row">
-                            <div class="col-md-12 text-center">
+                            <div class="col-md-12 text-left">
                                 <input type="submit" class="btn btn-primary" value="Create token" />
                                 <a class="pl-3" href="javascript:history.back()">Cancel</a>
                             </div>
@@ -25,17 +25,17 @@
                 </div>
             </div>
         </div>
+        <modal
+            :visible="{{ profileCreated }}"
+            @close="closeModal">
+            <template slot="body">
+                <p>You need to create profile, only then you will be able to create token</p>
+                <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
+            </template>
+        </modal>
     </div>
+{% endblock %}
 
-    <div class="modal modal-alert {{ profileCreated ? '' : 'show' }}" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header"></div>
-                <div class="modal-body text-center pt-5 text-white">
-                    <p>You need to create profile, only then you will be able to create token</p>
-                    <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
-                </div>
-            </div>
-        </div>
-    </div>
+{% block pagescripts %}
+    <script src="{{ asset('build/token_creation.js') }}"></script>
 {% endblock %}

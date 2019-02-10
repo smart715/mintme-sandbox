@@ -19,7 +19,7 @@ $border-radius: 0;
 $ghost-dark: rgba(0, 0, 0, 0.15);
 $ghost-light: rgba(255, 255, 255, 0.25);
 $grey-light: #8A96A4;
-$grey-dark: #4C596A;
+$grey-dark: #778588;
 $yellow: #be8817;
 $orange: #f7931e;
 $green: #8dc63f;
@@ -92,8 +92,8 @@ $input-btn-focus-color: $input-bg;
 
 // Card
 $card-border-width: 0.6rem;
-$card-border-color: $ghost-light;
-$card-input-color: $grey-light;
+$card-border-color: $ghost-dark;
+$card-input-color: $grey-dark;
 $card-header-bg: $primary;
 $card-body-bg: $secondary;
 $card-text-color: $white;
