@@ -80,61 +80,61 @@ class Order
         $this->referralId = $referralId;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getMaker(): ?User
     {
         return $this->maker;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getTaker(): ?User
     {
         return $this->taker;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getMarket(): Market
     {
         return $this->market;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getAmount(): Money
     {
         return $this->amount;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getPrice(): Money
     {
         return $this->price;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getSide(): int
     {
         return $this->side;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getStatus(): string
     {
         return $this->status;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getTimestamp(): ?int
     {
         return $this->timestamp;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getFee(): ?float
     {
         return $this->fee;

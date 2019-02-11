@@ -3,6 +3,7 @@
 namespace App\Wallet\Model;
 
 use App\Wallet\Model\Exception\StatusException;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class Status
 {
@@ -34,6 +35,7 @@ class Status
         );
     }
 
+    /** @Groups({"API"}) */
     public function getStatusCode(): string
     {
         return $this->status;

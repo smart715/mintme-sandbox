@@ -1,6 +1,7 @@
 <template>
     <div class="trading">
         <slot name="title"></slot>
+        <template v-if="loaded">
         <div class="table-responsive">
             <b-table
                 :items="tokens"
@@ -16,6 +17,10 @@
                 v-model="currentPage"
                 class="my-0" />
         </div>
+        </template>
+        <template v-else>
+            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </template>
     </div>
 </template>
 
@@ -25,13 +30,9 @@ import WebSocketMixin from '../../js/mixins/websocket';
 export default {
     name: 'Trading',
     mixins: [WebSocketMixin],
-    props: {
-        tableContainerClass: String,
-        tableClass: String,
-        markets: String,
-    },
     data() {
         return {
+            markets: null,
             currentPage: 1,
             perPage: 25,
             fields: {
@@ -61,13 +62,10 @@ export default {
     },
     computed: {
         totalRows: function() {
-            return this.marketsInfo.length;
-        },
-        marketsInfo: function() {
-            return JSON.parse(this.markets);
+            return this.markets.length;
         },
         marketsHiddenNames: function() {
-            return Object.keys(this.marketsInfo);
+            return Object.keys(this.markets);
         },
         tokens: function() {
             let tokens = [];
@@ -75,57 +73,21 @@ export default {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
 
-            tokens.sort((first, second) => {
-                let firstVolume = parseFloat(first.volume);
-                let secondVolume = parseFloat(second.volume);
-
-                if (firstVolume > secondVolume) {
-                    return -1;
-                }
-
-                if (firstVolume < secondVolume) {
-                    return 1;
-                }
-
-                return 0;
-            });
+            tokens.sort((first, second) => parseFloat(first.volume) < parseFloat(second.volume));
 
             return this.sanitizedMarketsOnTop.concat(tokens);
         },
+        loaded: function() {
+            return this.markets !== null;
+        },
     },
     mounted() {
-        let markets = {};
-        for (let market in this.marketsInfo) {
-            if (this.marketsInfo.hasOwnProperty(market)) {
-                markets[market] = this.getSanitizedMarket(
-                    this.marketsInfo[market].cryptoSymbol,
-                    this.marketsInfo[market].tokenName,
-                    this.getPercentage(
-                        parseFloat(this.marketsInfo[market].last),
-                        parseFloat(this.marketsInfo[market].open)
-                    ),
-                    parseFloat(this.marketsInfo[market].last),
-                    parseFloat(this.marketsInfo[market].volume)
-                );
-            }
-        }
-        this.sanitizedMarkets = markets;
-
-        if (this.websocketUrl) {
-            this.addOnOpenHandler(() => {
-                const request = JSON.stringify({
-                    method: 'state.subscribe',
-                    params: this.marketsHiddenNames,
-                    id: parseInt(Math.random().toString().replace('0.', '')),
-                });
-                this.sendMessage(request);
-            });
-            this.addMessageHandler((result) => {
-                if ('state.update' === result.method) {
-                    this.sanitizeMarket(result);
-                }
-            });
-        }
+        this.$axios.retry.get(this.$routing.generate('markets_info'))
+            .then((res) => {
+                this.markets = res.data;
+                this.updateDataWithMarkets();
+            })
+            .catch(() => this.$toasted.error('Can not update the markets data. Try again later.'));
     },
     methods: {
         sanitizeMarket: function(marketData) {
@@ -140,8 +102,8 @@ export default {
             const marketVolume = parseFloat(marketInfo.volume);
             const changePercentage = this.getPercentage(marketLastPrice, marketOpenPrice);
 
-            const marketCurrency = this.marketsInfo[marketName].cryptoSymbol;
-            const marketToken = this.marketsInfo[marketName].tokenName;
+            const marketCurrency = this.markets[marketName].cryptoSymbol;
+            const marketToken = this.markets[marketName].tokenName;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -186,6 +148,40 @@ export default {
         },
         getPercentage: function(lastPrice, openPrice) {
             return openPrice ? (lastPrice - openPrice) * 100 / openPrice : 0;
+        },
+        updateDataWithMarkets: function() {
+            let markets = {};
+            for (let market in this.markets) {
+                if (this.markets.hasOwnProperty(market)) {
+                    markets[market] = this.getSanitizedMarket(
+                        this.markets[market].cryptoSymbol,
+                        this.markets[market].tokenName,
+                        this.getPercentage(
+                            parseFloat(this.markets[market].last),
+                            parseFloat(this.markets[market].open)
+                        ),
+                        parseFloat(this.markets[market].last),
+                        parseFloat(this.markets[market].volume)
+                    );
+                }
+            }
+            this.sanitizedMarkets = markets;
+
+            if (this.websocketUrl) {
+                this.addOnOpenHandler(() => {
+                    const request = JSON.stringify({
+                        method: 'state.subscribe',
+                        params: this.marketsHiddenNames,
+                        id: parseInt(Math.random().toString().replace('0.', '')),
+                    });
+                    this.sendMessage(request);
+                });
+                this.addMessageHandler((result) => {
+                    if ('state.update' === result.method) {
+                        this.sanitizeMarket(result);
+                    }
+                });
+            }
         },
     },
 };
