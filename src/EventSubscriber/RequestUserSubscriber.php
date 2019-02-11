@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -29,9 +30,12 @@ class RequestUserSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onRequest(): void
+    public function onRequest(GetResponseEvent $request): void
     {
-        if (is_object($this->tokenStorage->getToken()) && is_object($this->tokenStorage->getToken()->getUser())) {
+        if (is_object($this->tokenStorage->getToken()) &&
+            is_object($this->tokenStorage->getToken()->getUser()) &&
+            !$request->getRequest()->isXmlHttpRequest()
+        ) {
             /** @var User $user */
             $user = $this->tokenStorage->getToken()->getUser();
             $this->profileManager->createHash($user);

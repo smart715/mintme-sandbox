@@ -4,6 +4,7 @@ namespace App\Wallet\Model;
 
 use App\Entity\Crypto;
 use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class Transaction
 {
@@ -56,46 +57,55 @@ class Transaction
         $this->type = $type;
     }
 
+    /** @Groups({"API"}) */
     public function getHash(): string
     {
         return $this->hash;
     }
 
+    /** @Groups({"API"}) */
     public function getFromAddress(): ?string
     {
         return $this->from;
     }
 
+    /** @Groups({"API"}) */
     public function getToAddress(): string
     {
         return $this->to;
     }
 
+    /** @Groups({"API"}) */
     public function getAmount(): Money
     {
         return $this->amount;
     }
 
+    /** @Groups({"API"}) */
     public function getFee(): Money
     {
         return $this->fee;
     }
 
+    /** @Groups({"API"}) */
     public function getDate(): \DateTime
     {
         return $this->date;
     }
 
+    /** @Groups({"API"}) */
     public function getCrypto(): ?Crypto
     {
         return $this->crypto;
     }
 
+    /** @Groups({"API"}) */
     public function getStatus(): Status
     {
         return $this->status;
     }
 
+    /** @Groups({"API"}) */
     public function getType(): Type
     {
         return $this->type;

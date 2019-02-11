@@ -2,9 +2,9 @@
 
 namespace App\Controller\API;
 
+use App\Deposit\DepositGatewayCommunicatorInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Verify\WebsiteVerifierInterface;
-use App\Wallet\Exception\NotEnoughAmountException;
+use App\Manager\TokenManagerInterface;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
@@ -26,27 +26,27 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class WalletAPIController extends FOSRestController
 {
-    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 5;
+    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 50;
 
     /**
      * @Rest\View()
-     * @Rest\GET("/history/{page}", name="api_history", requirements={"page"="^[1-9]\d*$"})
+     * @Rest\GET(
+     *     "/history/{page}",
+     *     name="payment_history",
+     *     requirements={"page"="^[0-9]\d*$"},
+     *     options={"expose"=true}
+     *     )
+     * @return mixed[]
      */
     public function getDepositWithdrawHistory(
         int $page,
-        ParamFetcherInterface $request,
         WalletInterface $wallet
-    ): View {
-
-        $depositWithdrawHistory = $wallet
-            ->getWithdrawDepositHistory(
-                $this->getUser(),
-                $page - 1,
-                self::DEPOSIT_WITHDRAW_HISTORY_LIMIT
-            )
-        ;
-
-        return $this->view($depositWithdrawHistory);
+    ): array {
+        return $wallet->getWithdrawDepositHistory(
+            $this->getUser(),
+            $page * self::DEPOSIT_WITHDRAW_HISTORY_LIMIT,
+            self::DEPOSIT_WITHDRAW_HISTORY_LIMIT
+        );
     }
 
     /**
@@ -90,5 +90,23 @@ class WalletAPIController extends FOSRestController
         }
 
         return $this->view();
+    }
+
+
+    /**
+     * @Rest\View()
+     * @Rest\GET("/addresses", name="deposit_addresses", options={"expose"=true})
+     */
+    public function getDepositAddresses(
+        DepositGatewayCommunicatorInterface $depositCommunicator,
+        TokenManagerInterface $tokenManager
+    ): View {
+
+        $depositAddresses = $depositCommunicator->getDepositCredentials(
+            $this->getUser()->getId(),
+            $tokenManager->findAllPredefined()
+        )->toArray();
+
+        return $this->view($depositAddresses);
     }
 }

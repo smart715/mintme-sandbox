@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Balance;
 
+use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResultContainer;
@@ -43,7 +44,7 @@ class BalanceFetcher implements BalanceFetcherInterface
             $type,
             $this->random->getNumber(),
             $amount,
-            [ 'extra' => 1 ],
+            ['extra' => 1],
         ]);
 
         if ($responce->hasError()) {
@@ -53,16 +54,12 @@ class BalanceFetcher implements BalanceFetcherInterface
 
     public function summary(string $tokenName): SummaryResult
     {
-        try {
-            $response = $this->jsonRpc->send(self::SUMMARY_METHOD, [
-                $tokenName,
-            ]);
-        } catch (\Throwable $exception) {
-            return SummaryResult::fail();
-        }
+        $response = $this->jsonRpc->send(self::SUMMARY_METHOD, [
+            $tokenName,
+        ]);
 
         if ($response->hasError()) {
-            return SummaryResult::fail();
+            throw new BalanceException($response->getError()['message'] ?? 'get error response');
         }
 
         $result = $response->getResult();
@@ -80,20 +77,15 @@ class BalanceFetcher implements BalanceFetcherInterface
     public function balance(int $userId, array $tokenNames): BalanceResultContainer
     {
         if (!$tokenNames) {
-            return BalanceResultContainer::fail();
+            throw new BalanceException('Failed to get the balance. No token name', BalanceException::EMPTY);
         }
-
-        try {
-            $response = $this->jsonRpc->send(
-                self::BALANCE_METHOD,
-                array_merge([ $userId ], $tokenNames)
-            );
-        } catch (\Throwable $exception) {
-            return BalanceResultContainer::fail();
-        }
+        $response = $this->jsonRpc->send(
+            self::BALANCE_METHOD,
+            array_merge([$userId], $tokenNames)
+        );
 
         if ($response->hasError()) {
-            return BalanceResultContainer::fail();
+            throw new BalanceException($response->getError()['message'] ?? 'get error response');
         }
 
         $result = $response->getResult();

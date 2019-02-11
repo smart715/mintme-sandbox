@@ -20,7 +20,7 @@ class Market
         $this->token = $token;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getHiddenName(): string
     {
         $cryptoSymbol = strtoupper($this->crypto->getSymbol());
@@ -29,13 +29,13 @@ class Market
         return $tokenName.$cryptoSymbol;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getCurrencySymbol(): string
     {
         return $this->crypto->getSymbol();
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getTokenName(): ?string
     {
         return $this->token->getName();
