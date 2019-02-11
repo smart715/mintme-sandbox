@@ -112,8 +112,6 @@ export default {
         },
         ordersList: function() {
             return this.orders.map((order) => {
-                console.log(order);
-                console.log(this.userId);
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
