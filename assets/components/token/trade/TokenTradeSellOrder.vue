@@ -201,15 +201,12 @@ export default {
                 };
                 this.$axios.single.post(this.placeOrderUrl, data)
                     .then(({data}) => this.showModalAction(data))
-                    .catch(() => this.showModalAction({
-                        result: 2,
-                        message: 'Order has failed. Try again later.',
-                    }));
+                    .catch(() => this.showModalAction());
             }
         },
         showModalAction: function(data) {
-            this.modalSuccess = 1 === data.result;
-            this.modalTitle = this.modalSuccess ? '': data.message;
+            this.modalSuccess = data && 1 === data.result;
+            this.modalTitle = this.modalSuccess ? '': data ? data.message : '';
             this.showModal = true;
         },
     },
