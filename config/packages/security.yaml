@@ -51,7 +51,6 @@ security:
         - { path: ^/settings, role: ROLE_USER }
         - { path: ^/wallet, role: ROLE_USER }
         - { path: ^/api/wallet, role: ROLE_USER }
-        - { path: ^/api/token/[a-zA-Z0-9]+/balance, role: ROLE_USER }
         - { path: ^/2fa, role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+, role: ROLE_USER }

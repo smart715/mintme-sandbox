@@ -3,6 +3,7 @@
 namespace App\Wallet\Model;
 
 use App\Wallet\Model\Exception\TypeException;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class Type
 {
@@ -33,6 +34,7 @@ class Type
         );
     }
 
+    /** @Groups({"API"}) */
     public function getTypeCode(): string
     {
         return $this->type;

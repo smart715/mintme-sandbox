@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card h-100">
             <div class="card-header"></div>
             <div class="card-body p-2">
@@ -82,7 +82,6 @@ export default {
     mixins: [WebSocketMixin],
     props: {
         websocketUrl: String,
-        containerClass: String,
         marketName: Object,
         currency: String,
     },
