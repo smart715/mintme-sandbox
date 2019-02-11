@@ -107,11 +107,15 @@ export default {
         };
     },
     computed: {
+        filtered: function() {
+          this.groupByPrice();
+          return this.orders;
+        },
         total: function() {
             return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sum_web) + sum, 0));
         },
         ordersList: function() {
-            return this.orders.map((order) => {
+            return this.filtered.map((order) => {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
@@ -148,7 +152,7 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            this.$axios.get(
+            this.$axios.single.get(
                 this.$routing.generate('orders_cancel', {
                     orders: JSON.stringify(
                         this.removeOrders.map((order) => {
@@ -160,10 +164,10 @@ export default {
                 this.$toasted.show('Service unavailable, try again later');
             });
         },
-        groupByPrice: function(orders) {
+        groupByPrice: function() {
             this.orders = [];
             let grouped = [];
-            JSON.parse(JSON.stringify(orders)).forEach( (item) => {
+            JSON.parse(JSON.stringify(this.buyOrders)).forEach( (item) => {
                 let price = toMoney(item.price);
                 if (grouped[price] === undefined) {
                     grouped[price] = [];
@@ -185,11 +189,6 @@ export default {
                 this.orders.push(grouped[orders][0]);
                 }
             }
-        },
-    },
-    watch: {
-        buyOrders: function(val) {
-            this.groupByPrice(val);
         },
     },
 };
