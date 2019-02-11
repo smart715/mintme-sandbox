@@ -113,6 +113,7 @@ export default {
                         this.addMessageHandler((response) => {
                             if ('order.update' === response.method) {
                                 this.updateOrders(response.params[1], response.params[0]);
+                                this.$refs.table.refresh();
                             }
                         });
                     })

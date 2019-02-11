@@ -124,6 +124,7 @@ export default {
                 'tokenName': this.tokenName,
             })).then((result) => {
                 this.history = result.data;
+                this.$refs.table.refresh();
             }).catch((error) => { });
         },
     },
