@@ -78,10 +78,8 @@ class TokenController extends AbstractController
     public function show(
         string $name,
         ?string $tab,
-        BalanceHandlerInterface $balanceHandler,
         TokenNameConverterInterface $tokenNameConverter,
-        NormalizerInterface $normalizer,
-        MarketHandlerInterface $marketHandler
+        NormalizerInterface $normalizer
     ): Response {
         $token = $this->tokenManager->findByName($name);
 
@@ -90,57 +88,19 @@ class TokenController extends AbstractController
         }
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
-        $market = $webCrypto ?
-            $this->marketManager->getMarket($webCrypto, $token) :
-            null;
-
-        $balances = $this->getUser() && $webCrypto ?
-            $balanceHandler->balances($this->getUser(), [$token, Token::getFromCrypto($webCrypto)]) :
-            [];
-
-        $hash = $this->getUser()
-            ? $this->getUser()->getHash()
-            : '';
-
-        $tokenAuthor = $token->getProfile()->getUser();
-
-        $tokens =  $balanceHandler->balances($tokenAuthor, $tokenAuthor->getRelatedTokens());
-
-        $pendingSellOrders = $market
-            ? $marketHandler->getPendingSellOrders($market)
-            : [];
-
-        $pendingBuyOrders = $market
-            ? $marketHandler->getPendingBuyOrders($market)
-            : [];
-
-        $executedOrders = $market
-            ? $marketHandler->getExecutedOrders($market)
-            : [];
+        $market = $webCrypto
+            ? $this->marketManager->getMarket($webCrypto, $token)
+            : null;
 
         return $this->render('pages/token.html.twig', [
             'token' => $token,
             'currency' => Token::WEB_SYMBOL,
-            'tokens' => $normalizer->normalize($tokens, null, [
-                'groups' => [ 'Default' ],
-            ]),
-            'pendingSellOrders' => $normalizer->normalize($pendingSellOrders, null, [
-                'groups' => [ 'Default' ],
-            ]),
-            'pendingBuyOrders' => $normalizer->normalize($pendingBuyOrders, null, [
-                'groups' => [ 'Default' ],
-            ]),
-            'executedOrders' => $normalizer->normalize($executedOrders, null, [
-                'groups' => [ 'Default' ],
-            ]),
-            'stats' => $normalizer->normalize($token->getLockIn(), null, ['groups' => [ 'Default' ]]),
-            'hash' => $hash,
+            'stats' => $normalizer->normalize($token->getLockIn(), null, ['groups' => ['Default']]),
+            'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
             'marketName' => $normalizer->normalize($market, null, ['groups' => ['Default']]),
-            'balances' => $normalizer->normalize($balances),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
@@ -213,7 +173,7 @@ class TokenController extends AbstractController
             $this->em->flush();
         }
 
-        $fileContent = WebsiteVerifierInterface::PREFIX.': '.$token->getWebsiteConfirmationToken();
+        $fileContent = WebsiteVerifierInterface::PREFIX . ': ' . $token->getWebsiteConfirmationToken();
         $response = new Response($fileContent);
 
         $disposition = $response->headers->makeDisposition(
@@ -239,7 +199,7 @@ class TokenController extends AbstractController
             'tab' => $showtab,
         ]);
     }
-    
+
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();

@@ -20,15 +20,10 @@ class TradingController extends AbstractController
     /**
      * @Route("/trading", name="trading")
      */
-    public function trading(
-        MarketManagerInterface $marketManager,
-        Market\MarketHandlerInterface $marketHandler,
-        NormalizerInterface $normalizer
-    ): Response {
-        $marketsInfo = $marketHandler->getMarketsInfo($marketManager->getAllMarkets());
-
+    public function trading(MarketManagerInterface $marketManager): Response
+    {
         return $this->render('pages/trading.html.twig', [
-            'markets' => $normalizer->normalize($marketsInfo, null, ['groups' => ['Default']]),
+            'markets' => $marketManager->getAllMarkets(),
         ]);
     }
 }

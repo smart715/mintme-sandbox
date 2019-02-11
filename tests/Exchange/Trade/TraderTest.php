@@ -153,7 +153,7 @@ class TraderTest extends TestCase
     public function testGetFinishedOrders(
         bool $hasError,
         array $error,
-        array $result,
+        ?array $result,
         array $finishedOrders
     ): void {
         $method = 'order.finished';
@@ -179,6 +179,10 @@ class TraderTest extends TestCase
             $this->createAppDateTime(new \DateTimeImmutable())
         );
 
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
         $this->assertEquals(
             $finishedOrders,
             $trader->getFinishedOrders(
@@ -193,7 +197,7 @@ class TraderTest extends TestCase
     {
         return [
             [false, [], $this->getRawOrders(), $this->getOrders(Order::FINISHED_STATUS)],
-            [true, ['code' => 1, 'message' => 'invalid arguments'], [], []],
+            [true, ['code' => 1, 'message' => 'invalid arguments'], null, []],
         ];
     }
 
@@ -213,12 +217,11 @@ class TraderTest extends TestCase
             $this->createAppDateTime(new \DateTimeImmutable())
         );
 
-        $this->assertEquals(
-            [],
-            $trader->getFinishedOrders(
-                $this->createUser(),
-                $this->createMarket()
-            )
+        $this->expectException(FetchException::class);
+
+        $trader->getFinishedOrders(
+            $this->createUser(),
+            $this->createMarket()
         );
     }
 
@@ -226,7 +229,7 @@ class TraderTest extends TestCase
     public function testGetPendingOrders(
         bool $hasError,
         array $error,
-        array $result,
+        ?array $result,
         array $pendingOrders
     ): void {
         $method = 'order.pending';
@@ -252,6 +255,10 @@ class TraderTest extends TestCase
             $this->createAppDateTime(new \DateTimeImmutable())
         );
 
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
         $this->assertEquals(
             $pendingOrders,
             $trader->getPendingOrders(
@@ -266,7 +273,7 @@ class TraderTest extends TestCase
     {
         return [
             [false, [], $this->getRawOrders(), $this->getOrders(Order::PENDING_STATUS)],
-            [true, ['code' => 1, 'message' => 'invalid arguments'], [], []],
+            [true, ['code' => 1, 'message' => 'invalid arguments'], null, []],
         ];
     }
 
@@ -285,12 +292,11 @@ class TraderTest extends TestCase
             $this->createPrelaunchConfig(false, new \DateTimeImmutable()),
             $this->createAppDateTime(new \DateTimeImmutable())
         );
-        $this->assertEquals(
-            [],
-            $trader->getPendingOrders(
-                $this->createUser(),
-                $this->createMarket()
-            )
+        $this->expectException(FetchException::class);
+
+        $trader->getPendingOrders(
+            $this->createUser(),
+            $this->createMarket()
         );
     }
 

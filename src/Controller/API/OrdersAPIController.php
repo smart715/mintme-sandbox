@@ -17,12 +17,11 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use http\Exception\InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @Rest\Route("/api/orders")
@@ -48,17 +47,13 @@ class OrdersAPIController extends FOSRestController
     /** @var MarketManagerInterface */
     private $marketManager;
 
-    /** @var NormalizerInterface */
-    protected $normalizer;
-
     public function __construct(
         TraderInterface $trader,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         MarketNameParserInterface $marketParser,
         MarketHandlerInterface $marketHandler,
-        MarketManagerInterface $marketManager,
-        NormalizerInterface $normalizer
+        MarketManagerInterface $marketManager
     ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
@@ -66,7 +61,6 @@ class OrdersAPIController extends FOSRestController
         $this->marketParser = $marketParser;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
-        $this->normalizer = $normalizer;
     }
 
     /**
@@ -75,6 +69,10 @@ class OrdersAPIController extends FOSRestController
      */
     public function cancelOrders(string $orders): View
     {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
         $response = [
                 'result' => [],
                 'message' => [],
@@ -123,6 +121,10 @@ class OrdersAPIController extends FOSRestController
         MarketManagerInterface $marketManager,
         MoneyWrapperInterface $moneyWrapper
     ): View {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
         $token = $this->tokenManager->findByName($request->get('tokenName'));
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
@@ -173,10 +175,11 @@ class OrdersAPIController extends FOSRestController
 
 
     /**
-     *  @Rest\Get("/pending/{tokenName}", name="pending_orders", options={"expose"=true})
-     *  @Rest\View()
+     * @Rest\Get("/{tokenName}/pending", name="pending_orders", options={"expose"=true})
+     * @Rest\View()
+     * @return mixed[]
      */
-    public function getPendingBuyOrder(String $tokenName): View
+    public function getPendingOrders(String $tokenName): array
     {
         $market = $this->getMarket($tokenName);
 
@@ -188,26 +191,64 @@ class OrdersAPIController extends FOSRestController
             ? ['sell' => $this->marketHandler->getPendingSellOrders($market)]
             : [];
 
-        $orders = array_merge($pendingBuyOrders, $pendingSellOrders);
-        return $this->view(
-            $this->normalizer->normalize($orders, null, ['groups' => [ 'Default' ]])
+        return array_merge($pendingBuyOrders, $pendingSellOrders);
+    }
+
+    /**
+     * @Rest\Get("/{tokenName}/executed", name="executed_orders", options={"expose"=true})
+     * @Rest\View()
+     * @return Order[]
+     */
+    public function getExecutedOrders(String $tokenName): array
+    {
+        $market = $this->getMarket($tokenName);
+
+        return $market
+            ? $this->marketHandler->getExecutedOrders($market)
+            : [];
+    }
+
+    /**
+     * @Rest\Get("/executed", name="executed_user_orders", options={"expose"=true})
+     * @Rest\View()
+     * @return Order[]
+     */
+    public function getExecutedUserOrders(): array
+    {
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $user = $this->getUser();
+        $markets = $this->marketManager->getUserRelatedMarkets($user);
+
+        if (!$markets) {
+            return [];
+        }
+
+        return $this->marketHandler->getUserExecutedHistory(
+            $user,
+            $markets
         );
     }
 
     /**
-     *  @Rest\Get("/executed/{tokenName}", name="executed_orders", options={"expose"=true})
-     *  @Rest\View()
+     * @Rest\Get("/pending", name="orders", options={"expose"=true})
+     * @Rest\View()
+     * @return Order[]
      */
-    public function getExecutedOrders(String $tokenName): View
+    public function getPendingUserOrders(): array
     {
-        $market = $this->getMarket($tokenName);
+        if (!$this->getUser()) {
+            throw new AccessDeniedHttpException();
+        }
 
-        $pendingBuyOrders = $market
-            ? $this->marketHandler->getExecutedOrders($market)
-            : [];
+        /** @var User $user */
+        $user = $this->getUser();
 
-        return $this->view(
-            $this->normalizer->normalize($pendingBuyOrders, null, ['groups' => [ 'Default' ]])
+        return $this->marketHandler->getPendingOrdersByUser(
+            $user,
+            $this->marketManager->getUserRelatedMarkets($user)
         );
     }
 

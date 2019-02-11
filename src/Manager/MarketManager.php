@@ -32,7 +32,7 @@ class MarketManager implements MarketManagerInterface
     public function getAllMarkets(): array
     {
         return $this->getMarkets(
-            $this->cryptoManager->findAll(),
+            $this->getMainCryptos(),
             $this->tokenManager->findAll()
         );
     }
@@ -41,9 +41,21 @@ class MarketManager implements MarketManagerInterface
     public function getUserRelatedMarkets(User $user): array
     {
         return $this->getMarkets(
-            $this->cryptoManager->findAll(),
+            $this->getMainCryptos(),
             $user->getRelatedTokens()
         );
+    }
+
+    /** @return Crypto[] */
+    private function getMainCryptos(): array
+    {
+        $web = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+
+        if (!$web) {
+            throw new \InvalidArgumentException('Can not find valid currency to trade');
+        }
+
+        return [$web];
     }
 
     /**

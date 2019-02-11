@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card">
             <confirm-modal
                     :visible="confirmModal"
@@ -16,6 +16,7 @@
             </confirm-modal>
             <div class="card-header">
                 Buy Orders
+                <template v-if="loaded">
                 <span class="card-header-icon">
                     Total: {{ total }} WEB
                     <guide>
@@ -27,9 +28,14 @@
                         </template>
                     </guide>
                 </span>
+                </template>
+                <template v-else>
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                </template>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
+                    <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
@@ -51,6 +57,10 @@
                     <div v-if="!hasOrders">
                         <h4 class="text-center p-5">No order was added yet</h4>
                     </div>
+                    </template>
+                    <template v-else>
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </template>
                 </div>
             </div>
         </div>
@@ -66,8 +76,7 @@ import Decimal from 'decimal.js';
 export default {
     name: 'TokenTradeBuyOrders',
     props: {
-        containerClass: String,
-        buyOrders: Array,
+        buyOrders: [Array, Object],
         tokenName: String,
         userId: Number,
     },
@@ -117,6 +126,9 @@ export default {
         },
         hasOrders: function() {
               return this.buyOrders.length > 0;
+        },
+        loaded: function() {
+            return this.buyOrders !== null;
         },
     },
     methods: {
