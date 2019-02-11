@@ -3,12 +3,23 @@ fos_rest:
     param_fetcher_listener:  true
     allowed_methods_listener:  true
     routing_loader: true
+
+    access_denied_listener:
+        json: true
+
+    exception:
+        codes:
+            'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException': 401
+
     view:
         view_response_listener:  true
+
     service:
         serializer: fos_rest.serializer.symfony
+
     serializer:
         groups: ['API']
+
     format_listener:
         rules:
             - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [ json ] }

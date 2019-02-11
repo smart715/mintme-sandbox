@@ -26,7 +26,8 @@ class WithdrawStorageTest extends TestCase
         $this->assertEquals(99, $storage->requestBalance('web'));
 
         $response->method('hasError')->willReturn(true);
-        $this->assertEquals([], $storage->requestHistory(1, 0, 10));
+        $this->expectException(\Throwable::class);
+        $storage->requestHistory(1, 0, 10);
         $this->assertEquals(0, $storage->requestBalance('web'));
 
         $rpc->method('send')->willThrowException(new \Exception());

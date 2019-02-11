@@ -53,7 +53,7 @@ class Profile
      * @Assert\Regex(pattern="/^[A-Za-z\s-]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default"})
+     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $city;
@@ -63,7 +63,7 @@ class Profile
      * @Assert\Country()
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default"})
+     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $country;
@@ -71,7 +71,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Length(max="150")
-     * @Groups({"Default"})
+     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $description;

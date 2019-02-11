@@ -10,7 +10,6 @@ use App\Wallet\Model\Transaction;
 interface DepositGatewayCommunicatorInterface extends RowsFetcherInterface
 {
     public function getDepositCredentials(int $userId, array $predefinedToken): DepositCredentials;
-    public function getUnavailableCredentials(array $predefinedTokens): DepositCredentials;
 
     /** @return Transaction[] */
     public function getTransactions(User $user, int $offset, int $limit): array;

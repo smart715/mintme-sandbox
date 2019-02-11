@@ -132,7 +132,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getProfile(): ?Profile
     {
         return $this->profile;

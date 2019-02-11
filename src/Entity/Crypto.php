@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CryptoRepository")
@@ -46,16 +47,19 @@ class Crypto
      */
     protected $fee;
 
+    /** @Groups({"API"}) */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /** @Groups({"API"}) */
     public function getSymbol(): string
     {
         return $this->symbol;
     }
 
+    /** @Groups({"API"}) */
     public function getSubunit(): int
     {
         return $this->subunit;

@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 class MarketFetcherTest extends TestCase
 {
     /** @dataProvider pendingSellOrdersProvider */
-    public function testGetPendingSellOrders(bool $hasError, array $rpcResult, array $sellOrders): void
+    public function testGetPendingSellOrders(bool $hasError, ?array $rpcResult, array $sellOrders): void
     {
         $method = 'order.book';
         $params = ['TOK000000000001WEB', 1, 0, 100];
@@ -33,6 +33,9 @@ class MarketFetcherTest extends TestCase
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc);
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
         $this->assertEquals(
             $rpcResult,
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
@@ -43,7 +46,7 @@ class MarketFetcherTest extends TestCase
     {
         return [
             [false, $this->getPendingResult(Order::SELL_SIDE), $this->getPendingOrders(Order::SELL_SIDE)],
-            [true, [], []],
+            [true, null, []],
         ];
     }
 
@@ -54,6 +57,7 @@ class MarketFetcherTest extends TestCase
             ->will($this->throwException(new FetchException()));
 
         $marketFetcher = new MarketFetcher($jsonRpc);
+        $this->expectException(FetchException::class);
         $this->assertEquals(
             [],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
@@ -61,7 +65,7 @@ class MarketFetcherTest extends TestCase
     }
 
     /** @dataProvider pendingBuyOrdersProvider */
-    public function testGetPendingBuyOrders(bool $hasError, array $rpcResult, array $buyOrders): void
+    public function testGetPendingBuyOrders(bool $hasError, ?array $rpcResult, array $buyOrders): void
     {
         $method = 'order.book';
         $params = ['TOK000000000001WEB', 2, 0, 100];
@@ -76,6 +80,9 @@ class MarketFetcherTest extends TestCase
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc);
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
         $this->assertEquals(
             $rpcResult,
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
@@ -86,7 +93,7 @@ class MarketFetcherTest extends TestCase
     {
         return [
             [false, $this->getPendingResult(Order::BUY_SIDE), $this->getPendingOrders(Order::BUY_SIDE)],
-            [true, [], []],
+            [true, null, []],
         ];
     }
 
@@ -97,6 +104,7 @@ class MarketFetcherTest extends TestCase
             ->will($this->throwException(new FetchException()));
 
         $marketFetcher = new MarketFetcher($jsonRpc);
+        $this->expectException(FetchException::class);
         $this->assertEquals(
             [],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
@@ -104,7 +112,7 @@ class MarketFetcherTest extends TestCase
     }
 
     /** @dataProvider executedOrdersProvider */
-    public function testGetExecutedOrders(bool $hasError, array $rpcResult, array $orders): void
+    public function testGetExecutedOrders(bool $hasError, ?array $rpcResult, array $orders): void
     {
         $method = 'market.deals';
         $params = ['TOK000000000001WEB', 100, 0];
@@ -118,6 +126,10 @@ class MarketFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
         $marketFetcher = new MarketFetcher($jsonRpc);
         $this->assertEquals(
             $rpcResult,
@@ -129,7 +141,7 @@ class MarketFetcherTest extends TestCase
     {
         return [
             [false, $this->getExecutedResult(), $this->getExecutedOrders()],
-            [true, [], []],
+            [true, null, []],
         ];
     }
 
@@ -140,8 +152,9 @@ class MarketFetcherTest extends TestCase
             ->will($this->throwException(new FetchException()));
 
         $marketFetcher = new MarketFetcher($jsonRpc);
+        $this->expectException(FetchException::class);
         $this->assertEquals(
-            [],
+            null,
             $marketFetcher->getExecutedOrders('TOK000000000001WEB')
         );
     }
