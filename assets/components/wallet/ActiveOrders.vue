@@ -2,9 +2,11 @@
     <div class="pb-3">
         <div class="table-responsive">
             <confirm-modal
+                :loading="cancelingOrder"
                 :visible="confirmModal"
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
+                @success="orderSucces"
             >
                 <div>
                     Are you sure that you want to remove {{ this.currentRow.name }}
@@ -60,6 +62,7 @@ export default {
             perPage: 10,
             pageOptions: [10, 20, 30],
             confirmModal: false,
+            cancelingOrder: false,
             tokenName: null,
             amount: null,
             price: null,
@@ -174,9 +177,16 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            this.$axios.get(this.actionUrl).catch(() => {
+            this.cancelingOrder = true;
+            this.$axios.get(this.actionUrl).then(({data}) => {
+                    if (data.result === 1) {
+                        this.switchConfirmModal(false);
+                    } else {
+                        this.$toasted.error(data.message);
+                    }
+                }).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
-            });
+            }).then(() => {this.cancelingOrder = false});
         },
         getMarketFromName: function(name) {
             return this.markets.find((market) => market.hiddenName === name);

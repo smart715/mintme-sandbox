@@ -1,5 +1,6 @@
 <template>
     <modal
+        :loading="loading"
         :visible="visible"
         @close="closeModal">
         <template slot="body">
@@ -11,6 +12,7 @@
                 <button
                     class="btn btn-primary"
                     @click="onConfirm">
+                    <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
                     <slot name="confirm">CONFIRM</slot>
                 </button>
                 <a
@@ -33,13 +35,17 @@ export default {
     },
     props: {
         visible: Boolean,
+        loading: {
+            type: Boolean,
+            default: false,
+        },
     },
     methods: {
         closeModal: function() {
             this.$emit('close');
         },
         onConfirm: function() {
-            this.closeModal();
+            this.$emit('loading', true);
             this.$emit('confirm');
         },
         onCancel: function() {
