@@ -110,12 +110,12 @@ export default {
             this.$emit('close');
         },
         onWithdraw: function() {
-            if (this.$v.address.$error || this.$v.amount.$error) {
-                this.$toasted.error('Correct your form fields');
+            if (this.loading) {
                 return;
             }
 
-            if (this.loading) {
+            if (this.$v.address.$error || this.$v.amount.$error) {
+                this.$toasted.error('Correct your form fields');
                 return;
             }
 
