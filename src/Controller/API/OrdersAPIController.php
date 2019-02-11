@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -172,7 +173,6 @@ class OrdersAPIController extends FOSRestController
             Response::HTTP_ACCEPTED
         );
     }
-
 
     /**
      * @Rest\Get("/{tokenName}/pending", name="pending_orders", options={"expose"=true})

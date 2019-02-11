@@ -147,7 +147,7 @@ class Order
     }
 
     /** @Groups({"Default", "API"}) */
-    public function getToken(): Token
+    public function getToken(): ?Token
     {
         return $this->market->getToken();
     }
