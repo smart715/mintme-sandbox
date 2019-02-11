@@ -29,10 +29,11 @@ export default {
     props: {
         type: Boolean,
         visible: Boolean,
+        modalTitle: String,
     },
     computed: {
         title: function() {
-            return (this.type) ? 'Order Created' : 'Order Failed';
+            return (this.type) ? 'Order Created' : this.modalTitle ? this.modalTitle: 'Order Failed';
         },
     },
     methods: {

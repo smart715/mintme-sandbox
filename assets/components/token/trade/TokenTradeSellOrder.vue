@@ -143,6 +143,7 @@
             </div>
         </div>
         <order-modal
+            :modal-title="modalTitle"
             :type="modalSuccess"
             :visible="showModal"
             @close="showModal = false"
@@ -178,6 +179,7 @@ export default {
     },
     data() {
         return {
+            modalTitle: '',
             immutableBalance: this.balance,
             sellPrice: 0,
             sellAmount: 0,
@@ -198,12 +200,16 @@ export default {
                     'action': this.action,
                 };
                 this.$axios.single.post(this.placeOrderUrl, data)
-                    .then((response) => this.showModalAction(response.data.result))
-                    .catch((error) => this.showModalAction());
+                    .then(({data}) => this.showModalAction(data))
+                    .catch(() => this.showModalAction({
+                        result: 2,
+                        message: 'Order has failed. Try again later.',
+                    }));
             }
         },
-        showModalAction: function(result) {
-            this.modalSuccess = 1 === result;
+        showModalAction: function(data) {
+            this.modalSuccess = 1 === data.result;
+            this.modalTitle = this.modalSuccess ? '': data.message;
             this.showModal = true;
         },
     },
