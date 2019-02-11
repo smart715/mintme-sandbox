@@ -33,7 +33,7 @@ export default {
     },
     computed: {
         title: function() {
-            return (this.type) ? 'Order Created' : this.modalTitle ? this.modalTitle: 'Order Failed';
+            return (this.type) ? 'Order Created' : this.modalTitle ? this.modalTitle : 'Order Failed';
         },
     },
     methods: {
