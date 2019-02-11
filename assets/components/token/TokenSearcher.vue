@@ -42,7 +42,7 @@ export default {
     },
     methods: {
         searchUpdate: function(value) {
-            this.$axios.get(
+            this.$axios.retry.get(
                 this.searchUrl,
                 {params: {tokenName: value}}
             ).then((response) => {

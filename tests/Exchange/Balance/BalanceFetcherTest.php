@@ -61,10 +61,9 @@ class BalanceFetcherTest extends TestCase
             $this->mockRandom(21),
             $this->mockMoneyWrapper()
         );
+        $this->expectException(FetchException::class);
 
-        $result = $handler->balance(1, ['TOK999'])->get('TOK999');
-
-        $this->assertTrue($result->isFailed());
+        $handler->balance(1, ['TOK999'])->get('TOK999');
     }
 
     public function testSummary(): void
@@ -110,10 +109,8 @@ class BalanceFetcherTest extends TestCase
             $this->mockRandom(21),
             $this->mockMoneyWrapper()
         );
-
-        $result = $handler->summary('TOK999');
-
-        $this->assertTrue($result->isFailed());
+        $this->expectException(FetchException::class);
+        $handler->summary('TOK999');
     }
 
     public function testSummaryWithError(): void
@@ -132,9 +129,9 @@ class BalanceFetcherTest extends TestCase
             $this->mockMoneyWrapper()
         );
 
-        $result = $handler->summary('TOK999');
+        $this->expectException(BalanceException::class);
 
-        $this->assertTrue($result->isFailed());
+        $handler->summary('TOK999');
     }
 
     public function testBalanceUpdateThrowsException(): void

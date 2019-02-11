@@ -56,7 +56,7 @@ class MarketInfo
         $this->deal = $deal;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getLast(): Money
     {
         return $this->last;
@@ -82,25 +82,25 @@ class MarketInfo
         return $this->close;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getOpen(): Money
     {
         return $this->open;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getVolume(): Money
     {
         return $this->volume;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getCryptoSymbol(): string
     {
         return $this->cryptoSymbol;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getTokenName(): ?string
     {
         return $this->tokenName;

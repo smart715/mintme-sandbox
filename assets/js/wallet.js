@@ -10,6 +10,13 @@ new Vue({
     return {
       tabIndex: 0,
       tabIndexsWithoutPadding: [1, 2, 3],
+      depositAddresses: null,
+      tokens: null,
+      predefinedTokens: null,
+      executedHistory: null,
+      depositWithdrawHistory: null,
+      markets: null,
+      orders: null,
     };
   },
   computed: {
