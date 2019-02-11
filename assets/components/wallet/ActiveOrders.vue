@@ -7,7 +7,6 @@
                 :visible="confirmModal"
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
-                @success="orderSucces"
             >
                 <div>
                     Are you sure that you want to remove {{ this.currentRow.name }}
