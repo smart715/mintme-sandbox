@@ -95,10 +95,11 @@ export default {
                         this.$routing.generate('payment_history', {page: this.currentPage})
                     )
                     .then((response) => {
+                        if (this.history.data === null) {
+                            this.history.data = response.data;
+                        }
                         if (response.data.length > 0) {
-                            if (this.history.data === null) {
-                                this.history.data = response.data;
-                            } else {
+                            if (this.history.data !== null) {
                                 this.history.data = this.history.data.concat(response.data);
                             }
                             this.canRequestNextPage = true;
