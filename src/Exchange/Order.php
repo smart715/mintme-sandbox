@@ -2,6 +2,7 @@
 
 namespace App\Exchange;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -143,5 +144,11 @@ class Order
     public function getReferralId(): int
     {
         return $this->referralId;
+    }
+
+    /** @Groups({"Default", "API"}) */
+    public function getToken(): Token
+    {
+        return $this->market->getToken();
     }
 }

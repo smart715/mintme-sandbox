@@ -108,10 +108,10 @@ export default {
                         ? order.taker.profile.firstName + order.taker.profile.lastName
                         : '',
                     maker_url: order.maker != null
-                        ? this.$routing.generate('token_show', {name: order.maker.profile.token.name})
+                        ? this.$routing.generate('token_show', {name: order.token.name})
                         : '',
                     taker_url: order.taker != null
-                        ? this.$routing.generate('token_show', {name: order.taker.profile.token.name})
+                        ? this.$routing.generate('token_show', {name: order.token.name})
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     price_per_token: toMoney(order.price),

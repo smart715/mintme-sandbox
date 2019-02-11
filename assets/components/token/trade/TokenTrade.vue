@@ -98,8 +98,6 @@ export default {
     },
     data() {
         return {
-            pendingBuyOrders: null,
-            pendingSellOrders: null,
             buy: {
                 amount: 0,
                 price: 0,

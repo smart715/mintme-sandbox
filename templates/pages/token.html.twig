@@ -29,7 +29,7 @@
                             :logged-in="{{ app.user ? 'true' : 'false' }}"
                             token-name="{{ token.name }}"
                             place-order-url="{{ path('token_place_order', {'tokenName' : token.name}) }}"
-                            token-hidden-name="{{ tokenHiddenName }}">
+                            token-hidden-name="{{ tokenHiddenName }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}">
                         </token-trade>
                     </b-tab>

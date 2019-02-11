@@ -112,13 +112,15 @@ export default {
         },
         ordersList: function() {
             return this.orders.map((order) => {
+                console.log(order);
+                console.log(this.userId);
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
                     trader_url: this.$routing.generate('token_show', {
-                        name: order.maker.profile.token.name,
+                        name: order.token.name,
                     }),
                     trader_id: order.maker.id === this.userId ? this.userId : null,
                 };
