@@ -147,5 +147,6 @@ export default {
 <style lang="sass" scoped>
     p
         white-space: pre-line
+        word-break: break-word
 </style>
 
