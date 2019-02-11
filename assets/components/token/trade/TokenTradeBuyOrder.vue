@@ -204,7 +204,7 @@ export default {
         },
         showModalAction: function(data) {
             this.modalSuccess = data && 1 === data.result;
-            this.modalTitle = this.modalSuccess ? '': data ? data.message : '';
+            this.modalTitle = !this.modalSuccess && data ? data.message : '';
             this.showModal = true;
         },
     },

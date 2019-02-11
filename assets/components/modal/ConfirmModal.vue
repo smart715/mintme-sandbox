@@ -48,7 +48,6 @@ export default {
             if (this.loading) {
                 return;
             }
-
             this.$emit('loading', true);
             this.$emit('confirm');
         },
