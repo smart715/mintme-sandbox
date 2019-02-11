@@ -45,6 +45,10 @@ export default {
             this.$emit('close');
         },
         onConfirm: function() {
+            if (this.loading) {
+                return;
+            }
+
             this.$emit('loading', true);
             this.$emit('confirm');
         },

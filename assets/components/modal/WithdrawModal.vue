@@ -51,6 +51,7 @@
                     <button
                         class="btn btn-primary"
                         @click="onWithdraw">
+                        <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
                         WITHDRAW
                     </button>
                     <a
@@ -85,6 +86,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             amount: 0,
             address: '',
         };
@@ -113,6 +115,11 @@ export default {
                 return;
             }
 
+            if (this.loading) {
+                return;
+            }
+
+            this.loading = true;
             this.$axios.single.post(this.withdrawUrl, {
                 'crypto': this.currency,
                 'amount': this.amount,
@@ -124,7 +131,8 @@ export default {
             })
             .catch((error) => {
                 this.$toasted.error(error.response.data.error);
-            });
+            })
+            .then(() => this.loading = false);
 
             this.$emit('withdraw', this.currency, this.amount, this.address);
         },
