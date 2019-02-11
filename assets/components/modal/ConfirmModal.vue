@@ -1,6 +1,5 @@
 <template>
     <modal
-        :loading="loading"
         :visible="visible"
         @close="closeModal">
         <template slot="body">
