@@ -4,16 +4,14 @@
         News | Mintme
     {% endspaceless %}
 {% endblock %}
-{% block contentClass %}blog{% endblock %}
 
 {% block content %}
-    <div class="container pt-5 text-white">
+    <div class="container pt-5 text-white news">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <h1>News</h1>
                 <div>
                     {% for post in pager.getResults() %}
-                        <div>
+                        <div class="news-box p-4 mb-4">
                             <header>
                                 <h2>
                                     <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">{{ post.title }}</a>
@@ -30,7 +28,7 @@
                                     {{ post.abstract }}
                                 </p>
                                 <div class="col-12 pt-3 read-more">
-                                    <a class="btn btn-secondary py-1 undraggable float-right" href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">Read More</a>
+                                    <a class="py-1 undraggable float-right" href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">Read More</a>
                                 </div>
                             </div>
                         </div>
