@@ -53,20 +53,15 @@ class UserController extends AbstractController
         $emailForm = $this->getEmailForm($request);
 
         if ('edit_email2_fa' === $emailForm->getName()) {
-            return $this->renderEmail2FA($emailForm);
+            return $this->render('default/simple_form.html.twig', [
+                'form' => $emailForm->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email',
+            ]);
         }
 
         return $this->render('pages/settings.html.twig', [
             'emailForm' => $emailForm->createView(),
             'passwordForm' => $passwordForm->createView(),
             'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
-        ]);
-    }
-
-    private function renderEmail2FA(FormInterface $emailForm2FA): Response
-    {
-        return $this->render('default/simple_form.html.twig', [
-            'form' => $emailForm2FA->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email',
         ]);
     }
 
