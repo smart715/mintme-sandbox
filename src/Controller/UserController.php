@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Exchange\Trade\Config\PrelaunchConfig;
+use App\Form\EditEmail2FAType;
 use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
 use App\Form\TwoFactorType;
@@ -48,10 +49,36 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
+        $passwordForm = $this->getPasswordForm($request);
+        $emailForm = $this->getEmailForm($request);
+
+        if ('edit_email2_fa' === $emailForm->getName()) {
+            return $this->renderEmail2FA($emailForm);
+        }
+
+        return $this->renderSettings(
+            $emailForm,
+            $passwordForm,
+            $this->getUser()->isGoogleAuthenticatorEnabled()
+        );
+    }
+
+    private function renderSettings(
+        FormInterface $emailForm,
+        FormInterface $passwordForm,
+        bool $twoFactorAuth
+    ): Response {
         return $this->render('pages/settings.html.twig', [
-            'emailForm' => $this->getEmailForm($request)->createView(),
-            'passwordForm' => $this->getPasswordForm($request)->createView(),
-            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
+            'emailForm' => $emailForm->createView(),
+            'passwordForm' => $passwordForm->createView(),
+            'twoFactorAuth' => $twoFactorAuth,
+        ]);
+    }
+
+    private function renderEmail2FA(FormInterface $emailForm2FA): Response
+    {
+        return $this->render('default/simple_form.html.twig', [
+            'form' => $emailForm2FA->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email'
         ]);
     }
 
@@ -145,21 +172,37 @@ class UserController extends AbstractController
         $email = new EmailModel($user->getEmail());
         $emailForm = $this->createForm(EditEmailType::class, $email);
         $emailForm->handleRequest($request);
+        $emailForm2FA = $this->createForm(EditEmail2FAType::class, $email);
+        $emailForm2FA->handleRequest($request);
 
-        if ($emailForm->isSubmitted() && $emailForm->isValid() && $user->getEmail() !== $email->getEmail()) {
-            // Create temporary user with new email and use him in email sender.
-            // Set new email as temporary for user
-            $tmpUser = clone $user;
-            $tmpUser->setEmail($email->getEmail());
-            $user->setTempEmail($email->getEmail());
-            $this->mailDispatcher->sendEmailConfirmation($tmpUser);
-            $user->setConfirmationToken($tmpUser->getConfirmationToken());
-            $this->userManager->updateUser($user);
+        if ($user->isGoogleAuthenticatorEnabled()) {
+            if ($emailForm2FA->isSubmitted() && !$emailForm2FA->isValid() || $emailForm->isSubmitted() && $emailForm->isValid()) {
+                return $emailForm2FA;
+            }
+            if ($emailForm->isSubmitted() || $emailForm2FA->isSubmitted()) {
+                $this->submitEmailForm($email);
+            }
+            return $emailForm;
+        }
 
-            $this->addFlash('success', 'Confirmation email was sent to your new address');
+        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
+            $this->submitEmailForm($email);
         }
 
         return $emailForm;
+
+    }
+
+    private function submitEmailForm(EmailModel $email): void
+    {
+        $user = $this->getUser();
+        $tmpUser = clone $user;
+        $tmpUser->setEmail($email->getEmail());
+        $user->setTempEmail($email->getEmail());
+        $this->mailDispatcher->sendEmailConfirmation($tmpUser);
+        $user->setConfirmationToken($tmpUser->getConfirmationToken());
+        $this->userManager->updateUser($user);
+        $this->addFlash('success', 'Confirmation email was sent to your new address');
     }
 
     private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager, User $user): array

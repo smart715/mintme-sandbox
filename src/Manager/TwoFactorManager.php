@@ -18,10 +18,10 @@ class TwoFactorManager implements TwoFactorManagerInterface
 
     /** @var GoogleAuthenticatorInterface */
     private $authenticator;
-    
+
     /** @var EntityManagerInterface */
     private $entityManager;
-    
+
     public function __construct(
         SessionInterface $session,
         EntityManagerInterface $entityManager,
@@ -35,10 +35,15 @@ class TwoFactorManager implements TwoFactorManagerInterface
     public function checkCode(User $user, FormInterface $form): bool
     {
         $code = $form->getData()['code'] ?? '';
+        return $this->isValidCode($user, $code);
+    }
+
+    public function isValidCode(User $user, string $code): bool
+    {
         $isBackupCode = in_array($code, $user->getGoogleAuthenticatorBackupCodes());
         return $isBackupCode || $this->authenticator->checkCode($user, $code);
     }
-    
+
     public function generateBackupCodes(): array
     {
         $codes = [];
