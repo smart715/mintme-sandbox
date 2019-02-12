@@ -60,7 +60,7 @@
                 <tr>
                     <td colspan="2">
                         You have not bought tokens yet. Find favorite content creators or
-                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>. 
+                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
                         Start trading now.
                     </td>
                 </tr>
