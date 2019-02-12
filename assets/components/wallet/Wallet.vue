@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="px-0 py-2">
         <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Balance
         </div>
@@ -11,21 +11,25 @@
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney }}
                 </template>
-                <template slot="action" slot-scope="data">
-                    <div class="d-inline text-center float-left">
-                        <span
-                            class="icon-deposit c-pointer mx-auto"
-                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
-                        </span>
-                        <span class="text-sm">Deposit</span>
-                    </div>
-                    <div class="d-inline text-center float-left pl-2">
-                        <span
-                            class="icon-withdraw c-pointer mx-auto"
-                            @click="openDeposit(data.item.name)">
-                        </span>
-                        <span class="text-sm">Withdraw</span>
-                    </div>
+                     <template slot="action" slot-scope="data">
+                         <div  class="row justify-content-center">
+                             <div class="d-inline">
+                                 <i
+                                     class="icon-deposit c-pointer float-left"
+                                     @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                                 </i>
+                                 <span class="pl-2 float-left text-sm align-middle">Deposit</span>
+                             </div>
+                             <div class="d-inline pl-3">
+                                 <span class="d-inline">
+                                     <i
+                                         class="icon-withdraw c-pointer float-left"
+                                         @click="openDeposit(data.item.name)">
+                                     </i>
+                                 </span>
+                                 <span class="pl-2 float-left text-sm align-middle">Withdraw</span>
+                             </div>
+                         </div>
                 </template>
             </b-table>
         </div>
@@ -33,7 +37,7 @@
             Web tokens you own
         </div>
         <div v-if="hasTokens" class="table-responsive">
-            <b-table hover :items="items" :fields="tokenFields" class="wallet-table">
+            <b-table hover :items="items" :fields="tokenFields">
                      <template slot="name" slot-scope="data">
                     {{ data.item.name }}
                 </template>
@@ -56,7 +60,7 @@
                 <tr>
                     <td colspan="2">
                         You have not bought tokens yet. Find favorite content creators or
-                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
+                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>. 
                         Start trading now.
                     </td>
                 </tr>
@@ -68,14 +72,12 @@
             :fee="fee"
             :withdraw-url="withdrawUrl"
             :max-amount="amount"
-            @close="closeWithdraw"
-            />
+            @close="closeWithdraw"/>
         <deposit-modal
             :address="depositAddress"
             :visible="showDepositModal"
             :description="depositDescription"
-            @close="closeDeposit()"
-            />
+            @close="closeDeposit()"/>
     </div>
 </template>
 
@@ -121,13 +123,13 @@ export default {
             fee: '0',
             amount: '0',
             predefinedTokenFields: {
-                name: {label: 'Name', sortable: true},
-                available: {label: 'Amount', sortable: true},
-                action: {label: 'Actions', sortable: false},
+                name: {label: 'Name'},
+                available: {label: 'Amount'},
+                action: {label: 'Actions'},
             },
             tokenFields: {
-                name: {label: 'Name', sortable: true},
-                available: {label: 'Amount', sortable: true},
+                name: {label: 'Name'},
+                available: {label: 'Amount'},
             },
         };
     },
