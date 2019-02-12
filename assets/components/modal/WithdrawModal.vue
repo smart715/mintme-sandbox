@@ -125,12 +125,12 @@ export default {
                 'amount': this.amount,
                 'address': this.address,
             })
-            .then((response) => {
+            .then(() => {
                 this.$toasted.success('Paid');
                 this.closeModal();
             })
-            .catch((error) => {
-                this.$toasted.error(error.response.data.error);
+            .catch(({response}) => {
+                this.$toasted.error(response.data.error);
             })
             .then(() => this.loading = false);
 

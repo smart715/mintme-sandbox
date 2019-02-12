@@ -202,9 +202,9 @@ export default {
                     .catch(() => this.showModalAction());
             }
         },
-        showModalAction: function(data) {
-            this.modalSuccess = data && 1 === data.result;
-            this.modalTitle = !this.modalSuccess && data ? data.message : '';
+        showModalAction: function({result = 2, message = ''} = {}) {
+            this.modalSuccess = 1 === result;
+            this.modalTitle = this.modalSuccess ? '' : message;
             this.showModal = true;
         },
     },
