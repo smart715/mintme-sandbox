@@ -2,7 +2,6 @@
 
 namespace App\Validator\Constraints;
 
-
 use App\Entity\User;
 use App\Manager\TwoFactorManager;
 use App\Manager\TwoFactorManagerInterface;
@@ -21,8 +20,8 @@ class TwoFactorAuthValidator extends ConstraintValidator
 
     public function __construct(TokenStorageInterface $token, TwoFactorManager $twoFactorManager)
     {
-       $this->user = $token->getToken()->getUser();
-       $this->twoFactorManager = $twoFactorManager;
+        $this->user = $token->getToken()->getUser();
+        $this->twoFactorManager = $twoFactorManager;
     }
 
     /** {@inheritdoc} */

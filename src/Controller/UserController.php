@@ -56,29 +56,17 @@ class UserController extends AbstractController
             return $this->renderEmail2FA($emailForm);
         }
 
-        return $this->renderSettings(
-            $emailForm,
-            $passwordForm,
-            $this->getUser()->isGoogleAuthenticatorEnabled()
-        );
-    }
-
-    private function renderSettings(
-        FormInterface $emailForm,
-        FormInterface $passwordForm,
-        bool $twoFactorAuth
-    ): Response {
         return $this->render('pages/settings.html.twig', [
             'emailForm' => $emailForm->createView(),
             'passwordForm' => $passwordForm->createView(),
-            'twoFactorAuth' => $twoFactorAuth,
+            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
         ]);
     }
 
     private function renderEmail2FA(FormInterface $emailForm2FA): Response
     {
         return $this->render('default/simple_form.html.twig', [
-            'form' => $emailForm2FA->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email'
+            'form' => $emailForm2FA->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email',
         ]);
     }
 
@@ -190,7 +178,6 @@ class UserController extends AbstractController
         }
 
         return $emailForm;
-
     }
 
     private function submitEmailForm(EmailModel $email): void

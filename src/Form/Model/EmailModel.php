@@ -2,8 +2,8 @@
 
 namespace App\Form\Model;
 
-use App\Validator\Constraints\UserEmail;
 use App\Validator\Constraints\TwoFactorAuth;
+use App\Validator\Constraints\UserEmail;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class EmailModel

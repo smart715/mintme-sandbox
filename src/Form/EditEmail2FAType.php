@@ -32,4 +32,3 @@ class EditEmail2FAType extends AbstractType
         $resolver->setDefault('data_class', EmailModel::class);
     }
 }
-
