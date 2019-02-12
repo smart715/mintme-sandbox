@@ -1,6 +1,6 @@
 <template>
     <div class="px-0 py-2">
-        <div class="card-title font-weight-bold pl-3 pt-2 pb-1">
+        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Balance
         </div>
         <div class="table-responsive">
@@ -18,24 +18,28 @@
                     {{ data.value | toMoney }}
                 </template>
                 <template slot="action" slot-scope="data">
-                    <font-awesome-icon
-                            :title="withdrawTooltip"
-                            v-tippy="tooltipOptions"
-                            icon="shopping-cart"
-                            class="text-orange c-pointer"
-                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)"
-                    />
-                    <font-awesome-icon
-                            :title="depositTooltip"
-                            v-tippy="tooltipOptions"
-                            icon="piggy-bank"
-                            class="text-orange c-pointer"
-                            @click="openDeposit(data.item.name)"
-                            size="1x"/>
+                         <div  class="row justify-content-center">
+                             <div class="d-inline">
+                                 <i
+                                     class="icon-deposit c-pointer float-left"
+                                     @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                                 </i>
+                                 <span class="pl-2 float-left text-sm align-middle">Deposit</span>
+                             </div>
+                             <div class="d-inline pl-3">
+                                 <span class="d-inline">
+                                     <i
+                                         class="icon-withdraw c-pointer float-left"
+                                         @click="openDeposit(data.item.name)">
+                                     </i>
+                                 </span>
+                                 <span class="pl-2 float-left text-sm align-middle">Withdraw</span>
+                             </div>
+                         </div>
                 </template>
             </b-table>
         </div>
-        <div class="card-title font-weight-bold pl-3 pt-2 pb-1">
+        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Web tokens you own
         </div>
         <font-awesome-icon
