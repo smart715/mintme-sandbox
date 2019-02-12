@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card h-100">
             <div class="card-header text-center">
                 Sell Order
@@ -14,9 +14,8 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div v-if="balance"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
-                        pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0"
+                    <div v-if="immutableBalance"
+                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0"
                         >
                         Your Tokens:
                         <span class="text-white">
@@ -31,9 +30,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div v-if="balance"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
-                        text-sm-right text-md-left text-xl-right">
+                    <div class="col-12 col-sm-6 col-md-12 col-xl-6 text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"
@@ -60,7 +57,7 @@
                     <div class="col-12 pt-2">
                         <label
                             for="sell-price-input"
-                            class="text-white">
+                            class="text-primary">
                             Price in WEB:
                             <guide>
                                 <template slot="header">
@@ -134,7 +131,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
@@ -149,7 +145,6 @@ export default {
     },
     mixins: [WebSocketMixin],
     props: {
-        containerClass: String,
         loginUrl: String,
         signupUrl: String,
         loggedIn: Boolean,
@@ -157,7 +152,7 @@ export default {
         placeOrderUrl: String,
         marketName: Object,
         sell: Object,
-        balance: String,
+        balance: [String, Boolean],
         tokenHiddenName: String,
         currency: String,
     },
@@ -176,13 +171,13 @@ export default {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 let data = {
-                    tokenName: this.tokenName,
-                    amountInput: toMoney(this.sellAmount),
-                    priceInput: toMoney(this.sellPrice),
-                    marketPrice: this.useMarketPrice,
-                    action: this.action,
+                    'tokenName': this.tokenName,
+                    'amountInput': toMoney(this.sellAmount),
+                    'priceInput': toMoney(this.sellPrice),
+                    'marketPrice': this.useMarketPrice,
+                    'action': this.action,
                 };
-                axios.post(this.placeOrderUrl, data)
+                this.$axios.single.post(this.placeOrderUrl, data)
                     .then((response) => this.showModalAction(response.data.result))
                     .catch((error) => this.showModalAction());
             }
@@ -217,21 +212,36 @@ export default {
       },
     },
     mounted: function() {
-        if (!this.balance) {
+        if (!this.immutableBalance) {
             return;
         }
 
-        this.authorize(() => {
-              this.sendMessage(JSON.stringify({
-                  method: 'asset.subscribe',
-                  params: [this.tokenHiddenName],
-                  id: parseInt(Math.random()),
-              }));
-        }, (response) => {
-          if ('asset.update' === response.method) {
-              this.immutableBalance = response.params[0][this.tokenHiddenName].available;
-          }
-        });
+        this.authorize()
+            .then(() => {
+                this.addMessageHandler((response) => {
+                    if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.tokenHiddenName)) {
+                        this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.tokenName}))
+                            .then((res) => {
+                                this.immutableBalance =
+                                    new Decimal(response.params[0][this.tokenHiddenName].available).sub(
+                                        res.data.frozenAmount
+                                    );
+                            })
+                            .catch(() => {});
+                    }
+                });
+
+                this.sendMessage(JSON.stringify({
+                    method: 'asset.subscribe',
+                    params: [this.tokenHiddenName],
+                    id: parseInt(Math.random()),
+                }));
+            })
+            .catch(() => {
+                this.$toasted.error(
+                    'Can not connect to internal services'
+                );
+            });
     },
     filters: {
         toMoney: function(val) {

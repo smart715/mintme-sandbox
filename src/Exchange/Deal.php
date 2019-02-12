@@ -96,37 +96,37 @@ class Deal
         return $this->role;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getMarket(): Market
     {
         return $this->market;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getAmount(): Money
     {
         return $this->amount;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getPrice(): Money
     {
         return $this->price;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getSide(): int
     {
         return $this->side;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getFee(): Money
     {
         return $this->fee;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getTimestamp(): ?float
     {
         return $this->timestamp;

@@ -67,7 +67,6 @@ import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import LimitedTextarea from '../../LimitedTextarea';
-import axios from 'axios';
 import Toasted from 'vue-toasted';
 
 library.add(faEdit);
@@ -113,7 +112,7 @@ export default {
             return this.doEditDescription();
         },
         doEditDescription: function() {
-            axios.patch(this.updateUrl, {
+            this.$axios.single.patch(this.updateUrl, {
                 description: this.newDescription,
                 _csrf_token: this.csrfToken,
             })

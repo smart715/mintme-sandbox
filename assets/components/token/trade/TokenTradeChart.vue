@@ -67,7 +67,6 @@ export default {
     mixins: [WebSocketMixin],
     props: {
         websocketUrl: String,
-        containerClass: String,
         marketName: Object,
         currency: String,
     },

@@ -156,7 +156,6 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isValidUrl} from '../../../js/utils';
-import axios from 'axios';
 import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
@@ -239,7 +238,7 @@ export default {
             this.showConfirmWebsiteModal = true;
         },
         confirmWebsite: function() {
-            axios.post(this.confirmWebsiteUrl, {url: this.parsedWebsite})
+            this.$axios.single.post(this.confirmWebsiteUrl, {url: this.parsedWebsite})
                 .then((response) => {
                     if (response.data.verified) {
                         this.currentWebsite = this.parsedWebsite;

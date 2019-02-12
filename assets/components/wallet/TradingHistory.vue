@@ -1,5 +1,6 @@
 <template>
-    <div class="px-0 pt-2 col-12 col-lg-4 col-md-6">
+    <div class="px-0 pt-2">
+        <template v-if="loaded">
         <div class="table-responsive">
             <b-table
                 v-if="hasHistory"
@@ -23,6 +24,10 @@
                 v-model="currentPage"
                 class="my-0" />
         </div>
+        </template>
+        <template v-else>
+            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </template>
     </div>
 </template>
 
@@ -33,11 +38,9 @@ import {WSAPI} from '../../js/utils/constants';
 
 export default {
     name: 'TradingHistory',
-    props: {
-        executedHistory: {type: Array, default: () => []},
-    },
     data() {
         return {
+            history: null,
             currentPage: 1,
             perPage: 10,
             fields: {
@@ -76,15 +79,22 @@ export default {
         };
     },
     computed: {
-        history: function() {
-            return Object.values(this.executedHistory);
-        },
         totalRows: function() {
             return this.history.length;
+        },
+        loaded: function() {
+            return this.history !== null;
         },
         hasHistory: function() {
             return (this.totalRows > 0);
         },
+    },
+    mounted: function() {
+        this.$axios.retry.get(this.$routing.generate('executed_user_orders'))
+            .then((res) =>
+                this.history = typeof res.data === 'object' ? Object.values(res.data) : res.data
+            )
+            .catch(() => this.$toasted.error('Can not update history now. Try again later.'));
     },
     methods: {
         getDate: function(timestamp) {

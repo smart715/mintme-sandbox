@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card">
             <div class="card-header">
                 Trade History
@@ -16,6 +16,7 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fix-height">
+                    <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
@@ -37,6 +38,10 @@
                     <div v-if="!hasOrders">
                         <p class="text-center p-5">No deal was made yet</p>
                     </div>
+                    </template>
+                    <template v-else>
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </template>
                 </div>
             </div>
         </div>
@@ -51,8 +56,6 @@ import Decimal from 'decimal.js';
 export default {
     name: 'TokenTradeTradeHistory',
     props: {
-        containerClass: String,
-        ordersHistory: String,
         tokenName: String,
     },
     components: {
@@ -60,7 +63,7 @@ export default {
     },
     data() {
         return {
-            history: [],
+            history: null,
             fields: {
                 type: {
                     label: 'Type',
@@ -91,7 +94,7 @@ export default {
             return this.ordersList.length > 0;
         },
         ordersList: function() {
-            return this.history.map((order) => {
+            return this.history !== false ? this.history.map((order) => {
                 return {
                     date_time: new Date(order.timestamp * 1000).toDateString(),
                     order_maker: order.maker != null
@@ -105,19 +108,25 @@ export default {
                     token_amount: toMoney(order.amount),
                     web_amount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                 };
-            });
+            }) : [];
+        },
+        loaded: function() {
+            return this.history !== null;
         },
     },
     mounted: function() {
-        this.history = JSON.parse(this.ordersHistory);
-        setInterval(() => {
-            this.$axios.get(this.$routing.generate('executed_orders', {
-                tokenName: this.tokenName,
+        this.updateHistory();
+        this.$store.state.interval.make(this.updateHistory, 10000);
+    },
+    methods: {
+        updateHistory: function() {
+            this.$axios.single.get(this.$routing.generate('executed_orders', {
+                'tokenName': this.tokenName,
             })).then((result) => {
                 this.history = result.data;
                 this.$refs.table.refresh();
-            });
-        }, 10000);
+            }).catch((error) => { });
+        },
     },
 };
 </script>

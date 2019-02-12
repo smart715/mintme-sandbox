@@ -68,7 +68,6 @@
 <script>
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
-import axios from 'axios';
 import {required, minLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../js/utils';
 
@@ -114,10 +113,10 @@ export default {
                 return;
             }
 
-            axios.post(this.withdrawUrl, {
-                crypto: this.currency,
-                amount: this.amount,
-                address: this.address,
+            this.$axios.single.post(this.withdrawUrl, {
+                'crypto': this.currency,
+                'amount': this.amount,
+                'address': this.address,
             })
             .then((response) => {
                 this.$toasted.success('Paid');

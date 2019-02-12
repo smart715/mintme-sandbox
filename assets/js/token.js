@@ -22,5 +22,10 @@ new Vue({
     TokenName,
     Tabs,
   },
+  methods: {
+    onTabUpdated: function() {
+      store.state.interval.clearAll();
+    },
+  },
   store,
 });

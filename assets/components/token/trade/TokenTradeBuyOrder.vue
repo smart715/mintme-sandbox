@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card h-100">
             <div class="card-header text-center">
                 Buy Order
@@ -15,11 +15,10 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div v-if="balance"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
-                        pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
+                    <div v-if="immutableBalance"
+                         class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your WEB:
-                        <span class="text-white">
+                        <span class="text-primary">
                             {{ immutableBalance | toMoney }}
                             <guide>
                                 <template slot="header">
@@ -31,7 +30,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div v-if="balance"
+                    <div
                         class="col-12 col-sm-6 col-md-12 col-xl-6
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
@@ -61,7 +60,7 @@
                     <div class="col-12 pt-2">
                         <label
                             for="buy-price-input"
-                            class="text-white">
+                            class="text-primary">
                             Price in WEB:
                             <guide>
                                 <template slot="header">
@@ -133,7 +132,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Guide from '../../Guide';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
@@ -148,7 +146,6 @@ export default {
         OrderModal,
     },
     props: {
-        containerClass: String,
         loginUrl: String,
         signupUrl: String,
         loggedIn: Boolean,
@@ -156,7 +153,7 @@ export default {
         placeOrderUrl: String,
         marketName: Object,
         buy: Object,
-        balance: String,
+        balance: [String, Boolean],
         currency: String,
     },
     data() {
@@ -174,14 +171,14 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 let data = {
-                    tokenName: this.tokenName,
-                    amountInput: toMoney(this.buyAmount),
-                    priceInput: toMoney(this.buyPrice),
-                    marketPrice: this.useMarketPrice,
-                    action: this.action,
+                    'tokenName': this.tokenName,
+                    'amountInput': toMoney(this.buyAmount),
+                    'priceInput': toMoney(this.buyPrice),
+                    'marketPrice': this.useMarketPrice,
+                    'action': this.action,
                 };
 
-                axios.post(this.placeOrderUrl, data)
+                this.$axios.single.post(this.placeOrderUrl, data)
                     .then((response) => this.showModalAction(response.data.result))
                     .catch((error) => this.showModalAction());
             }
@@ -220,7 +217,10 @@ export default {
         this.authorize()
             .then(() => {
                 this.addMessageHandler((response) => {
-                    if ('asset.update' === response.method) {
+                    if (
+                        'asset.update' === response.method &&
+                        response.params[0].hasOwnProperty(this.marketName.currencySymbol)
+                    ) {
                         this.immutableBalance = response.params[0][this.marketName.currencySymbol].available;
                     }
                 });

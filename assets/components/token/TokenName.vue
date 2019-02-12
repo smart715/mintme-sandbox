@@ -17,7 +17,6 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import axios from 'axios';
 import Toasted from 'vue-toasted';
 
 library.add(faEdit, faCheck);
@@ -62,7 +61,7 @@ export default {
             this.icon = 'check';
         },
         doEditName: function() {
-            axios.patch(this.updateUrl, {
+            this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
                 _csrf_token: this.csrfToken,
             })

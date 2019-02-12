@@ -1,5 +1,6 @@
 <template>
     <div class="px-0 pt-2">
+        <template v-if="loaded">
         <div class="table-responsive deposit-withdraw-history" @scroll.passive="loadMore">
             <b-table
                 v-if="!noHistory"
@@ -13,20 +14,19 @@
                 <p class="text-center p-5">No transactions were added yet</p>
             </div>
         </div>
+        </template>
+        <template v-else>
+            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </template>
     </div>
 </template>
 
 <script>
 import moment from 'moment';
-import axios from 'axios';
-import Routing from '../../js/routing.js';
 import {toMoney} from '../../js/utils';
 
 export default {
     name: 'DepositWithdrawHistory',
-    props: {
-        initHistory: Array,
-    },
     data() {
         return {
             fields: {
@@ -60,10 +60,10 @@ export default {
                 },
             },
             history: {
-                data: this.initHistory,
+                data: null,
                 dateFormat: 'MM-DD-YYYY',
             },
-            currentPage: 1,
+            currentPage: 0,
             canRequestNextPage: true,
         };
     },
@@ -74,6 +74,12 @@ export default {
         noHistory: function() {
             return this.history.data.length === 0;
         },
+        loaded: function() {
+            return this.history.data !== null;
+        },
+    },
+    mounted: function() {
+        this.getHistory();
     },
     methods: {
         addDetailsForEmptyMessageToHistory: function(historyData) {
@@ -85,15 +91,22 @@ export default {
         getHistory: function() {
             if (this.canRequestNextPage) {
                 this.canRequestNextPage = false;
-                axios.get(
-                    Routing.generate('api_history', {page: page})
-                ).then((response) => {
-                    if (response.data.length > 0) {
-                        this.history.data = this.history.data.concat(response.data);
-                        this.canRequestNextPage = true;
-                        this.currentPage++;
-                    }
-                }).catch((error) => { });
+                this.$axios.retry.get(
+                        this.$routing.generate('payment_history', {page: this.currentPage})
+                    )
+                    .then((response) => {
+                        if (this.history.data === null) {
+                            this.history.data = response.data;
+                        }
+                        if (response.data.length > 0) {
+                            if (this.history.data !== null) {
+                                this.history.data = this.history.data.concat(response.data);
+                            }
+                            this.canRequestNextPage = true;
+                            this.currentPage++;
+                        }
+                    })
+                    .catch((error) => this.$toasted.error('Can not update payment history. Try again later.'));
             }
         },
         sanitizeHistory: function(historyData) {

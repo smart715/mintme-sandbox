@@ -1,5 +1,5 @@
 <template>
-    <div :class="containerClass">
+    <div>
         <div class="card h-100">
             <div class="card-header">
                 Statistics
@@ -16,9 +16,6 @@
                         </p>
                     </div>
                 </guide>
-
-            </div>
-            <div class="card-body">
                 <span class="card-header-icon">
                     <font-awesome-icon
                         v-if="editable && !showSettings"
@@ -28,6 +25,9 @@
                         @click="switchAction"
                         />
                 </span>
+            </div>
+            <div class="card-body">
+                <template v-if="loaded">
                 <div v-if="!showSettings" class="row">
                     <div class="col">
                         <div class="font-weight-bold pb-4">
@@ -142,6 +142,10 @@
                         @onStatsUpdate="statsUpdated">
                     </release-period-component>
                 </div>
+                </template>
+                <template v-else>
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                </template>
             </div>
         </div>
     </div>
@@ -164,12 +168,8 @@ export default {
     },
     props: {
         name: String,
-        tokens: {type: Object, required: true},
-        pendingSellOrders: {type: Array, required: true},
-        executedOrders: {type: Array, required: true},
         releasePeriodRoute: String,
         csrf: String,
-        containerClass: String,
         editable: Boolean,
         stats: {
             type: Object,
@@ -186,7 +186,23 @@ export default {
     data() {
         return {
             showSettings: false,
+            tokens: null,
+            pendingSellOrders: null,
+            executedOrders: null,
         };
+    },
+    mounted: function() {
+        this.$axios.retry.get(this.$routing.generate('tokens'))
+            .then((res) => this.tokens = {...res.data.common, ...res.data.predefined})
+            .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
+
+        this.$axios.retry.get(this.$routing.generate('executed_orders', {tokenName: this.name}))
+            .then((res) => this.executedOrders = res.data)
+            .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
+
+        this.$axios.retry.get(this.$routing.generate('pending_orders', {tokenName: this.name}))
+            .then((res) => this.pendingSellOrders = res.data.sell)
+            .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
     },
     methods: {
         switchAction: function() {
@@ -197,6 +213,9 @@ export default {
         },
     },
     computed: {
+        loaded: function() {
+            return this.tokens !== null && this.pendingSellOrders !== null && this.executedOrders !== null;
+        },
         releasedDisabled: function() {
             return this.stats.releasePeriod !== defaultValue;
         },

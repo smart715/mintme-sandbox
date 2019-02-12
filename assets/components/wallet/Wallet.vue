@@ -1,44 +1,52 @@
 <template>
     <div class="px-0 py-2">
-        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
+        <div class="card-title font-weight-bold pl-3 pt-2 pb-1">
             Balance
         </div>
         <div class="table-responsive">
-            <b-table hover :items="predefinedItems" :fields="predefinedTokenFields" class="wallet-table">
-                     <template slot="name" slot-scope="data">
+            <font-awesome-icon
+                    icon="circle-notch"
+                    spin class="loading-spinner"
+                    fixed-width
+                    v-if="showLoadingIconP"
+            />
+            <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
+                <template slot="name" slot-scope="data">
                     {{ data.item.fullname }} ({{ data.item.name }})
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney }}
                 </template>
-                     <template slot="action" slot-scope="data">
-                         <div  class="row justify-content-center">
-                             <div class="d-inline">
-                                 <i
-                                     class="icon-deposit c-pointer float-left"
-                                     @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
-                                 </i>
-                                 <span class="pl-2 float-left text-sm align-middle">Deposit</span>
-                             </div>
-                             <div class="d-inline pl-3">
-                                 <span class="d-inline">
-                                     <i
-                                         class="icon-withdraw c-pointer float-left"
-                                         @click="openDeposit(data.item.name)">
-                                     </i>
-                                 </span>
-                                 <span class="pl-2 float-left text-sm align-middle">Withdraw</span>
-                             </div>
-                         </div>
+                <template slot="action" slot-scope="data">
+                    <font-awesome-icon
+                            :title="withdrawTooltip"
+                            v-tippy="tooltipOptions"
+                            icon="shopping-cart"
+                            class="text-orange c-pointer"
+                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)"
+                    />
+                    <font-awesome-icon
+                            :title="depositTooltip"
+                            v-tippy="tooltipOptions"
+                            icon="piggy-bank"
+                            class="text-orange c-pointer"
+                            @click="openDeposit(data.item.name)"
+                            size="1x"/>
                 </template>
             </b-table>
         </div>
-        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
+        <div class="card-title font-weight-bold pl-3 pt-2 pb-1">
             Web tokens you own
         </div>
+        <font-awesome-icon
+                icon="circle-notch"
+                spin class="loading-spinner"
+                fixed-width
+                v-if="showLoadingIcon"
+        />
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
-                     <template slot="name" slot-scope="data">
+                <template slot="name" slot-scope="data">
                     {{ data.item.name }}
                 </template>
                 <template slot="available" slot-scope="data">
@@ -46,7 +54,7 @@
                 </template>
             </b-table>
         </div>
-        <table v-if="!hasTokens" class="table table-hover">
+        <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -72,12 +80,14 @@
             :fee="fee"
             :withdraw-url="withdrawUrl"
             :max-amount="amount"
-            @close="closeWithdraw"/>
+            @close="closeWithdraw"
+        />
         <deposit-modal
             :address="depositAddress"
             :visible="showDepositModal"
             :description="depositDescription"
-            @close="closeDeposit()"/>
+            @close="closeDeposit()"
+        />
     </div>
 </template>
 
@@ -96,17 +106,15 @@ export default {
         DepositModal,
     },
     props: {
-        tokens: {type: Array, default: () => []},
-        predefinedTokens: {type: Array, default: () => []},
         withdrawUrl: {type: String, required: true},
-        depositAddresses: {type: Object},
         createTokenUrl: String,
         tradingUrl: String,
     },
     data() {
         return {
-            immutableTokens: this.tokens,
-            immutablePTokens: this.predefinedTokens,
+            tokens: null,
+            predefinedTokens: null,
+            depositAddresses: {},
             showModal: false,
             selectedCurrency: null,
             depositAddress: null,
@@ -125,7 +133,7 @@ export default {
             predefinedTokenFields: {
                 name: {label: 'Name'},
                 available: {label: 'Amount'},
-                action: {label: 'Actions'},
+                action: {label: 'Actions', sortable: false},
             },
             tokenFields: {
                 name: {label: 'Name'},
@@ -135,7 +143,7 @@ export default {
     },
     computed: {
         hasTokens: function() {
-            return Object.values(this.tokens).length > 0;
+            return Object.values(this.tokens || {}).length > 0;
         },
         allTokens: function() {
             return Object.assign({}, this.tokens || {}, this.predefinedTokens || {});
@@ -146,30 +154,53 @@ export default {
             });
         },
         predefinedItems: function() {
-            return this.tokensToArray(this.predefinedTokens);
+            return this.tokensToArray(this.predefinedTokens || {});
         },
         items: function() {
-            return this.tokensToArray(this.tokens);
+            return this.tokensToArray(this.tokens || {});
+        },
+        showLoadingIconP: function() {
+            return (this.predefinedTokens === null);
+        },
+        showLoadingIcon: function() {
+            return (this.tokens === null);
         },
     },
     mounted: function() {
-        this.authorize()
+        this.$axios.retry.get(this.$routing.generate('tokens'))
+            .then((res) => {
+                let tokensData = res.data;
+                this.tokens = tokensData.common;
+                this.predefinedTokens = tokensData.predefined;
+            })
             .then(() => {
-                this.addMessageHandler((response) => {
-                    if ('asset.update' === response.method) {
-                        this.updateBalances(response.params[0]);
-                    }
-                });
-                this.sendMessage(JSON.stringify({
-                    method: 'asset.subscribe',
-                    params: this.allTokensName,
-                    id: parseInt(Math.random()),
-                }));
+                this.authorize()
+                    .then(() => {
+                        this.addMessageHandler((response) => {
+                            if ('asset.update' === response.method) {
+                                this.updateBalances(response.params[0]);
+                            }
+                        });
+                        this.sendMessage(JSON.stringify({
+                            method: 'asset.subscribe',
+                            params: this.allTokensName,
+                            id: parseInt(Math.random()),
+                        }));
+                    })
+                    .catch((err) => {
+                        this.$toasted.error(
+                            'Can not connect to internal services'
+                        );
+                    });
             })
             .catch(() => {
-                this.$toasted.error(
-                    'Can not connect to internal services'
-                );
+                this.$toasted.error('Can not update tokens now. Try again later.');
+            });
+
+        this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
+            .then((res) => this.depositAddresses = res.data)
+            .catch(() => {
+                this.$toasted.error('Can not update deposit data now. Try again later.');
             });
     },
     methods: {
@@ -183,7 +214,7 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency) {
-            this.depositAddress = this.depositAddresses[currency];
+            this.depositAddress = this.depositAddresses[currency] || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.showDepositModal = true;
         },
@@ -194,20 +225,20 @@ export default {
             Object.keys(data).forEach((oTokenName) => {
                 let oToken = data[oTokenName];
 
-                Object.keys(this.immutablePTokens).forEach((token) => {
-                    if (oTokenName === this.immutablePTokens[token].hiddenName) {
-                        this.immutablePTokens[token].available = Decimal.sub(
+                Object.keys(this.predefinedTokens).forEach((token) => {
+                    if (oTokenName === this.predefinedTokens[token].hiddenName) {
+                        this.predefinedTokens[token].available = Decimal.sub(
                             oToken.available,
-                            this.immutablePTokens[token].frozen
+                            this.predefinedTokens[token].frozen
                         ).toString();
                     }
                 });
 
-                Object.keys(this.immutableTokens).forEach((token) => {
-                    if (oTokenName === this.immutableTokens[token].hiddenName) {
-                        this.immutableTokens[token].available = Decimal.sub(
+                Object.keys(this.tokens).forEach((token) => {
+                    if (oTokenName === this.tokens[token].hiddenName) {
+                        this.tokens[token].available = Decimal.sub(
                             oToken.available,
-                            this.immutableTokens[token].frozen
+                            this.tokens[token].frozen
                         ).toString();
                     }
                 });

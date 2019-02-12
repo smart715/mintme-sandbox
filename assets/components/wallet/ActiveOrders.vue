@@ -1,5 +1,6 @@
 <template>
     <div class="px-0 pt-2">
+        <template v-if="loaded">
         <div class="table-responsive">
             <confirm-modal
                 :visible="confirmModal"
@@ -33,6 +34,10 @@
                 v-model="currentPage"
                 class="my-0" />
         </div>
+        </template>
+        <template v-else>
+            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </template>
     </div>
 </template>
 <script>
@@ -48,12 +53,10 @@ export default {
     components: {
         ConfirmModal,
     },
-    props: {
-        markets: Array,
-        orders: {type: Array, default: () => []},
-    },
     data() {
         return {
+            markets: null,
+            orders: null,
             currentRow: {},
             actionUrl: '',
             currentPage: 1,
@@ -63,7 +66,6 @@ export default {
             tokenName: null,
             amount: null,
             price: null,
-            ordersList: Object.values(this.orders),
             fields: {
                 date: {label: 'Date', sortable: true},
                 type: {label: 'Type', sortable: true},
@@ -78,78 +80,52 @@ export default {
     },
     computed: {
         totalRows: function() {
-            return this.ordersList.length;
+            return this.orders.length;
         },
         marketNames: function() {
             return this.markets.map((market) => market.hiddenName);
         },
         hasOrders: function() {
-            return this.ordersList.length > 0;
+            return this.totalRows > 0;
+        },
+        loaded: function() {
+            return this.markets !== null && this.orders !== null;
         },
     },
     mounted: function() {
-        this.authorize()
+        Promise.all([
+                this.$axios.retry.get(this.$routing.generate('markets')).then((res) =>
+                    this.markets = typeof res.data === 'object' ? Object.values(res.data) : res.data
+                ),
+                this.$axios.retry.get(this.$routing.generate('orders')).then((res) =>
+                    this.orders = typeof res.data === 'object' ? Object.values(res.data) : res.data
+                ),
+            ])
             .then(() => {
-                this.sendMessage(JSON.stringify({
-                    method: 'order.subscribe',
-                    params: this.marketNames,
-                    id: parseInt(Math.random()),
-                }));
+                this.authorize()
+                    .then(() => {
+                        this.sendMessage(JSON.stringify({
+                            method: 'order.subscribe',
+                            params: this.marketNames,
+                            id: parseInt(Math.random()),
+                        }));
 
-                this.addMessageHandler((response) => {
-                    if ('order.update' === response.method) {
-                        let data = response.params[1];
-                        let order = this.ordersList.find((order) => data.id === order.id);
-
-                        switch (response.params[0]) {
-                            case WSAPI.order.status.PUT:
-                                this.ordersList.push({
-                                    amount: data.amount,
-                                    price: data.price,
-                                    fee: WSAPI.order.type.SELL === parseInt(data.type)
-                                        ? data.maker_fee : data.taker_fee,
-                                    id: data.id,
-                                    side: data.side,
-                                    timestamp: data.mtime,
-                                    market: this.getMarketFromName(data.market),
-                                });
-                                break;
-                            case WSAPI.order.status.UPDATE:
-                                if (typeof order === 'undefined') {
-                                    return;
-                                }
-
-                                let index = this.ordersList.indexOf(order);
-                                order.amount = data.left;
-                                order.price = data.price;
-                                order.timestamp = data.mtime;
-                                this.ordersList[index] = order;
-                                break;
-                            case WSAPI.order.status.FINISH:
-                                if (typeof order === 'undefined') {
-                                    return;
-                                }
-
-                                this.ordersList.splice(this.ordersList.indexOf(order), 1);
-                                break;
-                        }
-
-                        this.ordersList.sort((a, b) => {
-                            return a.timestamp < b.timestamp;
+                        this.addMessageHandler((response) => {
+                            if ('order.update' === response.method) {
+                                this.updateOrders(response.params[1], response.params[0]);
+                                this.$refs.table.refresh();
+                            }
                         });
-                        this.$refs.table.refresh();
-                    }
-                });
+                    })
+                    .catch(() => {
+                        this.$toasted.error('Can not connect to internal services');
+                    });
             })
-            .catch(() => {
-                this.$toasted.error(
-                    'Can not connect to internal services'
-                );
-            });
+            .catch(() => this.$toasted.error('Can not update order list now. Try again later'));
     },
     methods: {
         getHistory: function() {
-            return this.ordersList.map((order) => {
+            return this.orders.map((order) => {
                 return {
                     date: new Date(order.timestamp * 1000).toDateString(),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
@@ -174,12 +150,51 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            this.$axios.get(this.actionUrl).catch(() => {
+            this.$axios.single.get(this.actionUrl).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
             });
         },
         getMarketFromName: function(name) {
             return this.markets.find((market) => market.hiddenName === name);
+        },
+        updateOrders: function(data, type) {
+            let order = this.orders.find((order) => data.id === order.id);
+
+            switch (type) {
+                case WSAPI.order.status.PUT:
+                    this.orders.push({
+                        amount: data.left,
+                        price: data.price,
+                        fee: WSAPI.order.type.SELL === parseInt(data.type)
+                            ? data.maker_fee : data.taker_fee,
+                        id: data.id,
+                        side: data.side,
+                        timestamp: data.mtime,
+                        market: this.getMarketFromName(data.market),
+                    });
+                    break;
+                case WSAPI.order.status.UPDATE:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    let index = this.orders.indexOf(order);
+                    order.amount = data.left;
+                    order.price = data.price;
+                    order.timestamp = data.mtime;
+                    this.orders[index] = order;
+                    break;
+                case WSAPI.order.status.FINISH:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    this.orders.splice(this.orders.indexOf(order), 1);
+                    break;
+            }
+
+            this.orders.sort((a, b) => a.timestamp < b.timestamp);
+            this.$refs.table.refresh();
         },
     },
 };
