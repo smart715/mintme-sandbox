@@ -9,7 +9,7 @@
 {% block content %}
     <div id="token" class="container">
         <div class="row pt-5 justify-content-center">
-            <div class="col-md-8" v-cloak>
+            <div class="col-md-10" v-cloak>
                 {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                 <b-tabs :lazy="true" @input="onTabUpdated" class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
