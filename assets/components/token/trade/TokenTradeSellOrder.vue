@@ -57,7 +57,7 @@
                     <div class="col-12 pt-2">
                         <label
                             for="sell-price-input"
-                            class="text-primary">
+                            class="text-white">
                             Price in WEB:
                             <guide>
                                 <template slot="header">
