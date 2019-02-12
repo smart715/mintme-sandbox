@@ -17,7 +17,9 @@
                 </span>
                 </template>
                 <template v-else>
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
                 </template>
             </div>
             <div class="card-body p-0">
@@ -39,7 +41,9 @@
                     </div>
                     </template>
                     <template v-else>
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        <div class="p-5 text-center">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </div>
                     </template>
                 </div>
             </div>

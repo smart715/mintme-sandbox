@@ -4,12 +4,13 @@
             Balance
         </div>
         <div class="table-responsive">
-            <font-awesome-icon
+            <div v-if="showLoadingIconP" class="p-5 text-center">
+                <font-awesome-icon
                     icon="circle-notch"
                     spin class="loading-spinner"
                     fixed-width
-                    v-if="showLoadingIconP"
-            />
+                    />
+            </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template slot="name" slot-scope="data">
                     {{ data.item.fullname }} ({{ data.item.name }})
@@ -42,12 +43,13 @@
         <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Web tokens you own
         </div>
-        <font-awesome-icon
+        <div class="text-center p-5" v-if="showLoadingIcon">
+            <font-awesome-icon
                 icon="circle-notch"
                 spin class="loading-spinner"
                 fixed-width
-                v-if="showLoadingIcon"
-        />
+                />
+        </div>
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template slot="name" slot-scope="data">
