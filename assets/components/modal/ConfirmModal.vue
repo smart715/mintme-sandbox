@@ -4,11 +4,11 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <div class="mt-3">
+                <div class="mt-2">
                     <img src="../../img/are-you-sure.png"/>
                 </div>
                 <slot>
-                    <p class="text-white modal-title pt-3 pb-4 text-uppercase">
+                    <p class="text-white modal-title pt-2 pb-4 text-uppercase">
                         ARE YOU SURE?
                     </p>
                 </slot>

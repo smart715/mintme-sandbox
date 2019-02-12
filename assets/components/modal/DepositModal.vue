@@ -6,7 +6,7 @@
         <template slot="body">
             <div class="text-center">
                 <h3 class="modal-title">DEPOSIT</h3>
-                <div class="col-12 pt-3">
+                <div class="col-12 pt-2">
                     <code class="wallet-code" id="walletaddress">
                         <span>
                             {{ address }}
@@ -17,11 +17,11 @@
                         </copy-link>
                     </code>
                     <div class="clearfix"></div>
-                    <p class="text-center mt-3">
+                    <p class="text-center mt-2">
                         {{ description }}
                     </p>
                 </div>
-                <div class="pt-3">
+                <div class="pt-2">
                     <button
                         class="btn btn-primary"
                         @click="onSuccess">
