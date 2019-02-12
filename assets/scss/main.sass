@@ -110,7 +110,7 @@ a
     background: $card-header-bg
     color: $white
     padding: .45rem 1.35rem
-    font-size: 1.2rem
+    @include font-scale(md)
 
     .card-header-description
       font-size: .7em
@@ -177,7 +177,7 @@ a
         background-color: $color-tabs
         color: $white
         padding: .45rem 1.35rem
-        font-size: 1.2rem
+        @include font-scale(md)
 
         &.disabled
           cursor: default
@@ -243,7 +243,7 @@ a
       color: $white
       font-weight: lighter;
   .modal-title
-    font-size: 1.2rem
+    @include font-scale(md)
 
 nav.top-navbar
     .navbar-toggler-icon
@@ -289,7 +289,7 @@ nav.top-navbar
 
 .notification
   .title
-    font-size: 1.2rem
+    @include font-scale(md)
     font-weight: 800
   .link
     color: $blue
@@ -348,7 +348,7 @@ nav.top-navbar
   background-repeat: no-repeat
 
 .icon-edit
-  font-size: 1.2rem
+  @include font-scale(md)
 
 .img-barcode
   width: 120px
