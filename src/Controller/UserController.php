@@ -162,7 +162,7 @@ class UserController extends AbstractController
             if ($emailForm2FA->isSubmitted() && !$emailForm2FA->isValid() || $emailForm->isSubmitted() && $emailForm->isValid()) {
                 return $emailForm2FA;
             }
-            if ($emailForm->isSubmitted() || $emailForm2FA->isSubmitted()) {
+            if ($emailForm2FA->isSubmitted()) {
                 $this->submitEmailForm($email);
             }
             return $emailForm;
