@@ -176,16 +176,13 @@ export default {
             });
             for (let orders in grouped) {
                 if (grouped.hasOwnProperty(orders)) {
+                    grouped[orders].sort((first, second) => first.maker.id - second.maker.id);
                     grouped[orders].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
                             order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
                         }
                     });
-                    grouped[orders].sort((first, second) => {
-                        if (parseFloat(first.amount) > parseFloat(second.amount)) {
-                            return -1;
-                        }
-                    });
+                    grouped[orders].sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
                     this.orders.push(grouped[orders][0]);
                 }
             }
