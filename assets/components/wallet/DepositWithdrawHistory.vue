@@ -96,15 +96,16 @@ export default {
                     )
                     .then((response) => {
                         if (this.history.data === null) {
-                            this.history.data = response.data;
-                        }
-                        if (response.data.length > 0) {
+                            this.history.data = JSON.parse(response.request.response);
+                        } else if (response.data.length > 0) {
                             if (this.history.data !== null) {
-                                this.history.data = this.history.data.concat(response.data);
+                                this.history.data = this.history.data.concat(
+                                    JSON.parse(response.request.response)
+                                );
                             }
-                            this.canRequestNextPage = true;
-                            this.currentPage++;
                         }
+                        this.canRequestNextPage = true;
+                        this.currentPage++;
                     })
                     .catch((error) => this.$toasted.error('Can not update payment history. Try again later.'));
             }
