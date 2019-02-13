@@ -4,8 +4,6 @@ namespace App\Validator\Constraints;
 
 use App\Entity\User;
 use App\Manager\TwoFactorManager;
-use App\Manager\TwoFactorManagerInterface;
-use App\Manager\UserManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
