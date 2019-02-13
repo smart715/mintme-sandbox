@@ -21,6 +21,7 @@ describe('TokenSearcher', () => {
                 searchUrl: 'searchUrl',
             },
         });
+        wrapper.vm.$axios.retry = wrapper.vm.$axios.single;
         moxios.stubRequest(/searchUrl\?.*/, {
             status: 200,
             response: [
