@@ -40,17 +40,16 @@
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
-                                <a
-                                    @click="removeOrderModal(row.item)"
-                                    v-if="row.item.trader_id">
-                                        <font-awesome-icon icon="times" class="text-danger c-pointer" />
-                                </a>
                                 <a :href="row.item.trader_url">
-                                    <span v-if="!row.item.trader_id">{{ row.value }}</span>
+                                    <span>{{ row.value }}</span>
                                     <img
                                         src="../../../img/avatar.png"
                                         class="float-right"
                                         alt="avatar">
+                                </a>
+                                <a @click="removeOrderModal(row.item)"
+                                   v-if="row.item.trader_id">
+                                     <font-awesome-icon icon="times" class="text-danger c-pointer" />
                                 </a>
                         </template>
                     </b-table>
@@ -120,7 +119,7 @@ export default {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
-                    trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
+                    trader: this.truncateFullName(order),
                     trader_url: this.$routing.generate('token_show', {
                         name: order.token.name,
                     }),
@@ -136,6 +135,15 @@ export default {
         },
     },
     methods: {
+        truncateFullName: function(order) {
+            let first = order.maker.profile.firstName;
+            let second = order.maker.profile.lastName;
+            if ((first + second).length > 23) {
+               return first.slice(0, 5) + '. ' + second.slice(0, 10) + '.';
+            } else {
+                return first + ' ' + second;
+            }
+        },
         removeOrderModal: function(row) {
             this.removeOrders = [];
             this.currentRow = row;
