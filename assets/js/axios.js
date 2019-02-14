@@ -1,7 +1,11 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
+let csrfToken = document.querySelector('meta[name="csrf-token"]')
+    .getAttribute('content');
+
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
 
 const client = axios.create();
 
