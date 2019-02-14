@@ -26,10 +26,11 @@
             </div>
         </div>
         <modal
-            :visible="{{ profileCreated }}"
-            @close="closeModal">
+            no-close-on-backdrop
+            :visible="{{ profileCreated ? 'false' : 'true' }}">
+            <template slot="close"> &nbsp; </template>
             <template slot="body">
-                <p>You need to create profile, only then you will be able to create token</p>
+                <p class="text-white">You need to create profile, only then you will be able to create token</p>
                 <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
             </template>
         </modal>

@@ -112,7 +112,7 @@
         </div>
         <modal
             :visible="showConfirmWebsiteModal"
-            @close="closeModal">
+            @close="showConfirmWebsiteModal = false">
             <template slot="header">
                 <h5 class="modal-title">Website Confirmation</h5>
             </template>

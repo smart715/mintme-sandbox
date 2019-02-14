@@ -43,7 +43,7 @@
         </div>
         <modal
             :visible="showConfirmModal"
-            @close="closeModal">
+            @close="showConfirmModal = false">
             <template slot="header">
                 <h5 class="modal-title">Facebook Confirmation</h5>
             </template>

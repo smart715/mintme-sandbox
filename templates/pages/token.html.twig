@@ -14,7 +14,7 @@
                 <b-tabs :lazy="true" @input="onTabUpdated" class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
                         <token-trade
-                            websocket-url="{{    global_websocket_url }}"
+                            websocket-url="{{ global_websocket_url }}"
                             hash="{{ hash }}"
                             currency="{{ currency }}"
                             login-url="{{ path('fos_user_security_login') }}"

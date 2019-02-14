@@ -1,10 +1,18 @@
 <template>
-    <b-modal :visible="visible" :size="size" @hidden="closeModal" hide-footer>
+    <b-modal
+        :visible="visible"
+        :size="size"
+        @hidden="closeModal"
+        hide-footer
+        no-close-on-backdrop
+        no-close-on-esc>
         <div slot="modal-header">
             <slot name="header"></slot>
-            <a class="modal-close float-right pr-2 c-pointer" @click="closeModal()">
-                &times;
-            </a>
+            <slot name="close">
+                <a class="modal-close float-right pr-2 c-pointer" @click="closeModal()">
+                    &times;
+                </a>
+            </slot>
         </div>
         <div class="modal-body">
             <slot name="body"></slot>

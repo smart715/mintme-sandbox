@@ -20,20 +20,16 @@
                 </template>
                 <template slot="action" slot-scope="data">
                          <div  class="row justify-content-center">
-                             <div class="d-inline">
-                                 <i
-                                     class="icon-deposit c-pointer float-left"
-                                     @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
-                                 </i>
+                             <div
+                                 class="d-inline  c-pointer"
+                                 @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                                 <i class="icon-deposit float-left"></i>
                                  <span class="pl-2 float-left text-sm align-middle">Deposit</span>
                              </div>
-                             <div class="d-inline pl-3">
-                                 <span class="d-inline">
-                                     <i
-                                         class="icon-withdraw c-pointer float-left"
-                                         @click="openDeposit(data.item.name)">
-                                     </i>
-                                 </span>
+                             <div
+                                 class="d-inline pl-3  c-pointer"
+                                 @click="openDeposit(data.item.name)">
+                                 <i class="icon-withdraw float-left"></i>
                                  <span class="pl-2 float-left text-sm align-middle">Withdraw</span>
                              </div>
                          </div>
