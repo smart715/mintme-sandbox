@@ -52,7 +52,7 @@ class UserController extends AbstractController
         $passwordForm = $this->getPasswordForm($request);
         $emailForm = $this->getEmailForm($request);
 
-        if ('edit_email2_fa' === $emailForm->getName()) {
+        if ($emailForm->has('code')) {
             return $this->render('default/simple_form.html.twig', [
                 'form' => $emailForm->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email',
             ]);
@@ -178,6 +178,8 @@ class UserController extends AbstractController
     private function submitEmailForm(EmailModel $email): void
     {
         $user = $this->getUser();
+        // Create temporary user with new email and use him in email sender.
+        // Set new email as temporary for user
         $tmpUser = clone $user;
         $tmpUser->setEmail($email->getEmail());
         $user->setTempEmail($email->getEmail());

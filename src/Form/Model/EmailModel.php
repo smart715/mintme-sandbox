@@ -11,7 +11,7 @@ class EmailModel
     /**
      * @var string|null
      * @Assert\NotBlank()
-     * @Assert\Email()
+     * @Assert\Email(mode="strict")
      * @UserEmail()
      */
     private $email;
