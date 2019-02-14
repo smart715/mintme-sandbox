@@ -182,10 +182,6 @@ a
         &.disabled
           cursor: default
 
-        &.active
-          background: $secondary
-          color: $white
-
   .tab-content
     flex: 1 1 auto
     background: $secondary
@@ -210,14 +206,15 @@ a
             color: inherit
             position: relative
             background: $secondary
-
+            &.active
+              color: $color-link
             &.active::after
               content: ' '
               position: absolute
               bottom: .75rem
               left: 1.5rem
               height: .125rem
-              background-color: $color-tabs-links
+              background-color: none
               width: calc(100% - 3rem)
 
       .edit-token-profile

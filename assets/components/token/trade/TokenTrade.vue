@@ -22,10 +22,9 @@
                 :balance="webBalance"
             />
             <template v-else>
-                <font-awesome-icon
-                    icon="circle-notch"
-                    spin class="loading-spinner d-block text-white mx-auto my-3"
-                    size="5x" />
+                <div class="p-5 text-center text-white">
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                </div>
             </template>
         </div>
         <div class="sell-order mt-3 col-12 col-md-6 col-lg-4">
@@ -45,10 +44,9 @@
                 :token-hidden-name="tokenHiddenName"
             />
             <template v-else>
-                <font-awesome-icon
-                    icon="circle-notch"
-                    spin class="loading-spinner d-block text-white mx-auto my-3"
-                    size="5x" />
+                <div class="p-5 text-center text-white">
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                </div>
             </template>
         </div>
         <div class="col-12 col-md-6 mt-3">
@@ -57,11 +55,9 @@
                 :buy-orders="buyOrders"
                 :token-name="tokenName" />
             <template v-else>
-                <font-awesome-icon
-                    icon="circle-notch"
-                    spin
-                    class="loading-spinner d-block text-white mx-auto my-3"
-                    size="5x" />
+                <div class="p-5 text-center text-white">
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                </div>
             </template>
         </div>
         <div class="col-12 col-md-6 mt-3">
@@ -70,11 +66,9 @@
                 :sell-orders="sellOrders"
                 :token-name="tokenName" />
             <template v-else>
-                <font-awesome-icon
-                    icon="circle-notch"
-                    spin
-                    class="loading-spinner d-block text-white mx-auto my-3"
-                    size="5x" />
+                <div class="p-5 text-center text-white">
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                </div>
             </template>
         </div>
         <token-trade-trade-history
