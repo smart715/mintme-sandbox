@@ -145,10 +145,4 @@ class Order
     {
         return $this->referralId;
     }
-
-    /** @Groups({"Default", "API"}) */
-    public function getToken(): ?Token
-    {
-        return $this->market->getToken();
-    }
 }

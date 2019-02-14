@@ -121,7 +121,7 @@ export default {
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     trader: this.truncateFullName(order),
                     trader_url: this.$routing.generate('token_show', {
-                        name: order.token.name,
+                        name: order.maker.profile.token.name,
                     }),
                     trader_id: order.maker.id === this.userId ? this.userId : null,
                 };

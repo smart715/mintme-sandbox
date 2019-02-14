@@ -214,6 +214,7 @@ class Profile
         return $this->user->getEmail();
     }
 
+    /** @Groups({"API"}) */
     public function getToken(): ?Token
     {
         return $this->token;
