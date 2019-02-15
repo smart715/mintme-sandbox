@@ -29,8 +29,13 @@
                     </template>
                 </b-table>
             </div>
-            <div class="pt-2">
-
+            <div class="text-center pb-2">
+                <a class="c-pointer">
+                    <img
+                        src="../../../img/down-arrows.png"
+                        class="icon-arrows-down"
+                        alt="arrow">
+                </a>
             </div>
         </div>
     </div>
@@ -56,7 +61,7 @@ export default {
         };
     },
     created: function() {
-        for (let i = 1; i < 8; i++) {
+        for (let i = 1; i < 7; i++) {
             this.traders.push({
                 trader: '0' + i + ' John Doe',
                 date: '2019-01-05',

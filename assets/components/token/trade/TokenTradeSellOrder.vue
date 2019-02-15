@@ -1,16 +1,18 @@
 <template>
     <div>
         <div class="card h-100">
-            <div class="card-header text-center">
+            <div class="card-header text-left">
                 Sell Order
-                <guide>
-                    <template slot="header">
-                        Sell Order
-                    </template>
-                    <template slot="body">
-                        Form used to create  an order so you can sell {{ currency }} or make offer.
-                    </template>
-                </guide>
+                <span  class="card-header-icon">
+                    <guide>
+                        <template slot="header">
+                            Sell Order
+                        </template>
+                        <template slot="body">
+                            Form used to create  an order so you can sell {{ currency }} or make offer.
+                        </template>
+                    </guide>
+                </span>
             </div>
             <div class="card-body">
                 <div class="row">

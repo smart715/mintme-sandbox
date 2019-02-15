@@ -17,37 +17,48 @@
             <div class="fix-height p-2">
                 <div class="chat">
                     <img
-                            src="../../../img/avatar.png"
-                            class=""
-                            alt="avatar">
-                    (12 : 44)
-                    John: bla bla bla bla bla bla bla bla bla bla
-                    bla bla bla bla bla bla bla bla bla bla
-                    bla bla bla bla bla bla bla bla bla bla
+                        src="../../../img/avatar.png"
+                        alt="avatar">
+                    <span class="pl-2">
+                       (12 : 44)
+                       John: bla bla bla bla bla bla bla bla bla bla
+                       bla bla bla bla bla bla bla bla bla bla
+                       bla bla bla bla bla bla bla bla bla bla 
+                    </span>
                 </div>
                 <div class="chat">
                     <img
-                            src="../../../img/avatar.png"
-                            class=""
-                            alt="avatar">
-                    (12 : 44)
-                    John: bla bla bla bla bla bla bla bla bla bla
-                    bla bla bla bla bla bla bla bla bla bla
-                    bla bla bla bla bla bla bla bla bla bla
+                        src="../../../img/avatar.png"
+                        alt="avatar">
+                    <span class="pl-2">
+                       (12 : 44)
+                       John: bla bla bla bla bla bla bla bla bla bla
+                       bla bla bla bla bla bla bla bla bla bla
+                       bla bla bla bla bla bla bla bla bla bla 
+                    </span>
                 </div>
                 <div class="chat">
                     <img
-                            src="../../../img/avatar.png"
-                            class=""
-                            alt="avatar">
-                    (12 : 44)
-                    John: bla bla bla bla bla bla bla bla bla bla
-                    bla bla bla bla bla bla bla bla bla bla
-                    bla bla bla bla bla bla bla bla bla bla
+                        src="../../../img/avatar.png"
+                        alt="avatar">
+                    <span class="pl-2">
+                       (12 : 44)
+                       John: bla bla bla bla bla bla bla bla bla bla
+                       bla bla bla bla bla bla bla bla bla bla
+                       bla bla bla bla bla bla bla bla bla bla 
+                    </span>
                 </div>
             </div>
             <div class="pt-2">
                 <textarea class="form-control"></textarea>
+            </div>
+            <div class="text-center pb-2">
+                <a class="c-pointer">
+                    <img
+                        src="../../../img/down-arrows.png"
+                        class="icon-arrows-down"
+                        alt="arrow">
+                </a>
             </div>
         </div>
     </div>
