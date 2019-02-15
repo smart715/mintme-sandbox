@@ -4,7 +4,7 @@ parameters:
 
     version: 'V1.0.0'
 
-    viabtc_rpc: 'http://212.32.255.77:8080'
+    viabtc_rpc: 'http://localhost:8080'
     viabtc_response_timeout_seconds: 10
 
     withdraw_rpc: 'http://localhost:8081'
