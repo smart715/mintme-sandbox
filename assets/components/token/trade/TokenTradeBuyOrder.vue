@@ -107,7 +107,7 @@
                             </template>
                         </guide>
                     </div>
-                    <div class="col-12 pt-3 text-center">
+                    <div class="col-12 pt-3 text-left">
                         <button @click="placeOrder"
                             v-if="loggedIn"
                             class="btn btn-primary"
