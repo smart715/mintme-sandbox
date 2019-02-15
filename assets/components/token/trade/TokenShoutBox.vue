@@ -3,53 +3,54 @@
         <div class="card-header">
             Shoutbox
             <span class="card-header-icon">
-                <guide>
-                    <template slot="header">
-                        Trade History
-                    </template>
-                    <template slot="body">
-                        List of last closed orders for {{ tokenName }}.
-                    </template>
-                </guide>
+                <font-awesome-icon
+                    icon="circle"
+                    class="text-success text-xs"/>
             </span>
         </div>
         <div class="card-body p-0">
-            <div class="fix-height p-2">
-                <div class="chat">
-                    <img
-                        src="../../../img/avatar.png"
-                        alt="avatar">
-                    <span class="pl-2">
-                       (12 : 44)
-                       John: bla bla bla bla bla bla bla bla bla bla
-                       bla bla bla bla bla bla bla bla bla bla
-                       bla bla bla bla bla bla bla bla bla bla 
+            <div class="fix-height">
+                <div class="chat px-3">
+                    <span class="align-middle">
+                        <img
+                            src="../../../img/avatar.png"
+                            alt="avatar">
+                    </span>
+                    <span class="pl-2 align-middle">
+                        (12 : 44)
+                        John: bla bla bla bla bla bla bla bla bla bla
+                        bla bla bla bla bla bla bla bla bla bla
+                        bla bla bla bla bla bla bla bla bla bla
                     </span>
                 </div>
-                <div class="chat">
-                    <img
-                        src="../../../img/avatar.png"
-                        alt="avatar">
-                    <span class="pl-2">
-                       (12 : 44)
-                       John: bla bla bla bla bla bla bla bla bla bla
-                       bla bla bla bla bla bla bla bla bla bla
-                       bla bla bla bla bla bla bla bla bla bla 
+                <div class="chat  px-3">
+                    <span class="align-middle">
+                        <img
+                            src="../../../img/avatar.png"
+                            alt="avatar">
+                    </span>
+                    <span class="pl-2 align-middle">
+                        (12 : 44)
+                        John: bla bla bla bla bla bla bla bla bla bla
+                        bla bla bla bla bla bla bla bla bla bla
+                        bla bla bla bla bla bla bla bla bla bla
                     </span>
                 </div>
-                <div class="chat">
-                    <img
-                        src="../../../img/avatar.png"
-                        alt="avatar">
-                    <span class="pl-2">
-                       (12 : 44)
-                       John: bla bla bla bla bla bla bla bla bla bla
-                       bla bla bla bla bla bla bla bla bla bla
-                       bla bla bla bla bla bla bla bla bla bla 
+                <div class="chat px-3">
+                    <span class="align-middle">
+                        <img
+                            src="../../../img/avatar.png"
+                            alt="avatar">
+                    </span>
+                    <span class="pl-2 align-middle">
+                        (12 : 44)
+                        John: bla bla bla bla bla bla bla bla bla bla
+                        bla bla bla bla bla bla bla bla bla bla
+                        bla bla bla bla bla bla bla bla bla bla
                     </span>
                 </div>
             </div>
-            <div class="pt-2">
+            <div class="py-2  px-3">
                 <textarea class="form-control"></textarea>
             </div>
             <div class="text-center pb-2">
