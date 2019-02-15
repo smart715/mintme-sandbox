@@ -10,7 +10,10 @@ class EmailModel
     /**
      * @var string|null
      * @Assert\NotBlank()
-     * @Assert\Email()
+     * @Assert\Email(
+     *     message = "Invalid email address.",
+     *     checkMX = true
+     * )
      * @UserEmail()
      */
     private $email;
