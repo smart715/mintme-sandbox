@@ -68,7 +68,7 @@ class MarketHandler implements MarketHandlerInterface
             );
         }, $markets);
 
-        $deals = array_merge(...$marketDeals);
+        $deals = $marketDeals ? array_merge(...$marketDeals) : [];
 
         uasort($deals, function (Deal $lDeal, Deal $rDeal) {
             return $lDeal->getTimestamp() > $rDeal->getTimestamp();
@@ -87,7 +87,7 @@ class MarketHandler implements MarketHandlerInterface
             );
         }, $markets);
 
-        $orders = array_merge(...$marketOrders);
+        $orders = $marketOrders ? array_merge(...$marketOrders) : [];
 
         uasort($orders, function (Order $lOrder, Order $rOrder) {
             return $lOrder->getTimestamp() > $rOrder->getTimestamp();
