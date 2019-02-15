@@ -14,8 +14,8 @@
             </span>
         </div>
         <div class="card-body p-0">
-            <div class="fix-height">
-                <div class="chat pl-2">
+            <div class="fix-height p-2">
+                <div class="chat">
                     <img
                             src="../../../img/avatar.png"
                             class=""
@@ -25,7 +25,7 @@
                     bla bla bla bla bla bla bla bla bla bla
                     bla bla bla bla bla bla bla bla bla bla
                 </div>
-                <div class="chat pl-2">
+                <div class="chat">
                     <img
                             src="../../../img/avatar.png"
                             class=""
@@ -35,7 +35,7 @@
                     bla bla bla bla bla bla bla bla bla bla
                     bla bla bla bla bla bla bla bla bla bla
                 </div>
-                <div class="chat pl-2">
+                <div class="chat">
                     <img
                             src="../../../img/avatar.png"
                             class=""

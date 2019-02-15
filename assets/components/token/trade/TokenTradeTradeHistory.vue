@@ -100,10 +100,10 @@ export default {
                 return {
                     date_time: new Date(order.timestamp * 1000).toDateString(),
                     order_maker: order.maker != null
-                        ? order.maker.profile.firstName + order.maker.profile.lastName
+                        ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
                         : '',
                     order_trader: order.taker != null
-                        ? order.taker.profile.firstName + order.taker.profile.lastName
+                        ? order.taker.profile.firstName + ' ' + order.taker.profile.lastName
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     price_per_token: toMoney(order.price),

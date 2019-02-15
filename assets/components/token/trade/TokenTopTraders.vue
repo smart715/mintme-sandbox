@@ -24,7 +24,7 @@
                         {{ row.value }}
                         <img
                             src="../../../img/avatar.png"
-                            class=""
+                            class="float-right"
                             alt="avatar">
                     </template>
                 </b-table>
