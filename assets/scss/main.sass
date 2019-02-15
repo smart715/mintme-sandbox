@@ -26,6 +26,7 @@ html
   box-sizing: border-box
 
 body
+  @include font-scale(sm)
   color: $body-background
   font-family: $lato-font
   background: $black url("../img/sky_image.jpg") no-repeat fixed
@@ -132,6 +133,17 @@ a
 .btn-primary
   color: $white
 
+.circle
+    background: #51677F
+    border-radius: 200px
+    height: 200px
+    width: 200px
+    display: table
+    img
+      vertical-align: middle
+      display: table-cell
+      width: 120px
+
 .table
   thead
     th
@@ -150,10 +162,13 @@ a
     border: none
     padding-top: 0.35rem
     padding-bottom: 0.35rem
+    vertical-align: middle
     &:first-child
       padding-left: 1.5rem
     &:last-child
       padding-right: 1.5rem
+    img
+      height: 18px
   
 .fix-layout
   table-layout: fixed
@@ -236,7 +251,7 @@ a
     div
       width: 100%
     .modal-close
-      font-size: 2rem
+      @include font-scale(md)
       color: $white
       font-weight: lighter;
   .modal-title
@@ -303,19 +318,8 @@ nav.top-navbar
   & > *:not(.v-cloak--inline)
     display: none
 
-.circle
-    background: #51677F
-    border-radius: 200px
-    height: 200px
-    width: 200px
-    display: table
-    img
-      vertical-align: middle
-      display: table-cell
-      width: 120px
-
-.text-sm
-  font-size: .7rem
+.text-xs
+  @include font-scale(xs)
 
 .pagination
   .page-item
@@ -330,12 +334,12 @@ nav.top-navbar
 .blue-question
   background: $color-tooltip
   padding: .125rem
-  font-size: .675em
+  font-size: .875em
   vertical-align: middle
 
 .icon
-  width: 1em
-  height: 1em
+  width: 18px
+  height: 18px
   display: block
   background-size: auto 100%
   background-repeat: no-repeat

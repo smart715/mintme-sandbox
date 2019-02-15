@@ -24,13 +24,13 @@
                                  class="d-inline  c-pointer"
                                  @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
                                  <i class="icon-deposit float-left"></i>
-                                 <span class="pl-2 float-left text-sm align-middle">Deposit</span>
+                                 <span class="pl-2 float-left text-xs align-middle">Deposit</span>
                              </div>
                              <div
                                  class="d-inline pl-3  c-pointer"
                                  @click="openDeposit(data.item.name)">
                                  <i class="icon-withdraw float-left"></i>
-                                 <span class="pl-2 float-left text-sm align-middle">Withdraw</span>
+                                 <span class="pl-2 float-left text-xs align-middle">Withdraw</span>
                              </div>
                          </div>
                 </template>

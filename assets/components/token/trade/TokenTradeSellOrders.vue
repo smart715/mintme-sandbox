@@ -32,7 +32,7 @@
                            {{ row.value }}
                            <img
                                src="../../../img/avatar.png"
-                               class="float-right"
+                               class=""
                                alt="avatar">
                         </template>
                     </b-table>

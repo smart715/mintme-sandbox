@@ -3,7 +3,7 @@
         <div class="card h-100">
             <div class="card-header"></div>
             <div class="card-body p-2">
-                <div class="small text-center">
+                <div class="text-center">
                     <div class="pt-2">
                         Last price: {{ marketStatus.last }}
                         <guide>

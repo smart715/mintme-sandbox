@@ -16,17 +16,15 @@
                         </p>
                     </div>
                 </guide>
-                <span class="card-header-icon">
-                    <font-awesome-icon
-                        v-if="editable && !showSettings"
-                        class="float-right c-pointer icon-edit"
-                        icon="edit"
-                        transform="shrink-4 up-1.5"
-                        @click="switchAction"
-                        />
-                </span>
             </div>
             <div class="card-body">
+                <font-awesome-icon
+                    v-if="editable && !showSettings"
+                    class="float-right c-pointer icon-edit"
+                    icon="edit"
+                    transform="shrink-4 up-1.5"
+                    @click="switchAction"
+                    />
                 <template v-if="loaded">
                 <div v-if="!showSettings" class="row">
                     <div class="col">
