@@ -6,7 +6,7 @@
             :currency="currency"
             :market-name="marketName"
         />
-        <div class="buy-order col-12 col-md-6 col-lg-4 mt-3">
+        <div class="col-12 col-md-6 col-lg-4 mt-3">
             <token-trade-buy-order
                 v-if="balanceLoaded"
                 :websocket-url="websocketUrl"
@@ -27,7 +27,7 @@
                 </div>
             </template>
         </div>
-        <div class="sell-order mt-3 col-12 col-md-6 col-lg-4">
+        <div class="pt-3 col-12 col-md-6 col-lg-4">
             <token-trade-sell-order
                 v-if="balanceLoaded"
                 :websocket-url="websocketUrl"
@@ -49,7 +49,10 @@
                 </div>
             </template>
         </div>
-        <div class="col-12 col-md-6 mt-3">
+        <div class="pt-3 col-12 col-md-6 col-lg-4">
+            <token-top-traders/>
+        </div>
+        <div class="col-12 col-md-6 pt-3">
             <token-trade-buy-orders
                 v-if="ordersLoaded"
                 :buy-orders="buyOrders"
@@ -60,7 +63,7 @@
                 </div>
             </template>
         </div>
-        <div class="col-12 col-md-6 mt-3">
+        <div class="col-12 col-md-6 pt-3">
             <token-trade-sell-orders
                 v-if="ordersLoaded"
                 :sell-orders="sellOrders"
@@ -71,6 +74,8 @@
                 </div>
             </template>
         </div>
+        <token-shout-box
+            class="col-12 mt-3"/>
         <token-trade-trade-history
             class="col-12 mt-3"
             :token-name="tokenName" />
@@ -83,7 +88,9 @@ import TokenTradeSellOrder from './TokenTradeSellOrder';
 import TokenTradeChart from './TokenTradeChart';
 import TokenTradeBuyOrders from './TokenTradeBuyOrders';
 import TokenTradeSellOrders from './TokenTradeSellOrders';
+import TokenTopTraders from './TokenTopTraders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
+import TokenShoutBox from './TokenShoutBox';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
 
@@ -97,6 +104,8 @@ export default {
         TokenTradeBuyOrders,
         TokenTradeSellOrders,
         TokenTradeTradeHistory,
+        TokenShoutBox,
+        TokenTopTraders,
         OrderModal,
     },
     props: {
