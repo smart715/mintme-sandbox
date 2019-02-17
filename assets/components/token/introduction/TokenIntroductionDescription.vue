@@ -86,7 +86,6 @@ export default {
     props: {
         name: String,
         description: String,
-        csrfToken: String,
         updateUrl: String,
         editable: Boolean,
     },
@@ -120,7 +119,6 @@ export default {
         doEditDescription: function() {
             this.$axios.single.patch(this.updateUrl, {
                 description: this.newDescription,
-                _csrf_token: this.csrfToken,
             })
             .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
