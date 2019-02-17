@@ -32,13 +32,7 @@ class TwoFactorManager implements TwoFactorManagerInterface
         $this->authenticator = $authenticator;
     }
 
-    public function checkCode(User $user, FormInterface $form): bool
-    {
-        $code = $form->getData()['code'] ?? '';
-        return $this->isValidCode($user, $code);
-    }
-
-    public function isValidCode(User $user, string $code): bool
+    public function checkCode(User $user, string $code): bool
     {
         $isBackupCode = in_array($code, $user->getGoogleAuthenticatorBackupCodes());
         return $isBackupCode || $this->authenticator->checkCode($user, $code);

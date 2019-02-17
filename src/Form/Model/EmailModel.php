@@ -12,7 +12,7 @@ class EmailModel
      * @var string|null
      * @Assert\NotBlank()
      * @Assert\Email(
-     *     mode="strict"
+     *     mode="strict",
      *     message = "Invalid email address.",
      *     checkMX = true
      * )

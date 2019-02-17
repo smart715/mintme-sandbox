@@ -17,6 +17,7 @@ use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Util\StringUtil;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,7 +53,7 @@ class UserController extends AbstractController
         $passwordForm = $this->getPasswordForm($request);
         $emailForm = $this->getEmailForm($request);
 
-        if ($emailForm->has('code')) {
+        if (StringUtil::fqcnToBlockPrefix(EditEmail2FAType::class) === $emailForm->getName()) {
             return $this->render('default/simple_form.html.twig', [
                 'form' => $emailForm->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email',
             ]);
@@ -121,16 +122,12 @@ class UserController extends AbstractController
             return $this->render('security/2fa_manager.html.twig', $parameters);
         }
 
-        if ($twoFactorManager->checkCode($user, $form)) {
-            if ($isTwoFactor) {
-                $this->turnOffAuthenticator($twoFactorManager);
-                return $this->redirectToRoute('settings');
-            }
-            $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
-            return $this->render('security/2fa_manager.html.twig', $parameters);
+        if ($isTwoFactor) {
+            $this->turnOffAuthenticator($twoFactorManager);
+            return $this->redirectToRoute('settings');
         }
 
-        $this->addFlash('danger', 'Invalid two-factor authentication code.');
+        $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
         return $this->render('security/2fa_manager.html.twig', $parameters);
     }
 

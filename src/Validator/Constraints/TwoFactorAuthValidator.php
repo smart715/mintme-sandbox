@@ -25,7 +25,7 @@ class TwoFactorAuthValidator extends ConstraintValidator
     /** {@inheritdoc} */
     public function validate($value, Constraint $constraint): void
     {
-        if ($value && !$this->twoFactorManager->isValidCode($this->user, $value)) {
+        if ($value && !$this->twoFactorManager->checkCode($this->user, $value)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
