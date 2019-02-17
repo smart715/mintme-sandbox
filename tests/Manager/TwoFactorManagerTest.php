@@ -18,20 +18,20 @@ class TwoFactorManagerTest extends TestCase
 {
     public function testCheckCode(): void
     {
-        $form = $this->mockFormInterface(['code' => '1']);
+        $code = '1';
         $session = $this->mockSession();
         $entityManager = $this->mockEntityManager();
         $googleAuth = $this->mockGoogleAuthenticatorInterface();
         $googleAuthEntry = $this->mockUser(['1', '2']);
         $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
-        $this->assertTrue($manager->checkCode($googleAuthEntry, $form));
+        $this->assertTrue($manager->checkCode($googleAuthEntry, $code));
         $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $googleAuthEntry = $this->mockUser(['3', '2']);
-        $this->assertFalse($manager->checkCode($googleAuthEntry, $form));
+        $this->assertFalse($manager->checkCode($googleAuthEntry, $code));
         $googleAuthEntry = $this->mockUser(['2', '2']);
         $googleAuth = $this->mockGoogleAuthenticatorInterface(true);
         $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
-        $this->assertTrue($manager->checkCode($googleAuthEntry, $form));
+        $this->assertTrue($manager->checkCode($googleAuthEntry, $code));
     }
 
     public function testGenerateBackUpCodes(): void
