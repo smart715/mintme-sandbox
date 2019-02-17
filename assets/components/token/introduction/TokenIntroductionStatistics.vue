@@ -175,7 +175,6 @@
                 </div>
                 <div v-else>
                     <release-period-component
-                        :csrf="csrf"
                         :release-period-route="releasePeriodRoute"
                         :period="statsPeriod"
                         :released-disabled="releasedDisabled"
@@ -210,7 +209,6 @@ export default {
     props: {
         name: String,
         releasePeriodRoute: String,
-        csrf: String,
         editable: Boolean,
         stats: {
             type: Object,
