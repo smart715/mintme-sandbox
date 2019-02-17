@@ -50,20 +50,23 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
+        $user = $this->getUser();
+        $email = new EmailModel($user->getEmail());
+        $emailForm = $this->createForm(EditEmailType::class, $email);
+        $emailForm->handleRequest($request);
         $passwordForm = $this->getPasswordForm($request);
-        $emailForm = $this->getEmailForm($request);
 
-        if (StringUtil::fqcnToBlockPrefix(EditEmail2FAType::class) === $emailForm->getName()) {
-            return $this->render('default/simple_form.html.twig', [
-                'form' => $emailForm->createView(), 'formHeader' => 'Enter two-factor code to confirm Edit Email',
-            ]);
+        if ($user->isGoogleAuthenticatorEnabled()) {
+            $emailForm2FA = $this->createForm(EditEmail2FAType::class, $email);
+            $emailForm2FA->handleRequest($request);
+            return $this->renderSettings2FA($passwordForm, $emailForm, $emailForm2FA);
         }
 
-        return $this->render('pages/settings.html.twig', [
-            'emailForm' => $emailForm->createView(),
-            'passwordForm' => $passwordForm->createView(),
-            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
-        ]);
+        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
+            $this->submitEmailForm($email);
+        }
+
+        return $this->renderSettings($passwordForm, $emailForm);
     }
 
     /**
@@ -146,30 +149,34 @@ class UserController extends AbstractController
         return $passwordForm;
     }
 
-    private function getEmailForm(Request $request): FormInterface
+    private function renderSettings(FormInterface $passwordForm, FormInterface $emailForm): Response
     {
-        $user = $this->getUser();
-        $email = new EmailModel($user->getEmail());
-        $emailForm = $this->createForm(EditEmailType::class, $email);
-        $emailForm->handleRequest($request);
-        $emailForm2FA = $this->createForm(EditEmail2FAType::class, $email);
-        $emailForm2FA->handleRequest($request);
+        return $this->render('pages/settings.html.twig', [
+            'emailForm' => $emailForm->createView(),
+            'passwordForm' => $passwordForm->createView(),
+            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
+        ]);
+    }
 
-        if ($user->isGoogleAuthenticatorEnabled()) {
-            if ($emailForm2FA->isSubmitted() && !$emailForm2FA->isValid() || $emailForm->isSubmitted() && $emailForm->isValid()) {
-                return $emailForm2FA;
-            }
-            if ($emailForm2FA->isSubmitted()) {
-                $this->submitEmailForm($email);
-            }
-            return $emailForm;
+    private function renderSettings2FA(
+        FormInterface $passwordForm,
+        FormInterface $emailForm,
+        FormInterface $emailForm2FA
+    ): Response {
+        if ($emailForm2FA->isSubmitted() && !$emailForm2FA->isValid() || $emailForm->isSubmitted() && $emailForm->isValid()) {
+            return $this->render('default/simple_form.html.twig', [
+                'form' => $emailForm2FA->createView(),
+                'formHeader' => 'Enter two-factor code to confirm Edit Email',
+            ]);
         }
 
-        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
+        if ($emailForm2FA->isSubmitted()) {
+            /** @var EmailModel $email */
+            $email = $emailForm2FA->getRoot()->getData();
             $this->submitEmailForm($email);
         }
 
-        return $emailForm;
+        return $this->renderSettings($passwordForm, $emailForm);
     }
 
     private function submitEmailForm(EmailModel $email): void
