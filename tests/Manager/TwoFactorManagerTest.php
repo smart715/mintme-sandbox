@@ -11,7 +11,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class TwoFactorManagerTest extends TestCase
@@ -75,14 +74,6 @@ class TwoFactorManagerTest extends TestCase
         $twoFactorManager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $instance = $twoFactorManager->getGoogleAuthEntry(1);
         $this->assertInstanceOf(GoogleAuthenticatorEntry::class, $instance);
-    }
-
-    private function mockFormInterface(array $array = []): FormInterface
-    {
-        /** @var FormInterface|MockObject $form */
-        $form = $this->createMock(FormInterface::class);
-        $form->method('getData')->willReturn($array);
-        return $form;
     }
 
     private function mockGoogleAuthenticatorInterface(
