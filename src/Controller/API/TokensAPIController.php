@@ -50,7 +50,6 @@ class TokensAPIController extends FOSRestController
     /**
      * @Rest\View()
      * @Rest\Patch("/{name}", name="token_update")
-     * @Rest\RequestParam(name="_csrf_token", allowBlank=false)
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
@@ -75,9 +74,7 @@ class TokensAPIController extends FOSRestController
             return null !== $value;
         }), false);
 
-        $csrfToken = $request->get('_csrf_token');
-
-        if (!$form->isValid() || !$this->isCsrfTokenValid('update-token', $csrfToken)) {
+        if (!$form->isValid()) {
             return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
 
@@ -138,7 +135,6 @@ class TokensAPIController extends FOSRestController
      * @Rest\Post("/{name}/lock-in", name="lock_in")
      * @Rest\RequestParam(name="released", allowBlank=false)
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
-     * @Rest\RequestParam(name="_csrf_token", allowBlank=false)
      */
     public function setTokenReleasePeriod(
         ParamFetcherInterface $request,
@@ -164,7 +160,7 @@ class TokensAPIController extends FOSRestController
 
         $form->submit($request->all());
 
-        if (!$form->isValid() || !$this->isCsrfTokenValid('update-token', $request->get('_csrf_token'))) {
+        if (!$form->isValid()) {
             return $this->view($form);
         }
 
