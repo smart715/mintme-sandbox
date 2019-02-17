@@ -107,7 +107,6 @@ export default {
         editing: Boolean,
         address: String,
         updateUrl: String,
-        csrfToken: String,
     },
     components: {
         FontAwesomeIcon,
@@ -173,7 +172,6 @@ export default {
         savePage: function() {
             this.$axios.single.patch(this.updateUrl, {
                 facebookUrl: this.selectedUrl,
-                _csrf_token: this.csrfToken,
             })
             .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
