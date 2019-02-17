@@ -61,8 +61,7 @@
                                     :app-id="facebookAppId"
                                     :editing="editingUrls"
                                     :address="facebookUrl"
-                                    :update-url="updateUrl"
-                                    :csrfToken="csrfToken"/>
+                                    :update-url="updateUrl"/>
                             </div>
                             <div v-if="youtubeChannelId">
                                 <token-youtube-address
@@ -70,8 +69,7 @@
                                     :editable="editable"
                                     :editing="editingUrls"
                                     :channel-id="youtubeChannelId"
-                                    :update-url="updateUrl"
-                                    :csrfToken="csrfToken"/>
+                                    :update-url="updateUrl"/>
                             </div>
                         </div>
                     </div>
@@ -188,7 +186,6 @@ export default {
         facebookUrl: String,
         youtubeChannelId: String,
         updateUrl: String,
-        csrfToken: String,
         editable: Boolean,
         profileUrl: String,
     },
