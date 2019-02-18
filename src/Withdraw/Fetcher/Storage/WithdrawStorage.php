@@ -3,6 +3,7 @@
 namespace App\Withdraw\Fetcher\Storage;
 
 use App\Communications\JsonRpcInterface;
+use Dompdf\Exception;
 
 class WithdrawStorage implements StorageAdapterInterface
 {
@@ -42,14 +43,10 @@ class WithdrawStorage implements StorageAdapterInterface
 
     private function sendRequest(string $method, array $params): array
     {
-        try {
-            $response = $this->jsonRpc->send($method, $params);
-        } catch (\Throwable $exception) {
-            return [];
-        }
+        $response = $this->jsonRpc->send($method, $params);
 
         if ($response->hasError()) {
-            return [];
+            throw new \Exception($response->getError()['message'] ?? '');
         }
 
         return $response->getResult();

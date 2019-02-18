@@ -49,7 +49,6 @@
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faYoutubeSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import axios from 'axios';
 import gapi from 'gapi';
 import Guide from '../Guide';
 
@@ -69,7 +68,6 @@ export default {
         editing: Boolean,
         channelId: String,
         updateUrl: String,
-        csrfToken: String,
     },
     components: {
         FontAwesomeIcon,
@@ -99,9 +97,8 @@ export default {
         addChannel: function() {
             this.signInYoutube()
                 .then(() => this.getChannelId().then((channelId) => {
-                    axios.patch(this.updateUrl, {
+                    this.$axios.single.patch(this.updateUrl, {
                         youtubeChannelId: channelId,
-                        _csrf_token: this.csrfToken,
                     }).then((response) => {
                         if (response.status === HTTP_NO_CONTENT) {
                             this.currentChannelId = channelId;

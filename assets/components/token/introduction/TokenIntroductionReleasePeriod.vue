@@ -79,7 +79,6 @@
 
 <script>
 import vueSlider from 'vue-slider-component';
-import axios from 'axios';
 import {deepFlatten} from '../../../js/utils';
 import Guide from '../../Guide';
 
@@ -87,7 +86,6 @@ export default {
     name: 'TokenIntroductionReleasePeriod',
     props: {
         releasePeriodRoute: String,
-        csrf: String,
         releasedDisabled: {type: Boolean, default: false},
         period: {type: Number, default: 10},
     },
@@ -105,10 +103,9 @@ export default {
             this.$emit('cancel');
         },
         saveReleasePeriod: function() {
-            axios.post(this.releasePeriodRoute, {
-                released: this.released,
-                releasePeriod: this.period,
-                _csrf_token: this.csrf,
+            this.$axios.single.post(this.releasePeriodRoute, {
+                'released': this.released,
+                'releasePeriod': this.period,
             }).then((response) => {
                 this.$emit('onStatsUpdate', response);
                 this.$toasted.success('Release period updated.');

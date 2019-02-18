@@ -53,7 +53,10 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Email()
+     * @Assert\Email(
+     *     message = "Invalid email address.",
+     *     checkMX = true
+     * )
      * @var string
      */
     protected $email;
@@ -132,7 +135,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this;
     }
 
-    /** @Groups({"Default"}) */
+    /** @Groups({"Default", "API"}) */
     public function getProfile(): ?Profile
     {
         return $this->profile;

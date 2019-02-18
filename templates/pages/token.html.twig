@@ -9,35 +9,30 @@
 {% block content %}
     <div id="token" class="container">
         <div class="row">
-            <div class="col">
+            <div class="col" v-cloak>
+                {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                 <token-name
                     name="{{ token.name }}"
                     csrf-token="{{ csrf_token('update-token') }}"
                     update-url="{{ path('token_update', {'name': token.name}) }}"
                     :editable="{{ isOwner ? 'true' : 'false' }}">
                 </token-name>
-                <b-tabs class="tabs-theme transparent" v-model="tabIndex">
-                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %} v-cloak>
-                        {{ include("loader.html.twig") }}
+                <b-tabs :lazy="true" @input="onTabUpdated" class="tabs-theme transparent" v-model="tabIndex">
+                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
                         <token-trade
-                                orders-history="{{ executedOrders | json_encode }}"
-                                pending-buy-orders="{{ pendingBuyOrders | json_encode }}"
-                                pending-sell-orders="{{ pendingSellOrders | json_encode }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                hash="{{ hash }}"
-                                currency="{{ currency }}"
-                                login-url="{{ path('fos_user_security_login') }}"
-                                signup-url="{{ path('fos_user_registration_register') }}"
-                                :market-name="{{ marketName | json_encode }}"
-                                :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                token-name= "{{ token.name }}"
-                                place-order-url= "{{ path('token_place_order', {'tokenName' : token.name}) }}"
-                                token-hidden-name="{{ tokenHiddenName }}"
-                                :balances="{{ balances | json_encode }}">
+                            websocket-url="{{    global_websocket_url }}"
+                            hash="{{ hash }}"
+                            currency="{{ currency }}"
+                            login-url="{{ path('fos_user_security_login') }}"
+                            signup-url="{{ path('fos_user_registration_register') }}"
+                            :market-name="{{ marketName | json_encode }}"
+                            :logged-in="{{ app.user ? 'true' : 'false' }}"
+                            token-name="{{ token.name }}"
+                            place-order-url="{{ path('token_place_order', {'tokenName' : token.name}) }}"
+                            token-hidden-name="{{ tokenHiddenName }}">
                         </token-trade>
                     </b-tab>
-                    <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %} v-cloak>
-                        {{ include("loader.html.twig") }}
+                    <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
                             <token-introduction-profile
                                 class="col-12 col-md-6"
@@ -50,20 +45,15 @@
                                 facebook-url="{{ token.facebookUrl }}"
                                 youtube-channel-id="{{ token.youtubeChannelId }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
-                                csrf-token="{{ csrf_token('update-token') }}"
                                 :editable="{{ isOwner ? 'true' : 'false' }}"
                                 profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
                             >
                             </token-introduction-profile>
 
                             <token-introduction-statistics
+                                class="col-12 col-md-6 mt-3 mt-md-0"
                                 name="{{ token.name }}"
-                                container-class="col-12 col-md-6 mt-3 mt-md-0"
                                 :editable="{{ isOwner ? 'true' : 'false' }}"
-                                csrf="{{ csrf_token('update-token') }}"
-                                :tokens="{{ tokens | json_encode }}"
-                                :pending-sell-orders="{{ pendingSellOrders | json_encode }}"
-                                :executed-orders="{{ executedOrders | json_encode }}"
                                 {% if stats is not null %}
                                     :stats="{{ stats | json_encode }}"
                                 {% endif %}
@@ -75,7 +65,6 @@
                                 class="col-12 mt-3 mt-3"
                                 name="{{ token.name }}"
                                 description="{{ token.description }}"
-                                csrf-token="{{ csrf_token('update-token') }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
                                 :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-introduction-description>
