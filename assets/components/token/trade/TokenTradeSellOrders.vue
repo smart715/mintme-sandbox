@@ -46,7 +46,7 @@
                         </div>
                     </template>
                 </div>
-                <div class="text-center" v-if="showDownArrow">
+                <div class="text-center pb-2" v-if="showDownArrow">
                     <img
                         src="../../../img/down-arrows.png"
                         class="icon-arrows-down c-pointer"
