@@ -187,7 +187,7 @@ export default {
                     grouped[orders].sort((first, second) => first.maker.id - second.maker.id);
                     grouped[orders].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
-                            order.amount = parseFloat(order.amount) + parseFloat(arr[i-1].amount);
+                            order.amount = new Decimal(order.amount).add(arr[i-1].amount);
                         }
                     });
                     grouped[orders].sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
