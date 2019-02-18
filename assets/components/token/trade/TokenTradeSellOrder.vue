@@ -232,36 +232,23 @@ export default {
       },
     },
     mounted: function() {
-        if (!this.immutableBalance) {
+        if (!this.balance) {
             return;
         }
 
-        this.authorize()
-            .then(() => {
-                this.addMessageHandler((response) => {
-                    if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.tokenHiddenName)) {
-                        this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.tokenName}))
-                            .then((res) => {
-                                this.immutableBalance =
-                                    new Decimal(response.params[0][this.tokenHiddenName].available).sub(
-                                        res.data.frozenAmount
-                                    );
-                            })
-                            .catch(() => {});
-                    }
-                });
-
-                this.sendMessage(JSON.stringify({
-                    method: 'asset.subscribe',
-                    params: [this.tokenHiddenName],
-                    id: parseInt(Math.random()),
-                }));
-            })
-            .catch(() => {
-                this.$toasted.error(
-                    'Can not connect to internal services'
-                );
-            });
+        this.addMessageHandler((response) => {
+            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.tokenHiddenName)) {
+                this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.tokenName}))
+                    .then((res) => {
+                        this.immutableBalance = res.data ?
+                            new Decimal(response.params[0][this.tokenHiddenName].available).sub(
+                                res.data.frozenAmount
+                            ) :
+                            response.params[0][this.tokenHiddenName].available;
+                    })
+                    .catch(() => {});
+            }
+        });
     },
     filters: {
         toMoney: function(val) {
