@@ -14,7 +14,7 @@
             </span>
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive fix-height">
+            <div class="table-responsive fix-height" ref="traders">
                 <b-table
                     :items="traders"
                     :fields="fields"
@@ -28,6 +28,13 @@
                             alt="avatar">
                     </template>
                 </b-table>
+            </div>
+            <div class="text-center" v-if="showDownArrow">
+                <img
+                    src="../../../img/down-arrows.png"
+                    class="icon-arrows-down c-pointer"
+                    alt="arrow down"
+                    @click="scrollDown">
             </div>
         </div>
     </div>
@@ -52,6 +59,11 @@ export default {
             },
         };
     },
+    computed: {
+        showDownArrow: function() {
+            return (this.traders.length > 7);
+        },
+    },
     created: function() {
         for (let i = 1; i < 9; i++) {
             this.traders.push({
@@ -60,6 +72,12 @@ export default {
                 amount: Math.floor(Math.random() * 99) + 10,
             });
         }
+    },
+    methods: {
+        scrollDown: function() {
+            let parentDiv = this.$refs.traders;
+            parentDiv.scrollTop = parentDiv.scrollHeight;
+        },
     },
 };
 </script>

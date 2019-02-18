@@ -23,7 +23,7 @@
                 </template>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fix-height">
+                <div class="table-responsive fix-height" ref="buyorders">
                     <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
@@ -45,6 +45,13 @@
                             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                         </div>
                     </template>
+                </div>
+                <div class="text-center" v-if="showDownArrow">
+                    <img
+                        src="../../../img/down-arrows.png"
+                        class="icon-arrows-down c-pointer"
+                        alt="arrow down"
+                        @click="scrollDown">
                 </div>
             </div>
         </div>
@@ -102,6 +109,15 @@ export default {
         },
         loaded: function() {
             return this.buyOrders !== null;
+        },
+        showDownArrow: function() {
+            return (this.buyOrders.length > 7);
+        },
+    },
+    methods: {
+        scrollDown: function() {
+            let parentDiv = this.$refs.buyorders;
+            parentDiv.scrollTop = parentDiv.scrollHeight;
         },
     },
 };
