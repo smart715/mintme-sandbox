@@ -74,14 +74,6 @@
                 </div>
             </template>
         </div>
-        <token-shout-box
-            class="col-12 mt-3"
-            :current-date="currentDate"
-            :login-url="loginUrl"
-            :signup-url="signupUrl"
-            :logged-in="loggedIn"
-            :user="user"
-            :messages="messages"/>
         <token-trade-trade-history
             class="col-12 mt-3"
             :token-name="tokenName" />
@@ -96,7 +88,6 @@ import TokenTradeBuyOrders from './TokenTradeBuyOrders';
 import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTopTraders from './TokenTopTraders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
-import TokenShoutBox from './TokenShoutBox';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
 
@@ -110,7 +101,6 @@ export default {
         TokenTradeBuyOrders,
         TokenTradeSellOrders,
         TokenTradeTradeHistory,
-        TokenShoutBox,
         TokenTopTraders,
         OrderModal,
     },
@@ -125,9 +115,6 @@ export default {
         tokenName: String,
         placeOrderUrl: String,
         tokenHiddenName: String,
-        currentDate: String,
-        user: String,
-        messages: Array,
     },
     data() {
         return {
