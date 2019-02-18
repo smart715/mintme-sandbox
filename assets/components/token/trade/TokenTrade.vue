@@ -75,7 +75,13 @@
             </template>
         </div>
         <token-shout-box
-            class="col-12 mt-3"/>
+            class="col-12 mt-3"
+            :current-date="currentDate"
+            :login-url="loginUrl"
+            :signup-url="signupUrl"
+            :logged-in="loggedIn"
+            :user="user"
+            :messages="messages"/>
         <token-trade-trade-history
             class="col-12 mt-3"
             :token-name="tokenName" />
@@ -119,6 +125,9 @@ export default {
         tokenName: String,
         placeOrderUrl: String,
         tokenHiddenName: String,
+        currentDate: String,
+        user: String,
+        messages: Array,
     },
     data() {
         return {

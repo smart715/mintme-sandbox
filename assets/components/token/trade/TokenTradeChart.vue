@@ -50,7 +50,7 @@
                     </div>
                     <div class="col-lg-5">
                         <div class="pt-2">
-                            [Volume]WEB({{ marketStatus.change }}%)
+                            [Volume] WEB ({{ marketStatus.change }}%)
                         </div>
                     </div>
                     <div class="col-lg-5 pt-2">

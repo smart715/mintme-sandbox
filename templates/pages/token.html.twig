@@ -16,6 +16,9 @@
                         <token-trade
                             websocket-url="{{ global_websocket_url }}"
                             hash="{{ hash }}"
+                            current-date="{{ "now"|date("m/d/Y") }}"
+                            user="{{ app.user ? app.user.profile.lastname : '' }}"
+                            :messages="[]"
                             currency="{{ currency }}"
                             login-url="{{ path('fos_user_security_login') }}"
                             signup-url="{{ path('fos_user_registration_register') }}"

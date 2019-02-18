@@ -10,56 +10,27 @@
         </div>
         <div class="card-body p-0">
             <div class="fix-height">
-                <div class="chat px-3">
+                <div
+                    class="chat px-3"
+                    v-for="msg in messages"
+                    v-bind:key="msg">
                     <span class="align-middle">
                         <img
                             src="../../../img/avatar.png"
                             alt="avatar">
                     </span>
                     <span class="pl-2 align-middle">
-                        (12 : 44)
-                        John: bla bla bla bla bla bla bla bla bla bla
-                        bla bla bla bla bla bla bla bla bla bla
-                        bla bla bla bla bla bla bla bla bla bla
-                    </span>
-                </div>
-                <div class="chat  px-3">
-                    <span class="align-middle">
-                        <img
-                            src="../../../img/avatar.png"
-                            alt="avatar">
-                    </span>
-                    <span class="pl-2 align-middle">
-                        (12 : 44)
-                        John: bla bla bla bla bla bla bla bla bla bla
-                        bla bla bla bla bla bla bla bla bla bla
-                        bla bla bla bla bla bla bla bla bla bla
-                    </span>
-                </div>
-                <div class="chat px-3">
-                    <span class="align-middle">
-                        <img
-                            src="../../../img/avatar.png"
-                            alt="avatar">
-                    </span>
-                    <span class="pl-2 align-middle">
-                        (12 : 44)
-                        John: bla bla bla bla bla bla bla bla bla bla
-                        bla bla bla bla bla bla bla bla bla bla
-                        bla bla bla bla bla bla bla bla bla bla
+                        {{ msg }}
                     </span>
                 </div>
             </div>
             <div class="py-2  px-3">
-                <textarea class="form-control"></textarea>
-            </div>
-            <div class="text-center pb-2">
-                <a class="c-pointer">
-                    <img
-                        src="../../../img/down-arrows.png"
-                        class="icon-arrows-down"
-                        alt="arrow">
-                </a>
+                <textarea class="form-control" v-model="message" @keyup="send" v-if="loggedIn"></textarea>
+                <template v-else>
+                    <a :href="loginUrl" class="btn btn-primary">Log In</a>
+                    <span class="px-2">or</span>
+                    <a :href="signupUrl">Sign Up</a>
+                </template>
             </div>
         </div>
     </div>
@@ -68,6 +39,27 @@
 <script>
 export default {
     name: 'TokenShoutBox',
+    props: {
+        loginUrl: String,
+        signupUrl: String,
+        loggedIn: Boolean,
+        messages: Array,
+        user: String,
+        currentDate: String,
+    },
+    data() {
+        return {
+            message: '',
+        };
+    },
+    methods: {
+        send: function(e) {
+            if (e.keyCode === 13 && this.message.trim().length > 0) {
+                this.messages.push('(' + this.currentDate + ') ' + this.user + ': ' + this.message);
+                this.message = '';
+            }
+        },
+    },
 };
 </script>
 

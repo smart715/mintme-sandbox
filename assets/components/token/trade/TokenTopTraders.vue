@@ -29,14 +29,6 @@
                     </template>
                 </b-table>
             </div>
-            <div class="text-center pb-2">
-                <a class="c-pointer">
-                    <img
-                        src="../../../img/down-arrows.png"
-                        class="icon-arrows-down"
-                        alt="arrow">
-                </a>
-            </div>
         </div>
     </div>
 </template>
@@ -61,14 +53,13 @@ export default {
         };
     },
     created: function() {
-        for (let i = 1; i < 7; i++) {
+        for (let i = 1; i < 9; i++) {
             this.traders.push({
                 trader: '0' + i + ' John Doe',
                 date: '2019-01-05',
-                amount: Math.floor(Math.random() * 99) + 10 + 'WEB',
+                amount: Math.floor(Math.random() * 99) + 10,
             });
         }
     },
 };
 </script>
-
