@@ -5,10 +5,16 @@
 {% set featured = true %}
 
 {% block formBody %}
-    {% if error %}
-        <div class="p-2 mb-4 bg-danger text-white">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
     <form action="{{ path("login") }}" method="post">
+        {% if error %}
+            <div class="row">
+                <div class="col-12 col-lg-4">
+                </div>
+                <div class="col">
+                    <div class="p-2 mb-2 bg-danger text-center text-white">Invalid credentials.</div>
+                </div>
+            </div>
+        {% endif %}
         <div class="form-group row">
             <div class="col-md-12">
                 <div class="row">
@@ -16,7 +22,7 @@
                         <label for="inputEmail" class="d-block label-featured">Email:</label>
                     </div>
                     <div class="col">
-                        <input type="email" name="_username"  value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
+                        <input type="email" name="_username"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
                     </div>
                 </div>
             </div>

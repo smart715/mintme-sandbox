@@ -65,7 +65,6 @@ export default {
         editing: Boolean,
         channelId: String,
         updateUrl: String,
-        csrfToken: String,
     },
     components: {
         FontAwesomeIcon,
@@ -97,7 +96,6 @@ export default {
                 .then(() => this.getChannelId().then((channelId) => {
                     this.$axios.single.patch(this.updateUrl, {
                         youtubeChannelId: channelId,
-                        _csrf_token: this.csrfToken,
                     }).then((response) => {
                         if (response.status === HTTP_NO_CONTENT) {
                             this.currentChannelId = channelId;

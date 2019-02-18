@@ -86,7 +86,6 @@ export default {
     name: 'TokenIntroductionReleasePeriod',
     props: {
         releasePeriodRoute: String,
-        csrf: String,
         releasedDisabled: {type: Boolean, default: false},
         period: {type: Number, default: 10},
     },
@@ -107,7 +106,6 @@ export default {
             this.$axios.single.post(this.releasePeriodRoute, {
                 'released': this.released,
                 'releasePeriod': this.period,
-                '_csrf_token': this.csrf,
             }).then((response) => {
                 this.$emit('onStatsUpdate', response);
                 this.$toasted.success('Release period updated.');
