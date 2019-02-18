@@ -107,7 +107,7 @@ export default {
                         this.sendMessage(JSON.stringify({
                             method: 'order.subscribe',
                             params: this.marketNames,
-                            id: parseInt(Math.random()),
+                            id: parseInt(Math.random().toString().replace('0.', '')),
                         }));
 
                         this.addMessageHandler((response) => {
