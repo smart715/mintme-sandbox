@@ -264,6 +264,11 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     {
         return $this->referralCode ?? '';
     }
+    
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
 
     /** @ORM\PrePersist() */
     public function prePersist(): void
