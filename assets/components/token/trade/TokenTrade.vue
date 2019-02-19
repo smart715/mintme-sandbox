@@ -170,12 +170,25 @@ export default {
             }
         });
         this.addOnOpenHandler(() => {
-            const request = JSON.stringify({
+            this.sendMessage(JSON.stringify({
                 method: 'deals.subscribe',
                 params: [this.market.hiddenName],
                 id: parseInt(Math.random().toString().replace('0.', '')),
-            });
-            this.sendMessage(request);
+            }));
+
+            this.authorize()
+                .then(() => {
+                    this.sendMessage(JSON.stringify({
+                        method: 'asset.subscribe',
+                        params: [this.tokenHiddenName, this.marketName.currencySymbol],
+                        id: parseInt(Math.random().toString().replace('0.', '')),
+                    }));
+                })
+                .catch(() => {
+                    this.$toasted.error(
+                        'Can not connect to internal services'
+                    );
+                });
         });
     },
     methods: {
