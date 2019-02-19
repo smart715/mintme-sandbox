@@ -24,7 +24,7 @@
                             {{ form_start(emailForm, {'attr': {'ref': 'emailForm'}}) }}
                             {{ form_row(emailForm.email, { 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required', 'ref': 'email', '@keyup': 'onEmailKeyUp'} }) }}
                             {{ form_rest(emailForm) }}
-                            <button type="submit" class="btn btn-primary float-right px-5" ref ="emailButton" @click.prevent="onEmailSubmit" disabled>Save</button>
+                            <button type="submit" class="btn btn-primary float-right px-5" ref ="emailButton" @click.prevent="onEmailSubmit" {% if app.user.tempEmail is not null %} disabled {% endif %}>Save</button>
                             {{ form_end(emailForm) }}
                         </div>
                         <div class="clearfix"></div>
