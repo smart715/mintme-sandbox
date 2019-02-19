@@ -11,7 +11,7 @@
                         <span>
                             {{ address }}
                         </span>
-                        <copy-link :content-to-copy="address">
+                        <copy-link :content-to-copy="address" class="c-pointer">
                             <font-awesome-icon :icon="['far', 'copy']">
                             </font-awesome-icon>
                         </copy-link>
@@ -21,7 +21,7 @@
                         {{ description }}
                     </p>
                 </div>
-                <div class="pt-2">
+                <div class="pt-2 text-center">
                     <button
                         class="btn btn-primary"
                         @click="onSuccess">

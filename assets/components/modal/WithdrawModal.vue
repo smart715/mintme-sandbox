@@ -41,23 +41,23 @@
                         You can't set bigger amount than your own balance. Amount must be decimal.
                     </div>
                 </div>
-                <div class="col-12  text-center">
+                <div class="col-12 text-center">
                     <label>
                         Amount {{ currency }}:
                     </label>
                     <span>{{ fullAmount | toMoney }}</span>
                 </div>
-                <div class="col-12  pt-2">
+                <div class="col-12 pt-2 text-center">
                     <button
                         class="btn btn-primary"
                         @click="onWithdraw">
-                        WITHDRAW
+                        Withdraw
                     </button>
                     <a
                         href="#"
                         class="ml-3"
                         @click="onCancel">
-                        <slot name="cancel">CANCEL</slot>
+                        <slot name="cancel">Cancel</slot>
                     </a>
                 </div>
             </div>

@@ -8,21 +8,23 @@
                     <img src="../../img/are-you-sure.png"/>
                 </div>
                 <slot>
-                    <p class="text-white modal-title pt-2 pb-4 text-uppercase">
+                    <p class="text-white modal-title pt-2 text-uppercase">
                         ARE YOU SURE?
                     </p>
                 </slot>
-                <button
-                    class="btn btn-primary"
-                    @click="onConfirm">
-                    <slot name="confirm">CONFIRM</slot>
-                </button>
-                <a
-                    href="#"
-                    class="ml-3"
-                    @click="onCancel">
-                    <slot name="cancel">CANCEL</slot>
-                </a>
+                <div class="pt-2">
+                    <button
+                        class="btn btn-primary"
+                        @click="onConfirm">
+                        <slot name="confirm">Confirm</slot>
+                    </button>
+                    <a
+                        href="#"
+                        class="ml-3"
+                        @click="onCancel">
+                        <slot name="cancel">Cancel</slot>
+                    </a>
+                </div>
             </div>
         </template>
     </modal>

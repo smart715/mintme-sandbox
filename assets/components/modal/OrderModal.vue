@@ -10,9 +10,9 @@
                 </div>
                 <p class="text-white modal-title pt-2 pb-4 text-uppercase">{{ title }}</p>
                 <button
-                    class="btn btn-primary px-5"
+                    class="btn btn-primary"
                     @click="closeModal()">
-                    OK
+                    Ok
                 </button>
             </div>
         </template>
