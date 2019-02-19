@@ -8,6 +8,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Verify\WebsiteVerifier;
 use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -91,7 +92,7 @@ class TokensAPIController extends FOSRestController
      */
     public function confirmWebsite(
         ParamFetcherInterface $request,
-        WebsiteVerifierInterface $websiteVerifier,
+        WebsiteVerifier $websiteVerifier,
         string $name
     ): View {
         $token = $this->tokenManager->findByName($name);
@@ -127,7 +128,12 @@ class TokensAPIController extends FOSRestController
             $this->em->flush();
         }
 
-        return $this->view(['verified' => $isVerified, 'errors' => []], Response::HTTP_ACCEPTED);
+        $errors = 404 === $websiteVerifier->getResponseCode() ? ['File not found'] : [];
+
+        return $this->view([
+            'verified' => $isVerified,
+            'errors' => $errors,
+        ], Response::HTTP_ACCEPTED);
     }
 
     /**

@@ -51,7 +51,7 @@
                     <button
                         class="btn btn-primary"
                         @click="onWithdraw">
-                        <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
                         WITHDRAW
                     </button>
                     <a
@@ -86,7 +86,7 @@ export default {
     },
     data() {
         return {
-            loading: false,
+            submitting: false,
             amount: 0,
             address: '',
         };
@@ -110,7 +110,7 @@ export default {
             this.$emit('close');
         },
         onWithdraw: function() {
-            if (this.loading) {
+            if (this.submitting) {
                 return;
             }
 
@@ -119,7 +119,7 @@ export default {
                 return;
             }
 
-            this.loading = true;
+            this.submitting = true;
             this.$axios.single.post(this.withdrawUrl, {
                 'crypto': this.currency,
                 'amount': this.amount,
@@ -129,10 +129,8 @@ export default {
                 this.$toasted.success('Paid');
                 this.closeModal();
             })
-            .catch(({response}) => {
-                this.$toasted.error(response.data.error);
-            })
-            .then(() => this.loading = false);
+            .catch(({response}) => this.$toasted.error(response ? response.data.error : 'Service unavailable now. Try later'))
+            .then(() => this.submitting = false);
 
             this.$emit('withdraw', this.currency, this.amount, this.address);
         },

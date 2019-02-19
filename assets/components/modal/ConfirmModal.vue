@@ -11,7 +11,7 @@
                 <button
                     class="btn btn-primary"
                     @click="onConfirm">
-                    <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
                     <slot name="confirm">CONFIRM</slot>
                 </button>
                 <a
@@ -34,7 +34,7 @@ export default {
     },
     props: {
         visible: Boolean,
-        loading: {
+        submitting: {
             type: Boolean,
             default: false,
         },
@@ -44,10 +44,10 @@ export default {
             this.$emit('close');
         },
         onConfirm: function() {
-            if (this.loading) {
+            if (this.submitting) {
                 return;
             }
-            this.$emit('loading', true);
+            this.$emit('submitting', true);
             this.$emit('confirm');
         },
         onCancel: function() {

@@ -142,7 +142,10 @@
                             </ol>
                         </div>
                         <div class="col-12 text-center">
-                            <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
+                            <button class="btn btn-primary" @click="confirmWebsite">
+                                <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                                Confirm
+                            </button>
                             <button class="btn btn-default" @click="showConfirmWebsiteModal = false">Cancel</button>
                         </div>
                     </div>
@@ -199,6 +202,7 @@ export default {
     },
     data() {
         return {
+            submitting: false,
             editingUrls: false,
             currentWebsite: this.websiteUrl,
             newWebsite: this.websiteUrl,
@@ -242,11 +246,16 @@ export default {
             this.showConfirmWebsiteModal = true;
         },
         confirmWebsite: function() {
+            if (this.submitting) {
+                return;
+            }
+            this.submitting = true;
             this.$axios.single.post(this.confirmWebsiteUrl, {url: this.parsedWebsite})
                 .then((response) => {
                     if (response.data.verified) {
                         this.currentWebsite = this.parsedWebsite;
                         this.$toasted.success('Website confirmed successfully');
+                        this.showConfirmWebsiteModal = false;
                     } else if (response.data.errors.length) {
                         response.data.errors.forEach((error) => {
                             this.$toasted.error(error);
@@ -256,12 +265,9 @@ export default {
                         this.$toasted.error('Website couldn\'t be confirmed, try again');
                         this.newWebsite = this.currentWebsite;
                     }
-                }, (error) => {
-                    this.$toasted.error('Website couldn\'t be confirmed, try again');
                 })
-                .then(() => {
-                    this.showConfirmWebsiteModal = false;
-                });
+                .catch(() => this.$toasted.error('Website couldn\'t be confirmed, try again'))
+                .then(() => this.submitting = false);
         },
     },
 };

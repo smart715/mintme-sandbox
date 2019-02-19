@@ -20,6 +20,9 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     /** @var int */
     private $timeoutSeconds;
 
+    /** @var int */
+    private $responseCode;
+
     public function __construct(
         HttpClientFactoryInterface $clientFactory,
         LoggerInterface $logger,
@@ -36,7 +39,9 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         try {
             $client = $this->clientFactory->createClient(['base_uri' => $formatUrl, 'timeout' => $this->timeoutSeconds]);
             $response = $client->request('GET', self::URI);
+            $this->responseCode =  $response->getStatusCode();
         } catch (GuzzleException $exception) {
+            $this->responseCode = $exception->getCode();
             $this->logger->error($exception->getMessage());
             return false;
         }
@@ -47,5 +52,10 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         }
 
         return false;
+    }
+
+    public function getResponseCode(): int
+    {
+        return $this->responseCode;
     }
 }

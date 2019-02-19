@@ -3,7 +3,7 @@
         <template v-if="loaded">
         <div class="table-responsive">
             <confirm-modal
-                :loading="cancelingOrder"
+                :submitting="cancelingOrder"
                 :visible="confirmModal"
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
