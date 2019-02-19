@@ -129,7 +129,13 @@ export default {
                 this.$toasted.success('Paid');
                 this.closeModal();
             })
-            .catch(({response}) => this.$toasted.error(response ? response.data.error : 'Service unavailable now. Try later'))
+            .catch(({response}) => this.$toasted.error(
+                !response
+                    ? 'Network error'
+                    : response.data.error
+                    ? response.data.error
+                    : 'Service unavailable now. Try later')
+            )
             .then(() => this.submitting = false);
 
             this.$emit('withdraw', this.currency, this.amount, this.address);

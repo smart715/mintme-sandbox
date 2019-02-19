@@ -257,16 +257,14 @@ export default {
                         this.$toasted.success('Website confirmed successfully');
                         this.showConfirmWebsiteModal = false;
                     } else if (response.data.errors.length) {
-                        response.data.errors.forEach((error) => {
-                            this.$toasted.error(error);
-                        });
+                        response.data.errors.forEach((error) => this.$toasted.error(error));
                         this.newWebsite = this.currentWebsite;
                     } else {
                         this.newWebsite = this.currentWebsite;
-                        return Promise.reject('error');
+                        return Promise.reject({response: 'error'});
                     }
                 })
-                .catch(() => this.$toasted.error('Website couldn\'t be confirmed, try again'))
+                .catch(({response}) => this.$toasted.error(!response ? 'Network error' : 'Website couldn\'t be confirmed, try again'))
                 .then(() => this.submitting = false);
         },
     },

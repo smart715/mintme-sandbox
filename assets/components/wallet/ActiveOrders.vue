@@ -157,7 +157,7 @@ export default {
                 .then(({data}) => data.result === 1
                     ? this.switchConfirmModal(false)
                     : this.$toasted.error(data.message))
-                .catch(() => this.$toasted.error('Service unavailable, try again later'))
+                .catch(({response}) => this.$toasted.error(!response ? 'Network error' : 'Service unavailable, try again later'))
                 .then(() => this.cancelingOrder = false);
         },
         getMarketFromName: function(name) {
