@@ -262,8 +262,8 @@ export default {
                         });
                         this.newWebsite = this.currentWebsite;
                     } else {
-                        this.$toasted.error('Website couldn\'t be confirmed, try again');
                         this.newWebsite = this.currentWebsite;
+                        return Promise.reject('error');
                     }
                 })
                 .catch(() => this.$toasted.error('Website couldn\'t be confirmed, try again'))
