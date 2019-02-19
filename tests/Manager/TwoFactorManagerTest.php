@@ -11,27 +11,26 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class TwoFactorManagerTest extends TestCase
 {
     public function testCheckCode(): void
     {
-        $form = $this->mockFormInterface(['code' => '1']);
+        $code = '1';
         $session = $this->mockSession();
         $entityManager = $this->mockEntityManager();
         $googleAuth = $this->mockGoogleAuthenticatorInterface();
         $googleAuthEntry = $this->mockUser(['1', '2']);
         $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
-        $this->assertTrue($manager->checkCode($googleAuthEntry, $form));
+        $this->assertTrue($manager->checkCode($googleAuthEntry, $code));
         $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $googleAuthEntry = $this->mockUser(['3', '2']);
-        $this->assertFalse($manager->checkCode($googleAuthEntry, $form));
+        $this->assertFalse($manager->checkCode($googleAuthEntry, $code));
         $googleAuthEntry = $this->mockUser(['2', '2']);
         $googleAuth = $this->mockGoogleAuthenticatorInterface(true);
         $manager = new TwoFactorManager($session, $entityManager, $googleAuth);
-        $this->assertTrue($manager->checkCode($googleAuthEntry, $form));
+        $this->assertTrue($manager->checkCode($googleAuthEntry, $code));
     }
 
     public function testGenerateBackUpCodes(): void
@@ -75,14 +74,6 @@ class TwoFactorManagerTest extends TestCase
         $twoFactorManager = new TwoFactorManager($session, $entityManager, $googleAuth);
         $instance = $twoFactorManager->getGoogleAuthEntry(1);
         $this->assertInstanceOf(GoogleAuthenticatorEntry::class, $instance);
-    }
-
-    private function mockFormInterface(array $array = []): FormInterface
-    {
-        /** @var FormInterface|MockObject $form */
-        $form = $this->createMock(FormInterface::class);
-        $form->method('getData')->willReturn($array);
-        return $form;
     }
 
     private function mockGoogleAuthenticatorInterface(
