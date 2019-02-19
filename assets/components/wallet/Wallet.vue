@@ -22,15 +22,15 @@
                          <div  class="row justify-content-center">
                              <div
                                  class="d-inline  c-pointer"
-                                 @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                                 @click="openDeposit(data.item.name)">
                                  <i class="icon-deposit float-left"></i>
-                                 <span class="pl-2 float-left text-xs align-middle">Deposit</span>
+                                 <span class="pl-2 pt-1 float-left text-xs align-middle">Deposit</span>
                              </div>
                              <div
                                  class="d-inline pl-3  c-pointer"
-                                 @click="openDeposit(data.item.name)">
+                                 @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
                                  <i class="icon-withdraw float-left"></i>
-                                 <span class="pl-2 float-left text-xs align-middle">Withdraw</span>
+                                 <span class="pl-2 pt-1 float-left text-xs align-middle">Withdraw</span>
                              </div>
                          </div>
                 </template>

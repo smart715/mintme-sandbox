@@ -31,7 +31,7 @@
                             :class="{ 'is-invalid': $v.amount.$error }"
                             class="form-control text-left input-custom-padding">
                         <button
-                            class="btn btn-primary btn-input mt-1"
+                            class="btn btn-primary btn-input"
                             type="button"
                             @click="setMaxAmount">
                             All
@@ -41,13 +41,13 @@
                         You can't set bigger amount than your own balance. Amount must be decimal.
                     </div>
                 </div>
-                <div class="col-12 pt-2 text-center">
+                <div class="col-12  text-center">
                     <label>
                         Amount {{ currency }}:
                     </label>
                     <span>{{ fullAmount | toMoney }}</span>
                 </div>
-                <div class="pt-2">
+                <div class="col-12  pt-2">
                     <button
                         class="btn btn-primary"
                         @click="onWithdraw">

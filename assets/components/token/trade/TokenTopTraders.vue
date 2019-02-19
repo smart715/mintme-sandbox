@@ -2,24 +2,13 @@
     <div class="card">
         <div class="card-header">
             Top Traders
-            <span class="card-header-icon">
-                <guide>
-                    <template slot="header">
-                        Trade History
-                    </template>
-                    <template slot="body">
-                        List of last closed orders for {{ tokenName }}.
-                    </template>
-                </guide>
-            </span>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive fix-height" ref="traders">
                 <b-table
                     :items="traders"
                     :fields="fields"
-                    :current-page="currentPage"
-                    :per-page="perPage">
+                    :current-page="currentPage">
                     <template slot="trader" slot-scope="row">
                         {{ row.value }}
                         <img
@@ -29,7 +18,7 @@
                     </template>
                 </b-table>
             </div>
-            <div class="text-center" v-if="showDownArrow">
+            <div class="text-center pb-2" v-if="showDownArrow">
                 <img
                     src="../../../img/down-arrows.png"
                     class="icon-arrows-down c-pointer"
@@ -41,11 +30,13 @@
 </template>
 
 <script>
+import Guide from '../../Guide';
 export default {
     name: 'TokenTopTraders',
     data() {
         return {
             traders: [],
+            currentPage: 0,
             fields: {
                 trader: {
                     label: 'Trader',
@@ -58,6 +49,9 @@ export default {
                 },
             },
         };
+    },
+    components: {
+        Guide,
     },
     computed: {
         showDownArrow: function() {
