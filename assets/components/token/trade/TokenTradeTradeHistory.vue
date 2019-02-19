@@ -123,7 +123,7 @@ export default {
             return this.history !== null;
         },
         showDownArrow: function() {
-            return (loaded && this.history.length > 7);
+            return (this.loaded && this.history.length > 7);
         },
     },
     mounted: function() {
