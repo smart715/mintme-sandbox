@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 
 interface TwoFactorManagerInterface
 {
-    public function checkCode(User $user, FormInterface $form): bool;
+    public function checkCode(User $user, string $code): bool;
     public function generateUrl(User $user): string;
     public function getGoogleAuthEntry(int $userId): GoogleAuthenticatorEntry;
     public function generateSecretCode(): string;
