@@ -7,7 +7,7 @@
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
             >
-                <div>
+                <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>

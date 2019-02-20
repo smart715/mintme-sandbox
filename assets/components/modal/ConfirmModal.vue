@@ -4,7 +4,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <div class="mt-2">
+                <div>
                     <img src="../../img/are-you-sure.png"/>
                 </div>
                 <slot>
