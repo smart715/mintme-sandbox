@@ -201,7 +201,7 @@ export default {
                 };
                 this.$axios.single.post(this.placeOrderUrl, data)
                     .then(({data}) => this.showModalAction(data))
-                    .catch(() => this.showModalAction());
+                    .catch((error) => this.showModalAction(!error.response ? {result: 2, message: 'Network Error'} : {}));
             }
         },
         showModalAction: function({result = 2, message = ''} = {}) {
