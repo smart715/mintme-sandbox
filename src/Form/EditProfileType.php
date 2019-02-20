@@ -43,7 +43,11 @@ class EditProfileType extends AbstractType
                     'title' => 'not valid city',
                 ],
             ])
-            ->add('country', CountryType::class, [ 'label' => 'Country' ])
+            ->add('country', CountryType::class, [
+                'label' => 'Country',
+                'required' => false,
+                'placeholder' => 'Select the country',
+            ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,
