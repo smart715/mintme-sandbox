@@ -83,7 +83,7 @@ class OrdersAPIController extends FOSRestController
             $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
 
             if (!$token || !$crypto) {
-                throw new httpException('500');
+                throw new httpException(500);
             }
 
             $order = new Order(
