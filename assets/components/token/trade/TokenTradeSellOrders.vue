@@ -107,8 +107,7 @@ export default {
     },
     computed: {
         filtered: function() {
-            this.groupByPrice();
-            return this.orders;
+            return this.groupByPrice(this.sellOrders);
         },
         total: function() {
             return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
@@ -170,10 +169,10 @@ export default {
                 this.$toasted.show('Service unavailable, try again later');
             });
         },
-        groupByPrice: function() {
-            this.orders = [];
+        groupByPrice: function(orders) {
+            let filtered = [];
             let grouped = [];
-            this.clone(this.sellOrders).forEach( (item) => {
+            this.clone(orders).forEach( (item) => {
                 if (grouped[item.price] === undefined) {
                     grouped[item.price] = [];
                 }
@@ -188,9 +187,10 @@ export default {
                         }
                     });
                     grouped[orders].sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
-                    this.orders.push(grouped[orders][0]);
+                    filtered.push(grouped[orders][0]);
                 }
             }
+            return filtered;
         },
         clone: function(orders) {
             return JSON.parse(JSON.stringify(orders));
