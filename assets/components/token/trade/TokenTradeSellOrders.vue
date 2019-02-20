@@ -160,13 +160,11 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            this.$axios.single.get(
+            let market = this.removeOrders[0].market.hiddenName;
+            this.$axios.single.delete(
                 this.$routing.generate('orders_cancel', {
-                    orders: JSON.stringify(
-                        this.removeOrders.map((order) => {
-                            return [order.market.hiddenName, order.id];
-                        })
-                    ),
+                    'market': market,
+                    'ids': JSON.stringify(this.removeOrders.map((order) => order.id)),
                 })
             ).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');

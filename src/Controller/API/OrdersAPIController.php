@@ -65,33 +65,31 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     *  @Rest\Get("/cancel/{orders}", name="orders_cancel", options={"expose"=true})
-     *  @Rest\View()
+     * @Rest\Delete("/cancel/{market}/{ids}", name="orders_cancel", options={"expose"=true})
+     * @Rest\View()
      */
-    public function cancelOrders(string $orders): View
+    public function cancelOrders(string $market, string $ids, ParamFetcherInterface $request): View
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
-
         $response = [
                 'result' => [],
                 'message' => [],
             ];
-        foreach (json_decode($orders) as $order) {
-            $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($order[0]));
-            $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($order[0]));
+        foreach (json_decode($ids) as $id) {
+            $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
+            $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
 
             if (!$token || !$crypto) {
                 throw new \InvalidArgumentException();
             }
 
-            $market = new Market($crypto, $token);
             $order = new Order(
-                $order[1],
+                $id,
                 $this->getUser(),
                 null,
-                $market,
+                new Market($crypto, $token),
                 new Money('0', new Currency($crypto->getSymbol())),
                 1,
                 new Money('0', new Currency($crypto->getSymbol())),
