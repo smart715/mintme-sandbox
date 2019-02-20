@@ -173,12 +173,11 @@ export default {
         groupByPrice: function() {
             this.orders = [];
             let grouped = [];
-            JSON.parse(JSON.stringify(this.buyOrders)).forEach( (item) => {
-                let price = toMoney(item.price);
-                if (grouped[price] === undefined) {
-                    grouped[price] = [];
+            this.clone(this.buyOrders).forEach( (item) => {
+                if (grouped[item.price] === undefined) {
+                    grouped[item.price] = [];
                 }
-                grouped[price].push(item);
+                grouped[item.price].push(item);
             });
             for (let orders in grouped) {
                 if (grouped.hasOwnProperty(orders)) {
@@ -192,6 +191,9 @@ export default {
                 this.orders.push(grouped[orders][0]);
                 }
             }
+        },
+        clone: function(orders) {
+            return JSON.parse(JSON.stringify(orders));
         },
     },
 };
