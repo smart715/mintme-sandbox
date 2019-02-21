@@ -28,13 +28,11 @@
         <!--Start of Tawk.to Script-->
         <script type="text/javascript">
             var Tawk_API=Tawk_API||{};
-            if ('{{ app.user }}'){
-                Tawk_API.onLoad = function(){
-                    Tawk_API.setAttributes({
-                        'name'  : '{{ app.user.username }}',
-                        'email' : '{{ app.user.username }}',
-                        'hash'  : '322d3b4f9190d719684e748002c1eb04d0b5bb6819db178e6dfc9d12615b708a'
-                    }, function(error){});
+            if('{{ app.user }}') {
+                Tawk_API.visitor = {
+                    name : '{{ app.user.username }}',
+                    email : '{{ app.user.username }}',
+                    hash : '{{ app.user.getTawkHash(tawk_api_key) }}',
                 };
             }
             var Tawk_LoadStart=new Date();
