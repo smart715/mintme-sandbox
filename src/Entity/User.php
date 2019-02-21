@@ -272,7 +272,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
 
     public function getTawkHash(string $api_key): string
     {
-       return hash_hmac('sha256', $this->getUsername(), $api_key);
+        return hash_hmac('sha256', $this->getUsername(), $api_key);
     }
 
     /** @ORM\PrePersist() */
