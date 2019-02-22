@@ -81,7 +81,7 @@ class TokenController extends AbstractController
         TokenNameConverterInterface $tokenNameConverter,
         NormalizerInterface $normalizer
     ): Response {
-        $token = $this->tokenManager->findByName($name);
+        $token = $this->tokenManager->findByName($name) ?? $this->tokenManager->findByUrl($name);
 
         if (null === $token) {
             return $this->render('pages/token_404.html.twig');
@@ -208,5 +208,10 @@ class TokenController extends AbstractController
     private function isProfileCreated(): bool
     {
         return null !== $this->profileManager->getProfile($this->getUser());
+    }
+
+    private function isTokenExisted(): bool
+    {
+
     }
 }

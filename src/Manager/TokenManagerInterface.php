@@ -10,6 +10,8 @@ interface TokenManagerInterface
 {
     public function findByName(string $name): ?Token;
 
+    public function findByUrl(string $name): ?Token;
+
     public function getOwnToken(): ?Token;
 
     public function findByHiddenName(string $name): ?Token;

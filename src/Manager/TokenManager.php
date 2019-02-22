@@ -65,6 +65,26 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
+    public function findByUrl(string $name): ?Token
+    {
+        if (!in_array(
+            strtoupper($name),
+            array_map(
+                function (Crypto $crypto) {
+                    return $crypto->getSymbol();
+                },
+                $this->cryptoManager->findAll()
+            )
+        )
+        ) {
+            return $this->repository->findByUrl($name);
+        }
+
+        return (new Token())->setName(strtoupper($name))->setCrypto(
+            $this->cryptoManager->findBySymbol(strtoupper($name))
+        );
+    }
+
     /** {@inheritdoc} */
     public function findAllPredefined(): array
     {
