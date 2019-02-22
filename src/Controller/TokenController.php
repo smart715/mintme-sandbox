@@ -193,7 +193,7 @@ class TokenController extends AbstractController
         return $response;
     }
 
-    private function redirectToOwnToken(string $showtab): RedirectResponse
+    private function redirectToOwnToken(string $showtab = 'trade'): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 

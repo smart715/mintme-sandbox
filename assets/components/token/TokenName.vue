@@ -57,7 +57,7 @@ export default {
             this.icon = 'check';
         },
         doEditName: function() {
-            axios.single.patch(this.updateUrl, {
+            this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
                 _csrf_token: this.csrfToken,
             })
