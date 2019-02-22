@@ -173,6 +173,16 @@ a
 .fix-layout
   table-layout: fixed
 
+
+.pagination
+  .page-item
+    .page-link 
+      background: none
+      color: $color-link
+  .active
+    .page-link 
+      color: $white
+
 .tabs
   .nav-tabs
     display: flex
@@ -196,6 +206,8 @@ a
 
         &.disabled
           cursor: default
+      .active
+        color: $color-link
 
   .tab-content
     flex: 1 1 auto
@@ -321,15 +333,6 @@ nav.top-navbar
 
 .text-xs
   @include font-scale(xs)
-
-.pagination
-  .page-item
-    .page-link 
-      background: none
-      color: $color-link
-  .active
-    .page-link 
-      color: $white
 
 .custom-social-btn
   padding: 2px 4px 2px 2px
