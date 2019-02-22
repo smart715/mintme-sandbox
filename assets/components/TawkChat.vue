@@ -5,7 +5,7 @@
 <script>
     export default {
         name: 'TawkChat',
-        porps: {
+        props: {
             username: String,
             hash: String,
         },

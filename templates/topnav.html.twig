@@ -1,7 +1,7 @@
 <b-navbar id="navbar" toggleable="lg" type="" class="top-navbar pt-3" v-cloak>
     <tawk-chat
         username="{{ app.user ? app.user.username : '' }}"
-        hash="{{ app.user ? app.user.getTawkHash(tawk_api_key) }}"
+        hash="{{ app.user ? app.user.getTawkHash(tawk_api_key) : ''}}"
     ></tawk-chat>
     <div class="container-fluid">
         <b-navbar-brand href="{{ path('homepage') }}">
