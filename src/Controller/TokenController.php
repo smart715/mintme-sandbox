@@ -193,7 +193,7 @@ class TokenController extends AbstractController
         return $response;
     }
 
-    private function redirectToOwnToken(string $showtab = 'trade'): RedirectResponse
+    private function redirectToOwnToken(?string $showtab = 'trade'): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 
@@ -217,7 +217,7 @@ class TokenController extends AbstractController
         return null !== $this->profileManager->getProfile($this->getUser());
     }
 
-    private function normalizeName(string $name): string
+    private function normalizeName(?string $name): string
     {
         $name = trim(strtolower($name));
         $name = str_replace(' ', '-', $name);
