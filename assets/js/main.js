@@ -15,6 +15,7 @@ import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from '../components/token/TokenSearcher';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import TawkChat from '../components/TawkChat';
 
 OfflinePluginRuntime.install();
 
@@ -55,6 +56,7 @@ new Vue({
         };
     },
     components: {
+        TawkChat,
         TokenSearcher,
     },
 });

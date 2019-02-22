@@ -25,28 +25,6 @@
             gtag('config', '{{ google_tracking_id }}');
         </script>
 
-        <!--Start of Tawk.to Script-->
-        <script type="text/javascript">
-            var Tawk_API=Tawk_API||{};
-            if('{{ app.user }}') {
-                Tawk_API.visitor = {
-                    name : '{{ app.user.username }}',
-                    email : '{{ app.user.username }}',
-                    hash : '{{ app.user.getTawkHash(tawk_api_key) }}',
-                };
-            }
-            var Tawk_LoadStart=new Date();
-            (function(){
-                var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-                s1.async=true;
-                s1.src='https://embed.tawk.to/5c66aba9a6c3590a404d5f2d/default';
-                s1.charset='UTF-8';
-                s1.setAttribute('crossorigin','*');
-                s0.parentNode.insertBefore(s1,s0);
-            })();
-        </script>
-        <!--End of Tawk.to Script-->
-
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('build/main.css') }}">
             {% block pagestyles %}{% endblock %}
