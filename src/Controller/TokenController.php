@@ -81,6 +81,13 @@ class TokenController extends AbstractController
         TokenNameConverterInterface $tokenNameConverter,
         NormalizerInterface $normalizer
     ): Response {
+
+        $normalizedName = $this->normalizeName($name);
+
+        if ($normalizedName !== $name) {
+            return $this->redirectToOwnToken($tab);
+        }
+
         $token = $this->tokenManager->findByName($name) ?? $this->tokenManager->findByUrl($name);
 
         if (null === $token) {
@@ -195,7 +202,7 @@ class TokenController extends AbstractController
         }
 
         return $this->redirectToRoute('token_show', [
-            'name' => $token->getName(),
+            'name' => $this->normalizeName($token->getName()),
             'tab' => $showtab,
         ]);
     }
@@ -210,8 +217,10 @@ class TokenController extends AbstractController
         return null !== $this->profileManager->getProfile($this->getUser());
     }
 
-    private function isTokenExisted(): bool
+    private function normalizeName(string $name): string
     {
-
+        $name = trim(strtolower($name));
+        $name = str_replace(' ', '-', $name);
+        return $name;
     }
 }

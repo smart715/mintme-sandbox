@@ -57,7 +57,7 @@ export default {
             this.icon = 'check';
         },
         doEditName: function() {
-            axios.patch(this.updateUrl, {
+            axios.single.patch(this.updateUrl, {
                 name: this.newName,
                 _csrf_token: this.csrfToken,
             })
@@ -67,6 +67,7 @@ export default {
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
+                    console.log(error.response);
                     this.$toasted.error(error.response.data[0][0].message);
                 } else {
                     this.$toasted.error('An error has ocurred, please try again later');
@@ -87,7 +88,7 @@ export default {
         font-size: 2rem
         color: #fff
         span
-            font-family: 'Open Sans'
+            font-family: sans-serif
 
     .icon
         cursor: pointer

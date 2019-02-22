@@ -44,7 +44,6 @@ class TokenManager implements TokenManagerInterface
         return $this->repository->find($id);
     }
 
-
     public function findByName(string $name): ?Token
     {
         if (!in_array(
@@ -83,6 +82,12 @@ class TokenManager implements TokenManagerInterface
         return (new Token())->setName(strtoupper($name))->setCrypto(
             $this->cryptoManager->findBySymbol(strtoupper($name))
         );
+    }
+
+    /** {@inheritdoc} */
+    public function getTokensByPattern(string $pattern): array
+    {
+        return $this->repository->findTokensByPattern($pattern);
     }
 
     /** {@inheritdoc} */
@@ -137,11 +142,5 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
-    }
-
-    /** {@inheritdoc} */
-    public function getTokensByPattern(string $pattern): array
-    {
-        return $this->repository->findTokensByPattern($pattern);
     }
 }

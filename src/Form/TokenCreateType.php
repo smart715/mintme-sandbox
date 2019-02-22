@@ -26,7 +26,7 @@ class TokenCreateType extends AbstractType
                         'pattern' => '/^([a-zA-Z0-9-]+\s)*[a-zA-Z0-9-]+$/',
                         'message' => 'Invalid token name' ,
                         'match' => true,
-                    ])
+                    ]),
                 ],
             ])
         ;

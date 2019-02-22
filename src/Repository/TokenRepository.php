@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use Doctrine\ORM\EntityRepository;
-use Oro\ORM\Query\AST\Functions\String\Replace;
 
 class TokenRepository extends EntityRepository
 {
@@ -18,9 +17,9 @@ class TokenRepository extends EntityRepository
     {
         return $this->createQueryBuilder('token')
             ->where('REPLACE(token.name, \' \', \'-\' ) = (:name)')
-            ->setParameter('name', $this->normalizeName($name))
+            ->setParameter('name', $name)
             ->getQuery()
-            ->getSingleResult()
+            ->getOneOrNullResult()
         ;
     }
 
@@ -35,12 +34,5 @@ class TokenRepository extends EntityRepository
             ->getQuery()
             ->getResult()
         ;
-    }
-
-    private function normalizeName(string $name): string
-    {
-        $name = trim(strtolower($name));
-        $name = str_replace(' ', '-', $name);
-        return $name;
     }
 }
