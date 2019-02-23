@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Exchange\Trade\Config\PrelaunchConfig;
+use App\Form\EditEmail2FAType;
 use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
 use App\Form\TwoFactorType;
@@ -48,11 +49,23 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
-        return $this->render('pages/settings.html.twig', [
-            'emailForm' => $this->getEmailForm($request)->createView(),
-            'passwordForm' => $this->getPasswordForm($request)->createView(),
-            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
-        ]);
+        $user = $this->getUser();
+        $email = new EmailModel($user->getEmail());
+        $emailForm = $this->createForm(EditEmailType::class, $email);
+        $emailForm->handleRequest($request);
+        $passwordForm = $this->getPasswordForm($request);
+
+        if ($user->isGoogleAuthenticatorEnabled()) {
+            $emailForm2FA = $this->createForm(EditEmail2FAType::class, $email);
+            $emailForm2FA->handleRequest($request);
+            return $this->renderSettings2FA($passwordForm, $emailForm, $emailForm2FA);
+        }
+
+        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
+            $this->submitEmailForm($email);
+        }
+
+        return $this->renderSettings($passwordForm, $emailForm);
     }
 
     /**
@@ -111,16 +124,12 @@ class UserController extends AbstractController
             return $this->render('security/2fa_manager.html.twig', $parameters);
         }
 
-        if ($twoFactorManager->checkCode($user, $form)) {
-            if ($isTwoFactor) {
-                $this->turnOffAuthenticator($twoFactorManager);
-                return $this->redirectToRoute('settings');
-            }
-            $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
-            return $this->render('security/2fa_manager.html.twig', $parameters);
+        if ($isTwoFactor) {
+            $this->turnOffAuthenticator($twoFactorManager);
+            return $this->redirectToRoute('settings');
         }
 
-        $this->addFlash('danger', 'Invalid two-factor authentication code.');
+        $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
         return $this->render('security/2fa_manager.html.twig', $parameters);
     }
 
@@ -139,27 +148,48 @@ class UserController extends AbstractController
         return $passwordForm;
     }
 
-    private function getEmailForm(Request $request): FormInterface
+    private function renderSettings(FormInterface $passwordForm, FormInterface $emailForm): Response
     {
-        $user = $this->getUser();
-        $email = new EmailModel($user->getEmail());
-        $emailForm = $this->createForm(EditEmailType::class, $email);
-        $emailForm->handleRequest($request);
+        return $this->render('pages/settings.html.twig', [
+            'emailForm' => $emailForm->createView(),
+            'passwordForm' => $passwordForm->createView(),
+            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
+        ]);
+    }
 
-        if ($emailForm->isSubmitted() && $emailForm->isValid() && $user->getEmail() !== $email->getEmail()) {
-            // Create temporary user with new email and use him in email sender.
-            // Set new email as temporary for user
-            $tmpUser = clone $user;
-            $tmpUser->setEmail($email->getEmail());
-            $user->setTempEmail($email->getEmail());
-            $this->mailDispatcher->sendEmailConfirmation($tmpUser);
-            $user->setConfirmationToken($tmpUser->getConfirmationToken());
-            $this->userManager->updateUser($user);
-
-            $this->addFlash('success', 'Confirmation email was sent to your new address');
+    private function renderSettings2FA(
+        FormInterface $passwordForm,
+        FormInterface $emailForm,
+        FormInterface $emailForm2FA
+    ): Response {
+        if ($emailForm2FA->isSubmitted() && !$emailForm2FA->isValid() || $emailForm->isSubmitted() && $emailForm->isValid()) {
+            return $this->render('default/simple_form.html.twig', [
+                'form' => $emailForm2FA->createView(),
+                'formHeader' => 'Enter two-factor code to confirm Edit Email',
+            ]);
         }
 
-        return $emailForm;
+        if ($emailForm2FA->isSubmitted()) {
+            /** @var EmailModel $email */
+            $email = $emailForm2FA->getRoot()->getData();
+            $this->submitEmailForm($email);
+        }
+
+        return $this->renderSettings($passwordForm, $emailForm);
+    }
+
+    private function submitEmailForm(EmailModel $email): void
+    {
+        $user = $this->getUser();
+        // Create temporary user with new email and use him in email sender.
+        // Set new email as temporary for user
+        $tmpUser = clone $user;
+        $tmpUser->setEmail($email->getEmail());
+        $user->setTempEmail($email->getEmail());
+        $this->mailDispatcher->sendEmailConfirmation($tmpUser);
+        $user->setConfirmationToken($tmpUser->getConfirmationToken());
+        $this->userManager->updateUser($user);
+        $this->addFlash('success', 'Confirmation email was sent to your new address');
     }
 
     private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager, User $user): array
