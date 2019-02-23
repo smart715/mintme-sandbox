@@ -23,7 +23,7 @@ class TokenCreateType extends AbstractType
 
                 'constraints' => [
                     new Regex([
-                        'pattern' => '/^([a-zA-Z0-9-]+\s)*[a-zA-Z0-9-]+$/',
+                        'pattern' => '/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[\-a-zA-Z0-9\s])*$/',
                         'message' => 'Invalid token name' ,
                         'match' => true,
                     ]),

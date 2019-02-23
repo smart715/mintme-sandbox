@@ -66,8 +66,10 @@ export default {
                     this.currentName = this.newName;
                 }
             }, (error) => {
+
+                console.log(error.response);
+
                 if (error.response.status === HTTP_BAD_REQUEST) {
-                    console.log(error.response);
                     this.$toasted.error(error.response.data[0][0].message);
                 } else {
                     this.$toasted.error('An error has ocurred, please try again later');

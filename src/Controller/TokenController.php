@@ -220,6 +220,8 @@ class TokenController extends AbstractController
     private function normalizeName(?string $name = ''): string
     {
         $name = trim(strtolower($name ?? ''));
+        $name = preg_replace('/-+/', '-', $name);
+        $name = preg_replace('/\s+/', ' ', $name);
         $name = str_replace(' ', '-', $name);
         return $name;
     }

@@ -31,7 +31,7 @@ class Token
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * @Assert\Regex("/^([a-zA-Z0-9-]+\s)*[a-zA-Z0-9-]+$/")
+     * @Assert\Regex("/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[\-a-zA-Z0-9\s])*$/")
      * @Assert\Length(min = 4, max = 255)
      * @Groups({"API"})
      * @var string|null
