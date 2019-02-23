@@ -57,7 +57,7 @@ export default {
             this.icon = 'check';
         },
         doEditName: function() {
-            this.$axios.single.patch(this.updateUrl, {
+            axios.patch(this.updateUrl, {
                 name: this.newName,
                 _csrf_token: this.csrfToken,
             })
@@ -88,7 +88,8 @@ export default {
         font-size: 2rem
         color: #fff
         span
-            font-family: sans-serif
+            font-family: monospace
+            font-size: 0.8em
 
     .icon
         cursor: pointer

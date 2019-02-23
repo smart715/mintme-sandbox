@@ -206,7 +206,7 @@ class TokenController extends AbstractController
             'tab' => $showtab,
         ]);
     }
-    
+
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();
@@ -217,9 +217,9 @@ class TokenController extends AbstractController
         return null !== $this->profileManager->getProfile($this->getUser());
     }
 
-    private function normalizeName(?string $name): string
+    private function normalizeName(?string $name = ''): string
     {
-        $name = trim(strtolower($name));
+        $name = trim(strtolower($name ?? ''));
         $name = str_replace(' ', '-', $name);
         return $name;
     }
