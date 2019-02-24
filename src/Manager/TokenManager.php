@@ -144,8 +144,8 @@ class TokenManager implements TokenManagerInterface
             : null;
     }
 
-    public function isValidName(string $name) :bool
+    public function isValidName(string $name): bool
     {
-        return preg_match('/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[a-zA-Z0-9\s\-])*$/', $name) === 1;
+        return 1 === preg_match('/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[a-zA-Z0-9\s\-])*$/', $name);
     }
 }
