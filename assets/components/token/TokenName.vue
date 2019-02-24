@@ -22,7 +22,6 @@ Vue.use(Toasted, {
 
 const HTTP_NO_CONTENT = 204;
 const HTTP_BAD_REQUEST = 400;
-const HTTP_NOT_ACCEPTABLE = 406;
 
 export default {
     name: 'TokenName',
@@ -65,14 +64,10 @@ export default {
                 if (response.status === HTTP_NO_CONTENT) {
                     this.currentName = this.newName;
                 }
-                console.log('ok');
-                console.log(response);
-
             }, (error) => {
-                console.log('not ok');
                 console.log(error);
                 if (error.response.status === HTTP_BAD_REQUEST) {
-                    this.$toasted.error(error.response.data[0][0].message);
+                    this.$toasted.error(error.response.data);
                 } else {
                     this.$toasted.error('An error has ocurred, please try again later');
                 }
