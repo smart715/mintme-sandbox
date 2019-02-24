@@ -84,12 +84,12 @@ class TokenController extends AbstractController
 
         $token = $this->tokenManager->findByName($name) ?? $this->tokenManager->findByUrl($name);
 
-        if ($token->getName() !== $token->getNameNormalized()) {
-            return $this->redirectToOwnToken($tab);
-        }
-
         if (null === $token) {
             return $this->render('pages/token_404.html.twig');
+        }
+
+        if ($name != $this->normalizeTokenName($token->getName())) {
+            return $this->redirectToOwnToken($tab);
         }
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
@@ -191,6 +191,18 @@ class TokenController extends AbstractController
         return $response;
     }
 
+    /**
+     *
+     */
+    public function normalizeTokenName(string $name) :string
+    {
+        $name = trim(strtolower($name));
+        $name = preg_replace('/-+/', '-', $name);
+        $name = preg_replace('/\s+/', ' ', $name);
+        $name = str_replace(' ', '-', $name);
+        return $name;
+    }
+
     private function redirectToOwnToken(?string $showtab = 'trade'): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
@@ -200,7 +212,7 @@ class TokenController extends AbstractController
         }
 
         return $this->redirectToRoute('token_show', [
-            'name' => $token->getNameNormalized(),
+            'name' => $this->normalizeTokenName($token->getName()),
             'tab' => $showtab,
         ]);
     }

@@ -26,4 +26,6 @@ interface TokenManagerInterface
 
     /** @return Token[] */
     public function getTokensByPattern(string $pattern): array;
+
+    public function isValidName(string $name): bool;
 }

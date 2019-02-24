@@ -206,14 +206,4 @@ class Token
     {
         return (new self())->setName($crypto->getSymbol());
     }
-
-    public function getNameNormalized() :string
-    {
-        $name = $this->getName();
-        $name = trim(strtolower($name));
-        $name = preg_replace('/-+/', '-', $name);
-        $name = preg_replace('/\s+/', ' ', $name);
-        $name = str_replace(' ', '-', $name);
-        return $name;
-    }
 }

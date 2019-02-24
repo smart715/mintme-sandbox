@@ -74,6 +74,9 @@ class TokensAPIController extends FOSRestController
             return null !== $value;
         }), false);
 
+
+
+
         if (!$form->isValid()) {
             return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
