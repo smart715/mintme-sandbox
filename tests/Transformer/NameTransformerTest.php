@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class NameTransformerTest extends TestCase
 {
-    public function testRemovingMultiSpaces(): void
+    public function testRemoveDoublespaces(): void
     {
         $nameTransformer = new NameTransformer();
         $this->assertEquals('foo bar', $nameTransformer->transform('foo     bar'));

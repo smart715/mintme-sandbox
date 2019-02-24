@@ -9,16 +9,16 @@ class NameTransformer implements DataTransformerInterface
     /** @inheritdoc */
     public function transform($value)
     {
-        return $this->removeMultispaces($value);
+        return $this->removeDoublespaces($value);
     }
 
     /** @inheritdoc */
     public function reverseTransform($value)
     {
-        return $this->removeMultispaces($value);
+        return $this->removeDoublespaces($value);
     }
 
-    private function removeMultispaces(?string $text): ?string
+    private function removeDoublespaces(?string $text): ?string
     {
         if ($text) {
             return preg_replace('/\s+/', ' ', $text);
