@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TokenType extends AbstractType
 {
+    /** @var NameTransformer  */
     private $nameTransformer;
 
     public function __construct(NameTransformer $nameTransformer)

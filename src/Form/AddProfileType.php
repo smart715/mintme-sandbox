@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class AddProfileType extends AbstractType
 {
+    /** @var NameTransformer  */
     private $nameTransformer;
 
     public function __construct(NameTransformer $nameTransformer)
