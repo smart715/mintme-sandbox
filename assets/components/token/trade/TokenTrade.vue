@@ -184,7 +184,6 @@ export default {
         updateMarketData: function(marketData) {
             marketData.forEach((deal) => {
                 // Pending order.
-                console.log(deal.taker_id);
                 if (!deal.taker_id) {
                     const price = parseFloat(deal.price);
                     const amount = parseFloat(deal.amount);
