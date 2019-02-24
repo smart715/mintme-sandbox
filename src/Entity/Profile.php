@@ -125,13 +125,13 @@ class Profile
         return $this;
     }
 
-    /** @ORM\PreUpdate() */
-    public function updateNameChangedDate(): self
-    {
-        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
-
-        return $this;
-    }
+//    /** @ORM\PreUpdate() */
+//    public function updateNameChangedDate(): self
+//    {
+//        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
+//
+//        return $this;
+//    }
 
     public function getNameChangedDate(): ?\DateTimeImmutable
     {
@@ -198,14 +198,14 @@ class Profile
 
     public function setFirstName(string $firstName): self
     {
-        $this->firstName = $this->removeDoubleSpaces($firstName);
+        $this->firstName = $firstName;
 
         return $this;
     }
 
     public function setLastName(string $lastName): self
     {
-        $this->lastName = $this->removeDoubleSpaces($lastName);
+        $this->lastName = $lastName;
 
         return $this;
     }
@@ -230,10 +230,5 @@ class Profile
     public function getToken(): ?Token
     {
         return $this->token;
-    }
-
-    protected function removeDoubleSpaces(string $text): ?string
-    {
-        return preg_replace('/\s+/', ' ', $text);
     }
 }

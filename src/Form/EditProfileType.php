@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Profile;
+use App\Form\DataTransformer\NameTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -12,6 +13,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EditProfileType extends AbstractType
 {
+    private $nameTransformer;
+
+    public function __construct(NameTransformer $nameTransformer)
+    {
+        $this->nameTransformer = $nameTransformer;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -55,6 +63,12 @@ class EditProfileType extends AbstractType
                     'maxlength' => 150,
                 ],
             ]);
+
+        $builder->get('firstName')
+            ->addModelTransformer($this->nameTransformer);
+
+        $builder->get('lastName')
+            ->addModelTransformer($this->nameTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
