@@ -82,13 +82,11 @@ class TokenController extends AbstractController
         NormalizerInterface $normalizer
     ): Response {
 
-        $normalizedName = $this->normalizeName($name);
+        $token = $this->tokenManager->findByName($name) ?? $this->tokenManager->findByUrl($name);
 
-        if ($normalizedName !== $name) {
+        if ($token->getName() !== $token->getNameNormalized()) {
             return $this->redirectToOwnToken($tab);
         }
-
-        $token = $this->tokenManager->findByName($name) ?? $this->tokenManager->findByUrl($name);
 
         if (null === $token) {
             return $this->render('pages/token_404.html.twig');
@@ -202,7 +200,7 @@ class TokenController extends AbstractController
         }
 
         return $this->redirectToRoute('token_show', [
-            'name' => $this->normalizeName($token->getName()),
+            'name' => $token->getNameNormalized(),
             'tab' => $showtab,
         ]);
     }
@@ -215,14 +213,5 @@ class TokenController extends AbstractController
     private function isProfileCreated(): bool
     {
         return null !== $this->profileManager->getProfile($this->getUser());
-    }
-
-    private function normalizeName(?string $name = ''): string
-    {
-        $name = trim(strtolower($name ?? ''));
-        $name = preg_replace('/-+/', '-', $name);
-        $name = preg_replace('/\s+/', ' ', $name);
-        $name = str_replace(' ', '-', $name);
-        return $name;
     }
 }

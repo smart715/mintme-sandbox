@@ -20,7 +20,13 @@ class TokenCreateType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Token name',
-
+                'attr' => [
+                    'pattern' =>  '/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[\-a-zA-Z0-9\s])*$/',
+                    'oninvalid' => 'setCustomValidity("Invalid token name")',
+                    'onchange' => 'setCustomValidity("")',
+                    'oninput' => 'setCustomValidity("")',
+                    'onmouseover' => "this.title=''",
+                ],
                 'constraints' => [
                     new Regex([
                         'pattern' => '/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[\-a-zA-Z0-9\s])*$/',
