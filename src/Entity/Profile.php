@@ -125,13 +125,13 @@ class Profile
         return $this;
     }
 
-//    /** @ORM\PreUpdate() */
-//    public function updateNameChangedDate(): self
-//    {
-//        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
-//
-//        return $this;
-//    }
+    /** @ORM\PreUpdate() */
+    public function updateNameChangedDate(): self
+    {
+        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
+
+        return $this;
+    }
 
     public function getNameChangedDate(): ?\DateTimeImmutable
     {
