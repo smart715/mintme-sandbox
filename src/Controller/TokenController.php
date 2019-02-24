@@ -191,8 +191,9 @@ class TokenController extends AbstractController
         return $response;
     }
 
-    public function normalizeTokenName(string $name): string
+    public function normalizeTokenName(?string $name) :string
     {
+        $name = $name ?? '';
         $name = trim(strtolower($name));
         $name = preg_replace('/-+/', '-', $name);
         $name = preg_replace('/\s+/', ' ', $name);

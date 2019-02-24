@@ -2,7 +2,7 @@
     <h1>
         <span v-if="!editingName">{{ currentName }}</span>
         <template v-if="editable">
-            <input type="text" v-model="newName" v-if="editingName">
+            <input type="text" v-model="newName" v-if="editingName" >
             <font-awesome-icon class="icon c-pointer" :icon="icon" transform="shrink-4 up-1.5" @click="editName" />
         </template>
     </h1>
@@ -82,6 +82,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+    input
+        font-family: monospace
+        font-size: 0.8em
     h1
         font-size: 2rem
         color: #fff
