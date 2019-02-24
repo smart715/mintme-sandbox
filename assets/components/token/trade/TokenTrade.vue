@@ -70,6 +70,7 @@ import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
+import {toMoney} from '../../../js/utils';
 
 export default {
     name: 'TokenTrade',
@@ -117,7 +118,8 @@ export default {
             return this.marketName;
         },
         tokenBalance: function() {
-            return this.balances[this.tokenName] ? this.balances[this.tokenName].available : false;
+            return this.balances[this.tokenName] ? this.balances[this.tokenName].available
+                : this.balances ? toMoney(0) : false;
         },
         webBalance: function() {
             return this.balances['WEB'] ? this.balances['WEB'].available : false;
@@ -144,8 +146,8 @@ export default {
         this.$store.state.interval.make(this.updateOrders, 10000);
 
         this.addMessageHandler((result) => {
-            if ('state.update' === result.method) {
-                this.updateMarketData(result);
+            if ('deals.update' === result.method) {
+                this.updateMarketData(result.params[1]);
             }
         });
         this.addOnOpenHandler(() => {
@@ -180,35 +182,28 @@ export default {
             }).catch((error) => { });
         },
         updateMarketData: function(marketData) {
-            if (!marketData.params) {
-                return;
-            }
-
-            const marketDealsInfo = marketData.params[1];
-
-            if (Array.isArray(marketDealsInfo)) {
-                marketDealsInfo.forEach((deal) => {
-                    // Pending order.
-                    if (!deal.taker_id) {
-                        const price = parseFloat(deal.price);
-                        const amount = parseFloat(deal.amount);
-                        switch (deal.type) {
-                            case 'buy':
-                                if (price > this.sell.price) {
-                                    this.sell.price = price;
-                                    this.sell.amount = amount;
-                                }
-                                break;
-                            case 'sell':
-                                if (0 === this.buy.price || price < this.buy.price) {
-                                    this.buy.price = price;
-                                    this.buy.amount = amount;
-                                }
-                                break;
-                        }
+            marketData.forEach((deal) => {
+                // Pending order.
+                console.log(deal.taker_id);
+                if (!deal.taker_id) {
+                    const price = parseFloat(deal.price);
+                    const amount = parseFloat(deal.amount);
+                    switch (deal.type) {
+                        case 'buy':
+                            if (price > this.sell.price) {
+                                this.sell.price = price;
+                                this.sell.amount = amount;
+                            }
+                            break;
+                        case 'sell':
+                            if (0 === this.buy.price || price < this.buy.price) {
+                                this.buy.price = price;
+                                this.buy.amount = amount;
+                            }
+                            break;
                     }
-                });
-            }
+                }
+            });
         },
     },
 };
