@@ -40,7 +40,7 @@
                                         </template>
                                     </guide>
                                 </div>
-                                <div class="pb-1">Please describe goals milestones plans promises</div>
+                                <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
                                 <limited-textarea
                                     class="form-control"
