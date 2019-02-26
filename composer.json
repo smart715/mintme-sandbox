@@ -25,7 +25,7 @@
         "ramsey/uuid": "^3.8",
         "scheb/two-factor-bundle": "^3.12",
         "sensio/framework-extra-bundle": "^5.2",
-        "sensiolabs/security-checker": "^4.1",
+        "sensiolabs/security-checker": "^5.0",
         "sonata-project/admin-bundle": "^3.31",
         "sonata-project/block-bundle": "^3.12",
         "sonata-project/classification-bundle": "^3.6",
