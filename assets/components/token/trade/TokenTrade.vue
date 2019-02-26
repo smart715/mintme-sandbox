@@ -6,7 +6,7 @@
             :currency="currency"
             :market-name="marketName"
         />
-        <div class="col-12 col-lg-4 mt-3">
+        <div class="col-12 col-lg-4 mt-3 pr-lg-2">
             <token-trade-buy-order
                 v-if="balanceLoaded"
                 :websocket-url="websocketUrl"
@@ -27,7 +27,7 @@
                 </div>
             </template>
         </div>
-        <div class="pt-3 col-12 col-lg-4">
+        <div class="pt-3 col-12 col-lg-4 px-lg-2">
             <token-trade-sell-order
                 v-if="balanceLoaded"
                 :websocket-url="websocketUrl"
@@ -49,10 +49,10 @@
                 </div>
             </template>
         </div>
-        <div class="pt-3 col-12 col-lg-4">
+        <div class="pt-3 col-12 col-lg-4 pl-lg-2">
             <token-top-traders/>
         </div>
-        <div class="col-12 col-lg-6 pt-3">
+        <div class="col-12 col-lg-6 pt-3 pr-lg-2">
             <token-trade-buy-orders
                 v-if="ordersLoaded"
                 :buy-orders="buyOrders"
@@ -63,7 +63,7 @@
                 </div>
             </template>
         </div>
-        <div class="col-12 col-lg-6 pt-3">
+        <div class="col-12 col-lg-6 pt-3 pl-lg-2">
             <token-trade-sell-orders
                 v-if="ordersLoaded"
                 :sell-orders="sellOrders"
@@ -75,7 +75,7 @@
             </template>
         </div>
         <token-trade-trade-history
-            class="col-12 mt-3"
+            class="col-12 pt-3"
             :token-name="tokenName" />
     </div>
 </template>

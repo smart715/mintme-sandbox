@@ -36,12 +36,6 @@ body
 .text-bold
   font-weight: 800
 
-.g-recaptcha
-  height: 80px
-
-  & > div
-    position: absolute
-
 a
   color: $color-link
 
@@ -359,13 +353,12 @@ nav.top-navbar
   width: 120px
 
 .g-recaptcha
-  @include media-breakpoint-down(xs)
-    iframe 
-      transform: scale(0.7)
-      -webkit-transform: scale(0.7)
-      transform-origin: 0 0
-      -webkit-transform-origin: 0 0
-      
+  transform: scale(0.7)
+  -webkit-transform: scale(0.7)
+  transform-origin: 0 0
+  -webkit-transform-origin: 0 0
+  margin-bottom: -25px
+
 @media (min-width: 992px)
   .resetlabel
     position: absolute
