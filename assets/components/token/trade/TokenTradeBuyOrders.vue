@@ -180,6 +180,7 @@ export default {
             });
             for (let orders in grouped) {
                 if (grouped.hasOwnProperty(orders)) {
+                    let sum = grouped[orders].reduce((sum, order)=> parseFloat(order.amount) + sum, 0);
                     grouped[orders].sort((first, second) => first.maker.id - second.maker.id);
                     grouped[orders].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
@@ -187,6 +188,7 @@ export default {
                         }
                     });
                     grouped[orders].sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
+                    grouped[orders][0].amount = sum;
                     filtered.push(grouped[orders][0]);
                 }
             }
