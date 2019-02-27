@@ -45,32 +45,20 @@
             :currency="currency"
             :market-name="market"
         />
-        <div class="col-12 col-md-6 mt-3">
-            <token-trade-buy-orders v-if="ordersLoaded" :buy-orders="buyOrders" :token-name="tokenName" :user-id="userId" />
-            <template v-else>
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3" size="5x" />
-            </template>
-        </div>
-        <div class="col-12 col-md-6 mt-3">
-            <token-trade-sell-orders v-if="ordersLoaded" :sell-orders="sellOrders" :token-name="tokenName" :user-id="userId" />
-            <template v-else>
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3" size="5x" />
-            </template>
-        </div>
+        <token-trade-orders :orders-loaded="ordersLoaded" :buy-orders="buyOrders" :sell-orders="sellOrders" :token-name="tokenName" :user-id="userId" />
         <token-trade-trade-history class="col-12 mt-3" :token-name="tokenName" />
     </div>
 </template>
 
 <script>
-import TokenTradeBuyOrder from './TokenTradeBuyOrder';
-import TokenTradeSellOrder from './TokenTradeSellOrder';
 import TokenTradeChart from './TokenTradeChart';
-import TokenTradeBuyOrders from './TokenTradeBuyOrders';
-import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
 import {toMoney} from '../../../js/utils';
+import TokenTradeOrders from './TokenTradeOrders';
+import TokenTradeBuyOrder from './TokenTradeBuyOrder';
+import TokenTradeSellOrder from './TokenTradeSellOrder';
 
 export default {
     name: 'TokenTrade',
@@ -79,8 +67,7 @@ export default {
         TokenTradeBuyOrder,
         TokenTradeSellOrder,
         TokenTradeChart,
-        TokenTradeBuyOrders,
-        TokenTradeSellOrders,
+        TokenTradeOrders,
         TokenTradeTradeHistory,
         OrderModal,
     },
