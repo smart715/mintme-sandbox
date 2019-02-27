@@ -76,6 +76,7 @@ export default {
     name: 'TokenTradeSellOrders',
     props: {
         sellOrders: [Array, Object],
+        filtered: [Array, Object],
         tokenName: String,
         userId: Number,
     },
@@ -106,9 +107,6 @@ export default {
         };
     },
     computed: {
-        filtered: function() {
-            return this.groupByPrice(this.sellOrders);
-        },
         total: function() {
             return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
         },
@@ -168,31 +166,6 @@ export default {
             ).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
             });
-        },
-        groupByPrice: function(orders) {
-            let filtered = [];
-            let grouped = {};
-            this.clone(orders).forEach( (item) => {
-                if (grouped[item.price] === undefined) {
-                    grouped[item.price] = [];
-                }
-                grouped[item.price].push(item);
-            });
-            for (let orders in grouped) {
-                if (grouped.hasOwnProperty(orders)) {
-                    let sum = grouped[orders].reduce((sum, order)=> parseFloat(order.amount) + sum, 0);
-                    grouped[orders].sort((first, second) => first.maker.id - second.maker.id);
-                    grouped[orders].forEach((order, i, arr) => {
-                        if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
-                            order.amount = new Decimal(order.amount).add(arr[i-1].amount);
-                        }
-                    });
-                    grouped[orders].sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
-                    grouped[orders][0].amount = sum;
-                    filtered.push(grouped[orders][0]);
-                }
-            }
-            return filtered;
         },
         clone: function(orders) {
             return JSON.parse(JSON.stringify(orders));
