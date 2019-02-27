@@ -20,7 +20,7 @@
                     </template>
                 </guide>
             </div>
-            <div>
+            <div class="text-xs">
                 explanation about token release period. Three maybe four sentences. how it works.
             </div>
         </b-col>

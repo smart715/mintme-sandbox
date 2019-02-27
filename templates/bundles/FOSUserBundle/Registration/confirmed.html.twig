@@ -6,7 +6,7 @@
 {% block fos_user_content %}
     <div class="container">
         <div class="row pt-5 justify-content-center notification">
-            <div class="col-12 col-lg-4 col-md-6">
+            <div class="col-12 col-lg-5 col-md-6">
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
@@ -21,7 +21,7 @@
                     <div class="card-body py-2 text-center">
                         <h1 class="title">{{ user.username }}</h1>
                         <p class="text">your account is now activated</p>
-                        <p class="mt-1">
+                        <p class="mt-1 pb-0 mb-0">
                             {% if targetUrl is empty %}
                                 {% if prelaunch.isFinished() %}
                                     <a href="{{ path('trading') }}" class="link">Go to Trading</a>
@@ -30,11 +30,11 @@
                                 {% endif %}
                             {% else %}
                                 <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>
-                                {% endif %}
-                                </p>
-                            </div>
-                        </div>
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
             </div>
-            {% endblock fos_user_content %}
+        </div>
+    </div>
+{% endblock fos_user_content %}

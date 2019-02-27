@@ -8,7 +8,7 @@
                         <h5 class="font-bold">Statistics</h5>
                     </div>
                     <div slot="body">
-                        <p class="text-xs">
+                        <p>
                             Statistics associated with {{ name }},
                             here you can find out how token creator
                             manage his tokens and if he set any restriction

@@ -6,7 +6,7 @@
 {% block fos_user_content %}
     <div class="container">
         <div class="row pt-5 justify-content-center notification">
-            <div class="col-12 col-lg-4 col-md-6">
+            <div class="col-12 col-lg-5 col-md-6">
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
@@ -16,8 +16,7 @@
                     <div class="card-body py-2 text-center">
                         <p>An email has been sent to</p>
                         <h1 class="title">{{ user.username }}</h1>
-                        <p>it contains an activation link you must click to activate your account</p>
-                        <p>Do not forget to check your spam folder</p>
+                        <p class="pb-0 mb-0">it contains an activation link you must click to activate your account <br/> Do not forget to check your spam folder</p>
                     </div>
                 </div>
             </div>
