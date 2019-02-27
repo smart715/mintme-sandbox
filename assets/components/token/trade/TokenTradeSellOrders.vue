@@ -146,7 +146,7 @@ export default {
         removeOrderModal: function(row) {
             this.removeOrders = [];
             this.currentRow = row;
-            this.sellOrders.forEach( (order) => {
+            this.clone(this.sellOrders).forEach( (order) => {
                 if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
                     order.price = toMoney(order.price);
                     order.amount = toMoney(order.amount);
@@ -171,7 +171,7 @@ export default {
         },
         groupByPrice: function(orders) {
             let filtered = [];
-            let grouped = [];
+            let grouped = {};
             this.clone(orders).forEach( (item) => {
                 if (grouped[item.price] === undefined) {
                     grouped[item.price] = [];

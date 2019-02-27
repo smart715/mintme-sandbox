@@ -23,7 +23,7 @@ use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @Rest\Route("/api/orders")
@@ -83,7 +83,7 @@ class OrdersAPIController extends FOSRestController
             $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
 
             if (!$token || !$crypto) {
-                throw new httpException(500);
+                throw new BadRequestHttpException();
             }
 
             $order = new Order(
