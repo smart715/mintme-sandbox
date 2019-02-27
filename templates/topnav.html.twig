@@ -30,26 +30,26 @@
                 {% endif %}
                 {% if not app.user %}
                     <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
-                        Login
+                        Log In
                     </b-nav-item>
                     <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
                         <span>Sign Up</span>
                     </b-nav-item>
                 {% else %}
-                    <div class="d-md-none">
+                    <div class="d-lg-none align-self-end ">
                         {% if prelaunch.isFinished() %}
-                            <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'profile' ? 'active' : '' }}" href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
+                            <b-nav-item class="text-right {{ app.request.get('_route') == 'profile' ? 'active' : '' }}" href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
                                 <span>Profile</span>
                             </b-nav-item>
                         {% endif %}
-                        <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
+                        <b-nav-item class="text-right {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
                             <span>Setting</span>
                         </b-nav-item>
-                        <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
+                        <b-nav-item class="text-right {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
                             <span>Log Out</span>
                         </b-nav-item>
                     </div>
-                    <b-nav-item-dropdown class="d-none d-md-block align-self-end align-self-lg-center" right="right">
+                    <b-nav-item-dropdown class="d-none d-lg-block align-self-end align-self-lg-center" right="right">
                         <template slot="button-content">
                             <i class="d-block icon-user-avatar"></i>
                         </template>
