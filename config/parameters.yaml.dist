@@ -22,7 +22,7 @@ parameters:
     verify_timeout_seconds: 10
 
     # Permanent quantity of each token asset
-    token_quantity: 1000000
+    token_quantity: 10000000
 
     # Show all hidden from prelaunch content automatically when prelaunch finishes
     prelaunch_autostart: false
