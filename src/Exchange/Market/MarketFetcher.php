@@ -4,6 +4,7 @@ namespace App\Exchange\Market;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Exchange\Config\Config;
 
 class MarketFetcher implements MarketFetcherInterface
 {
@@ -18,9 +19,13 @@ class MarketFetcher implements MarketFetcherInterface
     /** @var JsonRpcInterface */
     private $jsonRpc;
 
-    public function __construct(JsonRpcInterface $jsonRpc)
+    /** @var Config */
+    private $config;
+
+    public function __construct(JsonRpcInterface $jsonRpc, Config $config)
     {
         $this->jsonRpc = $jsonRpc;
+        $this->config = $config;
     }
 
     public function getMarketInfo(string $market, int $period = 86400): array
@@ -53,13 +58,17 @@ class MarketFetcher implements MarketFetcherInterface
             throw new FetchException($response->getError()['message'] ?? '');
         }
 
-        return $response->getResult();
+        return array_map(function (array $order) {
+            $order['maker_id'] -= $this->config->getOffset();
+            $order['taker_id'] -= $this->config->getOffset();
+            return $order;
+        }, $response->getResult());
     }
 
     public function getUserExecutedHistory(int $userId, string $market, int $offset = 0, int $limit = 100): array
     {
         $response = $this->jsonRpc->send(self::USER_EXECUTED_HISTORY, [
-            $userId,
+            $userId + $this->config->getOffset(),
             $market,
             $offset,
             $limit,
@@ -68,13 +77,16 @@ class MarketFetcher implements MarketFetcherInterface
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
         }
-        return $response->getResult();
+        return array_map(function (array $order) {
+            $order['id'] -= $this->config->getOffset();
+            return $order;
+        }, $response->getResult()['records']);
     }
 
     public function getPendingOrdersByUser(int $userId, string $market, int $offset = 0, int $limit = 100): array
     {
         $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
-            $userId,
+            $userId + $this->config->getOffset(),
             $market,
             $offset,
             $limit,
@@ -84,7 +96,10 @@ class MarketFetcher implements MarketFetcherInterface
             throw new FetchException($response->getError()['message'] ?? '');
         }
 
-        return $response->getResult()['records'];
+        return array_map(function (array $order) {
+            $order['user'] -= $this->config->getOffset();
+            return $order;
+        }, $response->getResult()['records']);
     }
 
     public function getPendingOrders(string $market, int $offset, int $limit, int $side): array
@@ -99,6 +114,10 @@ class MarketFetcher implements MarketFetcherInterface
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
         }
-        return $response->getResult();
+
+        return array_map(function (array $order) {
+            $order['user'] -= $this->config->getOffset();
+            return $order;
+        }, $response->getResult()['orders']);
     }
 }
