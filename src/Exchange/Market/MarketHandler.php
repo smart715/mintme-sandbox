@@ -8,6 +8,7 @@ use App\Exchange\Market;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
+use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 
 class MarketHandler implements MarketHandlerInterface
@@ -19,23 +20,33 @@ class MarketHandler implements MarketHandlerInterface
     private $moneyWrapper;
 
     /** @var UserManagerInterface */
-    protected $userManager;
+    private $userManager;
+
+    /** @var MarketNameConverterInterface */
+    private $marketNameConverter;
 
     public function __construct(
         MarketFetcherInterface $marketFetcher,
         MoneyWrapperInterface $moneyWrapper,
-        UserManagerInterface $userManager
+        UserManagerInterface $userManager,
+        MarketNameConverterInterface $marketNameConverter
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
         $this->userManager = $userManager;
+        $this->marketNameConverter = $marketNameConverter;
     }
 
     /** {@inheritdoc} */
     public function getPendingSellOrders(Market $market, int $offset = 0, int $limit = 100): array
     {
         return $this->parsePendingOrders(
-            $this->marketFetcher->getPendingOrders($market->getHiddenName(), $offset, $limit, MarketFetcher::SELL),
+            $this->marketFetcher->getPendingOrders(
+                $this->marketNameConverter->convert($market),
+                $offset,
+                $limit,
+                MarketFetcher::SELL
+            ),
             $market
         );
     }
@@ -44,7 +55,12 @@ class MarketHandler implements MarketHandlerInterface
     public function getPendingBuyOrders(Market $market, int $offset = 0, int $limit = 100): array
     {
         return $this->parsePendingOrders(
-            $this->marketFetcher->getPendingOrders($market->getHiddenName(), $offset, $limit, MarketFetcher::BUY),
+            $this->marketFetcher->getPendingOrders(
+                $this->marketNameConverter->convert($market),
+                $offset,
+                $limit,
+                MarketFetcher::BUY
+            ),
             $market
         );
     }
@@ -53,7 +69,11 @@ class MarketHandler implements MarketHandlerInterface
     public function getExecutedOrders(Market $market, int $offset = 0, int $limit = 100): array
     {
         return $this->parseExecutedOrders(
-            $this->marketFetcher->getExecutedOrders($market->getHiddenName(), $offset, $limit),
+            $this->marketFetcher->getExecutedOrders(
+                $this->marketNameConverter->convert($market),
+                $offset,
+                $limit
+            ),
             $market
         );
     }
@@ -63,7 +83,12 @@ class MarketHandler implements MarketHandlerInterface
     {
         $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit) {
             return $this->parseDeals(
-                $this->marketFetcher->getUserExecutedHistory($user->getId(), $market->getHiddenName(), $offset, $limit),
+                $this->marketFetcher->getUserExecutedHistory(
+                    $user->getId(),
+                    $this->marketNameConverter->convert($market),
+                    $offset,
+                    $limit
+                ),
                 $market
             );
         }, $markets);
@@ -82,7 +107,12 @@ class MarketHandler implements MarketHandlerInterface
     {
         $marketOrders = array_map(function (Market $market) use ($user, $offset, $limit) {
             return $this->parsePendingOrders(
-                $this->marketFetcher->getPendingOrdersByUser($user->getId(), $market->getHiddenName(), $offset, $limit),
+                $this->marketFetcher->getPendingOrdersByUser(
+                    $user->getId(),
+                    $this->marketNameConverter->convert($market),
+                    $offset,
+                    $limit
+                ),
                 $market
             );
         }, $markets);
@@ -183,7 +213,7 @@ class MarketHandler implements MarketHandlerInterface
                 $dealData['deal_order_id'],
                 $market
             );
-        }, $result['records']);
+        }, $result);
     }
 
     /**
@@ -194,11 +224,11 @@ class MarketHandler implements MarketHandlerInterface
     {
         $marketsInfo = [];
         foreach ($markets as $market) {
-            $result = $this->marketFetcher->getMarketInfo($market->getHiddenName());
+            $result = $this->marketFetcher->getMarketInfo($this->marketNameConverter->convert($market));
             if (!$result) {
                 break;
             }
-            $marketsInfo[$market->getHiddenName()] = new MarketInfo(
+            $marketsInfo[$this->marketNameConverter->convert($market)] = new MarketInfo(
                 $market->getCurrencySymbol(),
                 $market->getToken()->getName(),
                 $this->moneyWrapper->parse(
