@@ -24,11 +24,16 @@ class RequestSubscriber implements EventSubscriberInterface
     /** @var CsrfTokenManagerInterface */
     private $csrfTokenManager;
 
+    /** @var bool */
+    private $isAuth;
+
     public function __construct(
+        bool $isAuth,
         ProfileManagerInterface $profileManager,
         TokenStorageInterface $tokenStorage,
         CsrfTokenManagerInterface $csrfTokenManager
     ) {
+        $this->isAuth = $isAuth;
         $this->profileManager = $profileManager;
         $this->tokenStorage = $tokenStorage;
         $this->csrfTokenManager = $csrfTokenManager;
@@ -59,7 +64,7 @@ class RequestSubscriber implements EventSubscriberInterface
         ) {
             /** @var User $user */
             $user = $this->tokenStorage->getToken()->getUser();
-            $this->profileManager->createHash($user);
+            $this->profileManager->createHash($user, true, $this->isAuth);
         }
     }
 

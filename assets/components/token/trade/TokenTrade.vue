@@ -121,7 +121,7 @@ export default {
                 if (401 === err.response.status) {
                     this.balances = false;
                 } else {
-                    this.$toasted.error('Can not load current balance. try again later.');
+                    this.$toasted.error('Can not load current balance. Try again later.');
                 }
             });
 
@@ -139,6 +139,10 @@ export default {
                 params: [this.market.hiddenName],
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
+
+            if (!this.loggedIn) {
+                return;
+            }
 
             this.authorize()
                 .then(() => {
