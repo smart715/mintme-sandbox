@@ -90,6 +90,30 @@ export default {
         },
     },
     methods: {
+        ordersList: function(orders) {
+            return orders.map((order) => {
+                return {
+                    price: toMoney(order.price),
+                    amount: toMoney(order.amount),
+                    sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    trader: this.truncateFullName(order),
+                    trader_url: this.$routing.generate('token_show', {
+                        name: order.maker.profile.token.name,
+                    }),
+                    trader_id: order.maker.id === this.userId ? this.userId : null,
+                    side: order.side,
+                };
+            });
+        },
+        truncateFullName: function(order) {
+            let first = order.maker.profile.firstName;
+            let second = order.maker.profile.lastName;
+            if ((first + second).length > 23) {
+                return first.slice(0, 5) + '. ' + second.slice(0, 10) + '.';
+            } else {
+                return first + ' ' + second;
+            }
+        },
         groupByPrice: function(orders) {
             let filtered = [];
             let grouped = {};
@@ -115,30 +139,6 @@ export default {
             }
             return filtered;
         },
-        ordersList: function(orders) {
-            return orders.map((order) => {
-                return {
-                    price: toMoney(order.price),
-                    amount: toMoney(order.amount),
-                    sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
-                    trader: this.truncateFullName(order),
-                    trader_url: this.$routing.generate('token_show', {
-                        name: order.maker.profile.token.name,
-                    }),
-                    trader_id: order.maker.id === this.userId ? this.userId : null,
-                    side: order.side,
-                };
-            });
-        },
-        truncateFullName: function(order) {
-            let first = order.maker.profile.firstName;
-            let second = order.maker.profile.lastName;
-            if ((first + second).length > 23) {
-                return first.slice(0, 5) + '. ' + second.slice(0, 10) + '.';
-            } else {
-                return first + ' ' + second;
-            }
-        },
         removeOrderModal: function(row) {
             let orders = row.side === 1 ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
@@ -151,9 +151,6 @@ export default {
             });
             this.switchConfirmModal(true);
         },
-        switchConfirmModal: function(val) {
-            this.confirmModal = val;
-        },
         removeOrder: function() {
             let market = this.removeOrders[0].market.hiddenName;
             this.$axios.single.delete(
@@ -164,6 +161,9 @@ export default {
             ).catch(() => {
                 this.$toasted.show('Service unavailable, try again later');
             });
+        },
+        switchConfirmModal: function(val) {
+            this.confirmModal = val;
         },
         clone: function(orders) {
             return JSON.parse(JSON.stringify(orders));
