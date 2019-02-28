@@ -129,7 +129,7 @@ export default {
                 return {
                     date: new Date(order.timestamp * 1000).toDateString(),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: order.market.tokenName + '/' + order.market.currencySymbol,
+                    name: order.market.token.name + '/' + order.market.currencySymbol,
                     amount: toMoney(order.amount),
                     price: toMoney(order.price),
                     total: toMoney(new Decimal(order.price).mul(order.amount).toString()),
