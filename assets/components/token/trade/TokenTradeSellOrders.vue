@@ -24,7 +24,7 @@
                 <div class="table-responsive fix-height">
                     <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
-                        :items="filtered"
+                        :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
                             <a :href="row.item.trader_url">
@@ -60,49 +60,27 @@ import {toMoney} from '../../../js/utils';
 export default {
     name: 'TokenTradeSellOrders',
     props: {
-        sellOrders: [Array, Object],
-        filtered: [Array, Object],
+        ordersList: [Array, Object],
         tokenName: String,
-        userId: Number,
+        fields: Object,
     },
     components: {
         Guide,
     },
-    data() {
-        return {
-            fields: {
-                price: {
-                    label: 'Price',
-                },
-                amount: {
-                    label: 'Amount',
-                },
-                sum_web: {
-                    label: 'Sum WEB',
-                },
-                trader: {
-                    label: 'Trader',
-                },
-            },
-        };
-    },
     computed: {
         total: function() {
-            return toMoney(this.filtered.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
+            return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
         },
         hasOrders: function() {
-            return this.sellOrders.length > 0;
+            return this.ordersList.length > 0;
         },
         loaded: function() {
-            return this.sellOrders !== null;
+            return this.ordersList !== null;
         },
     },
     methods: {
         removeOrderModal: function(row) {
-            this.$emit('modal', {
-                row: row,
-                orders: this.sellOrders,
-            });
+            this.$emit('modal', row);
         },
     },
 };

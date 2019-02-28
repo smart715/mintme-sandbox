@@ -16,10 +16,9 @@
         <div class="col-12 col-md-6 mt-3">
             <token-trade-buy-orders
                     v-if="ordersLoaded"
-                    :buy-orders="buyOrders"
-                    :filtered="filteredBuyOrders"
+                    :orders-list="filteredBuyOrders"
                     :token-name="tokenName"
-                    :user-id="userId"
+                    :fields="fields"
                     @modal="removeOrderModal"/>
             <template v-else>
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
@@ -29,10 +28,9 @@
         <div class="col-12 col-md-6 mt-3">
             <token-trade-sell-orders
                     v-if="ordersLoaded"
-                    :sell-orders="sellOrders"
-                    :filtered="filteredSellOrders"
+                    :orders-list="filteredSellOrders"
                     :token-name="tokenName"
-                    :user-id="userId"
+                    :fields="fields"
                     @modal="removeOrderModal"/>
             <template v-else>
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
@@ -67,6 +65,20 @@ export default {
         return {
             removeOrders: [],
             confirmModal: false,
+            fields: {
+                price: {
+                    label: 'Price',
+                },
+                amount: {
+                    label: 'Amount',
+                },
+                sum_web: {
+                    label: 'Sum WEB',
+                },
+                trader: {
+                    label: 'Trader',
+                },
+            },
         };
     },
     computed: {
@@ -114,6 +126,7 @@ export default {
                         name: order.maker.profile.token.name,
                     }),
                     trader_id: order.maker.id === this.userId ? this.userId : null,
+                    side: order.side,
                 };
             });
         },
@@ -126,10 +139,11 @@ export default {
                 return first + ' ' + second;
             }
         },
-        removeOrderModal: function(data) {
+        removeOrderModal: function(row) {
+            let orders = row.side === 1 ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
-            this.clone(data.orders).forEach( (order) => {
-                if (toMoney(order.price) === data.row.price && order.maker.id === data.row.trader_id) {
+            this.clone(orders).forEach( (order) => {
+                if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
                     order.price = toMoney(order.price);
                     order.amount = toMoney(order.amount);
                     this.removeOrders.push(order);
