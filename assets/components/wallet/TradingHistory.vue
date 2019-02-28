@@ -51,7 +51,7 @@ export default {
                 market: {
                     label: 'Name',
                     sortable: true,
-                    formatter: (market) => market.tokenName + '/' + market.currencySymbol,
+                    formatter: (market) => market.token.name + '/' + market.currencySymbol,
                 },
                 amount: {
                     label: 'Amount',

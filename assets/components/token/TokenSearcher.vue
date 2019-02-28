@@ -50,7 +50,7 @@ export default {
                     return token.name;
                 });
             }).catch((error) => {
-                console.error('Service timeout');
+                this.$toasted.error('Service timeout');
             });
         },
         redirectToToken: function() {

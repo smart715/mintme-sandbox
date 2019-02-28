@@ -21,26 +21,12 @@ class Market
     }
 
     /** @Groups({"Default", "API"}) */
-    public function getHiddenName(): string
-    {
-        $cryptoSymbol = strtoupper($this->crypto->getSymbol());
-        $tokenName = 'TOK'.str_pad((string) $this->token->getId(), 12, '0', STR_PAD_LEFT);
-
-        return $tokenName.$cryptoSymbol;
-    }
-
-    /** @Groups({"Default", "API"}) */
     public function getCurrencySymbol(): string
     {
         return $this->crypto->getSymbol();
     }
 
     /** @Groups({"Default", "API"}) */
-    public function getTokenName(): ?string
-    {
-        return $this->token->getName();
-    }
-
     public function getToken(): ?Token
     {
         return $this->token;
