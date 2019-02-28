@@ -1,41 +1,43 @@
 <template>
-    <div class="d-flex">
-        <confirm-modal
-                :visible="confirmModal"
-                @close="switchConfirmModal(false)"
-                @confirm="removeOrder"
-        >
-            <ul>
-                You want to delete these orders:
-                <li v-for="order in this.removeOrders" :key="order.id">
-                    Price {{ order.price }} Amount {{ order.amount }}
-                </li>
-                Are you sure?
-            </ul>
-        </confirm-modal>
-        <div class="col-12 col-md-6 mt-3">
-            <token-trade-buy-orders
-                    v-if="ordersLoaded"
-                    :orders-list="filteredBuyOrders"
-                    :token-name="tokenName"
-                    :fields="fields"
-                    @modal="removeOrderModal"/>
-            <template v-else>
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
-                                   size="5x"/>
-            </template>
-        </div>
-        <div class="col-12 col-md-6 mt-3">
-            <token-trade-sell-orders
-                    v-if="ordersLoaded"
-                    :orders-list="filteredSellOrders"
-                    :token-name="tokenName"
-                    :fields="fields"
-                    @modal="removeOrderModal"/>
-            <template v-else>
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
-                                   size="5x"/>
-            </template>
+    <div class="container">
+        <div class="row">
+            <confirm-modal
+                    :visible="confirmModal"
+                    @close="switchConfirmModal(false)"
+                    @confirm="removeOrder"
+            >
+                <ul>
+                    You want to delete these orders:
+                    <li v-for="order in this.removeOrders" :key="order.id">
+                        Price {{ order.price }} Amount {{ order.amount }}
+                    </li>
+                    Are you sure?
+                </ul>
+            </confirm-modal>
+            <div class="col-12 col-md-6 mt-3">
+                <token-trade-buy-orders
+                        v-if="ordersLoaded"
+                        :orders-list="filteredBuyOrders"
+                        :token-name="tokenName"
+                        :fields="fields"
+                        @modal="removeOrderModal"/>
+                <template v-else>
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
+                                       size="5x"/>
+                </template>
+            </div>
+            <div class="col-12 col-md-6 mt-3">
+                <token-trade-sell-orders
+                        v-if="ordersLoaded"
+                        :orders-list="filteredSellOrders"
+                        :token-name="tokenName"
+                        :fields="fields"
+                        @modal="removeOrderModal"/>
+                <template v-else>
+                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
+                                       size="5x"/>
+                </template>
+            </div>
         </div>
     </div>
 </template>
