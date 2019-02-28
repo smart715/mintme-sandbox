@@ -239,4 +239,24 @@ class TokensAPIController extends FOSRestController
             ),
         ]);
     }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/exchange-amount", name="token_exchange_amount", options={"expose"=true})
+     */
+    public function getTokenExchange(string $name, BalanceHandlerInterface $balanceHandler): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(
+            $balanceHandler->balance(
+                $token->getProfile()->getUser(),
+                $token
+            )->getAvailable()
+        );
+    }
 }

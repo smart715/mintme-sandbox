@@ -5,6 +5,7 @@ namespace App\Tests\Exchange\Market;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
+use App\Exchange\Config\Config;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 class MarketFetcherTest extends TestCase
 {
     /** @dataProvider pendingSellOrdersProvider */
-    public function testGetPendingSellOrders(bool $hasError, ?array $rpcResult, array $sellOrders): void
+    public function testGetPendingSellOrders(bool $hasError, ?array $rpcResult): void
     {
         $method = 'order.book';
         $params = ['TOK000000000001WEB', 1, 0, 100];
@@ -32,12 +33,12 @@ class MarketFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
         if ($hasError) {
             $this->expectException(FetchException::class);
         }
         $this->assertEquals(
-            $rpcResult,
+            $rpcResult['orders'],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
         );
     }
@@ -45,7 +46,7 @@ class MarketFetcherTest extends TestCase
     public function pendingSellOrdersProvider(): array
     {
         return [
-            [false, $this->getPendingResult(Order::SELL_SIDE), $this->getPendingOrders(Order::SELL_SIDE)],
+            [false, $this->getPendingResult(Order::SELL_SIDE)],
             [true, null, []],
         ];
     }
@@ -56,7 +57,7 @@ class MarketFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
         $this->expectException(FetchException::class);
         $this->assertEquals(
             [],
@@ -65,7 +66,7 @@ class MarketFetcherTest extends TestCase
     }
 
     /** @dataProvider pendingBuyOrdersProvider */
-    public function testGetPendingBuyOrders(bool $hasError, ?array $rpcResult, array $buyOrders): void
+    public function testGetPendingBuyOrders(bool $hasError, ?array $rpcResult): void
     {
         $method = 'order.book';
         $params = ['TOK000000000001WEB', 2, 0, 100];
@@ -79,12 +80,12 @@ class MarketFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
         if ($hasError) {
             $this->expectException(FetchException::class);
         }
         $this->assertEquals(
-            $rpcResult,
+            $rpcResult['orders'],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
         );
     }
@@ -92,8 +93,8 @@ class MarketFetcherTest extends TestCase
     public function pendingBuyOrdersProvider(): array
     {
         return [
-            [false, $this->getPendingResult(Order::BUY_SIDE), $this->getPendingOrders(Order::BUY_SIDE)],
-            [true, null, []],
+            [false, $this->getPendingResult(Order::BUY_SIDE)],
+            [true, null],
         ];
     }
 
@@ -103,7 +104,7 @@ class MarketFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
         $this->expectException(FetchException::class);
         $this->assertEquals(
             [],
@@ -112,7 +113,7 @@ class MarketFetcherTest extends TestCase
     }
 
     /** @dataProvider executedOrdersProvider */
-    public function testGetExecutedOrders(bool $hasError, ?array $rpcResult, array $orders): void
+    public function testGetExecutedOrders(bool $hasError, ?array $rpcResult): void
     {
         $method = 'market.deals';
         $params = ['TOK000000000001WEB', 100, 0];
@@ -130,7 +131,7 @@ class MarketFetcherTest extends TestCase
             $this->expectException(FetchException::class);
         }
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
         $this->assertEquals(
             $rpcResult,
             $marketFetcher->getExecutedOrders('TOK000000000001WEB')
@@ -151,7 +152,7 @@ class MarketFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $marketFetcher = new MarketFetcher($jsonRpc);
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
         $this->expectException(FetchException::class);
         $this->assertEquals(
             null,
@@ -159,12 +160,21 @@ class MarketFetcherTest extends TestCase
         );
     }
 
+    /** @return Config|MockObject */
+    private function mockConfig(int $offset): Config
+    {
+        $config = $this->createMock(Config::class);
+
+        $config->method('getOffset')->willReturn($offset);
+
+        return $config;
+    }
+
     /** @return MockObject|Market */
     private function createMarket(): Market
     {
         $market = $this->createMock(Market::class);
 
-        $market->method('getHiddenName')->willReturn('TOK000000000001WEB');
         $market->method('getCurrencySymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
 
         return $market;
@@ -178,41 +188,25 @@ class MarketFetcherTest extends TestCase
     private function getPendingResult(int $side): array
     {
         return [
-            [
-                'id' => 1,
-                'type' => 1,
-                'side' => $side,
-                'ctime' => 1492616173.355293,
-                'mtime' => 1492697636.0,
-                'user' => 1,
-                'market' => 'TOK000000000001WEB',
-                'price' => '1',
-                'amount' => '10',
-                'taker_fee' => '0.01',
-                'maker_fee' => '0.01',
-                'left' => '1',
-                'freeze' => '0',
-                'deal_stock' => '1',
-                'deal_money' => '1',
-                'deal_fee' => '0.01',
-            ],
-        ];
-    }
-
-    private function getPendingOrders(int $side): array
-    {
-        return [
-            [
-                [],
-                1,
-                1,
-                null,
-                $this->createMarket(),
-                $this->createMoney(10),
-                $side,
-                $this->createMoney(1),
-                Order::PENDING_STATUS,
-                1492697636,
+            'orders' => [
+                [
+                    'id' => 1,
+                    'type' => 1,
+                    'side' => $side,
+                    'ctime' => 1492616173.355293,
+                    'mtime' => 1492697636.0,
+                    'user' => 1,
+                    'market' => 'TOK000000000001WEB',
+                    'price' => '1',
+                    'amount' => '10',
+                    'taker_fee' => '0.01',
+                    'maker_fee' => '0.01',
+                    'left' => '1',
+                    'freeze' => '0',
+                    'deal_stock' => '1',
+                    'deal_money' => '1',
+                    'deal_fee' => '0.01',
+                ],
             ],
         ];
     }
@@ -226,8 +220,8 @@ class MarketFetcherTest extends TestCase
                 'type' => 'sell',
                 'amount' => '10',
                 'price' => '1',
-                'maker' => 1,
-                'taker' => 2,
+                'maker_id' => 1,
+                'taker_id' => 2,
             ],
         ];
     }
