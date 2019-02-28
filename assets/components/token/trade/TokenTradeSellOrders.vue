@@ -54,10 +54,8 @@
 </template>
 
 <script>
-import ConfirmModal from '../../modal/ConfirmModal';
 import Guide from '../../Guide';
 import {toMoney} from '../../../js/utils';
-import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenTradeSellOrders',
@@ -72,8 +70,6 @@ export default {
     },
     data() {
         return {
-            currentRow: {},
-            orders: [],
             fields: {
                 price: {
                     label: 'Price',
@@ -102,7 +98,7 @@ export default {
         },
     },
     methods: {
-        removeOrderModal: function(row){
+        removeOrderModal: function(row) {
             this.$emit('modal', {
                 row: row,
                 orders: this.sellOrders,

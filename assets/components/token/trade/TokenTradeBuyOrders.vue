@@ -72,9 +72,6 @@ export default {
     },
     data() {
         return {
-            currentRow: {},
-            orders: [],
-            removeOrders: [],
             fields: {
                 price: {
                     label: 'Price',
@@ -103,7 +100,7 @@ export default {
         },
     },
     methods: {
-        removeOrderModal: function(row){
+        removeOrderModal: function(row) {
             this.$emit('modal', {
                 row: row,
                 orders: this.buyOrders,
