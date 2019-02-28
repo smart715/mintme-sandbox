@@ -7,7 +7,7 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Repository\TokenRepository;
-use App\Utils\TokenNameConverterInterface;
+use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
