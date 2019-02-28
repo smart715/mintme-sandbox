@@ -30,13 +30,13 @@ class MarketManagerTest extends TestCase
 
         $this->assertCount(3, $markets);
         $this->assertEquals([
-            'TOK000000000123WEB' => ['tok1', 'WEB'],
-            'TOK000000000456WEB' => ['tok2', 'WEB'],
-            'TOK000000000789WEB' => ['tok3', 'WEB'],
+            ['tok1', 'WEB'],
+            ['tok2', 'WEB'],
+            ['tok3', 'WEB'],
         ], [
-            $markets[0]->getHiddenName() => [$markets[0]->getTokenName(), $markets[0]->getCurrencySymbol()],
-            $markets[1]->getHiddenName() => [$markets[1]->getTokenName(), $markets[1]->getCurrencySymbol()],
-            $markets[2]->getHiddenName() => [$markets[2]->getTokenName(), $markets[2]->getCurrencySymbol()],
+            [$markets[0]->getToken()->getName(), $markets[0]->getCurrencySymbol()],
+            [$markets[1]->getToken()->getName(), $markets[1]->getCurrencySymbol()],
+            [$markets[2]->getToken()->getName(), $markets[2]->getCurrencySymbol()],
         ]);
     }
 

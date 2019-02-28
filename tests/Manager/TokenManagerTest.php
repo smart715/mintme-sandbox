@@ -5,6 +5,7 @@ namespace App\Tests\Manager;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
+use App\Exchange\Config\Config;
 use App\Fetcher\ProfileFetcherInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManager;
@@ -27,7 +28,8 @@ class TokenManagerTest extends TestCase
             $entityManager,
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
-            $this->mockCryptoManager([$this->mockCrypto($name)])
+            $this->mockCryptoManager([$this->mockCrypto($name)]),
+            $this->mockConfig(0)
         );
 
         $this->assertEquals($name, $tokenManager->findByName($name)->getCrypto()->getName());
@@ -52,7 +54,8 @@ class TokenManagerTest extends TestCase
             $entityManager,
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
-            $this->mockCryptoManager([])
+            $this->mockCryptoManager([]),
+            $this->mockConfig(0)
         );
 
         $this->assertEquals($token, $tokenManager->findByName($name));
@@ -73,7 +76,8 @@ class TokenManagerTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $profileFetcher,
             $this->mockTokenStorage(),
-            $this->mockCryptoManager([])
+            $this->mockCryptoManager([]),
+            $this->mockConfig(0)
         );
         $this->assertEquals($token, $tokenManager->getOwnToken());
     }
@@ -88,7 +92,8 @@ class TokenManagerTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $profileFetcher,
             $this->mockTokenStorage(),
-            $this->mockCryptoManager([])
+            $this->mockCryptoManager([]),
+            $this->mockConfig(0)
         );
         $this->assertEquals(null, $tokenManager->getOwnToken());
     }
@@ -128,5 +133,15 @@ class TokenManagerTest extends TestCase
         $crypto->method('getName')->willReturn($symbol);
 
         return $crypto;
+    }
+
+    /** @return MockObject|Config */
+    private function mockConfig(int $offset): Config
+    {
+        $config = $this->createMock(Config::class);
+
+        $config->method('getOffset')->willReturn($offset);
+
+        return $config;
     }
 }

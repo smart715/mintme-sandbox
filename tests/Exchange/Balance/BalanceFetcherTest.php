@@ -10,8 +10,9 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceFetcher;
 use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Config\Config;
+use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\RandomNumber;
-use App\Utils\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
@@ -38,7 +39,8 @@ class BalanceFetcherTest extends TestCase
         $handler = new BalanceFetcher(
             $rpc,
             $this->mockRandom(21),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
         );
 
         $result = $handler->balance(
@@ -59,7 +61,8 @@ class BalanceFetcherTest extends TestCase
         $handler = new BalanceFetcher(
             $rpc,
             $this->mockRandom(21),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
         );
         $this->expectException(FetchException::class);
 
@@ -86,7 +89,8 @@ class BalanceFetcherTest extends TestCase
         $handler = new BalanceFetcher(
             $rpc,
             $this->mockRandom(21),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
         );
 
         $result = $handler->summary('TOK999');
@@ -107,7 +111,8 @@ class BalanceFetcherTest extends TestCase
         $handler = new BalanceFetcher(
             $rpc,
             $this->mockRandom(21),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
         );
         $this->expectException(FetchException::class);
         $handler->summary('TOK999');
@@ -126,7 +131,8 @@ class BalanceFetcherTest extends TestCase
         $handler = new BalanceFetcher(
             $rpc,
             $this->mockRandom(21),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
         );
 
         $this->expectException(BalanceException::class);
@@ -142,7 +148,8 @@ class BalanceFetcherTest extends TestCase
         $handler = new BalanceFetcher(
             $rpc,
             $this->mockRandom(21),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
         );
 
         $this->expectException(BalanceException::class);
@@ -155,16 +162,27 @@ class BalanceFetcherTest extends TestCase
         $rpc = $this->mockRpc();
         $rpc->expects($this->once())->method('send')->with(
             'balance.update',
-            [ 1, 'TOK999', 'withdraw', 21, '1000000', [ 'extra' => 1 ] ]
+            [ 11, 'TOK999', 'withdraw', 21, '1000000', [ 'extra' => 1 ] ]
         );
 
         $handler = new BalanceFetcher(
             $rpc,
             $this->mockRandom(21),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(5)
         );
 
-        $handler->update(1, 'TOK999', '1000000', 'withdraw');
+        $handler->update(6, 'TOK999', '1000000', 'withdraw');
+    }
+
+    /** @return Config|MockObject */
+    private function mockConfig(int $offset): Config
+    {
+        $config = $this->createMock(Config::class);
+
+        $config->method('getOffset')->willReturn($offset);
+
+        return $config;
     }
 
     /** @return MockObject|MoneyWrapperInterface */
