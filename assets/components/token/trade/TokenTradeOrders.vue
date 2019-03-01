@@ -98,7 +98,7 @@ export default {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
-                    trader: this.truncateFullName(order),
+                    trader: order.maker != null ? this.truncateFullName(order.maker.profile) : 'Anonymous',
                     trader_url: this.$routing.generate('token_show', {
                         name: order.maker.profile.token.name,
                     }),
@@ -107,9 +107,9 @@ export default {
                 };
             });
         },
-        truncateFullName: function(order) {
-            let first = order.maker.profile.firstName;
-            let second = order.maker.profile.lastName;
+        truncateFullName: function(profile) {
+            let first = profile.firstName;
+            let second = profile.lastName;
             if ((first + second).length > 23) {
                 return first.slice(0, 5) + '. ' + second.slice(0, 10) + '.';
             } else {
