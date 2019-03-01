@@ -102,10 +102,10 @@ export default {
                 return {
                     date_time: new Date(order.timestamp * 1000).toDateString(),
                     order_maker: order.maker != null
-                        ? order.maker.profile.firstName + order.maker.profile.lastName
+                        ? order.maker.profile ? this.profileToString(order.maker.profile): 'Anonymous'
                         : '',
                     order_trader: order.taker != null
-                        ? order.taker.profile.firstName + order.taker.profile.lastName
+                        ? order.taker.profile ? this.profileToString(order.taker.profile): 'Anonymous'
                         : '',
                     maker_url: order.maker != null
                         ? this.$routing.generate('token_show', {name: order.maker.profile.token.name})
@@ -136,6 +136,9 @@ export default {
                 this.history = result.data;
                 this.$refs.table.refresh();
             }).catch((error) => { });
+        },
+        profileToString: function(profile) {
+            return profile.firstName + profile.lastName;
         },
     },
 };
