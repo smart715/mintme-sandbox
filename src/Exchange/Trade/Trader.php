@@ -12,6 +12,7 @@ use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
 use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Repository\UserRepository;
+use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\DateTimeInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,17 +21,8 @@ use Money\Money;
 
 class Trader implements TraderInterface
 {
-    private const PLACE_ORDER_METHOD = 'order.put_limit';
-    private const CANCEL_ORDER_METHOD = 'order.cancel';
-    private const FINISHED_ORDERS_METHOD = 'order.finished';
-    private const PENDING_ORDERS_METHOD = 'order.pending';
-
-    private const INSUFFICIENT_BALANCE_CODE = 10;
-    private const ORDER_NOT_FOUND_CODE = 10;
-    private const USER_NOT_MATCH_CODE = 11;
-
-    /** @var JsonRpcInterface */
-    private $jsonRpc;
+    /** @var TraderFetcherInterface */
+    private $fetcher;
 
     /** @var LimitOrderConfig */
     private $config;
@@ -47,76 +39,62 @@ class Trader implements TraderInterface
     /** @var DateTimeInterface */
     private $time;
 
+    /** @var MarketNameConverterInterface */
+    private $marketNameConverter;
+
     public function __construct(
-        JsonRpcInterface $jsonRpc,
+        TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
         PrelaunchConfig $prelaunchConfig,
-        DateTimeInterface $time
+        DateTimeInterface $time,
+        MarketNameConverterInterface $marketNameConverter
     ) {
-        $this->jsonRpc = $jsonRpc;
+        $this->fetcher = $fetcher;
         $this->config = $config;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->prelaunchConfig = $prelaunchConfig;
         $this->time = $time;
+        $this->marketNameConverter = $marketNameConverter;
     }
 
     public function placeOrder(Order $order): TradeResult
     {
-        try {
-            $response = $this->jsonRpc->send(self::PLACE_ORDER_METHOD, [
-                $order->getMaker()->getId(),
-                $order->getMarket()->getHiddenName(),
-                $order->getSide(),
-                $this->moneyWrapper->format($order->getAmount()),
-                $this->moneyWrapper->format($order->getPrice()),
-                (string)$this->config->getTakerFeeRate(),
-                (string)$this->config->getMakerFeeRate(),
-                '',
-                $this->isReferralFeeEnabled() ? $order->getReferralId() : 0,
-                $this->isReferralFeeEnabled() ? (string)$this->prelaunchConfig->getReferralFee() : '0',
-            ]);
-        } catch (FetchException $e) {
-            return new TradeResult(TradeResult::FAILED);
+        $result = $this->fetcher->placeOrder(
+            $order->getMaker()->getId(),
+            $this->marketNameConverter->convert($order->getMarket()),
+            $order->getSide(),
+            $this->moneyWrapper->format($order->getAmount()),
+            $this->moneyWrapper->format($order->getPrice()),
+            (string)$this->config->getTakerFeeRate(),
+            (string)$this->config->getMakerFeeRate(),
+            $this->isReferralFeeEnabled() ? $order->getReferralId() : 0,
+            $this->isReferralFeeEnabled() ? (string)$this->prelaunchConfig->getReferralFee() : '0'
+        );
+
+        if (TradeResult::SUCCESS === $result->getResult()) {
+            $maker = $this->getUserRepository()->find($order->getMaker()->getId());
+            $taker = $this->getUserRepository()->find($order->getTaker() ? $order->getTaker()->getId() : 0);
+
+            $token = $order->getMarket()->getToken();
+
+            if (null !== $token) {
+                $this->updateUsers([$maker, $taker], $token);
+            }
         }
 
-        if ($response->hasError()) {
-            return self::INSUFFICIENT_BALANCE_CODE === $response->getError()['code']
-                ? new TradeResult(TradeResult::INSUFFICIENT_BALANCE)
-                : new TradeResult(TradeResult::FAILED);
-        }
-
-        $maker = $this->getUserRepository()->find($order->getMaker()->getId());
-        $taker = $this->getUserRepository()->find($order->getTaker() ? $order->getTaker()->getId() : 0);
-
-        $token = $order->getMarket()->getToken();
-
-        if (null !== $token) {
-            $this->updateUsers([$maker, $taker], $token);
-        }
-
-        return new TradeResult(TradeResult::SUCCESS);
+        return $result;
     }
 
     public function cancelOrder(Order $order): TradeResult
     {
-        try {
-            $response = $this->jsonRpc->send(self::CANCEL_ORDER_METHOD, [
-                $order->getMaker()->getId(),
-                $order->getMarket()->getHiddenName(),
-                $order->getId(),
-            ]);
-        } catch (FetchException $e) {
-            return new TradeResult(TradeResult::FAILED);
-        }
-
-        if ($response->hasError()) {
-            return $this->getCancelOrderErrorResult($response->getError()['code']);
-        }
-
-        return new TradeResult(TradeResult::SUCCESS);
+        return $this->fetcher->cancelOrder(
+            $order->getMaker()->getId(),
+            $this->marketNameConverter->convert($order->getMarket()),
+            $order->getId() ?? 0
+        );
     }
 
     /**
@@ -127,23 +105,19 @@ class Trader implements TraderInterface
         $options = new OrderFilterConfig();
         $options->merge($filterOptions);
 
-        $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [
+        $records = $this->fetcher->getFinishedOrders(
             $user->getId(),
-            $market->getHiddenName(),
+            $this->marketNameConverter->convert($market),
             $options['start_time'],
             $options['end_time'],
             $options['offset'],
             $options['limit'],
-            Order::SIDE_MAP[$options['side']],
-        ]);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
+            Order::SIDE_MAP[$options['side']]
+        );
 
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::FINISHED_STATUS);
-        }, $response->getResult()['records']);
+        }, $records);
     }
 
     /**
@@ -154,23 +128,17 @@ class Trader implements TraderInterface
         $options = new OrderFilterConfig();
         $options->merge($filterOptions);
 
-        $params = [
+        $records = $this->fetcher->getPendingOrders(
             $user->getId(),
-            $market->getHiddenName(),
+            $this->marketNameConverter->convert($market),
             $options['offset'],
             $options['limit'],
-            Order::SIDE_MAP[$options['side']],
-        ];
-
-        $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, $params);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
+            Order::SIDE_MAP[$options['side']]
+        );
 
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
-        }, $response->getResult()['records']);
+        }, $records);
     }
 
     private function isReferralFeeEnabled(): bool
@@ -217,17 +185,5 @@ class Trader implements TraderInterface
             $status,
             $orderData['mtime']
         );
-    }
-
-    private function getCancelOrderErrorResult(int $errorCode): TradeResult
-    {
-        $errorMapping = [
-            self::ORDER_NOT_FOUND_CODE => TradeResult::ORDER_NOT_FOUND,
-            self::USER_NOT_MATCH_CODE => TradeResult::USER_NOT_MATCH,
-        ];
-
-        return array_key_exists($errorCode, $errorMapping)
-            ? new TradeResult($errorMapping[$errorCode])
-            : new TradeResult(TradeResult::FAILED);
     }
 }

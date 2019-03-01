@@ -9,7 +9,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
-use App\Utils\TokenNameConverterInterface;
+use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Money;

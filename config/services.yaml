@@ -59,7 +59,7 @@ services:
             $takerFeeRate: '%taker_fee_rate%'
             $makerFeeRate: '%maker_fee_rate%'
 
-    App\Exchange\Trade\Trader:
+    App\Exchange\Trade\TraderFetcher:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
@@ -185,8 +185,14 @@ services:
             - '@fos_user.mailer'
             - '%fos_user.resetting.retry_ttl%'
 
-    App\EventSubscriber\LoadViewSubscriber:
+    App\Exchange\Config\Config:
         arguments:
-            - '@session'
-            - '@viabtc.json_rpc'
-            - '@App\Exchange\Trade\Config\PrelaunchConfig'
+            $offset: "%env(VIABTC_OFFSET)%"
+
+    App\Controller\API\WebSocketAPIController:
+        arguments:
+            $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
+
+    App\EventSubscriber\RequestSubscriber:
+        arguments:
+            $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
