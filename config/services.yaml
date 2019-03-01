@@ -185,12 +185,6 @@ services:
             - '@fos_user.mailer'
             - '%fos_user.resetting.retry_ttl%'
 
-    App\EventSubscriber\LoadViewSubscriber:
-        arguments:
-            - '@session'
-            - '@viabtc.json_rpc'
-            - '@App\Exchange\Trade\Config\PrelaunchConfig'
-
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
