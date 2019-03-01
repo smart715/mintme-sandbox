@@ -100,7 +100,7 @@ export default {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
-                    trader: order.maker.profile.firstName + ' ' + order.maker.profile.lastName,
+                    trader: order.maker.profile ? this.profileToString(order.maker.profile): 'Anonymous',
                 };
             });
         },
@@ -118,6 +118,11 @@ export default {
         scrollDown: function() {
             let parentDiv = this.$refs.buyorders;
             parentDiv.scrollTop = parentDiv.scrollHeight;
+        },
+    },
+    methods: {
+        profileToString: function(profile) {
+            return profile.firstName + profile.lastName;
         },
     },
 };

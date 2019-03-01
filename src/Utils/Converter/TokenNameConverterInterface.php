@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace App\Utils\Converter;
 
 use App\Entity\Token\Token;
 

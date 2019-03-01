@@ -113,6 +113,7 @@ class Token
         return $this->lockIn;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getName(): ?string
     {
         return $this->name;

@@ -11,7 +11,7 @@ interface ProfileManagerInterface
     public function getProfileByPageUrl(String $pageUrl): ?Profile;
     public function findByEmail(string $email): ?Profile;
     public function generatePageUrl(Profile $profile): ?string;
-    public function createHash(User $user, bool $hash = true): User;
+    public function createHash(User $user, bool $hash = true, bool $enforceSecurity = true): User;
     public function findProfileByHash(?string $hash): ?User;
 
     /**

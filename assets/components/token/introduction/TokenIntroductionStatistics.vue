@@ -184,14 +184,14 @@ export default {
     data() {
         return {
             showSettings: false,
-            tokens: null,
+            tokenExchangeAmount: null,
             pendingSellOrders: null,
             executedOrders: null,
         };
     },
     mounted: function() {
-        this.$axios.retry.get(this.$routing.generate('tokens'))
-            .then((res) => this.tokens = {...res.data.common, ...res.data.predefined})
+        this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.name}))
+            .then((res) => this.tokenExchangeAmount = res.data)
             .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
 
         this.$axios.retry.get(this.$routing.generate('executed_orders', {tokenName: this.name}))
@@ -212,7 +212,7 @@ export default {
     },
     computed: {
         loaded: function() {
-            return this.tokens !== null && this.pendingSellOrders !== null && this.executedOrders !== null;
+            return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.executedOrders !== null;
         },
         releasedDisabled: function() {
             return this.stats.releasePeriod !== defaultValue;
@@ -221,14 +221,7 @@ export default {
             return !this.releasedDisabled ? 10 : this.stats.releasePeriod;
         },
         walletBalance: function() {
-            let available = new Decimal(0);
-            for (let key in this.tokens) {
-                if (this.tokens.hasOwnProperty(key)) {
-                    let amount = new Decimal(this.tokens[key]['available']);
-                    available = available.plus(amount);
-                }
-            }
-            return toMoney(available.toString());
+            return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
             let sum = new Decimal(0);
