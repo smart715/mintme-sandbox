@@ -17,12 +17,6 @@ new Vue({
         },
     },
     methods: {
-        onEmailSubmit: function() {
-            this.$v.$touch();
-            if (this.email !== this.initialEmail && !this.$v.$invalid) {
-                this.$refs.emailForm.submit();
-            }
-        },
         onEmailKeyUp: function(event) {
             this.$v.$touch();
             this.email = this.$refs.email.value;
