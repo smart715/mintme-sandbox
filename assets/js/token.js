@@ -1,4 +1,4 @@
-import {Tabs} from 'bootstrap-vue/es/components';
+import Tabs from 'bootstrap-vue/es/components';
 import TokenTrade from '../components/token/trade/TokenTrade';
 import TokenIntroductionProfile from '../components/token/introduction/TokenIntroductionProfile';
 import TokenIntroductionStatistics from '../components/token/introduction/TokenIntroductionStatistics';

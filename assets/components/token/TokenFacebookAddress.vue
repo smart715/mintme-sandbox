@@ -60,8 +60,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label for="select-fb-pages text-primary">Select Facebook page to show:</label>
-                                    <select v-model="selectedUrl" class="form-control text-primary" id="select-fb-pages">
+                                    <label for="select-fb-pages">Select Facebook page to show:</label>
+                                    <select v-model="selectedUrl" class="form-control" id="select-fb-pages">
                                         <option
                                             v-for="(page, index) in pages"
                                             :selected="index === 0 ? 'selected' : ''"
