@@ -127,7 +127,7 @@ export default {
             });
             for (let orders in grouped) {
                 if (grouped.hasOwnProperty(orders)) {
-                    let sum = grouped[orders].reduce((sum, order)=> parseFloat(order.amount) + sum, 0);
+                    let sum = grouped[orders].reduce((sum, order) => parseFloat(order.amount) + sum, 0);
                     grouped[orders].sort((first, second) => first.maker.id - second.maker.id);
                     grouped[orders].forEach((order, i, arr) => {
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
@@ -144,7 +144,7 @@ export default {
         removeOrderModal: function(row) {
             let orders = row.side === 1 ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
-            this.clone(orders).forEach( (order) => {
+            this.clone(orders).forEach((order) => {
                 if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
                     order.price = toMoney(order.price);
                     order.amount = toMoney(order.amount);
@@ -154,15 +154,14 @@ export default {
             this.switchConfirmModal(true);
         },
         removeOrder: function() {
-            let market = this.removeOrders[0].market.hiddenName;
-            this.$axios.single.delete(
-                this.$routing.generate('orders_cancel', {
-                    'market': market,
-                    'ids': JSON.stringify(this.removeOrders.map((order) => order.id)),
-                })
-            ).catch(() => {
-                this.$toasted.show('Service unavailable, try again later');
+            let deleteOrdersUrl = this.$routing.generate('orders_cancel', {
+                'market': this.removeOrders[0].market.hiddenName,
             });
+            let data = {'ids': this.removeOrders.map((order) => order.id)};
+            this.$axios.single.post(deleteOrdersUrl, data)
+                .catch(() => {
+                    this.$toasted.show('Service unavailable, try again later');
+                });
         },
         switchConfirmModal: function(val) {
             this.confirmModal = val;

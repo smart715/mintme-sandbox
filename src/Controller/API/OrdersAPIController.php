@@ -66,10 +66,11 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     * @Rest\Delete("/cancel/{market}/{ids}", name="orders_cancel", options={"expose"=true})
+     * @Rest\Post("/cancel/{market}", name="orders_cancel", options={"expose"=true})
+     * @Rest\RequestParam(name="ids", allowBlank=false)
      * @Rest\View()
      */
-    public function cancelOrders(string $market, string $ids, ParamFetcherInterface $request): View
+    public function cancelOrders(string $market, ParamFetcherInterface $request): View
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -78,7 +79,7 @@ class OrdersAPIController extends FOSRestController
                 'result' => [],
                 'message' => [],
             ];
-        foreach (json_decode($ids) as $id) {
+        foreach ($request->get('ids') as $id) {
             $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
             $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
 
