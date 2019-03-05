@@ -182,6 +182,7 @@ class Profile
         if ($this->country) {
             return Intl::getRegionBundle()->getCountryName($this->country);
         }
+        return null;
     }
 
     public function getCountry(): ?string
