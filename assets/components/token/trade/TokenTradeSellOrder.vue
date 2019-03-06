@@ -171,8 +171,8 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        marketName: Object,
-        sell: Object,
+        market: Object,
+        marketPrice: [Number, String],
         balance: [String, Boolean],
         tokenHiddenName: String,
         currency: String,
@@ -193,7 +193,6 @@ export default {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 let data = {
-                    'tokenName': this.tokenName,
                     'amountInput': toMoney(this.sellAmount),
                     'priceInput': toMoney(this.sellPrice),
                     'marketPrice': this.useMarketPrice,
@@ -209,30 +208,30 @@ export default {
             this.modalTitle = this.modalSuccess ? '' : message;
             this.showModal = true;
         },
+        updateMarketPrice: function() {
+            if (this.useMarketPrice) {
+                this.sellPrice = this.price || 0;
+            }
+        },
     },
     computed: {
         totalPrice: function() {
             return new Decimal(this.sellPrice || 0).times(this.sellAmount || 0).toString();
         },
-        market: function() {
-            return JSON.parse(this.marketName);
-        },
-        amount: function() {
-            return this.sell.amount || null;
-        },
         price: function() {
-            return this.sell.price || null;
+            return toMoney(this.marketPrice) || null;
         },
         fieldsValid: function() {
-            return Boolean(this.sellPrice && this.sellAmount);
+            return this.sellPrice > 0 && this.sellAmount > 0;
         },
     },
     watch: {
-      useMarketPrice: function() {
-          if (this.useMarketPrice) {
-              this.sellPrice = this.price || 0;
-          }
-      },
+        useMarketPrice: function() {
+            this.updateMarketPrice();
+        },
+        marketPrice: function() {
+            this.updateMarketPrice();
+        },
     },
     mounted: function() {
         if (!this.balance) {
