@@ -265,7 +265,7 @@ export default {
                     }
                 })
                 .catch(({response}) => this.$toasted.error(
-                  !response
+                  ! response
                   ? 'Network error'
                   : response.statusText
                   ? response.statusText
