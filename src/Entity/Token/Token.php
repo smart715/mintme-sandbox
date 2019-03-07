@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
- * @UniqueEntity("name")
+ * @UniqueEntity(fields={"name"}, message="Token name is already exists.")
  * @UniqueEntity("address")
  */
 class Token

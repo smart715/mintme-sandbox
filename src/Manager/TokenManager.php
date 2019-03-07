@@ -39,7 +39,7 @@ class TokenManager implements TokenManagerInterface
 
     public function findByHiddenName(string $name): ?Token
     {
-        $id = (int) filter_var($name, FILTER_SANITIZE_NUMBER_INT);
+        $id = (int)filter_var($name, FILTER_SANITIZE_NUMBER_INT);
 
         return $this->repository->find($id);
     }
@@ -120,7 +120,8 @@ class TokenManager implements TokenManagerInterface
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult
     {
-        if ($token !== $this->getOwnToken() || $token->getProfile()->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
+        if ($token !== $this->getOwnToken() || $token->getProfile()
+                ->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
             return $balanceResult;
         }
 
@@ -147,5 +148,20 @@ class TokenManager implements TokenManagerInterface
     public function isValidName(string $name): bool
     {
         return 1 === preg_match('/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[a-zA-Z0-9\s\-])*$/', $name);
+    }
+
+    public function isExisted(string $name): bool
+    {
+        return null !== $this->findByUrl($this->normalizeTokenName($name));
+    }
+
+    public function normalizeTokenName(?string $name): string
+    {
+        $name = $name ?? '';
+        $name = trim(strtolower($name));
+        $name = preg_replace('/-+/', '-', $name);
+        $name = preg_replace('/\s+/', ' ', $name);
+        $name = str_replace(' ', '-', $name);
+        return $name;
     }
 }

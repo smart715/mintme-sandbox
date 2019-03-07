@@ -74,11 +74,18 @@ class TokensAPIController extends FOSRestController
             return null !== $value;
         }), false);
 
+        if ($this->tokenManager->isExisted($token->getName())) {
+            return $this->view(
+                'Token name is already exists.',
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
         if (!$form->isValid()) {
             return $this->view(
                 !$this->tokenManager->isValidName($token->getName())
-                ? 'Invalid token name'
-                : $form->getErrors()[0],
+                    ? 'Invalid token name.'
+                    : $form->getErrors()[0],
                 Response::HTTP_BAD_REQUEST
             );
         }
@@ -157,9 +164,9 @@ class TokensAPIController extends FOSRestController
         $lock = $token->getLockIn() ?? new LockIn($token);
 
         $form = $this->createFormBuilder($lock, [
-                'csrf_protection' => false,
-                'allow_extra_fields' => true,
-            ])
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ])
             ->add('releasePeriod')
             ->getForm();
 

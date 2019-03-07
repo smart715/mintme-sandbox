@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -88,7 +89,7 @@ class TokenController extends AbstractController
             return $this->render('pages/token_404.html.twig');
         }
 
-        if ($name != $this->normalizeTokenName($token->getName())) {
+        if ($name != $this->tokenManager->normalizeTokenName($token->getName())) {
             return $this->redirectToOwnToken($tab);
         }
 
@@ -128,6 +129,16 @@ class TokenController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
+
+            if ($form->isSubmitted() && $this->tokenManager->isExisted($token->getName())) {
+                $form->addError(new FormError('Token name is already exists'));
+                return $this->render('pages/token_creation.html.twig', [
+                    'formHeader' => 'Create your own token',
+                    'form' => $form->createView(),
+                    'profileCreated' => $this->isProfileCreated(),
+                    'existed' => true,
+                ]);
+            }
 
             if (null !== $profile) {
                 $token->setProfile($profile);
@@ -191,16 +202,6 @@ class TokenController extends AbstractController
         return $response;
     }
 
-    public function normalizeTokenName(?string $name): string
-    {
-        $name = $name ?? '';
-        $name = trim(strtolower($name));
-        $name = preg_replace('/-+/', '-', $name);
-        $name = preg_replace('/\s+/', ' ', $name);
-        $name = str_replace(' ', '-', $name);
-        return $name;
-    }
-
     private function redirectToOwnToken(?string $showtab = 'trade'): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
@@ -210,7 +211,7 @@ class TokenController extends AbstractController
         }
 
         return $this->redirectToRoute('token_show', [
-            'name' => $this->normalizeTokenName($token->getName()),
+            'name' => $this->tokenManager->normalizeTokenName($token->getName()),
             'tab' => $showtab,
         ]);
     }

@@ -19,8 +19,7 @@ class TokenRepository extends EntityRepository
             ->where('REPLACE(token.name, \' \', \'-\' ) = (:name)')
             ->setParameter('name', $name)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
 
     /** @return Token[] */
@@ -32,7 +31,6 @@ class TokenRepository extends EntityRepository
             ->orderBy('token.name', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 }
