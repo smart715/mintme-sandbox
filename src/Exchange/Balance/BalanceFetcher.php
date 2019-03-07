@@ -8,6 +8,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\BalanceResultFactory;
 use App\Exchange\Balance\Model\SummaryResult;
+use App\Exchange\Config\Config;
 use App\Utils\RandomNumberInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 
@@ -26,20 +27,25 @@ class BalanceFetcher implements BalanceFetcherInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var Config */
+    private $config;
+
     public function __construct(
         JsonRpcInterface $jsonRpc,
         RandomNumberInterface $randomNumber,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        Config $config
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->random = $randomNumber;
         $this->moneyWrapper = $moneyWrapper;
+        $this->config = $config;
     }
 
     public function update(int $userId, string $tokenName, string $amount, string $type): void
     {
         $responce = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
-            $userId,
+            $userId + $this->config->getOffset(),
             $tokenName,
             $type,
             $this->random->getNumber(),
@@ -79,9 +85,10 @@ class BalanceFetcher implements BalanceFetcherInterface
         if (!$tokenNames) {
             throw new BalanceException('Failed to get the balance. No token name', BalanceException::EMPTY);
         }
+
         $response = $this->jsonRpc->send(
             self::BALANCE_METHOD,
-            array_merge([$userId], $tokenNames)
+            array_merge([$userId + $this->config->getOffset()], $tokenNames)
         );
 
         if ($response->hasError()) {

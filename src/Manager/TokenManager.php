@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\Model\BalanceResult;
+use App\Exchange\Config\Config;
 use App\Fetcher\ProfileFetcherInterface;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,23 +26,28 @@ class TokenManager implements TokenManagerInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var Config */
+    private $config;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileFetcherInterface $profileFetcher,
         TokenStorageInterface $storage,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        Config $config
     ) {
         $this->repository = $em->getRepository(Token::class);
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
+        $this->config = $config;
     }
 
     public function findByHiddenName(string $name): ?Token
     {
         $id = (int)filter_var($name, FILTER_SANITIZE_NUMBER_INT);
 
-        return $this->repository->find($id);
+        return $this->repository->find($id - $this->config->getOffset());
     }
 
     public function findByName(string $name): ?Token

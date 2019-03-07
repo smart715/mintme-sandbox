@@ -68,22 +68,22 @@ export default {
                 type: {
                     label: 'Type',
                 },
-                order_maker: {
+                orderMaker: {
                     label: 'Order maker',
                 },
-                order_trader: {
+                orderTrader: {
                     label: 'Order trader',
                 },
-                price_per_token: {
+                pricePerToken: {
                     label: 'Price per token',
                 },
-                token_amount: {
+                tokenAmount: {
                     label: 'Token amount',
                 },
-                web_amount: {
+                webAmount: {
                     label: 'WEB amount',
                 },
-                date_time: {
+                dateTime: {
                     label: 'Date & Time',
                 },
             },
@@ -98,10 +98,10 @@ export default {
                 return {
                     date_time: new Date(order.timestamp * 1000).toDateString(),
                     order_maker: order.maker != null
-                        ? order.maker.profile.firstName + order.maker.profile.lastName
+                        ? order.maker.profile ? this.profileToString(order.maker.profile): 'Anonymous'
                         : '',
                     order_trader: order.taker != null
-                        ? order.taker.profile.firstName + order.taker.profile.lastName
+                        ? order.taker.profile ? this.profileToString(order.taker.profile): 'Anonymous'
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     price_per_token: toMoney(order.price),
@@ -126,6 +126,9 @@ export default {
                 this.history = result.data;
                 this.$refs.table.refresh();
             }).catch((error) => { });
+        },
+        profileToString: function(profile) {
+            return profile.firstName + profile.lastName;
         },
     },
 };

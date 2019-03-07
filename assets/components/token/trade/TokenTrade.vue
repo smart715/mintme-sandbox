@@ -9,8 +9,8 @@
                 :login-url="loginUrl"
                 :signup-url="signupUrl"
                 :logged-in="loggedIn"
-                :market-name="marketName"
-                :buy="buy"
+                :market="market"
+                :market-price="marketPriceBuy"
                 :token-name="tokenName"
                 :place-order-url="placeOrderUrl"
                 :balance="webBalance"
@@ -29,8 +29,8 @@
                 :login-url="loginUrl"
                 :signup-url="signupUrl"
                 :logged-in="loggedIn"
-                :market-name="marketName"
-                :sell="sell"
+                :market="market"
+                :market-price="marketPriceSell"
                 :token-name="tokenName"
                 :place-order-url="placeOrderUrl"
                 :balance="tokenBalance"
@@ -45,7 +45,7 @@
             class="chart mt-3 mt-lg-0 col-12 col-lg-4"
             :websocket-url="websocketUrl"
             :currency="currency"
-            :market-name="marketName"
+            :market-name="market"
         />
         <div class="col-12 col-md-6 mt-3">
             <token-trade-buy-orders v-if="ordersLoaded" :buy-orders="buyOrders" :token-name="tokenName" />
@@ -74,6 +74,7 @@ import TokenTradeSellOrders from './TokenTradeSellOrders';
 import TokenTradeTradeHistory from './TokenTradeTradeHistory';
 import OrderModal from '../../modal/OrderModal';
 import WebSocketMixin from '../../../js/mixins/websocket';
+import {toMoney} from '../../../js/utils';
 
 export default {
     name: 'TokenTrade',
@@ -93,7 +94,7 @@ export default {
         currency: String,
         loginUrl: String,
         signupUrl: String,
-        marketName: Object,
+        market: Object,
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
@@ -103,25 +104,15 @@ export default {
         return {
             pendingBuyOrders: null,
             pendingSellOrders: null,
-            buy: {
-                amount: 0,
-                price: 0,
-            },
-            sell: {
-                amount: 0,
-                price: 0,
-            },
             buyOrders: null,
             sellOrders: null,
             balances: null,
         };
     },
     computed: {
-        market: function() {
-            return this.marketName;
-        },
         tokenBalance: function() {
-            return this.balances[this.tokenName] ? this.balances[this.tokenName].available : false;
+            return this.balances[this.tokenName] ? this.balances[this.tokenName].available
+                : this.balances ? toMoney(0) : false;
         },
         webBalance: function() {
             return this.balances['WEB'] ? this.balances['WEB'].available : false;
@@ -132,26 +123,42 @@ export default {
         ordersLoaded: function() {
             return this.buyOrders !== null && this.sellOrders !== null;
         },
+        marketPriceSell: function() {
+            return this.buyOrders && this.buyOrders[0] ? this.buyOrders[0].price : 0;
+        },
+        marketPriceBuy: function() {
+            return this.sellOrders && this.sellOrders[0] ? this.sellOrders[0].price : 0;
+        },
     },
     mounted() {
         this.$axios.retry.get(this.$routing.generate('tokens'))
-            .then((res) => this.balances = {...res.data.common, ...res.data.predefined})
+            .then((res) => {
+                this.balances = {...res.data.common, ...res.data.predefined};
+                this.authorize()
+                    .then(() => {
+                        this.sendMessage(JSON.stringify({
+                            method: 'asset.subscribe',
+                            params: [this.tokenHiddenName, this.market.currencySymbol],
+                            id: parseInt(Math.random().toString().replace('0.', '')),
+                        }));
+                    })
+                    .catch(() => {
+                        this.$toasted.error(
+                            'Can not connect to internal services'
+                        );
+                    });
+            })
             .catch((err) => {
                 if (401 === err.response.status) {
                     this.balances = false;
                 } else {
-                    this.$toasted.error('Can not load current balance. try again later.');
+                    this.$toasted.error('Can not load current balance. Try again later.');
                 }
             });
 
         this.updateOrders();
         this.$store.state.interval.make(this.updateOrders, 10000);
 
-        this.addMessageHandler((result) => {
-            if ('state.update' === result.method) {
-                this.updateMarketData(result);
-            }
-        });
         this.addOnOpenHandler(() => {
             this.sendMessage(JSON.stringify({
                 method: 'deals.subscribe',
@@ -159,11 +166,15 @@ export default {
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
 
+            if (!this.loggedIn) {
+                return;
+            }
+
             this.authorize()
                 .then(() => {
                     this.sendMessage(JSON.stringify({
                         method: 'asset.subscribe',
-                        params: [this.tokenHiddenName, this.marketName.currencySymbol],
+                        params: [this.tokenHiddenName, this.market.currencySymbol],
                         id: parseInt(Math.random().toString().replace('0.', '')),
                     }));
                 })
@@ -182,37 +193,6 @@ export default {
                 this.buyOrders = result.data.buy;
                 this.sellOrders = result.data.sell;
             }).catch((error) => { });
-        },
-        updateMarketData: function(marketData) {
-            if (!marketData.params) {
-                return;
-            }
-
-            const marketDealsInfo = marketData.params[1];
-
-            if (Array.isArray(marketDealsInfo)) {
-                marketDealsInfo.forEach((deal) => {
-                    // Pending order.
-                    if (!deal.taker_id) {
-                        const price = parseFloat(deal.price);
-                        const amount = parseFloat(deal.amount);
-                        switch (deal.type) {
-                            case 'buy':
-                                if (price > this.sell.price) {
-                                    this.sell.price = price;
-                                    this.sell.amount = amount;
-                                }
-                                break;
-                            case 'sell':
-                                if (0 === this.buy.price || price < this.buy.price) {
-                                    this.buy.price = price;
-                                    this.buy.amount = amount;
-                                }
-                                break;
-                        }
-                    }
-                });
-            }
         },
     },
 };
