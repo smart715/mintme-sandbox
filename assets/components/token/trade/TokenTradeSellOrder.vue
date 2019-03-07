@@ -15,16 +15,16 @@
             <div class="card-body">
                 <div class="row">
                     <div v-if="immutableBalance"
-                         class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
-                    >
+                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
+                        >
                         Your Tokens:
                         <span class="text-primary">
                             {{ immutableBalance | toMoney  }}
                             <guide>
                                 <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
+                                    icon="question"
+                                    slot='icon'
+                                    class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Your Tokens
@@ -38,20 +38,20 @@
                     <div class="col-12 col-sm-6 col-md-12 col-xl-6 text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
-                                    v-model.number="useMarketPrice"
-                                    step="0.00000001"
-                                    type="checkbox"
-                                    id="sell-price"
-                                    class="custom-control-input">
+                                v-model.number="useMarketPrice"
+                                step="0.00000001"
+                                type="checkbox"
+                                id="sell-price"
+                                class="custom-control-input">
                             <label
-                                    class="custom-control-label"
-                                    for="sell-price">
+                                class="custom-control-label"
+                                for="sell-price">
                                 Market Price
                                 <guide>
                                     <font-awesome-icon
-                                            icon="question"
-                                            slot='icon'
-                                            class="ml-1 mb-1 bg-primary text-white
+                                        icon="question"
+                                        slot='icon'
+                                        class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                     <template slot="header">
                                         Market Price
@@ -66,14 +66,14 @@
                     </div>
                     <div class="col-12 pt-3">
                         <label
-                                for="sell-price-input"
-                                class="text-primary">
+                            for="sell-price-input"
+                            class="text-primary">
                             Price in WEB:
                             <guide>
                                 <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
+                                    icon="question"
+                                    slot='icon'
+                                    class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Price in WEB
@@ -84,37 +84,37 @@
                             </guide>
                         </label>
                         <input
-                                v-model.number="sellPrice"
-                                step="0.00000001"
-                                type="number"
-                                id="sell-price-input"
-                                class="form-control"
-                                :disabled="useMarketPrice"
-                                min="0"
+                            v-model.number="sellPrice"
+                            step="0.00000001"
+                            type="number"
+                            id="sell-price-input"
+                            class="form-control"
+                            :disabled="useMarketPrice"
+                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
                         <label
-                                for="sell-price-amount"
-                                class="text-primary">
+                            for="sell-price-amount"
+                            class="text-primary">
                             Amount:
                         </label>
                         <input
-                                v-model="sellAmount"
-                                step="0.00000001"
-                                type="number"
-                                id="sell-price-amount"
-                                class="form-control"
-                                min="0"
+                            v-model="sellAmount"
+                            step="0.00000001"
+                            type="number"
+                            id="sell-price-amount"
+                            class="form-control"
+                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
+                                icon="question"
+                                slot='icon'
+                                class="ml-1 mb-1 bg-primary text-white
                                        rounded-circle square blue-question"/>
                             <template slot="header">
                                 Total Price
@@ -126,10 +126,10 @@
                     </div>
                     <div class="col-12 pt-4 text-center">
                         <button
-                                v-if="loggedIn"
-                                class="btn btn-primary"
-                                :disabled="!fieldsValid"
-                                @click="placeOrder"
+                            v-if="loggedIn"
+                            class="btn btn-primary"
+                            :disabled="!fieldsValid"
+                            @click="placeOrder"
                         >
                             Create sell order
                         </button>
@@ -143,116 +143,116 @@
             </div>
         </div>
         <order-modal
-                :type="modalSuccess"
-                :visible="showModal"
-                @close="showModal = false"
+            :type="modalSuccess"
+            :visible="showModal"
+            @close="showModal = false"
         />
     </div>
 </template>
 
 <script>
-  import Guide from '../../Guide';
-  import OrderModal from '../../modal/OrderModal';
-  import WebSocketMixin from '../../../js/mixins/websocket';
-  import {toMoney} from '../../../js/utils';
-  import Decimal from 'decimal.js';
+import Guide from '../../Guide';
+import OrderModal from '../../modal/OrderModal';
+import WebSocketMixin from '../../../js/mixins/websocket';
+import {toMoney} from '../../../js/utils';
+import Decimal from 'decimal.js';
 
-  export default {
+export default {
     name: 'TokenTradeSellOrder',
     components: {
-      Guide,
-      OrderModal,
+        Guide,
+        OrderModal,
     },
     mixins: [WebSocketMixin],
     props: {
-      loginUrl: String,
-      signupUrl: String,
-      loggedIn: Boolean,
-      tokenName: String,
-      placeOrderUrl: String,
-      market: Object,
-      marketPrice: [Number, String],
-      balance: [String, Boolean],
-      tokenHiddenName: String,
-      currency: String,
+        loginUrl: String,
+        signupUrl: String,
+        loggedIn: Boolean,
+        tokenName: String,
+        placeOrderUrl: String,
+        market: Object,
+        marketPrice: [Number, String],
+        balance: [String, Boolean],
+        tokenHiddenName: String,
+        currency: String,
     },
     data() {
-      return {
-        immutableBalance: this.balance,
-        sellPrice: 0,
-        sellAmount: 0,
-        useMarketPrice: false,
-        action: 'sell',
-        showModal: false,
-        modalSuccess: false,
-      };
+        return {
+            immutableBalance: this.balance,
+            sellPrice: 0,
+            sellAmount: 0,
+            useMarketPrice: false,
+            action: 'sell',
+            showModal: false,
+            modalSuccess: false,
+        };
     },
     methods: {
-      placeOrder: function() {
-        if (this.sellPrice && this.sellAmount) {
-          let data = {
-            'amountInput': toMoney(this.sellAmount),
-            'priceInput': toMoney(this.sellPrice),
-            'marketPrice': this.useMarketPrice,
-            'action': this.action,
-          };
-          this.$axios.single.post(this.placeOrderUrl, data)
-            .then((response) => this.showModalAction(response.data.result))
-            .catch((error) => this.showModalAction());
-        }
-      },
-      showModalAction: function(result) {
-        this.modalSuccess = 1 === result;
-        this.showModal = true;
-      },
-      updateMarketPrice: function() {
-        if (this.useMarketPrice) {
-          this.sellPrice = this.price || 0;
-        }
-      },
+        placeOrder: function() {
+            if (this.sellPrice && this.sellAmount) {
+                let data = {
+                    'amountInput': toMoney(this.sellAmount),
+                    'priceInput': toMoney(this.sellPrice),
+                    'marketPrice': this.useMarketPrice,
+                    'action': this.action,
+                };
+                this.$axios.single.post(this.placeOrderUrl, data)
+                    .then((response) => this.showModalAction(response.data.result))
+                    .catch((error) => this.showModalAction());
+            }
+        },
+        showModalAction: function(result) {
+            this.modalSuccess = 1 === result;
+            this.showModal = true;
+        },
+        updateMarketPrice: function() {
+            if (this.useMarketPrice) {
+                this.sellPrice = this.price || 0;
+            }
+        },
     },
     computed: {
-      totalPrice: function() {
-        return new Decimal(this.sellPrice || 0).times(this.sellAmount || 0).toString();
-      },
-      price: function() {
-        return toMoney(this.marketPrice) || null;
-      },
-      fieldsValid: function() {
-        return this.sellPrice > 0 && this.sellAmount > 0;
-      },
+        totalPrice: function() {
+            return new Decimal(this.sellPrice || 0).times(this.sellAmount || 0).toString();
+        },
+        price: function() {
+            return toMoney(this.marketPrice) || null;
+        },
+        fieldsValid: function() {
+            return this.sellPrice > 0 && this.sellAmount > 0;
+        },
     },
     watch: {
-      useMarketPrice: function() {
-        this.updateMarketPrice();
-      },
-      marketPrice: function() {
-        this.updateMarketPrice();
-      },
+        useMarketPrice: function() {
+            this.updateMarketPrice();
+        },
+        marketPrice: function() {
+            this.updateMarketPrice();
+        },
     },
     mounted: function() {
-      if (!this.balance) {
-        return;
-      }
-
-      this.addMessageHandler((response) => {
-        if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.tokenHiddenName)) {
-          this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.tokenName}))
-            .then((res) => {
-              this.immutableBalance = res.data ?
-                new Decimal(response.params[0][this.tokenHiddenName].available).sub(
-                  res.data.frozenAmount
-                ) :
-                response.params[0][this.tokenHiddenName].available;
-            })
-            .catch(() => {});
+        if (!this.balance) {
+            return;
         }
-      });
+
+        this.addMessageHandler((response) => {
+            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.tokenHiddenName)) {
+                this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.tokenName}))
+                    .then((res) => {
+                        this.immutableBalance = res.data ?
+                            new Decimal(response.params[0][this.tokenHiddenName].available).sub(
+                                res.data.frozenAmount
+                            ) :
+                            response.params[0][this.tokenHiddenName].available;
+                    })
+                    .catch(() => {});
+            }
+        });
     },
     filters: {
-      toMoney: function(val) {
-        return toMoney(val);
-      },
+        toMoney: function(val) {
+            return toMoney(val);
+        },
     },
-  };
+};
 </script>

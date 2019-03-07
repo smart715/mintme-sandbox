@@ -1,7 +1,7 @@
 <template>
     <modal
-            :visible="visible"
-            @close="closeModal">
+        :visible="visible"
+        @close="closeModal">
         <template slot="body">
             <div class="text-center">
                 <div class="mb-5">
@@ -9,14 +9,14 @@
                     <slot><h3>ARE YOU SURE?</h3></slot>
                 </div>
                 <button
-                        class="btn btn-primary"
-                        @click="onConfirm">
+                    class="btn btn-primary"
+                    @click="onConfirm">
                     <slot name="confirm">CONFIRM</slot>
                 </button>
                 <a
-                        href="#"
-                        class="ml-3"
-                        @click="onCancel">
+                    href="#"
+                    class="ml-3"
+                    @click="onCancel">
                     <slot name="cancel">CANCEL</slot>
                 </a>
             </div>
@@ -25,27 +25,27 @@
 </template>
 
 <script>
-  import Modal from './Modal.vue';
-  export default {
+import Modal from './Modal.vue';
+export default {
     name: 'ConfirmModal',
     components: {
-      Modal,
+        Modal,
     },
     props: {
-      visible: Boolean,
+        visible: Boolean,
     },
     methods: {
-      closeModal: function() {
-        this.$emit('close');
-      },
-      onConfirm: function() {
-        this.closeModal();
-        this.$emit('confirm');
-      },
-      onCancel: function() {
-        this.closeModal();
-        this.$emit('cancel');
-      },
+        closeModal: function() {
+            this.$emit('close');
+        },
+        onConfirm: function() {
+            this.closeModal();
+            this.$emit('confirm');
+        },
+        onCancel: function() {
+            this.closeModal();
+            this.$emit('cancel');
+        },
     },
-  };
+};
 </script>
