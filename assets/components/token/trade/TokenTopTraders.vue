@@ -1,5 +1,5 @@
 <template>
-    <div class="card">
+    <div class="card h-100">
         <div class="card-header">
             Top Traders
         </div>

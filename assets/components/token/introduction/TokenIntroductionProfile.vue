@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header">
                 {{ profileName }}
             </div>

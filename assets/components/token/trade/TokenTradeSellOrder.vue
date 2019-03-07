@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="h-100">
         <div class="card h-100">
             <div class="card-header text-left">
                 Sell Order
