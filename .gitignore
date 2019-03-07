@@ -24,4 +24,3 @@ public/build
 .vscode
 
 aware-connector.sh
-config/packages/dev/ewz_recaptcha.yaml
