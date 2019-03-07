@@ -1,7 +1,7 @@
 <template>
     <modal
-        :visible="visible"
-        @close="closeModal">
+            :visible="visible"
+            @close="closeModal">
         <template slot="body">
             <div class="text-center">
                 <h3>WITHDRAW({{ currency }})</h3>
@@ -10,11 +10,11 @@
                         Address:
                     </label>
                     <input
-                        v-model="$v.address.$model"
-                        type="text"
-                        id="address"
-                        :class="{ 'is-invalid': $v.address.$error }"
-                        class="form-control">
+                            v-model="$v.address.$model"
+                            type="text"
+                            id="address"
+                            :class="{ 'is-invalid': $v.address.$error }"
+                            class="form-control">
                     <div v-if="$v.address.$error" class="invalid-feedback">
                         Address can't be empty and must contain alphanumeric letters only.
                     </div>
@@ -25,15 +25,15 @@
                     </label>
                     <div class="text-right">
                         <input
-                            id="wamount"
-                            v-model.number="$v.amount.$model"
-                            type="text"
-                            :class="{ 'is-invalid': $v.amount.$error }"
-                            class="form-control text-left input-custom-padding">
+                                id="wamount"
+                                v-model.number="$v.amount.$model"
+                                type="text"
+                                :class="{ 'is-invalid': $v.amount.$error }"
+                                class="form-control text-left input-custom-padding">
                         <button
-                            class="btn btn-primary btn-input"
-                            type="button"
-                            @click="setMaxAmount">
+                                class="btn btn-primary btn-input"
+                                type="button"
+                                @click="setMaxAmount">
                             All
                         </button>
                     </div>
@@ -49,15 +49,14 @@
                 </div>
                 <div class="pt-3">
                     <button
-                        class="btn btn-primary"
-                        @click="onWithdraw">
-                        <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                            class="btn btn-primary"
+                            @click="onWithdraw">
                         WITHDRAW
                     </button>
                     <a
-                        href="#"
-                        class="ml-3"
-                        @click="onCancel">
+                            href="#"
+                            class="ml-3"
+                            @click="onCancel">
                         <slot name="cancel">CANCEL</slot>
                     </a>
                 </div>
@@ -67,111 +66,100 @@
 </template>
 
 <script>
-import Decimal from 'decimal.js';
-import Modal from './Modal.vue';
-import {required, minLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
-import {toMoney} from '../../js/utils';
+  import Decimal from 'decimal.js';
+  import Modal from './Modal.vue';
+  import {required, minLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
+  import {toMoney} from '../../js/utils';
 
-export default {
+  export default {
     name: 'WithdrawModal',
     components: {
-        Modal,
+      Modal,
     },
     props: {
-        visible: Boolean,
-        currency: String,
-        fee: String,
-        withdrawUrl: String,
-        maxAmount: String,
+      visible: Boolean,
+      currency: String,
+      fee: String,
+      withdrawUrl: String,
+      maxAmount: String,
     },
     data() {
-        return {
-            submitting: false,
-            amount: 0,
-            address: '',
-        };
+      return {
+        amount: 0,
+        address: '',
+      };
     },
     computed: {
-        fullAmount: function() {
-            Decimal.set({precision: 36});
+      fullAmount: function() {
+        Decimal.set({precision: 36});
 
-            let amount = new Decimal(
-                new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
-            );
+        let amount = new Decimal(
+          new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
+        );
 
-            return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString());
-        },
+        return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString());
+      },
     },
     methods: {
-        closeModal: function() {
-            this.$v.$reset();
-            this.amount = 0;
-            this.address = '';
-            this.$emit('close');
-        },
-        onWithdraw: function() {
-            if (this.submitting) {
-                return;
-            }
+      closeModal: function() {
+        this.$v.$reset();
+        this.amount = 0;
+        this.address = '';
+        this.$emit('close');
+      },
+      onWithdraw: function() {
+        if (this.$v.address.$error || this.$v.amount.$error) {
+          this.$toasted.error('Correct your form fields');
+          return;
+        }
 
-            if (this.$v.address.$error || this.$v.amount.$error) {
-                this.$toasted.error('Correct your form fields');
-                return;
-            }
-
-            this.submitting = true;
-            this.$axios.single.post(this.withdrawUrl, {
-                'crypto': this.currency,
-                'amount': this.amount,
-                'address': this.address,
-            })
-            .then(() => {
-                this.$toasted.success('Paid');
-                this.closeModal();
-            })
-            .catch(({response}) => this.$toasted.error(
-                !response
-                    ? 'Network error'
-                    : response.data.error
-                    ? response.data.error
-                    : 'Service unavailable now. Try later')
-            )
-            .then(() => this.submitting = false);
-
-            this.$emit('withdraw', this.currency, this.amount, this.address);
-        },
-        onCancel: function() {
-            this.$emit('cancel');
+        this.$axios.single.post(this.withdrawUrl, {
+          'crypto': this.currency,
+          'amount': this.amount,
+          'address': this.address,
+        })
+          .then((response) => {
+            this.$toasted.success('Paid');
             this.closeModal();
-        },
-        setMaxAmount: function() {
-            let amount = new Decimal(this.maxAmount);
-            this.amount = amount.greaterThan(this.fee) ?
-                toMoney(amount.sub(this.fee).toString()) : toMoney(0);
-        },
+          })
+          .catch((error) => {
+            this.$toasted.error(error.response.data.error);
+          });
+
+        this.$emit('withdraw', this.currency, this.amount, this.address);
+      },
+      onCancel: function() {
+        this.$emit('cancel');
+        this.closeModal();
+      },
+      setMaxAmount: function() {
+        let amount = new Decimal(this.maxAmount);
+        this.amount = amount.greaterThan(this.fee) ?
+          toMoney(amount.sub(this.fee).toString()) : toMoney(0);
+      },
     },
     validations() {
-        return {
-            amount: {
-                required,
-                decimal,
-                maxValue: maxValue(
-                    toMoney(new Decimal(this.maxAmount).sub(this.fee).toString())
-                ),
-                minValue: minValue(0.00001),
-            },
-            address: {
-                required,
-                alphaNum,
-                minLength: minLength(1),
-            },
-        };
+      return {
+        amount: {
+          required,
+          decimal,
+          maxValue: maxValue(
+            toMoney(new Decimal(this.maxAmount).sub(this.fee).toString())
+          ),
+          minValue: minValue(0.00001),
+        },
+        address: {
+          required,
+          alphaNum,
+          minLength: minLength(1),
+        },
+      };
     },
     filters: {
-        toMoney: function(val) {
-            return toMoney(val);
-        },
+      toMoney: function(val) {
+        return toMoney(val);
+      },
     },
-};
+  };
 </script>
 

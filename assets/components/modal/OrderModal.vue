@@ -1,7 +1,7 @@
 <template>
     <modal
-        :visible="visible"
-        @close="closeModal">
+            :visible="visible"
+            @close="closeModal">
         <template slot="body">
             <div class="text-center">
                 <h3 class="font-weight-bold">{{ title }}</h3>
@@ -10,8 +10,8 @@
                     <img v-if="!this.type" src="../../img/order-failed.png"/>
                 </div>
                 <button
-                    class="btn btn-primary px-5"
-                    @click="closeModal()">
+                        class="btn btn-primary px-5"
+                        @click="closeModal()">
                     OK
                 </button>
             </div>
@@ -20,27 +20,26 @@
 </template>
 
 <script>
-import Modal from './Modal.vue';
-export default {
+  import Modal from './Modal.vue';
+  export default {
     name: 'OrderModal',
     components: {
-        Modal,
+      Modal,
     },
     props: {
-        type: Boolean,
-        visible: Boolean,
-        modalTitle: String,
+      type: Boolean,
+      visible: Boolean,
     },
     computed: {
-        title: function() {
-            return (this.type) ? 'Order Created' : this.modalTitle ? this.modalTitle : 'Order Failed';
-        },
+      title: function() {
+        return (this.type) ? 'Order Created' : 'Order Failed';
+      },
     },
     methods: {
-        closeModal: function() {
-            this.$emit('close');
-        },
+      closeModal: function() {
+        this.$emit('close');
+      },
     },
-};
+  };
 </script>
 

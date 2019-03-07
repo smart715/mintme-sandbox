@@ -22,9 +22,9 @@
                             {{ immutableBalance | toMoney }}
                             <guide>
                                 <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
+                                        icon="question"
+                                        slot='icon'
+                                        class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Your WEB
                                 </template>
@@ -35,25 +35,25 @@
                         </span>
                     </div>
                     <div
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
+                            class="col-12 col-sm-6 col-md-12 col-xl-6
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
-                                v-model="useMarketPrice"
-                                step="0.00000001"
-                                type="checkbox"
-                                id="buy-price"
-                                class="custom-control-input"
-                                >
+                                    v-model="useMarketPrice"
+                                    step="0.00000001"
+                                    type="checkbox"
+                                    id="buy-price"
+                                    class="custom-control-input"
+                            >
                             <label
-                                class="custom-control-label"
-                                for="buy-price">
+                                    class="custom-control-label"
+                                    for="buy-price">
                                 Market Price
                                 <guide>
                                     <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
+                                            icon="question"
+                                            slot='icon'
+                                            class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
                                     <template slot="header">
                                         Market Price
                                     </template>
@@ -67,14 +67,14 @@
                     </div>
                     <div class="col-12 pt-3">
                         <label
-                            for="buy-price-input"
-                            class="text-primary">
+                                for="buy-price-input"
+                                class="text-primary">
                             Price in WEB:
                             <guide>
                                 <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
+                                        icon="question"
+                                        slot='icon'
+                                        class="ml-1 mb-1 bg-primary text-white rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Price in WEB
                                 </template>
@@ -84,37 +84,37 @@
                             </guide>
                         </label>
                         <input
-                            v-model.number="buyPrice"
-                            step="0.00000001"
-                            type="number"
-                            id="buy-price-input"
-                            class="form-control"
-                            :disabled="useMarketPrice"
-                            min="0"
+                                v-model.number="buyPrice"
+                                step="0.00000001"
+                                type="number"
+                                id="buy-price-input"
+                                class="form-control"
+                                :disabled="useMarketPrice"
+                                min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
                         <label
-                            for="buy-price-amount"
-                            class="text-primary">
+                                for="buy-price-amount"
+                                class="text-primary">
                             Amount:
                         </label>
                         <input
-                            v-model.number="buyAmount"
-                            step="0.00000001"
-                            type="number"
-                            id="buy-price-amount"
-                            class="form-control"
-                            min="0"
+                                v-model.number="buyAmount"
+                                step="0.00000001"
+                                type="number"
+                                id="buy-price-amount"
+                                class="form-control"
+                                min="0"
                         >
                     </div>
                     <div class="col-12 pt-3">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
                             <font-awesome-icon
-                                icon="question"
-                                slot='icon'
-                                class="ml-1 mb-1 bg-primary text-white
+                                    icon="question"
+                                    slot='icon'
+                                    class="ml-1 mb-1 bg-primary text-white
                                             rounded-circle square blue-question"/>
                             <template slot="header">
                                 Total Price
@@ -126,9 +126,9 @@
                     </div>
                     <div class="col-12 pt-4 text-center">
                         <button @click="placeOrder"
-                            v-if="loggedIn"
-                            class="btn btn-primary"
-                            :disabled="!fieldsValid">
+                                v-if="loggedIn"
+                                class="btn btn-primary"
+                                :disabled="!fieldsValid">
                             Create buy order
                         </button>
                         <template v-else>
@@ -141,114 +141,111 @@
             </div>
         </div>
         <order-modal
-            :modal-title="modalTitle"
-            :type="modalSuccess"
-            :visible="showModal"
-            @close="showModal = false"
+                :type="modalSuccess"
+                :visible="showModal"
+                @close="showModal = false"
         />
     </div>
 </template>
 
 <script>
-import Guide from '../../Guide';
-import OrderModal from '../../modal/OrderModal';
-import WebSocketMixin from '../../../js/mixins/websocket';
-import {toMoney} from '../../../js/utils';
-import Decimal from 'decimal.js';
+  import Guide from '../../Guide';
+  import OrderModal from '../../modal/OrderModal';
+  import WebSocketMixin from '../../../js/mixins/websocket';
+  import {toMoney} from '../../../js/utils';
+  import Decimal from 'decimal.js';
 
-export default {
+  export default {
     name: 'TokenTradeBuyOrder',
     mixins: [WebSocketMixin],
     components: {
-        Guide,
-        OrderModal,
+      Guide,
+      OrderModal,
     },
     props: {
-        loginUrl: String,
-        signupUrl: String,
-        loggedIn: Boolean,
-        tokenName: String,
-        placeOrderUrl: String,
-        market: Object,
-        marketPrice: [Number, String],
-        balance: [String, Boolean],
-        currency: String,
+      loginUrl: String,
+      signupUrl: String,
+      loggedIn: Boolean,
+      tokenName: String,
+      placeOrderUrl: String,
+      market: Object,
+      marketPrice: [Number, String],
+      balance: [String, Boolean],
+      currency: String,
     },
     data() {
-        return {
-            modalTitle: '',
-            immutableBalance: this.balance,
-            buyPrice: 0,
-            buyAmount: 0,
-            useMarketPrice: false,
-            action: 'buy',
-            showModal: false,
-            modalSuccess: false,
-        };
+      return {
+        immutableBalance: this.balance,
+        buyPrice: 0,
+        buyAmount: 0,
+        useMarketPrice: false,
+        action: 'buy',
+        showModal: false,
+        modalSuccess: false,
+      };
     },
     methods: {
-        placeOrder: function() {
-            if (this.buyPrice && this.buyAmount) {
-                let data = {
-                    'amountInput': toMoney(this.buyAmount),
-                    'priceInput': toMoney(this.buyPrice),
-                    'marketPrice': this.useMarketPrice,
-                    'action': this.action,
-                };
+      placeOrder: function() {
+        if (this.buyPrice && this.buyAmount) {
+          let data = {
+            'amountInput': toMoney(this.buyAmount),
+            'priceInput': toMoney(this.buyPrice),
+            'marketPrice': this.useMarketPrice,
+            'action': this.action,
+          };
 
-                this.$axios.single.post(this.placeOrderUrl, data)
-                    .then(({data}) => this.showModalAction(data))
-                    .catch((error) => this.showModalAction(!error.response ? {result: 2, message: 'Network Error'} : {}));
-            }
-        },
-        showModalAction: function({result = 2, message = ''} = {}) {
-            this.modalSuccess = 1 === result;
-            this.modalTitle = this.modalSuccess ? '' : message;
-            this.showModal = true;
-        },
-        updateMarketPrice: function() {
-            if (this.useMarketPrice) {
-                this.buyPrice = this.price || 0;
-            }
-        },
+          this.$axios.single.post(this.placeOrderUrl, data)
+            .then((response) => this.showModalAction(response.data.result))
+            .catch((error) => this.showModalAction());
+        }
+      },
+      showModalAction: function(result) {
+        this.modalSuccess = 1 === result;
+        this.showModal = true;
+      },
+      updateMarketPrice: function() {
+        if (this.useMarketPrice) {
+          this.buyPrice = this.price || 0;
+        }
+      },
     },
     computed: {
-        totalPrice: function() {
-            return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
-        },
-        price: function() {
-            return toMoney(this.marketPrice) || null;
-        },
-        fieldsValid: function() {
-            return this.buyPrice > 0 && this.buyAmount > 0;
-        },
+      totalPrice: function() {
+        return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
+      },
+      price: function() {
+        return toMoney(this.marketPrice) || null;
+      },
+      fieldsValid: function() {
+        return this.buyPrice > 0 && this.buyAmount > 0;
+      },
     },
     watch: {
-        useMarketPrice: function() {
-            this.updateMarketPrice();
-        },
-        marketPrice: function() {
-            this.updateMarketPrice();
-        },
+      useMarketPrice: function() {
+        this.updateMarketPrice();
+      },
+      marketPrice: function() {
+        this.updateMarketPrice();
+      },
     },
     mounted: function() {
-        if (!this.balance) {
-            return;
-        }
+      if (!this.balance) {
+        return;
+      }
 
-        this.addMessageHandler((response) => {
-            if (
-                'asset.update' === response.method &&
-                response.params[0].hasOwnProperty(this.market.currencySymbol)
-            ) {
-                this.immutableBalance = response.params[0][this.market.currencySymbol].available;
-            }
-        });
+      this.addMessageHandler((response) => {
+        if (
+          'asset.update' === response.method &&
+          response.params[0].hasOwnProperty(this.market.currencySymbol)
+        ) {
+          this.immutableBalance = response.params[0][this.market.currencySymbol].available;
+        }
+      });
     },
     filters: {
-        toMoney: function(val) {
-            return toMoney(val);
-        },
+      toMoney: function(val) {
+        return toMoney(val);
+      },
     },
-};
+  };
 </script>
