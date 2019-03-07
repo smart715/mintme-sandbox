@@ -153,8 +153,8 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         placeOrderUrl: String,
-        marketName: Object,
-        buy: Object,
+        market: Object,
+        marketPrice: [Number, String],
         balance: [String, Boolean],
         currency: String,
     },
@@ -173,9 +173,9 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 let data = {
-                    'tokenName': this.tokenName,
                     'amountInput': toMoney(this.buyAmount),
                     'priceInput': toMoney(this.buyPrice),
+                    'marketPrice': this.useMarketPrice,
                     'action': this.action,
                 };
 
@@ -188,27 +188,30 @@ export default {
             this.modalSuccess = 1 === result;
             this.showModal = true;
         },
+        updateMarketPrice: function() {
+            if (this.useMarketPrice) {
+                this.buyPrice = this.price || 0;
+            }
+        },
     },
     computed: {
         totalPrice: function() {
             return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
         },
-        amount: function() {
-            return this.buy.amount || null;
-        },
         price: function() {
-            return this.buy.price || null;
+            return toMoney(this.marketPrice) || null;
         },
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
         },
     },
     watch: {
-      useMarketPrice: function() {
-          if (this.useMarketPrice) {
-              this.buyPrice = this.price || 0;
-          }
-      },
+        useMarketPrice: function() {
+            this.updateMarketPrice();
+        },
+        marketPrice: function() {
+            this.updateMarketPrice();
+        },
     },
     mounted: function() {
         if (!this.balance) {
@@ -218,9 +221,9 @@ export default {
         this.addMessageHandler((response) => {
             if (
                 'asset.update' === response.method &&
-                response.params[0].hasOwnProperty(this.marketName.currencySymbol)
+                response.params[0].hasOwnProperty(this.market.currencySymbol)
             ) {
-                this.immutableBalance = response.params[0][this.marketName.currencySymbol].available;
+                this.immutableBalance = response.params[0][this.market.currencySymbol].available;
             }
         });
     },
