@@ -111,12 +111,13 @@ class OrdersAPIController extends FOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{tokenName}/place-order", name="token_place_order")
-     * @Rest\RequestParam(name="tokenName", allowBlank=false)
      * @Rest\RequestParam(name="priceInput", allowBlank=false)
      * @Rest\RequestParam(name="amountInput", allowBlank=false)
+     * @Rest\RequestParam(name="marketPrice", default="0")
      * @Rest\RequestParam(name="action", allowBlank=false, requirements="(sell|buy|all)")
      */
     public function placeOrder(
+        string $tokenName,
         ParamFetcherInterface $request,
         TraderInterface $trader,
         MarketManagerInterface $marketManager,
@@ -126,7 +127,7 @@ class OrdersAPIController extends FOSRestController
             throw new AccessDeniedHttpException();
         }
 
-        $token = $this->tokenManager->findByName($request->get('tokenName'));
+        $token = $this->tokenManager->findByName($tokenName);
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
         if (null === $token || null === $crypto) {
@@ -139,39 +140,37 @@ class OrdersAPIController extends FOSRestController
             throw $this->createNotFoundException('Market not found.');
         }
 
+        $isSellSide = Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')];
+        $price = $moneyWrapper->parse($request->get('priceInput'), $crypto->getSymbol());
+
+        if ($request->get('marketPrice')) {
+            /** @var Order[] $orders */
+            $orders = $this->getPendingOrders($tokenName)[$isSellSide ? 'buy' : 'sell'];
+            if ($orders) {
+                $price = $orders[0]->getPrice();
+            }
+        }
+
         $order = new Order(
             null,
             $this->getUser(),
             null,
             $market,
-            $moneyWrapper->parse(
-                $request->get('amountInput'),
-                MoneyWrapper::TOK_SYMBOL
-            ),
+            $moneyWrapper->parse($request->get('amountInput'), MoneyWrapper::TOK_SYMBOL),
             Order::SIDE_MAP[$request->get('action')],
-            $moneyWrapper->parse(
-                $request->get('priceInput'),
-                $crypto->getSymbol()
-            ),
+            $price,
             Order::PENDING_STATUS,
-            Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
-                ? $this->getParameter('maker_fee_rate')
-                : $this->getParameter('taker_fee_rate'),
+            $isSellSide ? $this->getParameter('maker_fee_rate') : $this->getParameter('taker_fee_rate'),
             null,
-            $this->getUser()->getReferrencer() ?
-                $this->getUser()->getReferrencer()->getId() :
-                0
+            $this->getUser()->getReferrencer() ? $this->getUser()->getReferrencer()->getId() : 0
         );
 
         $tradeResult = $trader->placeOrder($order);
 
-        return $this->view(
-            [
-                'result' => $tradeResult->getResult(),
-                'message' => $tradeResult->getMessage(),
-            ],
-            Response::HTTP_ACCEPTED
-        );
+        return $this->view([
+            'result' => $tradeResult->getResult(),
+            'message' => $tradeResult->getMessage(),
+        ], Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -183,15 +182,13 @@ class OrdersAPIController extends FOSRestController
     {
         $market = $this->getMarket($tokenName);
 
-        $pendingBuyOrders = $market
-            ? ['buy' => $this->marketHandler->getPendingBuyOrders($market)]
-            : [];
+        $pendingBuyOrders = $market ? $this->marketHandler->getPendingBuyOrders($market) : [];
+        $pendingSellOrders = $market ? $this->marketHandler->getPendingSellOrders($market) : [];
 
-        $pendingSellOrders = $market
-            ? ['sell' => $this->marketHandler->getPendingSellOrders($market)]
-            : [];
-
-        return array_merge($pendingBuyOrders, $pendingSellOrders);
+        return [
+            'sell' => $pendingSellOrders,
+            'buy' => $pendingBuyOrders,
+        ];
     }
 
     /**

@@ -72,22 +72,22 @@ export default {
                 type: {
                     label: 'Type',
                 },
-                order_maker: {
+                orderMaker: {
                     label: 'Order maker',
                 },
-                order_trader: {
+                orderTrader: {
                     label: 'Order trader',
                 },
-                price_per_token: {
+                pricePerToken: {
                     label: 'Price per token',
                 },
-                token_amount: {
+                tokenAmount: {
                     label: 'Token amount',
                 },
-                web_amount: {
+                webAmount: {
                     label: 'WEB amount',
                 },
-                date_time: {
+                dateTime: {
                     label: 'Date & Time',
                 },
             },
