@@ -22,7 +22,8 @@
 
 html
   @include font-scale(sm)
-  height: 100%
+  min-height: 100vh
+  height: 100vh
   box-sizing: border-box
 
 body
@@ -31,11 +32,16 @@ body
   font-family: $lato-font
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
+  min-height: 100vh
   height: 100vh
 
 .text-bold
   font-weight: 800
 
+.content-wrapper
+  min-height: 100vh
+  height: 100vh
+  
 a
   color: $color-link
 
@@ -44,15 +50,6 @@ a
 
   &:hover
     color: $color-link-hover
-
-.content-wrapper
-  height: 100%
-  width: 100%
-  display: table
-
-  .content
-    display: table-row
-    height: 100%
 
 .faq-block
   a:hover

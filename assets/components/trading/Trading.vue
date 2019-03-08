@@ -2,7 +2,7 @@
     <div class="trading">
         <slot name="title"></slot>
         <template v-if="loaded">
-            <div class="table-responsive">
+            <div class="table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
                     :fields="fields"

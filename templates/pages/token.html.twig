@@ -63,7 +63,7 @@
                         </div>
                     </b-tab>
                     <template slot="tabs">
-                        <b-nav-item class="float-right" @click="()=>{}">
+                        <b-nav-item class="float-sm-right" @click="()=>{}">
                             <token-name
                                 name="{{ token.name }}"
                                 csrf-token="{{ csrf_token('update-token') }}"
@@ -71,6 +71,7 @@
                                 :editable="{{ isOwner ? 'true' : 'false' }}">
                             </token-name>
                         </b-nav-item>
+                        <div class="clearfix"></div>
                     </template>
                 </b-tabs>
             </div>

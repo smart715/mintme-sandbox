@@ -17,27 +17,27 @@
             <div class="card-body p-0">
                 <div class="table-responsive fix-height" ref="history">
                     <template v-if="loaded">
-                    <b-table v-if="hasOrders" ref="table"
-                        :items="ordersList"
-                        :fields="fields">
-                        <template slot="order_maker" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
-                        </template>
-                        <template slot="order_trader" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
-                        </template>
-                    </b-table>
-                    <div v-if="!hasOrders">
-                        <p class="text-center p-5">No deal was made yet</p>
-                    </div>
+                        <b-table v-if="hasOrders" class="w-100" ref="table"
+                            :items="ordersList"
+                            :fields="fields">
+                            <template slot="order_maker" slot-scope="row">
+                                {{ row.value }}
+                                <img
+                                    src="../../../img/avatar.png"
+                                    class="float-right"
+                                    alt="avatar">
+                            </template>
+                            <template slot="order_trader" slot-scope="row">
+                                {{ row.value }}
+                                <img
+                                    src="../../../img/avatar.png"
+                                    class="float-right"
+                                    alt="avatar">
+                            </template>
+                        </b-table>
+                        <div v-if="!hasOrders">
+                            <p class="text-center p-5">No deal was made yet</p>
+                        </div>
                     </template>
                     <template v-else>
                         <div class="p-5 text-center">

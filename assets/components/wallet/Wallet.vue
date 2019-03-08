@@ -19,20 +19,24 @@
                     {{ data.value | toMoney }}
                 </template>
                 <template slot="action" slot-scope="data">
-                         <div  class="row justify-content-center">
-                             <div
-                                 class="d-inline  c-pointer"
-                                 @click="openDeposit(data.item.name)">
-                                 <i class="icon-deposit float-left"></i>
-                                 <span class="pl-2 pt-1 float-left text-xs align-middle">Deposit</span>
-                             </div>
-                             <div
-                                 class="d-inline pl-3  c-pointer"
-                                 @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
-                                 <i class="icon-withdraw float-left"></i>
-                                 <span class="pl-2 pt-1 float-left text-xs align-middle">Withdraw</span>
-                             </div>
-                         </div>
+                    <div
+                        class="row"
+                        @click="openDeposit(data.item.name)">
+                        <div class="d-flex flex-row c-pointer pl-2">
+                            <div><i class="icon-deposit"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                            </div>
+                        </div>
+                        <div
+                            class="d-flex flex-row c-pointer pl-2"
+                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                                <div><i class="icon-withdraw"></i></div>
+                                <div>
+                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                </div>
+                        </div>
+                    </div>
                 </template>
             </b-table>
         </div>

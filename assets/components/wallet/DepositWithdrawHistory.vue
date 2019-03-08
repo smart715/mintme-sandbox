@@ -1,7 +1,7 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="table-responsive deposit-withdraw-history" @scroll.passive="loadMore">
+        <div class="table-responsive text-nowrap deposit-withdraw-history" @scroll.passive="loadMore">
             <b-table
                 v-if="!noHistory"
                 :items="sanitizedHistory"
