@@ -89,8 +89,11 @@ class TokenController extends AbstractController
             return $this->render('pages/token_404.html.twig');
         }
 
-        if ($name != $this->tokenManager->normalizeTokenName($token->getName())) {
-            return $this->redirectToOwnToken($tab);
+        $this->tokenManager->normalizeName($token);
+        $dashedName = str_replace(' ', '-', $token->getName());
+
+        if ($dashedName != $token->getName()) {
+            $this->redirectToOwnToken($tab);
         }
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
@@ -130,13 +133,21 @@ class TokenController extends AbstractController
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
 
-            if ($form->isSubmitted() && $this->tokenManager->isExisted($token->getName())) {
-                $form->addError(new FormError('Token name is already exists'));
+            if (!$this->tokenManager->isValidName($token)) {
+                $form->addError(new FormError('Invalid token name.'));
                 return $this->render('pages/token_creation.html.twig', [
                     'formHeader' => 'Create your own token',
                     'form' => $form->createView(),
                     'profileCreated' => $this->isProfileCreated(),
-                    'existed' => true,
+                ]);
+            }
+
+            if ($this->tokenManager->isExisted($token)) {
+                $form->addError(new FormError('Token name is already exists.'));
+                return $this->render('pages/token_creation.html.twig', [
+                    'formHeader' => 'Create your own token',
+                    'form' => $form->createView(),
+                    'profileCreated' => $this->isProfileCreated(),
                 ]);
             }
 
@@ -210,8 +221,11 @@ class TokenController extends AbstractController
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
+        $this->tokenManager->normalizeName($token);
+        $dashedName = str_replace(' ', '-', $token->getName());
+
         return $this->redirectToRoute('token_show', [
-            'name' => $this->tokenManager->normalizeTokenName($token->getName()),
+            'name' => $dashedName,
             'tab' => $showtab,
         ]);
     }

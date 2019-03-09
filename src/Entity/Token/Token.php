@@ -19,6 +19,8 @@ class Token
 {
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
+    public const NAME_MIN_LENGTH = 4;
+    public const NAME_MAX_LENGTH = 255;
 
     /**
      * @ORM\Id()
@@ -31,7 +33,7 @@ class Token
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * @Assert\Regex("/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[\-a-zA-Z0-9\s])*$/")
+     * @Assert\Regex(pattern="/^[a-zA-Z0-9\-\s]*$/", message="Invalid token name.")
      * @Assert\Length(min = 4, max = 255)
      * @Groups({"API"})
      * @var string|null

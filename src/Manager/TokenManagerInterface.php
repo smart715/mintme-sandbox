@@ -27,5 +27,9 @@ interface TokenManagerInterface
     /** @return Token[] */
     public function getTokensByPattern(string $pattern): array;
 
-    public function isValidName(string $name): bool;
+    public function isValidName(Token $token): bool;
+
+    public function isExisted(Token $token): bool;
+
+    public function normalizeName(Token &$token): void;
 }

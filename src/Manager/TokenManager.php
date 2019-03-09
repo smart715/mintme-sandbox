@@ -151,23 +151,28 @@ class TokenManager implements TokenManagerInterface
             : null;
     }
 
-    public function isValidName(string $name): bool
+    public function isValidName(Token $token): bool
     {
-        return 1 === preg_match('/^\-?[a-zA-Z0-9]((?![\-]{2})(?![\s]{2})[a-zA-Z0-9\s\-])*$/', $name);
+        $this->normalizeName($token);
+        $length = strlen($token->getName());
+        return Token::NAME_MIN_LENGTH <= $length
+            && Token::NAME_MAX_LENGTH >= $length;
     }
 
-    public function isExisted(string $name): bool
+    public function isExisted(Token $token): bool
     {
-        return null !== $this->findByUrl($this->normalizeTokenName($name));
-    }
-
-    public function normalizeTokenName(?string $name): string
-    {
-        $name = $name ?? '';
-        $name = trim(strtolower($name));
-        $name = preg_replace('/-+/', '-', $name);
-        $name = preg_replace('/\s+/', ' ', $name);
+        $this->normalizeName($token);
+        $name = strtolower($token->getName());
         $name = str_replace(' ', '-', $name);
-        return $name;
+        return null !== $this->findByUrl($name);
+    }
+
+    public function normalizeName(Token &$token): void
+    {
+        $name = (string)$token->getName() ?? '';
+        $name = trim($name, " -");
+        $name = (string)preg_replace('/-+/', '-', $name);
+        $name = (string)preg_replace('/\s+/', ' ', $name);
+        $token->setName($name);
     }
 }
