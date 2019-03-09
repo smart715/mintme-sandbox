@@ -26,6 +26,11 @@ new Vue({
                 this.$refs.emailButton.disabled = true;
             }
         },
+        onEmailSubmit: function() {
+            if (this.email !== this.initialEmail && !this.$v.$invalid) {
+                this.$refs.emailForm.submit();
+            }
+        },
     },
 });
 
