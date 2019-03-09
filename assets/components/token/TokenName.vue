@@ -20,7 +20,7 @@ Vue.use(Toasted, {
     duration: 5000,
 });
 
-const HTTP_NO_CONTENT = 204;
+const HTTP_ACCEPTED = 202;
 const HTTP_BAD_REQUEST = 400;
 
 export default {
@@ -61,7 +61,8 @@ export default {
                 _csrf_token: this.csrfToken,
             })
             .then((response) => {
-                if (response.status === HTTP_NO_CONTENT) {
+                if (response.status === HTTP_ACCEPTED) {
+                    this.newName = response.data['tokenName'];
                     this.currentName = this.newName;
                 }
             }, (error) => {

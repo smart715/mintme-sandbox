@@ -133,6 +133,8 @@ class TokenController extends AbstractController
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
 
+            $this->tokenManager->normalizeName($token);
+
             if (!$this->tokenManager->isValidName($token)) {
                 $form->addError(new FormError('Invalid token name.'));
                 return $this->render('pages/token_creation.html.twig', [

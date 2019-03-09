@@ -63,6 +63,8 @@ class TokensAPIController extends FOSRestController
             throw $this->createNotFoundException('Token does not exist');
         }
 
+        $this->tokenManager->normalizeName($token);
+
         $this->denyAccessUnlessGranted('edit', $token);
 
         $form = $this->createForm(TokenType::class, $token, [
@@ -73,6 +75,13 @@ class TokensAPIController extends FOSRestController
         $form->submit(array_filter($request->all(), function ($value) {
             return null !== $value;
         }), false);
+
+        if (!$this->tokenManager->isValidName($token)) {
+            return $this->view(
+                'Invalid token name.',
+                Response::HTTP_BAD_REQUEST
+            );
+        }
 
         if ($this->tokenManager->isExisted($token)) {
             return $this->view(
@@ -93,7 +102,7 @@ class TokensAPIController extends FOSRestController
         $this->em->persist($token);
         $this->em->flush();
 
-        return $this->view($token, Response::HTTP_NO_CONTENT);
+        return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
     }
 
     /**
