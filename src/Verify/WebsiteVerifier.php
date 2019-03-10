@@ -22,8 +22,8 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     /** @var int */
     private $timeoutSeconds;
 
-    /** @var array */
-    private $errors;
+    /** @var string[] */
+    private $errors = [];
 
     public function __construct(
         HttpClientFactoryInterface $clientFactory,
@@ -55,11 +55,11 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         return false;
     }
 
-    public function addError($code): void
+    public function addError(int $code): void
     {
-        if ($code === self::FILE_NOT_FOUND) {
+        if (self::FILE_NOT_FOUND === $code) {
             $this->errors[] = 'File not found';
-        } elseif ($code === self::ACCESS_DENIED) {
+        } elseif (self::ACCESS_DENIED === $code) {
             $this->errors[] = 'Access denied';
         } else {
             $this->errors[] = 'Website couldn\'t be confirmed, try again';
