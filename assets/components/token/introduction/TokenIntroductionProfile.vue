@@ -264,13 +264,7 @@ export default {
                         return Promise.reject({response: 'error'});
                     }
                 })
-                .catch(({response}) => this.$toasted.error(
-                  ! response
-                  ? 'Network error'
-                  : response.statusText
-                  ? response.statusText
-                  : 'Website couldn\'t be confirmed, try again'
-                ))
+                .catch(({response}) => this.$toasted.error(!response ? 'Network error' : response.statusText))
                 .then(() => this.submitting = false);
         },
     },

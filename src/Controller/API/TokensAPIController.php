@@ -126,11 +126,9 @@ class TokensAPIController extends FOSRestController
             $this->em->flush();
         }
 
-        $errors = 404 === $websiteVerifier->getResponseCode() ? ['File not found'] : [];
-
         return $this->view([
             'verified' => $isVerified,
-            'errors' => $errors,
+            'errors' => $websiteVerifier->getErrors(),
         ], Response::HTTP_ACCEPTED);
     }
 

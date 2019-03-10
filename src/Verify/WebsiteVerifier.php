@@ -10,6 +10,8 @@ class WebsiteVerifier implements WebsiteVerifierInterface
 {
     private const HTTP_OK = 200;
     private const MATCH_CODE = 1;
+    private const FILE_NOT_FOUND = 404;
+    private const ACCESS_DENIED = 403;
 
     /** @var HttpClientFactoryInterface */
     private $clientFactory;
@@ -20,8 +22,8 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     /** @var int */
     private $timeoutSeconds;
 
-    /** @var int */
-    private $responseCode;
+    /** @var array */
+    private $errors;
 
     public function __construct(
         HttpClientFactoryInterface $clientFactory,
@@ -39,9 +41,8 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         try {
             $client = $this->clientFactory->createClient(['base_uri' => $formatUrl, 'timeout' => $this->timeoutSeconds]);
             $response = $client->request('GET', self::URI);
-            $this->responseCode =  $response->getStatusCode();
         } catch (GuzzleException $exception) {
-            $this->responseCode = $exception->getCode();
+            $this->addError($exception->getCode());
             $this->logger->error($exception->getMessage());
             return false;
         }
@@ -54,8 +55,19 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         return false;
     }
 
-    public function getResponseCode(): int
+    public function addError($code): void
     {
-        return $this->responseCode;
+        if ($code === self::FILE_NOT_FOUND) {
+            $this->errors[] = 'File not found';
+        } elseif ($code === self::ACCESS_DENIED) {
+            $this->errors[] = 'Access denied';
+        } else {
+            $this->errors[] = 'Website couldn\'t be confirmed, try again';
+        }
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }
