@@ -1,7 +1,7 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="table-responsive text-nowrap">
+        <div class="table-responsive">
             <confirm-modal
                 :visible="confirmModal"
                 @close="switchConfirmModal(false)"
