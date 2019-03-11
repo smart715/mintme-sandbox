@@ -20,21 +20,21 @@
                     <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
                         :fields="fields">
-                        <template slot="order_maker" slot-scope="row">
+                        <template slot="orderMaker" slot-scope="row">
                             <a :href="row.item.maker_url">
                                 {{ row.value }}
                                 <img
                                     src="../../../img/avatar.png"
-                                    class="float-right"
+                                    class="pl-3"
                                     alt="avatar">
                             </a>
                         </template>
-                        <template slot="order_trader" slot-scope="row">
+                        <template slot="orderTrader" slot-scope="row">
                             <a :href="row.item.taker_url">
                                 {{ row.value }}
                                 <img
                                     src="../../../img/avatar.png"
-                                    class="float-right"
+                                    class="pl-3"
                                     alt="avatar">
                             </a>
                         </template>
@@ -100,11 +100,11 @@ export default {
         ordersList: function() {
             return this.history !== false ? this.history.map((order) => {
                 return {
-                    date_time: new Date(order.timestamp * 1000).toDateString(),
-                    order_maker: order.maker != null
+                    dateTime: new Date(order.timestamp * 1000).toDateString(),
+                    orderMaker: order.maker != null
                         ? order.maker.profile ? this.truncateFullName(order.maker.profile): 'Anonymous'
                         : '',
-                    order_trader: order.taker != null
+                    orderTrader: order.taker != null
                         ? order.taker.profile ? this.truncateFullName(order.taker.profile): 'Anonymous'
                         : '',
                     maker_url: order.maker != null
@@ -114,9 +114,9 @@ export default {
                         ? this.$routing.generate('token_show', {name: order.taker.profile.token.name})
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
-                    price_per_token: toMoney(order.price),
-                    token_amount: toMoney(order.amount),
-                    web_amount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    pricePerToken: toMoney(order.price),
+                    tokenAmount: toMoney(order.amount),
+                    webAmount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                 };
             }) : [];
         },
