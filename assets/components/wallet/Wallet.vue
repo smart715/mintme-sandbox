@@ -20,9 +20,9 @@
                 </template>
                 <template slot="action" slot-scope="data">
                     <div
-                        class="row"
-                        @click="openDeposit(data.item.name)">
-                        <div class="d-flex flex-row c-pointer pl-2">
+                        class="row">
+                        <div class="d-flex flex-row c-pointer pl-2"
+                            @click="openDeposit(data.item.name)">
                             <div><i class="icon-deposit"></i></div>
                             <div>
                                 <span class="pl-2 text-xs align-middle">Deposit</span>
