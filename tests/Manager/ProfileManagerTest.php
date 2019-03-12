@@ -24,6 +24,8 @@ class ProfileManagerTest extends TestCase
 
         $this->assertRegExp('/^foo\.baz\..+/', $manager->generatePageUrl($this->mockProfile('foo', 'baz')));
         $this->assertEquals('foo.bar', $manager->generatePageUrl($profile));
+        $this->assertEquals('foo-bar.baz', $manager->generatePageUrl($this->mockProfile('foo bar', 'baz')));
+        $this->assertEquals('foo-bar.baz', $manager->generatePageUrl($this->mockProfile('foo-bar', 'baz')));
         $this->expectException(\Throwable::class);
 
         $manager->generatePageUrl($emptyProfile);

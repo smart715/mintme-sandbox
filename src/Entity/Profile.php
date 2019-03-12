@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints\ProfilePeriodLock;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -26,7 +27,9 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
+     * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
@@ -36,8 +39,9 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
      * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
@@ -46,8 +50,9 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Regex(pattern="/^\w+$/")
+     * @Assert\Regex(pattern="/^[A-Za-z\s-]+$/u")
      * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @Groups({"Default", "API"})
      * @var string|null
      */
@@ -57,6 +62,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Country()
      * @Assert\Length(min="2")
+     * @Assert\Length(max="30")
      * @Groups({"Default", "API"})
      * @var string|null
      */
@@ -64,6 +70,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Length(max="150")
      * @Groups({"Default", "API"})
      * @var string|null
      */
@@ -118,7 +125,7 @@ class Profile
         return $this;
     }
 
-    /** @ORM\PrePersist() */
+    /** @ORM\PreUpdate() */
     public function updateNameChangedDate(): self
     {
         $this->nameChangedDate = new \DateTimeImmutable('+1 month');
@@ -168,6 +175,14 @@ class Profile
         $this->city = $city;
 
         return $this;
+    }
+
+    public function getCountryFullName(): ?string
+    {
+        if ($this->country) {
+            return Intl::getRegionBundle()->getCountryName($this->country);
+        }
+        return null;
     }
 
     public function getCountry(): ?string
