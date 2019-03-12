@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
  * @UniqueEntity(fields={"name"}, message="Token name is already exists.")
  * @UniqueEntity("address")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Token
 {
@@ -92,6 +93,12 @@ class Token
 
     /** @var Crypto|null */
     protected $crypto;
+
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     * @var \DateTimeImmutable
+     */
+    protected $created;
 
     public function getCrypto(): ?Crypto
     {
@@ -208,5 +215,18 @@ class Token
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());
+    }
+
+    public function getCreated(): \DateTimeImmutable
+    {
+        return $this->created;
+    }
+
+    /** @ORM\PrePersist() */
+    public function setCreatedValue(): self
+    {
+        $this->created = new \DateTimeImmutable();
+
+        return $this;
     }
 }
