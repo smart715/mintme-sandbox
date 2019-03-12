@@ -35,7 +35,7 @@
                                         alt="avatar">
                                 </a>
                                 <a @click="removeOrderModal(row.item)"
-                                   v-if="row.item.trader_id">
+                                   v-if="row.item.owner">
                                      <font-awesome-icon icon="times" class="text-danger c-pointer" />
                                 </a>
                         </template>

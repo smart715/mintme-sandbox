@@ -102,8 +102,8 @@ export default {
                     trader_url: this.$routing.generate('token_show', {
                         name: order.maker.profile.token.name,
                     }),
-                    trader_id: order.maker.id === this.userId ? this.userId : null,
                     side: order.side,
+                    owner: order.owner,
                 };
             });
         },
@@ -119,6 +119,7 @@ export default {
         groupByPrice: function(orders) {
             let filtered = [];
             let grouped = {};
+            let owner = false;
             this.clone(orders).forEach( (item) => {
                 if (grouped[item.price] === undefined) {
                     grouped[item.price] = [];
@@ -130,12 +131,14 @@ export default {
                     let sum = grouped[orders].reduce((sum, order) => parseFloat(order.amount) + sum, 0);
                     grouped[orders].sort((first, second) => first.maker.id - second.maker.id);
                     grouped[orders].forEach((order, i, arr) => {
+                        owner = owner === true || order.maker.id === this.userId;
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
                             order.amount = new Decimal(order.amount).add(arr[i-1].amount);
                         }
                     });
                     grouped[orders].sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
                     grouped[orders][0].amount = sum;
+                    grouped[orders][0].owner = owner;
                     filtered.push(grouped[orders][0]);
                 }
             }
@@ -145,7 +148,7 @@ export default {
             let orders = row.side === 1 ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
             this.clone(orders).forEach((order) => {
-                if (toMoney(order.price) === row.price && order.maker.id === row.trader_id) {
+                if (toMoney(order.price) === row.price && order.maker.id === this.userId) {
                     order.price = toMoney(order.price);
                     order.amount = toMoney(order.amount);
                     this.removeOrders.push(order);
