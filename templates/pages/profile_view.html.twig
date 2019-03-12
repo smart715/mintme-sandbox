@@ -22,14 +22,19 @@
                         <div class="row" v-if="!showEditForm">
                             <div class="col-12 col-md-4">
                                 <div class="pb-1">
-                                    City: {% if profile.city is not empty %}{{ profile.city }}{% else %}Not defined{% endif %}
+                                    {% if profile.city is not empty %}
+                                        City: {{ profile.city }}
+                                    {% endif %}
                                 </div>
                                 <div class="pb-1">
-                                    Country: {% if profile.country is not empty %}{{ profile.country }}{% else %}Not defined{% endif %}
+                                     {% if profile.country is not empty %}
+                                         Country: {{ profile.getCountryFullName() }}
+                                     {% endif %}
                                 </div>
                                 {% if token is not empty %}
                                     <div class="pb-1">
-                                        {{ token.getName() }} created on July 2018
+                                        <a href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
+                                        created on {{ token.getCreated().format('d M Y') }}
                                     </div>
                                 {% endif %}
                             </div>
