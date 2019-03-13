@@ -21,12 +21,9 @@ class AddProfileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-<<<<<<< HEAD
-            ->add('firstName', TextType::class, [ 'label' => 'First Name:' ])
-            ->add('lastName', TextType::class, [ 'label' => 'Last Name:' ]);
-=======
+
             ->add('firstName', TextType::class, [
-                'label' => 'First Name',
+                'label' => 'First Name:',
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -35,7 +32,7 @@ class AddProfileType extends AbstractType
                 ],
             ])
             ->add('lastName', TextType::class, [
-                'label' => 'Last Name',
+                'label' => 'Last Name:',
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -49,6 +46,5 @@ class AddProfileType extends AbstractType
 
         $builder->get('lastName')
             ->addModelTransformer($this->nameTransformer);
->>>>>>> f380fe97538dff490ac6a8bff4b2ef374600ca55
     }
 }
