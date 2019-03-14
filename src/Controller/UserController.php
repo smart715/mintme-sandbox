@@ -12,6 +12,7 @@ use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Utils\MailerDispatcherInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\UserBundle\Form\Type\ChangePasswordFormType;
 use FOS\UserBundle\Form\Type\ResettingFormType;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -136,7 +137,7 @@ class UserController extends AbstractController
     private function getPasswordForm(Request $request): FormInterface
     {
         $user = $this->getUser();
-        $passwordForm = $this->createForm(ResettingFormType::class, $user);
+        $passwordForm = $this->createForm(ChangePasswordFormType::class, $user);
         $passwordForm->handleRequest($request);
 
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
