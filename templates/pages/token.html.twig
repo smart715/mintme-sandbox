@@ -13,7 +13,6 @@
                 {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                 <token-name
                     name="{{ token.name }}"
-                    csrf-token="{{ csrf_token('update-token') }}"
                     update-url="{{ path('token_update', {'name': token.name}) }}"
                     :editable="{{ isOwner ? 'true' : 'false' }}">
                 </token-name>
