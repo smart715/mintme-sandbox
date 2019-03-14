@@ -70,7 +70,7 @@ class RequestSubscriber implements EventSubscriberInterface
 
     private function isApiRequest(Request $request): bool
     {
-        return (bool)preg_match('/$api/', $request->getPathInfo());
+        return (bool)preg_match('/^\/api\//', $request->getPathInfo());
     }
 
     private function isCsrfTokenValid(string $token): bool
