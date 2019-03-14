@@ -27,7 +27,6 @@ export default {
     name: 'TokenName',
     props: {
         name: String,
-        csrfToken: String,
         updateUrl: String,
         editable: Boolean,
     },
@@ -58,7 +57,6 @@ export default {
         doEditName: function() {
             this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
-                _csrf_token: this.csrfToken,
             })
             .then((response) => {
                 if (response.status === HTTP_ACCEPTED) {
