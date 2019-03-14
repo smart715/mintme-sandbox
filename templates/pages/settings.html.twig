@@ -5,7 +5,7 @@
 {% block messageContainer %}{% endblock %}
 
 {% block content %}
-    <div id="profile" class="container">
+    <div id="settings" class="container">
         <div class="row justify-content-center">
             <div class="col-xs-12 col-lg-10 col-xl-6">
                 <div class="card">
@@ -21,10 +21,13 @@
                             {% endfor %}
                         </div>
                         <div>
-                            {{ form_start(emailForm) }}
-                            {{ form_row(emailForm.email, { 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required'} }) }}
+                            <div v-if="$v.email.$error" class="text-danger" v-cloak>
+                                <span>Email can't be empty and must be valid.</span>
+                            </div>
+                            {{ form_start(emailForm, {'attr': {'ref': 'emailForm'}}) }}
+                            {{ form_row(emailForm.email, { 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required', 'ref': 'email', '@keyup': 'onEmailKeyUp', ':class': "{ 'is-invalid': $v.email.$error }"} }) }}
                             {{ form_rest(emailForm) }}
-                            <button type="submit" class="btn btn-primary float-right px-5">Save</button>
+                            <button type="submit" class="btn btn-primary float-right px-5" ref="emailButton" @click.prevent="onEmailSubmit" disabled>Save</button>
                             {{ form_end(emailForm) }}
                         </div>
                         <div class="clearfix"></div>
@@ -61,4 +64,7 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block pagescripts %}
+    <script src="{{ asset('build/settings.js') }}"></script>
 {% endblock %}
