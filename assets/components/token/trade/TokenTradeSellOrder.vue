@@ -1,31 +1,28 @@
 <template>
-    <div>
+    <div class="h-100">
         <div class="card h-100">
-            <div class="card-header text-center">
+            <div class="card-header text-left">
                 Sell Order
-                <guide>
-                    <template slot="header">
-                        Sell Order
-                    </template>
-                    <template slot="body">
-                        Form used to create  an order so you can sell {{ currency }} or make offer.
-                    </template>
-                </guide>
+                <span  class="card-header-icon">
+                    <guide>
+                        <template slot="header">
+                            Sell Order
+                        </template>
+                        <template slot="body">
+                            Form used to create  an order so you can sell {{ currency }} or make offer.
+                        </template>
+                    </guide>
+                </span>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div v-if="immutableBalance"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-3 pb-sm-0 pb-md-3 pb-xl-0"
+                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0"
                         >
                         Your Tokens:
-                        <span class="text-primary">
+                        <span class="text-white">
                             {{ immutableBalance | toMoney  }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Your Tokens
                                 </template>
@@ -48,11 +45,6 @@
                                 for="sell-price">
                                 Market Price
                                 <guide>
-                                    <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                     <template slot="header">
                                         Market Price
                                     </template>
@@ -64,17 +56,12 @@
                             </label>
                         </label>
                     </div>
-                    <div class="col-12 pt-3">
+                    <div class="col-12 pt-2">
                         <label
                             for="sell-price-input"
-                            class="text-primary">
+                            class="text-white">
                             Price in WEB:
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Price in WEB
                                 </template>
@@ -93,10 +80,10 @@
                             min="0"
                         >
                     </div>
-                    <div class="col-12 pt-3">
+                    <div class="col-12 pt-2">
                         <label
                             for="sell-price-amount"
-                            class="text-primary">
+                            class="text-white">
                             Amount:
                         </label>
                         <input
@@ -108,14 +95,9 @@
                             min="0"
                         >
                     </div>
-                    <div class="col-12 pt-3">
+                    <div class="col-12 pt-2">
                         Total Price: {{ totalPrice | toMoney }} WEB
                         <guide>
-                            <font-awesome-icon
-                                icon="question"
-                                slot='icon'
-                                class="ml-1 mb-1 bg-primary text-white
-                                       rounded-circle square blue-question"/>
                             <template slot="header">
                                 Total Price
                             </template>
@@ -124,7 +106,7 @@
                             </template>
                         </guide>
                     </div>
-                    <div class="col-12 pt-4 text-center">
+                    <div class="col-12 pt-3 text-left">
                         <button
                             v-if="loggedIn"
                             class="btn btn-primary"

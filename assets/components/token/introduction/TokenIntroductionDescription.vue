@@ -3,7 +3,7 @@
         <div class="card h-100">
             <div class="card-header">
                 Description
-                <guide>
+                <guide class="float-right">
                     <template  slot="header">
                         Description
                     </template>
@@ -12,31 +12,25 @@
                         Everything you should know before you buy {{ name }}.
                     </template>
                 </guide>
-                <span class="card-header-icon">
-                    <font-awesome-icon
-                        v-if="editable"
-                        class="icon float-right c-pointer"
-                        size="2x"
-                        :icon="icon"
-                        transform="shrink-4 up-1.5"
-                        @click="editDescription"
-                    />
-                </span>
+
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
+                        <span class="card-header-icon">
+                            <font-awesome-icon
+                                v-if="showEditIcon"
+                                class="float-right c-pointer icon-edit"
+                                icon="edit"
+                                transform="shrink-4 up-1.5"
+                                @click="editingDescription = true"/>
+                        </span>
                         <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
                                     About your plan
                                     <guide>
-                                        <font-awesome-icon
-                                            icon="question"
-                                            slot='icon'
-                                            class="ml-1 mb-1 bg-primary text-white
-                                            rounded-circle square blue-question"/>
                                         <template slot="header">
                                             About your plan
                                         </template>
@@ -46,7 +40,7 @@
                                         </template>
                                     </guide>
                                 </div>
-                                <div class="pb-1">Please describe goals milestones plans promises</div>
+                                <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
                                 <limited-textarea
                                     class="form-control"
@@ -54,6 +48,10 @@
                                     max="20000"
                                     @get-value="getValue">
                                 </limited-textarea>
+                                <div class="text-left pt-3">
+                                    <button class="btn btn-primary" @click="editDescription">Save</button>
+                                    <a class="pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -66,13 +64,12 @@
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
-import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
 
-library.add(faEdit, faCheck);
+library.add(faEdit);
 Vue.use(Toasted, {
     position: 'top-center',
     duration: 5000,
@@ -97,24 +94,21 @@ export default {
     data() {
         return {
             editingDescription: false,
-            icon: 'edit',
             currentDescription: this.description,
             newDescription: this.description,
         };
+    },
+    computed: {
+        showEditIcon: function() {
+            return !this.editingDescription && this.editable;
+        },
     },
     methods: {
         getValue: function(newValue) {
             this.newDescription = newValue;
         },
         editDescription: function() {
-            if (this.icon === 'check') {
-                return this.doEditDescription();
-            }
-            if (!this.editable) {
-                return;
-            }
-            this.editingDescription = !this.editingDescription;
-            this.icon = 'check';
+            return this.doEditDescription();
         },
         doEditDescription: function() {
             this.$axios.single.patch(this.updateUrl, {
