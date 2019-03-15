@@ -89,16 +89,14 @@ export default {
             return this.ordersList !== null;
         },
         showDownArrow: function() {
-            return (this.sellOrders.length > 7);
+            return (this.ordersList.length > 7);
         },
     },
     methods: {
         scrollDown: function() {
-            let parentDiv = this.$refs.sellorders;
+            let parentDiv = this.$refs.ordersList;
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
-    },
-    methods: {
         removeOrderModal: function(row) {
             this.$emit('modal', row);
         },

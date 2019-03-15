@@ -6,13 +6,13 @@
                     @close="switchConfirmModal(false)"
                     @confirm="removeOrder"
             >
-                <ul>
-                    You want to delete these orders:
-                    <li v-for="order in this.removeOrders" :key="order.id">
-                        Price {{ order.price }} Amount {{ order.amount }}
-                    </li>
+                <span class="text-white">
+                    You want to delete these orders:<br>
+                    <span v-for="order in this.removeOrders" :key="order.id">
+                        Price {{ order.price }} Amount {{ order.amount }}<br>
+                    </span>
                     Are you sure?
-                </ul>
+                </span>
             </confirm-modal>
             <div class="col-12 col-md-6 mt-3">
                 <token-trade-buy-orders
@@ -22,8 +22,9 @@
                         :fields="fields"
                         @modal="removeOrderModal"/>
                 <template v-else>
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
-                                       size="5x"/>
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
+                    </div>
                 </template>
             </div>
             <div class="col-12 col-md-6 mt-3">
@@ -34,8 +35,9 @@
                         :fields="fields"
                         @modal="removeOrderModal"/>
                 <template v-else>
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner d-block text-white mx-auto my-3"
-                                       size="5x"/>
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
+                    </div>
                 </template>
             </div>
         </div>

@@ -20,7 +20,7 @@
                         <b-table v-if="hasOrders" class="w-100" ref="table"
                             :items="ordersList"
                             :fields="fields">
-                            <template slot="order_maker" slot-scope="row">
+                            <template slot="orderMaker" slot-scope="row">
                                 <a :href="row.item.makerUrl">
                                     {{ row.value }}
                                     <img
@@ -29,7 +29,7 @@
                                         alt="avatar">
                                 </a>
                             </template>
-                            <template slot="order_trader" slot-scope="row">
+                            <template slot="orderTrader" slot-scope="row">
                                 <a :href="row.item.takerUrl">
                                     {{ row.value }}
                                     <img
@@ -157,6 +157,7 @@ export default {
             } else {
                 return first + ' ' + second;
             }
+        },
         scrollDown: function() {
             let parentDiv = this.$refs.history;
             parentDiv.scrollTop = parentDiv.scrollHeight;
