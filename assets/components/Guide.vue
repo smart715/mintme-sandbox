@@ -4,8 +4,9 @@
             <slot name="icon">
                 <font-awesome-icon
                     icon="question"
-                    class="m-0 p-1 h4 bg-orange rounded-circle square"
-                    />
+                    slot='icon'
+                    class="ml-1 text-white
+                    rounded-circle square blue-question"/>
             </slot>
         </a>
         <div :id="id" class="d-none">
@@ -15,7 +16,7 @@
                         <slot name="header"></slot>
                     </h5>
                     <p>
-                        <slot name="body"></slot>
+                    <slot name="body"></slot>
                     </p>
                 </div>
             </slot>

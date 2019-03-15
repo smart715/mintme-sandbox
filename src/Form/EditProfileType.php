@@ -25,7 +25,7 @@ class EditProfileType extends AbstractType
     {
         $builder
             ->add('firstName', TextType::class, [
-                'label' => 'First Name',
+                'label' => 'First Name:',
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -34,7 +34,7 @@ class EditProfileType extends AbstractType
                 ],
             ])
             ->add('lastName', TextType::class, [
-                'label' => 'Last Name',
+                'label' => 'Last Name:',
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -43,7 +43,7 @@ class EditProfileType extends AbstractType
                 ],
             ])
             ->add('city', TextType::class, [
-                'label' => 'City',
+                'label' => 'City:',
                 'required' => false,
                 'attr' => [
                     'minlength' => 2,
@@ -53,12 +53,12 @@ class EditProfileType extends AbstractType
                 ],
             ])
             ->add('country', CountryType::class, [
-                'label' => 'Country',
+                'label' => 'Country:',
                 'required' => false,
                 'placeholder' => 'Select the country',
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Description',
+                'label' => 'Description:',
                 'required' => false,
                 'attr' => [
                     'maxlength' => 150,

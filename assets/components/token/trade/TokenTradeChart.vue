@@ -1,72 +1,62 @@
 <template>
     <div>
-        <div class="card h-100">
-            <div class="card-header"></div>
+        <div class="card">
             <div class="card-body p-2">
-                <div class="small text-center">
-                    <div class="pt-2">
-                        Last price: {{ marketStatus.last }}
-                        <guide>
-                            <font-awesome-icon
-                                icon="question"
-                                slot='icon'
-                                class="ml-1 mb-1 bg-primary text-white
-                                       rounded-circle square blue-question"/>
-                            <template slot="header">
-                                Last price
-                            </template>
-                            <template slot="body">
-                                Price per one {{ currency }} for last transaction.
-                            </template>
-                        </guide>
-                    </div>
-                    <div class="pt-3">
-                        <div class="d-inline-block px-2">
-                            <div>
-                                24h change
+                <div class="row">
+                    <div class="col-lg-2">
+                        <div class="text-left">
+                            <div class="pt-2">
+                                Last price: {{ marketStatus.last }}
                                 <guide>
-                                    <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                               rounded-circle square blue-question"/>
                                     <template slot="header">
+                                        Last price
+                                    </template>
+                                    <template slot="body">
+                                        Price per one {{ currency }} for last transaction.
+                                    </template>
+                                </guide>
+                            </div>
+                            <div class="pt-4">
+                                <div class="d-inline-block">
+                                    <div>
                                         24h change
-                                    </template>
-                                    <template slot="body">
-                                        Price change in last 24h
-                                    </template>
-                                </guide>
-                            </div>
-                            <div>{{ marketStatus.change }}</div>
-                        </div>
-                        <div class="d-inline-block px-2">
-                            <div>
-                                24h volume
-                                <guide>
-                                    <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                               rounded-circle square blue-question"/>
-                                    <template slot="header">
+                                        <guide>
+                                            <template slot="header">
+                                                24h change
+                                            </template>
+                                            <template slot="body">
+                                                Price change in last 24h
+                                            </template>
+                                        </guide>
+                                    </div>
+                                    <div>{{ marketStatus.change }}</div>
+                                </div>
+                                <div class="d-inline-block pt-4">
+                                    <div>
                                         24h volume
-                                    </template>
-                                    <template slot="body">
-                                        The amount of {{ currency }} that has been traded in the last 24 hours.
-                                    </template>
-                                </guide>
+                                        <guide>
+                                            <template slot="header">
+                                                24h volume
+                                            </template>
+                                            <template slot="body">
+                                                The amount of {{ currency }} that has been traded in the last 24 hours.
+                                            </template>
+                                        </guide>
+                                    </div>
+                                    <div>{{ marketStatus.volume }} Tokens</div>
+                                </div>
                             </div>
-                            <div>{{ marketStatus.volume }} Tokens</div>
                         </div>
                     </div>
+                    <div class="col-lg-6">
+                        <div class="pt-2">
+                            [Volume] WEB ({{ marketStatus.change }}%)
+                        </div>
+                    </div>
+                    <div class="col-lg-4 pt-2">
+                        <line-chart :data="chartData" :options="chartOptions"/>
+                    </div>
                 </div>
-                <div class="pt-3">
-                    [Volume]WEB({{ marketStatus.change }}%)
-                </div>
-                <line-chart :data="chartData"
-                            :options="chartOptions"
-                />
             </div>
         </div>
     </div>
@@ -82,7 +72,7 @@ export default {
     mixins: [WebSocketMixin],
     props: {
         websocketUrl: String,
-        marketName: Object,
+        market: Object,
         currency: String,
     },
     data() {
@@ -144,9 +134,6 @@ export default {
         };
     },
     computed: {
-        market: function() {
-            return this.marketName;
-        },
         chartInitValues: function() {
             let values = [];
 
