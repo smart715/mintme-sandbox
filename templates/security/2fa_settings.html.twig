@@ -1,65 +1,75 @@
-<div class="container card">
-    {% if not isTwoFactor %}
-        <div class="row card-header">
-            <h3 class="text-white">SETTINGS 2FA</h3>
-        </div>
-        <div class="row card-header">
-            <div class="col pl-0 mb-3 text-white text-left">
-                Download the Google Authenticator application from
-                <a class="text-blue" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">App Store</a> or
-                <a class="text-blue" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
-            </div>
-        </div>
-        <div class="row py-3 justify-content-center align-content-center text-center card-body">
-            <div class="col-md-5">
-                <div><img src="{{ imgUrl }}" alt="QR Code" class="img-thumbnail img-fluid"></div>
-            </div>
-            <div class="col-md-5">
-                <div class="text-left text-black px-3 pb-3 pt-0 text-white">
-                    Can't scan the code?
-                    To add the entry manually, provide the following details to the application on your phone.
-                </div>
-                <div class="responsive">
-                    <table class="table text-white">
-                        <tbody>
-                        <tr>
-                            <th class="border-top-0">Account</th>
-                            <td class="border-top-0 p-2">
-                                <p class="bg-ghost-light p-1 m-0">
-                                    {{ app.user.username }}
-                                </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="border-top-0">Key</th>
-                            <td class="border-top-0 p-2">
-                                <p class="bg-ghost-light p-1 m-0">
-                                    {{ twoFactorKey }}
-                                </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="border-top-0">Time based</th>
-                            <td class="border-top-0 p-2">
-                                <p class="bg-ghost-light p-1 m-0">
-                                    Yes
-                                </p>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    {% else %}
-        <div class="row card-header">
-            <h3 class="text-white">DISABLE 2FA</h3>
-        </div>
-    {% endif %}
+<div class="container">
+    <div class="row  pt-5 justify-content-center">
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                {% if not isTwoFactor %}
+                    <div class="card-header">
+                        SETTINGS 2FA
+                    </div>
+                    <div class="card-body">
+                        <div class='row'>
+                            <div class="col-12 pb-2 text-white text-center">
+                                Download the Google Authenticator application from
+                                <a class="text-blue" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">App Store</a> or
+                                <a class="text-blue" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
+                            </div>
+                            <div class="col-12 pb-2 text-center">
+                                <img src="{{ imgUrl }}" alt="QR Code" class="img-thumbnail img-fluid img-barcode">
+                            </div>
+                            <div class="col-12">
+                                <div class="text-center text-white pb-2">
+                                    Can't scan the code?
+                                    To add the entry manually, provide the following details to the application on your phone.
+                                </div>
+                                <div class="responsive mx-auto">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label>Account:</label>
+                                        </div>
+                                        <div class="col-12">
+                                            <p class="form-control m-0 text-white">
+                                                {{ app.user.username }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label>Key:</label>
+                                        </div>
+                                        <div class="col-12">
+                                            <p class="form-control m-0 text-white">
+                                                {{ twoFactorKey }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label>Time based:</label>
+                                        </div>
+                                        <div class="col-12">
+                                            <p class="form-control m-0 text-white">
+                                                Yes
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row card-header">
+                        <h3 class="text-white">DISABLE 2FA</h3>
+                    </div>
+                {% endif %}
 
-    <div class="row text-center card-body justify-content-center mp-5">
-        <div class="col-6">
-            {% block formBody %}{{ form(form) }}{% endblock %}
+                <div class="text-center card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            {% block formBody %}{{ form(form) }}{% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

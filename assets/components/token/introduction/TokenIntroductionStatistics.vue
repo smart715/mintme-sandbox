@@ -3,7 +3,7 @@
         <div class="card h-100">
             <div class="card-header">
                 Statistics
-                <guide>
+                <guide class="float-right">
                     <div slot="header">
                         <h5 class="font-bold">Statistics</h5>
                     </div>
@@ -16,18 +16,15 @@
                         </p>
                     </div>
                 </guide>
-                <span class="card-header-icon">
-                    <font-awesome-icon
-                        v-if="editable && !showSettings"
-                        class="icon float-right c-pointer"
-                        size="2x"
-                        icon="edit"
-                        transform="shrink-4 up-1.5"
-                        @click="switchAction"
-                        />
-                </span>
             </div>
             <div class="card-body">
+                <font-awesome-icon
+                    v-if="editable && !showSettings"
+                    class="float-right c-pointer icon-edit"
+                    icon="edit"
+                    transform="shrink-4 up-1.5"
+                    @click="switchAction"
+                    />
                 <template v-if="loaded">
                 <div v-if="!showSettings" class="row">
                     <div class="col">
@@ -37,11 +34,6 @@
                         <div class="pb-1">
                             Wallet on exchange: {{ walletBalance }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Wallet on exchange
                                 </template>
@@ -54,11 +46,6 @@
                         <div class="pb-1">
                             Active orders: {{ activeOrdersSum }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Active orders
                                 </template>
@@ -70,11 +57,6 @@
                         <div class="pb-1">
                             Withdrawn: {{ withdrawBalance }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Withdrawn
                                 </template>
@@ -86,11 +68,6 @@
                         <div class="pb-1">
                             Sold on the market: {{ soldOrdersSum }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Sold on the market
                                 </template>
@@ -108,11 +85,6 @@
                         <div class="pb-1">
                             Release period: {{ stats.releasePeriod }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Release period
                                 </template>
@@ -124,11 +96,6 @@
                         <div class="pb-1">
                             Hourly installment: {{ stats.hourlyRate }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Hourly installment
                                 </template>
@@ -140,11 +107,6 @@
                         <div class="pb-1">
                             Already released: {{ stats.releasedAmount }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Already released
                                 </template>
@@ -157,11 +119,6 @@
                         <div class="pb-1">
                             Remaining: {{ stats.frozenAmount }}
                             <guide>
-                                <font-awesome-icon
-                                    icon="question"
-                                    slot='icon'
-                                    class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
                                 <template slot="header">
                                     Remaining
                                 </template>
@@ -184,7 +141,9 @@
                 </div>
                 </template>
                 <template v-else>
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
                 </template>
             </div>
         </div>

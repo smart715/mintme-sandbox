@@ -11,12 +11,14 @@
                         rel="nofollow">
                         https://www.youtube.com/channel/{{ this.currentChannelId }}
                     </a>
+                    <div
+                        v-if="currentChannelId"
+                        class="g-ytsubscribe"
+                        :data-channelid="currentChannelId"
+                        data-layout="default"
+                        data-count="default">
+                    </div>
                     <guide>
-                        <font-awesome-icon
-                            icon="question"
-                            slot='icon'
-                            class="ml-1 mb-1 bg-primary text-white
-                        rounded-circle square blue-question"/>
                         <template slot="header">
                             Youtube
                         </template>
@@ -25,21 +27,16 @@
                         </template>
                     </guide>
                 </div>
-                <div
-                    v-if="currentChannelId"
-                    class="g-ytsubscribe"
-                    :data-channelid="currentChannelId"
-                    data-layout="default"
-                    data-count="default">
-                </div>
             </div>
         </div>
         <div v-show="editing">
-            <div class="col-lg-6 col-md-9  d-block mx-0 my-1 p-0">
-                <button class="btn btn-primary btn-block" @click="addChannel">
-                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'youtube-square'}" size="lg"/>
+            <div class="d-block mx-0 my-1 p-0">
+                <a class="c-pointer" @click="addChannel">
+                    <font-awesome-icon
+                        :icon="{prefix: 'fab', iconName: 'youtube-square'}"
+                        size="lg"/>
                     Add Youtube channel
-                </button>
+                </a>
             </div>
         </div>
     </div>

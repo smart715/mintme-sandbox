@@ -53,11 +53,11 @@
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div class="content-wrapper {% block contentclass %}{% endblock %}">
-                <div class="content">
-                    {% block header %}
-                        {% include 'topnav.html.twig' %}
-                    {% endblock %}
+            <wrapper class="content-wrapper d-flex flex-column {% block contentclass %}{% endblock %}">
+                {% block header %}
+                    {% include 'topnav.html.twig' %}
+                {% endblock %}
+                <main class="flex-fill content">
                     {% block main %}
                         {% block messageContainer %}
                             {% if app.session.flashbag.peekAll() is not empty %}
@@ -74,11 +74,11 @@
                         {% endblock %}
                         {% block content %}{% endblock %}
                     {% endblock %}
-                </div>
+                </main>
                 {% block footer %}
                     {% include 'footer.html.twig' %}
                 {% endblock %}
-            </div>
+            </wrapper>
         {% endblock %}
         {% block javascripts %}
             <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
