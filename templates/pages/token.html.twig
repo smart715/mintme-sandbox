@@ -8,23 +8,18 @@
 
 {% block content %}
     <div id="token" class="container">
-        <div class="row">
-            <div class="col" v-cloak>
+        <div class="row pt-5 justify-content-center">
+            <div class="col-md-10" v-cloak>
                 {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                <token-name
-                    name="{{ token.name }}"
-                    update-url="{{ path('token_update', {'name': token.name}) }}"
-                    :editable="{{ isOwner ? 'true' : 'false' }}">
-                </token-name>
                 <b-tabs :lazy="true" @input="onTabUpdated" class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
                         <token-trade
-                            websocket-url="{{    global_websocket_url }}"
+                            websocket-url="{{ global_websocket_url }}"
                             hash="{{ hash }}"
                             currency="{{ currency }}"
                             login-url="{{ path('fos_user_security_login') }}"
                             signup-url="{{ path('fos_user_registration_register') }}"
-                            :market="{{ marketName | json_encode }}"
+                            :market="{{ market | json_encode }}"
                             :logged-in="{{ app.user ? 'true' : 'false' }}"
                             token-name="{{ token.name }}"
                             place-order-url="{{ path('token_place_order', {'tokenName' : token.name}) }}"
@@ -35,7 +30,7 @@
                     <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
                             <token-introduction-profile
-                                class="col-12 col-md-6"
+                                class="col-12 col-lg-4 pr-lg-2"
                                 youtube-client-id="{{ global_youtube_client_id }}"
                                 facebook-app-id="{{ global_facebook_app_id }}"
                                 confirm-website-file-url="{{ path('token_website_confirmation', {'name': token.name}) }}"
@@ -51,7 +46,7 @@
                             </token-introduction-profile>
 
                             <token-introduction-statistics
-                                class="col-12 col-md-6 mt-3 mt-md-0"
+                                class="col-12 col-lg-4 pt-3 pt-lg-0 px-lg-2"
                                 name="{{ token.name }}"
                                 :editable="{{ isOwner ? 'true' : 'false' }}"
                                 {% if stats is not null %}
@@ -59,10 +54,8 @@
                                 {% endif %}
                                 release-period-route="{{ path('lock_in', {'name': token.name}) }}">
                             </token-introduction-statistics>
-                        </div>
-                        <div class="row">
                             <token-introduction-description
-                                class="col-12 mt-3 mt-3"
+                                class="col-12 col-lg-4 pt-3 pt-lg-0 pl-lg-2"
                                 name="{{ token.name }}"
                                 description="{{ token.description }}"
                                 update-url="{{ path('token_update', {'name': token.name}) }}"
@@ -70,6 +63,16 @@
                             </token-introduction-description>
                         </div>
                     </b-tab>
+                    <template slot="tabs">
+                        <b-nav-item class="float-sm-right" @click="()=>{}">
+                            <token-name
+                                name="{{ token.name }}"
+                                update-url="{{ path('token_update', {'name': token.name}) }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}">
+                            </token-name>
+                        </b-nav-item>
+                        <div class="clearfix"></div>
+                    </template>
                 </b-tabs>
             </div>
         </div>

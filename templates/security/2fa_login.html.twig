@@ -15,8 +15,8 @@
     {% endif %}
 
     <div class="container text-center">
-        <div class="row py-3 justify-content-center">
-            <div class="col-xs-12 col-lg-10 col-xl-6">
+        <div class="row pt-5 justify-content-center">
+            <div class="col-lg-4 col-md-6">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
@@ -25,11 +25,11 @@
                         {% block formBody %}
                             <form action="{{ path("2fa_login_check") }}" method="post">
                                 <div class="form-group">
-                                    <label for="code">Two-factor authentication code</label>
+                                    <label for="code">Two-factor authentication code:</label>
                                     <input
                                         type="text" name="{{ authCodeParameterName }}" required="required"
                                         class="form-control form-control-md" id="code" autofocus
-                                    >
+                                        >
                                 </div>
                                 <div class="form-group">
                                     <small>
@@ -41,7 +41,7 @@
                                     <input
                                         type="submit" id="_submit" name="_submit"
                                         class="btn btn-primary" value="VERIFY CODE"
-                                    >
+                                        >
                                 </div>
                             </form>
                         {% endblock %}

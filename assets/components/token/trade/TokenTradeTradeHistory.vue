@@ -15,37 +15,46 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fix-height">
+                <div class="table-responsive fix-height" ref="history">
                     <template v-if="loaded">
-                    <b-table v-if="hasOrders" ref="table"
-                        :items="ordersList"
-                        :fields="fields">
-                        <template slot="orderMaker" slot-scope="row">
-                            <a :href="row.item.maker_url">
-                                {{ row.value }}
-                                <img
-                                    src="../../../img/avatar.png"
-                                    class="pl-3"
-                                    alt="avatar">
-                            </a>
-                        </template>
-                        <template slot="orderTrader" slot-scope="row">
-                            <a :href="row.item.taker_url">
-                                {{ row.value }}
-                                <img
-                                    src="../../../img/avatar.png"
-                                    class="pl-3"
-                                    alt="avatar">
-                            </a>
-                        </template>
-                    </b-table>
-                    <div v-if="!hasOrders">
-                        <h4 class="text-center p-5">No deal was made yet</h4>
-                    </div>
+                        <b-table v-if="hasOrders" class="w-100" ref="table"
+                            :items="ordersList"
+                            :fields="fields">
+                            <template slot="order_maker" slot-scope="row">
+                                <a :href="row.item.makerUrl">
+                                    {{ row.value }}
+                                    <img
+                                        src="../../../img/avatar.png"
+                                        class="pl-3"
+                                        alt="avatar">
+                                </a>
+                            </template>
+                            <template slot="order_trader" slot-scope="row">
+                                <a :href="row.item.takerUrl">
+                                    {{ row.value }}
+                                    <img
+                                        src="../../../img/avatar.png"
+                                        class="pl-3"
+                                        alt="avatar">
+                                </a>
+                            </template>
+                        </b-table>
+                        <div v-if="!hasOrders">
+                            <p class="text-center p-5">No deal was made yet</p>
+                        </div>
                     </template>
                     <template v-else>
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        <div class="p-5 text-center">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </div>
                     </template>
+                </div>
+                <div class="text-center pb-2" v-if="showDownArrow">
+                    <img
+                        src="../../../img/down-arrows.png"
+                        class="icon-arrows-down c-pointer"
+                        alt="arrow down"
+                        @click="scrollDown">
                 </div>
             </div>
         </div>
@@ -107,10 +116,10 @@ export default {
                     orderTrader: order.taker != null
                         ? order.taker.profile ? this.truncateFullName(order.taker.profile): 'Anonymous'
                         : '',
-                    maker_url: order.maker != null
+                    makerUrl: order.maker != null
                         ? this.$routing.generate('token_show', {name: order.maker.profile.token.name})
                         : '',
-                    taker_url: order.taker != null
+                    takerUrl: order.taker != null
                         ? this.$routing.generate('token_show', {name: order.taker.profile.token.name})
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
@@ -122,6 +131,9 @@ export default {
         },
         loaded: function() {
             return this.history !== null;
+        },
+        showDownArrow: function() {
+            return (this.loaded && this.history.length > 7);
         },
     },
     mounted: function() {
@@ -145,6 +157,9 @@ export default {
             } else {
                 return first + ' ' + second;
             }
+        scrollDown: function() {
+            let parentDiv = this.$refs.history;
+            parentDiv.scrollTop = parentDiv.scrollHeight;
         },
     },
 };

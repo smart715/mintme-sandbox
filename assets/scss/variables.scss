@@ -7,8 +7,8 @@ $cloud-font: 'AlphaCloud', sans-serif;
 
 $font-scales: (
   xs: 13px,
-  sm: 16px,
-  md: 24px,
+  sm: 15px,
+  md: 18px,
   lg: 32px
 );
 
@@ -17,15 +17,18 @@ $border-radius: 0;
 
 // Colors
 $ghost-dark: rgba(0, 0, 0, 0.15);
+
 $ghost-light: rgba(255, 255, 255, 0.25);
+$grey-light: #8A96A4;
+$grey-dark: #778588;
 $yellow: #be8817;
 $orange: #f7931e;
 $green: #8dc63f;
 $red: #fe6e43;
 $white: white;
 $black: #131313;
-$secondary: #90c7ff;
-$primary: #1b557b;
+$secondary: #152D47;
+$primary: #0E3B58;
 $blue: #1da1f3;
 
 // This variable affects the `.h-*` and `.w-*` classes.
@@ -67,7 +70,7 @@ $body-background-sm: linear-gradient(#184b80, #193a5d);
 $body-text-color: #1a1a1a;
 $color-nav: $white;
 $color-nav-active: #0071bc;
-$color-nav-hover: $secondary;
+$color-nav-hover: #32A3F7;
 $color-link: $blue;
 $color-link-hover: #90c7ff;
 $color-tabs: $primary;
@@ -75,25 +78,25 @@ $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
 $color-facebook: #3b5998;
 $color-twitter: $blue;
+$color-tooltip: #1B557B;
 $color-linkedin: #0077b5;
 $color-wallet-code: #666666;
-$modal-alert-border-color: #4ecb22;
-$index-description-bg: linear-gradient(180deg, #193A5D, #193A5D, #102238, #102238, transparent, transparent) repeat-x;
+$modal-alert-border-color: $primary;
+$index-description-bg: linear-gradient(180deg, #102238, #102238, #102238, #102238, transparent, transparent) repeat-x;
 
 // Forms
-$input-bg: $ghost-light;
-$input-btn-padding-y: .5rem;
+$input-bg: $grey-light;
+$input-btn-padding-y: .25rem;
 $input-btn-padding-x: 1rem;
 $input-focus-border-color: $input-bg;
-
 $input-btn-focus-color: $input-bg;
 
 // Card
 $card-border-width: 0.6rem;
-$card-border-color: $ghost-light;
-$card-input-color: $ghost-light;
-$card-header-bg: $ghost-dark;
-$card-body-bg: $ghost-dark;
+$card-border-color: $ghost-dark;
+$card-input-color: $grey-dark;
+$card-header-bg: $primary;
+$card-body-bg: $secondary;
 $card-text-color: $white;
 
 // Pagination
