@@ -5,20 +5,28 @@
 
 {% block fos_user_content %}
     <div class="container">
-        <div class="row align-items-center d-flex justify-content-center">
-            <div class="col-xs-12 notification">
-                <div class="bell"></div>
-                <div class="cloud  mx-auto text-center">
-                    <div>
-                        <p class="font-bold title">Congrats {{ user.username }}</p>
-                        <p>your account is now activated</p>
-                        <p class="mt-1">
+        <div class="row pt-5 justify-content-center notification">
+            <div class="col-12 col-lg-5 col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-lg-4">Congrats!</div>
+                            <div class="col-lg-8 card-header-description text-lg-right align-self-center">
+                                <span class="align-middle">
+                                    The user has been created successfully!
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body py-2 text-center">
+                        <h1 class="title">{{ user.username }}</h1>
+                        <p class="text">your account is now activated</p>
+                        <p class="mt-1 pb-0 mb-0">
                             {% if targetUrl is empty %}
-                                {% if prelaunch %}
-                                    <a href="{{ path('referral-program') }}" class="link text-primary">Go to Referral</a>
-                                {% endif %}
-                                {% if not prelaunch %}
+                                {% if prelaunch.isFinished() %}
                                     <a href="{{ path('trading') }}" class="link">Go to Trading</a>
+                                {% else %}
+                                    <a href="{{ path('referral-program') }}" class="link">Go to Referral</a>
                                 {% endif %}
                             {% else %}
                                 <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>

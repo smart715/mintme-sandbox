@@ -1,7 +1,7 @@
 <template>
-    <div class="pb-3">
+    <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="table-responsive deposit-withdraw-history" @scroll.passive="loadMore">
+        <div class="table-responsive text-nowrap deposit-withdraw-history" @scroll.passive="loadMore">
             <b-table
                 v-if="!noHistory"
                 :items="sanitizedHistory"
@@ -11,12 +11,14 @@
             >
             </b-table>
             <div v-if="noHistory">
-                <h4 class="text-center p-5">No transactions were added yet</h4>
+                <p class="text-center p-5">No transactions were added yet</p>
             </div>
         </div>
         </template>
         <template v-else>
-            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            <div class="p-5 text-center">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
         </template>
     </div>
 </template>

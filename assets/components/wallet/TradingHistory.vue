@@ -1,5 +1,5 @@
 <template>
-    <div class="pb-3">
+    <div class="px-0 pt-2">
         <template v-if="loaded">
         <div class="table-responsive">
             <b-table
@@ -12,7 +12,7 @@
                  <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
             </b-table>
             <div v-if="!hasHistory">
-                <h4 class="text-center p-5">No deal was made yet</h4>
+                <p class="text-center p-5">No deal was made yet</p>
             </div>
         </div>
         <div
@@ -26,7 +26,9 @@
         </div>
         </template>
         <template v-else>
-            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            <div class="p-5 text-center">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
         </template>
     </div>
 </template>

@@ -2,24 +2,26 @@
     <div class="trading">
         <slot name="title"></slot>
         <template v-if="loaded">
-        <div class="table-responsive">
-            <b-table
-                :items="tokens"
-                :fields="fields"
-                :current-page="currentPage"
-                :per-page="perPage">
-            </b-table>
-        </div>
-        <div class="row justify-content-center">
-            <b-pagination
-                :total-rows="totalRows"
-                :per-page="perPage"
-                v-model="currentPage"
-                class="my-0" />
-        </div>
+            <div class="table-responsive text-nowrap">
+                <b-table
+                    :items="tokens"
+                    :fields="fields"
+                    :current-page="currentPage"
+                    :per-page="perPage">
+                </b-table>
+            </div>
+            <div class="row justify-content-center">
+                <b-pagination
+                    :total-rows="totalRows"
+                    :per-page="perPage"
+                    v-model="currentPage"
+                    class="my-0" />
+            </div>
         </template>
         <template v-else>
-            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            <div class="p-5 text-center">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
         </template>
     </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-    <div class="pb-3">
+    <div class="px-0 pt-2">
         <template v-if="loaded">
         <div class="table-responsive">
             <confirm-modal
@@ -7,7 +7,7 @@
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
             >
-                <div>
+                <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
@@ -19,12 +19,12 @@
                 :per-page="perPage">
                 <template slot="action" slot-scope="row">
                     <a @click="removeOrderModal(row.item)">
-                        <font-awesome-icon icon="times" class="text-danger c-pointer" />
+                        <span class="icon-cancel c-pointer"></span>
                     </a>
                 </template>
             </b-table>
             <div v-if="!hasOrders">
-                <h4 class="text-center p-5">No order was added yet</h4>
+                <p class="text-center p-5">No order was added yet</p>
             </div>
         </div>
         <div v-if="hasOrders" class="row justify-content-center">
@@ -36,7 +36,9 @@
         </div>
         </template>
         <template v-else>
-            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            <div class="p-5 text-center">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
         </template>
     </div>
 </template>
@@ -113,7 +115,9 @@ export default {
                         this.addMessageHandler((response) => {
                             if ('order.update' === response.method) {
                                 this.updateOrders(response.params[1], response.params[0]);
-                                this.$refs.table.refresh();
+                                if (this.$refs.table) {
+                                    this.$refs.table.refresh();
+                                }
                             }
                         });
                     })
@@ -194,7 +198,9 @@ export default {
             }
 
             this.orders.sort((a, b) => a.timestamp < b.timestamp);
-            this.$refs.table.refresh();
+            if (this.$refs.table) {
+                this.$refs.table.refresh();
+            }
         },
     },
 };
