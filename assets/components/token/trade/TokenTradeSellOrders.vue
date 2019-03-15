@@ -119,8 +119,6 @@ export default {
             let parentDiv = this.$refs.sellorders;
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
-    },
-    methods: {
         profileToString: function(profile) {
             return profile.firstName + profile.lastName;
         },
