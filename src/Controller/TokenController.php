@@ -100,7 +100,7 @@ class TokenController extends AbstractController
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
-            'marketName' => $normalizer->normalize($market, null, ['groups' => ['Default']]),
+            'market' => $normalizer->normalize($market, null, ['groups' => ['Default']]),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
@@ -199,7 +199,7 @@ class TokenController extends AbstractController
             'tab' => $showtab,
         ]);
     }
-    
+
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();

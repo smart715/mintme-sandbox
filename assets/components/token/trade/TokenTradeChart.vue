@@ -72,7 +72,7 @@ export default {
     mixins: [WebSocketMixin],
     props: {
         websocketUrl: String,
-        marketName: Object,
+        market: Object,
         currency: String,
     },
     data() {
@@ -134,9 +134,6 @@ export default {
         };
     },
     computed: {
-        market: function() {
-            return this.marketName;
-        },
         chartInitValues: function() {
             let values = [];
 

@@ -115,7 +115,9 @@ export default {
                         this.addMessageHandler((response) => {
                             if ('order.update' === response.method) {
                                 this.updateOrders(response.params[1], response.params[0]);
-                                this.$refs.table.refresh();
+                                if (this.$refs.table) {
+                                    this.$refs.table.refresh();
+                                }
                             }
                         });
                     })
@@ -196,7 +198,9 @@ export default {
             }
 
             this.orders.sort((a, b) => a.timestamp < b.timestamp);
-            this.$refs.table.refresh();
+            if (this.$refs.table) {
+                this.$refs.table.refresh();
+            }
         },
     },
 };

@@ -1,82 +1,85 @@
 <template>
-    <div class="row">
-        <token-trade-chart
-            class="col-12"
-            :websocket-url="websocketUrl"
-            :currency="currency"
-            :market-name="marketName"
-        />
-        <div class="col-12 col-lg-4 mt-3 pr-lg-2">
-            <token-trade-buy-order
-                v-if="balanceLoaded"
-                :websocket-url="websocketUrl"
-                :hash="hash"
-                :currency="currency"
-                :login-url="loginUrl"
-                :signup-url="signupUrl"
-                :logged-in="loggedIn"
-                :market="market"
-                :market-price="marketPriceBuy"
-                :token-name="tokenName"
-                :place-order-url="placeOrderUrl"
-                :balance="webBalance"
+    <div class="container-fluid px-0">
+        <div class="row px-0">
+            <token-trade-chart
+                    class="col"
+                    :websocket-url="websocketUrl"
+                    :currency="currency"
+                    :market="market"
             />
-            <template v-else>
-                <div class="p-5 text-center text-white">
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                </div>
-            </template>
         </div>
-        <div class="pt-3 col-12 col-lg-4 px-lg-2">
-            <token-trade-sell-order
-                v-if="balanceLoaded"
-                :websocket-url="websocketUrl"
-                :hash="hash"
-                :currency="currency"
-                :login-url="loginUrl"
-                :signup-url="signupUrl"
-                :logged-in="loggedIn"
-                :market="market"
-                :market-price="marketPriceSell"
-                :token-name="tokenName"
-                :place-order-url="placeOrderUrl"
-                :balance="tokenBalance"
-                :token-hidden-name="tokenHiddenName"
-            />
-            <template v-else>
-                <div class="p-5 text-center text-white">
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                </div>
-            </template>
+        <div class="row px-0 mt-3">
+            <div class="col-12 col-lg-6 pr-lg-2">
+                <token-trade-buy-order
+                        v-if="balanceLoaded"
+                        :websocket-url="websocketUrl"
+                        :hash="hash"
+                        :currency="currency"
+                        :login-url="loginUrl"
+                        :signup-url="signupUrl"
+                        :logged-in="loggedIn"
+                        :market="market"
+                        :market-price="marketPriceBuy"
+                        :token-name="tokenName"
+                        :place-order-url="placeOrderUrl"
+                        :balance="webBalance"
+                />
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+            </div>
+            <div class="col-12 col-lg-6 pl-lg-2">
+                <token-trade-sell-order
+                        v-if="balanceLoaded"
+                        :websocket-url="websocketUrl"
+                        :hash="hash"
+                        :currency="currency"
+                        :login-url="loginUrl"
+                        :signup-url="signupUrl"
+                        :logged-in="loggedIn"
+                        :market="market"
+                        :market-price="marketPriceSell"
+                        :token-name="tokenName"
+                        :place-order-url="placeOrderUrl"
+                        :balance="tokenBalance"
+                        :token-hidden-name="tokenHiddenName"
+                />
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+            </div>
         </div>
-        <div class="pt-3 col-12 col-lg-4 pl-lg-2">
-            <token-top-traders/>
+        <div class="row px-0 mt-3">
+            <div class="col-12 col-lg-6 pr-lg-2">
+                <token-trade-buy-orders
+                        v-if="ordersLoaded"
+                        :buy-orders="buyOrders"
+                        :token-name="tokenName" />
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+            </div>
+            <div class="col-12 col-lg-6 pl-lg-2">
+                <token-trade-sell-orders
+                        v-if="ordersLoaded"
+                        :sell-orders="sellOrders"
+                        :token-name="tokenName" />
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+            </div>
         </div>
-        <div class="col-12 col-lg-6 pt-3 pr-lg-2">
-            <token-trade-buy-orders
-                v-if="ordersLoaded"
-                :buy-orders="buyOrders"
-                :token-name="tokenName" />
-            <template v-else>
-                <div class="p-5 text-center text-white">
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                </div>
-            </template>
+        <div class="row px-0 mt-3">
+            <token-trade-trade-history class="col" :token-name="tokenName" />
         </div>
-        <div class="col-12 col-lg-6 pt-3 pl-lg-2">
-            <token-trade-sell-orders
-                v-if="ordersLoaded"
-                :sell-orders="sellOrders"
-                :token-name="tokenName" />
-            <template v-else>
-                <div class="p-5 text-center text-white">
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                </div>
-            </template>
-        </div>
-        <token-trade-trade-history
-            class="col-12 pt-3"
-            :token-name="tokenName" />
     </div>
 </template>
 
