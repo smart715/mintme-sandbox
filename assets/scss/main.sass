@@ -13,6 +13,7 @@
 @import 'errorpages'
 @import 'mixins'
 @import 'wallet'
+@import 'news'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
@@ -21,24 +22,22 @@
 
 html
   @include font-scale(sm)
-  height: 100%
+  min-height: 100vh
   box-sizing: border-box
 
 body
+  @include font-scale(sm)
   color: $body-background
   font-family: $lato-font
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
-  height: 100vh
+  min-height: 100vh
 
 .text-bold
   font-weight: 800
 
-.g-recaptcha
-  height: 80px
-
-  & > div
-    position: absolute
+.content-wrapper
+  min-height: 100vh
 
 a
   color: $color-link
@@ -48,15 +47,6 @@ a
 
   &:hover
     color: $color-link-hover
-
-.content-wrapper
-  height: 100%
-  width: 100%
-  display: table
-
-  .content
-    display: table-row
-    height: 100%
 
 .faq-block
   a:hover
@@ -75,25 +65,44 @@ a
 .c-pointer
   cursor: pointer
 
-label
-  margin: 0
+.card, .modal, .box
+  label
+    margin: 0
+    padding-bottom: .3em
 
+  .form-group
+    margin-bottom: .5rem
+
+  input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+    background-color: $card-input-color
+    color: $white
+    border-radius: 0
+    border: none
+    height: calc(2.0rem + 2px)
+    
+  textarea
+    height: auto
+    border: none
+
+  .custom-select, .form-control
+    border: none
+      
 .card
   background: none
   position: relative
   color: $card-text-color
-  border: $card-border-width solid $card-border-color
+  border: none
   border-radius: 0
 
   .card-header
     border: none
     background: $card-header-bg
     color: $white
-    padding: .75rem 1.5rem
+    padding: .45rem 1.35rem
     @include font-scale(md)
 
-    span
-      font-size: .9em
+    .card-header-description
+      font-size: .7em
 
     .card-header-icon
       float: right
@@ -102,16 +111,6 @@ label
   .card-body
     background: $card-body-bg
 
-    input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
-      background: $card-input-color
-      color: $white
-      border-radius: 0
-      border: none
-
-  .card-title
-    margin: 0
-    @include font-scale(md)
-
   &.transparent
     background-color: transparent
 
@@ -119,68 +118,88 @@ label
       background-color: $white
       color: inherit
 
-  &.card-featured
-    form
-      width: 100%
-      margin: auto
-
-      @include media-breakpoint-up(md)
-        width: 70%
-
-      .card-header
-        font-size: 2em
-
-      label.label-featured
-        font-size: 1.6em
-
 .btn-primary
   color: $white
 
-  th
-    font-weight: normal
-    @include font-scale(sm)
+.circle
+    background: #51677F
+    border-radius: 200px
+    height: 200px
+    width: 200px
+    display: table
+    img
+      vertical-align: middle
+      display: table-cell
+      width: 120px
 
-  td, th
+.table
+  thead
+    th
+      border: none
+      font-weight: normal
+      &:first-child
+        padding-left: 1.5rem
+
+  tbody
+    tr
+      &:nth-child(odd)
+        background-color: #00334E
+        border: none
+
+  td
+    border: none
+    padding-top: 0.35rem
+    padding-bottom: 0.35rem
+    vertical-align: middle
     &:first-child
-      padding-left: 2rem
-
+      padding-left: 1.5rem
+    &:last-child
+      padding-right: 1.5rem
+    img
+      height: 22px
+  
 .fix-layout
   table-layout: fixed
+
+
+.pagination
+  .page-item
+    .page-link 
+      background: none
+      color: $color-link
+  .active
+    .page-link 
+      color: $white
 
 .tabs
   .nav-tabs
     display: flex
     text-align: center
     padding: 0 !important
-    @include font-scale(md)
     align-items: stretch
     border: none
 
     .nav-item
       flex: 1 1 auto
       padding: 0
-      border-left: .0625rem solid $white
-
-      &:first-child
-        border-left: none
+      border: none      
+      color: $white
 
       .nav-link
         border: none
         background-color: $color-tabs
         color: $white
-        padding: .75rem 1.5rem
+        padding: .45rem 1.35rem
+        @include font-scale(md)
 
         &.disabled
           cursor: default
-
-        &.active
-          background: $white
-          color: inherit
+      .active
+        color: $color-link
 
   .tab-content
     flex: 1 1 auto
-    padding: 1.25rem
-    background: $white
+    background: $secondary
 
   &.no-padding
     .tab-content
@@ -190,9 +209,9 @@ label
     .nav-tabs
       position: relative
       display: block
-      background: $white
+      background: $secondary
       text-align: left
-      border: .0625rem solid $white
+      border: 2px solid $secondary
 
       .nav-item
         display: inline-block
@@ -201,15 +220,17 @@ label
         .nav-link
             color: inherit
             position: relative
-            background: $white
-
+            background: $secondary
+            @include font-scale(md)
+            &.active
+              color: $color-link
             &.active::after
               content: ' '
               position: absolute
               bottom: .75rem
               left: 1.5rem
               height: .125rem
-              background-color: $color-tabs-links
+              background-color: none
               width: calc(100% - 3rem)
 
       .edit-token-profile
@@ -224,47 +245,18 @@ label
       background: none
 
 .modal-content
-  border-top-width: 20px
-  border-top-style: solid
-  border-top-color: $ghost-light
-
+  background: $secondary
   .modal-header
-    display: block
-    border-bottom: none
-
-    .cancel-button
-      top: -60.5px
-      right: -28px
-      position: relative
-      float: right
-      border-top-width: 5px
-      border-top-style: solid
-      border-top-color: $ghost-dark
-      background: $ghost-dark
-      opacity: 1
-      height: 70px
-      width: 70px
-      border-radius: 50%
-
-      .inner
-        background: $white
-        color: $ghost-dark
-        vertical-align: middle
-        text-align: center
-        height: 65px
-        width: 65px
-        border-radius: 50%
-        top: -4px
-        right: -5px
-        position: relative
-        font-size: 45px
-
-        a:hover
-          cursor: pointer
-          color: $black
-
-  .modal-body
-    margin-top: -50px
+    background-color: $primary
+    padding: 0px
+    div
+      width: 100%
+    .modal-close
+      @include font-scale(lg)
+      color: $white
+      font-weight: lighter;
+  .modal-title
+    @include font-scale(md)
 
 nav.top-navbar
     .navbar-toggler-icon
@@ -279,18 +271,14 @@ nav.top-navbar
 .btn-input
   position: relative
   right: 5px
-  top: -38px
-  height: 34px
-  padding-top: 5px
-  padding-bottom: 5px
+  top: -30px
+  height: 28px
+  padding-top: 3px
+  padding-bottom: 3px
 
 .wallet-code
   color: $color-wallet-code
   @include font-scale(sm)
-
-.modal.modal-alert
-  .modal-content
-    border-top: 1rem solid $modal-alert-border-color
 
 .modal.show
   display: block
@@ -309,19 +297,11 @@ nav.top-navbar
     display: none
 
 .notification
-  .bell
-    background: url('../img/bell.png') no-repeat center
-    background-size: 100px
-    min-height: 110px
-
-  .cloud
-    background: url('../img/cloud.png') no-repeat
-    background-size: 100% 100%
-    padding: 5rem
-    .title
-      @include font-scale(lg)
-    .link
-      @include font-scale(xs)
+  .title
+    @include font-scale(md)
+    font-weight: 800
+  .link
+    color: $blue
 
 .v-cloak--block
   display: none
@@ -339,17 +319,40 @@ nav.top-navbar
   & > *:not(.v-cloak--inline)
     display: none
 
-.circle
-    background: #51677F
-    border-radius: 200px
-    height: 200px
-    width: 200px
-    display: table
-    img
-      vertical-align: middle
-      display: table-cell
-      width: 120px
-      
+.text-xs
+  @include font-scale(xs)
+
+.custom-social-btn
+  padding: 2px 4px 2px 2px
+  word-spacing: 7px
+  text-align: left
+
+.blue-question
+  background: $color-tooltip
+  padding: .125rem
+  font-size: .875em
+  vertical-align: middle
+
+.icon
+  width: 18px
+  height: 18px
+  display: block
+  background-size: auto 100%
+  background-repeat: no-repeat
+
+.icon-edit
+  @include font-scale(md)
+
+.img-barcode
+  width: 120px
+
+.g-recaptcha
+  transform: scale(0.7)
+  -webkit-transform: scale(0.7)
+  transform-origin: 0 0
+  -webkit-transform-origin: 0 0
+  margin-bottom: -25px
+
 @media (min-width: 992px)
   .resetlabel
     position: absolute

@@ -5,23 +5,23 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3>DEPOSIT</h3>
-                <div class="col-12 pt-3">
+                <h3 class="modal-title">DEPOSIT</h3>
+                <div class="col-12 pt-2">
                     <code class="wallet-code" id="walletaddress">
                         <span>
                             {{ address }}
                         </span>
-                        <copy-link :content-to-copy="address">
+                        <copy-link :content-to-copy="address" class="c-pointer">
                             <font-awesome-icon :icon="['far', 'copy']">
                             </font-awesome-icon>
                         </copy-link>
                     </code>
                     <div class="clearfix"></div>
-                    <p class="text-center mt-3">
+                    <p class="text-center mt-2">
                         {{ description }}
                     </p>
                 </div>
-                <div class="pt-3">
+                <div class="pt-2 text-center">
                     <button
                         class="btn btn-primary"
                         @click="onSuccess">

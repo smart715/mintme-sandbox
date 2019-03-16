@@ -26,7 +26,7 @@
         },
         data: function() {
             return {
-                icon: 'arrow-down',
+                icon: 'chevron-down',
             };
         },
         computed: {

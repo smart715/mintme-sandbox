@@ -32,7 +32,7 @@ class ProfileController extends AbstractController
         $profile = $profileManager->getProfileByPageUrl($pageUrl);
 
         if (null === $profile) {
-            throw new NotFoundHttpException();
+            return $this->render('pages/profile_404.html.twig');
         }
 
         $form = $this->createForm(EditProfileType::class, $profile);
@@ -41,10 +41,10 @@ class ProfileController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile_view.html.twig', [
                 'token' => $profile->getToken(),
-                'profile' => $normalizer->normalize($profile, null, [ 'groups' => [ 'Default' ] ]),
+                'profile' => $profile,
                 'form' =>  $form->createView(),
                 'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
-                'editFormShowFirst' => $session->get('editFormShowFirst') || $form->getErrors(true)->count(),
+                'editFormShowFirst' => !! $form->getErrors(true)->count(),
             ]);
         }
 
@@ -57,8 +57,6 @@ class ProfileController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
-
-        $session->set('editFormShowFirst', false);
 
         return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }
@@ -90,8 +88,6 @@ class ProfileController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
-
-        $session->set('editFormShowFirst', true);
 
         return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }

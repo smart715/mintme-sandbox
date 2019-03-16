@@ -7,12 +7,14 @@
 
 {% block formBody %}
     {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
-        {{ form_row(form.email, { 'inline': true, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required'} }) }}
-        {{ form_row(form.plainPassword.first, { 'inline': true }) }}
-        {{ form_row(form.plainPassword.second, { 'inline': true }) }}
-        {{ form_row(form.recaptcha, { 'inline': true }) }}
-        <div class="text-center">
-            <input type="submit" class="btn btn-primary px-4" value="Sign Up">
+        {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required'} }) }}
+        {{ form_row(form.plainPassword.first, { 'inline': false }) }}
+        {{ form_row(form.plainPassword.second, { 'inline': false }) }}
+        <div class="py-2">
+            {{ form_row(form.recaptcha, { 'inline': false }) }}
+        </div>
+        <div class="text-left">
+            <input type="submit" class="btn btn-primary" value="Sign Up">
             <span class="px-3">or</span>
             <a class="link-light" href="{{ path('fos_user_security_login') }}">Log In</a>
         </div>

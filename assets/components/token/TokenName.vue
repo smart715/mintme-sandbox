@@ -1,11 +1,15 @@
 <template>
-    <h1>
-        <span v-if="!editingName">{{ currentName }}</span>
+    <div>
         <template v-if="editable">
-            <input type="text" v-model="newName" v-if="editingName" >
-            <font-awesome-icon class="icon c-pointer" :icon="icon" transform="shrink-4 up-1.5" @click="editName" />
+            <input type="text" v-model="newName" v-if="editingName">
+            <font-awesome-icon
+                class="icon-edit c-pointer align-middle"
+                :icon="icon"
+                transform="shrink-4 up-1.5"
+                @click="editName" />
         </template>
-    </h1>
+        <span v-if="!editingName">{{ currentName }}</span>
+    </div>
 </template>
 
 <script>
@@ -27,7 +31,6 @@ export default {
     name: 'TokenName',
     props: {
         name: String,
-        csrfToken: String,
         updateUrl: String,
         editable: Boolean,
     },
@@ -58,7 +61,6 @@ export default {
         doEditName: function() {
             this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
-                _csrf_token: this.csrfToken,
             })
             .then((response) => {
                 if (response.status === HTTP_ACCEPTED) {

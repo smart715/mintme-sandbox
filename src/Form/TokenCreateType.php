@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Token\Token;
+use App\Form\DataTransformer\NameTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -15,6 +16,13 @@ use Symfony\Component\Validator\Constraints\RegexValidator;
 
 class TokenCreateType extends AbstractType
 {
+    /** @var NameTransformer  */
+    private $nameTransformer;
+
+    public function __construct(NameTransformer $nameTransformer)
+    {
+        $this->nameTransformer = $nameTransformer;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -35,6 +43,9 @@ class TokenCreateType extends AbstractType
                 ],
             ])
         ;
+
+        $builder->get('name')
+            ->addModelTransformer($this->nameTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

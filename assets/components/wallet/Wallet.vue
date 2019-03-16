@@ -1,15 +1,16 @@
 <template>
-    <div>
-        <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
+    <div class="px-0 py-2">
+        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Balance
         </div>
         <div class="table-responsive">
-            <font-awesome-icon
+            <div v-if="showLoadingIconP" class="p-5 text-center">
+                <font-awesome-icon
                     icon="circle-notch"
                     spin class="loading-spinner"
                     fixed-width
-                    v-if="showLoadingIconP"
-            />
+                    />
+            </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template slot="name" slot-scope="data">
                     {{ data.item.fullname }} ({{ data.item.name }})
@@ -18,32 +19,37 @@
                     {{ data.value | toMoney }}
                 </template>
                 <template slot="action" slot-scope="data">
-                    <font-awesome-icon
-                            :title="withdrawTooltip"
-                            v-tippy="tooltipOptions"
-                            icon="shopping-cart"
-                            class="text-orange c-pointer"
-                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)"
-                    />
-                    <font-awesome-icon
-                            :title="depositTooltip"
-                            v-tippy="tooltipOptions"
-                            icon="piggy-bank"
-                            class="text-orange c-pointer"
-                            @click="openDeposit(data.item.name)"
-                            size="1x"/>
+                    <div
+                        class="row">
+                        <div class="d-flex flex-row c-pointer pl-2"
+                            @click="openDeposit(data.item.name)">
+                            <div><i class="icon-deposit"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                            </div>
+                        </div>
+                        <div
+                            class="d-flex flex-row c-pointer pl-2"
+                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                                <div><i class="icon-withdraw"></i></div>
+                                <div>
+                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                </div>
+                        </div>
+                    </div>
                 </template>
             </b-table>
         </div>
-        <div class="card-title font-weight-bold pl-3 pt-3 pb-1">
+        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Web tokens you own
         </div>
-        <font-awesome-icon
+        <div class="text-center p-5" v-if="showLoadingIcon">
+            <font-awesome-icon
                 icon="circle-notch"
                 spin class="loading-spinner"
                 fixed-width
-                v-if="showLoadingIcon"
-        />
+                />
+        </div>
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template slot="name" slot-scope="data">
@@ -131,13 +137,13 @@ export default {
             fee: '0',
             amount: '0',
             predefinedTokenFields: {
-                name: {label: 'Name', sortable: true},
-                available: {label: 'Amount', sortable: true},
+                name: {label: 'Name'},
+                available: {label: 'Amount'},
                 action: {label: 'Actions', sortable: false},
             },
             tokenFields: {
-                name: {label: 'Name', sortable: true},
-                available: {label: 'Amount', sortable: true},
+                name: {label: 'Name'},
+                available: {label: 'Amount'},
             },
         };
     },
