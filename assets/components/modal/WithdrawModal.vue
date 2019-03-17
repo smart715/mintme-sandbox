@@ -4,8 +4,8 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3>WITHDRAW({{ currency }})</h3>
-                <div class="col-12 pt-3">
+                <h3 class="modal-title">WITHDRAW({{ currency }})</h3>
+                <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
                         Address:
                     </label>
@@ -19,7 +19,7 @@
                         Address can't be empty and must contain alphanumeric letters only.
                     </div>
                 </div>
-                <div class="col-12 pt-3">
+                <div class="col-12 pt-2">
                     <label for="wamount"  class="d-block text-left">
                         Amount (balance):
                     </label>
@@ -41,23 +41,23 @@
                         You can't set bigger amount than your own balance. Amount must be decimal.
                     </div>
                 </div>
-                <div class="col-12 pt-3 text-left">
+                <div class="col-12 text-center">
                     <label>
                         Amount {{ currency }}:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney }}</span>
+                    <span>{{ fullAmount | toMoney }}</span>
                 </div>
-                <div class="pt-3">
+                <div class="col-12 pt-2 text-center">
                     <button
                         class="btn btn-primary"
                         @click="onWithdraw">
-                        WITHDRAW
+                        Withdraw
                     </button>
                     <a
                         href="#"
                         class="ml-3"
                         @click="onCancel">
-                        <slot name="cancel">CANCEL</slot>
+                        <slot name="cancel">Cancel</slot>
                     </a>
                 </div>
             </div>

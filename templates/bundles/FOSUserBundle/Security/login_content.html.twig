@@ -1,7 +1,7 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
 
-{% set formHeader = "LOGIN" %}
+{% set formHeader = "Log In" %}
 {% set featured = true %}
 
 {% block formBody %}
@@ -18,8 +18,8 @@
         <div class="form-group row">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="col-12 col-lg-4 text-left text-lg-right">
-                        <label for="inputEmail" class="d-block label-featured">Email</label>
+                    <div class="col-12  text-left">
+                        <label for="inputEmail" class="d-block label-featured">Email:</label>
                     </div>
                     <div class="col">
                         <input type="email" name="_username"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
@@ -30,8 +30,8 @@
         <div class="form-group row">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="col-12 col-lg-4 text-left text-lg-right">
-                        <label for="inputPassword" class="d-block label-featured">Password</label>
+                    <div class="col-12  text-left">
+                        <label for="inputPassword" class="d-block label-featured">Password:</label>
                     </div>
                     <div class="col">
                         <input type="password" name="_password" required="required" id="inputPassword" class="form-control">
@@ -39,10 +39,10 @@
                 </div>
             </div>
         </div>
-        <div class="form-group row my-1 mb-3">
+        <div class="form-group row my-1">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="col-12 col-lg-4 text-left text-lg-right"></div>
+                    <div class="col-12  text-left"></div>
                     <div class="col">
                         <label class="custom-control custom-checkbox">
                             <input type="checkbox" id="remember_me" name="_remember_me" class="custom-control-input">
@@ -55,7 +55,7 @@
         <div class="form-group row">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="col-12 col-lg-4 text-left text-lg-right"></div>
+                    <div class="col-12  text-left"></div>
                     <div class="col">
                         {% if form_errors(form)|length > 0 %}
                             <div class="bg-danger text-white">{{ form_errors(form) }}</div>
@@ -65,15 +65,15 @@
                 </div>
             </div>
         </div>
-        <div class="form-group row">
-            <div class="col-md-12 text-center">
-                <input type="submit" id="_submit" name="_submit" class="btn btn-primary rounded-0 px-4" value="Log In">
+        <div class="form-group row ">
+            <div class="col-md-12 text-left">
+                <input type="submit" id="_submit" name="_submit" class="btn btn-primary rounded-0 text-white" value="Log In">
                 <span class="px-2">or</span>
-                <a class="link-light" href="{{ path('fos_user_registration_register') }}">Sign Up</a>
+                <a href="{{ path('fos_user_registration_register') }}">Sign Up</a>
             </div>
         </div>
-        <div class="text-center text-white">
-            <a class="link-light" href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
+        <div class="text-left text-white">
+            <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
         </div>
         {% if csrf_token %}
             <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />

@@ -15,33 +15,42 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fix-height">
+                <div class="table-responsive fix-height" ref="history">
                     <template v-if="loaded">
-                    <b-table v-if="hasOrders" ref="table"
-                        :items="ordersList"
-                        :fields="fields">
-                        <template slot="order_maker" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
-                        </template>
-                        <template slot="order_trader" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
-                        </template>
-                    </b-table>
-                    <div v-if="!hasOrders">
-                        <h4 class="text-center p-5">No deal was made yet</h4>
-                    </div>
+                        <b-table v-if="hasOrders" class="w-100" ref="table"
+                            :items="ordersList"
+                            :fields="fields">
+                            <template slot="order_maker" slot-scope="row">
+                                {{ row.value }}
+                                <img
+                                    src="../../../img/avatar.png"
+                                    class="float-right"
+                                    alt="avatar">
+                            </template>
+                            <template slot="order_trader" slot-scope="row">
+                                {{ row.value }}
+                                <img
+                                    src="../../../img/avatar.png"
+                                    class="float-right"
+                                    alt="avatar">
+                            </template>
+                        </b-table>
+                        <div v-if="!hasOrders">
+                            <p class="text-center p-5">No deal was made yet</p>
+                        </div>
                     </template>
                     <template v-else>
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        <div class="p-5 text-center">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </div>
                     </template>
+                </div>
+                <div class="text-center pb-2" v-if="showDownArrow">
+                    <img
+                        src="../../../img/down-arrows.png"
+                        class="icon-arrows-down c-pointer"
+                        alt="arrow down"
+                        @click="scrollDown">
                 </div>
             </div>
         </div>
@@ -96,22 +105,25 @@ export default {
         ordersList: function() {
             return this.history !== false ? this.history.map((order) => {
                 return {
-                    date_time: new Date(order.timestamp * 1000).toDateString(),
-                    order_maker: order.maker != null
+                    dateTime: new Date(order.timestamp * 1000).toDateString(),
+                    orderMaker: order.maker != null
                         ? order.maker.profile ? this.profileToString(order.maker.profile): 'Anonymous'
                         : '',
-                    order_trader: order.taker != null
+                    orderTrader: order.taker != null
                         ? order.taker.profile ? this.profileToString(order.taker.profile): 'Anonymous'
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
-                    price_per_token: toMoney(order.price),
-                    token_amount: toMoney(order.amount),
-                    web_amount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    pricePerToken: toMoney(order.price),
+                    tokenAmount: toMoney(order.amount),
+                    webAmount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                 };
             }) : [];
         },
         loaded: function() {
             return this.history !== null;
+        },
+        showDownArrow: function() {
+            return (this.loaded && this.history.length > 7);
         },
     },
     mounted: function() {
@@ -126,6 +138,10 @@ export default {
                 this.history = result.data;
                 this.$refs.table.refresh();
             }).catch((error) => { });
+        },
+        scrollDown: function() {
+            let parentDiv = this.$refs.history;
+            parentDiv.scrollTop = parentDiv.scrollHeight;
         },
         profileToString: function(profile) {
             return profile.firstName + profile.lastName;
