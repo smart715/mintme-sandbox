@@ -102,7 +102,10 @@ class TokensAPIController extends FOSRestController
         $this->denyAccessUnlessGranted('edit', $token);
 
         if (null === $token->getWebsiteConfirmationToken()) {
-            return $this->view(null, Response::HTTP_BAD_REQUEST);
+            return $this->view([
+                'verified' => false,
+                'errors' => ['File not downloaded yet'],
+            ], Response::HTTP_ACCEPTED);
         }
 
         $url = $request->get('url');
