@@ -157,7 +157,7 @@ export default {
                 if (this.markets.hasOwnProperty(market)) {
                     markets[market] = this.getSanitizedMarket(
                         this.markets[market].cryptoSymbol,
-                        this.markets[market].token.name,
+                        this.markets[market].tokenName,
                         this.getPercentage(
                             parseFloat(this.markets[market].last),
                             parseFloat(this.markets[market].open)
