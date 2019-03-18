@@ -105,7 +105,7 @@ export default {
             const changePercentage = this.getPercentage(marketLastPrice, marketOpenPrice);
 
             const marketCurrency = this.markets[marketName].cryptoSymbol;
-            const marketToken = this.markets[marketName].token.name;
+            const marketToken = this.markets[marketName].tokenName;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
