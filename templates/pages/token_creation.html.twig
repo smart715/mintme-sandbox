@@ -3,21 +3,21 @@
 {% block title %}mintMe | Token Creation{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row py-3 justify-content-center">
-            <div class="col-xs-12 col-lg-10 col-xl-6">
+    <div class="container" id="token">
+        <div class="row pt-5 justify-content-center">
+            <div class="col-lg-4 col-md-6">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
                     </div>
-                    <div class="card-body">
+                    <div class="card-body py-2">
                         {{ form_start(form) }}
                         {{ form_label(form.name) }}
                         {{ form_errors(form) }}
                         {{ form_errors(form.name) }}
                         {{ form_widget(form.name) }}
                         <div class="form-group row pt-2">
-                            <div class="col-md-12 text-center">
+                            <div class="col-md-12 text-left">
                                 <input type="submit" class="btn btn-primary" value="Create token"/>
                                 <a class="p-3" href="javascript:history.back()">Cancel</a>
                             </div>
@@ -27,17 +27,20 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="modal modal-alert {{ profileCreated ? '' : 'show' }}" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header"></div>
-                <div class="modal-body text-center pt-5">
-                    <p>You need to create profile, only then you will be able to create token</p>
+        <modal
+            no-close-on-backdrop
+            :visible="{{ profileCreated ? 'false' : 'true' }}">
+            <template slot="close"> &nbsp; </template>
+            <template slot="body">
+                <div class="text-center">
+                    <p class="text-white">You need to create profile, only then you will be able to create token</p>
                     <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
                 </div>
-            </div>
-        </div>
+            </template>
+        </modal>
     </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/token_creation.js') }}"></script>
 {% endblock %}

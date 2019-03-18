@@ -20,7 +20,7 @@
                     </template>
                 </guide>
             </div>
-            <div>
+            <div class="text-xs">
                 explanation about token release period. Three maybe four sentences. how it works.
             </div>
         </b-col>
@@ -69,9 +69,9 @@
             </b-row>
         </b-col>
         <b-col cols="12" class="mt-3">
-            <div class="text-right">
+            <div class="text-left">
                 <b-button type="submit" class="px-4" variant="primary" @click="saveReleasePeriod">Save</b-button>
-                <b-button class="px-4" @click="cancelAction">Cancel</b-button>
+                <a class="pl-3 c-pointer" @click="cancelAction">Cancel</a>
             </div>
         </b-col>
     </b-row>

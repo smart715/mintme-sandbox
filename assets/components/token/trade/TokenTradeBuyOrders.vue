@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="card">
+    <div class="h-100">
+        <div class="card h-100">
             <div class="card-header">
                 Buy Orders
                 <template v-if="loaded">
@@ -17,11 +17,13 @@
                 </span>
                 </template>
                 <template v-else>
-                    <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
                 </template>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fix-height">
+                <div class="table-responsive fix-height" ref="buyorders">
                     <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
                         :items="ordersList"
@@ -35,12 +37,21 @@
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
-                        <h4 class="text-center p-5">No order was added yet</h4>
+                        <p class="text-center p-5">No order was added yet</p>
                     </div>
                     </template>
                     <template v-else>
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        <div class="p-5 text-center">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </div>
                     </template>
+                </div>
+                <div class="text-center pb-2" v-if="showDownArrow">
+                    <img
+                        src="../../../img/down-arrows.png"
+                        class="icon-arrows-down c-pointer"
+                        alt="arrow down"
+                        @click="scrollDown">
                 </div>
             </div>
         </div>
@@ -99,8 +110,15 @@ export default {
         loaded: function() {
             return this.buyOrders !== null;
         },
+        showDownArrow: function() {
+            return (this.buyOrders.length > 7);
+        },
     },
     methods: {
+        scrollDown: function() {
+            let parentDiv = this.$refs.buyorders;
+            parentDiv.scrollTop = parentDiv.scrollHeight;
+        },
         profileToString: function(profile) {
             return profile.firstName + profile.lastName;
         },
