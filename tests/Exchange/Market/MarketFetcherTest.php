@@ -18,6 +18,36 @@ use PHPUnit\Framework\TestCase;
 
 class MarketFetcherTest extends TestCase
 {
+    /** @dataProvider marketInfoProvider */
+    public function testGetMarketInfo(bool $hasError, ?array $rpcResult): void
+    {
+        $method = 'market.status';
+        $params = ["TOK000000000001WEB", 86400];
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($rpcResult);
+
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
+
+        $this->assertEquals(
+            $rpcResult,
+            $marketFetcher->getMarketInfo('TOK000000000001WEB', 86400)
+        );
+    }
+
+    public function marketInfoProvider(): array
+    {
+        return [
+            [false, $this->getMarketInfoResult()],
+        ];
+    }
+
     /** @dataProvider pendingSellOrdersProvider */
     public function testGetPendingSellOrders(bool $hasError, ?array $rpcResult): void
     {
@@ -37,6 +67,7 @@ class MarketFetcherTest extends TestCase
         if ($hasError) {
             $this->expectException(FetchException::class);
         }
+
         $this->assertEquals(
             $rpcResult['orders'],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
@@ -183,6 +214,22 @@ class MarketFetcherTest extends TestCase
     private function createMoney(int $value): Money
     {
         return new Money($value, new Currency(MoneyWrapper::TOK_SYMBOL));
+    }
+
+    private function getMarketInfoResult(): array
+    {
+        return [
+            'result' => [
+                'period' => 86400,
+                'last' => '2',
+                'open' => '5',
+                'close' => '2',
+                'high' => '5',
+                'low' => '2',
+                'volume' => '1.98',
+                'deal' => '6.93',
+            ],
+        ];
     }
 
     private function getPendingResult(int $side): array
