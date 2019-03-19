@@ -29,7 +29,7 @@
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
-                                <a :href="row.item.trader_url">
+                                <a :href="row.item.traderUrl">
                                     <span>{{ row.value }}</span>
                                     <img
                                         src="../../../img/avatar.png"

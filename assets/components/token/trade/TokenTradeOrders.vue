@@ -76,7 +76,7 @@ export default {
                 amount: {
                     label: 'Amount',
                 },
-                sum_web: {
+                sumWeb: {
                     label: 'Sum WEB',
                 },
                 trader: {
@@ -99,9 +99,9 @@ export default {
                 return {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
-                    sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
-                    trader: order.maker != null ? this.truncateFullName(order.maker.profile) : 'Anonymous',
-                    trader_url: this.$routing.generate('token_show', {
+                    sumWeb: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    trader: order.maker !== null ? this.truncateFullName(order.maker.profile) : 'Anonymous',
+                    traderUrl: this.$routing.generate('token_show', {
                         name: order.maker.profile.token.name,
                     }),
                     side: order.side,
@@ -122,7 +122,7 @@ export default {
             let filtered = [];
             let grouped = {};
             let owner = false;
-            this.clone(orders).forEach( (item) => {
+            this.clone(orders).forEach((item) => {
                 if (grouped[item.price] === undefined) {
                     grouped[item.price] = [];
                 }
@@ -162,8 +162,7 @@ export default {
             let deleteOrdersUrl = this.$routing.generate('orders_cancel', {
                 'market': this.removeOrders[0].market.hiddenName,
             });
-            let data = {'ids': this.removeOrders.map((order) => order.id)};
-            this.$axios.single.post(deleteOrdersUrl, data)
+            this.$axios.single.post(deleteOrdersUrl, {'order_data': this.removeOrders.map((order) => order.id)})
                 .catch(() => {
                     this.$toasted.show('Service unavailable, try again later');
                 });

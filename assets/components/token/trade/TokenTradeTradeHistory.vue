@@ -110,16 +110,16 @@ export default {
             return this.history !== false ? this.history.map((order) => {
                 return {
                     dateTime: new Date(order.timestamp * 1000).toDateString(),
-                    orderMaker: order.maker != null
+                    orderMaker: order.maker !== null
                         ? order.maker.profile ? this.truncateFullName(order.maker.profile): 'Anonymous'
                         : '',
-                    orderTrader: order.taker != null
+                    orderTrader: order.taker !== null
                         ? order.taker.profile ? this.truncateFullName(order.taker.profile): 'Anonymous'
                         : '',
-                    makerUrl: order.maker != null
+                    makerUrl: order.maker.profile !== null
                         ? this.$routing.generate('token_show', {name: order.maker.profile.token.name})
                         : '',
-                    takerUrl: order.taker != null
+                    takerUrl: order.taker.profile !== null
                         ? this.$routing.generate('token_show', {name: order.taker.profile.token.name})
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',

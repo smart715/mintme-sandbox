@@ -67,7 +67,7 @@ class OrdersAPIController extends FOSRestController
 
     /**
      * @Rest\Post("/cancel/{market}", name="orders_cancel", options={"expose"=true})
-     * @Rest\RequestParam(name="ids", allowBlank=false)
+     * @Rest\RequestParam(name="order_data", allowBlank=false, description="array of order id's")
      * @Rest\View()
      */
     public function cancelOrders(string $market, ParamFetcherInterface $request): View
@@ -75,11 +75,8 @@ class OrdersAPIController extends FOSRestController
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
-        $response = [
-                'result' => [],
-                'message' => [],
-            ];
-        foreach ($request->get('ids') as $id) {
+
+        foreach ($request->get('order_data') as $id) {
             $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
             $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
 
@@ -97,15 +94,9 @@ class OrdersAPIController extends FOSRestController
                 new Money('0', new Currency($crypto->getSymbol())),
                 ""
             );
-
-            $tradeResult = $this->trader->cancelOrder($order);
-            array_push($response['result'], $tradeResult->getResult());
-            array_push($response['message'], $tradeResult->getMessage());
+            $this->trader->cancelOrder($order);
         }
-        return $this->view([
-            'result' => $response['result'],
-            'message' => $response['message'],
-        ]);
+        return $this->view(Response::HTTP_OK);
     }
 
     /**

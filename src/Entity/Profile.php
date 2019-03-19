@@ -90,7 +90,6 @@ class Profile
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
-     * @Groups({"Default"})
      * @var Token|null
      */
     protected $token;
@@ -229,7 +228,7 @@ class Profile
         return $this->user->getEmail();
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"Default", "API"}) */
     public function getToken(): ?Token
     {
         return $this->token;
