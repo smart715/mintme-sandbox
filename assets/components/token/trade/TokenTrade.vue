@@ -45,6 +45,7 @@
                         :place-order-url="placeOrderUrl"
                         :balance="tokenBalance"
                         :token-hidden-name="tokenHiddenName"
+                        :is-owner="isOwner"
                 />
                 <template v-else>
                     <div class="p-5 text-center text-white">
@@ -119,6 +120,7 @@ export default {
         tokenName: String,
         placeOrderUrl: String,
         tokenHiddenName: String,
+        isOwner: Boolean,
     },
     data() {
         return {
