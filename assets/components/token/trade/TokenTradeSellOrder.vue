@@ -157,6 +157,7 @@ export default {
         balance: [String, Boolean],
         tokenHiddenName: String,
         currency: String,
+        isOwner: Boolean,
     },
     data() {
         return {
@@ -219,6 +220,11 @@ export default {
 
         this.addMessageHandler((response) => {
             if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.tokenHiddenName)) {
+                if (!this.isOwner) {
+                    this.immutableBalance = response.params[0][this.tokenHiddenName].available;
+                    return;
+                }
+
                 this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.tokenName}))
                     .then((res) => {
                         this.immutableBalance = res.data ?
