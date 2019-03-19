@@ -248,6 +248,7 @@ export default {
                         this.currentWebsite = this.newWebsite = this.websiteUrl = this.parsedWebsite;
                         this.$toasted.success('Website confirmed successfully');
                         this.showConfirmWebsiteModal = false;
+                        this.editingUrls = false;
                     } else if (response.data.errors.length) {
                         response.data.errors.forEach((error) => this.$toasted.error(error));
                         this.newWebsite = this.currentWebsite;
