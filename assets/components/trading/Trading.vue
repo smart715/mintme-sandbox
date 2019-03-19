@@ -105,7 +105,7 @@ export default {
             const changePercentage = this.getPercentage(marketLastPrice, marketOpenPrice);
 
             const marketCurrency = this.markets[marketName].cryptoSymbol;
-            const marketToken = this.markets[marketName].token.name;
+            const marketToken = this.markets[marketName].tokenName;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -157,7 +157,7 @@ export default {
                 if (this.markets.hasOwnProperty(market)) {
                     markets[market] = this.getSanitizedMarket(
                         this.markets[market].cryptoSymbol,
-                        this.markets[market].token.name,
+                        this.markets[market].tokenName,
                         this.getPercentage(
                             parseFloat(this.markets[market].last),
                             parseFloat(this.markets[market].open)
