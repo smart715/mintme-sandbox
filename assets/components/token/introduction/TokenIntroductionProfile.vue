@@ -109,15 +109,14 @@
             </div>
         </div>
         <modal
+            class="text-white"
             :visible="showConfirmWebsiteModal"
             @close="showConfirmWebsiteModal = false">
-            <template slot="header">
-                <h5 class="modal-title">Website Confirmation</h5>
-            </template>
             <template slot="body">
+                <h5 class="modal-title text-center mb-2">Website Confirmation</h5>
                 <div class="row">
                     <div class="col-12">
-                        <ol>
+                        <ol class="pl-3">
                             <li>
                                 Download
                                 <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
@@ -246,7 +245,7 @@ export default {
             this.$axios.single.post(this.confirmWebsiteUrl, {url: this.parsedWebsite})
                 .then((response) => {
                     if (response.data.verified) {
-                        this.currentWebsite = this.parsedWebsite;
+                        this.currentWebsite = this.newWebsite = this.websiteUrl = this.parsedWebsite;
                         this.$toasted.success('Website confirmed successfully');
                         this.showConfirmWebsiteModal = false;
                     } else if (response.data.errors.length) {

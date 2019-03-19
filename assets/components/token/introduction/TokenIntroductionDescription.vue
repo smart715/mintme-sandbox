@@ -15,7 +15,7 @@
 
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row fix-height">
                     <div class="col-12">
                         <span class="card-header-icon">
                             <font-awesome-icon
@@ -42,12 +42,12 @@
                                 </div>
                                 <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
-                                <limited-textarea
+                                <textarea
                                     class="form-control"
-                                    :value="newDescription"
+                                    v-model="newDescription"
                                     max="20000"
                                     @get-value="getValue">
-                                </limited-textarea>
+                                </textarea>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription">Save</button>
                                     <a class="pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
