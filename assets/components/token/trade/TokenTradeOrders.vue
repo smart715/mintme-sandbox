@@ -120,30 +120,31 @@ export default {
         },
         groupByPrice: function(orders) {
             let filtered = [];
-            let grouped = {};
             let owner = false;
-            this.clone(orders).forEach((item) => {
-                if (grouped[item.price] === undefined) {
-                    grouped[item.price] = [];
+            let grouped = this.clone(orders).reduce((a, e) => {
+                if (a[e.price] === undefined) {
+                    a[e.price] = [];
                 }
-                grouped[item.price].push(item);
-            });
-            for (let orders in grouped) {
-                if (grouped.hasOwnProperty(orders)) {
-                    let sum = grouped[orders].reduce((sum, order) => parseFloat(order.amount) + sum, 0);
-                    grouped[orders].sort((first, second) => first.maker.id - second.maker.id);
-                    grouped[orders].forEach((order, i, arr) => {
+                a[e.price].push(e);
+                return a;
+            }, {});
+
+            Object.values(grouped).forEach((e) => {
+                let sum = e.reduce((a, e) => parseFloat(e.amount) + a, 0);
+
+                e.sort((first, second) => first.maker.id - second.maker.id)
+                    .forEach((order, i, arr) => {
                         owner = owner === true || order.maker.id === this.userId;
                         if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
                             order.amount = new Decimal(order.amount).add(arr[i-1].amount);
                         }
                     });
-                    grouped[orders].sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
-                    grouped[orders][0].amount = sum;
-                    grouped[orders][0].owner = owner;
-                    filtered.push(grouped[orders][0]);
-                }
-            }
+
+                e.sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
+                e[0].amount = sum;
+                e[0].owner = owner;
+                filtered.push(e[0]);
+            });
             return filtered;
         },
         removeOrderModal: function(row) {
