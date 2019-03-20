@@ -130,7 +130,7 @@ export default {
 
             Object.values(grouped).forEach((e) => {
                 let obj = e.reduce((a, e) => {
-                    a.owner = a.owner === true ? true : e.maker.id === this.userId;
+                    a.owner = a.owner || e.maker.id === this.userId;
                     a.orders.push(e);
                     a.sum = new Decimal(a.sum).add(e.amount);
 
