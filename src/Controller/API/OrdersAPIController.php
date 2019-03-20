@@ -67,7 +67,7 @@ class OrdersAPIController extends FOSRestController
 
     /**
      * @Rest\Post("/cancel/{market}", name="orders_cancel", options={"expose"=true})
-     * @Rest\RequestParam(name="order_data", allowBlank=false, description="array of order id's")
+     * @Rest\RequestParam(name="order_data", allowBlank=false, description="array of orders ids")
      * @Rest\View()
      */
     public function cancelOrders(string $market, ParamFetcherInterface $request): View

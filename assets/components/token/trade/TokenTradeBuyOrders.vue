@@ -80,7 +80,7 @@ export default {
     },
     computed: {
         total: function() {
-            return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sum_web) + sum, 0));
+            return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sumWeb) + sum, 0));
         },
         hasOrders: function() {
               return this.ordersList.length > 0;
