@@ -120,7 +120,6 @@ export default {
         },
         groupByPrice: function(orders) {
             let filtered = [];
-            let owner = false;
             let grouped = this.clone(orders).reduce((a, e) => {
                 if (a[e.price] === undefined) {
                     a[e.price] = [];
@@ -130,20 +129,26 @@ export default {
             }, {});
 
             Object.values(grouped).forEach((e) => {
-                let sum = e.reduce((a, e) => parseFloat(e.amount) + a, 0);
+                let obj = e.reduce((a, e) => {
+                    a.owner = a.owner === true ? true : e.maker.id === this.userId;
+                    a.orders.push(e);
+                    a.sum = new Decimal(a.sum).add(e.amount);
 
-                e.sort((first, second) => first.maker.id - second.maker.id)
-                    .forEach((order, i, arr) => {
-                        owner = owner === true || order.maker.id === this.userId;
-                        if (arr[i-1] !== undefined && arr[i-1].maker.id === order.maker.id) {
-                            order.amount = new Decimal(order.amount).add(arr[i-1].amount);
-                        }
-                    });
+                    let amount = a.orders.filter((order) => order.maker.id === e.maker.id)
+                        .reduce((a, e) => new Decimal(a).add(e.amount), 0);
 
-                e.sort((first, second) => parseFloat(second.amount) - parseFloat(first.amount));
-                e[0].amount = sum;
-                e[0].owner = owner;
-                filtered.push(e[0]);
+                    if (parseFloat(a.main.amount) < parseFloat(amount)) {
+                        a.main.amount = amount;
+                        a.main.order = e;
+                    }
+
+                    return a;
+                }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});
+
+                let order = obj.main.order;
+                order.amount = obj.sum;
+                order.owner = obj.owner;
+                filtered.push(order);
             });
             return filtered;
         },
