@@ -265,6 +265,16 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this->referralCode ?? '';
     }
 
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function getTawkHash(string $api_key): string
+    {
+        return hash_hmac('sha256', $this->getUsername(), $api_key);
+    }
+
     /** @ORM\PrePersist() */
     public function prePersist(): void
     {
