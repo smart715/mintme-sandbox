@@ -116,11 +116,13 @@ export default {
                     orderTrader: order.taker !== null
                         ? order.taker.profile ? this.truncateFullName(order.taker.profile): 'Anonymous'
                         : '',
-                    makerUrl: order.maker.profile !== null
-                        ? this.$routing.generate('token_show', {name: order.maker.profile.token.name})
+                    makerUrl: order.maker !== null
+                        ? order.maker.profile ?
+                            this.$routing.generate('token_show', {name: order.maker.profile.token.name}) : ''
                         : '',
-                    takerUrl: order.taker.profile !== null
-                        ? this.$routing.generate('token_show', {name: order.taker.profile.token.name})
+                    takerUrl: order.taker !== null
+                        ? order.taker.profile ?
+                            this.$routing.generate('token_show', {name: order.taker.profile.token.name}) : ''
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     pricePerToken: toMoney(order.price),
