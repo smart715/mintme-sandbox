@@ -14,7 +14,7 @@
                     Are you sure?
                 </span>
             </confirm-modal>
-            <div class="col-12 col-md-6 mt-3">
+            <div class="col-12 col-lg-6 pr-lg-2 pl-lg-0 mt-3">
                 <token-trade-buy-orders
                         v-if="ordersLoaded"
                         :orders-list="filteredBuyOrders"
@@ -27,7 +27,7 @@
                     </div>
                 </template>
             </div>
-            <div class="col-12 col-md-6 mt-3">
+            <div class="col-12 col-lg-6 pr-lg-0 pl-lg-2 mt-3">
                 <token-trade-sell-orders
                         v-if="ordersLoaded"
                         :orders-list="filteredSellOrders"
@@ -112,8 +112,8 @@ export default {
         truncateFullName: function(profile) {
             let first = profile.firstName;
             let second = profile.lastName;
-            if ((first + second).length > 23) {
-                return first.slice(0, 5) + '. ' + second.slice(0, 10) + '.';
+            if ((first + second).length > 9) {
+                return second.slice(0, 6) + '. ' + first.slice(0, 1);
             } else {
                 return first + ' ' + second;
             }

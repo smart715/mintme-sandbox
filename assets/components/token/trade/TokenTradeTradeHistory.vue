@@ -15,7 +15,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fix-height" ref="history">
+                <div class="table-responsive table-orders" ref="history">
                     <template v-if="loaded">
                         <b-table v-if="hasOrders" class="w-100" ref="table"
                             :items="ordersList"
@@ -154,8 +154,8 @@ export default {
         truncateFullName: function(profile) {
             let first = profile.firstName;
             let second = profile.lastName;
-            if ((first + second).length > 23) {
-                return first.slice(0, 5) + '. ' + second.slice(0, 10) + '.';
+            if ((first + second).length > 9) {
+                return second.slice(0, 6) + '. ' + first.slice(0, 1);
             } else {
                 return first + ' ' + second;
             }
