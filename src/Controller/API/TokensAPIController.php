@@ -133,7 +133,7 @@ class TokensAPIController extends FOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in")
-     * @Rest\RequestParam(name="released", allowBlank=false, requirements="[1-9]{1,2}")
+     * @Rest\RequestParam(name="released", allowBlank=false, requirements="[0-9][1-9]")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false, requirements="[1-8]0")
      */
     public function setTokenReleasePeriod(
