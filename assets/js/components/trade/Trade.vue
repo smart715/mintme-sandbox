@@ -153,10 +153,6 @@ export default {
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
 
-            if (!this.loggedIn) {
-                return;
-            }
-
             this.updateAssets();
         });
     },
@@ -174,6 +170,7 @@ export default {
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
                     this.balances = {...res.data.common, ...res.data.predefined};
+
                     this.authorize()
                         .then(() => {
                             this.sendMessage(JSON.stringify({
