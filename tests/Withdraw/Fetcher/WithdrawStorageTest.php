@@ -16,22 +16,22 @@ class WithdrawStorageTest extends TestCase
         $rpc = $this->createMock(JsonRpcInterface::class);
         /** @var JsonRpcResponse|MockObject $rpc */
         $response = $this->createMock(JsonRpcResponse::class);
-        $response->method('getResult')->willReturn(['balance' => 99]);
+        $response->method('getResult')->willReturn(['balance' => '99']);
 
         $rpc->method('send')->willReturn($response);
 
         $storage = new WithdrawStorage($rpc, 'mintme');
 
-        $this->assertEquals(['balance' => 99], $storage->requestHistory(1, 0, 10));
-        $this->assertEquals(99, $storage->requestBalance('web'));
+        $this->assertEquals(['balance' => '99'], $storage->requestHistory(1, 0, 10));
+        $this->assertEquals('99', $storage->requestBalance('web'));
 
         $response->method('hasError')->willReturn(true);
         $this->expectException(\Throwable::class);
         $storage->requestHistory(1, 0, 10);
-        $this->assertEquals(0, $storage->requestBalance('web'));
+        $this->assertEquals('0', $storage->requestBalance('web'));
 
         $rpc->method('send')->willThrowException(new \Exception());
         $this->assertEquals([], $storage->requestHistory(1, 0, 10));
-        $this->assertEquals(0, $storage->requestBalance('web'));
+        $this->assertEquals('0', $storage->requestBalance('web'));
     }
 }

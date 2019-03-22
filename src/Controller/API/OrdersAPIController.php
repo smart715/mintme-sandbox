@@ -98,6 +98,7 @@ class OrdersAPIController extends FOSRestController
             );
             $this->trader->cancelOrder($order);
         }
+
         return $this->view(Response::HTTP_OK);
     }
 
