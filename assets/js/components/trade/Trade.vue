@@ -108,7 +108,6 @@ export default {
         market: Object,
         loggedIn: Boolean,
         tokenName: String,
-        tokenHiddenName: String,
         isOwner: Boolean,
     },
     data() {

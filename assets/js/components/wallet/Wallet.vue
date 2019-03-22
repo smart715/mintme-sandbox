@@ -156,7 +156,7 @@ export default {
         },
         allTokensName: function() {
             return Object.values(this.allTokens).map((token) => {
-                return token.hiddenName;
+                return token.identifier;
             });
         },
         predefinedItems: function() {
@@ -232,7 +232,7 @@ export default {
                 let oToken = data[oTokenName];
 
                 Object.keys(this.predefinedTokens).forEach((token) => {
-                    if (oTokenName === this.predefinedTokens[token].hiddenName) {
+                    if (oTokenName === this.predefinedTokens[token].identifier) {
                         this.predefinedTokens[token].available = Decimal.sub(
                             oToken.available,
                             this.predefinedTokens[token].frozen
@@ -241,7 +241,7 @@ export default {
                 });
 
                 Object.keys(this.tokens).forEach((token) => {
-                    if (oTokenName === this.tokens[token].hiddenName) {
+                    if (oTokenName === this.tokens[token].identifier) {
                         this.tokens[token].available = Decimal.sub(
                             oToken.available,
                             this.tokens[token].frozen
