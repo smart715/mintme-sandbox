@@ -63,7 +63,7 @@ class BalanceResultContainerNormalizer implements NormalizerInterface
             );
 
             $result[$token->getName()] = $this->normalizer->normalize($result[$token->getName()], $format, $context);
-            $result[$token->getName()]['hiddenName'] = $this->tokenNameConverter->convert($token);
+            $result[$token->getName()]['identifier'] = $this->tokenNameConverter->convert($token);
             $result[$token->getName()]['frozen'] = $token->getLockIn() ? $this->moneyWrapper->format(
                 $token->getLockIn()->getFrozenAmount()
             ) : 0;

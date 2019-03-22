@@ -1,6 +1,6 @@
 import '../../js/main';
 import {mount} from '../testHelper';
-import Trading from '../../components/trading/Trading';
+import Trading from '../../js/components/trading/Trading';
 import bPagination from 'bootstrap-vue/es/components/pagination/pagination';
 import bTable from 'bootstrap-vue/es/components/table/table';
 

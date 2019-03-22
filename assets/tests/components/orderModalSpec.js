@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import bModal from 'bootstrap-vue/es/components/modal/modal';
 Vue.component('b-modal', bModal);
-import OrderModal from '../../components/modal/OrderModal';
+import OrderModal from '../../js/components/modal/OrderModal';
 import {mount} from '../testHelper';
 
 describe('OrderModal', () => {

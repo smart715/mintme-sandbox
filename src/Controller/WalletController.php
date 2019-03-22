@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @Route("/wallet")
  * @Security(expression="is_granted('prelaunch')")
  */
-class WalletController extends AbstractController
+class WalletController extends Controller
 {
     /**
      * @Route(name="wallet")
