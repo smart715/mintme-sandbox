@@ -277,7 +277,7 @@ class TokensAPIController extends FOSRestController
             $balanceHandler->balance(
                 $token->getProfile()->getUser(),
                 $token
-            )->getAvailable()
+            )->getAvailable()->subtract($token->getLockIn()->getFrozenAmount())
         );
     }
 }

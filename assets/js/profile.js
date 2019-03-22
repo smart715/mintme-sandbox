@@ -1,4 +1,4 @@
-import LimitedTextarea from '../components/LimitedTextarea.vue';
+import LimitedTextarea from './components/LimitedTextarea.vue';
 new Vue({
     el: '#profile',
     data: {

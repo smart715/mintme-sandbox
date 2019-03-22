@@ -2,9 +2,8 @@
 
 namespace App\Exchange\Trade;
 
-use App\Communications\Exception\FetchException;
-use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Order;
@@ -14,6 +13,7 @@ use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Repository\UserRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\DateTimeInterface;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -78,9 +78,9 @@ class Trader implements TraderInterface
             $maker = $this->getUserRepository()->find($order->getMaker()->getId());
             $taker = $this->getUserRepository()->find($order->getTaker() ? $order->getTaker()->getId() : 0);
 
-            $token = $order->getMarket()->getToken();
+            $token = $order->getMarket()->getQuote();
 
-            if (null !== $token) {
+            if ($token instanceof Token) {
                 $this->updateUsers([$maker, $taker], $token);
             }
         }
@@ -175,15 +175,22 @@ class Trader implements TraderInterface
             $market,
             new Money(
                 $orderData['amount'],
-                new Currency($market->getCurrencySymbol())
+                new Currency($this->getSymbol($market->getQuote()))
             ),
             $orderData['side'],
             new Money(
                 $orderData['price'],
-                new Currency($market->getCurrencySymbol())
+                new Currency($this->getSymbol($market->getQuote()))
             ),
             $status,
             $orderData['mtime']
         );
+    }
+
+    private function getSymbol(TradebleInterface $tradeble): string
+    {
+        return $tradeble instanceof Token
+            ? MoneyWrapper::TOK_SYMBOL
+            : $tradeble->getSymbol();
     }
 }

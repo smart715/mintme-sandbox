@@ -3,12 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
+use App\Exception\NotFoundPairException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\MarketManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -31,7 +32,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @Route("/token")
  * @Security(expression="is_granted('prelaunch')")
  */
-class TokenController extends AbstractController
+class TokenController extends Controller
 {
     /** @var EntityManagerInterface */
     protected $em;
@@ -45,7 +46,7 @@ class TokenController extends AbstractController
     /** @var CryptoManagerInterface */
     protected $cryptoManager;
 
-    /** @var MarketManagerInterface */
+    /** @var MarketFactoryInterface */
     protected $marketManager;
 
     /** @var TraderInterface */
@@ -56,8 +57,9 @@ class TokenController extends AbstractController
         ProfileManagerInterface $profileManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        MarketManagerInterface $marketManager,
-        TraderInterface $trader
+        MarketFactoryInterface $marketManager,
+        TraderInterface $trader,
+        NormalizerInterface $normalizer
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -65,6 +67,8 @@ class TokenController extends AbstractController
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
         $this->trader = $trader;
+
+        parent::__construct($normalizer);
     }
 
     /**
@@ -79,14 +83,13 @@ class TokenController extends AbstractController
     public function show(
         string $name,
         ?string $tab,
-        TokenNameConverterInterface $tokenNameConverter,
-        NormalizerInterface $normalizer
+        TokenNameConverterInterface $tokenNameConverter
     ): Response {
 
         $token = $this->tokenManager->findByName($name) ?? $this->tokenManager->findByUrl($name);
 
         if (null === $token) {
-            return $this->render('pages/token_404.html.twig');
+            throw new NotFoundPairException();
         }
 
         $this->tokenManager->normalizeName($token);
@@ -98,18 +101,19 @@ class TokenController extends AbstractController
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
         $market = $webCrypto
-            ? $this->marketManager->getMarket($webCrypto, $token)
+            ? $this->marketManager->create($webCrypto, $token)
             : null;
 
-        return $this->render('pages/token.html.twig', [
+        return $this->render('pages/pair.html.twig', [
             'token' => $token,
             'currency' => Token::WEB_SYMBOL,
-            'stats' => $normalizer->normalize($token->getLockIn(), null, ['groups' => ['Default']]),
+            'stats' => $this->normalize($token->getLockIn()),
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
-            'market' => $normalizer->normalize($market, null, ['groups' => ['Default']]),
+            'showIntro' => true,
+            'market' => $this->normalize($market),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
