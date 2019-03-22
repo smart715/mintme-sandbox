@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Admin;
 
@@ -22,8 +22,10 @@ class CategoryAdmin extends Admin
                 $context->setEnabled(true);
                 $this->contextManager->save($context);
             }
+
             $object->setContext($context);
         }
+
         parent::prePersist($object);
     }
 }

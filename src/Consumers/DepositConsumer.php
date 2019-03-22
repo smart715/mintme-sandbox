@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Consumers;
 
@@ -47,8 +47,11 @@ class DepositConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
+        /** @var string|null $body */
+        $body = $msg->body;
+
         $clbResult = DepositCallbackMessage::parse(
-            json_decode($msg->body, true)
+            json_decode((string)$body, true)
         );
 
         /** @var User $user */
@@ -61,6 +64,7 @@ class DepositConsumer implements ConsumerInterface
 
             if (!$crypto) {
                 $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
+
                 return true;
             }
 
@@ -76,8 +80,11 @@ class DepositConsumer implements ConsumerInterface
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') returned back');
         } catch (\Throwable $exception) {
             $this->logger->error('[deposit-consumer] Failed to update balance. Retry operation');
+            sleep(10);
+
             return false;
         }
+
         return true;
     }
 }
