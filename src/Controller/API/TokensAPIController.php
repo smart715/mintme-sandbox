@@ -252,11 +252,15 @@ class TokensAPIController extends FOSRestController
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        return $this->view(
-            $balanceHandler->balance(
-                $token->getProfile()->getUser(),
-                $token
-            )->getAvailable()->subtract($token->getLockIn()->getFrozenAmount())
-        );
+        $balance = $balanceHandler->balance(
+            $token->getProfile()->getUser(),
+            $token
+        )->getAvailable();
+
+        if ($token->getLockIn()) {
+            $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
+        }
+
+        return $this->view($balance);
     }
 }
