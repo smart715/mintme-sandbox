@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\CaptchaLoginType;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,7 +35,7 @@ class SecurityController extends FOSSecurityController
         $securityContext = $this->container->get('security.authorization_checker');
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ||
             $securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
-                return $this->redirectToRoute('referral-program');
+                return $this->redirectToRoute('login_success');
         }
         
         $this->form = $this->createForm(CaptchaLoginType::class);
@@ -45,6 +46,14 @@ class SecurityController extends FOSSecurityController
                 ], 307);
         }
         return parent::loginAction($request);
+    }
+
+    /** @Route("/login_success", name="login_success") */
+    public function postLoginRedirectAction(PrelaunchConfig $prelaunchConfig): Response
+    {
+         return $prelaunchConfig->isFinished()
+         ? $this->redirectToRoute("trading")
+         : $this->redirectToRoute("referral-program");
     }
     
     /**
