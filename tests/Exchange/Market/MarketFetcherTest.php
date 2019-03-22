@@ -5,6 +5,7 @@ namespace App\Tests\Exchange\Market;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
+use App\Entity\Token\Token;
 use App\Exchange\Config\Config;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
@@ -175,7 +176,10 @@ class MarketFetcherTest extends TestCase
     {
         $market = $this->createMock(Market::class);
 
-        $market->method('getCurrencySymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+        $token = $this->createMock(Token::class);
+        $token->method('getSymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+
+        $market->method('getQuote')->willReturn($token);
 
         return $market;
     }

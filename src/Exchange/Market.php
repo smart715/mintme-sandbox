@@ -2,33 +2,32 @@
 
 namespace App\Exchange;
 
-use App\Entity\Crypto;
-use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class Market
 {
-    /** @var Crypto|null */
-    private $crypto;
+    /** @var TradebleInterface */
+    private $base;
 
-    /** @var Token|null */
-    private $token;
+    /** @var TradebleInterface */
+    private $quote;
 
-    public function __construct(?Crypto $crypto, ?Token $token)
+    public function __construct(TradebleInterface $base, TradebleInterface $quote)
     {
-        $this->crypto = $crypto;
-        $this->token = $token;
+        $this->base = $base;
+        $this->quote = $quote;
     }
 
     /** @Groups({"Default", "API"}) */
-    public function getCurrencySymbol(): string
+    public function getBase(): TradebleInterface
     {
-        return $this->crypto->getSymbol();
+        return $this->base;
     }
 
     /** @Groups({"Default", "API"}) */
-    public function getToken(): ?Token
+    public function getQuote(): TradebleInterface
     {
-        return $this->token;
+        return $this->quote;
     }
 }

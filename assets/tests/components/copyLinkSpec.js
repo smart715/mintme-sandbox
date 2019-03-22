@@ -1,5 +1,5 @@
 import {mount} from '../testHelper';
-import CopyLink from '../../components/CopyLink';
+import CopyLink from '../../js/components/CopyLink';
 
 describe('CopyLink', () => {
     let copyLink = mount(CopyLink, {
