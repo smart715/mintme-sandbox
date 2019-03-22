@@ -47,8 +47,11 @@ class DepositConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
+        /** @var string|null $body */
+        $body = $msg->body;
+
         $clbResult = DepositCallbackMessage::parse(
-            json_decode((string)$msg->body, true)
+            json_decode((string)$body, true)
         );
 
         /** @var User $user */
