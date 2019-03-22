@@ -40,7 +40,7 @@ class RegistrationInitializedListener
         }
 
         $event->setResponse(new RedirectResponse(
-            $this->router->generate('profile')
+            $this->router->generate('login_success')
         ));
     }
 }
