@@ -50,6 +50,7 @@
             <link rel="stylesheet" href="{{ asset('build/main.css') }}">
             {% block pagestyles %}{% endblock %}
         {% endblock %}
+        {% include 'schema.html.twig' %}
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}
