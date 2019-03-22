@@ -71,7 +71,7 @@ class ProfileManager implements ProfileManagerInterface
     public function createHash(User $user, bool $hash = true, bool $enforceSecurity = true): User
     {
         $user->setHash($hash ?
-            ($enforceSecurity ? hash('sha256', Uuid::uuid4()->toString()) : $user->getId())
+            ($enforceSecurity ? hash('sha256', Uuid::uuid4()->toString()) : (string)$user->getId())
             : null);
         $this->em->persist($user);
         $this->em->flush();
