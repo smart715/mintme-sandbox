@@ -38,7 +38,7 @@
                             </a>
                             <a @click="removeOrderModal(row.item)"
                                v-if="row.item.owner">
-                                <font-awesome-icon icon="times" class="text-danger c-pointer" />
+                                <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
                             </a>
                         </template>
                     </b-table>

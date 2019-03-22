@@ -46,7 +46,7 @@
                 </template>
             </div>
         </div>
-        <token-trade-orders :orders-loaded="ordersLoaded" :buy-orders="buyOrders" :sell-orders="sellOrders" :token-name="market.base.symbol" :user-id="userId" />
+        <trade-orders :orders-loaded="ordersLoaded" :buy-orders="buyOrders" :sell-orders="sellOrders" :market="market" :user-id="userId" />
         <div class="row px-0 mt-3">
             <trade-trade-history class="col" :market="market" />
         </div>
@@ -57,7 +57,7 @@
 import TradeBuyOrder from './TradeBuyOrder';
 import TradeSellOrder from './TradeSellOrder';
 import TradeChart from './TradeChart';
-import TokenTradeOrders from './TokenTradeOrders';
+import TradeOrders from './TradeOrders';
 import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
@@ -70,7 +70,7 @@ export default {
         TradeBuyOrder,
         TradeSellOrder,
         TradeChart,
-        TokenTradeOrders,
+        TradeOrders,
         TradeTradeHistory,
         TopTraders,
         OrderModal,

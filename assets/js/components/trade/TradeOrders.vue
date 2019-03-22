@@ -15,10 +15,10 @@
                 </span>
             </confirm-modal>
             <div class="col-12 col-lg-6 pr-lg-2 pl-lg-0 mt-3">
-                <token-trade-buy-orders
+                <trade-buy-orders
                         v-if="ordersLoaded"
                         :orders-list="filteredBuyOrders"
-                        :token-name="tokenName"
+                        :token-name="market.base.symbol"
                         :fields="fields"
                         @modal="removeOrderModal"/>
                 <template v-else>
@@ -28,10 +28,10 @@
                 </template>
             </div>
             <div class="col-12 col-lg-6 pr-lg-0 pl-lg-2 mt-3">
-                <token-trade-sell-orders
+                <trade-sell-orders
                         v-if="ordersLoaded"
                         :orders-list="filteredSellOrders"
-                        :token-name="tokenName"
+                        :token-name="market.quote.symbol"
                         :fields="fields"
                         @modal="removeOrderModal"/>
                 <template v-else>
@@ -45,24 +45,24 @@
 </template>
 
 <script>
-import TokenTradeBuyOrders from './TokenTradeBuyOrders';
-import TokenTradeSellOrders from './TokenTradeSellOrders';
-import ConfirmModal from '../../modal/ConfirmModal';
+import TradeBuyOrders from './TradeBuyOrders';
+import TradeSellOrders from './TradeSellOrders';
+import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../../js/utils';
 
 export default {
     name: 'TokenTradeOrders',
     components: {
-        TokenTradeBuyOrders,
-        TokenTradeSellOrders,
+        TradeBuyOrders,
+        TradeSellOrders,
         ConfirmModal,
     },
     props: {
         ordersLoaded: Boolean,
         buyOrders: [Array, Object],
         sellOrders: [Array, Object],
-        tokenName: String,
+        market: Object,
         userId: Number,
     },
     data() {
@@ -166,7 +166,7 @@ export default {
         },
         removeOrder: function() {
             let deleteOrdersUrl = this.$routing.generate('orders_cancel', {
-                'market': this.removeOrders[0].market.hiddenName,
+                'market': this.removeOrders[0].market.identifier,
             });
             this.$axios.single.post(deleteOrdersUrl, {'order_data': this.removeOrders.map((order) => order.id)})
                 .catch(() => {

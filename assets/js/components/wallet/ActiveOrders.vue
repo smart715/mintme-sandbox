@@ -152,7 +152,7 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            this.$axios.single.post(this.actionUrl, {'ids': [this.currentRow.id]})
+            this.$axios.single.post(this.actionUrl, {'order_data': [this.currentRow.id]})
                 .catch(() => {
                     this.$toasted.show('Service unavailable, try again later');
                 });
