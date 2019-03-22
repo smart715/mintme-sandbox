@@ -75,6 +75,7 @@ class Wallet implements WalletInterface
             $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $crypto);
         } catch (\Throwable $exception) {
             $this->balanceHandler->deposit($user, $token, $amount->getAmount()->add($crypto->getFee()));
+
             throw new \Exception();
         }
     }

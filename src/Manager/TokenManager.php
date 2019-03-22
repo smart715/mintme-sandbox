@@ -120,6 +120,7 @@ class TokenManager implements TokenManagerInterface
     private function getCurrentUser()
     {
         $token = $this->storage->getToken();
+
         return $token
             ? $token->getUser()
             : null;

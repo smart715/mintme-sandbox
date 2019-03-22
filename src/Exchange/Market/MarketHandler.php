@@ -226,11 +226,14 @@ class MarketHandler implements MarketHandlerInterface
     public function getMarketsInfo(array $markets): array
     {
         $marketsInfo = [];
+
         foreach ($markets as $market) {
             $result = $this->marketFetcher->getMarketInfo($this->marketNameConverter->convert($market));
+
             if (!$result) {
                 break;
             }
+
             $marketsInfo[$this->marketNameConverter->convert($market)] = new MarketInfo(
                 $market->getBase()->getSymbol(),
                 $market->getQuote()->getSymbol(),
@@ -261,6 +264,7 @@ class MarketHandler implements MarketHandlerInterface
                 $result['deal']
             );
         }
+
         return $marketsInfo;
     }
 

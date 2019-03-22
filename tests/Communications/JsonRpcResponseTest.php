@@ -33,6 +33,7 @@ class JsonRpcResponseTest extends TestCase
     {
         $responseResult = JsonRpcResponse::parse($this->getJsonResponse());
         $responseError = JsonRpcResponse::parse($this->getErrorJsonResponse());
+
         return [
             [$this->getJsonResponseAsArray()['result'], $responseResult->getResult()],
             [[], $responseError->getResult()],
@@ -51,6 +52,7 @@ class JsonRpcResponseTest extends TestCase
     {
         $responseError = JsonRpcResponse::parse($this->getErrorJsonResponse());
         $responseResult = JsonRpcResponse::parse($this->getJsonResponse());
+
         return [
             [$this->getErrorJsonResponseAsArray()['error'], $responseError->getError()],
             [[], $responseResult->getError()],
@@ -69,6 +71,7 @@ class JsonRpcResponseTest extends TestCase
     {
         $responseResult = JsonRpcResponse::parse($this->getJsonResponse());
         $responseError = JsonRpcResponse::parse($this->getErrorJsonResponse());
+
         return [
             [true, $responseResult->hasResult()],
             [false, $responseError->hasResult()],
@@ -87,6 +90,7 @@ class JsonRpcResponseTest extends TestCase
     {
         $responseResult = JsonRpcResponse::parse($this->getJsonResponse());
         $responseError = JsonRpcResponse::parse($this->getErrorJsonResponse());
+
         return [
             [false, $responseResult->hasError()],
             [true, $responseError->hasError()],

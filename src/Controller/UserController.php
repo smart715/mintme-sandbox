@@ -60,6 +60,7 @@ class UserController extends AbstractController
         if ($user->isGoogleAuthenticatorEnabled()) {
             $emailForm2FA = $this->createForm(EditEmail2FAType::class, $email);
             $emailForm2FA->handleRequest($request);
+
             return $this->renderSettings2FA($passwordForm, $emailForm, $emailForm2FA);
         }
 
@@ -130,10 +131,12 @@ class UserController extends AbstractController
 
         if ($isTwoFactor) {
             $this->turnOffAuthenticator($twoFactorManager);
+
             return $this->redirectToRoute('settings');
         }
 
         $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
+
         return $this->render('security/2fa_manager.html.twig', $parameters);
     }
 
@@ -204,6 +207,7 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
         $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
+
         return $backupCodes;
     }
 

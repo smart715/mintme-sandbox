@@ -59,6 +59,7 @@ class MarketFactoryTest extends TestCase
             ->method('findAll')
             ->willReturn([$crypto])
         ;
+
         return $cryptoManagerMock;
     }
 
@@ -74,6 +75,7 @@ class MarketFactoryTest extends TestCase
             ->method('findAll')
             ->willReturn($tokens)
         ;
+
         return $tokenManagerMock;
     }
 

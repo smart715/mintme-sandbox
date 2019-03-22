@@ -35,9 +35,11 @@ class MarketFetcherTest extends TestCase
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
+
         if ($hasError) {
             $this->expectException(FetchException::class);
         }
+
         $this->assertEquals(
             $rpcResult['orders'],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
@@ -82,9 +84,11 @@ class MarketFetcherTest extends TestCase
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
+
         if ($hasError) {
             $this->expectException(FetchException::class);
         }
+
         $this->assertEquals(
             $rpcResult['orders'],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)

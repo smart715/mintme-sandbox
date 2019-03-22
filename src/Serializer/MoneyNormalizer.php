@@ -29,6 +29,7 @@ class MoneyNormalizer implements NormalizerInterface
         if (!$this->moneyWrapper->getRepository()->contains($object->getCurrency())) {
             $object = new Money($object->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL));
         }
+
         return $this->moneyWrapper->format($object);
     }
 

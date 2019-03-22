@@ -164,6 +164,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     public function setEmail($email)
     {
         $this->username = $email;
+
         return parent::setEmail($email);
     }
 
@@ -189,6 +190,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     public function isBackupCode(string $code): bool
     {
         $googleAuth = $this->googleAuthenticatorEntry;
+
         return null !== $googleAuth
             ? in_array($code, $googleAuth->getBackupCodes())
             : false;
@@ -204,6 +206,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     public function getGoogleAuthenticatorBackupCodes(): array
     {
         $googleAuth = $this->googleAuthenticatorEntry;
+
         return null !== $googleAuth ? $googleAuth->getBackupCodes() : [];
     }
 

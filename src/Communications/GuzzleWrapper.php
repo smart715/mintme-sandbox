@@ -48,12 +48,14 @@ class GuzzleWrapper implements JsonRpcInterface
         try {
             $this->constructClient();
             $response = $this->sendRequest($methodName, $requestParams);
+
             return $this->parseResponse($response);
         } catch (\Throwable $e) {
             $this->logger->error(
                 "Failed to get response from '$this->url' with method '$methodName' and params: " .
                 json_encode($requestParams) . " Error: " . $e->getCode() .". ". $e->getMessage()
             );
+
             throw new FetchException($e->getMessage(), $e->getCode());
         }
     }

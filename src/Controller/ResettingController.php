@@ -36,6 +36,7 @@ class ResettingController extends FOSResettingController
     {
         $form = $this->createForm(ResetRequestType::class);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             return parent::sendEmailAction($request);
         }

@@ -46,6 +46,7 @@ class ProfileManager implements ProfileManagerInterface
     public function findByEmail(string $email): ?Profile
     {
         $user = $this->userRepository->findByEmail($email);
+
         return is_null($user)
             ? null
             : $this->getProfile($user);
@@ -74,6 +75,7 @@ class ProfileManager implements ProfileManagerInterface
             : null);
         $this->em->persist($user);
         $this->em->flush();
+
         return $user;
     }
 

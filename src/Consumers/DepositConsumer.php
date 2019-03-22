@@ -61,6 +61,7 @@ class DepositConsumer implements ConsumerInterface
 
             if (!$crypto) {
                 $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
+
                 return true;
             }
 
@@ -77,8 +78,10 @@ class DepositConsumer implements ConsumerInterface
         } catch (\Throwable $exception) {
             $this->logger->error('[deposit-consumer] Failed to update balance. Retry operation');
             sleep(10);
+
             return false;
         }
+
         return true;
     }
 }

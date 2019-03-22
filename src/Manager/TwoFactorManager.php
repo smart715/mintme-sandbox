@@ -35,6 +35,7 @@ class TwoFactorManager implements TwoFactorManagerInterface
     public function checkCode(User $user, string $code): bool
     {
         $isBackupCode = in_array($code, $user->getGoogleAuthenticatorBackupCodes());
+
         return $isBackupCode || $this->authenticator->checkCode($user, $code);
     }
 
@@ -57,6 +58,7 @@ class TwoFactorManager implements TwoFactorManagerInterface
 
         $secrete = $this->authenticator->generateSecret();
         $this->session->set('googleSecreteCode', $secrete);
+
         return $secrete;
     }
 
@@ -69,6 +71,7 @@ class TwoFactorManager implements TwoFactorManagerInterface
     {
         /** @var GoogleAuthenticatorEntryRepository */
         $repository = $this->entityManager->getRepository(GoogleAuthenticatorEntry::class);
+
         return $repository->getGoogleAuthenticator($userId);
     }
 }

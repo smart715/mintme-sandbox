@@ -34,7 +34,6 @@
             <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment" />
             <exclude name="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
             <exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses" />
-            <exclude name="SlevomatCodingStandard.ControlStructures.ControlStructureSpacing" />
             <exclude name="SlevomatCodingStandard.Functions.UnusedParameter" />
             <exclude name="SlevomatCodingStandard.Operators.RequireOnlyStandaloneIncrementAndDecrementOperators" />
             <exclude name="SlevomatCodingStandard.Functions.UnusedParameter" />
@@ -57,6 +56,12 @@
     <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
         <properties>
             <property name="rootNamespaces" type="array" value="src=>App,tests=>App\Tests"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.ControlStructureSpacing">
+        <properties>
+            <property name="linesCountAfterLastControlStructure" value="0" />
+            <property name="linesCountBeforeFirstControlStructure" value="0" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration">

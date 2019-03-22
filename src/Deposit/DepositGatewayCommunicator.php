@@ -39,6 +39,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
     public function getDepositCredentials(int $userId, array $predefinedTokens): DepositCredentials
     {
         $credentials = [];
+
         foreach ($predefinedTokens as $token) {
             $response = $this->jsonRpc->send(
                 self::GET_DEPOSIT_CREDENTIALS_METHOD,
@@ -51,6 +52,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                 "Address unavailable." :
                 $response->getResult();
         }
+
         return new DepositCredentials($credentials);
     }
 

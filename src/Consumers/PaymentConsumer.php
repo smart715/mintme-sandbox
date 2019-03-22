@@ -64,6 +64,7 @@ class PaymentConsumer implements ConsumerInterface
 
                 if (!$crypto) {
                     $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
+
                     return true;
                 }
 
@@ -78,6 +79,7 @@ class PaymentConsumer implements ConsumerInterface
                 $this->logger->info('[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back');
             } catch (\Throwable $exception) {
                 $this->logger->error('[payment-consumer] Failed to resume payment. Retry operation');
+
                 return false;
             }
         }

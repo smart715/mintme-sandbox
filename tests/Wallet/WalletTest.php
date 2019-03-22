@@ -92,6 +92,7 @@ class WalletTest extends TestCase
             ->method('getTransactions')
             ->willReturn($transactions)
         ;
+
         return $depositCommunicatorMock;
     }
 
@@ -102,6 +103,7 @@ class WalletTest extends TestCase
             ->method('getHistory')
             ->willReturn($history)
         ;
+
         return $withdrawGatewayMock;
     }
 
@@ -125,6 +127,7 @@ class WalletTest extends TestCase
             ->method('getType')
             ->willReturn($this->mockType($type))
         ;
+
         return $transactionMock;
     }
 
@@ -135,6 +138,7 @@ class WalletTest extends TestCase
             ->method('getTypeCode')
             ->willReturn($type)
         ;
+
         return $typeMock;
     }
 
@@ -145,6 +149,7 @@ class WalletTest extends TestCase
             ->method('getSymbol')
             ->willReturn($crypto)
         ;
+
         return $cryptoMock;
     }
 
@@ -155,6 +160,7 @@ class WalletTest extends TestCase
             ->method('getTimestamp')
             ->willReturn($timestamp)
         ;
+
         return $dateMock;
     }
 

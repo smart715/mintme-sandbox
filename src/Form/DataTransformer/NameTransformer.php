@@ -23,6 +23,7 @@ class NameTransformer implements DataTransformerInterface
         if ($text) {
             return preg_replace('/\s+/', ' ', $text);
         }
+
         return null;
     }
 }

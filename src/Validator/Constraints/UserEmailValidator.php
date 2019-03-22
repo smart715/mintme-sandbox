@@ -25,6 +25,7 @@ class UserEmailValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         $user = $this->userManager->findUserByEmail($value ?? '');
+
         if (!is_null($user) && ($this->user !== $user || $value === $user->getEmail())) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
