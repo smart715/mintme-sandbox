@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Manager;
 
@@ -146,6 +146,7 @@ class TokenManager implements TokenManagerInterface
     private function getCurrentUser()
     {
         $token = $this->storage->getToken();
+
         return $token
             ? $token->getUser()
             : null;

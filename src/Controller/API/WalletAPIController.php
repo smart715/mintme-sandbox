@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller\API;
 
@@ -76,7 +76,7 @@ class WalletAPIController extends FOSRestController
             $wallet->withdraw(
                 $this->getUser(),
                 new Address($request->get('address')),
-                new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
+                new Amount($moneyWrapper->parse((string)$request->get('amount'), $crypto->getSymbol())),
                 $crypto
             );
         } catch (NotEnoughUserAmountException $exception) {

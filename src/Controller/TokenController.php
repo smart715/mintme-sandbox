@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller;
 
@@ -168,7 +168,7 @@ class TokenController extends Controller
                     $this->getUser(),
                     $token,
                     $moneyWrapper->parse(
-                        $this->getParameter('token_quantity'),
+                        (string)$this->getParameter('token_quantity'),
                         MoneyWrapper::TOK_SYMBOL
                     )
                 );
