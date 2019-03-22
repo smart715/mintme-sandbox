@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller;
 
@@ -33,6 +33,7 @@ class SecurityController extends FOSSecurityController
     public function loginAction(Request $request): Response
     {
         $securityContext = $this->container->get('security.authorization_checker');
+
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ||
             $securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
                 return $this->redirectToRoute('login_success');
@@ -40,11 +41,13 @@ class SecurityController extends FOSSecurityController
         
         $this->form = $this->createForm(CaptchaLoginType::class);
         $this->form->handleRequest($request);
+
         if ($this->form->isSubmitted() && $this->form->isValid()) {
                 return $this->redirectToRoute('fos_user_security_check', [
                     'request' => $request,
                 ], 307);
         }
+
         return parent::loginAction($request);
     }
 

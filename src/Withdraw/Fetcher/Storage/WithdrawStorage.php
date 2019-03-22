@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Withdraw\Fetcher\Storage;
 
@@ -38,7 +38,7 @@ class WithdrawStorage implements StorageAdapterInterface
     {
         return $this->sendRequest(self::RPC_BALANCE, [
             'crypto' => $symbol,
-        ])['balance'] ?? 0;
+        ])['balance'] ?? '0';
     }
 
     private function sendRequest(string $method, array $params): array

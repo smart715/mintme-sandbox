@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller\API;
 
@@ -134,6 +134,7 @@ class OrdersAPIController extends FOSRestController
         if ($request->get('marketPrice')) {
             /** @var Order[] $orders */
             $orders = $this->getPendingOrders($base, $quote)[$isSellSide ? 'buy' : 'sell'];
+
             if ($orders) {
                 $price = $orders[0]->getPrice();
             }

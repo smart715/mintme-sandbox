@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Entity;
 
@@ -78,6 +78,7 @@ class GoogleAuthenticatorEntry
     {
         if (null !== $this->backupCodes) {
             $key = array_search($code, $this->backupCodes);
+
             if (false !== $key) {
                 unset($this->backupCodes[$key]);
             }

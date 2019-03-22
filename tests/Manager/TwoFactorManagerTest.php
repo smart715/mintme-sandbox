@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Tests\Manager;
 
@@ -86,6 +86,7 @@ class TwoFactorManagerTest extends TestCase
         $googleAuth->method('getUrl')->willReturn($url);
         $googleAuth->method('checkCode')->willReturn($bool);
         $googleAuth->method('generateSecret')->willReturn($secret);
+
         return $googleAuth;
     }
 
@@ -95,6 +96,7 @@ class TwoFactorManagerTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $session->method('has')->willReturn($has);
         $session->method('get')->willReturn($code);
+
         return $session;
     }
 
@@ -103,6 +105,7 @@ class TwoFactorManagerTest extends TestCase
         /** @var User|MockObject $user */
         $user = $this->createMock(User::class);
         $user->method('getGoogleAuthenticatorBackupCodes')->willReturn($backupCodes);
+
         return $user;
     }
 
@@ -111,6 +114,7 @@ class TwoFactorManagerTest extends TestCase
         /** @var EntityManagerInterface|MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->method('getRepository')->willReturn($repository);
+
         return $entityManager;
     }
 

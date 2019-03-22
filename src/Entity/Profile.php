@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Entity;
 
@@ -182,6 +182,7 @@ class Profile
         if ($this->country) {
             return Intl::getRegionBundle()->getCountryName($this->country);
         }
+
         return null;
     }
 

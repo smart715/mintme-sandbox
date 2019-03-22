@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Tests\Deposit;
 
@@ -80,6 +80,7 @@ class DepositGatewayCommunicatorTest extends TestCase
             )
             ->willReturn($this->mockRpcResponse($response))
         ;
+
         return $rpcInterfaceMock;
     }
 
@@ -90,6 +91,7 @@ class DepositGatewayCommunicatorTest extends TestCase
             ->method('getResult')
             ->willReturn($response)
         ;
+
         return $rpcResponseMock;
     }
 
