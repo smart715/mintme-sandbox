@@ -2,6 +2,8 @@
 
 namespace App\Exchange\Market;
 
+use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
@@ -9,6 +11,7 @@ use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 
 class MarketHandler implements MarketHandlerInterface
@@ -141,12 +144,12 @@ class MarketHandler implements MarketHandlerInterface
                 $market,
                 $this->moneyWrapper->parse(
                     $orderData['left'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $orderData['side'],
                 $this->moneyWrapper->parse(
                     $orderData['price'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 Order::PENDING_STATUS,
                 $orderData['maker_fee'],
@@ -170,12 +173,12 @@ class MarketHandler implements MarketHandlerInterface
                 $market,
                 $this->moneyWrapper->parse(
                     $orderData['amount'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 Order::SIDE_MAP[$orderData['type']],
                 $this->moneyWrapper->parse(
                     $orderData['price'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 Order::FINISHED_STATUS,
                 array_key_exists('fee', $orderData) ? $orderData['fee'] : 0,
@@ -196,19 +199,19 @@ class MarketHandler implements MarketHandlerInterface
                 $dealData['role'],
                 $this->moneyWrapper->parse(
                     $dealData['amount'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $dealData['price'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $dealData['deal'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $dealData['fee'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $dealData['deal_order_id'],
                 $market
@@ -229,35 +232,42 @@ class MarketHandler implements MarketHandlerInterface
                 break;
             }
             $marketsInfo[$this->marketNameConverter->convert($market)] = new MarketInfo(
-                $market->getCurrencySymbol(),
-                $market->getToken()->getName(),
+                $market->getBase()->getSymbol(),
+                $market->getQuote()->getSymbol(),
                 $this->moneyWrapper->parse(
                     $result['last'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $result['volume'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $result['open'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $result['close'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $result['high'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $this->moneyWrapper->parse(
                     $result['low'],
-                    $market->getCurrencySymbol()
+                    $this->getSymbol($market->getQuote())
                 ),
                 $result['deal']
             );
         }
         return $marketsInfo;
+    }
+
+    private function getSymbol(TradebleInterface $tradeble): string
+    {
+        return $tradeble instanceof Token
+            ? MoneyWrapper::TOK_SYMBOL
+            : $tradeble->getSymbol();
     }
 }

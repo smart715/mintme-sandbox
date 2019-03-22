@@ -1,6 +1,6 @@
 import '../../js/main';
 import Vue from 'vue';
-import TradingHistory from '../../components/wallet/TradingHistory';
+import TradingHistory from '../../js/components/wallet/TradingHistory';
 
 describe('TradingHistory', () => {
     const vm = new Vue(TradingHistory).$mount();

@@ -31,7 +31,7 @@ class MarketNormalizer implements NormalizerInterface
         $normalized = $this->normalizer->normalize($market, $format, $context);
         $name = $this->marketNameConverter->convert($market);
 
-        $normalized['hiddenName'] = $name;
+        $normalized['identifier'] = $name;
 
         return $normalized;
     }

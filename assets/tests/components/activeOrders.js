@@ -1,6 +1,6 @@
 import '../../js/main';
 import {mount} from '../testHelper';
-import ActiveOrders from '../../components/wallet/ActiveOrders';
+import ActiveOrders from '../../js/components/wallet/ActiveOrders';
 
 describe('ActiveOrders', () => {
     describe('get result from server', () => {

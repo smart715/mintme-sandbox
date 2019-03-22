@@ -1,6 +1,6 @@
 import '../../js/main';
 import {mount} from '@vue/test-utils';
-import TokenName from '../../components/token/TokenName';
+import TokenName from '../../js/components/token/TokenName';
 import moxios from 'moxios';
 
 

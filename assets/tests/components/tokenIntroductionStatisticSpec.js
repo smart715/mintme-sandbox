@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
-import component from '../../../assets/components/token/introduction/TokenIntroductionStatistics';
+import component from '../../js/components/token/introduction/TokenIntroductionStatistics';
 import {mount} from '../testHelper';
 import fontawesome from '@fortawesome/fontawesome';
 import fas from '@fortawesome/fontawesome-free-solid';

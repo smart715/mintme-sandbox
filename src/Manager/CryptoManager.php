@@ -18,7 +18,7 @@ class CryptoManager implements CryptoManagerInterface
 
     public function findBySymbol(string $symbol): ?Crypto
     {
-        return $this->repository->getBySymbol($symbol);
+        return $this->repository->getBySymbol(strtoupper($symbol));
     }
 
     /** {@inheritdoc} */
