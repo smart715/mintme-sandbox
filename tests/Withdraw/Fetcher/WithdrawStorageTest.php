@@ -22,16 +22,16 @@ class WithdrawStorageTest extends TestCase
 
         $storage = new WithdrawStorage($rpc, 'mintme');
 
-        $this->assertEquals(['balance' => '99'], $storage->requestHistory(1, 0, 10));
-        $this->assertEquals('99', $storage->requestBalance('web'));
+        $this->assertEquals(['balance' => 99], $storage->requestHistory(1, 0, 10));
+        $this->assertEquals(99, $storage->requestBalance('web'));
 
         $response->method('hasError')->willReturn(true);
         $this->expectException(\Throwable::class);
         $storage->requestHistory(1, 0, 10);
-        $this->assertEquals('0', $storage->requestBalance('web'));
+        $this->assertEquals(0, $storage->requestBalance('web'));
 
         $rpc->method('send')->willThrowException(new \Exception());
         $this->assertEquals([], $storage->requestHistory(1, 0, 10));
-        $this->assertEquals('0', $storage->requestBalance('web'));
+        $this->assertEquals(0, $storage->requestBalance('web'));
     }
 }
