@@ -64,8 +64,7 @@ export default {
             })
             .then((response) => {
                 if (response.status === HTTP_ACCEPTED) {
-                    this.newName = response.data['tokenName'];
-                    this.currentName = this.newName;
+                    this.currentName = response.data['tokenName'];
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {

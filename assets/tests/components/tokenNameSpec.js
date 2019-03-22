@@ -22,8 +22,8 @@ describe('TokenName', () => {
             },
         });
         moxios.stubRequest('updateUrl', {
-            status: 204,
-            response: [],
+            status: 202,
+            response: {'tokenName': 'bar'},
         });
         expect(wrapper.find('input').exists()).to.deep.equal(false);
         expect(wrapper.vm.editingName).to.deep.equal(false);
