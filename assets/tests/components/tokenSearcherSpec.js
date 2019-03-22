@@ -1,5 +1,5 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
-import TokenSearcher from '../../components/token/TokenSearcher';
+import TokenSearcher from '../../js/components/token/TokenSearcher';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
 

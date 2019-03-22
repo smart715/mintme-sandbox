@@ -1,6 +1,6 @@
 import '../../js/main';
 import {mount} from '../testHelper';
-import TokenTradeChart from '../../components/token/trade/TokenTradeChart';
+import TokenTradeChart from '../../js/components/trade/TradeChart';
 
 describe('TokenTradeChart', () => {
     describe('data field', () => {

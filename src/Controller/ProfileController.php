@@ -3,36 +3,31 @@
 namespace App\Controller;
 
 use App\Entity\Profile;
+use App\Exception\NotFoundProfileException;
 use App\Form\AddProfileType;
 use App\Form\EditProfileType;
 use App\Manager\ProfileManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/profile")
  * @Security(expression="is_granted('prelaunch')")
  */
-class ProfileController extends AbstractController
+class ProfileController extends Controller
 {
     /** @Route("/{pageUrl}", name="profile-view") */
     public function profileView(
         Request $request,
-        SessionInterface $session,
         ProfileManagerInterface $profileManager,
-        NormalizerInterface $normalizer,
         string $pageUrl
     ): Response {
         $profile = $profileManager->getProfileByPageUrl($pageUrl);
 
         if (null === $profile) {
-            return $this->render('pages/profile_404.html.twig');
+            throw new NotFoundProfileException();
         }
 
         $form = $this->createForm(EditProfileType::class, $profile);
@@ -64,7 +59,6 @@ class ProfileController extends AbstractController
     /** @Route(name="profile") */
     public function profile(
         Request $request,
-        SessionInterface $session,
         ProfileManagerInterface $profileManager
     ): Response {
         $profile = $profileManager->getProfile($this->getUser());

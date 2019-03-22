@@ -4,6 +4,7 @@ namespace App\Entity\Token;
 
 use App\Entity\Crypto;
 use App\Entity\Profile;
+use App\Entity\TradebleInterface;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -16,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity("address")
  * @ORM\HasLifecycleCallbacks()
  */
-class Token
+class Token implements TradebleInterface
 {
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
@@ -35,7 +36,7 @@ class Token
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
      * @Assert\Length(min = 4, max = 255)
      * @Groups({"API"})
-     * @var string|null
+     * @var string
      */
     protected $name;
 
@@ -98,6 +99,12 @@ class Token
      */
     protected $created;
 
+    /** {@inheritdoc} */
+    public function getSymbol(): string
+    {
+        return $this->getName();
+    }
+
     public function getCrypto(): ?Crypto
     {
         return $this->crypto;
@@ -120,13 +127,16 @@ class Token
         return $this->lockIn;
     }
 
-    /** @Groups({"Default", "API"}) */
-    public function getName(): ?string
+    /** {@inheritdoc} */
+    public function getName(): string
     {
-        return $this->name;
+        /** @var string|null $name */
+        $name = $this->name;
+
+        return (string)$name;
     }
 
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
 
