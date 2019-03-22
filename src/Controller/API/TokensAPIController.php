@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller\API;
 
@@ -133,8 +133,8 @@ class TokensAPIController extends FOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in")
-     * @Rest\RequestParam(name="released", allowBlank=false)
-     * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
+     * @Rest\RequestParam(name="released", allowBlank=false, requirements="[1-9]{1,2}")
+     * @Rest\RequestParam(name="releasePeriod", allowBlank=false, requirements="[1-8]0")
      */
     public function setTokenReleasePeriod(
         ParamFetcherInterface $request,

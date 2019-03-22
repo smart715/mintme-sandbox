@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Validator\Constraints;
 
@@ -19,7 +19,7 @@ class GreaterThanPreviousValidator extends ConstraintValidator
     /** {@inheritdoc} */
     public function validate($value, Constraint $constraint): void
     {
-        if (!$this->isGreaterThanPrevious($this->context->getObject(), $value)) {
+        if (!$this->isGreaterThanPrevious($this->context->getObject(), (string)$value)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }

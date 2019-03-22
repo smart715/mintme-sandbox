@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Exchange\Market;
 
@@ -152,8 +152,8 @@ class MarketHandler implements MarketHandlerInterface
                     $this->getSymbol($market->getQuote())
                 ),
                 Order::PENDING_STATUS,
-                $orderData['maker_fee'],
-                $orderData['mtime']
+                $orderData['maker_fee'] ? floatval($orderData['maker_fee']) : null,
+                $orderData['mtime'] ? intval($orderData['mtime']) : null
             );
         }, $orders);
     }
@@ -182,7 +182,7 @@ class MarketHandler implements MarketHandlerInterface
                 ),
                 Order::FINISHED_STATUS,
                 array_key_exists('fee', $orderData) ? $orderData['fee'] : 0,
-                $orderData['time']
+                $orderData['time'] ? intval($orderData['time']) : null
             );
         }, $result);
     }

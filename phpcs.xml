@@ -16,7 +16,6 @@
             <exclude name="SlevomatCodingStandard.ControlStructures.DisallowEqualOperators" />
             <exclude name="SlevomatCodingStandard.ControlStructures.DisallowEmpty" />
             <exclude name="SlevomatCodingStandard.Operators.DisallowIncrementAndDecrementOperators" />
-            <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes" />
             <exclude name="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming" />
             <exclude name="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming" />
             <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming" />

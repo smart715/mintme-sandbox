@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Consumers;
 
@@ -48,7 +48,7 @@ class DepositConsumer implements ConsumerInterface
     public function execute(AMQPMessage $msg)
     {
         $clbResult = DepositCallbackMessage::parse(
-            json_decode($msg->body, true)
+            json_decode((string)$msg->body, true)
         );
 
         /** @var User $user */
@@ -76,6 +76,7 @@ class DepositConsumer implements ConsumerInterface
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') returned back');
         } catch (\Throwable $exception) {
             $this->logger->error('[deposit-consumer] Failed to update balance. Retry operation');
+            sleep(10);
             return false;
         }
         return true;
