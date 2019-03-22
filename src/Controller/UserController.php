@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class UserController extends AbstractController
 {
@@ -84,9 +85,11 @@ class UserController extends AbstractController
     /**
      * @Rest\Route("/invite/{code}", name="register-referral")
      */
-    public function registerReferral(string $code): Response
+    public function registerReferral(string $code, AuthorizationCheckerInterface $authorizationChecker): Response
     {
-        $response = $this->redirectToRoute('fos_user_registration_register');
+        $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
+            ? $this->redirectToRoute('homepage')
+            : $this->redirectToRoute('fos_user_registration_register');
 
         $response->headers->setCookie(
             new Cookie('referral-code', $code)
