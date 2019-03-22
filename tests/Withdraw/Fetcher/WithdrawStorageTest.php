@@ -16,7 +16,7 @@ class WithdrawStorageTest extends TestCase
         $rpc = $this->createMock(JsonRpcInterface::class);
         /** @var JsonRpcResponse|MockObject $rpc */
         $response = $this->createMock(JsonRpcResponse::class);
-        $response->method('getResult')->willReturn(['balance' => 99]);
+        $response->method('getResult')->willReturn(['balance' => '99']);
 
         $rpc->method('send')->willReturn($response);
 
