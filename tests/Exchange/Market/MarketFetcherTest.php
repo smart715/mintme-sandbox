@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Tests\Exchange\Market;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
+use App\Entity\Token\Token;
 use App\Exchange\Config\Config;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
@@ -34,9 +35,11 @@ class MarketFetcherTest extends TestCase
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
+
         if ($hasError) {
             $this->expectException(FetchException::class);
         }
+
         $this->assertEquals(
             $rpcResult['orders'],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
@@ -81,9 +84,11 @@ class MarketFetcherTest extends TestCase
             ->willReturn($jsonResponse);
 
         $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
+
         if ($hasError) {
             $this->expectException(FetchException::class);
         }
+
         $this->assertEquals(
             $rpcResult['orders'],
             $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
@@ -175,7 +180,10 @@ class MarketFetcherTest extends TestCase
     {
         $market = $this->createMock(Market::class);
 
-        $market->method('getCurrencySymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+        $token = $this->createMock(Token::class);
+        $token->method('getSymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+
+        $market->method('getQuote')->willReturn($token);
 
         return $market;
     }

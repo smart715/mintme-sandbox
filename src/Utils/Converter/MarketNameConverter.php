@@ -1,7 +1,9 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Utils\Converter;
 
+use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Exchange\Market;
 
 class MarketNameConverter implements MarketNameConverterInterface
@@ -16,12 +18,15 @@ class MarketNameConverter implements MarketNameConverterInterface
 
     public function convert(Market $market): string
     {
-        $token = $market->getToken();
+        return strtoupper(
+            $this->convertIfToken($market->getQuote()) . $this->convertIfToken($market->getBase())
+        );
+    }
 
-        if (!$token) {
-            throw new \InvalidArgumentException();
-        }
-
-        return $this->tokenConverter->convert($token) . strtoupper($market->getCurrencySymbol());
+    private function convertIfToken(TradebleInterface $tradeble): string
+    {
+        return $tradeble instanceof Token ?
+            $this->tokenConverter->convert($tradeble) :
+            $tradeble->getSymbol();
     }
 }

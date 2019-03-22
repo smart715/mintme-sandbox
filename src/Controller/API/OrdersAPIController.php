@@ -1,16 +1,18 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller\API;
 
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\MarketManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Serializer\TradableNormalizer;
 use App\Utils\MarketNameParserInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -46,7 +48,7 @@ class OrdersAPIController extends FOSRestController
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
-    /** @var MarketManagerInterface */
+    /** @var MarketFactoryInterface */
     private $marketManager;
 
     public function __construct(
@@ -55,7 +57,7 @@ class OrdersAPIController extends FOSRestController
         TokenManagerInterface $tokenManager,
         MarketNameParserInterface $marketParser,
         MarketHandlerInterface $marketHandler,
-        MarketManagerInterface $marketManager
+        MarketFactoryInterface $marketManager
     ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
@@ -101,42 +103,36 @@ class OrdersAPIController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{tokenName}/place-order", name="token_place_order")
+     * @Rest\Post("/{base}/{quote}/place-order", name="token_place_order", options={"expose"=true})
      * @Rest\RequestParam(name="priceInput", allowBlank=false)
      * @Rest\RequestParam(name="amountInput", allowBlank=false)
      * @Rest\RequestParam(name="marketPrice", default="0")
      * @Rest\RequestParam(name="action", allowBlank=false, requirements="(sell|buy|all)")
      */
     public function placeOrder(
-        string $tokenName,
+        string $base,
+        string $quote,
         ParamFetcherInterface $request,
         TraderInterface $trader,
-        MarketManagerInterface $marketManager,
         MoneyWrapperInterface $moneyWrapper
     ): View {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
 
-        $token = $this->tokenManager->findByName($tokenName);
-        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
-        if (null === $token || null === $crypto) {
-            throw $this->createNotFoundException('Token or Crypto not found.');
-        }
-
-        $market = $marketManager->getMarket($crypto, $token);
+        $market = $this->getMarket($base, $quote);
 
         if (null === $market) {
             throw $this->createNotFoundException('Market not found.');
         }
 
         $isSellSide = Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')];
-        $price = $moneyWrapper->parse($request->get('priceInput'), $crypto->getSymbol());
+        $price = $moneyWrapper->parse($request->get('priceInput'), $this->getSymbol($market->getQuote()));
 
         if ($request->get('marketPrice')) {
             /** @var Order[] $orders */
-            $orders = $this->getPendingOrders($tokenName)[$isSellSide ? 'buy' : 'sell'];
+            $orders = $this->getPendingOrders($base, $quote)[$isSellSide ? 'buy' : 'sell'];
+
             if ($orders) {
                 $price = $orders[0]->getPrice();
             }
@@ -147,7 +143,7 @@ class OrdersAPIController extends FOSRestController
             $this->getUser(),
             null,
             $market,
-            $moneyWrapper->parse($request->get('amountInput'), MoneyWrapper::TOK_SYMBOL),
+            $moneyWrapper->parse($request->get('amountInput'), $this->getSymbol($market->getQuote())),
             Order::SIDE_MAP[$request->get('action')],
             $price,
             Order::PENDING_STATUS,
@@ -165,13 +161,13 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     * @Rest\Get("/{tokenName}/pending", name="pending_orders", options={"expose"=true})
+     * @Rest\Get("/{base}/{quote}/pending", name="pending_orders", options={"expose"=true})
      * @Rest\View()
      * @return mixed[]
      */
-    public function getPendingOrders(String $tokenName): array
+    public function getPendingOrders(string $base, string $quote): array
     {
-        $market = $this->getMarket($tokenName);
+        $market = $this->getMarket($base, $quote);
 
         $pendingBuyOrders = $market ? $this->marketHandler->getPendingBuyOrders($market) : [];
         $pendingSellOrders = $market ? $this->marketHandler->getPendingSellOrders($market) : [];
@@ -183,13 +179,13 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     * @Rest\Get("/{tokenName}/executed", name="executed_orders", options={"expose"=true})
+     * @Rest\Get("/{base}/{quote}/executed", name="executed_orders", options={"expose"=true})
      * @Rest\View()
      * @return Order[]
      */
-    public function getExecutedOrders(String $tokenName): array
+    public function getExecutedOrders(string $base, string $quote): array
     {
-        $market = $this->getMarket($tokenName);
+        $market = $this->getMarket($base, $quote);
 
         return $market
             ? $this->marketHandler->getExecutedOrders($market)
@@ -208,7 +204,7 @@ class OrdersAPIController extends FOSRestController
         }
 
         $user = $this->getUser();
-        $markets = $this->marketManager->getUserRelatedMarkets($user);
+        $markets = $this->marketManager->createUserRelated($user);
 
         if (!$markets) {
             return [];
@@ -236,17 +232,24 @@ class OrdersAPIController extends FOSRestController
 
         return $this->marketHandler->getPendingOrdersByUser(
             $user,
-            $this->marketManager->getUserRelatedMarkets($user)
+            $this->marketManager->createUserRelated($user)
         );
     }
 
-    private function getMarket(string $tokenName): ?Market
+    private function getSymbol(TradebleInterface $tradeble): string
     {
-        $token = $this->tokenManager->findByName($tokenName);
-        $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        return $tradeble instanceof Token
+            ? MoneyWrapper::TOK_SYMBOL
+            : $tradeble->getSymbol();
+    }
 
-        return $webCrypto && $token
-            ? $this->marketManager->getMarket($webCrypto, $token)
+    private function getMarket(string $base, string $quote): ?Market
+    {
+        $base = $this->cryptoManager->findBySymbol($base) ?? $this->tokenManager->findByName($base);
+        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        return ($base && $quote) && ($base !== $quote)
+            ? $this->marketManager->create($base, $quote)
             : null;
     }
 }

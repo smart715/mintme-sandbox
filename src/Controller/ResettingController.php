@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller;
 
@@ -36,6 +36,7 @@ class ResettingController extends FOSResettingController
     {
         $form = $this->createForm(ResetRequestType::class);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             return parent::sendEmailAction($request);
         }

@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller\API;
 
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Manager\MarketManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
@@ -22,10 +22,10 @@ class MarketAPIController extends FOSRestController
      * @Rest\Get("/", name="markets", options={"expose"=true})
      */
     public function getMarkets(
-        MarketManagerInterface $marketManager
+        MarketFactoryInterface $marketManager
     ): View {
 
-        $markets = $marketManager->getUserRelatedMarkets($this->getUser());
+        $markets = $marketManager->createUserRelated($this->getUser());
 
         return $this->view($markets);
     }
@@ -35,10 +35,10 @@ class MarketAPIController extends FOSRestController
      * @Rest\Get("/info", name="markets_info", options={"expose"=true})
      */
     public function getMarketsInfo(
-        MarketManagerInterface $marketManager,
+        MarketFactoryInterface $marketManager,
         MarketHandlerInterface $marketHandler
     ): View {
-        $marketsInfo = $marketHandler->getMarketsInfo($marketManager->getAllMarkets());
+        $marketsInfo = $marketHandler->getMarketsInfo($marketManager->createAll());
 
         return $this->view($marketsInfo);
     }

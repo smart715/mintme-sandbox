@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Verify;
 
@@ -33,16 +33,19 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     public function verify(string $url, string $verificationToken): bool
     {
         $formatUrl = rtrim($url, '/').'/';
+
         try {
             $client = $this->clientFactory->createClient(['base_uri' => $formatUrl, 'timeout' => $this->timeoutSeconds]);
             $response = $client->request('GET', self::URI);
         } catch (GuzzleException $exception) {
             $this->logger->error($exception->getMessage());
+
             return false;
         }
 
         if (self::HTTP_OK === $response->getStatusCode()) {
             $expectedPattern = '/('.self::PREFIX.': '.$verificationToken.')/';
+
             return self::MATCH_CODE === preg_match($expectedPattern, $response->getBody()->getContents());
         }
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Utils\Converter;
 
@@ -24,6 +24,6 @@ class TokenNameConverter implements TokenNameConverterInterface
     {
         return !$this->cryptoManager->findBySymbol(strtoupper($token->getName() ?? ''))
             ? 'TOK'.str_pad((string)($token->getId() + $this->config->getOffset()), 12, '0', STR_PAD_LEFT)
-            : (string)$token->getName();
+            : $token->getName();
     }
 }

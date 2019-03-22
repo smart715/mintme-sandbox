@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\MarketManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,15 +15,15 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * @Security(expression="is_granted('prelaunch')")
  */
-class TradingController extends AbstractController
+class TradingController extends Controller
 {
     /**
      * @Route("/trading", name="trading")
      */
-    public function trading(MarketManagerInterface $marketManager): Response
+    public function trading(MarketFactoryInterface $marketManager): Response
     {
         return $this->render('pages/trading.html.twig', [
-            'markets' => $marketManager->getAllMarkets(),
+            'markets' => $marketManager->createAll(),
         ]);
     }
 }

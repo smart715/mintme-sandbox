@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Withdraw\Fetcher\Mapper;
 
@@ -42,8 +42,8 @@ class WithdrawMapper implements MapperInterface
                 $transaction['transactionHash'],
                 null,
                 $transaction['walletAddress'],
-                $this->moneyWrapper->parse($transaction['amount'], $transaction['crypto']),
-                $this->moneyWrapper->parse($transaction['fee'], $transaction['crypto']),
+                $this->moneyWrapper->parse((string)$transaction['amount'], $transaction['crypto']),
+                $this->moneyWrapper->parse((string)$transaction['fee'], $transaction['crypto']),
                 $this->cryptoManager->findBySymbol(
                     strtoupper($transaction['crypto'])
                 ),

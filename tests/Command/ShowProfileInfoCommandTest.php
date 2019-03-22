@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Tests\Command;
 
@@ -42,6 +42,7 @@ class ShowProfileInfoCommandTest extends KernelTestCase
             ->with($this->equalTo('info@coinimp.com'))
             ->willReturn($this->profileMock())
         ;
+
         return $profileManagerMock;
     }
 
@@ -64,6 +65,7 @@ class ShowProfileInfoCommandTest extends KernelTestCase
             ->method('isChangesLocked')
             ->willReturn(false)
         ;
+
         return $profileMock;
     }
 }

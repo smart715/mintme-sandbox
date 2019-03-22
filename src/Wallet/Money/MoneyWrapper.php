@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Wallet\Money;
 
@@ -38,10 +38,13 @@ final class MoneyWrapper implements MoneyWrapperInterface
     private function convertToDecimalIfNotation(string $notation, string $symbol): string
     {
         $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) ) [eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';
+
         if (preg_match($regEx, $notation, $matches)) {
             bcscale($this->getRepository()->subunitFor(new Currency($symbol)));
+
             return bcmul($matches['left'], bcpow('10', $matches['right']));
         }
+
         return $notation;
     }
 

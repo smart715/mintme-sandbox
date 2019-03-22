@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Exchange\Market;
 
@@ -60,7 +60,9 @@ class MarketFetcher implements MarketFetcherInterface
 
         return array_map(function (array $order) {
             $order['maker_id'] -= $this->config->getOffset();
+
             $order['taker_id'] -= $this->config->getOffset();
+
             return $order;
         }, $response->getResult());
     }
@@ -77,8 +79,10 @@ class MarketFetcher implements MarketFetcherInterface
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
         }
+
         return array_map(function (array $order) {
             $order['id'] -= $this->config->getOffset();
+
             return $order;
         }, $response->getResult()['records']);
     }
@@ -98,6 +102,7 @@ class MarketFetcher implements MarketFetcherInterface
 
         return array_map(function (array $order) {
             $order['user'] -= $this->config->getOffset();
+
             return $order;
         }, $response->getResult()['records']);
     }
@@ -117,6 +122,7 @@ class MarketFetcher implements MarketFetcherInterface
 
         return array_map(function (array $order) {
             $order['user'] -= $this->config->getOffset();
+
             return $order;
         }, $response->getResult()['orders']);
     }

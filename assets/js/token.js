@@ -1,9 +1,9 @@
 import {Tabs} from 'bootstrap-vue/es/components';
-import TokenTrade from '../components/token/trade/TokenTrade';
-import TokenIntroductionProfile from '../components/token/introduction/TokenIntroductionProfile';
-import TokenIntroductionStatistics from '../components/token/introduction/TokenIntroductionStatistics';
-import TokenIntroductionDescription from '../components/token/introduction/TokenIntroductionDescription';
-import TokenName from '../components/token/TokenName';
+import Trade from './components/trade/Trade';
+import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
+import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
+import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
+import TokenName from './components/token/TokenName';
 import store from './storage';
 
 new Vue({
@@ -15,7 +15,7 @@ new Vue({
     };
   },
   components: {
-    TokenTrade,
+    Trade,
     TokenIntroductionProfile,
     TokenIntroductionStatistics,
     TokenIntroductionDescription,

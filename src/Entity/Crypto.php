@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Entity;
 
@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @UniqueEntity("name")
  * @UniqueEntity("symbol")
  */
-class Crypto
+class Crypto implements TradebleInterface
 {
     /**
      * @ORM\Id()
@@ -47,13 +47,25 @@ class Crypto
      */
     protected $fee;
 
-    /** @Groups({"API"}) */
+    /**
+     * @ORM\Column(type="boolean")
+     * @var bool
+     */
+    protected $tradable;
+
+    /**
+     * @ORM\Column(type="boolean")
+     * @var bool
+     */
+    protected $exchangeble;
+
+    /** {@inheritdoc} */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /** @Groups({"API"}) */
+    /** {@inheritdoc} */
     public function getSymbol(): string
     {
         return $this->symbol;
@@ -63,6 +75,18 @@ class Crypto
     public function getSubunit(): int
     {
         return $this->subunit;
+    }
+
+    /** Show if crypto could be used as `base` currency */
+    public function isTradable(): bool
+    {
+        return $this->tradable;
+    }
+
+    /** Show if crypto could be used as `quote` currency */
+    public function isExchangeble(): bool
+    {
+        return $this->exchangeble;
     }
 
     public function getFee(): Money

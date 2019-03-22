@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Tests\Communications;
 
@@ -102,6 +102,7 @@ class GuzzleWrapperTest extends TestCase
     {
         $streamMock = $this->createMock(StreamInterface::class);
         $streamMock->method('getContents')->willReturn($content);
+
         return $streamMock;
     }
 
@@ -122,6 +123,7 @@ class GuzzleWrapperTest extends TestCase
             ->willReturn($this->getResponseMock($stream));
         $clientMock->method('request')
             ->willReturn($this->createMock(RequestInterface::class));
+
         return $clientMock;
     }
 
@@ -133,6 +135,7 @@ class GuzzleWrapperTest extends TestCase
     {
         $responseMock = $this->createMock(ResponseInterface::class);
         $responseMock->method('getBody')->willReturn($stream);
+
         return $responseMock;
     }
 
