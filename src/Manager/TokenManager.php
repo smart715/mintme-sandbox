@@ -156,6 +156,7 @@ class TokenManager implements TokenManagerInterface
     {
         $this->normalizeName($token);
         $length = strlen($token->getName());
+
         return Token::NAME_MIN_LENGTH <= $length
             && Token::NAME_MAX_LENGTH >= $length;
     }
@@ -165,12 +166,13 @@ class TokenManager implements TokenManagerInterface
         $this->normalizeName($token);
         $name = strtolower($token->getName());
         $name = str_replace(' ', '-', $name);
+
         return null !== $this->findByUrl($name);
     }
 
     public function normalizeName(Token &$token): void
     {
-        $name = (string)$token->getName() ?? '';
+        $name = $token->getName() ?? '';
         $name = trim($name, " -");
         $name = (string)preg_replace('/-+/', '-', $name);
         $name = (string)preg_replace('/\s+/', ' ', $name);
