@@ -42,9 +42,6 @@ class OrdersAPIController extends FOSRestController
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    /** @var MarketNameParserInterface */
-    private $marketParser;
-
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
@@ -55,49 +52,42 @@ class OrdersAPIController extends FOSRestController
         TraderInterface $trader,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        MarketNameParserInterface $marketParser,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager
     ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
-        $this->marketParser = $marketParser;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
     }
 
     /**
-     * @Rest\Post("/cancel/{market}", name="orders_cancel", options={"expose"=true})
-     * @Rest\RequestParam(name="order_data", allowBlank=false, description="array of orders ids")
+     * @Rest\Get("/cancel/{base}/{quote}/{orderid}", name="order_cancel", options={"expose"=true})
      * @Rest\View()
      */
-    public function cancelOrders(string $market, ParamFetcherInterface $request): View
+    public function cancelOrder(string $base, string $quote, int $orderid): View
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
 
-        foreach ($request->get('order_data') as $id) {
-            $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
-            $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
+        $market = $this->getMarket($base, $quote);
 
-            if (!$token || !$crypto) {
-                throw new BadRequestHttpException();
-            }
-
-            $order = new Order(
-                $id,
-                $this->getUser(),
-                null,
-                new Market($crypto, $token),
-                new Money('0', new Currency($crypto->getSymbol())),
-                1,
-                new Money('0', new Currency($crypto->getSymbol())),
-                ""
-            );
-            $this->trader->cancelOrder($order);
+        if (!$market) {
+            throw new \InvalidArgumentException();
         }
+
+        $order = new Order(
+            $orderid,
+            $this->getUser(),
+            null,
+            $market,
+            new Money('0', new Currency($market->getQuote()->getSymbol())),
+            1,
+            new Money('0', new Currency($market->getQuote()->getSymbol())),
+            ""
+        );
 
         return $this->view(Response::HTTP_OK);
     }
