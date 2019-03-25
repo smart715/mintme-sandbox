@@ -5,34 +5,6 @@ import TokenTradeChart from '../../js/components/trade/TradeChart';
 describe('TokenTradeChart', () => {
     describe('data field', () => {
         describe(':chartData', () => {
-            context('when component not mounted', () => {
-                it('chart labels/data should be empty arrays', () => {
-                    const data = TokenTradeChart.data();
-                    expect(data.chartData.labels).to.deep.equal([]);
-                    expect(data.chartData.datasets[0].data).to.deep.equal([]);
-                });
-            });
-
-            context('when component mounted', () => {
-                it('chart labels/data should be arrays of zeros', () => {
-                    const vm = mount(TokenTradeChart, {});
-
-                    const labelsLength = vm.chartData.labels.length;
-                    const labelsSum = vm.chartData.labels.reduce((total, num) => {
-                        return total + num;
-                    });
-                    const dataLength = vm.chartData.datasets[0].data.length;
-                    const dataSum = vm.chartData.datasets[0].data.reduce((total, num) => {
-                        return total + num;
-                    });
-
-                    expect(labelsLength).to.equal(vm.chartXAxesPoints);
-                    expect(labelsSum).to.equal(0);
-                    expect(dataLength).to.equal(vm.chartXAxesPoints);
-                    expect(dataSum).to.equal(0);
-                });
-            });
-
             context('when fetch market status from server', () => {
                 const market = JSON.stringify({
                     hiddenName: 'TOK000000000001WEB',
