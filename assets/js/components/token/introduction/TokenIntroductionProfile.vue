@@ -70,11 +70,11 @@
                     <div class="col-12 pt-3 text-left" v-if="!editingUrls">
                         <b-dropdown id="share" text="Share" variant="primary">
                             <social-sharing :url="profileUrl"
-                                title="MINTME"
-                                description="Check my new cryptocurrency."
-                                quote="Check my new token."
-                                hashtags="mintme"
-                                inline-template>
+                                    title="MINTME"
+                                    description="Check my new cryptocurrency."
+                                    quote="Check my new token."
+                                    hashtags="mintme"
+                                    inline-template>
                                 <div class="px-2">
                                     <network class="d-block c-pointer" network="email">
                                         <font-awesome-icon icon="envelope"></font-awesome-icon> Email
