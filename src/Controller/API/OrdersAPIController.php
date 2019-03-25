@@ -41,9 +41,6 @@ class OrdersAPIController extends FOSRestController
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    /** @var MarketNameParserInterface */
-    private $marketParser;
-
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
@@ -54,44 +51,40 @@ class OrdersAPIController extends FOSRestController
         TraderInterface $trader,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        MarketNameParserInterface $marketParser,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager
     ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
-        $this->marketParser = $marketParser;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
     }
 
     /**
-     * @Rest\Get("/cancel/{market}/{orderid}", name="order_cancel", options={"expose"=true})
+     * @Rest\Get("/cancel/{base}/{quote}/{orderid}", name="order_cancel", options={"expose"=true})
      * @Rest\View()
      */
-    public function cancelOrder(String $market, int $orderid): View
+    public function cancelOrder(string $base, string $quote, int $orderid): View
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
 
-        $crypto = $this->cryptoManager->findBySymbol($this->marketParser->parseSymbol($market));
-        $token = $this->tokenManager->findByHiddenName($this->marketParser->parseName($market));
+        $market = $this->getMarket($base, $quote);
 
-        if (!$token || !$crypto) {
+        if (!$market) {
             throw new \InvalidArgumentException();
         }
 
-        $market = new Market($crypto, $token);
         $order = new Order(
             $orderid,
             $this->getUser(),
             null,
             $market,
-            new Money('0', new Currency($crypto->getSymbol())),
+            new Money('0', new Currency($market->getQuote()->getSymbol())),
             1,
-            new Money('0', new Currency($crypto->getSymbol())),
+            new Money('0', new Currency($market->getQuote()->getSymbol())),
             ""
         );
 

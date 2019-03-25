@@ -1,10 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace App\Tests\Wallet;
+namespace App\Tests\Wallet\Money;
 
 use App\Manager\CryptoManager;
 use App\Wallet\Money\MoneyWrapper;
-use Money\Currency;
 use PHPUnit\Framework\TestCase;
 
 class MoneyWrapperTest extends TestCase
