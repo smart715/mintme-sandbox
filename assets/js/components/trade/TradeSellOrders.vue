@@ -26,6 +26,8 @@
                 <div class="table-responsive table-orders" ref="ordersList">
                     <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
@@ -74,6 +76,8 @@ export default {
         ordersList: [Array, Object],
         tokenName: String,
         fields: Object,
+        sortBy: String,
+        sortDesc: Boolean,
     },
     components: {
         Guide,

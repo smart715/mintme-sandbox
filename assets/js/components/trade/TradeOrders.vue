@@ -20,6 +20,8 @@
                         :orders-list="filteredBuyOrders"
                         :token-name="market.base.symbol"
                         :fields="fields"
+                        :sort-by="fields.price.key"
+                        :sort-desc="true"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -33,6 +35,8 @@
                         :orders-list="filteredSellOrders"
                         :token-name="market.quote.symbol"
                         :fields="fields"
+                        :sort-by="fields.price.key"
+                        :sort-desc="false"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -72,6 +76,7 @@ export default {
             fields: {
                 price: {
                     label: 'Price',
+                    key: 'price',
                 },
                 amount: {
                     label: 'Amount',
@@ -100,18 +105,22 @@ export default {
                     price: toMoney(order.price),
                     amount: toMoney(order.amount),
                     sumWeb: toMoney(new Decimal(order.price).mul(order.amount).toString()),
-                    trader: order.maker !== null ? this.truncateFullName(order.maker.profile) : 'Anonymous',
+                    trader: order.maker !== null
+                        ? this.truncateFullName(order.maker.profile, order.owner)
+                        : 'Anonymous',
                     traderUrl: this.$routing.generate('profile-view', {pageUrl: order.maker.profile.pageUrl}),
                     side: order.side,
                     owner: order.owner,
                 };
             });
         },
-        truncateFullName: function(profile) {
+        truncateFullName: function(profile, owner) {
             let first = profile.firstName;
             let second = profile.lastName;
-            if ((first + second).length > 9) {
-                return second.slice(0, 6) + '. ' + first.slice(0, 1);
+            if ((first + second).length > 8 && owner ) {
+                return second.slice(0, 5) + '. ' + first.slice(0, 1);
+            } else if (((first + second).length > 10 && !owner)) {
+                return second.slice(0, 7) + '. ' + first.slice(0, 1);
             } else {
                 return first + ' ' + second;
             }
