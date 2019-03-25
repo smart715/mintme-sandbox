@@ -212,6 +212,7 @@ class Profile
         return $this;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getPageUrl(): ?string
     {
         return $this->page_url;

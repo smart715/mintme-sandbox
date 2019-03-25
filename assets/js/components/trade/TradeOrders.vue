@@ -101,9 +101,7 @@ export default {
                     amount: toMoney(order.amount),
                     sumWeb: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     trader: order.maker !== null ? this.truncateFullName(order.maker.profile) : 'Anonymous',
-                    traderUrl: this.$routing.generate('token_show', {
-                        name: order.maker.profile.token.name,
-                    }),
+                    traderUrl: this.$routing.generate('profile-view', {pageUrl: order.maker.profile.pageUrl}),
                     side: order.side,
                     owner: order.owner,
                 };

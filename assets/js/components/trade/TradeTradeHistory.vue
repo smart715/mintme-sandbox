@@ -118,11 +118,11 @@ export default {
                         : '',
                     makerUrl: order.maker !== null
                         ? order.maker.profile ?
-                            this.$routing.generate('token_show', {name: order.maker.profile.token.name}) : ''
+                            this.$routing.generate('profile-view', {pageUrl: order.maker.profile.pageUrl}) : ''
                         : '',
                     takerUrl: order.taker !== null
                         ? order.taker.profile ?
-                            this.$routing.generate('token_show', {name: order.taker.profile.token.name}) : ''
+                            this.$routing.generate('profile-view', {pageUrl: order.taker.profile.pageUrl}) : ''
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     pricePerToken: toMoney(order.price),
