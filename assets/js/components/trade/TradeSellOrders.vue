@@ -94,7 +94,7 @@ export default {
     },
     methods: {
         scrollDown: function() {
-            let parentDiv = this.$refs.ordersList;
+            let parentDiv = this.$refs.table.$el.tBodies[0];
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
         removeOrderModal: function(row) {
