@@ -3,18 +3,21 @@
 namespace App\Controller\API;
 
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Utils\MarketNameParserInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Rest\Route("/api/markets")
  * @Security(expression="is_granted('prelaunch')")
  */
-class MarketAPIController extends FOSRestController
+class MarketAPIController extends APIController
 {
 
     /**
@@ -41,5 +44,25 @@ class MarketAPIController extends FOSRestController
         $marketsInfo = $marketHandler->getMarketsInfo($marketManager->createAll());
 
         return $this->view($marketsInfo);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{base}/{quote}/kline", name="market_kline", options={"expose"=true})
+     */
+    public function getMarketKline(
+        string $base,
+        string $quote,
+        MarketHandlerInterface $marketHandler
+    ): View {
+        $market = $this->getMarket($base, $quote);
+
+        if (!$market) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $this->view(
+            $marketHandler->getKLineStatDaily($market)
+        );
     }
 }

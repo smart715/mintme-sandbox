@@ -35,4 +35,9 @@ interface MarketHandlerInterface
      * @return MarketInfo[]
      */
     public function getMarketsInfo(array $markets): array;
+
+    /**
+     * @return Market\Model\LineStat[]
+     */
+    public function getKLineStatDaily(Market $market): array;
 }
