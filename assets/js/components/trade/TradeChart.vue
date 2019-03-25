@@ -1,71 +1,74 @@
 <template>
-    <div>
-        <div class="card">
-            <div class="card-body p-2">
-                <div class="row">
-                    <div class="col-lg-2">
-                        <div class="text-left">
-                            <div class="pt-2">
-                                Last price: {{ marketStatus.last }}
-                                <guide>
-                                    <template slot="header">
-                                        Last price
-                                    </template>
-                                    <template slot="body">
-                                        Price per one {{ market.base.symbol }} for last transaction.
-                                    </template>
-                                </guide>
-                            </div>
-                            <div class="pt-4">
-                                <div class="d-inline-block">
-                                    <div>
-                                        24h change
-                                        <guide>
-                                            <template slot="header">
-                                                24h change
-                                            </template>
-                                            <template slot="body">
-                                                Price change in last 24h
-                                            </template>
-                                        </guide>
-                                    </div>
-                                    <div>{{ marketStatus.change }}</div>
-                                </div>
-                                <div class="d-inline-block pt-4">
-                                    <div>
-                                        24h volume
-                                        <guide>
-                                            <template slot="header">
-                                                24h volume
-                                            </template>
-                                            <template slot="body">
-                                                The amount of {{ market.base.symbol }} that has been traded in the last 24 hours.
-                                            </template>
-                                        </guide>
-                                    </div>
-                                    <div>{{ marketStatus.volume }} Tokens</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="pt-2">
-                            [Volume] WEB ({{ marketStatus.change }}%)
-                        </div>
-                    </div>
-                    <div class="col-lg-4 pt-2">
-                        <line-chart :data="chartData" :options="chartOptions"/>
-                    </div>
+    <div v-if="loaded" class="card">
+        <div class="card-body p-2">
+            <div class="row mx-2">
+                <div class="col text-left">
+                    Last price: {{ marketStatus.last }}
+                    <guide>
+                        <template slot="header">
+                            Last price
+                        </template>
+                        <template slot="body">
+                            Price per one {{ market.quote.symbol }} for last transaction.
+                        </template>
+                    </guide>
+                </div>
+                <div class="col text-center">
+                    24h change: {{ marketStatus.change }}
+                    <guide>
+                        <template slot="header">
+                            24h change
+                        </template>
+                        <template slot="body">
+                            Price change in last 24h
+                        </template>
+                    </guide>
+                </div>
+                <div class="col text-center">
+                    24h volume: {{ marketStatus.volume }} Tokens
+                    <guide>
+                        <template slot="header">
+                            24h volume
+                        </template>
+                        <template slot="body">
+                            The amount of {{ market.quote.symbol }} that has been traded in the last 24 hours.
+                        </template>
+                    </guide>
+                </div>
+                <div class="col text-right">
+                    [Volume] {{ market.base.symbol }} ({{ marketStatus.change }}%)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <ve-candle
+                            class="m-2"
+                            :extend="additionalAttributes"
+                            :data="chartData"
+                            :settings="chartSettings"
+                            :theme="chartTheme"
+                            :not-set-unchange="['dataZoom']"
+                            :loading="isKlineEmpty"
+                            :resize-delay="0">
+                    </ve-candle>
                 </div>
             </div>
         </div>
     </div>
+    <div v-else class="p-5 text-center text-white">
+        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+    </div>
 </template>
 
 <script>
-import LineChart from '../../line-chart';
+import VeLineTheme from '../../../js/utils/echart-theme';
+import VeLine from 'v-charts';
 import Guide from '../Guide';
-import WebSocketMixin from '../../mixins/websocket';
+import WebSocketMixin from '../../../js/mixins/websocket';
+import {toMoney} from '../../../js/utils';
+import moment from 'moment';
+
+Vue.use(VeLine);
 
 export default {
     name: 'TradeChart',
@@ -76,93 +79,107 @@ export default {
     },
     data() {
         return {
-            chartData: {
-                labels: [],
-                datasets: [
-                    {
-                        borderWidth: 0,
-                        borderColor: 'white',
-                        backgroundColor: '#4d40c6',
-                        radius: 0,
-                        data: [],
-                        lineTension: 0,
-                    },
-                ],
+            chartTheme: VeLineTheme,
+            chartSettings: {
+                labelMap: {
+                    '日K': 'Indexes',
+                },
+                showMA: true,
+                showDataZoom: true,
+                start: 70,
+                end: 100,
+                downColor: '#ff6961',
+                upColor: '#77DD77',
+                showVol: false,
             },
-            chartOptions: {
-                layout: {
-                    padding: {
-                        left: -10,
-                        bottom: -10,
-                    },
-                },
-                scales: {
-                    xAxes: [
-                        {
-                            gridLines: {
-                                display: false,
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                display: false,
-                            },
-                        },
-                    ],
-                    yAxes: [
-                        {
-                            gridLines: {
-                                display: false,
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                display: false,
-                            },
-                        },
-                    ],
-                },
-                legend: {
-                    display: false,
+            additionalAttributes: {
+                grid: {
+                    top: 55,
+                    bottom: 60,
+                    left: '8%',
+                    right: '8%',
                 },
             },
-            chartXAxesPoints: 10,
+            chartOptions: {},
             marketStatus: {
                 volume: 0,
                 last: 0,
                 change: 0,
             },
+            stats: null,
         };
     },
     computed: {
-        chartInitValues: function() {
-            let values = [];
-
-            for (let i = 0; i < this.chartXAxesPoints; i++) {
-                values.push(0);
+        isKlineEmpty: function() {
+            return this.chartRows.length === 0;
+        },
+        chartRows: function() {
+            if (!this.stats.length) {
+                return [[new Date().toISOString().slice(0, 10), 0, 0, 0, 0, 0]];
             }
 
-            return values;
+            return this.stats.map((line) => {
+                 return [
+                    this.getDate(line.time),
+                    toMoney(line.open),
+                    toMoney(line.close),
+                    toMoney(line.highest),
+                    toMoney(line.lowest),
+                    toMoney(line.volume),
+                 ];
+              });
+        },
+        chartData: function() {
+            return {
+                columns: ['date', 'open', 'close', 'lowest', 'highest', 'vol'],
+                rows: this.chartRows,
+            };
+        },
+        loaded: function() {
+            return this.stats !== null;
         },
     },
     mounted() {
-        // Init values cause chart stick to xAxes initially.
-        this.chartData.labels = this.chartInitValues;
-        this.chartData.datasets[0].data = this.chartInitValues;
+        this.$axios.retry.get(this.$routing.generate('market_kline', {
+            base: this.market.base.symbol,
+            quote: this.market.quote.symbol,
+        })).then((res) => {
+            this.stats = res.data;
 
-        if (this.websocketUrl) {
             this.addMessageHandler((result) => {
                 if (result.method === 'state.update') {
                     this.updateMarketData(result);
                 }
+                if (result.method === 'kline.update') {
+                    if (this.getDate(result.params[0][0]) === this.getDate(this.stats[this.stats.length - 1].time)) {
+                        this.stats.pop();
+                    }
+
+                    this.stats.push({
+                        time: result.params[0][0],
+                        open: result.params[0][1],
+                        close: result.params[0][2],
+                        lowest: result.params[0][3],
+                        highest: result.params[0][4],
+                        volume: result.params[0][5],
+                    });
+                }
             });
             this.addOnOpenHandler(() => {
-                const request = JSON.stringify({
+                this.sendMessage(JSON.stringify({
                     method: 'state.subscribe',
                     params: [this.market.identifier],
                     id: parseInt(Math.random().toString().replace('0.', '')),
-                });
-                this.sendMessage(request);
+                }));
+                this.sendMessage(JSON.stringify({
+                    method: 'kline.subscribe',
+                    params: [this.market.identifier, 24*60*60],
+                    id: parseInt(Math.random().toString().replace('0.', '')),
+                }));
             });
-        }
+        }).catch((err) => {
+            this.$toasted.error('Service unavailable now. Can not load the chart data');
+        });
     },
     methods: {
         updateMarketData: function(marketData) {
@@ -173,26 +190,21 @@ export default {
             const marketInfo = marketData.params[1];
             const marketOpenPrice = parseFloat(marketInfo.open);
             const marketLastPrice = parseFloat(marketInfo.last);
-            const makretVolume = parseFloat(marketInfo.volume);
+            const marketVolume = parseFloat(marketInfo.volume);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
 
             this.marketStatus = {
                 change: changePercentage.toFixed(2),
-                last: marketLastPrice.toFixed(2),
-                volume: makretVolume.toFixed(2),
+                last: toMoney(marketLastPrice),
+                volume: marketVolume.toFixed(2),
             };
-
-            let data = this.chartData.datasets[0].data;
-            data.push(makretVolume);
-            if (data.length > this.chartXAxesPoints) {
-                data = data.slice(1);
-            }
-            this.chartData.datasets[0].data = data;
+        },
+        getDate: function(timestamp) {
+            return moment.utc((timestamp + 3600) * 1000).format('YYYY-MM-DD');
         },
     },
     components: {
-        LineChart,
         Guide,
     },
 };

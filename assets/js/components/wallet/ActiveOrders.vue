@@ -139,7 +139,9 @@ export default {
                     total: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     fee: order.fee * 100 + '%',
                     action: this.$routing.generate('order_cancel', {
-                        market: order.market.identifier, orderid: order.id,
+                        base: order.market.base.symbol,
+                        quote: order.market.quote.symbol,
+                        orderid: order.id,
                     }),
                     id: order.id,
                 };
