@@ -15,6 +15,7 @@ class MarketFetcher implements MarketFetcherInterface
     private const EXECUTED_ORDERS_METHOD = 'market.deals';
     private const USER_EXECUTED_HISTORY = 'market.user_deals';
     private const MARKET_STATUS = 'market.status';
+    private const KLINE = 'market.kline';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -125,5 +126,21 @@ class MarketFetcher implements MarketFetcherInterface
 
             return $order;
         }, $response->getResult()['orders']);
+    }
+
+    public function getKLineStat(string $market, int $start, int $end, int $interval): array
+    {
+        $response = $this->jsonRpc->send(self::KLINE, [
+            $market,
+            $start,
+            $end,
+            $interval,
+        ]);
+
+        if ($response->hasError()) {
+            throw new FetchException($response->getError()['message'] ?? '');
+        }
+
+        return $response->getResult();
     }
 }

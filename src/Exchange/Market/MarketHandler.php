@@ -7,6 +7,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
+use App\Exchange\Market\Model\LineStat;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
@@ -127,6 +128,30 @@ class MarketHandler implements MarketHandlerInterface
         });
 
         return $orders;
+    }
+
+    /** {@inheritdoc} */
+    public function getKLineStatDaily(Market $market): array
+    {
+        $stats = $this->marketFetcher->getKLineStat(
+            $this->marketNameConverter->convert($market),
+            (new \DateTimeImmutable('1970-01-01 12:00:00'))->getTimestamp(),
+            (new \DateTimeImmutable())->getTimestamp(),
+            60 * 60 * 24
+        );
+
+        return array_map(function (array $line) use ($market) {
+            return new LineStat(
+                (new \DateTimeImmutable())->setTimestamp($line[0]),
+                $this->moneyWrapper->parse($line[1], $this->getSymbol($market->getQuote())),
+                $this->moneyWrapper->parse($line[2], $this->getSymbol($market->getQuote())),
+                $this->moneyWrapper->parse($line[3], $this->getSymbol($market->getQuote())),
+                $this->moneyWrapper->parse($line[4], $this->getSymbol($market->getQuote())),
+                $this->moneyWrapper->parse($line[5], $this->getSymbol($market->getQuote())),
+                $this->moneyWrapper->parse($line[6], $this->getSymbol($market->getQuote())),
+                $market
+            );
+        }, $stats);
     }
 
     /** @return Order[] */
