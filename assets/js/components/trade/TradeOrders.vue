@@ -163,10 +163,11 @@ export default {
             this.switchConfirmModal(true);
         },
         removeOrder: function() {
-            let deleteOrdersUrl = this.$routing.generate('orders_cancel', {
-                'market': this.removeOrders[0].market.identifier,
+            let deleteOrdersUrl = this.$routing.generate('ordersCancel', {
+                base: this.removeOrders[0].market.base.symbol,
+                quote: this.removeOrders[0].market.quote.symbol,
             });
-            this.$axios.single.post(deleteOrdersUrl, {'order_data': this.removeOrders.map((order) => order.id)})
+            this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
                 .catch(() => {
                     this.$toasted.show('Service unavailable, try again later');
                 });

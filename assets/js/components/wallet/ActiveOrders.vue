@@ -138,10 +138,9 @@ export default {
                     price: toMoney(order.price),
                     total: toMoney(new Decimal(order.price).mul(order.amount).toString()),
                     fee: order.fee * 100 + '%',
-                    action: this.$routing.generate('order_cancel', {
+                    action: this.$routing.generate('ordersCancel', {
                         base: order.market.base.symbol,
                         quote: order.market.quote.symbol,
-                        orderid: order.id,
                     }),
                     id: order.id,
                 };
@@ -156,7 +155,7 @@ export default {
             this.confirmModal = val;
         },
         removeOrder: function() {
-            this.$axios.single.post(this.actionUrl, {'order_data': [this.currentRow.id]})
+            this.$axios.single.post(this.actionUrl, {'orderData': [this.currentRow.id]})
                 .catch(() => {
                     this.$toasted.show('Service unavailable, try again later');
                 });
