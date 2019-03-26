@@ -117,9 +117,9 @@ export default {
         truncateFullName: function(profile, owner) {
             let first = profile.firstName;
             let second = profile.lastName;
-            if ((first + second).length > 8 && owner ) {
+            if ((first + second).length > 7 && owner ) {
                 return second.slice(0, 5) + '. ' + first.slice(0, 1);
-            } else if (((first + second).length > 10 && !owner)) {
+            } else if (((first + second).length > 9 && !owner)) {
                 return second.slice(0, 7) + '. ' + first.slice(0, 1);
             } else {
                 return first + ' ' + second;
