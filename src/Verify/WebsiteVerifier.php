@@ -5,13 +5,11 @@ namespace App\Verify;
 use App\Communications\Factory\HttpClientFactoryInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebsiteVerifier implements WebsiteVerifierInterface
 {
-    private const HTTP_OK = 200;
     private const MATCH_CODE = 1;
-    private const FILE_NOT_FOUND = 404;
-    private const ACCESS_DENIED = 403;
 
     /** @var HttpClientFactoryInterface */
     private $clientFactory;
@@ -49,7 +47,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
             return false;
         }
 
-        if (self::HTTP_OK === $response->getStatusCode()) {
+        if (Response::HTTP_OK === $response->getStatusCode()) {
             $expectedPattern = '/('.self::PREFIX.': '.$verificationToken.')/';
 
             return self::MATCH_CODE === preg_match($expectedPattern, $response->getBody()->getContents());
@@ -60,9 +58,9 @@ class WebsiteVerifier implements WebsiteVerifierInterface
 
     public function addError(int $code): void
     {
-        if (self::FILE_NOT_FOUND === $code) {
+        if (Response::HTTP_NOT_FOUND === $code) {
             $this->errors[] = 'File not found';
-        } elseif (self::ACCESS_DENIED === $code) {
+        } elseif (Response::HTTP_FORBIDDEN === $code) {
             $this->errors[] = 'Access denied';
         } else {
             $this->errors[] = 'Website couldn\'t be confirmed, try again';
