@@ -116,11 +116,16 @@ export default {
         },
         truncateFullName: function(profile, owner) {
             let first = profile.firstName;
+            let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 7 && owner ) {
-                return second.slice(0, 5) + '. ' + first.slice(0, 1);
-            } else if (((first + second).length > 9 && !owner)) {
-                return second.slice(0, 7) + '. ' + first.slice(0, 1);
+            if ((first + second).length > 6 && owner ) {
+                return first.length > 6
+                    ? first.slice(0, 6) + '..'
+                    : first + ' ' +second.slice(0, 6 - firstLength) + '..';
+            } else if (((first + second).length > 8 && !owner)) {
+                return first.length > 8
+                    ? first.slice(0, 8) + '..'
+                    : first + ' ' + second.slice(0, 8 - firstLength) + '..';
             } else {
                 return first + ' ' + second;
             }
