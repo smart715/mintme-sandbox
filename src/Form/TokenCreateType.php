@@ -29,10 +29,10 @@ class TokenCreateType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Token name',
                 'attr' => [
-                    'oninvalid' => 'setCustomValidity("Invalid token name.")',
-                    'onchange' => 'setCustomValidity("")',
-                    'oninput' => 'setCustomValidity("")',
-                    'onmouseover' => "this.title=''",
+                    'minlength' => Token::NAME_MIN_LENGTH,
+                    'maxlength' => Token::NAME_MAX_LENGTH,
+                    'pattern' => "[a-zA-Z0-9\-\s]*",
+                    'title' => 'Invalid token name.',
                 ],
                 'constraints' => [
                     new Regex([

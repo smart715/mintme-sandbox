@@ -36,7 +36,7 @@ class Token implements TradebleInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[a-zA-Z0-9\-\s]*$/", message="Invalid token name.")
-     * @Assert\Length(min = 4, max = 255)
+     * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
      * @Groups({"API"})
      * @var string
      */

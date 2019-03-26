@@ -10,8 +10,6 @@ interface TokenManagerInterface
 {
     public function findByName(string $name): ?Token;
 
-    public function findByUrl(string $name): ?Token;
-
     public function getOwnToken(): ?Token;
 
     public function findByHiddenName(string $name): ?Token;
@@ -27,9 +25,6 @@ interface TokenManagerInterface
     /** @return Token[] */
     public function getTokensByPattern(string $pattern): array;
 
-    public function isValidName(Token $token): bool;
-
     public function isExisted(Token $token): bool;
 
-    public function normalizeName(Token &$token): void;
 }

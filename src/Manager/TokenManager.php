@@ -62,26 +62,11 @@ class TokenManager implements TokenManagerInterface
             )
         )
         ) {
-            return $this->repository->findByName($name);
-        }
+            $token = $this->repository->findByName($name);
 
-        return (new Token())->setName(strtoupper($name))->setCrypto(
-            $this->cryptoManager->findBySymbol(strtoupper($name))
-        );
-    }
-
-    public function findByUrl(string $name): ?Token
-    {
-        if (!in_array(
-            strtoupper($name),
-            array_map(
-                function (Crypto $crypto) {
-                    return $crypto->getSymbol();
-                },
-                $this->cryptoManager->findAll()
-            )
-        )
-        ) {
+            if ($token !== null){
+                return $token;
+            }
             return $this->repository->findByUrl($name);
         }
 
@@ -152,30 +137,11 @@ class TokenManager implements TokenManagerInterface
             : null;
     }
 
-    public function isValidName(Token $token): bool
-    {
-        $this->normalizeName($token);
-        $length = strlen($token->getName());
-
-        return Token::NAME_MIN_LENGTH <= $length
-            && Token::NAME_MAX_LENGTH >= $length;
-    }
-
     public function isExisted(Token $token): bool
     {
-        $this->normalizeName($token);
-        $name = strtolower($token->getName());
-        $name = str_replace(' ', '-', $name);
-
-        return null !== $this->findByUrl($name);
-    }
-
-    public function normalizeName(Token &$token): void
-    {
-        $name = $token->getName() ?? '';
-        $name = trim($name, " -");
-        $name = (string)preg_replace('/-+/', '-', $name);
-        $name = (string)preg_replace('/\s+/', ' ', $name);
-        $token->setName($name);
+        $name = strtoupper(
+            str_replace(' ', '-', $token->getName())
+        );
+        return null !== $this->findByName($name);
     }
 }

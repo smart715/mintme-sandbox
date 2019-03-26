@@ -8,6 +8,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Serializer\TradableNormalizer;
 use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -47,6 +48,7 @@ class TokensAPIController extends FOSRestController
         $this->cryptoManager = $cryptoManager;
     }
 
+
     /**
      * @Rest\View()
      * @Rest\Patch("/{name}", name="token_update")
@@ -63,7 +65,7 @@ class TokensAPIController extends FOSRestController
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        $this->tokenManager->normalizeName($token);
+        $token->setName(TradableNormalizer::tokenNameParser($token->getName()));
 
         $this->denyAccessUnlessGranted('edit', $token);
 
@@ -76,12 +78,6 @@ class TokensAPIController extends FOSRestController
             return null !== $value;
         }), false);
 
-        if (!$this->tokenManager->isValidName($token)) {
-            return $this->view(
-                'Invalid token name.',
-                Response::HTTP_BAD_REQUEST
-            );
-        }
 
         if ($this->tokenManager->isExisted($token)) {
             return $this->view(
@@ -91,14 +87,9 @@ class TokensAPIController extends FOSRestController
         }
 
         if (!$form->isValid()) {
-            return $this->view(
-                !$this->tokenManager->isValidName($token)
-                    ? 'Invalid token name.'
-                    : $form->getErrors()[0],
-                Response::HTTP_BAD_REQUEST
-            );
+            return $this->view('Invalid token name.',Response::HTTP_BAD_REQUEST);
         }
-
+        
         $this->em->persist($token);
         $this->em->flush();
 
@@ -173,8 +164,8 @@ class TokensAPIController extends FOSRestController
         $lock = $token->getLockIn() ?? new LockIn($token);
 
         $form = $this->createFormBuilder($lock, [
-            'csrf_protection' => false,
-            'allow_extra_fields' => true,
+                'csrf_protection' => false,
+                'allow_extra_fields' => true,
         ])
             ->add('releasePeriod')
             ->getForm();

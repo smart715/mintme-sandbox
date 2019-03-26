@@ -63,6 +63,7 @@ export default {
                 name: this.newName,
             })
             .then((response) => {
+                console.log(response);
                 if (response.status === HTTP_ACCEPTED) {
                     this.currentName = response.data['tokenName'];
                 }
