@@ -92,7 +92,8 @@ class TokenController extends Controller
             throw new NotFoundPairException();
         }
 
-        $dashedName = str_replace(' ', '-', $token->getName());
+        $dashedName = str_replace(' ', '_', $token->getName());
+
         if ($dashedName != $token->getName()) {
             $this->redirectToOwnToken($tab);
         }
@@ -135,18 +136,6 @@ class TokenController extends Controller
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
 
-            $token->setName($this->normalize($token)['name']);
-
-            if ($this->tokenManager->isExisted($token)) {
-                $form->addError(new FormError('Token name is already exists.'));
-                return $this->render('pages/token_creation.html.twig', [
-                    'formHeader' => 'Create your own token',
-                    'form' => $form->createView(),
-                    'profileCreated' => true,
-                ]);
-            }
-
-            exit();
             if (null !== $profile) {
                 $token->setProfile($profile);
                 $this->em->persist($token);
@@ -217,7 +206,7 @@ class TokenController extends Controller
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
-        $dashedName = str_replace(' ', '-', $token->getName());
+        $dashedName = str_replace(' ', '_', $token->getName());
 
         return $this->redirectToRoute('token_show', [
             'name' => $dashedName,

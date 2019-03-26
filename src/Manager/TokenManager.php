@@ -64,9 +64,10 @@ class TokenManager implements TokenManagerInterface
         ) {
             $token = $this->repository->findByName($name);
 
-            if ($token !== null){
+            if (null !== $token) {
                 return $token;
             }
+
             return $this->repository->findByUrl($name);
         }
 
@@ -142,6 +143,7 @@ class TokenManager implements TokenManagerInterface
         $name = strtoupper(
             str_replace(' ', '-', $token->getName())
         );
+
         return null !== $this->findByName($name);
     }
 }

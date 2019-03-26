@@ -30,18 +30,8 @@ class TradableNormalizer implements NormalizerInterface
         $tradable['identifier'] = $object instanceof Token ?
             $this->tokenNameConverter->convert($object) :
             $object->getSymbol();
-;
-        $tradable['name'] = $this->tokenNameParser($object->getName());
 
         return $tradable;
-    }
-
-    public static function tokenNameParser(string $name): string
-    {
-        $name = trim($name, " -");
-        $name = (string)preg_replace('/-+/', '-', $name);
-        $name = (string)preg_replace('/\s+/', ' ', $name);
-        return $name;
     }
 
     /** {@inheritdoc} */
