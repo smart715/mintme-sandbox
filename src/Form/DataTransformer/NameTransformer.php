@@ -2,8 +2,8 @@
 
 namespace App\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
 use App\Utils\Converter\TokenNameConverter;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class NameTransformer implements DataTransformerInterface
 {

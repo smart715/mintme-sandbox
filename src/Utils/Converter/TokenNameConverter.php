@@ -27,14 +27,16 @@ class TokenNameConverter implements TokenNameConverterInterface
             : $token->getName();
     }
 
-    public static function parse(string $name) :?string
+    public static function parse(string $name): ?string
     {
         if ($name) {
             $name = trim($name, '\s-');
             $name = (string)preg_replace('/\s+/', ' ', $name);
             $name = (string)preg_replace('/\s*\-{1,}\s*/', '-', $name);
+
             return $name;
         }
+
         return null;
     }
 }

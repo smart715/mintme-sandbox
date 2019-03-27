@@ -139,6 +139,7 @@ class TokenController extends Controller
 
             if ($this->tokenManager->isExisted($token)) {
                 $form->addError(new FormError('Token name is already exists.'));
+
                 return $this->render('pages/token_creation.html.twig', [
                     'formHeader' => 'Create your own token',
                     'form' => $form->createView(),

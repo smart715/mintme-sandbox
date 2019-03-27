@@ -63,7 +63,6 @@ class TokenManager implements TokenManagerInterface
             )
         )
         ) {
-
             $name = TokenNameConverter::parse($name);
 
             $token = $this->repository->findByName($name);
