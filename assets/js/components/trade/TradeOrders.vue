@@ -177,7 +177,7 @@ export default {
             this.switchConfirmModal(true);
         },
         removeOrder: function() {
-            let deleteOrdersUrl = this.$routing.generate('ordersCancel', {
+            let deleteOrdersUrl = this.$routing.generate('orders_сancel', {
                 base: this.removeOrders[0].market.base.symbol,
                 quote: this.removeOrders[0].market.quote.symbol,
             });

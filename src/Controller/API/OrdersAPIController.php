@@ -63,7 +63,7 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     * @Rest\Post("/cancel/{base}/{quote}", name="ordersCancel", options={"expose"=true})
+     * @Rest\Post("/cancel/{base}/{quote}", name="orders_сancel", options={"expose"=true})
      * @Rest\RequestParam(name="orderData", allowBlank=false, description="array of orders ids")
      * @Rest\View()
      */

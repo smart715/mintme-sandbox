@@ -23,7 +23,7 @@
                 </template>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive table-orders" ref="ordersList">
+                <div class="table-responsive fixed-head-table" ref="ordersList">
                     <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
                         :sort-by.sync="sortBy"

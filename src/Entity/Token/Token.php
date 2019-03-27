@@ -35,7 +35,7 @@ class Token implements TradebleInterface
      * @Assert\NotBlank()
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
      * @Assert\Length(min = 4, max = 255)
-     * @Groups({"API", "Default"})
+     * @Groups({"API"})
      * @var string
      */
     protected $name;
@@ -127,7 +127,6 @@ class Token implements TradebleInterface
         return $this->lockIn;
     }
 
-    /** @Groups({"Default", "API"}) */
     public function getName(): string
     {
         /** @var string|null $name */

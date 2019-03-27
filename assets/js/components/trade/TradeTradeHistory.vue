@@ -15,7 +15,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive table-orders" ref="history">
+                <div class="table-responsive fixed-head-table" ref="history">
                     <template v-if="loaded">
                         <b-table v-if="hasOrders" class="w-100" ref="table"
                             :items="ordersList"
