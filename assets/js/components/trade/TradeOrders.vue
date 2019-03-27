@@ -108,7 +108,7 @@ export default {
                     trader: order.maker !== null
                         ? this.truncateFullName(order.maker.profile, order.owner)
                         : 'Anonymous',
-                    traderUrl: this.$routing.generate('profile-view', {pageUrl: order.maker.profile.pageUrl}),
+                    traderUrl: this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url}),
                     side: order.side,
                     owner: order.owner,
                 };
