@@ -2,7 +2,6 @@
 
 namespace App\Exchange;
 
-use App\Entity\Token\Token;
 use App\Entity\User;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;

@@ -127,6 +127,7 @@ class Token implements TradebleInterface
         return $this->lockIn;
     }
 
+    /** {@inheritdoc} */
     public function getName(): string
     {
         /** @var string|null $name */
