@@ -62,6 +62,7 @@ import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
+import {toMoney} from '../../utils';
 
 export default {
     name: 'Trade',
@@ -143,6 +144,10 @@ export default {
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
                     this.balances = {...res.data.common, ...res.data.predefined};
+
+                    if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
+                        this.balances[this.market.quote.symbol] = {available: toMoney(0)};
+                    }
 
                     this.authorize()
                         .then(() => {
