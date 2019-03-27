@@ -12,6 +12,7 @@ use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\TokenNameConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -86,16 +87,15 @@ class TokenController extends Controller
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
 
+        $dashedName = TokenNameConverter::parse($name);
+        if ($dashedName != $name) {
+            return $this->redirectToOwnToken($tab);
+        }
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             throw new NotFoundPairException();
-        }
-
-        $dashedName = str_replace(' ', '_', $token->getName());
-
-        if ($dashedName != $token->getName()) {
-            $this->redirectToOwnToken($tab);
         }
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
@@ -135,6 +135,16 @@ class TokenController extends Controller
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
+
+            if ($this->tokenManager->isExisted($token)) {
+                $form->addError(new FormError('Token name is already exists.'));
+                return $this->render('pages/token_creation.html.twig', [
+                    'formHeader' => 'Create your own token',
+                    'form' => $form->createView(),
+                    'profileCreated' => $this->isProfileCreated(),
+                    'profileCreated' => true,
+                ]);
+            }
 
             if (null !== $profile) {
                 $token->setProfile($profile);
@@ -206,7 +216,7 @@ class TokenController extends Controller
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
-        $dashedName = str_replace(' ', '_', $token->getName());
+        $dashedName = TokenNameConverter::parse($token->getName());
 
         return $this->redirectToRoute('token_show', [
             'name' => $dashedName,

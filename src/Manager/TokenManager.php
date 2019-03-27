@@ -9,6 +9,7 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
 use App\Fetcher\ProfileFetcherInterface;
 use App\Repository\TokenRepository;
+use App\Utils\Converter\TokenNameConverter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -62,6 +63,9 @@ class TokenManager implements TokenManagerInterface
             )
         )
         ) {
+
+            $name = TokenNameConverter::parse($name);
+
             $token = $this->repository->findByName($name);
 
             if (null !== $token) {

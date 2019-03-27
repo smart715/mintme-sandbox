@@ -26,4 +26,14 @@ class TokenNameConverter implements TokenNameConverterInterface
             ? 'TOK'.str_pad((string)($token->getId() + $this->config->getOffset()), 12, '0', STR_PAD_LEFT)
             : $token->getName();
     }
+
+    public static function parse(string $name) :?string
+    {
+        if ($name) {
+            $name = (string)preg_replace('/\s+/', ' ', $name);
+            $name = (string)preg_replace('/\s*\-{1,}\s*/', '-', $name);
+            return $name;
+        }
+        return null;
+    }
 }
