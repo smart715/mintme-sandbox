@@ -233,19 +233,23 @@ export default {
 
                 Object.keys(this.predefinedTokens).forEach((token) => {
                     if (oTokenName === this.predefinedTokens[token].identifier) {
-                        this.predefinedTokens[token].available = Decimal.sub(
-                            oToken.available,
-                            this.predefinedTokens[token].frozen
-                        ).toString();
+                        this.predefinedTokens[token].available = oToken.available;
                     }
                 });
 
                 Object.keys(this.tokens).forEach((token) => {
                     if (oTokenName === this.tokens[token].identifier) {
-                        this.tokens[token].available = Decimal.sub(
-                            oToken.available,
-                            this.tokens[token].frozen
-                        ).toString();
+                        if (!this.tokens[token].owner) {
+                            this.tokens[token].available = oToken.available;
+                            return;
+                        }
+
+                        this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
+                            .then((res) =>
+                                this.tokens[token].available = res.data ?
+                                    new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
+                            )
+                            .catch(() => {});
                     }
                 });
             });

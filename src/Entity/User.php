@@ -94,7 +94,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     protected $googleAuthenticatorEntry;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token", inversedBy="relatedUsers")
      * @ORM\JoinTable(name="user_tokens",
      *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="token_id", referencedColumnName="id")}

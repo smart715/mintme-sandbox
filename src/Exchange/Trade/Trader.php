@@ -74,15 +74,10 @@ class Trader implements TraderInterface
             $this->isReferralFeeEnabled() ? (string)$this->prelaunchConfig->getReferralFee() : '0'
         );
 
-        if (TradeResult::SUCCESS === $result->getResult()) {
-            $maker = $this->getUserRepository()->find($order->getMaker()->getId());
-            $taker = $this->getUserRepository()->find($order->getTaker() ? $order->getTaker()->getId() : 0);
+        $quote = $order->getMarket()->getQuote();
 
-            $token = $order->getMarket()->getQuote();
-
-            if ($token instanceof Token) {
-                $this->updateUsers([$maker, $taker], $token);
-            }
+        if (TradeResult::SUCCESS === $result->getResult() && $quote instanceof Token) {
+            $this->updateUserReferrencer($order->getMaker(), $quote);
         }
 
         return $result;
@@ -147,23 +142,15 @@ class Trader implements TraderInterface
             $this->prelaunchConfig->getTradeFinishDate()->getTimestamp() < $this->time->now()->getTimestamp();
     }
 
-    /**
-     * @param User[] $users
-     */
-    private function updateUsers(array $users, Token $token): void
+    private function updateUserReferrencer(User $user, Token $token): void
     {
-        foreach ($users as $user) {
-            if (null !== $user && !in_array($token, $user->getRelatedTokens())) {
-                $user->addRelatedToken($token);
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-            }
-        }
-    }
+        $referrencer = $user->getReferrencer();
 
-    private function getUserRepository(): UserRepository
-    {
-        return $this->entityManager->getRepository(User::class);
+        if ($referrencer && !in_array($referrencer, $token->getRelatedUsers(), true)) {
+            $referrencer->addRelatedToken($token);
+            $this->entityManager->persist($referrencer);
+            $this->entityManager->flush();
+        }
     }
 
     private function createOrder(array $orderData, User $user, Market $market, string $status): Order

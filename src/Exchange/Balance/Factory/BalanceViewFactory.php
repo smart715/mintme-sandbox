@@ -5,9 +5,13 @@ namespace App\Exchange\Balance\Factory;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BalanceViewFactory implements BalanceViewFactoryInterface
 {
+    /** @var TokenStorageInterface */
+    private $tokenStorage;
+
     /** @var TokenManagerInterface */
     private $tokenManager;
 
@@ -15,9 +19,11 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     private $tokenNameConverter;
 
     public function __construct(
+        TokenStorageInterface $tokenStorage,
         TokenManagerInterface $tokenManager,
         TokenNameConverterInterface $tokenNameConverter
     ) {
+        $this->tokenStorage = $tokenStorage;
         $this->tokenManager = $tokenManager;
         $this->tokenNameConverter = $tokenNameConverter;
     }
@@ -42,6 +48,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $name = $token->getCrypto()->getName();
             }
 
+            $securityToken = $this->tokenStorage->getToken();
             $result[$token->getName()] = new BalanceView(
                 $this->tokenNameConverter->convert($token),
                 $this->tokenManager->getRealBalance(
@@ -50,7 +57,8 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 )->getAvailable(),
                 $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
                 $name,
-                $fee
+                $fee,
+                $securityToken && $token->getProfile() && $securityToken->getUser() === $token->getProfile()->getUser()
             );
         }
 
