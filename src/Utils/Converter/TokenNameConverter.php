@@ -27,7 +27,7 @@ class TokenNameConverter implements TokenNameConverterInterface
             : $token->getName();
     }
 
-    public static function parse(string $name): ?string
+    public static function parse(?string $name): string
     {
         if ($name) {
             $name = trim($name, '\s-');
@@ -37,6 +37,6 @@ class TokenNameConverter implements TokenNameConverterInterface
             return $name;
         }
 
-        return null;
+        return '';
     }
 }
