@@ -1,10 +1,10 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
-import TradeSellOrder from '../../js/components/trade/TradeSellOrder';
+import TradeBuyOrder from '../../js/components/trade/TradeBuyOrder';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
 
 
-describe('TradeSellOrder', () => {
+describe('TradeBuyOrder', () => {
     beforeEach(() => {
        moxios.install();
     });
@@ -17,7 +17,7 @@ describe('TradeSellOrder', () => {
     const localVue = createLocalVue();
     localVue.use(Axios);
 
-    const wrapper = shallowMount(TradeSellOrder, {
+    const wrapper = shallowMount(TradeBuyOrder, {
         localVue,
         mocks: {
             $routing,
@@ -59,8 +59,8 @@ describe('TradeSellOrder', () => {
         expect(wrapper.vm.showModal).to.deep.equal(false);
         wrapper.vm.placeOrder();
         expect(wrapper.vm.showModal).to.deep.equal(false);
-        wrapper.vm.sellPrice = 2;
-        wrapper.vm.sellAmount = 2;
+        wrapper.vm.buyPrice = 2;
+        wrapper.vm.buyAmount = 2;
         wrapper.vm.placeOrder();
         moxios.wait(() => {
             expect(wrapper.vm.showModal).to.deep.equal(true);
