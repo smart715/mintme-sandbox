@@ -70,6 +70,7 @@ export default {
     name: 'TradeTradeHistory',
     props: {
         market: Object,
+        precision: Number,
     },
     components: {
         Guide,
@@ -123,9 +124,9 @@ export default {
                         ? this.$routing.generate('profile-view', {pageUrl: order.taker.profile.page_url})
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
-                    pricePerToken: toMoney(order.price),
-                    tokenAmount: toMoney(order.amount),
-                    webAmount: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    pricePerToken: toMoney(order.price, this.precision),
+                    tokenAmount: toMoney(order.amount, this.precision),
+                    webAmount: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.precision),
                 };
             }) : [];
         },

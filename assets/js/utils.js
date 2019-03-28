@@ -71,8 +71,10 @@ export function deepFlatten(object) {
 
 /**
  * @param {string|int|float} val
+ * @param {int} precision
  * @return {string}
  */
-export function toMoney(val) {
-    return new Decimal(val).toFixed(GENERAL.precision);
+export function toMoney(val, precision = GENERAL.precision) {
+    Decimal.set({rounding: Decimal.ROUND_DOWN});
+    return new Decimal(val).toFixed(precision);
 }

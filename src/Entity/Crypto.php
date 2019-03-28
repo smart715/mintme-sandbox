@@ -71,7 +71,6 @@ class Crypto implements TradebleInterface
         return $this->symbol;
     }
 
-    /** @Groups({"API"}) */
     public function getSubunit(): int
     {
         return $this->subunit;
