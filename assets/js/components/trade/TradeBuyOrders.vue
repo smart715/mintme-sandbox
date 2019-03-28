@@ -78,13 +78,14 @@ export default {
         fields: Object,
         sortBy: String,
         sortDesc: Boolean,
+        precision: Number,
     },
     components: {
         Guide,
     },
     computed: {
         total: function() {
-            return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sumWeb) + sum, 0));
+            return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sumWeb) + sum, 0), this.precision);
         },
         hasOrders: function() {
               return this.ordersList.length > 0;

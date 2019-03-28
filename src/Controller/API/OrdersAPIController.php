@@ -123,7 +123,10 @@ class OrdersAPIController extends FOSRestController
         }
 
         $isSellSide = Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')];
-        $price = $moneyWrapper->parse($request->get('priceInput'), $this->getSymbol($market->getQuote()));
+        $price = $moneyWrapper->parse(
+            $this->parseAmount($request->get('priceInput'), $market),
+            $this->getSymbol($market->getQuote())
+        );
 
         if ($request->get('marketPrice')) {
             /** @var Order[] $orders */
@@ -139,7 +142,10 @@ class OrdersAPIController extends FOSRestController
             $this->getUser(),
             null,
             $market,
-            $moneyWrapper->parse($request->get('amountInput'), $this->getSymbol($market->getQuote())),
+            $moneyWrapper->parse(
+                $this->parseAmount($request->get('amountInput'), $market),
+                $this->getSymbol($market->getQuote())
+            ),
             Order::SIDE_MAP[$request->get('action')],
             $price,
             Order::PENDING_STATUS,
@@ -230,6 +236,15 @@ class OrdersAPIController extends FOSRestController
             $user,
             $this->marketManager->createUserRelated($user)
         );
+    }
+
+    private function parseAmount(string $amount, Market $market): string
+    {
+        $precisionContainer = $this->getParameter('market_precision');
+
+        return bcdiv($amount, '1', $market->isTokenMarket() ?
+            $precisionContainer['token'] :
+            $precisionContainer['coin']);
     }
 
     private function getSymbol(TradebleInterface $tradeble): string
