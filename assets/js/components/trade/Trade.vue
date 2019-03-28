@@ -49,14 +49,16 @@
                 </template>
             </div>
         </div>
-        <div class="row px-0">
-            <trade-orders
-                    :orders-loaded="ordersLoaded"
-                    :buy-orders="buyOrders"
-                    :sell-orders="sellOrders"
-                    :market="market"
-                    :user-id="userId"
-                    :precision="precision" />
+        <div class="row">
+            <div class="col">
+                <trade-orders
+                        :orders-loaded="ordersLoaded"
+                        :buy-orders="buyOrders"
+                        :sell-orders="sellOrders"
+                        :market="market"
+                        :user-id="userId"
+                        :precision="precision" />
+            </div>
         </div>
         <div class="row px-0 mt-3">
             <trade-trade-history class="col" :market="market" :precision="precision" />

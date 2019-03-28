@@ -69,6 +69,7 @@
 <script>
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'TradeBuyOrders',
@@ -85,7 +86,9 @@ export default {
     },
     computed: {
         total: function() {
-            return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.sumWeb) + sum, 0), this.precision);
+            return toMoney(this.ordersList.reduce((sum, order) =>
+                new Decimal(order.sumWeb).add(sum), 0), this.precision
+            );
         },
         hasOrders: function() {
               return this.ordersList.length > 0;

@@ -65,6 +65,7 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
+import {WSAPI} from '../../utils/constants';
 
 export default {
     name: 'TradeTradeHistory',
@@ -123,7 +124,7 @@ export default {
                     takerUrl: order.taker && order.taker.profile
                         ? this.$routing.generate('profile-view', {pageUrl: order.taker.profile.page_url})
                         : '',
-                    type: (order.side === 0) ? 'Buy' : 'Sell',
+                    type: (order.side === WSAPI.order.type.BUY) ? 'Buy' : 'Sell',
                     pricePerToken: toMoney(order.price, this.precision),
                     tokenAmount: toMoney(order.amount, this.precision),
                     webAmount: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.precision),
