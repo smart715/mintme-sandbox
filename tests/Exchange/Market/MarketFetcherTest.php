@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Config\Config;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
@@ -285,7 +286,7 @@ class MarketFetcherTest extends TestCase
         return [
             new Order(
                 1,
-                null,
+                $this->createMock(User::class),
                 null,
                 $this->createMarket(),
                 $this->createMoney(10),
