@@ -14,6 +14,7 @@ use App\Manager\UserManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use InvalidArgumentException;
 
 class MarketHandler implements MarketHandlerInterface
 {
@@ -162,9 +163,15 @@ class MarketHandler implements MarketHandlerInterface
             : $result;
 
         return array_map(function (array $orderData) use ($market) {
+            $user = $this->userManager->find($orderData['user']);
+
+            if (!$user) {
+                throw new InvalidArgumentException();
+            }
+
             return new Order(
                 $orderData['id'],
-                $this->userManager->find($orderData['user']),
+                $user,
                 null,
                 $market,
                 $this->moneyWrapper->parse(
@@ -187,11 +194,17 @@ class MarketHandler implements MarketHandlerInterface
     private function parseExecutedOrders(array $result, Market $market): array
     {
         return array_map(function (array $orderData) use ($market) {
+            $user = array_key_exists('maker_id', $orderData)
+                ? $this->userManager->find($orderData['maker_id'])
+                : null;
+
+            if (!$user) {
+                throw new InvalidArgumentException();
+            }
+
             return new Order(
                 $orderData['id'],
-                array_key_exists('maker_id', $orderData)
-                    ? $this->userManager->find($orderData['maker_id'])
-                    : null,
+                $user,
                 array_key_exists('taker_id', $orderData)
                     ? $this->userManager->find($orderData['taker_id'])
                     : null,
