@@ -5,7 +5,9 @@ namespace App\Entity\Token;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
+use App\Entity\User;
 use App\Validator\Constraints as AppAssert;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -82,7 +84,7 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
-     * @var Profile
+     * @var Profile|null
      */
     protected $profile;
 
@@ -100,6 +102,18 @@ class Token implements TradebleInterface
      * @var \DateTimeImmutable
      */
     protected $created;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="relatedTokens")
+     * @var ArrayCollection
+     */
+    protected $relatedUsers;
+
+    /** @return User[] */
+    public function getRelatedUsers(): array
+    {
+        return $this->relatedUsers->toArray();
+    }
 
     /** {@inheritdoc} */
     public function getSymbol(): string
@@ -217,7 +231,7 @@ class Token implements TradebleInterface
         return $this;
     }
 
-    public function getProfile(): Profile
+    public function getProfile(): ?Profile
     {
         return $this->profile;
     }

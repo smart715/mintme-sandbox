@@ -226,13 +226,11 @@ export default {
                 }
 
                 this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
-                    .then((res) => {
-                        this.immutableBalance = res.data ?
+                    .then((res) => this.immutableBalance = res.data ?
                             new Decimal(response.params[0][this.market.quote.identifier].available).sub(
                                 res.data.frozenAmount
-                            ) :
-                            response.params[0][this.market.quote.identifier].available;
-                    })
+                            ) : response.params[0][this.market.quote.identifier].available
+                    )
                     .catch(() => {});
             }
         });

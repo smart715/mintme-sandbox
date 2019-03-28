@@ -22,18 +22,23 @@ class BalanceView
     /** @var Money|null */
     public $fee;
 
+    /** @var bool */
+    public $isOwner;
+
     public function __construct(
         string $identifier,
         Money $available,
         ?Money $frozen,
         string $fullname,
-        ?Money $fee
+        ?Money $fee,
+        bool $isOwner = false
     ) {
         $this->identifier = $identifier;
         $this->available = $available;
         $this->frozen = $frozen;
         $this->fullname = $fullname;
         $this->fee = $fee;
+        $this->isOwner = $isOwner;
     }
 
     /** @Groups({"API"}) */
@@ -64,5 +69,11 @@ class BalanceView
     public function getIdentifier(): string
     {
         return $this->identifier;
+    }
+
+    /** @Groups({"API"}) */
+    public function isOwner(): bool
+    {
+        return $this->isOwner;
     }
 }

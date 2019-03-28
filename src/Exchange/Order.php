@@ -24,7 +24,7 @@ class Order
     /** @var int|null */
     private $id;
 
-    /** @var User|null */
+    /** @var User */
     private $maker;
 
     /** @var User|null */
@@ -56,7 +56,7 @@ class Order
 
     public function __construct(
         ?int $id,
-        ?User $maker,
+        User $maker,
         ?User $taker,
         Market $market,
         Money $amount,
@@ -87,7 +87,7 @@ class Order
     }
 
     /** @Groups({"Default", "API"}) */
-    public function getMaker(): ?User
+    public function getMaker(): User
     {
         return $this->maker;
     }
