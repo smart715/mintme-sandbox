@@ -25,6 +25,7 @@ use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @Rest\Route("/api/orders")
@@ -62,10 +63,11 @@ class OrdersAPIController extends FOSRestController
     }
 
     /**
-     * @Rest\Get("/cancel/{base}/{quote}/{orderid}", name="order_cancel", options={"expose"=true})
+     * @Rest\Post("/cancel/{base}/{quote}", name="orders_сancel", options={"expose"=true})
+     * @Rest\RequestParam(name="orderData", allowBlank=false, description="array of orders ids")
      * @Rest\View()
      */
-    public function cancelOrder(string $base, string $quote, int $orderid): View
+    public function cancelOrders(string $base, string $quote, ParamFetcherInterface $request): View
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -77,23 +79,22 @@ class OrdersAPIController extends FOSRestController
             throw new \InvalidArgumentException();
         }
 
-        $order = new Order(
-            $orderid,
-            $this->getUser(),
-            null,
-            $market,
-            new Money('0', new Currency($market->getQuote()->getSymbol())),
-            1,
-            new Money('0', new Currency($market->getQuote()->getSymbol())),
-            ""
-        );
+        foreach ($request->get('orderData') as $id) {
+            $order = new Order(
+                $id,
+                $this->getUser(),
+                null,
+                $market,
+                new Money('0', new Currency($market->getQuote()->getSymbol())),
+                1,
+                new Money('0', new Currency($market->getQuote()->getSymbol())),
+                ""
+            );
 
-        $tradeResult = $this->trader->cancelOrder($order);
+            $this->trader->cancelOrder($order);
+        }
 
-        return $this->view([
-            'result' => $tradeResult->getResult(),
-            'message' => $tradeResult->getMessage(),
-        ]);
+        return $this->view(Response::HTTP_OK);
     }
 
     /**
@@ -154,7 +155,6 @@ class OrdersAPIController extends FOSRestController
             'message' => $tradeResult->getMessage(),
         ], Response::HTTP_ACCEPTED);
     }
-
 
     /**
      * @Rest\Get("/{base}/{quote}/pending", name="pending_orders", options={"expose"=true})
