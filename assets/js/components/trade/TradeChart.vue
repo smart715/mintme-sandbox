@@ -42,14 +42,14 @@
             <div class="row">
                 <div class="col">
                     <ve-candle
-                            class="m-2"
-                            :extend="additionalAttributes"
-                            :data="chartData"
-                            :settings="chartSettings"
-                            :theme="chartTheme"
-                            :not-set-unchange="['dataZoom']"
-                            :loading="isKlineEmpty"
-                            :resize-delay="0">
+                        class="m-2"
+                        :extend="additionalAttributes"
+                        :data="chartData"
+                        :settings="chartSettings"
+                        :theme="chartTheme(precision)"
+                        :not-set-unchange="['dataZoom']"
+                        :loading="isKlineEmpty"
+                        :resize-delay="0">
                     </ve-candle>
                 </div>
             </div>
@@ -76,6 +76,7 @@ export default {
     props: {
         websocketUrl: String,
         market: Object,
+        precision: Number,
     },
     data() {
         return {
@@ -121,11 +122,11 @@ export default {
             return this.stats.map((line) => {
                  return [
                     this.getDate(line.time),
-                    toMoney(line.open),
-                    toMoney(line.close),
-                    toMoney(line.highest),
-                    toMoney(line.lowest),
-                    toMoney(line.volume),
+                    toMoney(line.open, this.precision),
+                    toMoney(line.close, this.precision),
+                    toMoney(line.highest, this.precision),
+                    toMoney(line.lowest, this.precision),
+                    toMoney(line.volume, this.precision),
                  ];
               });
         },
@@ -151,7 +152,9 @@ export default {
                     this.updateMarketData(result);
                 }
                 if (result.method === 'kline.update') {
-                    if (this.getDate(result.params[0][0]) === this.getDate(this.stats[this.stats.length - 1].time)) {
+                    let lastCandle = this.stats[this.stats.length - 1];
+
+                    if (lastCandle && this.getDate(result.params[0][0]) === this.getDate(lastCandle.time)) {
                         this.stats.pop();
                     }
 
@@ -165,6 +168,7 @@ export default {
                     });
                 }
             });
+
             this.addOnOpenHandler(() => {
                 this.sendMessage(JSON.stringify({
                     method: 'state.subscribe',
@@ -196,7 +200,7 @@ export default {
 
             this.marketStatus = {
                 change: changePercentage.toFixed(2),
-                last: toMoney(marketLastPrice),
+                last: toMoney(marketLastPrice, this.precision),
                 volume: marketVolume.toFixed(2),
             };
         },

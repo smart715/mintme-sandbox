@@ -131,10 +131,6 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
-    App\Serializer\BalanceResultContainerNormalizer:
-        tags: ['serializer.normalizer']
-
-
     # SonataAdminBundle Registered Admin Classes
     # =======================================
     admin.user:

@@ -5,6 +5,7 @@
                     class="col"
                     :websocket-url="websocketUrl"
                     :market="market"
+                    :precision="precision"
             />
         </div>
         <div class="row px-0 mt-3">
@@ -19,6 +20,7 @@
                         :market="market"
                         :market-price="marketPriceBuy"
                         :balance="baseBalance"
+                        :precision="precision"
                 />
                 <template v-else>
                     <div class="p-5 text-center text-white">
@@ -38,6 +40,7 @@
                         :market-price="marketPriceSell"
                         :balance="quoteBalance"
                         :is-owner="isOwner"
+                        :precision="precision"
                 />
                 <template v-else>
                     <div class="p-5 text-center text-white">
@@ -46,9 +49,17 @@
                 </template>
             </div>
         </div>
-        <trade-orders :orders-loaded="ordersLoaded" :buy-orders="buyOrders" :sell-orders="sellOrders" :market="market" :user-id="userId" />
+        <div class="row px-0">
+            <trade-orders
+                    :orders-loaded="ordersLoaded"
+                    :buy-orders="buyOrders"
+                    :sell-orders="sellOrders"
+                    :market="market"
+                    :user-id="userId"
+                    :precision="precision" />
+        </div>
         <div class="row px-0 mt-3">
-            <trade-trade-history class="col" :market="market" />
+            <trade-trade-history class="col" :market="market" :precision="precision" />
         </div>
     </div>
 </template>
@@ -86,6 +97,7 @@ export default {
         tokenName: String,
         isOwner: Boolean,
         userId: Number,
+        precision: Number,
     },
     data() {
         return {
@@ -146,7 +158,7 @@ export default {
                     this.balances = {...res.data.common, ...res.data.predefined};
 
                     if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
-                        this.balances[this.market.quote.symbol] = {available: toMoney(0)};
+                        this.balances[this.market.quote.symbol] = {available: toMoney(0, this.precision)};
                     }
 
                     this.authorize()
