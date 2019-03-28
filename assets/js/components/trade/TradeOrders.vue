@@ -1,19 +1,6 @@
 <template>
     <div class="container">
         <div class="row">
-            <confirm-modal
-                    :visible="confirmModal"
-                    @close="switchConfirmModal(false)"
-                    @confirm="removeOrder"
-            >
-                <span class="text-white">
-                    You want to delete these orders:<br>
-                    <span v-for="order in this.removeOrders" :key="order.id">
-                        Price {{ order.price }} Amount {{ order.amount }}<br>
-                    </span>
-                    Are you sure?
-                </span>
-            </confirm-modal>
             <div class="col-12 col-xl-6 col-lg-12 pr-lg-2 pl-lg-0 mt-3">
                 <trade-buy-orders
                         v-if="ordersLoaded"
@@ -45,6 +32,19 @@
                 </template>
             </div>
         </div>
+        <confirm-modal
+                :visible="confirmModal"
+                @close="switchConfirmModal(false)"
+                @confirm="removeOrder"
+        >
+                <span class="text-white">
+                    You want to delete these orders:<br>
+                    <span v-for="order in this.removeOrders" :key="order.id">
+                        Price {{ order.price }} Amount {{ order.amount }}<br>
+                    </span>
+                    Are you sure?
+                </span>
+        </confirm-modal>
     </div>
 </template>
 
@@ -68,6 +68,7 @@ export default {
         sellOrders: [Array, Object],
         market: Object,
         userId: Number,
+        precision: Number,
     },
     data() {
         return {
@@ -102,9 +103,9 @@ export default {
         ordersList: function(orders) {
             return orders.map((order) => {
                 return {
-                    price: toMoney(order.price),
-                    amount: toMoney(order.amount),
-                    sumWeb: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    price: toMoney(order.price, this.precision),
+                    amount: toMoney(order.amount, this.precision),
+                    sumWeb: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.precision),
                     trader: order.maker !== null
                         ? this.truncateFullName(order.maker.profile, order.owner)
                         : 'Anonymous',
@@ -168,9 +169,9 @@ export default {
             let orders = row.side === 1 ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
             this.clone(orders).forEach((order) => {
-                if (toMoney(order.price) === row.price && order.maker.id === this.userId) {
-                    order.price = toMoney(order.price);
-                    order.amount = toMoney(order.amount);
+                if (toMoney(order.price, this.precision) === row.price && order.maker.id === this.userId) {
+                    order.price = toMoney(order.price, this.precision);
+                    order.amount = toMoney(order.amount, this.precision);
                     this.removeOrders.push(order);
                 }
             });
