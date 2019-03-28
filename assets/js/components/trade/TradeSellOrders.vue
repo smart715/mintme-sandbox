@@ -23,17 +23,25 @@
                 </template>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fix-height" ref="sellorders">
+                <div class="table-responsive fixed-head-table" ref="ordersList">
                     <template v-if="loaded">
                     <b-table v-if="hasOrders" ref="table"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
                         :items="ordersList"
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
-                           {{ row.value }}
-                           <img
-                               src="../../../img/avatar.png"
-                               class="float-right"
-                               alt="avatar">
+                            <a :href="row.item.traderUrl">
+                                <span>{{ row.value }}</span>
+                                <img
+                                        src="../../../img/avatar.png"
+                                        class="float-right"
+                                        alt="avatar">
+                            </a>
+                            <a @click="removeOrderModal(row.item)"
+                               v-if="row.item.owner">
+                                <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                            </a>
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
@@ -61,66 +69,40 @@
 <script>
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
-import Decimal from 'decimal.js';
 
 export default {
     name: 'TradeSellOrders',
     props: {
-        sellOrders: [Array, Object],
+        ordersList: [Array, Object],
         tokenName: String,
+        fields: Object,
+        sortBy: String,
+        sortDesc: Boolean,
     },
     components: {
         Guide,
-    },
-    data() {
-        return {
-            fields: {
-                price: {
-                    label: 'Price',
-                },
-                amount: {
-                    label: 'Amount',
-                },
-                sum_web: {
-                    label: 'Sum WEB',
-                },
-                trader: {
-                    label: 'Trader',
-                },
-            },
-        };
     },
     computed: {
         total: function() {
             return toMoney(this.ordersList.reduce((sum, order) => parseFloat(order.amount) + sum, 0));
         },
-        ordersList: function() {
-            return this.sellOrders.map((order) => {
-                return {
-                    price: toMoney(order.price),
-                    amount: toMoney(order.amount),
-                    sum_web: toMoney(new Decimal(order.price).mul(order.amount).toString()),
-                    trader: order.maker.profile ? this.profileToString(order.maker.profile): 'Anonymous',
-                };
-            });
-        },
         hasOrders: function() {
-            return this.sellOrders.length > 0;
+            return this.ordersList.length > 0;
         },
         loaded: function() {
-            return this.sellOrders !== null;
+            return this.ordersList !== null;
         },
         showDownArrow: function() {
-            return (this.sellOrders.length > 7);
+            return (this.ordersList.length > 7);
         },
     },
     methods: {
         scrollDown: function() {
-            let parentDiv = this.$refs.sellorders;
+            let parentDiv = this.$refs.table.$el.tBodies[0];
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
-        profileToString: function(profile) {
-            return profile.firstName + profile.lastName;
+        removeOrderModal: function(row) {
+            this.$emit('modal', row);
         },
     },
 };

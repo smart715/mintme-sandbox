@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ProfileController extends Controller
 {
-    /** @Route("/{pageUrl}", name="profile-view") */
+    /** @Route("/{pageUrl}", name="profile-view", options={"expose"=true}) */
     public function profileView(
         Request $request,
         ProfileManagerInterface $profileManager,

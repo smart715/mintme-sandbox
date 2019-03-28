@@ -48,7 +48,8 @@ export default {
             this.closeModal();
             this.$emit('confirm');
         },
-        onCancel: function() {
+        onCancel: function(event) {
+            event.preventDefault();
             this.closeModal();
             this.$emit('cancel');
         },
