@@ -91,6 +91,7 @@ class Profile
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
      * @var Token|null
+     * @Groups({"API"})
      */
     protected $token;
 
@@ -100,6 +101,7 @@ class Profile
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
+     * @Groups({"API"})
      */
     private $page_url;
 

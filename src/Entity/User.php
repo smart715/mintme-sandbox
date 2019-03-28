@@ -33,6 +33,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
+     * @Groups({"API"})
      */
     protected $id;
 
@@ -135,7 +136,7 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
         return $this;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /** @Groups({"API"}) */
     public function getProfile(): ?Profile
     {
         return $this->profile;

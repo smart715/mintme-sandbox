@@ -46,30 +46,7 @@
                 </template>
             </div>
         </div>
-        <div class="row px-0 mt-3">
-            <div class="col-12 col-lg-6 pr-lg-2">
-                <trade-buy-orders
-                        v-if="ordersLoaded"
-                        :buy-orders="buyOrders"
-                        :token-name="market.base.symbol" />
-                <template v-else>
-                    <div class="p-5 text-center text-white">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                </template>
-            </div>
-            <div class="col-12 col-lg-6 pl-lg-2">
-                <trade-sell-orders
-                        v-if="ordersLoaded"
-                        :sell-orders="sellOrders"
-                        :token-name="market.quote.symbol" />
-                <template v-else>
-                    <div class="p-5 text-center text-white">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                </template>
-            </div>
-        </div>
+        <trade-orders :orders-loaded="ordersLoaded" :buy-orders="buyOrders" :sell-orders="sellOrders" :market="market" :user-id="userId" />
         <div class="row px-0 mt-3">
             <trade-trade-history class="col" :market="market" />
         </div>
@@ -80,8 +57,7 @@
 import TradeBuyOrder from './TradeBuyOrder';
 import TradeSellOrder from './TradeSellOrder';
 import TradeChart from './TradeChart';
-import TradeBuyOrders from './TradeBuyOrders';
-import TradeSellOrders from './TradeSellOrders';
+import TradeOrders from './TradeOrders';
 import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
@@ -95,8 +71,7 @@ export default {
         TradeBuyOrder,
         TradeSellOrder,
         TradeChart,
-        TradeBuyOrders,
-        TradeSellOrders,
+        TradeOrders,
         TradeTradeHistory,
         TopTraders,
         OrderModal,
@@ -110,11 +85,10 @@ export default {
         loggedIn: Boolean,
         tokenName: String,
         isOwner: Boolean,
+        userId: Number,
     },
     data() {
         return {
-            pendingBuyOrders: null,
-            pendingSellOrders: null,
             buyOrders: null,
             sellOrders: null,
             balances: null,
