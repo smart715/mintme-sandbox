@@ -2,6 +2,7 @@
 
 namespace App\Exchange;
 
+use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -29,5 +30,10 @@ class Market
     public function getQuote(): TradebleInterface
     {
         return $this->quote;
+    }
+
+    public function isTokenMarket(): bool
+    {
+        return $this->base instanceof Token || $this->quote instanceof Token;
     }
 }

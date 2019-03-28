@@ -21,7 +21,7 @@
                          class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your {{ this.market.base.symbol }}:
                         <span class="text-white">
-                            {{ immutableBalance | toMoney }}
+                            {{ immutableBalance | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Your {{ this.market.base.symbol }}
@@ -99,7 +99,7 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney }} {{ this.market.base.symbol }}
+                        Total Price: {{ totalPrice | toMoney(precision) }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -155,6 +155,7 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
+        precision: Number,
     },
     data() {
         return {
@@ -171,8 +172,8 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 let data = {
-                    'amountInput': toMoney(this.buyAmount),
-                    'priceInput': toMoney(this.buyPrice),
+                    'amountInput': toMoney(this.buyAmount, this.precision),
+                    'priceInput': toMoney(this.buyPrice, this.precision),
                     'marketPrice': this.useMarketPrice,
                     'action': this.action,
                 };
@@ -200,7 +201,7 @@ export default {
             return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
         },
         price: function() {
-            return toMoney(this.marketPrice) || null;
+            return toMoney(this.marketPrice, this.precision) || null;
         },
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
@@ -229,8 +230,8 @@ export default {
         });
     },
     filters: {
-        toMoney: function(val) {
-            return toMoney(val);
+        toMoney: function(val, precision) {
+            return toMoney(val, precision);
         },
     },
 };

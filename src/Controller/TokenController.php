@@ -117,6 +117,7 @@ class TokenController extends Controller
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
+            'precision' => $this->getParameter('market_precision')['token'],
         ]);
     }
 
