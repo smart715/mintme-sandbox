@@ -16,7 +16,8 @@
                             signup-url="{{ path('fos_user_registration_register') }}"
                             :market="{{ market | json_encode }}"
                             :logged-in="{{ app.user ? 'true' : 'false' }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}">
+                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}">
                         </trade>
                     </b-tab>
                     {% if showIntro %}

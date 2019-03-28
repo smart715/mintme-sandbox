@@ -15,24 +15,28 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fix-height" ref="history">
+                <div class="table-responsive fixed-head-table" ref="history">
                     <template v-if="loaded">
                         <b-table v-if="hasOrders" class="w-100" ref="table"
                             :items="ordersList"
                             :fields="fields">
-                            <template slot="order_maker" slot-scope="row">
-                                {{ row.value }}
-                                <img
-                                    src="../../../img/avatar.png"
-                                    class="float-right"
-                                    alt="avatar">
+                            <template slot="orderMaker" slot-scope="row">
+                                <a :href="row.item.makerUrl">
+                                    {{ row.value }}
+                                    <img
+                                        src="../../../img/avatar.png"
+                                        class="pl-3"
+                                        alt="avatar">
+                                </a>
                             </template>
-                            <template slot="order_trader" slot-scope="row">
-                                {{ row.value }}
-                                <img
-                                    src="../../../img/avatar.png"
-                                    class="float-right"
-                                    alt="avatar">
+                            <template slot="orderTrader" slot-scope="row">
+                                <a :href="row.item.takerUrl">
+                                    {{ row.value }}
+                                    <img
+                                        src="../../../img/avatar.png"
+                                        class="pl-3"
+                                        alt="avatar">
+                                </a>
                             </template>
                         </b-table>
                         <div v-if="!hasOrders">
@@ -106,11 +110,17 @@ export default {
             return this.history !== false ? this.history.map((order) => {
                 return {
                     dateTime: new Date(order.timestamp * 1000).toDateString(),
-                    orderMaker: order.maker != null
-                        ? order.maker.profile ? this.profileToString(order.maker.profile): 'Anonymous'
+                    orderMaker: order.maker && order.maker.profile
+                        ? this.truncateFullName(order.maker.profile)
+                        : 'Anonymous',
+                    orderTrader: order.taker && order.taker.profile
+                        ? this.truncateFullName(order.taker.profile)
+                        : 'Anonymous',
+                    makerUrl: order.maker && order.maker.profile
+                        ? this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url})
                         : '',
-                    orderTrader: order.taker != null
-                        ? order.taker.profile ? this.profileToString(order.taker.profile): 'Anonymous'
+                    takerUrl: order.taker && order.taker.profile
+                        ? this.$routing.generate('profile-view', {pageUrl: order.taker.profile.page_url})
                         : '',
                     type: (order.side === 0) ? 'Buy' : 'Sell',
                     pricePerToken: toMoney(order.price),
@@ -140,12 +150,20 @@ export default {
                 this.$refs.table.refresh();
             }).catch((error) => { });
         },
-        scrollDown: function() {
-            let parentDiv = this.$refs.history;
-            parentDiv.scrollTop = parentDiv.scrollHeight;
+        truncateFullName: function(profile) {
+            let first = profile.firstName;
+            let second = profile.lastName;
+            if ((first + second).length > 7) {
+                return first.length > 7
+                    ? first.slice(0, 7) + '..'
+                    : first + ' ' + second.slice(0, 7 - first.length) + '..';
+            } else {
+                return first + ' ' + second;
+            }
         },
-        profileToString: function(profile) {
-            return profile.firstName + profile.lastName;
+        scrollDown: function() {
+            let parentDiv = this.$refs.table.$el.tBodies[0];
+            parentDiv.scrollTop = parentDiv.scrollHeight;
         },
     },
 };
