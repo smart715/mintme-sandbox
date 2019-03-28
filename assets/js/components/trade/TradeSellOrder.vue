@@ -21,7 +21,7 @@
                         >
                         Your {{ this.market.quote.symbol }}:
                         <span class="text-white">
-                            {{ immutableBalance | toMoney  }}
+                            {{ immutableBalance | toMoney(precision)  }}
                             <guide>
                                 <template slot="header">
                                     Your Tokens
@@ -96,7 +96,7 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney }} {{ this.market.base.symbol }}
+                        Total Price: {{ totalPrice | toMoney(precision) }} {{ this.market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -154,6 +154,7 @@ export default {
         marketPrice: [Number, String],
         balance: [String, Boolean],
         isOwner: Boolean,
+        precision: Number,
     },
     data() {
         return {
@@ -170,8 +171,8 @@ export default {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 let data = {
-                    'amountInput': toMoney(this.sellAmount),
-                    'priceInput': toMoney(this.sellPrice),
+                    'amountInput': toMoney(this.sellAmount, this.precision),
+                    'priceInput': toMoney(this.sellPrice, this.precision),
                     'marketPrice': this.useMarketPrice,
                     'action': this.action,
                 };
@@ -198,7 +199,7 @@ export default {
             return new Decimal(this.sellPrice || 0).times(this.sellAmount || 0).toString();
         },
         price: function() {
-            return toMoney(this.marketPrice) || null;
+            return toMoney(this.marketPrice, this.precision) || null;
         },
         fieldsValid: function() {
             return this.sellPrice > 0 && this.sellAmount > 0;
@@ -237,8 +238,8 @@ export default {
         });
     },
     filters: {
-        toMoney: function(val) {
-            return toMoney(val);
+        toMoney: function(val, precision) {
+            return toMoney(val, precision);
         },
     },
 };

@@ -5,6 +5,8 @@ namespace App\Controller\API;
 use App\Entity\Token\LockIn;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
+use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -212,7 +214,7 @@ class TokensAPIController extends FOSRestController
      * @Rest\View()
      * @Rest\Get(name="tokens", options={"expose"=true})
      */
-    public function getTokens(BalanceHandlerInterface $balanceHandler): View
+    public function getTokens(BalanceHandlerInterface $balanceHandler, BalanceViewFactoryInterface $viewFactory): View
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -225,18 +227,20 @@ class TokensAPIController extends FOSRestController
             );
         } catch (BalanceException $exception) {
             if (BalanceException::EMPTY == $exception->getCode()) {
-                $common = [];
+                $common = BalanceResultContainer::fail();
             } else {
                 return $this->view(null, 500);
             }
         }
 
+        $predefined = $balanceHandler->balances(
+            $this->getUser(),
+            $this->tokenManager->findAllPredefined()
+        );
+
         return $this->view([
-            'common' => $common,
-            'predefined' => $balanceHandler->balances(
-                $this->getUser(),
-                $this->tokenManager->findAllPredefined()
-            ),
+            'common' => $viewFactory->create($common),
+            'predefined' => $viewFactory->create($predefined),
         ]);
     }
 
