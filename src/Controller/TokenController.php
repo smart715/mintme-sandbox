@@ -143,7 +143,6 @@ class TokenController extends Controller
                 return $this->render('pages/token_creation.html.twig', [
                     'formHeader' => 'Create your own token',
                     'form' => $form->createView(),
-                    'profileCreated' => $this->isProfileCreated(),
                     'profileCreated' => true,
                 ]);
             }
