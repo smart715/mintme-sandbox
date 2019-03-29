@@ -22,7 +22,7 @@
                             :fields="fields">
                             <template slot="orderMaker" slot-scope="row">
                                 <a :href="row.item.makerUrl">
-                                    {{ row.value }}
+                                    <span v-b-tooltip.hover.top="row.item.makerFullName">{{ row.value }}</span>
                                     <img
                                         src="../../../img/avatar.png"
                                         class="pl-3"
@@ -31,7 +31,7 @@
                             </template>
                             <template slot="orderTrader" slot-scope="row">
                                 <a :href="row.item.takerUrl">
-                                    {{ row.value }}
+                                    <span v-b-tooltip.hover.top="row.item.takerFullName">{{ row.value }}</span>
                                     <img
                                         src="../../../img/avatar.png"
                                         class="pl-3"
@@ -117,6 +117,12 @@ export default {
                         : 'Anonymous',
                     orderTrader: order.taker && order.taker.profile
                         ? this.truncateFullName(order.taker.profile)
+                        : 'Anonymous',
+                    makerFullName: order.maker && order.maker.profile
+                        ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
+                        : 'Anonymous',
+                    takerFullName: order.taker && order.taker.profile
+                        ? order.taker.profile.firstName + ' ' + order.taker.profile.lastName
                         : 'Anonymous',
                     makerUrl: order.maker && order.maker.profile
                         ? this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url})
