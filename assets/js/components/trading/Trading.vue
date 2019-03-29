@@ -8,6 +8,9 @@
                     :fields="fields"
                     :current-page="currentPage"
                     :per-page="perPage">
+                    <template slot="pair" slot-scope="row">
+                        <a class="text-white" :href="row.item.tokenUrl">{{ row.value }}</a>
+                    </template>
                 </b-table>
             </div>
             <div class="row justify-content-center">
@@ -137,6 +140,7 @@ export default {
                 change: changePercentage.toFixed(2),
                 lastPrice: lastPrice.toFixed(2),
                 volume: volume.toFixed(2),
+                tokenUrl: this.$routing.generate('token_show', {name: token}),
             };
         },
         getMarketOnTopIndex: function(currency, token) {
