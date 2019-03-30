@@ -4,13 +4,12 @@
             <autocomplete
                     input-class="search-input form-control"
                     placeholder="Search for token... Use token name or wallet address"
-                    v-model="item"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
                     @item-clicked="onItemClicked"
                     @change="onInputChange"
                     :items="items"
-                    :min-len="1"
+                    :min-len="3"
             >
             </autocomplete>
         </div>
@@ -35,7 +34,6 @@ export default {
     },
     data() {
         return {
-            item: '',
             input: '',
             items: [],
         };
