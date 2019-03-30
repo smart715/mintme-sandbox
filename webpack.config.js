@@ -1,5 +1,4 @@
 const Encore = require('@symfony/webpack-encore');
-const OfflinePlugin = require('offline-plugin');
 
 Encore
     .setOutputPath('public/build/')
@@ -31,8 +30,6 @@ Encore
     .configureFilenames({
         'images': 'images/[name].[hash:8].[ext]',
     })
-
-    .addPlugin(new OfflinePlugin())
 
     .addExternals({
         gapi: 'gapi',

@@ -1,23 +1,17 @@
 <template>
     <div>
         <div v-show="!editing">
-            <div class="d-flex">
+            <div class="d-flex-inline">
                 <div class="display-text">
                     Youtube:
                     <a
                         v-if="currentChannelId"
-                        :href="'https://www.youtube.com/channel/'+this.currentChannelId"
+                        :href="youTubeUrl"
                         target="_blank"
                         rel="nofollow">
-                        https://www.youtube.com/channel/{{ this.currentChannelId }}
+                        {{ youTubeUrl }}
                     </a>
-                    <div
-                        v-if="currentChannelId"
-                        class="g-ytsubscribe"
-                        :data-channelid="currentChannelId"
-                        data-layout="default"
-                        data-count="default">
-                    </div>
+                    <div ref="ytButtonContainer" class="d-block-inline"></div>
                     <guide>
                         <template slot="header">
                             Youtube
@@ -80,7 +74,26 @@ export default {
             currentChannelId: this.channelId,
         };
     },
+    computed: {
+        youTubeUrl: function() {
+            return this.buildYoutubeUrl(this.currentChannelId);
+        },
+    },
+    mounted() {
+        if (this.currentChannelId) {
+            this.renderYtSubscribeButton(this.currentChannelId);
+        }
+    },
     methods: {
+        buildYoutubeUrl: function(id) {
+            return 'https://www.youtube.com/channel/' + id;
+        },
+        renderYtSubscribeButton: function(channelId) {
+            let options = {
+                'channelid': channelId,
+            };
+            gapi.ytsubscribe.render(this.$refs.ytButtonContainer, options);
+        },
         loadYoutubeClient: function() {
             gapi.load('client:auth2', this.initYoutubeClient);
         },
@@ -99,7 +112,8 @@ export default {
                     }).then((response) => {
                         if (response.status === HTTP_NO_CONTENT) {
                             this.currentChannelId = channelId;
-                            this.$toasted.success(`Youtube channel saved as https://youtube.com/channel/${channelId}`);
+                            this.$toasted.success(`Youtube channel saved as ${this.buildYoutubeUrl(channelId)}`);
+                            this.renderYtSubscribeButton(channelId);
                         }
                     }, (error) => {
                         if (error.response.status === HTTP_BAD_REQUEST) {
@@ -136,7 +150,5 @@ export default {
     .display-text
         display: inline-block
         width: 100%
-        white-space: nowrap
-        overflow: hidden
         text-overflow: ellipsis
 </style>

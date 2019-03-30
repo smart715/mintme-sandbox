@@ -22,7 +22,9 @@
                             :fields="fields">
                             <template slot="orderMaker" slot-scope="row">
                                 <a :href="row.item.makerUrl">
-                                    <span v-b-tooltip.hover.top="row.item.makerFullName">{{ row.value }}</span>
+                                    <span v-b-tooltip="{title: row.item.makerFullName, boundary:'viewport'}">
+                                        {{ row.value }}
+                                    </span>
                                     <img
                                         src="../../../img/avatar.png"
                                         class="pl-3"
@@ -31,7 +33,9 @@
                             </template>
                             <template slot="orderTrader" slot-scope="row">
                                 <a :href="row.item.takerUrl">
-                                    <span v-b-tooltip.hover.top="row.item.takerFullName">{{ row.value }}</span>
+                                    <span v-b-tooltip="{title: row.item.takerFullName, boundary:'viewport'}">
+                                        {{ row.value }}
+                                    </span>
                                     <img
                                         src="../../../img/avatar.png"
                                         class="pl-3"

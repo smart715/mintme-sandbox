@@ -14,7 +14,6 @@ import Toasted from 'vue-toasted';
 import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from './components/token/TokenSearcher';
-import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 
 /*
     To enable passive listeners,
@@ -22,8 +21,6 @@ import * as OfflinePluginRuntime from 'offline-plugin/runtime';
     Temporary disabled due the chart conflicts
 */
 // import 'default-passive-events';
-
-OfflinePluginRuntime.install();
 
 VueClipboard.config.autoSetContainer = true;
 
