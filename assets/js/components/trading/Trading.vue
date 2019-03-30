@@ -137,8 +137,8 @@ export default {
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume) {
             return {
                 pair: `${currency}/${token}`,
-                change: changePercentage.toFixed(2),
-                lastPrice: lastPrice.toFixed(2),
+                change: changePercentage.toFixed(2) + '%',
+                lastPrice: lastPrice.toFixed(2) + ' ' + currency,
                 volume: volume.toFixed(2),
                 tokenUrl: this.$routing.generate('token_show', {name: token}),
             };
