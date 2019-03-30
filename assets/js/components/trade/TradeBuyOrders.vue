@@ -32,7 +32,9 @@
                         :fields="fields">
                         <template slot="trader" slot-scope="row">
                                 <a :href="row.item.traderUrl">
-                                    <span v-b-tooltip.hover.top="row.item.traderFullName">{{ row.value }}</span>
+                                    <span v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
+                                        {{ row.value }}
+                                    </span>
                                     <img
                                         src="../../../img/avatar.png"
                                         class="float-right"

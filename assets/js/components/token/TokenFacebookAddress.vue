@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-show="!editing">
-            <div class="d-flex">
+            <div class="d-flex-inline">
                 <div class="display-text">
                     Facebook:
                     <a :href="currentAddress" target="_blank" rel="nofollow">
@@ -9,7 +9,7 @@
                     </a>
                     <div
                         class="fb-share-button"
-                        data-href="https://developers.facebook.com/docs/plugins/"
+                        :data-href="currentAddress"
                         data-layout="button_count"
                         data-size="small"
                         data-mobile-iframe="true">
@@ -44,12 +44,10 @@
         <modal
             :visible="showConfirmModal"
             @close="showConfirmModal = false">
-            <template slot="header">
-                <h5 class="modal-title">Facebook Confirmation</h5>
-            </template>
             <template slot="body">
                 <div class="row">
                     <div class="col-12">
+                        <h3 class="modal-title text-center pb-2">Facebook page Confirmation</h3>
                         <div class="form-group">
                             <label for="select-fb-pages">Select Facebook page to show:</label>
                             <select v-model="selectedUrl" class="form-control" id="select-fb-pages">
@@ -63,7 +61,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12 text-center">
+                    <div class="col-12 text-center pt-2">
                         <button class="btn btn-primary" @click="savePage">Confirm</button>
                         <a class="c-pointer pl-3" @click="showConfirmModal = false">Cancel</a>
                     </div>
@@ -110,19 +108,16 @@ export default {
             pages: [],
             currentAddress: this.address,
             showConfirmModal: false,
+            selectedUrl: '',
         };
     },
     computed: {
-        selectedUrl: function() {
-            if (this.pages.length) {
-                return this.pages[0].link;
-            } else {
-                return '';
-            }
-        },
         currentAddressEncoded: function() {
             return encodeURIComponent(this.currentAddress);
         },
+    },
+    mounted() {
+        this.selectedUrl = this.pages.length ? this.pages[0].link : '';
     },
     methods: {
         loadFacebookSdk: function() {
@@ -165,6 +160,7 @@ export default {
             })
             .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
+                    this.showConfirmModal = false;
                     this.currentAddress = this.selectedUrl;
                     this.$toasted.success(`Facebook paged saved as ${this.currentAddress}`);
                 }
@@ -176,7 +172,7 @@ export default {
                 }
             })
             .then(() => {
-                this.showConfirmFacebookModal = false;
+                this.showConfirmModal = false;
             });
         },
     },
@@ -187,7 +183,5 @@ export default {
     .display-text
         display: inline-block
         width: 100%
-        white-space: nowrap
-        overflow: hidden
         text-overflow: ellipsis
 </style>
