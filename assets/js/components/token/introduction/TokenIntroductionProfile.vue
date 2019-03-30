@@ -223,6 +223,10 @@ export default {
             if (this.showWebsiteError) {
                 return;
             }
+
+            if (!this.showConfirmWebsiteModal) {
+                this.editingUrls = false;
+            }
         },
         checkWebsiteUrl: function() {
             this.showWebsiteError = false;
