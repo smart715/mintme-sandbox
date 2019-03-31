@@ -91,7 +91,7 @@ export default {
                     label: 'Order maker',
                 },
                 orderTrader: {
-                    label: 'Order trader',
+                    label: 'Order taker',
                 },
                 pricePerToken: {
                     label: 'Price per token',
