@@ -18,24 +18,24 @@
             <div class="card-body p-0">
                 <div class="table-responsive fixed-head-table" ref="ordersList">
                     <b-table v-if="hasOrders" ref="table"
-                             :sort-by.sync="sortBy"
-                             :sort-desc.sync="sortDesc"
-                             :items="ordersList"
-                             :fields="fields">
+                         :sort-by.sync="sortBy"
+                         :sort-desc.sync="sortDesc"
+                         :items="ordersList"
+                         :fields="fields">
                         <template slot="trader" slot-scope="row">
-                            <a :href="row.item.traderUrl">
-                                <span v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
-                                    {{ row.value }}
-                                </span>
-                                <img
-                                        src="../../../img/avatar.png"
-                                        class="float-right"
-                                        alt="avatar">
-                            </a>
-                            <a @click="removeOrderModal(row.item)"
-                               v-if="row.item.owner">
-                                <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                            </a>
+                        <a :href="row.item.traderUrl">
+                            <span v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
+                                {{ row.value }}
+                            </span>
+                            <img
+                                src="../../../img/avatar.png"
+                                class="float-right"
+                                alt="avatar">
+                        </a>
+                        <a @click="removeOrderModal(row.item)"
+                           v-if="row.item.owner">
+                            <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                        </a>
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
