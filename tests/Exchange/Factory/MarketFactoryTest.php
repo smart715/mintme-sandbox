@@ -55,7 +55,7 @@ class MarketFactoryTest extends TestCase
     {
         $cryptoManagerMock = $this->createMock(CryptoManagerInterface::class);
         $cryptoManagerMock
-            ->expects($this->once())
+            ->expects($this->exactly(3))
             ->method('findAll')
             ->willReturn([$crypto])
         ;
@@ -71,7 +71,7 @@ class MarketFactoryTest extends TestCase
     {
         $tokenManagerMock = $this->createMock(TokenManagerInterface::class);
         $tokenManagerMock
-            ->expects($this->once())
+            ->expects($this->exactly(1))
             ->method('findAll')
             ->willReturn($tokens)
         ;

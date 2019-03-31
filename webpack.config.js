@@ -10,7 +10,7 @@ Encore
     .addEntry('trading', './assets/js/trading.js')
     .addEntry('profile', './assets/js/profile.js')
     .addEntry('wallet', './assets/js/wallet.js')
-    .addEntry('token', './assets/js/token.js')
+    .addEntry('pair', './assets/js/pair.js')
     .addEntry('referral', './assets/js/referral.js')
     .addEntry('token_creation', './assets/js/token_creation.js')
     .addEntry('settings', './assets/js/settings.js')
