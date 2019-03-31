@@ -35,19 +35,19 @@
                         ref="released-slider"
                         :disabled="releasedDisabled"
                         v-model="released"
-                        :min="1" :max="100"
+                        :min="1" :max="99"
                         :interval="1"
                         :tooltip="false"
                         width="100%">
                     </vue-slider>
                 </b-col>
                 <b-col cols="1" class="px-0 ml-1">
-                    <b>100%</b>
+                    <b>99%</b>
                 </b-col>
             </b-row>
         </b-col>
         <b-col cols="12">
-            <div>Time needed to unlock all tokens: {{ period }} years</div>
+            <div>Time needed to unlock all tokens: {{ currentPeriod }} years</div>
             <b-row class="mx-1">
                 <b-col cols="1" class="p-0">
                     <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
@@ -55,7 +55,7 @@
                 <b-col class="p-0">
                     <vue-slider
                         ref="release-period-slider"
-                        v-model="period"
+                        v-model="currentPeriod"
                         :min="10"
                         :max="80"
                         :interval="10"
@@ -92,6 +92,7 @@ export default {
     data() {
         return {
             released: 1,
+            currentPeriod: this.period,
         };
     },
     components: {
@@ -105,7 +106,7 @@ export default {
         saveReleasePeriod: function() {
             this.$axios.single.post(this.releasePeriodRoute, {
                 'released': this.released,
-                'releasePeriod': this.period,
+                'releasePeriod': this.currentPeriod,
             }).then((response) => {
                 this.$emit('onStatsUpdate', response);
                 this.$toasted.success('Release period updated.');

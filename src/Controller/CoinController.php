@@ -28,7 +28,7 @@ class CoinController extends Controller
         $this->marketFactory = $marketFactory;
     }
 
-    /** @Route("/coin/{base}/{quote}", defaults={"quote"="web"}) */
+    /** @Route("/coin/{base}/{quote}", name="coin", defaults={"quote"="web"}, options={"expose"=true}) */
     public function pair(string $base, string $quote): Response
     {
         $base = $this->cryptoManager->findBySymbol(strtoupper($base));

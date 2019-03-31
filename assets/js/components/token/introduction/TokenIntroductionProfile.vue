@@ -195,7 +195,7 @@ export default {
         return {
             editingUrls: false,
             currentWebsite: this.websiteUrl,
-            newWebsite: this.websiteUrl,
+            newWebsite: this.websiteUrl || 'http://',
             showConfirmWebsiteModal: false,
             showWebsiteError: false,
             parsedWebsite: '',

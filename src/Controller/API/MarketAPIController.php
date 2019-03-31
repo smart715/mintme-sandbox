@@ -11,6 +11,7 @@ use App\Utils\MarketNameParserInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
+use InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
@@ -41,9 +42,9 @@ class MarketAPIController extends APIController
         MarketFactoryInterface $marketManager,
         MarketHandlerInterface $marketHandler
     ): View {
-        $marketsInfo = $marketHandler->getMarketsInfo($marketManager->createAll());
-
-        return $this->view($marketsInfo);
+        return $this->view(
+            $marketHandler->getMarketsInfo($marketManager->createAll())
+        );
     }
 
     /**
@@ -58,7 +59,7 @@ class MarketAPIController extends APIController
         $market = $this->getMarket($base, $quote);
 
         if (!$market) {
-            throw new \InvalidArgumentException();
+            throw new InvalidArgumentException();
         }
 
         return $this->view(

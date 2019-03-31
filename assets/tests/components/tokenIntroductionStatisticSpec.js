@@ -1,64 +1,89 @@
-import Vue from 'vue';
-import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import component from '../../js/components/token/introduction/TokenIntroductionStatistics';
-import {mount} from '../testHelper';
-import fontawesome from '@fortawesome/fontawesome';
-import fas from '@fortawesome/fontawesome-free-solid';
-import far from '@fortawesome/fontawesome-free-regular';
-import fab from '@fortawesome/fontawesome-free-brands';
-import {faCog, faSearch} from '@fortawesome/free-solid-svg-icons';
+import moxios from 'moxios';
+import axios from 'axios';
 
-fontawesome.library.add(fas, far, fab, faSearch, faCog);
-
-Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component('font-awesome-layers', FontAwesomeLayers);
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.use(axios);
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$routing = {generate: () => 'test-url'};
+        },
+    });
+    return localVue;
+}
 
 describe('TokenIntroductionStatistics', () => {
+    beforeEach(() => {
+        moxios.install();
+    });
+
+    afterEach(() => {
+        moxios.uninstall();
+    });
+
     describe('computed field', () => {
         describe(':releasedDisabled', () => {
-            it('returns true', () => {
-                const obj = mount(component, {
-                    propsData: {
-                        stats: {
-                            releasePeriod: 10,
-                            hourlyRate: 1,
-                            releasedAmount: 1,
-                            frozenAmount: 1,
-                        },
+            it('returns true', (done) => {
+                const localVue = mockVue();
+                const wrapper = shallowMount(component, {localVue, propsData: {
+                    market: {
+                        base: {symbol: 'TOK1'}, quote: {symbol: 'TOK2'},
                     },
-                });
+                }});
 
-                expect(obj.releasedDisabled).to.be.true;
+                moxios.stubRequest('test-url', {status: 200, response: {
+                        releasePeriod: 10,
+                        hourlyRate: 1,
+                        releasedAmount: 1,
+                        frozenAmount: 1,
+                    }});
+
+                moxios.wait(() => {
+                    expect(wrapper.vm.releasedDisabled).to.be.true;
+                    done();
+                });
             });
 
             it('returns false', () => {
-                const obj = mount(component, { });
+                const localVue = mockVue();
+                const wrapper = shallowMount(component, {localVue, propsData: {
+                        market: {
+                            base: {symbol: 'TOK1'}, quote: {symbol: 'TOK2'},
+                        },
+                    }});
 
-                expect(obj.releasedDisabled).to.be.false;
+                expect(wrapper.vm.releasedDisabled).to.be.false;
             });
         });
 
         describe(':statsPeriod', () => {
             it('returns {Number}', () => {
-                const obj = mount(component, {
-                    propsData: {
-                        stats: {
-                            releasePeriod: 30,
-                            hourlyRate: 1,
-                            releasedAmount: 1,
-                            frozenAmount: 1,
+                const localVue = mockVue();
+                const wrapper = shallowMount(component, {localVue, propsData: {
+                        market: {
+                            base: {symbol: 'TOK1'}, quote: {symbol: 'TOK2'},
                         },
-                    },
-                });
+                    }});
 
-                expect(obj.statsPeriod).to.equal(30);
+                expect(wrapper.vm.statsPeriod).to.equal(10);
             });
 
             context('with default object', () => {
                 it('returns {Number}', () => {
-                    const obj = mount(component, { });
+                    const localVue = mockVue();
+                    const wrapper = shallowMount(component, {localVue, propsData: {
+                            market: {
+                                base: {symbol: 'TOK1'}, quote: {symbol: 'TOK2'},
+                            },
+                        }});
 
-                    expect(obj.statsPeriod).to.equal(10);
+                    expect(wrapper.vm.statsPeriod).to.equal(10);
                 });
             });
         });

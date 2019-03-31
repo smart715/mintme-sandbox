@@ -169,17 +169,6 @@ export default {
         market: Object,
         releasePeriodRoute: String,
         editable: Boolean,
-        stats: {
-            type: Object,
-            default: function() {
-                return {
-                    releasePeriod: defaultValue,
-                    hourlyRate: defaultValue,
-                    releasedAmount: defaultValue,
-                    frozenAmount: defaultValue,
-                };
-            },
-        },
     },
     data() {
         return {
@@ -187,9 +176,19 @@ export default {
             tokenExchangeAmount: null,
             pendingSellOrders: null,
             executedOrders: null,
+            stats: {
+                releasePeriod: defaultValue,
+                hourlyRate: defaultValue,
+                releasedAmount: defaultValue,
+                frozenAmount: defaultValue,
+            },
         };
     },
     mounted: function() {
+        this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
+            .then((res) => this.stats = res.data || this.stats)
+            .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
+
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
