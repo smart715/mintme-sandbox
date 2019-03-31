@@ -198,7 +198,7 @@ export default {
             submitting: false,
             editingUrls: false,
             currentWebsite: this.websiteUrl,
-            newWebsite: this.websiteUrl,
+            newWebsite: this.websiteUrl || 'http://',
             showConfirmWebsiteModal: false,
             showWebsiteError: false,
             parsedWebsite: '',

@@ -30,13 +30,13 @@ class LockIn
     protected $releasePeriod = 10;
 
     /**
-     * @ORM\Column(type="bigint")
+     * @ORM\Column(type="string")
      * @var string
      */
     protected $amountToRelease;
 
     /**
-     * @ORM\Column(type="bigint")
+     * @ORM\Column(type="string")
      * @var string
      */
     protected $frozenAmount = '0';

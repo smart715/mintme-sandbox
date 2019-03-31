@@ -15,33 +15,36 @@ module.exports = function(config) {
     frameworks: ['mocha', 'requirejs', 'chai', 'es6-shim'],
     files: [
       'test-main.js',
-      { pattern: 'assets/tests/**/*Spec.js', included: false },
-      { pattern: 'assets/js/*.js', included: false }
+      {pattern: 'assets/tests/**/*Spec.js', included: false},
+      {pattern: 'assets/js/*.js', included: false},
     ],
     webpack: webpackConfig,
     webpackServer: {
-        noInfo: true
+        noInfo: true,
     },
     webpackMiddleware: {
-        noInfo: true
+        noInfo: true,
     },
     preprocessors: {
         'assets/tests/**/*Spec.js': ['webpack'],
         'assets/js/**/*.js': ['webpack', 'coverage'],
-        'assets/components/**/*.vue': ['webpack', 'coverage']
+        'assets/components/**/*.vue': ['webpack', 'coverage'],
     },
     coverageReporter: {
-      type : 'text-summary',
-      dir : 'coverage/',
-      includeAllSources : true
+      type: 'text-summary',
+      dir: 'coverage/',
+      includeAllSources: true,
     },
     reporters: ['progress', 'coverage'],
     port: 9876,
+    client: {
+      captureConsole: false,
+    },
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
     browsers: ['PhantomJS'],
     singleRun: true,
-    concurrency: Infinity
-  })
+    concurrency: Infinity,
+  });
 };

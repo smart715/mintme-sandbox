@@ -98,7 +98,6 @@ class TokenController extends Controller
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
             'currency' => Token::WEB_SYMBOL,
-            'stats' => $this->normalize($token->getLockIn()),
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),

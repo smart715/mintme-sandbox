@@ -45,9 +45,6 @@
                                     class="col-12 col-lg-4 pt-3 pt-lg-0 px-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    {% if stats is not null %}
-                                        :stats="{{ stats | json_encode }}"
-                                    {% endif %}
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}">
                                 </token-introduction-statistics>
                                 <token-introduction-description
@@ -81,5 +78,5 @@
 {% block pagescripts %}
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="{{ asset('build/token.js') }}"></script>
+    <script src="{{ asset('build/pair.js') }}"></script>
 {% endblock %}
