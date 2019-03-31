@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-on-clickaway="cancelEditingMode">
         <template v-if="editable">
             <input type="text" v-model="newName" v-if="editingName">
             <font-awesome-icon
@@ -17,6 +17,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
+import {mixin as clickaway} from 'vue-clickaway';
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -37,6 +38,7 @@ export default {
     components: {
         FontAwesomeIcon,
     },
+    mixins: [clickaway],
     data() {
         return {
             editingName: false,
@@ -75,10 +77,13 @@ export default {
                 }
             })
             .then(() => {
-                this.newName = this.currentName;
-                this.editingName = false;
-                this.icon = 'edit';
+                this.cancelEditingMode();
             });
+        },
+        cancelEditingMode: function() {
+            this.newName = this.currentName;
+            this.editingName = false;
+            this.icon = 'edit';
         },
     },
 };
@@ -101,6 +106,7 @@ export default {
     input[type="text"]
         background-color: #fff
         border-style: unset
-        padding: 0 5px</style>
+        padding: 0 5px
+</style>
 
 

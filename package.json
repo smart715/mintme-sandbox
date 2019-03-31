@@ -33,6 +33,7 @@
     "v-autocomplete": "^1.8.2",
     "v-charts": "^1.19.0",
     "vue-chartjs": "^3.3.2",
+    "vue-clickaway": "^2.2.2",
     "vue-clipboard2": "^0.2.1",
     "vue-range-slider": "^0.6.0",
     "vue-slider-component": "^2.8.3",
