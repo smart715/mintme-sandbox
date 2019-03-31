@@ -47,7 +47,6 @@
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(precision)"
-                        :not-set-unchange="['dataZoom']"
                         :loading="isKlineEmpty"
                         :resize-delay="0">
                     </ve-candle>
