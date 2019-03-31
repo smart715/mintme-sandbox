@@ -16,36 +16,47 @@
                         :class="{ 'is-invalid': $v.address.$error }"
                         class="form-control">
                     <div v-if="$v.address.$error" class="invalid-feedback">
-                        Address can't be empty and must contain alphanumeric letters only.
+                        Wrong address
                     </div>
                 </div>
-                <div class="col-12 pt-2">
+                <div class="col-12 pt-2 pb-5 withdraw-amount">
                     <label for="wamount"  class="d-block text-left">
                         Amount (balance):
                     </label>
-                    <div class="text-right">
                         <input
                             id="wamount"
-                            v-model.number="$v.amount.$model"
+                            v-model="$v.amount.$model"
                             type="text"
+                            @keypress="checkAmount"
                             :class="{ 'is-invalid': $v.amount.$error }"
                             class="form-control text-left input-custom-padding">
                         <button
-                            class="btn btn-primary btn-input"
+                            class="btn btn-primary btn-input float-right"
                             type="button"
                             @click="setMaxAmount">
                             All
                         </button>
-                    </div>
-                    <div v-if="$v.amount.$error" class="invalid-feedback">
-                        You can't set bigger amount than your own balance. Amount must be decimal.
-                    </div>
+                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center mt-n4">
+                            You don't have enough {{ currency }}
+                        </div>
+                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center mt-n4">
+                            Minimum withdraw amount is {{ minAmount }} {{ currency }}
+                        </div>
+                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center mt-n4">
+                            Invalid amount.
+                        </div>
                 </div>
-                <div class="col-12 text-center">
+                <div class="col-12 text-left">
                     <label>
-                        Amount {{ currency }}:
+                        Withdrawal fee:
                     </label>
-                    <span>{{ fullAmount | toMoney }}</span>
+                    <span class="float-right">{{ fee | toMoney }}</span>
+                </div>
+                <div class="col-12 pt-3 text-left">
+                    <label>
+                        Total to be withdrawn:
+                    </label>
+                    <span class="float-right">{{ fullAmount | toMoney }}</span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
@@ -68,8 +79,9 @@
 <script>
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
-import {required, minLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
+import {GENERAL} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
@@ -82,11 +94,13 @@ export default {
         fee: String,
         withdrawUrl: String,
         maxAmount: String,
+        addressLength: Number,
     },
     data() {
         return {
             amount: 0,
             address: '',
+            minAmount: toMoney('1e-' + GENERAL.precision),
         };
     },
     computed: {
@@ -101,6 +115,21 @@ export default {
         },
     },
     methods: {
+        checkAmount: function(event) {
+            let inputPos = event.target.selectionStart;
+            let amount = this.$v.amount.$model.toString();
+            let selected = event.view.getSelection().toString();
+            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${GENERAL.precision}})?$`);
+            let key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+            if (selected && regex.test(amount.slice(0, inputPos) + key + amount.slice(inputPos + selected.length))) {
+                return true;
+            }
+            if (!regex.test(amount.slice(0, inputPos) + key + amount.slice(inputPos))) {
+                event.preventDefault();
+                return false;
+            }
+        },
         closeModal: function() {
             this.$v.$reset();
             this.amount = 0;
@@ -108,7 +137,8 @@ export default {
             this.$emit('close');
         },
         onWithdraw: function() {
-            if (this.$v.address.$error || this.$v.amount.$error) {
+            this.$v.$touch();
+            if (this.$v.$error) {
                 this.$toasted.error('Correct your form fields');
                 return;
             }
@@ -146,12 +176,13 @@ export default {
                 maxValue: maxValue(
                     toMoney(new Decimal(this.maxAmount).sub(this.fee).toString())
                 ),
-                minValue: minValue(0.00001),
+                minValue: minValue(this.minAmount),
             },
             address: {
                 required,
                 alphaNum,
-                minLength: minLength(1),
+                minLength: minLength(this.addressLength),
+                maxLength: maxLength(this.addressLength),
             },
         };
     },

@@ -86,6 +86,7 @@
             :fee="fee"
             :withdraw-url="withdrawUrl"
             :max-amount="amount"
+            :address-length="addressLength"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -148,6 +149,11 @@ export default {
         };
     },
     computed: {
+        addressLength: function() {
+            return this.depositAddresses[this.selectedCurrency] && this.depositAddresses[this.selectedCurrency].length
+                ? this.depositAddresses[this.selectedCurrency].length
+                : 1;
+        },
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },

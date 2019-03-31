@@ -14,7 +14,7 @@
                             transform="shrink-4 up-1.5"
                             @click="editingUrls = true"/>
                         <a :href="profileUrl" target="_blank">
-                            {{ profileUrl }}
+                            Visit token's creator profile
                         </a>
                         <div class="pt-4">
                             <div class="pb-1">
@@ -207,7 +207,7 @@ export default {
             submitting: false,
             editingUrls: false,
             currentWebsite: this.websiteUrl,
-            newWebsite: this.websiteUrl,
+            newWebsite: this.websiteUrl || 'http://',
             showConfirmWebsiteModal: false,
             showWebsiteError: false,
             parsedWebsite: '',
@@ -235,6 +235,10 @@ export default {
 
             if (this.showWebsiteError) {
                 return;
+            }
+
+            if (!this.showConfirmWebsiteModal) {
+                this.editingUrls = false;
             }
         },
         checkWebsiteUrl: function() {

@@ -14,7 +14,7 @@
                     </guide>
                 </div>
                 <div class="col text-center">
-                    24h change: {{ marketStatus.change }}
+                    24h change: {{ marketStatus.change }}%
                     <guide>
                         <template slot="header">
                             24h change
@@ -47,7 +47,6 @@
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(precision)"
-                        :not-set-unchange="['dataZoom']"
                         :loading="isKlineEmpty"
                         :resize-delay="0">
                     </ve-candle>

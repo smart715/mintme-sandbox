@@ -8,6 +8,9 @@
                     :fields="fields"
                     :current-page="currentPage"
                     :per-page="perPage">
+                    <template slot="pair" slot-scope="row">
+                        <a class="text-white" :href="row.item.tokenUrl">{{ row.value }}</a>
+                    </template>
                 </b-table>
             </div>
             <div class="row justify-content-center">
@@ -58,7 +61,7 @@ export default {
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
-                {token: 'WEB', currency: 'BTC'},
+                {token: 'BTC', currency: 'WEB'},
             ],
         };
     },
@@ -96,47 +99,43 @@ export default {
             if (!marketData.params) {
                 return;
             }
+
             const marketName = marketData.params[0];
             const marketInfo = marketData.params[1];
 
-            const marketOpenPrice = parseFloat(marketInfo.open);
             const marketLastPrice = parseFloat(marketInfo.last);
-            const marketVolume = parseFloat(marketInfo.volume);
-            const changePercentage = this.getPercentage(marketLastPrice, marketOpenPrice);
+            const changePercentage = this.getPercentage(marketLastPrice, parseFloat(marketInfo.open));
 
             const marketCurrency = this.markets[marketName].cryptoSymbol;
             const marketToken = this.markets[marketName].tokenName;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
+            const market = this.getSanitizedMarket(
+                marketCurrency,
+                marketToken,
+                changePercentage,
+                marketLastPrice,
+                parseFloat(marketInfo.volume)
+            );
+
             if (marketOnTopIndex > -1) {
-                this.sanitizedMarketsOnTop[marketOnTopIndex] = this.getSanitizedMarket(
-                    marketToken,
-                    marketCurrency,
-                    changePercentage,
-                    marketLastPrice,
-                    marketVolume
-                );
+                this.sanitizedMarketsOnTop[marketOnTopIndex] = market;
             } else {
-                this.$set(
-                    this.sanitizedMarkets,
-                    marketName,
-                    this.getSanitizedMarket(
-                        marketCurrency,
-                        marketToken,
-                        changePercentage,
-                        marketLastPrice,
-                        marketVolume
-                    )
-                );
+                this.sanitizedMarkets[marketName] = market;
             }
         },
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume) {
+            let hiddenName = this.findHiddenName(token);
+
             return {
                 pair: `${currency}/${token}`,
-                change: changePercentage.toFixed(2),
-                lastPrice: lastPrice.toFixed(2),
+                change: changePercentage.toFixed(2) + '%',
+                lastPrice: lastPrice.toFixed(2) + ' ' + currency,
                 volume: volume.toFixed(2),
+                tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
+                    this.$routing.generate('token_show', {name: token}) :
+                    this.$routing.generate('coin', {base: currency, quote: token}),
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -184,6 +183,20 @@ export default {
                     }
                 });
             }
+        },
+        findHiddenName: function(tokenOrCrypto) {
+            let result = null;
+
+            for (let key in this.markets) {
+                if (this.markets.hasOwnProperty(key) &&
+                    (this.markets[key].tokenName === tokenOrCrypto ||
+                    this.markets[key].cryptoSymbol === tokenOrCrypto)) {
+                    result = key;
+                    break;
+                }
+            }
+
+            return result;
         },
     },
 };

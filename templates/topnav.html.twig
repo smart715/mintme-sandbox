@@ -25,7 +25,7 @@
                     </b-nav-item>
                 {% endif %}
                 <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
-                    Referral Program
+                    Referrals
                 </b-nav-item>
                 {% if not app.user %}
                     <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">

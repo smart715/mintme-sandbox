@@ -64,20 +64,16 @@ describe('TradingHistory', () => {
             },
         ];
 
-    it('has a mounted hook', () => {
-       expect(typeof TradingHistory.mounted).toBe('function');
-    });
-
     it('correctly sets history after axios request', () => {
         vm.history = websocketResult;
         expect(vm.history).to.deep.equal(websocketResult);
     });
 
     it('must calculate history length', () => {
-        expect(vm.totalRows()).to.deep.equal(websocketResult.length);
+        expect(vm.totalRows).to.deep.equal(websocketResult.length);
     });
 
     it('must determine history', () => {
-        expect(vm.hasHistory()).to.equal(true);
+        expect(vm.hasHistory).to.equal(true);
     });
 });
