@@ -2,7 +2,7 @@ import {shallowMount} from '@vue/test-utils';
 import TradeBuyOrders from '../../js/components/trade/TradeBuyOrders';
 import {toMoney} from '../../js/utils';
 
-describe('TradeSellOrders', () => {
+describe('TradeBuyOrders', () => {
     const wrapper = shallowMount(TradeBuyOrders, {
         propsData: {
             ordersList: [],
