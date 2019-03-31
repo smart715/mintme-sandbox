@@ -20,7 +20,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     /** @var int */
     private $timeoutSeconds;
 
-    /** @var string[] */
+    /** @var string|int[] */
     private $errors = [];
 
     public function __construct(
