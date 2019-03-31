@@ -269,7 +269,7 @@ class MarketHandler implements MarketHandlerInterface
             $result = $this->marketFetcher->getMarketInfo($this->marketNameConverter->convert($market));
 
             if (!$result) {
-                break;
+                continue;
             }
 
             $marketsInfo[$this->marketNameConverter->convert($market)] = new MarketInfo(

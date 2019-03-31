@@ -34,9 +34,12 @@ class MarketFactory implements MarketFactoryInterface
     /** {@inheritdoc} */
     public function createAll(): array
     {
-        return $this->getMarkets(
-            $this->getExchangableCryptos(),
-            $this->tokenManager->findAll()
+        return array_merge(
+            $this->getCoinMarkets(),
+            $this->getMarkets(
+                $this->getExchangableCryptos(),
+                $this->tokenManager->findAll()
+            )
         );
     }
 
@@ -57,22 +60,38 @@ class MarketFactory implements MarketFactoryInterface
         });
     }
 
+    private function getTradableCryptos(): array
+    {
+        return array_filter($this->cryptoManager->findAll(), function (Crypto $crypto) {
+            return $crypto->isTradable();
+        });
+    }
+
+    /** @return Market[] */
+    private function getCoinMarkets(): array
+    {
+        return $this->getMarkets(
+            $this->getTradableCryptos(),
+            $this->getExchangableCryptos()
+        );
+    }
+
     /**
-     * @param Crypto[] $cryptos
-     * @param Token[] $tokens
+     * @param TradebleInterface[] $bases
+     * @param TradebleInterface[] $quotes
      * @return Market[]
      */
-    private function getMarkets(array $cryptos, array $tokens): array
+    private function getMarkets(array $bases, array $quotes): array
     {
         $markets = [];
 
-        foreach ($cryptos as $crypto) {
-            foreach ($tokens as $token) {
-                $market = $this->create($crypto, $token);
-
-                if (null !== $market) {
-                    $markets[] = $market;
+        foreach ($bases as $base) {
+            foreach ($quotes as $quote) {
+                if ($base === $quote) {
+                    continue;
                 }
+
+                $markets[] = $this->create($base, $quote);
             }
         }
 
