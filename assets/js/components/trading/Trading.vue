@@ -130,8 +130,8 @@ export default {
 
             return {
                 pair: `${currency}/${token}`,
-                change: changePercentage.toFixed(2),
-                lastPrice: lastPrice.toFixed(2),
+                change: changePercentage.toFixed(2) + '%',
+                lastPrice: lastPrice.toFixed(2) + ' ' + currency,
                 volume: volume.toFixed(2),
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
