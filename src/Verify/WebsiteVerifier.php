@@ -63,7 +63,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         } elseif (Response::HTTP_FORBIDDEN === $code) {
             $this->errors[] = 'Access denied';
         } else {
-            $this->errors[] = 'Website couldn\'t be confirmed, try again';
+            $this->errors['resultStatus'] = $code;
         }
     }
 

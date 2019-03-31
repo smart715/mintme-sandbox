@@ -134,6 +134,15 @@
                             <li>Click confirm below</li>
                         </ol>
                     </div>
+                    <div v-if="visibleStatusUrl" class="col-12">
+                        <a
+                            class="text-danger"
+                            href="https://www.restapitutorial.com/httpstatuscodes.html"
+                            target="_blank"
+                            rel="nofollow">
+                            More information about HTTP status codes
+                        </a>
+                    </div>
                     <div class="col-12 text-left">
                         <button class="btn btn-primary" @click="confirmWebsite">
                             <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
@@ -203,6 +212,7 @@ export default {
             showWebsiteError: false,
             parsedWebsite: '',
             websitePath: '/mintme.html',
+            visibleStatusUrl: false,
         };
     },
     computed: {
@@ -249,11 +259,15 @@ export default {
                         this.$toasted.success('Website confirmed successfully');
                         this.showConfirmWebsiteModal = false;
                         this.editingUrls = false;
+                        this.visibleStatusUrl = false;
+                    } else if (response.data.errors.resultStatus) {
+                        this.$toasted.error('Your server respond with error ' + response.data.errors.resultStatus);
+                        this.visibleStatusUrl = true;
                     } else if (response.data.errors.length) {
                         response.data.errors.forEach((error) => this.$toasted.error(error));
-                        this.newWebsite = this.currentWebsite;
+                        this.visibleStatusUrl = false;
                     } else {
-                        this.newWebsite = this.currentWebsite;
+                        this.visibleStatusUrl = false;
                         return Promise.reject({response: 'error'});
                     }
                 })
