@@ -106,13 +106,15 @@ export default {
                     price: toMoney(order.price, this.precision),
                     amount: toMoney(order.amount, this.precision),
                     sumWeb: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.precision),
-                    trader: order.maker !== null
+                    trader: order.maker.profile !== null
                         ? this.truncateFullName(order.maker.profile, order.owner)
                         : 'Anonymous',
-                    traderFullName: order.maker !== null
+                    traderFullName: order.maker.profile !== null
                         ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
                         : 'Anonymous',
-                    traderUrl: this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url}),
+                    traderUrl: order.maker.profile ?
+                        this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url}) :
+                        '#',
                     side: order.side,
                     owner: order.owner,
                 };
