@@ -240,7 +240,7 @@ export default {
               return !this.editingUrls && this.editable;
         },
         fileErrorVisible: function () {
-            return !!this.fileError.title;
+            return this.fileError.title && this.fileError.details;
         },
         fileErrorHttpUrl: function () {
             return !!this.fileError.visibleHttpUrl;
@@ -306,12 +306,11 @@ export default {
                 .then(() => this.submitting = false);
         },
         closeFileErrorModal: function () {
-            this.fileError = {}
+            this.fileError = {};
             this.showConfirmWebsiteModal = true;
         },
         clearFileError: function () {
-            this.fileError = {}
-
+            this.fileError = {};
         },
     },
 };

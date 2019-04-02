@@ -122,7 +122,7 @@ export default {
                 if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data[0][0].message);
                 } else {
-                    this.$toasted.error('An error has ocurred, please try again later');
+                    this.$toasted.error('An error has occurred, please try again later');
                 }
             })
             .then(() => {
