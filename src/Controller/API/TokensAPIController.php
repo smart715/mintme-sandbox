@@ -10,7 +10,7 @@ use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Verify\WebsiteVerifierInterface;
+use App\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -20,7 +20,6 @@ use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 
@@ -93,7 +92,7 @@ class TokensAPIController extends FOSRestController
      */
     public function confirmWebsite(
         ParamFetcherInterface $request,
-        WebsiteVerifierInterface $websiteVerifier,
+        WebsiteVerifier $websiteVerifier,
         string $name
     ): View {
         $token = $this->tokenManager->findByName($name);
@@ -105,7 +104,10 @@ class TokensAPIController extends FOSRestController
         $this->denyAccessUnlessGranted('edit', $token);
 
         if (null === $token->getWebsiteConfirmationToken()) {
-            return $this->view(null, Response::HTTP_BAD_REQUEST);
+            return $this->view([
+                'verified' => false,
+                'errors' => ['File not downloaded yet'],
+            ], Response::HTTP_ACCEPTED);
         }
 
         $url = $request->get('url');
@@ -119,7 +121,7 @@ class TokensAPIController extends FOSRestController
                 'errors' => array_map(static function ($violation) {
                     return $violation->getMessage();
                 }, iterator_to_array($urlViolations)),
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_ACCEPTED);
         }
 
         $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
@@ -129,7 +131,10 @@ class TokensAPIController extends FOSRestController
             $this->em->flush();
         }
 
-        return $this->view(['verified' => $isVerified, 'errors' => []], Response::HTTP_ACCEPTED);
+        return $this->view([
+            'verified' => $isVerified,
+            'errors' => ['fileError' => $websiteVerifier->getError()],
+        ], Response::HTTP_ACCEPTED);
     }
 
     /**
