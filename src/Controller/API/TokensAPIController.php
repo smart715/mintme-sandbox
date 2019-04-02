@@ -133,7 +133,7 @@ class TokensAPIController extends FOSRestController
 
         return $this->view([
             'verified' => $isVerified,
-            'errors' => $websiteVerifier->getErrors(),
+            'errors' => ['fileError' => $websiteVerifier->getError()],
         ], Response::HTTP_ACCEPTED);
     }
 

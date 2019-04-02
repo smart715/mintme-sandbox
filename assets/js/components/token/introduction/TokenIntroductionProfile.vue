@@ -109,6 +109,32 @@
             </div>
         </div>
         <modal
+            @close="closeFileErrorModal"
+            :visible="fileErrorVisible">
+            <template slot="body">
+                <h3 class="modal-title text-center text-danger">{{ fileError.title }}</h3>
+                <div class="text-white">
+                    <p>
+                        {{ fileError.details }}
+                        <a
+                            v-if="fileErrorHttpUrl"
+                            href="https://www.restapitutorial.com/httpstatuscodes.html"
+                            target="_blank"
+                            rel="nofollow">
+                            More information about HTTP status codes.
+                        </a>
+                    </p>
+                    <div class="pt-2 text-center">
+                        <button
+                            class="btn btn-primary"
+                            @click="closeFileErrorModal">
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </modal>
+        <modal
             class="text-white"
             :visible="showConfirmWebsiteModal"
             @close="showConfirmWebsiteModal = false">
@@ -133,15 +159,6 @@
                             </li>
                             <li>Click confirm below</li>
                         </ol>
-                    </div>
-                    <div v-if="visibleStatusUrl" class="col-12">
-                        <a
-                            class="text-danger"
-                            href="https://www.restapitutorial.com/httpstatuscodes.html"
-                            target="_blank"
-                            rel="nofollow">
-                            More information about HTTP status codes
-                        </a>
                     </div>
                     <div class="col-12 text-left">
                         <button class="btn btn-primary" @click="confirmWebsite">
@@ -212,7 +229,7 @@ export default {
             showWebsiteError: false,
             parsedWebsite: '',
             websitePath: '/mintme.html',
-            visibleStatusUrl: false,
+            fileError: {},
         };
     },
     computed: {
@@ -222,6 +239,17 @@ export default {
         showEditIcon: function() {
               return !this.editingUrls && this.editable;
         },
+        fileErrorVisible: function () {
+            return !!this.fileError.title;
+        },
+        fileErrorHttpUrl: function () {
+            return !!this.fileError.visibleHttpUrl;
+        },
+    },
+    watch: {
+        newWebsite: function () {
+            this.fileError = {};
+        }
     },
     methods: {
         editUrls: function() {
@@ -263,20 +291,27 @@ export default {
                         this.$toasted.success('Website confirmed successfully');
                         this.showConfirmWebsiteModal = false;
                         this.editingUrls = false;
-                        this.visibleStatusUrl = false;
-                    } else if (response.data.errors.resultStatus) {
-                        this.$toasted.error('Your server respond with error ' + response.data.errors.resultStatus);
-                        this.visibleStatusUrl = true;
+                        this.clearFileError();
+                    } else if (response.data.errors.fileError) {
+                        this.fileError = response.data.errors.fileError;
                     } else if (response.data.errors.length) {
                         response.data.errors.forEach((error) => this.$toasted.error(error));
-                        this.visibleStatusUrl = false;
+                        this.clearFileError();
                     } else {
-                        this.visibleStatusUrl = false;
+                        this.clearFileError();
                         return Promise.reject({response: 'error'});
                     }
                 })
                 .catch(({response}) => this.$toasted.error(!response ? 'Network error' : response.statusText))
                 .then(() => this.submitting = false);
+        },
+        closeFileErrorModal: function () {
+            this.fileError = {}
+            this.showConfirmWebsiteModal = true;
+        },
+        clearFileError: function () {
+            this.fileError = {}
+
         },
     },
 };
