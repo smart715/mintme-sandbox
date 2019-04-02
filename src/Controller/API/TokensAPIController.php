@@ -121,7 +121,7 @@ class TokensAPIController extends FOSRestController
                 'errors' => array_map(static function ($violation) {
                     return $violation->getMessage();
                 }, iterator_to_array($urlViolations)),
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_ACCEPTED);
         }
 
         $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
