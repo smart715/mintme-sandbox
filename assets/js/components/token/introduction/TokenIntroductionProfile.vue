@@ -239,17 +239,17 @@ export default {
         showEditIcon: function() {
               return !this.editingUrls && this.editable;
         },
-        fileErrorVisible: function () {
+        fileErrorVisible: function() {
             return this.fileError.title && this.fileError.details;
         },
-        fileErrorHttpUrl: function () {
+        fileErrorHttpUrl: function() {
             return !!this.fileError.visibleHttpUrl;
         },
     },
     watch: {
-        newWebsite: function () {
+        newWebsite: function() {
             this.fileError = {};
-        }
+        },
     },
     methods: {
         editUrls: function() {
@@ -305,11 +305,11 @@ export default {
                 .catch(({response}) => this.$toasted.error(!response ? 'Network error' : response.statusText))
                 .then(() => this.submitting = false);
         },
-        closeFileErrorModal: function () {
+        closeFileErrorModal: function() {
             this.fileError = {};
             this.showConfirmWebsiteModal = true;
         },
-        clearFileError: function () {
+        clearFileError: function() {
             this.fileError = {};
         },
     },

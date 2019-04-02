@@ -20,7 +20,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     /** @var int */
     private $timeoutSeconds;
 
-    /** @var array */
+    /** @var string[]|bool[] */
     private $error = [];
 
     public function __construct(
@@ -48,11 +48,11 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         }
 
         if (Response::HTTP_OK === $response->getStatusCode()) {
-
             $fileContent = $response->getBody()->getContents();
 
             if (empty($fileContent)) {
                 $this->selectError(Response::HTTP_NO_CONTENT);
+
                 return false;
             }
 
@@ -60,6 +60,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
 
             if (!preg_match($expectedPattern, $fileContent)) {
                 $this->selectError(self::INVALID_VERIFICATION_CODE);
+
                 return false;
             }
 
@@ -75,9 +76,9 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     {
         if (Response::HTTP_NO_CONTENT === $code) {
             $this->setError(
-              'Your verification file is empty.',
-              'Bot checks to see if your verification file has the same filename and content as the file provided on the Verification page. If the file name or content does not match the HTML file provided, we won\'t be able to verify your site ownership. Please download the verification file, and upload it to the specified location without any modifications.',
-              false
+                'Your verification file is empty.',
+                'Bot checks to see if your verification file has the same filename and content as the file provided on the Verification page. If the file name or content does not match the HTML file provided, we won\'t be able to verify your site ownership. Please download the verification file, and upload it to the specified location without any modifications.',
+                false
             );
         } elseif (self::INVALID_VERIFICATION_CODE === $code) {
             $this->setError(
@@ -98,7 +99,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         $this->error = [
             'title' => $title,
             'details' => $details,
-            'visibleHttpUrl' => $visibleHttpUrl
+            'visibleHttpUrl' => $visibleHttpUrl,
         ];
     }
 
