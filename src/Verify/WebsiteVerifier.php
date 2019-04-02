@@ -5,11 +5,11 @@ namespace App\Verify;
 use App\Communications\Factory\HttpClientFactoryInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebsiteVerifier implements WebsiteVerifierInterface
 {
-    private const HTTP_OK = 200;
-    private const MATCH_CODE = 1;
+    private const INVALID_VERIFICATION_CODE = 2;
 
     /** @var HttpClientFactoryInterface */
     private $clientFactory;
@@ -19,6 +19,9 @@ class WebsiteVerifier implements WebsiteVerifierInterface
 
     /** @var int */
     private $timeoutSeconds;
+
+    /** @var string[]|bool[] */
+    private $error = [];
 
     public function __construct(
         HttpClientFactoryInterface $clientFactory,
@@ -38,17 +41,70 @@ class WebsiteVerifier implements WebsiteVerifierInterface
             $client = $this->clientFactory->createClient(['base_uri' => $formatUrl, 'timeout' => $this->timeoutSeconds]);
             $response = $client->request('GET', self::URI);
         } catch (GuzzleException $exception) {
+            $this->selectError($exception->getCode());
             $this->logger->error($exception->getMessage());
 
             return false;
         }
 
-        if (self::HTTP_OK === $response->getStatusCode()) {
+        if (Response::HTTP_OK === $response->getStatusCode()) {
+            $fileContent = $response->getBody()->getContents();
+
+            if (empty($fileContent)) {
+                $this->selectError(Response::HTTP_NO_CONTENT);
+
+                return false;
+            }
+
             $expectedPattern = '/('.self::PREFIX.': '.$verificationToken.')/';
 
-            return self::MATCH_CODE === preg_match($expectedPattern, $response->getBody()->getContents());
+            if (!preg_match($expectedPattern, $fileContent)) {
+                $this->selectError(self::INVALID_VERIFICATION_CODE);
+
+                return false;
+            }
+
+            return true;
         }
 
+        $this->selectError($response->getStatusCode());
+
         return false;
+    }
+
+    private function selectError(int $code): void
+    {
+        if (Response::HTTP_NO_CONTENT === $code) {
+            $this->setError(
+                'Your verification file is empty.',
+                'Bot checks to see if your verification file has the same filename and content as the file provided on the Verification page. If the file name or content does not match the HTML file provided, we won\'t be able to verify your site ownership. Please download the verification file, and upload it to the specified location without any modifications.',
+                false
+            );
+        } elseif (self::INVALID_VERIFICATION_CODE === $code) {
+            $this->setError(
+                'Your verification file has the wrong content.',
+                'Bot checks to see if your verification file has the same filename and content as the file provided. If the file name or content does not match the HTML file provided, we won\'t be able to verify your site ownership. Please download the verification file, and upload it to the specified location without any modifications.',
+                false
+            );
+        } else {
+            $this->setError(
+                sprintf('Your verification file returns a HTTP status code of %s instead of 200(OK).', $code),
+                'If your server returns a HTTP status code other than 200(OK) for your HTML verification file, Bot will not be able to verify that it has the expected filename and content. More information about HTTP status codes.'
+            );
+        }
+    }
+
+    private function setError(string $title, string $details, bool $visibleHttpUrl = true): void
+    {
+        $this->error = [
+            'title' => $title,
+            'details' => $details,
+            'visibleHttpUrl' => $visibleHttpUrl,
+        ];
+    }
+
+    public function getError(): array
+    {
+        return $this->error;
     }
 }

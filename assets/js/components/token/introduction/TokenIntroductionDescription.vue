@@ -15,7 +15,7 @@
 
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row fix-height">
                     <div class="col-12">
                         <span class="card-header-icon">
                             <font-awesome-icon
@@ -42,12 +42,12 @@
                                 </div>
                                 <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
-                                <limited-textarea
+                                <textarea
                                     class="form-control"
-                                    :value="newDescription"
+                                    v-model="newDescription"
                                     max="20000"
                                     @get-value="getValue">
-                                </limited-textarea>
+                                </textarea>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription">Save</button>
                                     <a class="pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
@@ -122,7 +122,7 @@ export default {
                 if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data[0][0].message);
                 } else {
-                    this.$toasted.error('An error has ocurred, please try again later');
+                    this.$toasted.error('An error has occurred, please try again later');
                 }
             })
             .then(() => {
@@ -138,5 +138,6 @@ export default {
 <style lang="sass" scoped>
     p
         white-space: pre-line
+        word-break: break-word
 </style>
 
