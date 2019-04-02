@@ -1,11 +1,10 @@
 <template>
     <div>
         <div v-show="!editing">
-            <div class="d-flex-inline">
+            <div class="d-flex-inline" v-if="currentChannelId">
                 <div class="display-text">
                     Youtube:
                     <a
-                        v-if="currentChannelId"
                         :href="youTubeUrl"
                         target="_blank"
                         rel="nofollow">
