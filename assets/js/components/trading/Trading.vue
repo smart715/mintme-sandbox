@@ -151,7 +151,6 @@ export default {
             return openPrice ? (lastPrice - openPrice) * 100 / openPrice : 0;
         },
         updateDataWithMarkets: function() {
-            let markets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
                     const cryptoSymbol = this.markets[market].cryptoSymbol;
