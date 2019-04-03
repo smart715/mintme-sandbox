@@ -12,11 +12,19 @@
                     </div>
                     <div class="card-body py-2">
                         {{ form_start(form) }}
-                        {{ form_widget(form) }}
-
+                        {{ form_row(form.name, {'attr': {'v-model': '$v.tokenName.$model','class' : 'form-control'}}) }}
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.alphaNum" class="text-danger text-center">
+                            Token name can contain alphabets and numbers
+                        </div>
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
+                            Token name can have at least 4 symbols
+                        </div>
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
+                            Token name can't be longer than 255 characters
+                        </div>
                         <div class="form-group row">
                             <div class="col-md-12 text-left">
-                                <input type="submit" class="btn btn-primary" value="Create token" />
+                                <input type="submit" :disabled="$v.$anyError || !tokenName" class="btn btn-primary" value="Create token" />
                                 <a class="pl-3" href="javascript:history.back()">Cancel</a>
                             </div>
                         </div>
