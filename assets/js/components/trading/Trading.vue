@@ -141,7 +141,7 @@ export default {
         getMarketOnTopIndex: function(currency, token) {
             let index = -1;
             this.marketsOnTop.forEach((market, key) => {
-                if (token === market.token && currency === market.currency) {
+                if (token === market.currency && currency === market.token) {
                     index = key;
                 }
             });
@@ -154,16 +154,18 @@ export default {
             let markets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
-                    markets[market] = this.getSanitizedMarket(
-                        this.markets[market].cryptoSymbol,
-                        this.markets[market].tokenName,
-                        this.getPercentage(
+                    if (!this.getMarketOnTopIndex(this.markets[market].cryptoSymbol, this.markets[market].tokenName)) {
+                        markets[market] = this.getSanitizedMarket(
+                            this.markets[market].cryptoSymbol,
+                            this.markets[market].tokenName,
+                            this.getPercentage(
+                                parseFloat(this.markets[market].last),
+                                parseFloat(this.markets[market].open)
+                            ),
                             parseFloat(this.markets[market].last),
-                            parseFloat(this.markets[market].open)
-                        ),
-                        parseFloat(this.markets[market].last),
-                        parseFloat(this.markets[market].volume)
-                    );
+                            parseFloat(this.markets[market].volume)
+                        );
+                    }
                 }
             }
             this.sanitizedMarkets = markets;
