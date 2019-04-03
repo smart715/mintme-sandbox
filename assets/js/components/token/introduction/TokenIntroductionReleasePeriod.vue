@@ -71,7 +71,7 @@
         <b-col cols="12" class="mt-3">
             <div class="text-left">
                 <b-button type="submit" class="px-4" variant="primary" @click="saveReleasePeriod">Save</b-button>
-                <a class="pl-3 c-pointer" @click="cancelAction">Cancel</a>
+                <a class="cancel pl-3 c-pointer" @click="cancelAction">Cancel</a>
             </div>
         </b-col>
     </b-row>
