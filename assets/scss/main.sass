@@ -79,14 +79,14 @@ a
     border-radius: 0
     border: none
     height: calc(2.0rem + 2px)
-    
+
   textarea
     height: auto
     border: none
 
   .custom-select, .form-control
     border: none
-      
+
 .card
   background: none
   position: relative
@@ -157,18 +157,18 @@ a
       padding-right: 1.5rem
     img
       height: 22px
-  
+
 .fix-layout
   table-layout: fixed
 
 
 .pagination
   .page-item
-    .page-link 
+    .page-link
       background: none
       color: $color-link
   .active
-    .page-link 
+    .page-link
       color: $white
 
 .tabs
@@ -182,7 +182,7 @@ a
     .nav-item
       flex: 1 1 auto
       padding: 0
-      border: none      
+      border: none
       color: $white
 
       .nav-link
@@ -358,3 +358,9 @@ nav.top-navbar
     position: absolute
     bottom: 1.2rem
     right: 1rem
+
+#token, #profile-creation, #profile
+  [v-cloak]
+    display: none
+  .text-danger
+    font-size: 80%

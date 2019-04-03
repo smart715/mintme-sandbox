@@ -24,7 +24,7 @@ class TokenCreateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, ['label' => 'Token name'])
+            ->add('name', TextType::class, ['label' => 'Token name:', 'attr' => ['maxLength' => 255]])
         ;
 
         $builder->get('name')
