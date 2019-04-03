@@ -61,7 +61,7 @@ export default {
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
-                {token: 'BTC', currency: 'WEB'},
+                {currency: 'BTC', token: 'WEB'},
             ],
         };
     },
@@ -141,7 +141,7 @@ export default {
         getMarketOnTopIndex: function(currency, token) {
             let index = -1;
             this.marketsOnTop.forEach((market, key) => {
-                if (token === market.currency && currency === market.token) {
+                if (token === market.token && currency === market.currency) {
                     index = key;
                 }
             });
@@ -154,21 +154,27 @@ export default {
             let markets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
-                    if (!this.getMarketOnTopIndex(this.markets[market].cryptoSymbol, this.markets[market].tokenName)) {
-                        markets[market] = this.getSanitizedMarket(
-                            this.markets[market].cryptoSymbol,
-                            this.markets[market].tokenName,
-                            this.getPercentage(
-                                parseFloat(this.markets[market].last),
-                                parseFloat(this.markets[market].open)
-                            ),
+                    const cryptoSymbol = this.markets[market].cryptoSymbol;
+                    const tokenName = this.markets[market].tokenName;
+                    const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
+                    const sanitizedMarket = this.getSanitizedMarket(
+                        cryptoSymbol,
+                        tokenName,
+                        this.getPercentage(
                             parseFloat(this.markets[market].last),
-                            parseFloat(this.markets[market].volume)
-                        );
+                            parseFloat(this.markets[market].open)
+                        ),
+                        parseFloat(this.markets[market].last),
+                        parseFloat(this.markets[market].volume)
+                    );
+
+                    if (marketOnTopIndex > -1) {
+                        this.sanitizedMarketsOnTop[marketOnTopIndex] = sanitizedMarket;
+                    } else {
+                        this.sanitizedMarkets[market] = sanitizedMarket;
                     }
                 }
             }
-            this.sanitizedMarkets = markets;
 
             if (this.websocketUrl) {
                 this.addOnOpenHandler(() => {
