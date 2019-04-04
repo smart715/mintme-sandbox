@@ -14,6 +14,7 @@ Encore
     .addEntry('referral', './assets/js/referral.js')
     .addEntry('token_creation', './assets/js/token_creation.js')
     .addEntry('settings', './assets/js/settings.js')
+    .addEntry('profile_creation', './assets/js/profile_creation.js')
 
     .enablePostCssLoader()
 

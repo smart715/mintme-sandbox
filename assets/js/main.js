@@ -42,12 +42,6 @@ Vue.use(Toasted, {
     duration: 5000,
 });
 
-Vue.directive('init', {
-    bind: function(el, binding, vnode) {
-        vnode.context[binding.arg] = binding.value;
-    },
-});
-
 Vue.options.delimiters = ['{[', ']}'];
 
 const imagesContext = require.context(
