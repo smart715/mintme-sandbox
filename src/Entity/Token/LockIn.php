@@ -23,23 +23,29 @@ class LockIn
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\Regex(pattern="/^[1-8]0$/")
-     * @GreaterThanPrevious(message="Release period can be prolonged only.")
+     * @Assert\Regex(pattern="/^([1-3]|5|15|[1-5]0)$/")
+     * @GreaterThanPrevious(message="Release period can be prolonged only.", groups={"Exchanged"})
      * @var int
      */
-    protected $releasePeriod = 10;
+    protected $releasePeriod = 1;
 
     /**
      * @ORM\Column(type="string")
      * @var string
      */
-    protected $amountToRelease;
+    protected $amountToRelease = '0';
 
     /**
      * @ORM\Column(type="string")
      * @var string
      */
     protected $frozenAmount = '0';
+
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $releasedAtStart = '0';
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", inversedBy="lockIn")
@@ -81,8 +87,9 @@ class LockIn
     public function getReleasedAmount(): Money
     {
         $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $releasedAtStart = new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        return $money->subtract($this->getFrozenAmount());
+        return $money->subtract($this->getFrozenAmount())->add($releasedAtStart);
     }
 
     /**
@@ -91,6 +98,13 @@ class LockIn
     public function getFrozenAmount(): Money
     {
         return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+    }
+
+    public function setReleasedAtStart(int $releasedAtStart): self
+    {
+        $this->releasedAtStart = (string)$releasedAtStart;
+
+        return $this;
     }
 
     public function setReleasePeriod(int $releasePeriod): self

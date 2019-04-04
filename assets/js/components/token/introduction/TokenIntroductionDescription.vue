@@ -25,7 +25,7 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <p v-if="!editingDescription">{{ currentDescription }}</p>
+                        <p v-if="!editingDescription">{{ description }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
@@ -46,7 +46,7 @@
                                     class="form-control"
                                     v-model="newDescription"
                                     max="20000"
-                                    @get-value="getValue">
+                                >
                                 </textarea>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription">Save</button>
@@ -94,7 +94,6 @@ export default {
     data() {
         return {
             editingDescription: false,
-            currentDescription: this.description,
             newDescription: this.description,
         };
     },
@@ -103,33 +102,31 @@ export default {
             return !this.editingDescription && this.editable;
         },
     },
+    watch: {
+        description: function(old, cur) {
+            this.newDescription = cur;
+        },
+    },
     methods: {
-        getValue: function(newValue) {
-            this.newDescription = newValue;
-        },
         editDescription: function() {
-            return this.doEditDescription();
-        },
-        doEditDescription: function() {
             this.$axios.single.patch(this.updateUrl, {
                 description: this.newDescription,
             })
-            .then((response) => {
-                if (response.status === HTTP_NO_CONTENT) {
-                    this.currentDescription = this.newDescription;
-                }
-            }, (error) => {
-                if (error.response.status === HTTP_BAD_REQUEST) {
-                    this.$toasted.error(error.response.data[0][0].message);
-                } else {
-                    this.$toasted.error('An error has occurred, please try again later');
-                }
-            })
-            .then(() => {
-                this.newDescription = this.currentDescription;
-                this.editingDescription = false;
-                this.icon = 'edit';
-            });
+                .then((response) => {
+                    if (response.status === HTTP_NO_CONTENT) {
+                        this.$emit('updated', this.newDescription);
+                    }
+                }, (error) => {
+                    if (error.response.status === HTTP_BAD_REQUEST) {
+                        this.$toasted.error(error.response.data);
+                    } else {
+                        this.$toasted.error('An error has occurred, please try again later');
+                    }
+                })
+                .then(() => {
+                    this.editingDescription = false;
+                    this.icon = 'edit';
+                });
         },
     },
 };
