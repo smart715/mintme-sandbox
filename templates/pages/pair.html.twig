@@ -74,8 +74,9 @@
         {% if token|default %}
             <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || '{{ token.description }}'" />
         {% endif %}
-        <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
     </div>
+    
+    <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
 {% endblock %}
 
 {% block pagescripts %}
