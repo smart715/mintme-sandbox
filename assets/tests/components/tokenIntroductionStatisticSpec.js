@@ -12,7 +12,7 @@ function mockVue() {
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
-            Vue.prototype.$routing = {generate: () => 'test-url'};
+            Vue.prototype.$routing = {generate: (val) => val};
         },
     });
     return localVue;
@@ -37,12 +37,14 @@ describe('TokenIntroductionStatistics', () => {
                     },
                 }});
 
-                moxios.stubRequest('test-url', {status: 200, response: {
+                moxios.stubRequest('lock-period', {status: 200, response: {
                         releasePeriod: 10,
                         hourlyRate: 1,
                         releasedAmount: 1,
                         frozenAmount: 1,
                     }});
+
+                moxios.stubRequest('is_token_exchanged', {status: 200, response: true});
 
                 moxios.wait(() => {
                     expect(wrapper.vm.releasedDisabled).to.be.true;

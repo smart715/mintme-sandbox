@@ -12,6 +12,7 @@ class BalanceResultContainer implements \IteratorAggregate
         $this->balances = $balances;
     }
 
+    /** @return array<BalanceResult> */
     public function getAll(): array
     {
         return $this->balances;
