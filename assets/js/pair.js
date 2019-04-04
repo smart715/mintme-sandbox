@@ -11,6 +11,7 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
+      tokenDescription: null,
       editingName: false,
     };
   },
@@ -25,6 +26,9 @@ new Vue({
   methods: {
     onTabUpdated: function() {
       store.state.interval.clearAll();
+    },
+    descriptionUpdated: function(val) {
+      this.tokenDescription = val;
     },
   },
   store,

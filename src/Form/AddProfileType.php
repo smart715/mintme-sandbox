@@ -23,21 +23,19 @@ class AddProfileType extends AbstractType
         $builder
 
             ->add('firstName', TextType::class, [
-                'label' => 'First Name:',
+                'label' => 'First name:',
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
                     'pattern' => "[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*",
-                    'title' => 'not valid name',
                 ],
             ])
             ->add('lastName', TextType::class, [
-                'label' => 'Last Name:',
+                'label' => 'Last name:',
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
                     'pattern' => "[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*",
-                    'title' => 'not valid name',
                 ],
             ]);
 

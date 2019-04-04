@@ -42,18 +42,54 @@
                             </div>
                         </div>
 
-                        <div v-if="showEditForm" v-cloak>
+                        <div v-show="showEditForm" v-cloak>
                             {{ form_start(form) }}
                             <div class="row mb-3">
                                 <div class="col-12">
                                     <div class="pb-1">
-                                        {{ form_row(form.firstName) }}
+                                        {{ form_row(form.firstName, {'attr':
+                                            {
+                                                'v-model': '$v.firstName.$model',
+                                                'class' : 'form-control',
+                                                'ref' : 'firstName'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.firstName" v-if="!$v.firstName.helpers" class="text-danger text-center">
+                                        First name can contain only letters, ` and -
+                                    </div>
+                                    <div v-cloak="$v.firstName" v-if="!$v.firstName.minLength" class="text-danger text-center">
+                                        First name can have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_row(form.lastName) }}
+                                        {{ form_row(form.lastName, {'attr':
+                                            {
+                                                'v-model': '$v.lastName.$model',
+                                                'class' : 'form-control',
+                                                'ref': 'lastName'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
+                                        Last name can contain only letters, ` and -
+                                    </div>
+                                    <div v-cloak="$v.lastName" v-if="!$v.lastName.minLength" class="text-danger text-center">
+                                        Last name can have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_row(form.city) }}
+                                        {{ form_row(form.city, {'attr':
+                                            {
+                                                'v-model': '$v.city.$model',
+                                                'class' : 'form-control',
+                                                'ref' : 'city'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
+                                        City can contain alphabets and -
+                                    </div>
+                                    <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
+                                        City can have at least 2 letters
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.country) }}
@@ -66,8 +102,17 @@
                                 </div>
                             </div>
                             <div class="text-left">
+<<<<<<< HEAD
                                 <input type="submit" class="btn btn-primary" value="Save">
                                 <a href="#" @click="showEditForm = false" class="cancel pl-3" >Cancel</a>
+=======
+                                <input
+                                    type="submit"
+                                    :disabled="$v.$anyError || !(firstName && lastName && city)"
+                                    class="btn btn-primary"
+                                    value="Save">
+                                <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
+>>>>>>> b2e221b4a7b2f795790d0a0becfca493bed90e53
                             </div>
                             {{ form_end(form) }}
                         </div>

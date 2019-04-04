@@ -5,7 +5,7 @@
 {% block bodyclass %}profile-view{% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div id="profile-creation" class="container">
         <div class="row  pt-5 justify-content-center">
             <div class="col-12 col-lg-4 col-md-6">
                 <div class="card">
@@ -16,10 +16,23 @@
                         <div class="row justify-content-center pb-3">
                             <div class="col-12">
                                 {{ form_start(form) }}
-                                {{ form_widget(form) }}
+                                {{ form_row(form.firstName, {'attr': {'v-model': '$v.firstName.$model','class' : 'form-control'}}) }}
+                                <div v-cloak="$v.firstName" v-if="!$v.firstName.helpers" class="text-danger text-center">
+                                    First name can contain only letters, ` and -
+                                </div>
+                                <div v-cloak="$v.firstName" v-if="!$v.firstName.minLength" class="text-danger text-center">
+                                    First name can have at least 2 letters
+                                </div>
+                                {{ form_row(form.lastName, {'attr': {'v-model': '$v.lastName.$model','class' : 'form-control'}}) }}
+                                <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
+                                    Last name can contain only letters, ` and -
+                                </div>
+                                <div v-cloak="$v.lastName" v-if="!$v.lastName.minLength" class="text-danger text-center">
+                                    Last name can have at least 2 letters
+                                </div>
                                 <div class="text-left pt-3">
-                                    <input type="submit" class="btn btn-primary" value="Save">
-                                    <a href="{{ path('trading') }}" class="pl-3 cancel">Cancel</a>
+                                    <input type="submit" :disabled="$v.$anyError || !(firstName && lastName)" class="btn btn-primary px-4" value="Save">
+                                    <a href="{{ path('trading') }}" class="cancel pl-3">Cancel</a>
                                 </div>
                                 {{ form_end(form) }}
                             </div>
@@ -30,4 +43,8 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/profile_creation.js') }}"></script>
 {% endblock %}

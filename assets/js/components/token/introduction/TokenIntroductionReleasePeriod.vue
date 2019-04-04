@@ -3,31 +3,18 @@
         <b-col cols="12" class="statistic-description mb-2">
             <div>
                 Token release period:
-                <guide>
-                    <font-awesome-icon
-                        icon="question"
-                        slot='icon'
-                        class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
-                    <template slot="header">
-                        Token Release Period
-                    </template>
-                    <template slot="body">
-                        Period it will take for the full release of your newly created token,
-                        something similar to escrow. Mintme acts as 3rd party that ensure
-                        you won’t flood market with all of your tokens which could lower price
-                        significantly, because unlocking all tokens take time. It’s released hourly
-                    </template>
-                </guide>
             </div>
             <div class="text-xs">
-                explanation about token release period. Three maybe four sentences. how it works.
+                Period it will take for the full release of your newly created token,
+                something similar to escrow. Mintme acts as 3rd party that ensure you won’t
+                flood market with all of your tokens which could lower price significantly,
+                because unlocking all tokens take time. It’s released hourly
             </div>
         </b-col>
         <b-col cols="12">
             <div>Amount released at beginning: {{ released }}%</div>
-            <b-row class="mx-1">
-                <b-col cols="1" class="p-0">
+            <b-row class="mx-1 my-2">
+                <b-col cols="2" class="text-center px-0">
                     <b>1%</b>
                 </b-col>
                 <b-col class="p-0">
@@ -41,29 +28,28 @@
                         width="100%">
                     </vue-slider>
                 </b-col>
-                <b-col cols="1" class="px-0 ml-1">
+                <b-col cols="2" class="text-center px-0">
                     <b>99%</b>
                 </b-col>
             </b-row>
         </b-col>
         <b-col cols="12">
             <div>Time needed to unlock all tokens: {{ currentPeriod }} years</div>
-            <b-row class="mx-1">
-                <b-col cols="1" class="p-0">
+            <b-row class="mx-1 my-2">
+                <b-col cols="2" class="text-center px-0">
                     <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
                 </b-col>
                 <b-col class="p-0">
                     <vue-slider
                         ref="release-period-slider"
                         v-model="currentPeriod"
-                        :min="10"
-                        :max="80"
+                        :data="[1,2,3,5,10,15,20,30,40,50]"
                         :interval="10"
                         :tooltip="false"
                         width="100%">
                     </vue-slider>
                 </b-col>
-                <b-col cols="1" class="p-0" ml-1>
+                <b-col cols="2" class="text-center px-0">
                     <font-awesome-icon icon="lock" class="ml-1 mb-1" />
                 </b-col>
             </b-row>

@@ -61,7 +61,7 @@ export default {
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
-                {token: 'BTC', currency: 'WEB'},
+                {currency: 'BTC', token: 'WEB'},
             ],
         };
     },
@@ -151,12 +151,14 @@ export default {
             return openPrice ? (lastPrice - openPrice) * 100 / openPrice : 0;
         },
         updateDataWithMarkets: function() {
-            let markets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
-                    markets[market] = this.getSanitizedMarket(
-                        this.markets[market].cryptoSymbol,
-                        this.markets[market].tokenName,
+                    const cryptoSymbol = this.markets[market].cryptoSymbol;
+                    const tokenName = this.markets[market].tokenName;
+                    const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
+                    const sanitizedMarket = this.getSanitizedMarket(
+                        cryptoSymbol,
+                        tokenName,
                         this.getPercentage(
                             parseFloat(this.markets[market].last),
                             parseFloat(this.markets[market].open)
@@ -164,9 +166,14 @@ export default {
                         parseFloat(this.markets[market].last),
                         parseFloat(this.markets[market].volume)
                     );
+
+                    if (marketOnTopIndex > -1) {
+                        this.sanitizedMarketsOnTop[marketOnTopIndex] = sanitizedMarket;
+                    } else {
+                        this.sanitizedMarkets[market] = sanitizedMarket;
+                    }
                 }
             }
-            this.sanitizedMarkets = markets;
 
             if (this.websocketUrl) {
                 this.addOnOpenHandler(() => {

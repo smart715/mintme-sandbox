@@ -88,14 +88,14 @@ a
     border-radius: 0
     border: none
     height: calc(2.0rem + 2px)
-    
+
   textarea
     height: auto
     border: none
 
   .custom-select, .form-control
     border: none
-      
+
 .card
   background: none
   position: relative
@@ -108,6 +108,7 @@ a
     background: $card-header-bg
     color: $white
     padding: .45rem 1.35rem
+
     @include font-scale(md)
 
     .card-header-description
@@ -136,6 +137,7 @@ a
     height: 200px
     width: 200px
     display: table
+
     img
       vertical-align: middle
       display: table-cell
@@ -146,6 +148,7 @@ a
     th
       border: none
       font-weight: normal
+
       &:first-child
         padding-left: 1.5rem
 
@@ -160,24 +163,28 @@ a
     padding-top: 0.35rem
     padding-bottom: 0.35rem
     vertical-align: middle
+
     &:first-child
       padding-left: 1.5rem
+
     &:last-child
       padding-right: 1.5rem
+
     img
       height: 22px
-  
+
 .fix-layout
   table-layout: fixed
 
 
 .pagination
   .page-item
-    .page-link 
+    .page-link
       background: none
       color: $color-link
+
   .active
-    .page-link 
+    .page-link
       color: $white
 
 .tabs
@@ -191,7 +198,7 @@ a
     .nav-item
       flex: 1 1 auto
       padding: 0
-      border: none      
+      border: none
       color: $white
 
       .nav-link
@@ -199,10 +206,12 @@ a
         background-color: $color-tabs
         color: $white
         padding: .45rem 1.35rem
+
         @include font-scale(md)
 
         &.disabled
           cursor: default
+
       .active
         color: $color-link
 
@@ -230,16 +239,19 @@ a
             color: inherit
             position: relative
             background: $secondary
+
             @include font-scale(md)
+
             &.active
               color: $color-link
+
             &.active::after
               content: ' '
               position: absolute
               bottom: .75rem
               left: 1.5rem
               height: .125rem
-              background-color: none
+              background-color: unset
               width: calc(100% - 3rem)
 
       .edit-token-profile
@@ -255,15 +267,20 @@ a
 
 .modal-content
   background: $secondary
+
   .modal-header
     background-color: $primary
-    padding: 0px
+    padding: 0
+
     div
       width: 100%
+
     .modal-close
       @include font-scale(lg)
+
       color: $white
-      font-weight: lighter;
+      font-weight: lighter
+
   .modal-title
     @include font-scale(md)
 
@@ -352,6 +369,11 @@ nav.top-navbar
 .icon-edit
   @include font-scale(md)
 
+  &.icon-edit-absolute
+    position: absolute
+    right: 15px
+    z-index: $zindex-tooltip
+
 .img-barcode
   width: 120px
 
@@ -367,3 +389,9 @@ nav.top-navbar
     position: absolute
     bottom: 1.2rem
     right: 1rem
+
+#token, #profile-creation, #profile
+  [v-cloak]
+    display: none
+  .text-danger
+    font-size: 80%
