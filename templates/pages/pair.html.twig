@@ -71,10 +71,10 @@
                 </b-tabs>
             </div>
         </div>
-        <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || '{{ token.description }}'" />
+        {% if token|default %}
+            <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || '{{ token.description }}'" />
+        {% endif %}
     </div>
-
-    <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
 {% endblock %}
 
 {% block pagescripts %}
