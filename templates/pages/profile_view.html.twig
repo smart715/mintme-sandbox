@@ -102,17 +102,12 @@
                                 </div>
                             </div>
                             <div class="text-left">
-<<<<<<< HEAD
-                                <input type="submit" class="btn btn-primary" value="Save">
-                                <a href="#" @click="showEditForm = false" class="cancel pl-3" >Cancel</a>
-=======
                                 <input
                                     type="submit"
                                     :disabled="$v.$anyError || !(firstName && lastName && city)"
                                     class="btn btn-primary"
                                     value="Save">
-                                <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
->>>>>>> b2e221b4a7b2f795790d0a0becfca493bed90e53
+                                <a href="#" @click="showEditForm = false" class="cancel pl-3" >Cancel</a>
                             </div>
                             {{ form_end(form) }}
                         </div>
