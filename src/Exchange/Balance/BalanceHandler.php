@@ -74,6 +74,14 @@ class BalanceHandler implements BalanceHandlerInterface
             ->get($this->converter->convert($token));
     }
 
+    public function isNotExchanged(Token $token, int $amount): bool
+    {
+        $available = $this->balance($token->getProfile()->getUser(), $token)->getAvailable();
+        $balance = $this->moneyWrapper->parse((string)$amount, $available->getCurrency()->getCode());
+
+        return $available->equals($balance);
+    }
+
     /**
      * @throws FetchException
      * @throws BalanceException

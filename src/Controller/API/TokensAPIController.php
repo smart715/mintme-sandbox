@@ -141,12 +141,12 @@ class TokensAPIController extends FOSRestController
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in")
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
-     * @Rest\RequestParam(name="releasePeriod", allowBlank=false, requirements="[1-8]0")
+     * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
+        string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler,
-        string $name
+        BalanceHandlerInterface $balanceHandler
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -157,10 +157,12 @@ class TokensAPIController extends FOSRestController
         $this->denyAccessUnlessGranted('edit', $token);
 
         $lock = $token->getLockIn() ?? new LockIn($token);
+        $isNotExchanged = $balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'));
 
         $form = $this->createFormBuilder($lock, [
                 'csrf_protection' => false,
                 'allow_extra_fields' => true,
+                'validation_groups' => ['Default', !$isNotExchanged ? 'Exchanged' : ''],
             ])
             ->add('releasePeriod')
             ->getForm();
@@ -171,7 +173,7 @@ class TokensAPIController extends FOSRestController
             return $this->view($form);
         }
 
-        if (!$lock->getId()) {
+        if (!$lock->getId() || $isNotExchanged) {
             $balance = $balanceHandler->balance($this->getUser(), $token);
 
             if ($balance->isFailed()) {
@@ -179,7 +181,8 @@ class TokensAPIController extends FOSRestController
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount));
+            $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount))
+                ->setReleasedAtStart((int)$releasedAmount->getAmount());
         }
 
         $this->em->persist($lock);
@@ -271,5 +274,22 @@ class TokensAPIController extends FOSRestController
         }
 
         return $this->view($balance);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/is-exchanged", name="is_token_exchanged", options={"expose"=true})
+     */
+    public function isTokenNotExchanged(string $name, BalanceHandlerInterface $balanceHandler): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(
+            !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
+        );
     }
 }
