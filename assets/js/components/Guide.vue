@@ -27,6 +27,9 @@
 <script>
 export default {
     name: 'Guide',
+    props: {
+        maxWidth: {type: String, default: '350px'},
+    },
     data() {
         return {
             id: null,
@@ -42,6 +45,7 @@ export default {
                     interactive: true,
                     theme: 'light',
                     delay: [200, 0],
+                    maxWidth: this.maxWidth,
                 };
             }
             return null;

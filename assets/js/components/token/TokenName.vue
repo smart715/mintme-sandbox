@@ -71,7 +71,7 @@ export default {
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
-                    this.$toasted.error(error.response.data[0][0].message);
+                    this.$toasted.error('Invalid token name');
                 } else {
                     this.$toasted.error('An error has ocurred, please try again later');
                 }
