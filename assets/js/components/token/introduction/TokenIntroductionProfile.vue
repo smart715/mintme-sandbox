@@ -103,7 +103,7 @@
                     </div>
                     <div class="col-md-12 text-left" v-if="editingUrls">
                         <input type="submit" class="btn btn-primary" value="Save"  @click="editUrls"/>
-                        <a class="cancel pl-3 c-pointer" @click="editingUrls = false">Cancel</a>
+                        <a class="btn-cancel pl-3 c-pointer" @click="editingUrls = false">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -165,7 +165,7 @@
                             <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
                             Confirm
                         </button>
-                        <a class="cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
+                        <a class="btn-cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
                     </div>
                 </div>
             </template>

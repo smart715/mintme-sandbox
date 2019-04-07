@@ -20,7 +20,7 @@
                     </button>
                     <a
                         href="#"
-                        class="cancel pl-3"
+                        class="btn-cancel pl-3"
                         @click="onCancel">
                         <slot name="cancel">Cancel</slot>
                     </a>
