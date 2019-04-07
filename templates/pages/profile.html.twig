@@ -21,14 +21,14 @@
                                     First name can contain only letters, ` and -
                                 </div>
                                 <div v-cloak="$v.firstName" v-if="!$v.firstName.minLength" class="text-danger text-center">
-                                    First name can have at least 2 letters
+                                    First name must have at least 2 letters
                                 </div>
                                 {{ form_row(form.lastName, {'attr': {'v-model': '$v.lastName.$model','class' : 'form-control'}}) }}
                                 <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
                                     Last name can contain only letters, ` and -
                                 </div>
                                 <div v-cloak="$v.lastName" v-if="!$v.lastName.minLength" class="text-danger text-center">
-                                    Last name can have at least 2 letters
+                                    Last name must have at least 2 letters
                                 </div>
                                 <div class="text-left pt-3">
                                     <input type="submit" :disabled="$v.$anyError || !(firstName && lastName)" class="btn btn-primary px-4" value="Save">
