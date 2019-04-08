@@ -2,7 +2,7 @@
 
 {% block subject %}
   {%- autoescape false -%}
-  {{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
+  {{ 'resetting.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
   {%- endautoescape -%}
 {% endblock %}
 
@@ -65,12 +65,12 @@
                 <th>
                   <h3 style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;" >Hello</h3>
                   <h1 style="font-size: 34px; margin-top: 0px; margin-bottom: 0px "><strong>{{user.userName}}</strong></h1>
-                  <h3 style="font-size: 28px; margin-top: 0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;">Welcome to MintMe!</h3>
+                  <h3 style="font-size: 28px; margin-top: 0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;">Resetting your password!</h3>
                 </th>
               </tr>
               <tr>
                 <th>
-                  <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; ">To complete your registration, click on the following link:</p>
+                  <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; ">You can reset your password by click on the following link:</p>
                 </th>
               </tr>
               <tr>
