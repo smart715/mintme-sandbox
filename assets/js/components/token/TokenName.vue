@@ -1,7 +1,11 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
         <template v-if="editable">
-            <input type="text" v-model="newName" v-if="editingName">
+            <input
+                type="text"
+                v-model="newName"
+                v-if="editingName"
+                ref="tokenNameInput">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 :icon="icon"
@@ -60,6 +64,10 @@ export default {
 
             this.editingName = !this.editingName;
             this.icon = 'check';
+            this.$nextTick(() => {
+                let tokenNameInput = this.$refs.tokenNameInput;
+                tokenNameInput.focus();
+            });
         },
         doEditName: function() {
             this.$axios.single.patch(this.updateUrl, {
