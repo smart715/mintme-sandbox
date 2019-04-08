@@ -234,10 +234,10 @@ export default {
     },
     computed: {
         siteRequestUrl: function() {
-              return this.parsedWebsite + '/mintme.html';
+            return this.parsedWebsite + '/mintme.html';
         },
         showEditIcon: function() {
-              return !this.editingUrls && this.editable;
+            return !this.editingUrls && this.editable;
         },
         fileErrorVisible: function() {
             return this.fileError.title && this.fileError.details;
