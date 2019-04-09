@@ -104,7 +104,7 @@
                             <div class="text-left">
                                 <input
                                     type="submit"
-                                    :disabled="$v.$anyError || !(firstName && lastName && city)"
+                                    :disabled="$v.$anyError || !(firstName && lastName)"
                                     class="btn btn-primary"
                                     value="Save">
                                 <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
