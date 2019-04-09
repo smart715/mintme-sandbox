@@ -3,7 +3,7 @@
         <div ref="tokenSearch">
             <autocomplete
                     input-class="search-input form-control"
-                    placeholder="Search for token... Use token name or wallet address"
+                    placeholder="Search for token"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
                     @item-clicked="onItemClicked"
