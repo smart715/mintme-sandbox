@@ -50,7 +50,19 @@ export default {
             icon: 'edit',
             currentName: this.name,
             newName: this.name,
+            isTokenExchanged: false,
         };
+    },
+    mounted: function() {
+        if (!this.editable) {
+            return;
+        }
+
+        this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
+                name: this.currentName,
+            }))
+            .then((res) => this.isTokenExchanged = res.data)
+            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
     },
     methods: {
         editName: function() {
@@ -58,7 +70,7 @@ export default {
                 return this.doEditName();
             }
 
-            if (!this.editable) {
+            if (!this.allowEdit) {
                 return;
             }
 
@@ -92,6 +104,11 @@ export default {
             this.newName = this.currentName;
             this.editingName = false;
             this.icon = 'edit';
+        },
+    },
+    computed: {
+        allowEdit: function() {
+          return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
         },
     },
 };
