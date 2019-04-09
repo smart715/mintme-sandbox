@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-show="!editing">
-            <div class="d-flex-inline">
+            <div class="d-flex-inline" v-if="currentAddress">
                 <div class="display-text">
                     Facebook:
                     <a :href="currentAddress" target="_blank" rel="nofollow">
@@ -18,7 +18,6 @@
                             :href="'https://www.facebook.com/sharer/sharer.php?u='
                             +currentAddressEncoded+'&amp;src=sdkpreparse'"
                             class="fb-xfbml-parse-ignore">
-                            Share
                         </a>
                     </div>
                     <guide>

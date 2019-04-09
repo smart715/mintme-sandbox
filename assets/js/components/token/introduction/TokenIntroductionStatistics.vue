@@ -20,14 +20,14 @@
             <div class="card-body">
                 <font-awesome-icon
                     v-if="editable && !showSettings"
-                    class="float-right c-pointer icon-edit"
+                    class="float-right c-pointer icon-edit icon-edit-absolute"
                     icon="edit"
                     transform="shrink-4 up-1.5"
                     @click="switchAction"
                     />
                 <template v-if="loaded">
                 <div v-if="!showSettings" class="row">
-                    <div class="col">
+                    <div class="col pr-1">
                         <div class="font-weight-bold pb-4">
                             Token balance:
                         </div>
@@ -78,12 +78,29 @@
 
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="font-weight-bold py-4">
+                    <div class="col px-1">
+                        <div class="font-weight-bold pb-4">
                             Token release:
+                            <guide max-width="500px">
+                                <font-awesome-icon
+                                        icon="question"
+                                        slot='icon'
+                                        class="ml-1 mb-1 bg-primary text-white
+                                    rounded-circle square blue-question"/>
+                                <template slot="header">
+                                    Token Release Period
+                                </template>
+                                <template slot="body">
+                                    Period it will take for the full release of your newly created token,
+                                    something similar to escrow. Mintme acts as 3rd party that ensure
+                                    you won’t flood market with all of your tokens which could lower price
+                                    significantly, because unlocking all tokens take time. It’s released hourly
+                                </template>
+                            </guide>
                         </div>
                         <div class="pb-1">
                             Release period: {{ stats.releasePeriod }}
+                            <template v-if="stats.releasePeriod !== defaultValue">years</template>
                             <guide>
                                 <template slot="header">
                                     Release period
@@ -157,7 +174,7 @@ import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
 import {WSAPI} from '../../../utils/constants';
 
-const defaultValue = 'xxx';
+const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
@@ -176,6 +193,8 @@ export default {
             tokenExchangeAmount: null,
             pendingSellOrders: null,
             executedOrders: null,
+            isTokenExchanged: true,
+            defaultValue: defaultValue,
             stats: {
                 releasePeriod: defaultValue,
                 hourlyRate: defaultValue,
@@ -185,6 +204,10 @@ export default {
         };
     },
     mounted: function() {
+        this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
+            .then((res) => this.isTokenExchanged = res.data)
+            .catch(() => this.$toasted.error('Can not load token data. Try again later'));
+
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
             .then((res) => this.stats = res.data || this.stats)
             .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
@@ -220,7 +243,7 @@ export default {
             return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.executedOrders !== null;
         },
         releasedDisabled: function() {
-            return this.stats.releasePeriod !== defaultValue;
+            return this.stats.releasePeriod !== defaultValue && this.isTokenExchanged;
         },
         statsPeriod: function() {
             return !this.releasedDisabled ? 10 : this.stats.releasePeriod;

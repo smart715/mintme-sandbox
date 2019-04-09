@@ -28,4 +28,5 @@ interface BalanceHandlerInterface
     public function summary(Token $token): SummaryResult;
     public function balance(User $user, Token $token): BalanceResult;
     public function balances(User $user, array $tokens): BalanceResultContainer;
+    public function isNotExchanged(Token $token, int $amount): bool;
 }

@@ -109,15 +109,40 @@
             </div>
         </div>
         <modal
+            @close="closeFileErrorModal"
+            :visible="fileErrorVisible">
+            <template slot="body">
+                <h3 class="modal-title text-center text-danger">{{ fileError.title }}</h3>
+                <div class="text-white">
+                    <p>
+                        {{ fileError.details }}
+                        <a
+                            v-if="fileErrorHttpUrl"
+                            href="https://www.restapitutorial.com/httpstatuscodes.html"
+                            target="_blank"
+                            rel="nofollow">
+                            More information about HTTP status codes.
+                        </a>
+                    </p>
+                    <div class="pt-2 text-center">
+                        <button
+                            class="btn btn-primary"
+                            @click="closeFileErrorModal">
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </modal>
+        <modal
+            class="text-white"
             :visible="showConfirmWebsiteModal"
             @close="showConfirmWebsiteModal = false">
-            <template slot="header">
-                <h5 class="modal-title">Website Confirmation</h5>
-            </template>
             <template slot="body">
+                <h5 class="modal-title text-center mb-2">Website Confirmation</h5>
                 <div class="row">
                     <div class="col-12">
-                        <ol>
+                        <ol class="pl-3">
                             <li>
                                 Download
                                 <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
@@ -136,7 +161,10 @@
                         </ol>
                     </div>
                     <div class="col-12 text-left">
-                        <button class="btn btn-primary" @click="confirmWebsite">Confirm</button>
+                        <button class="btn btn-primary" @click="confirmWebsite">
+                            <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                            Confirm
+                        </button>
                         <a class="pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
                     </div>
                 </div>
@@ -193,6 +221,7 @@ export default {
     },
     data() {
         return {
+            submitting: false,
             editingUrls: false,
             currentWebsite: this.websiteUrl,
             newWebsite: this.websiteUrl || 'http://',
@@ -200,6 +229,7 @@ export default {
             showWebsiteError: false,
             parsedWebsite: '',
             websitePath: '/mintme.html',
+            fileError: {},
         };
     },
     computed: {
@@ -208,6 +238,17 @@ export default {
         },
         showEditIcon: function() {
               return !this.editingUrls && this.editable;
+        },
+        fileErrorVisible: function() {
+            return this.fileError.title && this.fileError.details;
+        },
+        fileErrorHttpUrl: function() {
+            return !!this.fileError.visibleHttpUrl;
+        },
+    },
+    watch: {
+        newWebsite: function() {
+            this.fileError = {};
         },
     },
     methods: {
@@ -239,26 +280,37 @@ export default {
             this.showConfirmWebsiteModal = true;
         },
         confirmWebsite: function() {
+            if (this.submitting) {
+                return;
+            }
+            this.submitting = true;
             this.$axios.single.post(this.confirmWebsiteUrl, {url: this.parsedWebsite})
                 .then((response) => {
                     if (response.data.verified) {
-                        this.currentWebsite = this.parsedWebsite;
+                        this.currentWebsite = this.newWebsite = this.websiteUrl = this.parsedWebsite;
                         this.$toasted.success('Website confirmed successfully');
+                        this.showConfirmWebsiteModal = false;
+                        this.editingUrls = false;
+                        this.clearFileError();
+                    } else if (response.data.errors.fileError) {
+                        this.fileError = response.data.errors.fileError;
                     } else if (response.data.errors.length) {
-                        response.data.errors.forEach((error) => {
-                            this.$toasted.error(error);
-                        });
-                        this.newWebsite = this.currentWebsite;
+                        response.data.errors.forEach((error) => this.$toasted.error(error));
+                        this.clearFileError();
                     } else {
-                        this.$toasted.error('Website couldn\'t be confirmed, try again');
-                        this.newWebsite = this.currentWebsite;
+                        this.clearFileError();
+                        return Promise.reject({response: 'error'});
                     }
-                }, (error) => {
-                    this.$toasted.error('Website couldn\'t be confirmed, try again');
                 })
-                .then(() => {
-                    this.showConfirmWebsiteModal = false;
-                });
+                .catch(({response}) => this.$toasted.error(!response ? 'Network error' : response.statusText))
+                .then(() => this.submitting = false);
+        },
+        closeFileErrorModal: function() {
+            this.fileError = {};
+            this.showConfirmWebsiteModal = true;
+        },
+        clearFileError: function() {
+            this.fileError = {};
         },
     },
 };

@@ -12,6 +12,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Serializer\TradableNormalizer;
 use App\Utils\Converter\TokenNameConverter;
+use App\Verify\WebsiteVerifier;
 use App\Verify\WebsiteVerifierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -22,7 +23,6 @@ use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 
@@ -105,7 +105,7 @@ class TokensAPIController extends FOSRestController
      */
     public function confirmWebsite(
         ParamFetcherInterface $request,
-        WebsiteVerifierInterface $websiteVerifier,
+        WebsiteVerifier $websiteVerifier,
         string $name
     ): View {
         $token = $this->tokenManager->findByName($name);
@@ -117,7 +117,10 @@ class TokensAPIController extends FOSRestController
         $this->denyAccessUnlessGranted('edit', $token);
 
         if (null === $token->getWebsiteConfirmationToken()) {
-            return $this->view(null, Response::HTTP_BAD_REQUEST);
+            return $this->view([
+                'verified' => false,
+                'errors' => ['File not downloaded yet'],
+            ], Response::HTTP_ACCEPTED);
         }
 
         $url = $request->get('url');
@@ -131,7 +134,7 @@ class TokensAPIController extends FOSRestController
                 'errors' => array_map(static function ($violation) {
                     return $violation->getMessage();
                 }, iterator_to_array($urlViolations)),
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_ACCEPTED);
         }
 
         $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
@@ -141,19 +144,22 @@ class TokensAPIController extends FOSRestController
             $this->em->flush();
         }
 
-        return $this->view(['verified' => $isVerified, 'errors' => []], Response::HTTP_ACCEPTED);
+        return $this->view([
+            'verified' => $isVerified,
+            'errors' => ['fileError' => $websiteVerifier->getError()],
+        ], Response::HTTP_ACCEPTED);
     }
 
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in")
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
-     * @Rest\RequestParam(name="releasePeriod", allowBlank=false, requirements="[1-8]0")
+     * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
+        string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler,
-        string $name
+        BalanceHandlerInterface $balanceHandler
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -164,11 +170,13 @@ class TokensAPIController extends FOSRestController
         $this->denyAccessUnlessGranted('edit', $token);
 
         $lock = $token->getLockIn() ?? new LockIn($token);
+        $isNotExchanged = $balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'));
 
         $form = $this->createFormBuilder($lock, [
                 'csrf_protection' => false,
                 'allow_extra_fields' => true,
-        ])
+                'validation_groups' => ['Default', !$isNotExchanged ? 'Exchanged' : ''],
+            ])
             ->add('releasePeriod')
             ->getForm();
 
@@ -178,7 +186,7 @@ class TokensAPIController extends FOSRestController
             return $this->view($form);
         }
 
-        if (!$lock->getId()) {
+        if (!$lock->getId() || $isNotExchanged) {
             $balance = $balanceHandler->balance($this->getUser(), $token);
 
             if ($balance->isFailed()) {
@@ -186,7 +194,8 @@ class TokensAPIController extends FOSRestController
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount));
+            $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount))
+                ->setReleasedAtStart((int)$releasedAmount->getAmount());
         }
 
         $this->em->persist($lock);
@@ -278,5 +287,22 @@ class TokensAPIController extends FOSRestController
         }
 
         return $this->view($balance);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/is-exchanged", name="is_token_exchanged", options={"expose"=true})
+     */
+    public function isTokenNotExchanged(string $name, BalanceHandlerInterface $balanceHandler): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(
+            !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
+        );
     }
 }

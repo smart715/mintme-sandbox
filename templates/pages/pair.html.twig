@@ -49,8 +49,9 @@
                                 </token-introduction-statistics>
                                 <token-introduction-description
                                     class="col-12 col-lg-4 pt-3 pt-lg-0 pl-lg-2"
+                                    @updated="descriptionUpdated"
                                     name="{{ token.name }}"
-                                    description="{{ token.description }}"
+                                    :description="tokenDescription"
                                     update-url="{{ path('token_update', {'name': market.quote.name}) }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-introduction-description>
@@ -70,8 +71,11 @@
                 </b-tabs>
             </div>
         </div>
+        {% if token|default %}
+            <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || '{{ token.description }}'" />
+        {% endif %}
     </div>
-
+    
     <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
 {% endblock %}
 
