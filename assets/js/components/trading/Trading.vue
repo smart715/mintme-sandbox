@@ -67,7 +67,7 @@ export default {
     },
     computed: {
         totalRows: function() {
-            return this.markets.length;
+            return Object.keys(this.markets).length;
         },
         marketsHiddenNames: function() {
             return Object.keys(this.markets);
