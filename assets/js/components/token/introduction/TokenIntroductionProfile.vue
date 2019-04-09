@@ -106,7 +106,7 @@
                     </div>
                     <div class="col-md-12 text-left" v-if="editingUrls">
                         <input type="submit" class="btn btn-primary" value="Save"  @click="editUrls"/>
-                        <a class="pl-3 c-pointer" @click="editingUrls = false">Cancel</a>
+                        <a class="btn-cancel pl-3 c-pointer" @click="editingUrls = false">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@
                             <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
                             Confirm
                         </button>
-                        <a class="pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
+                        <a class="btn-cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
                     </div>
                 </div>
             </template>
@@ -237,10 +237,10 @@ export default {
     },
     computed: {
         siteRequestUrl: function() {
-              return this.parsedWebsite + '/mintme.html';
+            return this.parsedWebsite + '/mintme.html';
         },
         showEditIcon: function() {
-              return !this.editingUrls && this.editable;
+            return !this.editingUrls && this.editable;
         },
         fileErrorVisible: function() {
             return this.fileError.title && this.fileError.details;
