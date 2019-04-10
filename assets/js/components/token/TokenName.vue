@@ -76,12 +76,10 @@ export default {
             if (!$v.newName.alphaNum) {
                 this.$toasted.error('Token name can contain alphabets and numbers');
                 return;
-            }
-            else if (!$v.newName.minLength) {
+            } else if (!$v.newName.minLength) {
                 this.$toasted.error('Token name can have at least 4 symbols');
                 return;
-            }
-            else if (!$v.newName.minLength) {
+            } else if (!$v.newName.minLength) {
                 this.$toasted.error('Token name can not be longer than 255 characters');
                 return;
             }
