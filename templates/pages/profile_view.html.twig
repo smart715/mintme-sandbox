@@ -59,7 +59,7 @@
                                         First name can contain only letters, ` and -
                                     </div>
                                     <div v-cloak="$v.firstName" v-if="!$v.firstName.minLength" class="text-danger text-center">
-                                        First name can have at least 2 letters
+                                        First name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.lastName, {'attr':
@@ -74,7 +74,7 @@
                                         Last name can contain only letters, ` and -
                                     </div>
                                     <div v-cloak="$v.lastName" v-if="!$v.lastName.minLength" class="text-danger text-center">
-                                        Last name can have at least 2 letters
+                                        Last name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.city, {'attr':
@@ -89,7 +89,7 @@
                                         City can contain alphabets and -
                                     </div>
                                     <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
-                                        City can have at least 2 letters
+                                        City must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.country) }}
@@ -104,10 +104,10 @@
                             <div class="text-left">
                                 <input
                                     type="submit"
-                                    :disabled="$v.$anyError || !(firstName && lastName && city)"
+                                    :disabled="$v.$anyError || !(firstName && lastName)"
                                     class="btn btn-primary"
                                     value="Save">
-                                <a href="#" @click="showEditForm = false" class="ml-3" >Cancel</a>
+                                <a href="#" @click="showEditForm = false" class="btn-cancel pl-3" >Cancel</a>
                             </div>
                             {{ form_end(form) }}
                         </div>

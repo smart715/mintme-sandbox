@@ -50,7 +50,7 @@ class ProfileController extends Controller
         }
 
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($profile);
+        $entityManager->merge($profile);
         $entityManager->flush();
 
         return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);

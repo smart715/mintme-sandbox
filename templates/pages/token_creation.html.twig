@@ -17,7 +17,7 @@
                             Token name can contain alphabets and numbers
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
-                            Token name can have at least 4 symbols
+                            Token name must have at least 4 symbols
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
                             Token name can't be longer than 255 characters
@@ -25,7 +25,7 @@
                         <div class="form-group row">
                             <div class="col-md-12 text-left">
                                 <input type="submit" :disabled="$v.$anyError || !tokenName" class="btn btn-primary" value="Create token" />
-                                <a class="pl-3" href="javascript:history.back()">Cancel</a>
+                                <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
                             </div>
                         </div>
                         {{ form_end(form) }}
