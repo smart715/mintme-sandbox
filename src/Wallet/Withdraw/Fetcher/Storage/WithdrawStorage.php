@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Withdraw\Fetcher\Storage;
+namespace App\Wallet\Withdraw\Fetcher\Storage;
 
 use App\Communications\JsonRpcInterface;
 use Dompdf\Exception;

@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace App\Withdraw\Communicator;
+namespace App\Wallet\Withdraw\Communicator;
 
 use App\Entity\Crypto;
 use App\Entity\User;
-use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
+use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use Money\Money;
 
 interface CommunicatorInterface

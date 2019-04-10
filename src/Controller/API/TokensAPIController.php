@@ -10,7 +10,7 @@ use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Verify\WebsiteVerifier;
+use App\Utils\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\QueryParam;

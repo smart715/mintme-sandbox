@@ -2,17 +2,17 @@
 
 namespace App\Tests\Wallet;
 
-use App\Deposit\DepositGatewayCommunicator;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManager;
+use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Wallet;
-use App\Withdraw\WithdrawGatewayInterface;
+use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 

@@ -1,12 +1,12 @@
 <?php declare(strict_types = 1);
 
-namespace App\Withdraw;
+namespace App\Wallet\Withdraw;
 
 use App\Entity\Crypto;
 use App\Entity\User;
-use App\Withdraw\Communicator\CommunicatorInterface;
-use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
-use App\Withdraw\Fetcher\Mapper\MapperInterface;
+use App\Wallet\Withdraw\Communicator\CommunicatorInterface;
+use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
+use App\Wallet\Withdraw\Fetcher\Mapper\MapperInterface;
 use Money\Money;
 
 class CryptoWithdrawGateway implements WithdrawGatewayInterface
