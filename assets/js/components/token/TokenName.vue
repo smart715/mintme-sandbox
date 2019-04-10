@@ -3,8 +3,9 @@
         <template v-if="editable">
             <input
                 type="text"
-                v-model="newName"
+                v-model="$v.newName.$model"
                 v-if="editingName"
+                :class="{ 'is-invalid': $v.newName.$error }"
                 ref="tokenNameInput">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -23,6 +24,7 @@ import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
+import {minLength, maxLength, alphaNum} from 'vuelidate/lib/validators';
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -70,6 +72,19 @@ export default {
             });
         },
         doEditName: function() {
+            this.$v.$touch();
+            if (!$v.newName.alphaNum) {
+                this.$toasted.error('Token name can contain alphabets and numbers');
+                return;
+            }
+            else if (!$v.newName.minLength) {
+                this.$toasted.error('Token name can have at least 4 symbols');
+                return;
+            }
+            else if (!$v.newName.minLength) {
+                this.$toasted.error('Token name can not be longer than 255 characters');
+                return;
+            }
             this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
             })
@@ -89,26 +104,20 @@ export default {
             });
         },
         cancelEditingMode: function() {
+            this.$v.$reset();
             this.newName = this.currentName;
             this.editingName = false;
             this.icon = 'edit';
         },
     },
+    validations: {
+        newName: {
+            alphaNum,
+            minLength: minLength(4),
+            maxLength: maxLength(255),
+        },
+    },
 };
 </script>
-
-<style lang="sass" scoped>
-    h1
-        font-size: 2rem
-        color: #fff
-
-    .icon
-        cursor: pointer
-
-    input[type="text"]
-        background-color: #fff
-        border-style: unset
-        padding: 0 5px
-</style>
 
 

@@ -44,10 +44,14 @@
 
                                 <textarea
                                     class="form-control"
-                                    v-model="newDescription"
+                                    v-model="$v.newDescription.$model"
                                     max="20000"
+                                    :class="{ 'is-invalid': $v.newDescription.$error }"
                                 >
                                 </textarea>
+                                <div v-if="!$v.newDescription.minValue" class="invalid-feedback text-center mt-n4">
+                                    Token Description must be more than one character
+                                </div>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription">Save</button>
                                     <a class="pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
@@ -68,6 +72,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
+import {minLength} from 'vuelidate/lib/validators';
 
 library.add(faEdit);
 Vue.use(Toasted, {
@@ -109,6 +114,11 @@ export default {
     },
     methods: {
         editDescription: function() {
+            this.$v.$touch();
+            if (this.$v.$error) {
+                this.$toasted.error('Token Description must be more than one character');
+                return;
+            }
             this.$axios.single.patch(this.updateUrl, {
                 description: this.newDescription,
             })
@@ -127,6 +137,11 @@ export default {
                     this.editingDescription = false;
                     this.icon = 'edit';
                 });
+        },
+    },
+    validations: {
+        newDescription: {
+            minLength: minLength(4),
         },
     },
 };
