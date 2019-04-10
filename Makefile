@@ -1,14 +1,3 @@
-init_docker:
-	npm i
-	npm run dev
-	composer install
-	php bin/console doctrine:database:create --if-not-exists
-	php bin/console doctrine:migrations:migrate --allow-no-migration -n
-	php bin/console cron:start
-	nohup php bin/console rabbitmq:consumer payment &
-	nohup php bin/console rabbitmq:consumer deposit &
-	docker-php-entrypoint php-fpm
-
 phpunit:
 	./vendor/bin/simple-phpunit
 

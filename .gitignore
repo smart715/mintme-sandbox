@@ -22,5 +22,3 @@ public/build
 /phpstan
 
 .vscode
-
-aware-connector.sh
