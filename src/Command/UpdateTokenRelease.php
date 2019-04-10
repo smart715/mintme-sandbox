@@ -4,14 +4,14 @@ namespace App\Command;
 
 use App\Entity\Token\LockIn;
 use App\Repository\LockInRepository;
-use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /* Cron job added to DB. */
-class UpdateTokenRelease extends AbstractCommand
+class UpdateTokenRelease extends Command
 {
     /** @var LoggerInterface */
     private $logger;
