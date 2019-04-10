@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Withdraw\Fetcher\Mapper;
+namespace App\Wallet\Withdraw\Fetcher\Mapper;
 
 use App\Entity\Crypto;
 use App\Entity\User;
@@ -9,7 +9,7 @@ use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapperInterface;
-use App\Withdraw\Fetcher\Storage\StorageAdapterInterface;
+use App\Wallet\Withdraw\Fetcher\Storage\StorageAdapterInterface;
 use Money\Money;
 
 class WithdrawMapper implements MapperInterface

@@ -12,8 +12,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Serializer\TradableNormalizer;
 use App\Utils\Converter\TokenNameConverter;
-use App\Verify\WebsiteVerifier;
-use App\Verify\WebsiteVerifierInterface;
+use App\Utils\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -23,6 +22,7 @@ use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 
@@ -60,7 +60,7 @@ class TokensAPIController extends FOSRestController
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
      */
-    public function update(ParamFetcherInterface $request, string $name): View
+    public function update(ParamFetcherInterface $request, BalanceHandlerInterface $balanceHandler, string $name): View
     {
         $name = TokenNameConverter::parse($name);
 
@@ -71,6 +71,10 @@ class TokensAPIController extends FOSRestController
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
+
+        if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new BadRequestHttpException("Token is already on trade");
+        }
 
         $form = $this->createForm(TokenType::class, $token, [
             'csrf_protection' => false,
@@ -293,7 +297,7 @@ class TokensAPIController extends FOSRestController
      * @Rest\View()
      * @Rest\Get("/{name}/is-exchanged", name="is_token_exchanged", options={"expose"=true})
      */
-    public function isTokenNotExchanged(string $name, BalanceHandlerInterface $balanceHandler): View
+    public function isTokenExchanged(string $name, BalanceHandlerInterface $balanceHandler): View
     {
         $token = $this->tokenManager->findByName($name);
 

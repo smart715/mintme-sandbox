@@ -1,12 +1,12 @@
 <?php declare(strict_types = 1);
 
-namespace App\Withdraw;
+namespace App\Wallet\Withdraw;
 
 use App\Entity\Crypto;
 use App\Entity\User;
-use App\Fetcher\RowsFetcherInterface;
 use App\Wallet\Model\Transaction;
-use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
+use App\Wallet\RowsFetcherInterface;
+use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use Money\Money;
 
 interface WithdrawGatewayInterface extends RowsFetcherInterface

@@ -4,10 +4,10 @@ namespace App\Tests\Deposit;
 
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
-use App\Deposit\DepositGatewayCommunicator;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;

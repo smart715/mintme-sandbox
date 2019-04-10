@@ -14,7 +14,7 @@ use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
-use App\Verify\WebsiteVerifierInterface;
+use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;

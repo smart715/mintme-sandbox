@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Fetcher;
+namespace App\Wallet;
 
 use App\Entity\User;
 use App\Wallet\Model\Transaction;

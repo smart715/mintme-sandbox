@@ -1,7 +1,22 @@
-import '../../js/main';
-import {mount} from '@vue/test-utils';
+import {createLocalVue, mount} from '@vue/test-utils';
 import TokenName from '../../js/components/token/TokenName';
 import moxios from 'moxios';
+import axios from 'axios';
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.use(axios);
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$routing = {generate: (val) => val};
+        },
+    });
+    return localVue;
+}
 
 describe('TokenName', () => {
     beforeEach(() => {
@@ -13,7 +28,9 @@ describe('TokenName', () => {
     });
 
     it('can be edited if editable', (done) => {
+        const localVue = mockVue();
         const wrapper = mount(TokenName, {
+            localVue,
             propsData: {
                 name: 'foo',
                 csrfToken: 'csrfToken',
@@ -24,6 +41,11 @@ describe('TokenName', () => {
         moxios.stubRequest('updateUrl', {
             status: 202,
             response: {'tokenName': 'bar'},
+        });
+
+        moxios.stubRequest('is_token_exchanged', {
+            status: 200,
+            response: true,
         });
 
         expect(wrapper.find('input').exists()).to.deep.equal(false);
@@ -45,8 +67,11 @@ describe('TokenName', () => {
             done();
         });
     });
-    it('can not be edited if not editable', () => {
+
+    it('can not be edited if not editable', (done) => {
+        const localVue = mockVue();
         const wrapper = mount(TokenName, {
+            localVue,
             propsData: {
                 name: 'foo',
                 csrfToken: 'csrfToken',
@@ -55,12 +80,51 @@ describe('TokenName', () => {
             },
         });
 
-        expect(wrapper.find('input').exists()).to.deep.equal(false);
-        expect(wrapper.vm.editingName).to.deep.equal(false);
+        moxios.stubRequest('is_token_exchanged', {
+            status: 200,
+            response: true,
+        });
 
-        wrapper.vm.editName();
+        moxios.wait(() => {
+            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.vm.editingName).to.deep.equal(false);
 
-        expect(wrapper.find('input').exists()).to.deep.equal(false);
-        expect(wrapper.vm.editingName).to.deep.equal(false);
+            wrapper.vm.editName();
+
+            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.vm.editingName).to.deep.equal(false);
+
+            done();
+        });
+    });
+
+    it('can not be edited if token exchanged', (done) => {
+        const localVue = mockVue();
+        const wrapper = mount(TokenName, {
+            localVue,
+            propsData: {
+                name: 'foo',
+                csrfToken: 'csrfToken',
+                updateUrl: 'updateUrl',
+                editable: true,
+            },
+        });
+
+        moxios.stubRequest('is_token_exchanged', {
+            status: 200,
+            response: true,
+        });
+
+        moxios.wait(() => {
+            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.vm.editingName).to.deep.equal(false);
+
+            wrapper.vm.editName();
+
+            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.vm.editingName).to.deep.equal(false);
+
+            done();
+        });
     });
 });

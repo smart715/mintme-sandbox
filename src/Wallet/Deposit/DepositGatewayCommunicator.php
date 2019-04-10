@@ -1,18 +1,14 @@
 <?php declare(strict_types = 1);
 
-namespace App\Deposit;
+namespace App\Wallet\Deposit;
 
-use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
-use App\Deposit\Exception\DepositCredentialsException;
-use App\Deposit\Model\DepositCredentials;
-use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Wallet\Deposit\Model\DepositCredentials;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 

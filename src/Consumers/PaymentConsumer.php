@@ -8,7 +8,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
-use App\Withdraw\Communicator\Model\WithdrawCallbackMessage;
+use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use Money\Currency;
 use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;

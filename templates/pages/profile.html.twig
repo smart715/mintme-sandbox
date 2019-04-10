@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="text-left pt-3">
                                     <input type="submit" :disabled="$v.$anyError || !(firstName && lastName)" class="btn btn-primary px-4" value="Save">
-                                    <a href="{{ path('trading') }}" class="ml-3" >Cancel</a>
+                                    <a href="{{ path('trading') }}" class="btn-cancel pl-3">Cancel</a>
                                 </div>
                                 {{ form_end(form) }}
                             </div>

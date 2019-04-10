@@ -23,6 +23,9 @@ class BalanceView
     public $fee;
 
     /** @var bool */
+    public $isNotExchanged;
+
+    /** @var bool */
     public $isOwner;
 
     public function __construct(
@@ -31,9 +34,11 @@ class BalanceView
         ?Money $frozen,
         string $fullname,
         ?Money $fee,
+        bool $isNotExchanged,
         bool $isOwner = false
     ) {
         $this->identifier = $identifier;
+        $this->isNotExchanged = $isNotExchanged;
         $this->available = $available;
         $this->frozen = $frozen;
         $this->fullname = $fullname;
@@ -69,6 +74,12 @@ class BalanceView
     public function getIdentifier(): string
     {
         return $this->identifier;
+    }
+
+    /** @Groups({"API"}) */
+    public function isNotExchanged(): bool
+    {
+        return $this->isNotExchanged;
     }
 
     /** @Groups({"API"}) */

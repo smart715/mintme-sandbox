@@ -50,7 +50,7 @@ services:
             $url: '%withdraw_rpc%'
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
 
-    App\Deposit\DepositGatewayCommunicator:
+    App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
             $jsonRpc: '@deposit.json_rpc'
 
@@ -67,7 +67,7 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
-    App\Withdraw\Fetcher\Storage\WithdrawStorage:
+    App\Wallet\Withdraw\Fetcher\Storage\WithdrawStorage:
         arguments:
             $jsonRpc: '@withdraw.json_rpc'
             $service: '%service%'
@@ -78,23 +78,13 @@ services:
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 
-    App\EventListener\RegistrationInitializedListener:
-        tags:
-            - { name: kernel.event_listener, event: fos_user.registration.initialize }
-
     App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
-
-    App\Manager\TokenManager: ~
-    App\Manager\TokenManagerInterface: '@App\Manager\TokenManager'
-
-    App\Fetcher\ProfileFetcher: ~
-    App\Fetcher\ProfileFetcherInterface: '@App\Fetcher\ProfileFetcher'
 
     App\Utils\MailerDispatcher:
         arguments:
             $mailer: '@fos_user.mailer.twig_swift'
 
-    App\Withdraw\Communicator\AMQPCommunicator:
+    App\Wallet\Withdraw\Communicator\AMQPCommunicator:
         arguments:
             $paymentProducer: '@old_sound_rabbit_mq.payment_producer'
             $paymentRetryProducer: '@old_sound_rabbit_mq.payment_retry_producer'
@@ -107,29 +97,15 @@ services:
             $type: '%fos_user.profile.form.type%'
             $validationGroups: '%fos_user.profile.form.validation_groups%'
 
-    App\Verify\WebsiteVerifier:
+    App\Utils\Verify\WebsiteVerifier:
         arguments:
             $timeoutSeconds: '%verify_timeout_seconds%'
-
-    App\Verify\WebsiteVerifierInterface: '@App\Verify\WebsiteVerifier'
 
     App\Command\UpdateTokenRelease:
         arguments:
             $logger: '@logger'
         tags:
             - { name: monolog.logger, channel: cron }
-
-    App\Consumers\PaymentConsumer:
-        arguments:
-            $logger: '@logger'
-        tags:
-            - { name: monolog.logger, channel: rabbitmq }
-
-    App\Consumers\DepositConsumer:
-        arguments:
-            $logger: '@logger'
-        tags:
-            - { name: monolog.logger, channel: rabbitmq }
 
     # SonataAdminBundle Registered Admin Classes
     # =======================================
@@ -145,9 +121,21 @@ services:
         calls:
              - [init, ['@fos_user.user_manager', '@App\Manager\ProfileManagerInterface']]
 
-    payment_consumer: '@App\Consumers\PaymentConsumer'
+    # Required by rabbitmq bundle
+    payment_consumer:
+        class: 'App\Consumers\PaymentConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
 
-    deposit_consumer: '@App\Consumers\DepositConsumer'
+    deposit_consumer:
+        class: 'App\Consumers\DepositConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
 
     App\Manager\UserManager:
         arguments:
@@ -155,10 +143,6 @@ services:
             - "@fos_user.util.canonical_fields_updater"
             - "@doctrine.orm.entity_manager"
             - "%fos_user.model.user.class%"
-
-    App\EventListener\RegistrationCompletedListener:
-        tags:
-            - { name: kernel.event_listener, event: fos_user.registration.completed }
 
     App\Exchange\Trade\Config\PrelaunchConfig:
         arguments:
@@ -192,3 +176,11 @@ services:
     App\EventSubscriber\RequestSubscriber:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
+
+    App\EventListener\RegistrationInitializedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.initialize }
+
+    App\EventListener\RegistrationCompletedListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.registration.completed }

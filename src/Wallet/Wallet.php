@@ -2,17 +2,17 @@
 
 namespace App\Wallet;
 
-use App\Deposit\DepositGatewayCommunicator;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
-use App\Withdraw\WithdrawGatewayInterface;
+use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Money\Currency;
 use Money\Money;
 

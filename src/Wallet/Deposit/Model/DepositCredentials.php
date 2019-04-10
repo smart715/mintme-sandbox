@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Deposit\Model;
+namespace App\Wallet\Deposit\Model;
 
 use App\Entity\Token\Token;
 

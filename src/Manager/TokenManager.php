@@ -7,9 +7,9 @@ use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
-use App\Fetcher\ProfileFetcherInterface;
 use App\Repository\TokenRepository;
 use App\Utils\Converter\TokenNameConverter;
+use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 

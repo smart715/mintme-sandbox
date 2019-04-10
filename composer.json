@@ -1,10 +1,10 @@
 {
-    "name": "Mint me",
+    "name": "abchosting/mintme",
     "description": "Mintme panel, exchange platform that allow users to create and exchange their own tokens built on Webchain.",
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": "^7.2.2",
+        "php": "~7.2",
         "ext-openssl": "*",
         "ext-bcmath": "*",
         "ext-ctype": "*",

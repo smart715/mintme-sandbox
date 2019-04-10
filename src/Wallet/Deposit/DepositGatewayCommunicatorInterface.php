@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-namespace App\Deposit;
+namespace App\Wallet\Deposit;
 
-use App\Deposit\Model\DepositCredentials;
 use App\Entity\User;
-use App\Fetcher\RowsFetcherInterface;
+use App\Wallet\Deposit\Model\DepositCredentials;
 use App\Wallet\Model\Transaction;
+use App\Wallet\RowsFetcherInterface;
 
 interface DepositGatewayCommunicatorInterface extends RowsFetcherInterface
 {
