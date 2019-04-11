@@ -67,12 +67,12 @@ export default {
     },
     methods: {
         editName: function() {
-            if (this.icon === 'check') {
-                return this.doEditName();
-            }
-
             if (!this.allowEdit) {
                 return;
+            }
+
+            if (this.icon === 'check') {
+                return this.doEditName();
             }
 
             this.editingName = !this.editingName;
