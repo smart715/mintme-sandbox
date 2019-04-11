@@ -3,7 +3,7 @@
         <div ref="tokenSearch">
             <autocomplete
                     input-class="search-input form-control"
-                    placeholder="Search for token"
+                    placeholder="Search for the token"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
                     @item-clicked="onItemClicked"
