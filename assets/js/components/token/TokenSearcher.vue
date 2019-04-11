@@ -60,6 +60,7 @@ export default {
         },
         onInputChange: function(val) {
             this.input = val;
+            this.items = [];
         },
     },
 };
