@@ -1,6 +1,6 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
-        <template v-if="editable">
+        <template v-if="allowEdit">
             <input
                 type="text"
                 v-model="newName"
@@ -10,7 +10,8 @@
                 class="icon-edit c-pointer align-middle"
                 :icon="icon"
                 transform="shrink-4 up-1.5"
-                @click="editName" />
+                @click="editName"
+            />
         </template>
         <span v-if="!editingName">{{ currentName }}</span>
     </div>
@@ -88,6 +89,11 @@ export default {
             .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
                     this.currentName = this.newName;
+
+                    // TODO: update name in a related components and link path instead of redirecting
+                    location.href = this.$routing.generate('token_show', {
+                        name: this.currentName,
+                    });
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
