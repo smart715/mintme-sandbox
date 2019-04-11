@@ -93,7 +93,7 @@ class TokensAPIController extends FOSRestController
         }
 
         if (!$form->isValid()) {
-            return $this->view('Invalid token name.', Response::HTTP_BAD_REQUEST);
+            return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
 
         $this->em->persist($token);

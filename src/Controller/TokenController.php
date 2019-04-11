@@ -87,7 +87,7 @@ class TokenController extends Controller
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
 
-        $dashedName = str_replace(' ', '-', TokenNameConverter::parse($name));
+        $dashedName = TokenNameConverter::dashedName($name);
 
         if ($dashedName != $name) {
             return $this->redirectToOwnToken($tab);
@@ -217,7 +217,7 @@ class TokenController extends Controller
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
-        $dashedName = str_replace(' ', '-', TokenNameConverter::parse($token->getName()));
+        $dashedName = TokenNameConverter::dashedName($token->getName());
 
         return $this->redirectToRoute('token_show', [
             'name' => $dashedName,

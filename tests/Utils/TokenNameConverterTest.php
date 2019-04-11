@@ -38,6 +38,53 @@ class TokenNameConverterTest extends TestCase
         ];
     }
 
+
+    /**
+     * @dataProvider parserProvider
+     */
+    public function testParser(string $name, string $parsedName): void
+    {
+        $this->assertEquals($parsedName, TokenNameConverter::parse($name));
+    }
+
+    public function parserProvider(): array
+    {
+        return [
+            ['test', 'test'],
+            [' test', 'test'],
+            ['test  123', 'test 123'],
+            ['test--123', 'test-123'],
+            [' - - - t--e st', 't-e st'],
+            [' te s  t ', 'te s t'],
+            [' test--', 'test'],
+            [' test-1--  1', 'test-1-1'],
+            ['- tes t-1--  1', 'tes t-1-1'],
+        ];
+    }
+
+
+    /**
+     * @dataProvider dasherProvider
+     */
+    public function testDasher(string $name, string $parsedName): void
+    {
+        $this->assertEquals($parsedName, TokenNameConverter::dashedName($name));
+    }
+
+    public function dasherProvider(): array
+    {
+        return [
+            ['test', 'test'],
+            ['test 123', 'test-123'],
+            ['test--123', 'test-123'],
+            [' test', 'test'],
+            [' test ', 'test'],
+            [' test--', 'test'],
+            [' test-1--  1', 'test-1-1'],
+            ['- tes t-1--  1', 'tes-t-1-1'],
+        ];
+    }
+
     /** @return MockObject|Config */
     private function mockConfig(int $offset): Config
     {

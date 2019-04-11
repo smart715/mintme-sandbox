@@ -85,13 +85,12 @@ export default {
                 name: this.newName,
             })
             .then((response) => {
-                console.log(response);
                 if (response.status === HTTP_ACCEPTED) {
                     this.currentName = response.data['tokenName'];
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
-                    this.$toasted.error(error.response.data);
+                    this.$toasted.error(error.response.data.message);
                 } else {
                     this.$toasted.error('An error has ocurred, please try again later');
                 }
