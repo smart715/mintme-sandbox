@@ -228,6 +228,12 @@ export default {
         openDeposit: function(currency) {
             this.depositAddress = this.depositAddresses[currency] || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
+
+            // TODO: Get rid of hardcoded WEB
+            if (currency === 'WEB') {
+                this.depositDescription += ' Minimal amount to deposit is a 1 WEB.';
+            }
+
             this.showDepositModal = true;
         },
         closeDeposit: function() {
