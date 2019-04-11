@@ -20,16 +20,6 @@
                                 {% endfor %}
                             {% endfor %}
                         </div>
-                        <div>
-                            <div v-if="$v.email.$error" class="text-danger" v-cloak>
-                                <span>Email can't be empty and must be valid.</span>
-                            </div>
-                            {{ form_start(emailForm, {'attr': {'ref': 'emailForm'}}) }}
-                            {{ form_row(emailForm.email, { 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required', 'ref': 'email', '@keyup': 'onEmailKeyUp', ':class': "{ 'is-invalid': $v.email.$error }"} }) }}
-                            {{ form_rest(emailForm) }}
-                            <button type="submit" class="btn btn-primary float-right px-5" ref="emailButton" @click.prevent="onEmailSubmit" disabled>Save</button>
-                            {{ form_end(emailForm) }}
-                        </div>
                         <div class="clearfix"></div>
                         <div class="mt-3">
                             {{ form_start(passwordForm) }}

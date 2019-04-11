@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\EditEmail2FAType;
-use App\Form\EditEmailType;
 use App\Form\Model\EmailModel;
 use App\Form\TwoFactorType;
 use App\Manager\ProfileManagerInterface;
@@ -53,22 +52,16 @@ class UserController extends AbstractController
     {
         $user = $this->getUser();
         $email = new EmailModel($user->getEmail());
-        $emailForm = $this->createForm(EditEmailType::class, $email);
-        $emailForm->handleRequest($request);
         $passwordForm = $this->getPasswordForm($request);
 
         if ($user->isGoogleAuthenticatorEnabled()) {
             $emailForm2FA = $this->createForm(EditEmail2FAType::class, $email);
             $emailForm2FA->handleRequest($request);
 
-            return $this->renderSettings2FA($passwordForm, $emailForm, $emailForm2FA);
+            return $this->renderSettings2FA($passwordForm, $emailForm2FA);
         }
 
-        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
-            $this->submitEmailForm($email);
-        }
-
-        return $this->renderSettings($passwordForm, $emailForm);
+        return $this->renderSettings($passwordForm);
     }
 
     /**
@@ -155,10 +148,9 @@ class UserController extends AbstractController
         return $passwordForm;
     }
 
-    private function renderSettings(FormInterface $passwordForm, FormInterface $emailForm): Response
+    private function renderSettings(FormInterface $passwordForm): Response
     {
         return $this->render('pages/settings.html.twig', [
-            'emailForm' => $emailForm->createView(),
             'passwordForm' => $passwordForm->createView(),
             'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
         ]);
@@ -166,10 +158,9 @@ class UserController extends AbstractController
 
     private function renderSettings2FA(
         FormInterface $passwordForm,
-        FormInterface $emailForm,
         FormInterface $emailForm2FA
     ): Response {
-        if ($emailForm2FA->isSubmitted() && !$emailForm2FA->isValid() || $emailForm->isSubmitted() && $emailForm->isValid()) {
+        if ($emailForm2FA->isSubmitted() && !$emailForm2FA->isValid()) {
             return $this->render('default/simple_form.html.twig', [
                 'form' => $emailForm2FA->createView(),
                 'formHeader' => 'Enter two-factor code to confirm Edit Email',
@@ -182,7 +173,7 @@ class UserController extends AbstractController
             $this->submitEmailForm($email);
         }
 
-        return $this->renderSettings($passwordForm, $emailForm);
+        return $this->renderSettings($passwordForm);
     }
 
     private function submitEmailForm(EmailModel $email): void
