@@ -51,7 +51,7 @@ export default {
             icon: 'edit',
             currentName: this.name,
             newName: this.name,
-            isTokenExchanged: false,
+            isTokenExchanged: true,
         };
     },
     mounted: function() {
