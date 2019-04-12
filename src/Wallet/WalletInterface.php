@@ -21,4 +21,10 @@ interface WalletInterface
      * @throws NotEnoughUserAmountException
      */
     public function withdraw(User $user, Address $address, Amount $amount, Crypto $crypto): void;
+
+
+    /** @return array<Address> */
+    public function getDepositCredentials(User $user, array $cryptos): array;
+
+    public function getDepositCredential(User $user, Crypto $crypto): Address;
 }
