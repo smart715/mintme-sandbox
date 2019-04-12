@@ -92,7 +92,7 @@ export default {
             } else if (!this.$v.newName.minLength) {
                 this.$toasted.error('Token name can have at least 4 symbols');
                 return;
-            } else if (!this.$v.newName.minLength) {
+            } else if (!this.$v.newName.maxLength) {
                 this.$toasted.error('Token name can not be longer than 255 characters');
                 return;
             }
