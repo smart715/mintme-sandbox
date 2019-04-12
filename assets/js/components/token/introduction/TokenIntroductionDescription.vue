@@ -117,7 +117,7 @@ export default {
                 this.$toasted.error('Token Description must be more than one character');
                 return;
             }
-            
+
             this.$axios.single.patch(this.updateUrl, {
                 description: this.newDescription,
             })
@@ -146,7 +146,7 @@ export default {
                 minLength: minLength(1),
             },
         };
-    },            
+    },
 };
 </script>
 
