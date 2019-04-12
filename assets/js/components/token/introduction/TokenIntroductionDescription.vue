@@ -49,7 +49,7 @@
                                     :class="{ 'is-invalid': $v.$invalid }"
                                 >
                                 </textarea>
-                                <div v-if="!$v.newDescription.minLength" class="invalid-feedback text-center mt-n4">
+                                <div v-if="$v.$invalid" class="error">
                                     Token Description must be more than one character
                                 </div>
                                 <div class="text-left pt-3">
@@ -141,7 +141,7 @@ export default {
         return {
             newDescription: {
                 required,
-                minLength: minLength(1),
+                minLength: minLength(2),
             },
         };
     },
