@@ -46,7 +46,7 @@
                                     class="form-control"
                                     v-model="$v.newDescription.$model"
                                     max="20000"
-                                    :class="{ 'is-invalid': $v.$error }"
+                                    :class="{ 'is-invalid': $v.$invalid }"
                                 >
                                 </textarea>
                                 <div v-if="!$v.newDescription.minLength" class="invalid-feedback text-center mt-n4">
@@ -111,7 +111,7 @@ export default {
     methods: {
         editDescription: function() {
             this.$v.$touch();
-            if (this.$v.$error) {
+            if (this.$v.$invalid) {
                 this.$toasted.error('Token Description must be more than one character');
                 return;
             }

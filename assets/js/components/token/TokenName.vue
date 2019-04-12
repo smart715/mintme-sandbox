@@ -3,10 +3,10 @@
         <template v-if="allowEdit">
             <input
                 type="text"
-                v-model="$v.newName.$model"
+                v-model.trim="$v.newName.$model"
                 v-if="editingName"
                 ref="tokenNameInput"
-                :class="{ 'is-invalid': $v.newName.$error }">
+                :class="{ 'is-invalid': $v.$invalid }">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 :icon="icon"
