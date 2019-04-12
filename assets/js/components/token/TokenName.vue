@@ -73,13 +73,13 @@ export default {
         },
         doEditName: function() {
             this.$v.$touch();
-            if (!$v.newName.alphaNum) {
+            if (!this.$v.newName.alphaNum) {
                 this.$toasted.error('Token name can contain alphabets and numbers');
                 return;
-            } else if (!$v.newName.minLength) {
+            } else if (!this.$v.newName.minLength) {
                 this.$toasted.error('Token name can have at least 4 symbols');
                 return;
-            } else if (!$v.newName.minLength) {
+            } else if (!this.$v.newName.minLength) {
                 this.$toasted.error('Token name can not be longer than 255 characters');
                 return;
             }
