@@ -49,7 +49,7 @@
                                     :class="{ 'is-invalid': $v.$invalid }"
                                 >
                                 </textarea>
-                                <div v-if="$v.$invalid" class="error">
+                                <div v-if="$v.$invalid" class="text-sm text-danger">
                                     Token Description must be more than one character
                                 </div>
                                 <div class="text-left pt-3">
