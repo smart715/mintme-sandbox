@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -50,12 +51,10 @@ class WalletController extends Controller
         $pendingWithdraw = $withdrawRepo->getWithdrawByHash($hash);
 
         if (!$pendingWithdraw) {
-            $this->addFlash(
+            return $this->createWalletRedirection(
                 'danger',
                 'There are no transactions attached to this hashcode'
             );
-
-            return $this->redirectToRoute('wallet');
         }
 
         $entityManager->remove($pendingWithdraw);
@@ -63,7 +62,7 @@ class WalletController extends Controller
 
         try {
             $wallet->withdraw(
-                $this->getUser(),
+                $pendingWithdraw->getUser(),
                 $wallet->getDepositCredential(
                     $pendingWithdraw->getUser(),
                     $pendingWithdraw->getCrypto()
@@ -72,18 +71,21 @@ class WalletController extends Controller
                 $pendingWithdraw->getCrypto()
             );
         } catch (Throwable $exception) {
-            $this->addFlash(
+            return $this->createWalletRedirection(
                 'danger',
                 'Something went wrong during withdrawal. Contact us or try again later!'
             );
-
-            return $this->redirectToRoute('wallet');
         }
 
-        $this->addFlash(
+        return $this->createWalletRedirection(
             'success',
             'Your transaction has been successfully sent.'
         );
+    }
+
+    private function createWalletRedirection(string $type, string $msg): RedirectResponse
+    {
+        $this->addFlash($type, $msg);
 
         return $this->redirectToRoute('wallet');
     }
