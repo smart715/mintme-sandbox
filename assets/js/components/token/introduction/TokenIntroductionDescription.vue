@@ -120,7 +120,7 @@ export default {
                 description: this.newDescription,
             })
                 .then((response) => {
-                    if (response.status === HTTP_NO_CONTENT) {                        
+                    if (response.status === HTTP_NO_CONTENT) {
                         this.currentDescription = this.newDescription;
                         this.$emit('updated', this.newDescription);
                     }
