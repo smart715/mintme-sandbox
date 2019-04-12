@@ -48,6 +48,16 @@ a
   &:hover
     color: $color-link-hover
 
+.btn-cancel
+  padding: .25rem 0rem
+  font-size: 1rem
+  line-height: 1.5
+  vertical-align: middle
+  border-width: 1px
+  border-style: solid
+  border-color: transparent
+  color: $color-link
+
 .faq-block
   a:hover
     color: white
@@ -64,6 +74,36 @@ a
 
 .c-pointer
   cursor: pointer
+
+.tooltip-static
+  background: white
+  height: auto
+  width: 115px
+  padding: 0.3rem
+  margin-left: 1.5em
+  position: absolute
+  display: inline-block
+  font-size: 12px
+  color: black
+  border-radius: 0.6rem
+  &.tooltip-static-left
+    &:before
+      content: ''
+      width: 0
+      height: 0
+      border-bottom: 10px solid white
+      border-left: 10px solid white
+      border-top: 10px solid transparent
+      border-right: 10px solid transparent
+      position: absolute
+      display: inline-block
+      top: 80%
+      transform: rotate(45deg)
+      margin-top: -28px
+      margin-left: -10px
+
+.margin-neg-15
+  margin-top: -15px
 
 .card, .modal, .box
   label

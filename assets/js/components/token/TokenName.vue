@@ -1,6 +1,6 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
-        <template v-if="editable">
+        <template v-if="allowEdit">
             <input
                 type="text"
                 v-model="$v.newName.$model"
@@ -11,7 +11,8 @@
                 class="icon-edit c-pointer align-middle"
                 :icon="icon"
                 transform="shrink-4 up-1.5"
-                @click="editName" />
+                @click="editName"
+            />
         </template>
         <span v-if="!editingName">{{ currentName }}</span>
     </div>
@@ -52,16 +53,28 @@ export default {
             icon: 'edit',
             currentName: this.name,
             newName: this.name,
+            isTokenExchanged: true,
         };
+    },
+    mounted: function() {
+        if (!this.editable) {
+            return;
+        }
+
+        this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
+                name: this.currentName,
+            }))
+            .then((res) => this.isTokenExchanged = res.data)
+            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
     },
     methods: {
         editName: function() {
-            if (this.icon === 'check') {
-                return this.doEditName();
+            if (!this.allowEdit) {
+                return;
             }
 
-            if (!this.editable) {
-                return;
+            if (this.icon === 'check') {
+                return this.doEditName();
             }
 
             this.editingName = !this.editingName;
@@ -89,6 +102,11 @@ export default {
             .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
                     this.currentName = this.newName;
+
+                    // TODO: update name in a related components and link path instead of redirecting
+                    location.href = this.$routing.generate('token_show', {
+                        name: this.currentName,
+                    });
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
@@ -113,6 +131,11 @@ export default {
             alphaNum,
             minLength: minLength(4),
             maxLength: maxLength(255),
+        },
+    },
+    computed: {
+        allowEdit: function() {
+          return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
         },
     },
 };

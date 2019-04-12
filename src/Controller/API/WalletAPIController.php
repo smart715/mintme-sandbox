@@ -2,15 +2,15 @@
 
 namespace App\Controller\API;
 
-use App\Deposit\DepositGatewayCommunicatorInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Wallet\Deposit\DepositGatewayCommunicatorInterface;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
-use App\Withdraw\WithdrawGatewayInterface;
+use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;

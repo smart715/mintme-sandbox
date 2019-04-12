@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Fetcher;
+namespace App\Utils\Fetcher;
 
 use App\Entity\Profile;
 use App\Manager\ProfileManagerInterface;
