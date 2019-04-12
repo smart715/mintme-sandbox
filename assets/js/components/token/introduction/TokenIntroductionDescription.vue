@@ -141,7 +141,7 @@ export default {
     },
     validations: {
         newDescription: {
-            minLength: minLength(4),
+            minLength: minLength(1),
         },
     },
 };
