@@ -25,7 +25,7 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <p v-if="!editingDescription">{{ description }}</p>
+                        <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
@@ -49,7 +49,7 @@
                                     :class="{ 'is-invalid': $v.$error }"
                                 >
                                 </textarea>
-                                <div v-if="!$v.newDescription.minValue" class="invalid-feedback text-center mt-n4">
+                                <div v-if="!$v.newDescription.minLength" class="invalid-feedback text-center mt-n4">
                                     Token Description must be more than one character
                                 </div>
                                 <div class="text-left pt-3">
@@ -99,6 +99,7 @@ export default {
     data() {
         return {
             editingDescription: false,
+            currentDescription: this.description,
             newDescription: this.description,
         };
     },
@@ -106,9 +107,6 @@ export default {
         showEditIcon: function() {
             return !this.editingDescription && this.editable;
         },
-    },
-    mounted() {
-        this.newDescription = this.description;
     },
     methods: {
         editDescription: function() {
@@ -122,9 +120,9 @@ export default {
                 description: this.newDescription,
             })
                 .then((response) => {
-                    if (response.status === HTTP_NO_CONTENT) {
+                    if (response.status === HTTP_NO_CONTENT) {                        
+                        this.currentDescription = this.newDescription;
                         this.$emit('updated', this.newDescription);
-                        this.description = this.newDescription;
                     }
                 }, (error) => {
                     if (error.response.status === HTTP_BAD_REQUEST) {
