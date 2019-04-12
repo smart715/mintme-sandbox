@@ -25,7 +25,7 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <p v-if="!editingDescription">{{ newDescription }}</p>
+                        <p v-if="!editingDescription">{{ description }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
@@ -123,6 +123,7 @@ export default {
                 .then((response) => {
                     if (response.status === HTTP_NO_CONTENT) {
                         this.$emit('updated', this.newDescription);
+                        this.description = this.this.newDescription;
                     }
                 }, (error) => {
                     if (error.response.status === HTTP_BAD_REQUEST) {
