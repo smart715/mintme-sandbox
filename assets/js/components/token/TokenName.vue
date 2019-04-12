@@ -5,8 +5,8 @@
                 type="text"
                 v-model="$v.newName.$model"
                 v-if="editingName"
-                :class="{ 'is-invalid': $v.newName.$error }"
-                ref="tokenNameInput">
+                ref="tokenNameInput"
+                :class="{ 'is-invalid': $v.newName.$error }">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 :icon="icon"
@@ -25,7 +25,7 @@ import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import {minLength, maxLength, alphaNum} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, alphaNum} from 'vuelidate/lib/validators';
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -96,6 +96,7 @@ export default {
                 this.$toasted.error('Token name can not be longer than 255 characters');
                 return;
             }
+
             this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
             })
@@ -126,16 +127,17 @@ export default {
             this.icon = 'edit';
         },
     },
-    validations: {
-        newName: {
-            alphaNum,
-            minLength: minLength(4),
-            maxLength: maxLength(255),
-        },
-    },
     computed: {
         allowEdit: function() {
           return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
+        },
+    },
+    validations: {
+        newName: {
+            required,
+            alphaNum,
+            minLength: minLength(4),
+            maxLength: maxLength(255),
         },
     },
 };

@@ -25,7 +25,7 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <p v-if="!editingDescription">{{ description }}</p>
+                        <p v-if="!editingDescription">{{ newDescription }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
@@ -46,7 +46,7 @@
                                     class="form-control"
                                     v-model="$v.newDescription.$model"
                                     max="20000"
-                                    :class="{ 'is-invalid': $v.newDescription.$error }"
+                                    :class="{ 'is-invalid': $v.$error }"
                                 >
                                 </textarea>
                                 <div v-if="!$v.newDescription.minValue" class="invalid-feedback text-center mt-n4">
@@ -72,7 +72,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
-import {minLength} from 'vuelidate/lib/validators';
+import {required, minLength} from 'vuelidate/lib/validators';
 
 library.add(faEdit);
 Vue.use(Toasted, {
@@ -107,10 +107,8 @@ export default {
             return !this.editingDescription && this.editable;
         },
     },
-    watch: {
-        description: function(old, cur) {
-            this.newDescription = cur;
-        },
+    mounted() {
+        this.newDescription = this.description;
     },
     methods: {
         editDescription: function() {
@@ -141,6 +139,7 @@ export default {
     },
     validations: {
         newDescription: {
+            required,
             minLength: minLength(1),
         },
     },
