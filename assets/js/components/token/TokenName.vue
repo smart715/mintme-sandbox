@@ -132,13 +132,15 @@ export default {
           return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
         },
     },
-    validations: {
-        newName: {
-            required,
-            alphaNum,
-            minLength: minLength(4),
-            maxLength: maxLength(255),
-        },
+    validations() {
+        return {
+            newName: {
+                required,
+                alphaNum,
+                minLength: minLength(4),
+                maxLength: maxLength(255),
+            },
+        };
     },
 };
 </script>

@@ -117,13 +117,14 @@ export default {
                 this.$toasted.error('Token Description must be more than one character');
                 return;
             }
+            
             this.$axios.single.patch(this.updateUrl, {
                 description: this.newDescription,
             })
                 .then((response) => {
                     if (response.status === HTTP_NO_CONTENT) {
                         this.$emit('updated', this.newDescription);
-                        this.description = this.this.newDescription;
+                        this.description = this.newDescription;
                     }
                 }, (error) => {
                     if (error.response.status === HTTP_BAD_REQUEST) {
@@ -138,12 +139,14 @@ export default {
                 });
         },
     },
-    validations: {
-        newDescription: {
-            required,
-            minLength: minLength(1),
-        },
-    },
+    validations() {
+        return {
+            newDescription: {
+                required,
+                minLength: minLength(1),
+            },
+        };
+    },            
 };
 </script>
 
