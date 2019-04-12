@@ -46,6 +46,16 @@
                             Invalid amount.
                         </div>
                 </div>
+                <div v-if="twofa" class="col-12 pb-3">
+                    <label for="twofactor" class="d-block text-left">
+                        Two Factor Authentication Code:
+                    </label>
+                    <input
+                        v-model="code"
+                        type="text"
+                        id="twofactor"
+                        class="form-control">
+                </div>
                 <div class="col-12 text-left">
                     <label>
                         Withdrawal fee:
@@ -95,9 +105,11 @@ export default {
         withdrawUrl: String,
         maxAmount: String,
         addressLength: Number,
+        twofa: String,
     },
     data() {
         return {
+            code: '',
             amount: 0,
             address: '',
             minAmount: toMoney('1e-' + GENERAL.precision),
@@ -147,9 +159,10 @@ export default {
                 'crypto': this.currency,
                 'amount': this.amount,
                 'address': this.address,
+                'code': this.code || null,
             })
             .then((response) => {
-                this.$toasted.success('Paid');
+                this.$toasted.success('Confirmation email has been sent to your email. It will expire in 4 hours.');
                 this.closeModal();
             })
             .catch((error) => {

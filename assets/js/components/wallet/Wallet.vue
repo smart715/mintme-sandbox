@@ -87,6 +87,7 @@
             :withdraw-url="withdrawUrl"
             :max-amount="amount"
             :address-length="addressLength"
+            :twofa="twofa"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -116,6 +117,7 @@ export default {
         withdrawUrl: {type: String, required: true},
         createTokenUrl: String,
         tradingUrl: String,
+        twofa: String,
     },
     data() {
         return {
