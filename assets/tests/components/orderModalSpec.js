@@ -13,6 +13,6 @@ describe('OrderModal', () => {
         orderModal = mount(OrderModal, {
             propsData: {type: false, visible: true},
         });
-        expect(orderModal.title).to.equal('Insufficient balance');
+        expect(orderModal.title).to.equal('Insufficient Balance');
     });
 });
