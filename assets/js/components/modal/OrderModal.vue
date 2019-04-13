@@ -32,7 +32,7 @@ export default {
     },
     computed: {
         title: function() {
-            return (this.type) ? 'Order Created' : 'Order Failed';
+            return (this.type) ? 'Order Created' : 'Insufficient Balance';
         },
     },
     methods: {
