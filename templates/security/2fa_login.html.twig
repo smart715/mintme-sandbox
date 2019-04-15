@@ -10,7 +10,7 @@
 
     {% if authenticationError %}
         <div class="alert alert-danger my-2" role="alert">
-            {{ authenticationError }}
+            {{ authenticationError|trans(authenticationErrorData) }}
         </div>
     {% endif %}
 
