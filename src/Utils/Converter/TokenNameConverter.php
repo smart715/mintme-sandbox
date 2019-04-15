@@ -29,19 +29,18 @@ class TokenNameConverter implements TokenNameConverterInterface
 
     public static function parse(?string $name): string
     {
-        if ($name) {
-            while (!ctype_alnum(substr($name, 0, 1)) || !ctype_alnum(substr($name, -1))) {
-                $name = trim($name);
-                $name = trim($name, '-');
-            }
-
-            $name = (string)preg_replace('/\s+/', ' ', $name);
-            $name = (string)preg_replace('/\s*\-{1,}\s*/', '-', $name);
-
-            return $name;
+        if (!$name) {
+            return '';
         }
 
-        return '';
+        while (!ctype_alnum(substr($name, 0, 1)) || !ctype_alnum(substr($name, -1))) {
+            $name = trim($name);
+            $name = trim($name, '-');
+        }
+
+        $name = (string)preg_replace(['/\s+/', '/\s*\-{1,}\s*/'], [' ', '-'], $name);
+
+        return $name;
     }
 
     public static function dashedName(?string $name): string

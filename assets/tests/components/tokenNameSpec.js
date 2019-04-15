@@ -26,7 +26,7 @@ describe('TokenName', () => {
     afterEach(() => {
         moxios.uninstall();
     });
-    
+
     // Commented due the component hard reloading. Consider to resolve TODO and uncomment it
     // it('can be edited if editable', (done) => {
     //     const localVue = mockVue();

@@ -115,8 +115,8 @@ class TokenManager implements TokenManagerInterface
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult
     {
-        if ($token !== $this->getOwnToken() || $token->getProfile()
-                ->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
+        if ($token !== $this->getOwnToken() ||
+            $token->getProfile()->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
             return $balanceResult;
         }
 
