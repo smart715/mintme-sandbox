@@ -16,7 +16,7 @@
                     </div>
                     <div class="card-body">
                         {% if authenticationError %}
-                            <div class="alert alert-danger my-2" role="alert">
+                            <div class="p-2 mb-2 bg-danger text-center text-white">
                                 {{ authenticationError|trans(authenticationErrorData) }}
                             </div>
                         {% endif %}
