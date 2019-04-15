@@ -7,13 +7,6 @@
 {% block title %}{{ formHeader }} | mintMe{% endblock %}
 
 {% block content %}
-
-    {% if authenticationError %}
-        <div class="alert alert-danger my-2" role="alert">
-            {{ authenticationError|trans(authenticationErrorData) }}
-        </div>
-    {% endif %}
-
     <div class="container text-center">
         <div class="row pt-5 justify-content-center">
             <div class="col-lg-4 col-md-6">
@@ -22,6 +15,11 @@
                         {{ formHeader }}
                     </div>
                     <div class="card-body">
+                        {% if authenticationError %}
+                            <div class="alert alert-danger my-2" role="alert">
+                                {{ authenticationError|trans(authenticationErrorData) }}
+                            </div>
+                        {% endif %}
                         {% block formBody %}
                             <form action="{{ path("2fa_login_check") }}" method="post">
                                 <div class="form-group">
@@ -40,7 +38,7 @@
                                 <div class="form-group">
                                     <input
                                         type="submit" id="_submit" name="_submit"
-                                        class="btn btn-primary" value="VERIFY CODE"
+                                        class="btn btn-primary" value="Verify Code"
                                         >
                                 </div>
                             </form>
