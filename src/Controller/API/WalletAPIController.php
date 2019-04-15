@@ -2,29 +2,28 @@
 
 namespace App\Controller\API;
 
-use App\Deposit\DepositGatewayCommunicatorInterface;
+use App\Entity\PendingWithdraw;
+use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\PendingWithdrawManager;
 use App\Manager\TokenManagerInterface;
-use App\Wallet\Exception\NotEnoughUserAmountException;
-use App\Wallet\Model\Address;
+use App\Manager\TwoFactorManagerInterface;
+use App\Wallet\Deposit\DepositGatewayCommunicatorInterface;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
-use App\Withdraw\WithdrawGatewayInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/wallet")
  * @Security(expression="is_granted('prelaunch')")
  */
-class WalletAPIController extends FOSRestController
+class WalletAPIController extends AbstractFOSRestController
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 50;
 
@@ -55,13 +54,23 @@ class WalletAPIController extends FOSRestController
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(name="address", allowBlank=false)
+     * @Rest\RequestParam(name="code")
      */
     public function withdraw(
         ParamFetcherInterface $request,
-        WalletInterface $wallet,
         CryptoManagerInterface $cryptoManager,
-        MoneyWrapperInterface $moneyWrapper
+        TwoFactorManagerInterface $twoFactorManager,
+        MoneyWrapperInterface $moneyWrapper,
+        MailerInterface $mailer
     ): View {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->view([
+                'error' => 'Invalid user',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
         $crypto = $cryptoManager->findBySymbol(
             $request->get('crypto')
         );
@@ -72,22 +81,23 @@ class WalletAPIController extends FOSRestController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        try {
-            $wallet->withdraw(
-                $this->getUser(),
-                new Address($request->get('address')),
-                new Amount($moneyWrapper->parse((string)$request->get('amount'), $crypto->getSymbol())),
-                $crypto
-            );
-        } catch (NotEnoughUserAmountException $exception) {
+        if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
             return $this->view([
-                'error' => 'Not enough balance to withdraw',
-            ], Response::HTTP_BAD_REQUEST);
-        } catch (\Throwable $exception) {
-            return $this->view([
-                'error' => 'Service unavailable now. Try later',
-            ], Response::HTTP_BAD_REQUEST);
+                'error' => 'Invalid 2fa code',
+                ], Response::HTTP_UNAUTHORIZED);
         }
+
+        $pendingWithdraw = new PendingWithdraw(
+            $user,
+            $crypto,
+            new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol()))
+        );
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($pendingWithdraw);
+        $entityManager->flush();
+
+        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
         return $this->view();
     }
@@ -98,14 +108,14 @@ class WalletAPIController extends FOSRestController
      * @Rest\GET("/addresses", name="deposit_addresses", options={"expose"=true})
      */
     public function getDepositAddresses(
-        DepositGatewayCommunicatorInterface $depositCommunicator,
-        TokenManagerInterface $tokenManager
+        WalletInterface $depositCommunicator,
+        CryptoManagerInterface $tokenManager
     ): View {
 
         $depositAddresses = $depositCommunicator->getDepositCredentials(
-            $this->getUser()->getId(),
-            $tokenManager->findAllPredefined()
-        )->toArray();
+            $this->getUser(),
+            $tokenManager->findAll()
+        );
 
         return $this->view($depositAddresses);
     }

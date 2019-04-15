@@ -33,15 +33,6 @@
     border: none
     min-width: 25rem
     height: 2.0rem
-    transition: min-width .25s ease
-
-    &:focus
-      min-width: 28rem
-      transition: min-width .5s ease
-      box-shadow: 0 0 0 0.2rem lighten($primary, 28%)
-
-      @include media-breakpoint-down(lg)
-        min-width: 14rem
 
     &::placeholder
       color: lighten($white, 5%)
@@ -51,8 +42,6 @@
     @include media-breakpoint-down(lg)
       min-width: 12rem
 
-      &:focus
-        min-width: 16rem
   .v-autocomplete
     .v-autocomplete-list
       background-color: $secondary

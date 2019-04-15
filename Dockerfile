@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     iputils-ping \
     libpng-dev \
-    libfontconfig
+    libfontconfig \
+    netcat
 
 RUN touch /usr/local/etc/php/php.ini
 RUN echo 'memory_limit=512M' >> /usr/local/etc/php/php.ini
@@ -25,7 +26,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql zip bcmath pcntl sockets gd
 
+COPY docker-entrypoint.sh /usr/local/bin/app-docker-entrypoint.sh
+
+RUN chmod 755 /usr/local/bin/app-docker-entrypoint.sh
+
 WORKDIR /var/www/html/panel
 
-
-
+ENTRYPOINT ["app-docker-entrypoint.sh"]

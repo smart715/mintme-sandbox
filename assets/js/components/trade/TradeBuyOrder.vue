@@ -182,13 +182,22 @@ export default {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
                 }), data)
-                    .then((response) => this.showModalAction(response.data.result))
+                    .then((response) => {
+                        if (response.data.result === 1) {
+                            this.resetOrder();
+                        }
+                        this.showModalAction(response.data.result);
+                    })
                     .catch((error) => this.showModalAction());
             }
         },
         showModalAction: function(result) {
             this.modalSuccess = 1 === result;
             this.showModal = true;
+        },
+        resetOrder: function() {
+            this.buyPrice = 0;
+            this.buyAmount = 0;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {

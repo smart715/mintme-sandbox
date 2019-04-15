@@ -4,7 +4,7 @@ namespace App\Tests\Withdraw\Fetcher;
 
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
-use App\Withdraw\Fetcher\Storage\WithdrawStorage;
+use App\Wallet\Withdraw\Fetcher\Storage\WithdrawStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

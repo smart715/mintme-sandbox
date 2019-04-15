@@ -8,6 +8,9 @@ fos_user:
         confirmation:
             enabled: true
             template: bundles/FOSUserBundle/Registration/email.html.twig
+    resetting:
+        email:
+            template: bundles/FOSUserBundle/Resetting/email.html.twig
     from_email:
         address: "%env(MAILER_USER)%"
         sender_name: "%env(MAILER_USER)%"

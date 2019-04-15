@@ -2,19 +2,19 @@
 
 namespace App\Wallet;
 
-use App\Deposit\DepositGatewayCommunicator;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
-use App\Withdraw\WithdrawGatewayInterface;
-use Money\Currency;
-use Money\Money;
+use App\Wallet\Withdraw\WithdrawGatewayInterface;
+use Exception;
+use Throwable;
 
 class Wallet implements WalletInterface
 {
@@ -54,7 +54,7 @@ class Wallet implements WalletInterface
         return $history;
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function withdraw(User $user, Address $address, Amount $amount, Crypto $crypto): void
     {
         $token = Token::getFromCrypto($crypto);
@@ -73,10 +73,26 @@ class Wallet implements WalletInterface
 
         try {
             $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $crypto);
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $this->balanceHandler->deposit($user, $token, $amount->getAmount()->add($crypto->getFee()));
 
-            throw new \Exception();
+            throw new Exception();
         }
+    }
+
+    /** {@inheritDoc} */
+    public function getDepositCredentials(User $user, array $cryptos): array
+    {
+        return array_map(function (string $address) {
+            return new Address($address);
+        }, $this->depositCommunicator->getDepositCredentials($user->getId(), array_map(function ($crypto) {
+            return Token::getFromCrypto($crypto);
+        }, $cryptos))->toArray());
+    }
+
+    /** {@inheritDoc} */
+    public function getDepositCredential(User $user, Crypto $crypto): Address
+    {
+        return $this->getDepositCredentials($user, [$crypto])[$crypto->getSymbol()];
     }
 }

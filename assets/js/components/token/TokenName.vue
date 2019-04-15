@@ -1,12 +1,17 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
-        <template v-if="editable">
-            <input type="text" v-model="newName" v-if="editingName">
+        <template v-if="allowEdit">
+            <input
+                type="text"
+                v-model="newName"
+                v-if="editingName"
+                ref="tokenNameInput">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 :icon="icon"
                 transform="shrink-4 up-1.5"
-                @click="editName" />
+                @click="editName"
+            />
         </template>
         <span v-if="!editingName">{{ currentName }}</span>
     </div>
@@ -46,20 +51,36 @@ export default {
             icon: 'edit',
             currentName: this.name,
             newName: this.name,
+            isTokenExchanged: true,
         };
+    },
+    mounted: function() {
+        if (!this.editable) {
+            return;
+        }
+
+        this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
+                name: this.currentName,
+            }))
+            .then((res) => this.isTokenExchanged = res.data)
+            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
     },
     methods: {
         editName: function() {
+            if (!this.allowEdit) {
+                return;
+            }
+
             if (this.icon === 'check') {
                 return this.doEditName();
             }
 
-            if (!this.editable) {
-                return;
-            }
-
             this.editingName = !this.editingName;
             this.icon = 'check';
+            this.$nextTick(() => {
+                let tokenNameInput = this.$refs.tokenNameInput;
+                tokenNameInput.focus();
+            });
         },
         doEditName: function() {
             this.$axios.single.patch(this.updateUrl, {
@@ -68,6 +89,11 @@ export default {
             .then((response) => {
                 if (response.status === HTTP_NO_CONTENT) {
                     this.currentName = this.newName;
+
+                    // TODO: update name in a related components and link path instead of redirecting
+                    location.href = this.$routing.generate('token_show', {
+                        name: this.currentName,
+                    });
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
@@ -84,6 +110,11 @@ export default {
             this.newName = this.currentName;
             this.editingName = false;
             this.icon = 'edit';
+        },
+    },
+    computed: {
+        allowEdit: function() {
+          return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
         },
     },
 };
