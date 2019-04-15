@@ -35,11 +35,11 @@ describe('TradeOrders', () => {
                     name: 'Webchain',
                     symbol: 'WEB',
                     identifier: 'WEB',
-                }
+                },
             },
             userId: 1,
             precision: 8,
-        }
+        },
     });
 
     let order = {
@@ -72,7 +72,7 @@ describe('TradeOrders', () => {
         expect(wrapper.find('trade-buy-orders-stub').exists()).to.deep.equal(true);
     });
 
-    it('should group by price', function () {
+    it('should group by price', function() {
         expect(wrapper.vm.filteredSellOrders).to.deep.equal([
             {price: toMoney(2), amount: toMoney(4), sumWeb: toMoney(8), trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
         ]);
@@ -85,11 +85,11 @@ describe('TradeOrders', () => {
         ]);
     });
 
-    describe('truncate FullName correctly', function () {
+    describe('truncate FullName correctly', function() {
         wrapper.vm.sellOrders = Array(2).fill(order);
         wrapper.vm.ordersLoaded = true;
 
-        it('should truncate FullName if is owner and fullName > 5', function () {
+        it('should truncate FullName if is owner and fullName > 5', function() {
             wrapper.vm.sellOrders = [order];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
@@ -97,7 +97,7 @@ describe('TradeOrders', () => {
             ]);
         });
 
-        it('should truncate FullName if isn\'t owner and fullName > 7', function () {
+        it('should truncate FullName if isn\'t owner and fullName > 7', function() {
             let newOrder = JSON.parse(JSON.stringify(order));
             newOrder.maker.id = 2;
             newOrder.maker.profile.firstName = 'fooBaz';
@@ -108,7 +108,7 @@ describe('TradeOrders', () => {
             ]);
         });
 
-        it('shouldn\'t truncate FullName if is owner and fullName <= 5', function () {
+        it('shouldn\'t truncate FullName if is owner and fullName <= 5', function() {
             let newOrder = JSON.parse(JSON.stringify(order));
             newOrder.maker.profile.firstName = 'f';
             wrapper.vm.sellOrders = [newOrder];
@@ -118,7 +118,7 @@ describe('TradeOrders', () => {
             ]);
         });
 
-        it('shouldn\'t truncate FullName if isn\'t owner and fullName <= 5', function () {
+        it('shouldn\'t truncate FullName if isn\'t owner and fullName <= 5', function() {
             let newOrder = JSON.parse(JSON.stringify(order));
             newOrder.maker.id = 2;
             wrapper.vm.sellOrders = [newOrder];
@@ -128,7 +128,7 @@ describe('TradeOrders', () => {
             ]);
         });
 
-        it('should add  Anonymous if the profile is null', function () {
+        it('should add  Anonymous if the profile is null', function() {
             let newOrder = JSON.parse(JSON.stringify(order));
             newOrder.maker.profile = null;
             wrapper.vm.sellOrders = [newOrder];
