@@ -1,5 +1,5 @@
 <template>
-    <b-card no-body class="mb-1 w-100">
+    <b-card no-body class="w-100">
         <b-card-header header-tag="div" class="p-1" role="tab">
             <b-btn block href="#" v-b-toggle="identifier" variant="link" class="text-white text-left">
                 <slot name="title">I don't beleive in people, I think they are all going to cheat!</slot>
