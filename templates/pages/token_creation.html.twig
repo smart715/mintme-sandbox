@@ -42,7 +42,7 @@
         </div>
         <modal
             no-close-on-backdrop
-            :visible="{{ profileCreated ? 'false' : 'true' }}">
+            :visible="domLoaded && {{ profileCreated ? 'false' : 'true' }}">
             <template slot="close"> &nbsp; </template>
             <template slot="body">
                 <div class="text-center">

@@ -10,6 +10,10 @@ new Vue({
     },
     data: {
         tokenName: '',
+        domLoaded: false,
+    },
+    mounted: function() {
+        window.onload = () => this.domLoaded = true;
     },
     validations: {
         tokenName: {

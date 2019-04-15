@@ -16,7 +16,8 @@
                             websocket-url="{{ global_websocket_url }}"
                             create-token-url="{{ path('token_create') }}"
                             trading-url="{{ path('trading') }}"
-                            withdraw-url="{{ path('withdraw') }}">
+                            withdraw-url="{{ path('withdraw') }}"
+                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}">
                         </wallet>
                     </b-tab>
                     <b-tab title="Trading history">

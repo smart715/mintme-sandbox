@@ -2,9 +2,14 @@
 
 namespace App\Wallet\Model;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+
 class Address
 {
-    /** @var string */
+    /**
+     * @var string
+     * @Groups({"API"})
+     */
     private $address;
 
     public function __construct(string $address)

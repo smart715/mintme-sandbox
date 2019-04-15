@@ -1,16 +1,18 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
-        <template v-if="editable">
+        <template v-if="allowEdit">
             <input
                 type="text"
-                v-model="newName"
+                v-model.trim="$v.newName.$model"
                 v-if="editingName"
-                ref="tokenNameInput">
+                ref="tokenNameInput"
+                :class="{ 'is-invalid': $v.$invalid }">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 :icon="icon"
                 transform="shrink-4 up-1.5"
-                @click="editName" />
+                @click="editName"
+            />
         </template>
         <span v-if="!editingName">{{ currentName }}</span>
     </div>
@@ -22,6 +24,7 @@ import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
+import {required, minLength, maxLength, alphaNum} from 'vuelidate/lib/validators';
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -49,7 +52,7 @@ export default {
             icon: 'edit',
             currentName: this.name,
             newName: this.name,
-            isTokenExchanged: false,
+            isTokenExchanged: true,
         };
     },
     mounted: function() {
@@ -65,12 +68,12 @@ export default {
     },
     methods: {
         editName: function() {
-            if (this.icon === 'check') {
-                return this.doEditName();
-            }
-
             if (!this.allowEdit) {
                 return;
+            }
+
+            if (this.icon === 'check') {
+                return this.doEditName();
             }
 
             this.editingName = !this.editingName;
@@ -81,12 +84,29 @@ export default {
             });
         },
         doEditName: function() {
+            this.$v.$touch();
+            if (!this.$v.newName.alphaNum) {
+                this.$toasted.error('Token name can contain alphabets and numbers');
+                return;
+            } else if (!this.$v.newName.minLength) {
+                this.$toasted.error('Token name can have at least 4 symbols');
+                return;
+            } else if (!this.$v.newName.maxLength) {
+                this.$toasted.error('Token name can not be longer than 255 characters');
+                return;
+            }
+
             this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
             })
             .then((response) => {
                 if (response.status === HTTP_ACCEPTED) {
                     this.currentName = response.data['tokenName'];
+
+                    // TODO: update name in a related components and link path instead of redirecting
+                    location.href = this.$routing.generate('token_show', {
+                        name: this.currentName,
+                    });
                 }
             }, (error) => {
                 if (error.response.status === HTTP_BAD_REQUEST) {
@@ -100,6 +120,7 @@ export default {
             });
         },
         cancelEditingMode: function() {
+            this.$v.$reset();
             this.newName = this.currentName;
             this.editingName = false;
             this.icon = 'edit';
@@ -110,27 +131,16 @@ export default {
           return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
         },
     },
+    validations() {
+        return {
+            newName: {
+                required,
+                alphaNum,
+                minLength: minLength(4),
+                maxLength: maxLength(255),
+            },
+        };
+    },
 };
 </script>
-
-<style lang="sass" scoped>
-    input
-        font-family: monospace
-        font-size: 0.8em
-    h1
-        font-size: 2rem
-        color: #fff
-        span
-            font-family: monospace
-            font-size: 0.8em
-
-    .icon
-        cursor: pointer
-
-    input[type="text"]
-        background-color: #fff
-        border-style: unset
-        padding: 0 5px
-</style>
-
 

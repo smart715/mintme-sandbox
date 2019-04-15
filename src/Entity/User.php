@@ -63,12 +63,6 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     protected $email;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @var string|null
-     */
-    protected $tempEmail;
-
-    /**
      * @Assert\NotBlank()
      * @Assert\Length(min="8")
      * @Assert\Regex(
@@ -116,6 +110,12 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      */
     protected $referencer;
 
+    /**
+     * @ORM\OneToMany(targetEntity="PendingWithdraw", mappedBy="user")
+     * @var ArrayCollection
+     */
+    protected $pendingWithdrawals;
+
     /** @return Token[] */
     public function getRelatedTokens(): array
     {
@@ -140,18 +140,6 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     public function getProfile(): ?Profile
     {
         return $this->profile;
-    }
-
-    public function getTempEmail(): ?string
-    {
-        return $this->tempEmail;
-    }
-
-    public function setTempEmail(?string $email): self
-    {
-        $this->tempEmail = $email;
-
-        return $this;
     }
 
     public function setProfile(Profile $profile): self

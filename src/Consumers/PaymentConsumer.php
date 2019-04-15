@@ -74,7 +74,7 @@ class PaymentConsumer implements ConsumerInterface
                     $this->moneyWrapper->parse(
                         $clbResult->getAmount(),
                         $crypto->getSymbol()
-                    )
+                    )->add($crypto->getFee())
                 );
                 $this->logger->info('[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back');
             } catch (\Throwable $exception) {

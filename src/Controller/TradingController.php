@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class TradingController extends Controller
 {
     /**
-     * @Route("/trading", name="trading")
+     * @Route("/trading", name="trading", options={"expose"=true})
      */
     public function trading(MarketFactoryInterface $marketManager): Response
     {

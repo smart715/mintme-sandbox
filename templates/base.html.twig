@@ -74,7 +74,7 @@
                                 <div class="{% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
-                                            <div class="w-50 mx-auto mb-3 alert alert-{{ label }}">
+                                            <div class="w-50 mx-auto mb-3 text-white text-center bg-{{ label }} alert alert-{{ label }}">
                                                 {{ message }}
                                             </div>
                                         {% endfor %}
