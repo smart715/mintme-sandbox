@@ -1,6 +1,6 @@
 <template>
     <div class="input-group">
-        <div ref="tokenSearch">
+        <div ref="tokenSearch" @keyup.enter="redirectToToken">
             <autocomplete
                     input-class="search-input form-control"
                     placeholder="Search for the token"
@@ -10,6 +10,7 @@
                     @change="onInputChange"
                     :items="items"
                     :min-len="3"
+
             >
             </autocomplete>
         </div>
@@ -52,6 +53,10 @@ export default {
             });
         },
         redirectToToken: function() {
+            if (this.input.trim().length === 0) {
+                location.href = this.$routing.generate('trading');
+                return;
+            }
             location.href = this.$routing.generate('token_show', {name: this.input}, true);
         },
         onItemClicked: function(val) {
