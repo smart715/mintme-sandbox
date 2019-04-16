@@ -3,7 +3,8 @@ parameters:
     locale: 'en'
 
     version: 'V1.0.0'
-
+    is_beta_version: true
+    
     viabtc_rpc: 'http://localhost:8080'
     viabtc_response_timeout_seconds: 10
 
