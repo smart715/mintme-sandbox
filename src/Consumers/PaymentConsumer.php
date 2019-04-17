@@ -78,7 +78,8 @@ class PaymentConsumer implements ConsumerInterface
                 );
                 $this->logger->info('[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back');
             } catch (\Throwable $exception) {
-                $this->logger->error('[payment-consumer] Failed to resume payment. Retry operation');
+                $this->logger->error('[payment-consumer] Failed to resume payment. Retry operation. Reason:'. $exception->getMessage());
+                sleep(10);
 
                 return false;
             }

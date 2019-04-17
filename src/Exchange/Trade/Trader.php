@@ -18,6 +18,8 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class Trader implements TraderInterface
 {
@@ -42,6 +44,12 @@ class Trader implements TraderInterface
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
 
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var NormalizerInterface */
+    private $normalizer;
+
     public function __construct(
         TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
@@ -49,7 +57,9 @@ class Trader implements TraderInterface
         MoneyWrapperInterface $moneyWrapper,
         PrelaunchConfig $prelaunchConfig,
         DateTimeInterface $time,
-        MarketNameConverterInterface $marketNameConverter
+        MarketNameConverterInterface $marketNameConverter,
+        NormalizerInterface $normalizer,
+        LoggerInterface $logger
     ) {
         $this->fetcher = $fetcher;
         $this->config = $config;
@@ -58,6 +68,8 @@ class Trader implements TraderInterface
         $this->prelaunchConfig = $prelaunchConfig;
         $this->time = $time;
         $this->marketNameConverter = $marketNameConverter;
+        $this->normalizer = $normalizer;
+        $this->logger = $logger;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -80,16 +92,35 @@ class Trader implements TraderInterface
             $this->updateUserReferrencer($order->getMaker(), $quote);
         }
 
+        if (TradeResult::FAILED === $result->getResult()) {
+            $this->logger->error(
+                "Failed to place new order for user {$order->getMaker()->getEmail()}. 
+                Reason: {$result->getMessage()}",
+                (array)$this->normalizer->normalize($result, null, [
+                    'groups' => ['Default'],
+                ])
+            );
+        }
+
         return $result;
     }
 
     public function cancelOrder(Order $order): TradeResult
     {
-        return $this->fetcher->cancelOrder(
+        $result = $this->fetcher->cancelOrder(
             $order->getMaker()->getId(),
             $this->marketNameConverter->convert($order->getMarket()),
             $order->getId() ?? 0
         );
+
+        if (TradeResult::FAILED === $result->getResult()) {
+            $this->logger->error(
+                "Failed to cancel order '{$order->getId()}' for user {$order->getMaker()->getEmail()}. 
+                Reason: {$result->getMessage()}"
+            );
+        }
+
+        return $result;
     }
 
     /**
