@@ -4,7 +4,7 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!common']
+            channels: ['!cron', '!rabbitmq', '!payments', '!exchange']
         console:
             type: console
             process_psr_3_messages: false
@@ -28,4 +28,4 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/exchange.log"
             level: debug
-            channels: ['payments']
+            channels: ['exchange']

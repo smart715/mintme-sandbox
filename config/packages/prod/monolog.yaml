@@ -4,7 +4,7 @@ monolog:
             type: fingers_crossed
             action_level: error
             handler: nested
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!common']
+            channels: ['!cron', '!rabbitmq', '!payments', '!exchange']
             excluded_404s:
                 # regex: exclude all 404 errors from the logs
                 - ^/
@@ -24,15 +24,15 @@ monolog:
         rabbitmq:
             type: stream
             path: "%kernel.logs_dir%/rabbitmq.log"
-            level: debug
+            level: info
             channels: ['rabbitmq']
         payments:
             type: stream
             path: "%kernel.logs_dir%/payments.log"
-            level: debug
+            level: info
             channels: ['payments']
         exchange:
             type: stream
             path: "%kernel.logs_dir%/exchange.log"
-            level: debug
-            channels: ['payments']
+            level: info
+            channels: ['exchange']

@@ -65,6 +65,10 @@ class Wallet implements WalletInterface
     {
         $token = Token::getFromCrypto($crypto);
         $available = $this->balanceHandler->balance($user, $token)->getAvailable();
+        $this->logger->debug(
+            "Created a new withdraw request for '{$user->getEmail()}' to 
+            send {$amount->getAmount()->getAmount()} {$crypto->getSymbol()} on {$address->getAddress()}"
+        );
 
         if ($available->lessThan($amount->getAmount()->add($crypto->getFee()))) {
             $this->logger->warning(
@@ -103,7 +107,9 @@ class Wallet implements WalletInterface
             } catch (Throwable $exception) {
                 $this->logger->critical(
                     "Failed to rollback payment. Requires to do it manually.
-                    User: {$user->getEmail()}; Amount: {$amount->getAmount()->getAmount()}; Crypto: {$crypto->getSymbol()}.
+                    User: {$user->getEmail()}; 
+                    Amount: {$amount->getAmount()->getAmount()}; 
+                    Crypto: {$crypto->getSymbol()}.
                     Reason: {$exception->getMessage()}"
                 );
             }
