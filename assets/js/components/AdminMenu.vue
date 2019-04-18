@@ -74,6 +74,20 @@ export default {
 </script>
 
 <style lang="sass">
+    @import '../../scss/variables'
+
+    .v-sidebar-menu
+        background: $secondary !important
+
+    .v-sidebar-menu .vsm-dropdown>.vsm-list
+        background: $primary !important
+
+    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon
+        background: transparent !important
+
+    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link
+        background: $primary-light !important
+
     .v-sidebar-menu.vsm-collapsed
         background: none !important
 
