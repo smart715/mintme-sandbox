@@ -1,5 +1,9 @@
 <template>
-    <sidebar-menu :menu="menu" />
+    <sidebar-menu
+            @collapse="isClicked = true"
+            :class="clickedStyles"
+            :width="!isClicked ? '50px' : '350px'"
+            :menu="menu" />
 </template>
 
 <script>
@@ -13,6 +17,7 @@ export default {
     name: 'AdminMenu',
     data() {
         return {
+            isClicked: false,
             menu: [
                 {
                     header: true,
@@ -53,6 +58,17 @@ export default {
                 },
             ],
         };
+    },
+    computed: {
+        clickedStyles: function() {
+            return !this.isClicked ? 'v-sidebar-menu vsm-collapsed' : '';
+        },
+    },
+    watch: {
+        isClicked: function() {
+            let collapseBtn = document.querySelector('.v-sidebar-menu button.collapse-btn');
+            collapseBtn.click();
+        },
     },
 };
 </script>
