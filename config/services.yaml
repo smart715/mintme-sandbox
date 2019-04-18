@@ -171,6 +171,10 @@ services:
         arguments:
             $env: "%kernel.environment%"
 
+    App\Security\HackerVoter:
+        arguments:
+            $isHackerAllowed: "%is_hacker_allowed%"
+
     App\Mailer\Mailer:
         arguments:
             $mail: "%env(MAILER_USER)%"
