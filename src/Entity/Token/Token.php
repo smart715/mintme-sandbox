@@ -89,7 +89,12 @@ class Token implements TradebleInterface
     protected $profile;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token\LockIn", mappedBy="token")
+     * @ORM\OneToOne(
+     *     targetEntity="App\Entity\Token\LockIn",
+     *     mappedBy="token",
+     *     orphanRemoval=true,
+     *     cascade={"persist", "remove"}
+     *     )
      * @var LockIn|null
      */
     protected $lockIn;
