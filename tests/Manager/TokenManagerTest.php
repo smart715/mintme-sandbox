@@ -9,6 +9,7 @@ use App\Exchange\Config\Config;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManager;
 use App\Repository\TokenRepository;
+use App\Utils\Converter\TokenNameNormalizer;
 use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -57,7 +58,7 @@ class TokenManagerTest extends TestCase
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
-            $this->createMock(TokenNameNormalizerInterface::class),
+            new TokenNameNormalizer(),
             $this->mockConfig(0)
         );
 

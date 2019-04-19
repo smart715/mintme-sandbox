@@ -5,7 +5,7 @@ namespace App\Utils\Converter;
 class TokenNameNormalizer implements TokenNameNormalizerInterface
 {
 
-    public function parse(string $tokenName): string
+    public function parse(?string $tokenName): string
     {
         return (string)preg_replace(
             ['/\s+/', '/\s*\-{1,}\s*/'],
@@ -14,7 +14,7 @@ class TokenNameNormalizer implements TokenNameNormalizerInterface
         );
     }
 
-    public function dashed(string $tokenName): string
+    public function dashed(?string $tokenName): string
     {
         return str_replace(' ', '-', $this->parse($tokenName));
     }

@@ -4,6 +4,6 @@ namespace App\Utils\Converter;
 
 interface TokenNameNormalizerInterface
 {
-    public function parse(string $TokenName): string;
-    public function dashed(string $TokenName): string;
+    public function parse(?string $TokenName): string;
+    public function dashed(?string $TokenName): string;
 }

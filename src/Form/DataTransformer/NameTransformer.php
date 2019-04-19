@@ -19,12 +19,12 @@ class NameTransformer implements DataTransformerInterface
     /** @inheritdoc */
     public function transform($value)
     {
-        return $this->tokenNameNormalizer->parse($value ?? '');
+        return $this->tokenNameNormalizer->parse($value);
     }
 
     /** @inheritdoc */
     public function reverseTransform($value)
     {
-        return $this->tokenNameNormalizer->parse($value ?? '');
+        return $this->tokenNameNormalizer->parse($value);
     }
 }
