@@ -58,12 +58,12 @@ class DepositConsumer implements ConsumerInterface
         $user = $this->userManager->find($clbResult->getUserId());
 
         try {
-            $this->logger->info('[payment-consumer] Received new message: '.json_encode($clbResult->toArray()));
+            $this->logger->info('[deposit-consumer] Received new message: '.json_encode($clbResult->toArray()));
 
             $crypto = $this->cryptoManager->findBySymbol($clbResult->getCrypto());
 
             if (!$crypto) {
-                $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
+                $this->logger->info('[deposit-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
 
                 return true;
             }
