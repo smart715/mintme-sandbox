@@ -24,7 +24,10 @@ import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import {required, minLength, maxLength, alphaNum} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+
+const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
+
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -85,8 +88,8 @@ export default {
         },
         doEditName: function() {
             this.$v.$touch();
-            if (!this.$v.newName.alphaNum) {
-                this.$toasted.error('Token name can contain alphabets and numbers');
+            if (!this.$v.newName.tokenContain) {
+                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
             } else if (!this.$v.newName.minLength) {
                 this.$toasted.error('Token name can have at least 4 symbols');
@@ -135,7 +138,7 @@ export default {
         return {
             newName: {
                 required,
-                alphaNum,
+                tokenContain: tokenContain,
                 minLength: minLength(4),
                 maxLength: maxLength(255),
             },

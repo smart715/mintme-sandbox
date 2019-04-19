@@ -12,6 +12,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Serializer\TradableNormalizer;
 use App\Utils\Converter\TokenNameConverter;
+use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -60,9 +61,13 @@ class TokensAPIController extends FOSRestController
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
      */
-    public function update(ParamFetcherInterface $request, BalanceHandlerInterface $balanceHandler, string $name): View
-    {
-        $name = TokenNameConverter::parse($name);
+    public function update(
+        ParamFetcherInterface $request,
+        BalanceHandlerInterface $balanceHandler,
+        TokenNameNormalizerInterface $tokenNameNormalizer,
+        string $name
+    ): View {
+        $name = $tokenNameNormalizer->parse($name);
 
         $token = $this->tokenManager->findByName($name);
 

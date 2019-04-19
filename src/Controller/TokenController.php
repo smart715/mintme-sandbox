@@ -14,6 +14,7 @@ use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
+use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -53,6 +54,9 @@ class TokenController extends Controller
     /** @var TraderInterface */
     protected $trader;
 
+    /** @var TokenNameNormalizerInterface */
+    private $tokenNameNormalizer;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -60,7 +64,8 @@ class TokenController extends Controller
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketManager,
         TraderInterface $trader,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        TokenNameNormalizerInterface $tokenNameNormalizer
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -68,6 +73,7 @@ class TokenController extends Controller
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
         $this->trader = $trader;
+        $this->tokenNameNormalizer = $tokenNameNormalizer;
 
         parent::__construct($normalizer);
     }
@@ -87,7 +93,7 @@ class TokenController extends Controller
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
 
-        $dashedName = TokenNameConverter::dashedName($name);
+        $dashedName = $this->tokenNameNormalizer->dashed($name);
 
         if ($dashedName != $name) {
             return $this->redirectToOwnToken($tab);
@@ -136,7 +142,7 @@ class TokenController extends Controller
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-
+            
             if ($this->tokenManager->isExisted($token)) {
                 $form->addError(new FormError('Token name is already exists.'));
 
@@ -217,10 +223,10 @@ class TokenController extends Controller
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
-        $dashedName = TokenNameConverter::dashedName($token->getName());
+        $tokenDashed = $this->tokenNameNormalizer->dashed($token->getName());
 
         return $this->redirectToRoute('token_show', [
-            'name' => $dashedName,
+            'name' => $tokenDashed,
             'tab' => $showtab,
         ]);
     }

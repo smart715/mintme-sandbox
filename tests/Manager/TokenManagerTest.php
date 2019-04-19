@@ -9,6 +9,7 @@ use App\Exchange\Config\Config;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManager;
 use App\Repository\TokenRepository;
+use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,6 +30,7 @@ class TokenManagerTest extends TestCase
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockCryptoManager([$this->mockCrypto($name)]),
+            $this->createMock(TokenNameNormalizerInterface::class),
             $this->mockConfig(0)
         );
 
@@ -55,6 +57,7 @@ class TokenManagerTest extends TestCase
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
+            $this->createMock(TokenNameNormalizerInterface::class),
             $this->mockConfig(0)
         );
 
@@ -77,6 +80,7 @@ class TokenManagerTest extends TestCase
             $profileFetcher,
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
+            $this->createMock(TokenNameNormalizerInterface::class),
             $this->mockConfig(0)
         );
         $this->assertEquals($token, $tokenManager->getOwnToken());
@@ -93,6 +97,7 @@ class TokenManagerTest extends TestCase
             $profileFetcher,
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
+            $this->createMock(TokenNameNormalizerInterface::class),
             $this->mockConfig(0)
         );
         $this->assertEquals(null, $tokenManager->getOwnToken());
