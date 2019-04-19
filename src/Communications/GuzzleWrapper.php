@@ -76,9 +76,18 @@ class GuzzleWrapper implements JsonRpcInterface
         return $response;
     }
 
+    /** @throws \Throwable */
     private function parseResponse(ResponseInterface $response): JsonRpcResponse
     {
-        return JsonRpcResponse::parse($response->getBody()->getContents());
+        try {
+            return JsonRpcResponse::parse($response->getBody()->getContents());
+        } catch (\Throwable $exception) {
+            $this->logger->error(
+                "Invalid JSON format from response: {$response->getBody()->getContents()}"
+            );
+
+            throw $exception;
+        }
     }
 
     private function constructClient(): void

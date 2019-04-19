@@ -9,6 +9,7 @@ use App\Manager\PendingWithdrawManager;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicatorInterface;
+use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -90,7 +91,8 @@ class WalletAPIController extends AbstractFOSRestController
         $pendingWithdraw = new PendingWithdraw(
             $user,
             $crypto,
-            new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol()))
+            new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
+            new Address(trim((string)$request->get('address')))
         );
 
         $entityManager = $this->getDoctrine()->getManager();
