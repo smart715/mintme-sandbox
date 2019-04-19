@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,6 +10,7 @@ use Money\Currency;
 use Money\Money;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PendingWithdrawRepository")
@@ -55,18 +57,25 @@ class PendingWithdraw
     private $user;
 
     /**
+     * @Assert\NotBlank()
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    private $address;
+
+    /**
      * @ORM\Column(type="string")
      * @var string
      */
     protected $hash;
 
-    public function __construct(User $user, Crypto $crypto, Amount $amount)
+    public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address)
     {
         $this->user = $user;
         $this->crypto = $crypto;
         $this->amount = $amount->getAmount()->getAmount();
+        $this->address = $address->getAddress();
     }
-
 
     public function getHash(): string
     {
@@ -86,6 +95,11 @@ class PendingWithdraw
                 new Currency($this->crypto->getSymbol())
             )
         );
+    }
+
+    public function getAddress(): Address
+    {
+        return new Address($this->address);
     }
 
     public function getDate(): DateTimeImmutable
