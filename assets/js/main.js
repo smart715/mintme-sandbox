@@ -14,6 +14,7 @@ import Toasted from 'vue-toasted';
 import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from './components/token/TokenSearcher';
+import AdminMenu from './components/AdminMenu';
 
 /*
     To enable passive listeners,
@@ -60,6 +61,7 @@ new Vue({
     },
     components: {
         TokenSearcher,
+        AdminMenu,
     },
 });
 

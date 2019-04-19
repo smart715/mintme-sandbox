@@ -85,9 +85,6 @@
                                     <network class="d-block c-pointer" network="linkedin">
                                         <font-awesome-icon :icon="['fab', 'linkedin']"></font-awesome-icon> LinkedIn
                                     </network>
-                                    <network class="d-block c-pointer" network="googleplus">
-                                        <font-awesome-icon :icon="['fab', 'google-plus']"></font-awesome-icon> Google +
-                                    </network>
                                     <network class="d-block c-pointer" network="reddit">
                                         <font-awesome-icon :icon="['fab', 'reddit']"></font-awesome-icon> Reddit
                                     </network>
@@ -165,7 +162,10 @@
                     </div>
                     <div class="col-12 text-left">
                         <button class="btn btn-primary" @click="confirmWebsite">
-                            <font-awesome-icon v-if="submitting" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                            <font-awesome-icon
+                                    v-if="submitting"
+                                    icon="circle-notch" spin
+                                    class="loading-spinner" fixed-width />
                             Confirm
                         </button>
                         <a class="btn-cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>

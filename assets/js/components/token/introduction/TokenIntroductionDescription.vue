@@ -25,7 +25,7 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <p v-if="!editingDescription">{{ description }}</p>
+                        <p v-if="!editingDescription">{{ currentDescription }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
@@ -44,10 +44,14 @@
 
                                 <textarea
                                     class="form-control"
-                                    v-model="newDescription"
+                                    v-model="$v.newDescription.$model"
                                     max="20000"
+                                    :class="{ 'is-invalid': $v.$invalid }"
                                 >
                                 </textarea>
+                                <div v-if="$v.$invalid" class="text-sm text-danger">
+                                    Token Description must be more than one character
+                                </div>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription">Save</button>
                                     <a class="btn-cancel pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
@@ -68,6 +72,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
+import {required, minLength} from 'vuelidate/lib/validators';
 
 library.add(faEdit);
 Vue.use(Toasted, {
@@ -94,6 +99,7 @@ export default {
     data() {
         return {
             editingDescription: false,
+            currentDescription: this.description,
             newDescription: this.description,
         };
     },
@@ -102,18 +108,20 @@ export default {
             return !this.editingDescription && this.editable;
         },
     },
-    watch: {
-        description: function(old, cur) {
-            this.newDescription = cur;
-        },
-    },
     methods: {
         editDescription: function() {
+            this.$v.$touch();
+            if (this.$v.$invalid) {
+                this.$toasted.error('Token Description must be more than one character');
+                return;
+            }
+
             this.$axios.single.patch(this.updateUrl, {
                 description: this.newDescription,
             })
                 .then((response) => {
                     if (response.status === HTTP_NO_CONTENT) {
+                        this.currentDescription = this.newDescription;
                         this.$emit('updated', this.newDescription);
                     }
                 }, (error) => {
@@ -128,6 +136,14 @@ export default {
                     this.icon = 'edit';
                 });
         },
+    },
+    validations() {
+        return {
+            newDescription: {
+                required,
+                minLength: minLength(2),
+            },
+        };
     },
 };
 </script>

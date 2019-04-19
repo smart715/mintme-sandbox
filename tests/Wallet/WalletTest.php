@@ -15,6 +15,7 @@ use App\Wallet\Wallet;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use DateTime;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class WalletTest extends TestCase
 {
@@ -32,7 +33,8 @@ class WalletTest extends TestCase
         $wallet = new Wallet(
             $this->mockWithdrawGatewayInterface($withdrawTransactions),
             $this->mockBalanceHandler(),
-            $this->mockDepositCommunicator($depositTransactions)
+            $this->mockDepositCommunicator($depositTransactions),
+            $this->createMock(LoggerInterface::class)
         );
 
         $history = $wallet->getWithdrawDepositHistory($this->mockUser(), 0, 10);
