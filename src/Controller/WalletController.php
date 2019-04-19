@@ -63,10 +63,7 @@ class WalletController extends Controller
         try {
             $wallet->withdraw(
                 $pendingWithdraw->getUser(),
-                $wallet->getDepositCredential(
-                    $pendingWithdraw->getUser(),
-                    $pendingWithdraw->getCrypto()
-                ),
+                $pendingWithdraw->getAddress(),
                 $pendingWithdraw->getAmount(),
                 $pendingWithdraw->getCrypto()
             );

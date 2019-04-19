@@ -13,6 +13,7 @@ use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Money;
+use Psr\Log\LoggerInterface;
 
 class BalanceHandler implements BalanceHandlerInterface
 {
@@ -28,16 +29,21 @@ class BalanceHandler implements BalanceHandlerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         TokenNameConverterInterface $converter,
         BalanceFetcherInterface $balanceFetcher,
         EntityManagerInterface $entityManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        LoggerInterface $logger
     ) {
         $this->converter = $converter;
         $this->balanceFetcher = $balanceFetcher;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->logger = $logger;
     }
 
     /** {@inheritdoc} */
@@ -88,12 +94,21 @@ class BalanceHandler implements BalanceHandlerInterface
      */
     private function update(User $user, Token $token, Money $amount, string $type): void
     {
-        $this->balanceFetcher->update(
-            $user->getId(),
-            $this->converter->convert($token),
-            $this->moneyWrapper->format($amount),
-            $type
-        );
+        try {
+            $this->balanceFetcher->update(
+                $user->getId(),
+                $this->converter->convert($token),
+                $this->moneyWrapper->format($amount),
+                $type
+            );
+        } catch (BalanceException $exception) {
+            $this->logger->error(
+                "Failed to update '{$user->getEmail()}' balance for {$token->getSymbol()}.
+                Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$exception->getMessage()}"
+            );
+
+            throw $exception;
+        }
 
         if (!in_array($token, $user->getRelatedTokens()) && $token->getId()) {
             $user->addRelatedToken($token);
