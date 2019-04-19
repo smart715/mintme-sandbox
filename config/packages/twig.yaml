@@ -14,3 +14,4 @@ twig:
         prelaunch: '@App\Exchange\Trade\Config\PrelaunchConfig'
         google_tracking_id: '%google_tracking_id%'
         tawk_api_key: '%tawk_api_key%'
+        is_hacker_allowed: '%is_hacker_allowed%'

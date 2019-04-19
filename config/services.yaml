@@ -132,6 +132,26 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
+    wallet:
+        class: 'App\Wallet\Wallet'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: payments }
+
+    trader:
+        class: 'App\Exchange\Trade\Trader'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: exchange }
+
+    balancer:
+        class: 'App\Exchange\Balance\BalanceHandler'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: exchange }
 
     App\Manager\UserManager:
         arguments:
@@ -150,6 +170,10 @@ services:
     App\Security\PrelaunchVoter:
         arguments:
             $env: "%kernel.environment%"
+
+    App\Security\HackerVoter:
+        arguments:
+            $isHackerAllowed: "%is_hacker_allowed%"
 
     App\Mailer\Mailer:
         arguments:
