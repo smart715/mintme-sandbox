@@ -417,6 +417,25 @@ nav.top-navbar
   -webkit-transform-origin: 0 0
   margin-bottom: -25px
 
+.pwdmeter
+  margin-top: -1.5rem
+
+meter
+  width: 100%
+  height: .5em
+  /* Applicable only to Firefox
+  background: none
+  background-color: $grey-light
+  &::-webkit-meter-bar
+    background: none
+    background-color: $grey-light
+
+@for $i from 1 to length($meterbg-list)+1
+  meter[value="#{$i}"]::-webkit-meter-optimum-value
+    background: nth($meterbg-list,$i)
+  meter[value="#{$i}"]::-moz-meter-bar
+    background: nth($meterbg-list,$i)
+
 @media (min-width: 992px)
   .resetlabel
     position: absolute
