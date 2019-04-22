@@ -12,9 +12,9 @@ use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Utils\Converter\TokenNameConverter;
+use App\Utils\Converter\String\DashStringStrategy;
+use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
-use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -54,8 +54,6 @@ class TokenController extends Controller
     /** @var TraderInterface */
     protected $trader;
 
-    /** @var TokenNameNormalizerInterface */
-    private $tokenNameNormalizer;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -64,8 +62,7 @@ class TokenController extends Controller
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketManager,
         TraderInterface $trader,
-        NormalizerInterface $normalizer,
-        TokenNameNormalizerInterface $tokenNameNormalizer
+        NormalizerInterface $normalizer
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -73,7 +70,6 @@ class TokenController extends Controller
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
         $this->trader = $trader;
-        $this->tokenNameNormalizer = $tokenNameNormalizer;
 
         parent::__construct($normalizer);
     }
@@ -93,7 +89,7 @@ class TokenController extends Controller
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
 
-        $dashedName = $this->tokenNameNormalizer->dashed($name);
+        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
             return $this->redirectToOwnToken($tab);
@@ -223,7 +219,7 @@ class TokenController extends Controller
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
-        $tokenDashed = $this->tokenNameNormalizer->dashed($token->getName());
+        $tokenDashed = (new StringConverter(new DashStringStrategy()))->convert($token->getName());
 
         return $this->redirectToRoute('token_show', [
             'name' => $tokenDashed,

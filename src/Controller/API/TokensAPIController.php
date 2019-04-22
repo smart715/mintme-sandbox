@@ -11,8 +11,9 @@ use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Serializer\TradableNormalizer;
+use App\Utils\Converter\String\ParseStringStrategy;
+use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverter;
-use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -64,10 +65,9 @@ class TokensAPIController extends FOSRestController
     public function update(
         ParamFetcherInterface $request,
         BalanceHandlerInterface $balanceHandler,
-        TokenNameNormalizerInterface $tokenNameNormalizer,
         string $name
     ): View {
-        $name = $tokenNameNormalizer->parse($name);
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
         $token = $this->tokenManager->findByName($name);
 

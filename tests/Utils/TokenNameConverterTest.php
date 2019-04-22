@@ -7,7 +7,6 @@ use App\Entity\Token\Token;
 use App\Exchange\Config\Config;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\TokenNameConverter;
-use App\Utils\Converter\TokenNameNormalizerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

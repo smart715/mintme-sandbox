@@ -8,6 +8,8 @@ use App\Entity\Token\Token;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
 use App\Repository\TokenRepository;
+use App\Utils\Converter\String\ParseStringStrategy;
+use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverter;
 use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Fetcher\ProfileFetcherInterface;
@@ -31,22 +33,17 @@ class TokenManager implements TokenManagerInterface
     /** @var Config */
     private $config;
 
-    /** @var TokenNameNormalizerInterface */
-    private $tokenNameNormalizer;
-
     public function __construct(
         EntityManagerInterface $em,
         ProfileFetcherInterface $profileFetcher,
         TokenStorageInterface $storage,
         CryptoManagerInterface $cryptoManager,
-        TokenNameNormalizerInterface $tokenNameNormalizer,
         Config $config
     ) {
         $this->repository = $em->getRepository(Token::class);
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
-        $this->tokenNameNormalizer = $tokenNameNormalizer;
         $this->config = $config;
     }
 
@@ -69,7 +66,7 @@ class TokenManager implements TokenManagerInterface
             )
         )
         ) {
-            $name = $this->tokenNameNormalizer->parse($name);
+            $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
             $token = $this->repository->findByName($name);
 
