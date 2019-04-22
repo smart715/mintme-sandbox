@@ -1,3 +1,12 @@
+import Passwordmeter from '../components/PasswordMeter';
+
+new Vue({
+    el: '#passwordmeter',
+    components: {Passwordmeter},
+    data: {
+        password: '',
+    },
+});
 import {required, email} from 'vuelidate/lib/validators';
 
 new Vue({

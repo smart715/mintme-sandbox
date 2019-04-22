@@ -12,6 +12,8 @@ Encore
     .addEntry('wallet', './assets/js/wallet.js')
     .addEntry('pair', './assets/js/pair.js')
     .addEntry('referral', './assets/js/referral.js')
+    .addEntry('register', './assets/js/register.js')
+    .addEntry('reset', './assets/js/reset.js')
     .addEntry('token_creation', './assets/js/token_creation.js')
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('profile_creation', './assets/js/profile_creation.js')
