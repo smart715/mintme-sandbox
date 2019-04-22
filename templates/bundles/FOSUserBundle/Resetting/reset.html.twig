@@ -3,3 +3,7 @@
 {% block fos_user_content %}
     {{ include("@FOSUser/Resetting/reset_content.html.twig") }}
 {% endblock fos_user_content %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/reset.js') }}"></script>
+{% endblock %}
