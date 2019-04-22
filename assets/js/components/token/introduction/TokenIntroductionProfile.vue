@@ -98,7 +98,7 @@
                             </social-sharing>
                         </b-dropdown>
                         <div class="tooltip-static tooltip-static-left">
-                            Do you want to help token creator? Spread the world!
+                            Do you want to help your token grow? Spread the word!
                         </div>
                     </div>
                     <div class="col-md-12 text-left" v-if="editingUrls">
