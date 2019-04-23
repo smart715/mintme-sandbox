@@ -5,11 +5,7 @@ namespace App\Utils\Converter\String;
 /***
  * Class DashStringStrategy
  *
- * - Convert all spaces to dashes
- *
- * - Trim all spaces and dashes in string
- * - reduce contiguous spaces to 1 space
- * - convert mixed spaces and dashed to 1 dash
+ * - Convert all spaces to dashes of ParseStringStrategy
  *
  * @package App\Utils\Converter
  */
