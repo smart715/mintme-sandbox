@@ -2,16 +2,21 @@
 
 namespace App\Security;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class HackerVoter extends Voter
 {
+    /** @var RequestStack */
+    private $requestStack;
+
     /** @var bool */
     private $isHackerAllowed;
 
-    public function __construct(bool $isHackerAllowed)
+    public function __construct(RequestStack $requestStack, bool $isHackerAllowed)
     {
+        $this->requestStack = $requestStack;
         $this->isHackerAllowed = $isHackerAllowed;
     }
 
@@ -24,6 +29,18 @@ class HackerVoter extends Voter
     /** {@inheritdoc} */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
-        return $this->isHackerAllowed;
+        return $this->isHackerAllowed && $this->isHostAllowed(
+            $this->requestStack->getCurrentRequest()->getHost()
+        );
+    }
+
+    private function isHostAllowed(string $host): bool
+    {
+        return (bool)preg_match($this->buildHostPattern(), $host);
+    }
+
+    private function buildHostPattern(): string
+    {
+        return "/^(localhost|[\w\-]{1,}\.mintme\.abchosting\.(abc|org))$/";
     }
 }
