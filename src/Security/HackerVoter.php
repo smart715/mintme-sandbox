@@ -30,7 +30,7 @@ class HackerVoter extends Voter
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         return $this->isHackerAllowed && $this->isHostAllowed(
-            $this->requestStack->getCurrentRequest()->getHost()
+            (string)parse_url($this->requestStack->getCurrentRequest()->getUri(), PHP_URL_HOST)
         );
     }
 
@@ -41,6 +41,6 @@ class HackerVoter extends Voter
 
     private function buildHostPattern(): string
     {
-        return "/^(localhost|[\w\-]{1,}\.mintme\.abchosting\.(abc|org))$/";
+        return "/^(localhost|(www\.)?[\w\-]{1,}\.mintme\.abchosting\.(abc|org))$/";
     }
 }
