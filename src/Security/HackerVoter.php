@@ -30,13 +30,13 @@ class HackerVoter extends Voter
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         return $this->isHackerAllowed && $this->isHostAllowed(
-                $this->requestStack->getCurrentRequest()->getHost()
-            );
+            $this->requestStack->getCurrentRequest()->getHost()
+        );
     }
 
     private function isHostAllowed(string $host): bool
     {
-        return preg_match($this->buildHostPattern(), $host);
+        return (bool)preg_match($this->buildHostPattern(), $host);
     }
 
     private function buildHostPattern(): string
