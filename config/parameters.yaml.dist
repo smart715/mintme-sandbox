@@ -45,5 +45,6 @@ parameters:
         coin: 8
         token: 4
 
-    # Show admin menu for testers. SET TO FALSE ON PRODUCTION
+    # Show hacker menu for testers. Works only on 'localhost' and 'mintme.abchosting.(abc|org)' domains.
+    # SET TO FALSE ON PRODUCTION
     is_hacker_allowed: true
