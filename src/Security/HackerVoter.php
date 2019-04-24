@@ -30,7 +30,7 @@ class HackerVoter extends Voter
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         return $this->isHackerAllowed && $this->isHostAllowed(
-            (string)parse_url($this->requestStack->getCurrentRequest()->getUri(), PHP_URL_HOST)
+            $this->requestStack->getCurrentRequest()->getHttpHost()
         );
     }
 
