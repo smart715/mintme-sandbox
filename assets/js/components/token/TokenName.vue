@@ -1,6 +1,6 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
-        <template v-if="allowEdit">
+        <template v-if="editable">
             <input
                 type="text"
                 v-model.trim="$v.newName.$model"
@@ -34,7 +34,6 @@ Vue.use(Toasted, {
 });
 
 const HTTP_NO_CONTENT = 204;
-const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenName',
@@ -69,7 +68,12 @@ export default {
     },
     methods: {
         editName: function() {
-            if (!this.allowEdit) {
+            if (!this.editable) {
+                return;
+            }
+
+            if (null === this.isTokenExchanged || this.isTokenExchanged) {
+                this.$toasted.error('You need all your tokens to change token\'s name');
                 return;
             }
 
@@ -93,7 +97,7 @@ export default {
                 this.$toasted.error('Token name can have at least 4 symbols');
                 return;
             } else if (!this.$v.newName.maxLength) {
-                this.$toasted.error('Token name can not be longer than 255 characters');
+                this.$toasted.error('Token name can not be longer than 60 characters');
                 return;
             }
 
@@ -110,8 +114,10 @@ export default {
                     });
                 }
             }, (error) => {
-                if (error.response.status === HTTP_BAD_REQUEST) {
-                    this.$toasted.error('Invalid token name');
+                if (!error.response) {
+                    this.$toasted.error('Network error');
+                } else if (error.response.data.message) {
+                    this.$toasted.error(error.response.data.message);
                 } else {
                     this.$toasted.error('An error has ocurred, please try again later');
                 }
@@ -127,18 +133,13 @@ export default {
             this.icon = 'edit';
         },
     },
-    computed: {
-        allowEdit: function() {
-          return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
-        },
-    },
     validations() {
         return {
             newName: {
                 required,
                 alphaNum,
                 minLength: minLength(4),
-                maxLength: maxLength(255),
+                maxLength: maxLength(60),
             },
         };
     },
