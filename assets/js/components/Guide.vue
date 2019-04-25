@@ -15,7 +15,7 @@
                     <h5 class="font-bold">
                         <slot name="header"></slot>
                     </h5>
-                    <p>
+                    <p class="overflow-wrap-break-word">
                     <slot name="body"></slot>
                     </p>
                 </div>
