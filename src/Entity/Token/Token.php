@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
- * @UniqueEntity("name")
+ * @UniqueEntity("name", message="Token name is already taken")
  * @UniqueEntity("address")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -36,7 +36,7 @@ class Token implements TradebleInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Regex("/^[a-zA-Z0-9 ]+$/")
-     * @Assert\Length(min = 4, max = 255)
+     * @Assert\Length(min = 4, max = 60)
      * @Groups({"API"})
      * @var string
      */

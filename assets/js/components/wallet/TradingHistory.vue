@@ -8,6 +8,9 @@
                 :fields="fields"
                 :current-page="currentPage"
                 :per-page="perPage">
+                <template slot="market" slot-scope="row">
+                    <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                </template>
                  <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
                  <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
             </b-table>
@@ -37,9 +40,11 @@
 import {Decimal} from 'decimal.js';
 import {toMoney} from '../../utils';
 import {WSAPI} from '../../utils/constants';
+import FiltersMixin from '../../mixins/filters';
 
 export default {
     name: 'TradingHistory',
+    mixins: [FiltersMixin],
     data() {
         return {
             history: null,
@@ -51,7 +56,13 @@ export default {
                 market: {
                     label: 'Name',
                     sortable: true,
-                    formatter: (market) => market.quote.symbol + '/' + market.base.symbol,
+                    formatter: (market) => {
+                        let name = market.quote.symbol + '/' + market.base.symbol;
+                        return {
+                            full: name,
+                            truncate: this.truncateFunc(name, 15),
+                        };
+                    },
                 },
                 amount: {
                     label: 'Amount',
