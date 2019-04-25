@@ -17,7 +17,7 @@
             <div class="card-body">
                 <div class="row">
                     <div v-if="immutableBalance"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0"
+                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
                         >
                         Your {{ this.market.quote.symbol }}:
                         <span class="text-white">
@@ -136,6 +136,7 @@
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
+import FiltersMixin from '../../mixins/filters';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 
@@ -145,7 +146,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, FiltersMixin],
     props: {
         loginUrl: String,
         signupUrl: String,

@@ -17,6 +17,9 @@
                 :fields="fields"
                 :current-page="currentPage"
                 :per-page="perPage">
+                <template slot="name" slot-scope="row">
+                    <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                </template>
                 <template slot="action" slot-scope="row">
                     <a @click="removeOrderModal(row.item)">
                         <span class="icon-cancel c-pointer"></span>
@@ -44,6 +47,7 @@
 </template>
 <script>
 import WebSocketMixin from '../../mixins/websocket';
+import FiltersMixin from '../../mixins/filters';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
@@ -51,7 +55,7 @@ import {toMoney} from '../../utils';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, FiltersMixin],
     components: {
         ConfirmModal,
     },
@@ -71,7 +75,16 @@ export default {
             fields: {
                 date: {label: 'Date', sortable: true},
                 type: {label: 'Type', sortable: true},
-                name: {label: 'Name', sortable: true},
+                name: {
+                    label: 'Name',
+                    sortable: true,
+                    formatter: (name) => {
+                        return {
+                            full: name,
+                            truncate: this.truncateFunc(name, 7),
+                        };
+                    },
+                },
                 amount: {label: 'Amount', sortable: true},
                 price: {label: 'Price', sortable: true},
                 total: {label: 'Total cost', sortable: true},
