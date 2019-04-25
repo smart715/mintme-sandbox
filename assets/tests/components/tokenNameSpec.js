@@ -100,9 +100,13 @@ describe('TokenName', () => {
     });
 
     it('can not be edited if token exchanged', (done) => {
+        const $toasted = {error: () => true};
         const localVue = mockVue();
         const wrapper = mount(TokenName, {
             localVue,
+            mocks: {
+                $toasted,
+            },
             propsData: {
                 name: 'foo',
                 csrfToken: 'csrfToken',

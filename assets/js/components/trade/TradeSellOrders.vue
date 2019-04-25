@@ -4,7 +4,7 @@
             <div class="card-header">
                 Sell Orders
                 <span class="card-header-icon">
-                    Total: {{ total }} {{ tokenName }}
+                    Total: {{ total }} <span v-b-tooltip:title="tokenName">{{ tokenName | truncate(7) }}</span>
                     <guide>
                         <template slot="header">
                             Sell Orders
@@ -58,9 +58,11 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
+import FiltersMixin from '../../mixins/filters';
 
 export default {
     name: 'TradeSellOrders',
+    mixins: [FiltersMixin],
     props: {
         ordersList: [Array, Object],
         tokenName: String,

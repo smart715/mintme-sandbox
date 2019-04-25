@@ -9,7 +9,7 @@
                     :current-page="currentPage"
                     :per-page="perPage">
                     <template slot="pair" slot-scope="row">
-                        <a class="text-white" :href="row.item.tokenUrl">{{ row.value }}</a>
+                        <a class="text-white" v-b-tooltip:title="row.value.full" :href="row.item.tokenUrl">{{ row.value.truncate }}</a>
                     </template>
                 </b-table>
             </div>
@@ -31,10 +31,11 @@
 
 <script>
 import WebSocketMixin from '../../mixins/websocket';
+import FiltersMixin from '../../mixins/filters';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, FiltersMixin],
     data() {
         return {
             markets: null,
@@ -44,6 +45,12 @@ export default {
                 pair: {
                     label: 'Pair',
                     sortable: true,
+                    formatter: (pair) => {
+                        return {
+                            full: pair,
+                            truncate: this.truncateFunc(pair, 15),
+                        };
+                    },
                 },
                 change: {
                     label: 'Change',

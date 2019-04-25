@@ -7,14 +7,12 @@
                     <div slot="header">
                         <h5 class="font-bold">Statistics</h5>
                     </div>
-                    <div slot="body">
-                        <p>
-                            Statistics associated with {{ market.quote.symbol }},
-                            here you can find out how token creator
-                            manage his tokens and if he set any restriction
-                            on token release.
-                        </p>
-                    </div>
+                    <template slot="body">
+                        Statistics associated with {{ market.quote.symbol }},
+                        here you can find out how token creator
+                        manage his tokens and if he set any restriction
+                        on token release.
+                    </template>
                 </guide>
             </div>
             <div class="card-body">
