@@ -18,6 +18,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -68,7 +69,7 @@ class TokensAPIController extends FOSRestController
         $this->denyAccessUnlessGranted('edit', $token);
 
         if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new BadRequestHttpException("Token is already on trade");
+            throw new BadRequestHttpException("You need all your tokens to change token's name");
         }
 
         $form = $this->createForm(TokenType::class, $token, [
@@ -81,7 +82,13 @@ class TokensAPIController extends FOSRestController
         }), false);
 
         if (!$form->isValid()) {
-            return $this->view($form, Response::HTTP_BAD_REQUEST);
+            /** @var FormError[] $nameErrors */
+            $nameErrors = $form->get('name')->getErrors();
+            $message = count($nameErrors) > 0
+                ? $nameErrors[0]->getMessage()
+                : 'Invalid name';
+
+            throw new BadRequestHttpException($message);
         }
 
         $this->em->persist($token);
