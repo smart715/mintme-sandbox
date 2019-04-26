@@ -7,6 +7,7 @@ use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Model\UserManagerInterface;
 
+/** @codeCoverageIgnore */
 class UserFixturesFactory extends AbstractFixturesFactory
 {
 

@@ -11,6 +11,7 @@ use Sonata\MediaBundle\Entity\BaseGallery;
  * @ORM\Table(name="media__gallery")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_gallery")
+ * @codeCoverageIgnore
  */
 class Gallery extends BaseGallery
 {

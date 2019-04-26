@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 
+/** @codeCoverageIgnore  */
 class ResetRequestType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
@@ -26,7 +27,7 @@ class ResetRequestType extends AbstractType
                 'label' => false,
                 'constraints' => [new Email(['message' => 'Invalid email address.']) ],
             ])
-        
+
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'attr' => [
                     'options' => [
@@ -42,7 +43,7 @@ class ResetRequestType extends AbstractType
             ])
         ;
     }
-    
+
     public function getBlockPrefix(): string
     {
         return '';

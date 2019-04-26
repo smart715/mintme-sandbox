@@ -2,6 +2,7 @@
 
 namespace App\Wallet\Model\Exception;
 
+/** @codeCoverageIgnore */
 class TypeException extends \Exception
 {
 

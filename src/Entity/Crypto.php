@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass="App\Repository\CryptoRepository")
  * @UniqueEntity("name")
  * @UniqueEntity("symbol")
+ * @codeCoverageIgnore
  */
 class Crypto implements TradebleInterface
 {

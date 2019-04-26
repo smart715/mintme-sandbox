@@ -11,6 +11,7 @@ use Sonata\ClassificationBundle\Entity\BaseCategory;
  * @ORM\Table(name="classification__category")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_category")
+ * @codeCoverageIgnore
  */
 class Category extends BaseCategory
 {
