@@ -2,6 +2,7 @@
 
 namespace App\Wallet\Deposit;
 
+use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
@@ -21,6 +22,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
     private $cryptoManager;
 
     private const GET_DEPOSIT_CREDENTIALS_METHOD = "get_deposit_credentials";
+    private const GET_DEPOSIT_FEE_METHOD = "get_fee";
 
     public const GET_TRANSACTIONS_METHOD = "get_transactions";
 
@@ -70,7 +72,22 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
             ]
         );
 
+        if ($response->getError()) {
+            throw new FetchException((string)json_encode($response->getError()));
+        }
+
         return $this->parseTransactions($response->getResult());
+    }
+
+    public function getFee(string $crypto): Money
+    {
+        $response = $this->jsonRpc->send(self::GET_DEPOSIT_FEE_METHOD, ['currency' => $crypto]);
+
+        if ($response->getError()) {
+            throw new FetchException((string)json_encode($response->getError()));
+        }
+
+        return new Money($response->getResult(), new Currency($crypto));
     }
 
     private function parseTransactions(array $transactions): array
