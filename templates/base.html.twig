@@ -49,7 +49,11 @@
                 Tawk_API.setAttributes({
                     'name'  : '{{ app.user.username|default('') }}',
                     'email' : '{{ app.user.username|default('') }}',
-                    'hash'  : '{{ app.user.getTawkHash(tawk_api_key)|default('') }}'
+                    'hash'  : '{{ app.user.getTawkHash(tawk_api_key)|default('') }}',
+                    'user' : '{{ app.user.username|default('') }}',
+                    'token' : '{{ app.user.getProfile().getToken().getName()|default('') }}',
+                    'first-name' : '{{ app.user.getProfile().getFirstName()|default('') }}',
+                    'last-name' : '{{ app.user.getProfile().getLastName()|default('') }}'
                 }, function(error){});
             }
         </script>
