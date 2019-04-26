@@ -111,14 +111,34 @@ class WalletAPIController extends AbstractFOSRestController
      */
     public function getDepositAddresses(
         WalletInterface $depositCommunicator,
-        CryptoManagerInterface $tokenManager
+        CryptoManagerInterface $cryptoManager
     ): View {
 
         $depositAddresses = $depositCommunicator->getDepositCredentials(
             $this->getUser(),
-            $tokenManager->findAll()
+            $cryptoManager->findAll()
         );
 
         return $this->view($depositAddresses);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/deposit/{crypto}/fee", name="deposit_fee", options={"expose"=true})
+     */
+    public function getDepositFee(
+        string $crypto,
+        WalletInterface $depositCommunicator,
+        CryptoManagerInterface $cryptoManager
+    ): View {
+        $crypto = $cryptoManager->findBySymbol($crypto);
+
+        if (!$crypto) {
+            return $this->view([
+                'error' => 'Not found currency',
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+
+        return $this->view($depositCommunicator->getFee($crypto));
     }
 }

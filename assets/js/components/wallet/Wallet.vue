@@ -83,9 +83,9 @@
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
-            :fee="fee"
+            :fee="withdraw.fee"
             :withdraw-url="withdrawUrl"
-            :max-amount="amount"
+            :max-amount="withdraw.amount"
             :address-length="addressLength"
             :twofa="twofa"
             @close="closeWithdraw"
@@ -94,6 +94,9 @@
             :address="depositAddress"
             :visible="showDepositModal"
             :description="depositDescription"
+            :currency="selectedCurrency"
+            :fee="deposit.fee"
+            :min="deposit.min"
             @close="closeDeposit()"
         />
     </div>
@@ -135,10 +138,6 @@ export default {
                 trigger: 'mouseenter',
                 delay: [100, 200],
             },
-            depositTooltip: 'Deposit!',
-            withdrawTooltip: 'Withdraw!',
-            fee: '0',
-            amount: '0',
             predefinedTokenFields: {
                 name: {label: 'Name'},
                 available: {label: 'Amount'},
@@ -147,6 +146,14 @@ export default {
             tokenFields: {
                 name: {label: 'Name'},
                 available: {label: 'Amount'},
+            },
+            withdraw: {
+                fee: '0',
+                amount: '0',
+            },
+            deposit: {
+                fee: undefined,
+                min: undefined,
             },
         };
     },
@@ -221,7 +228,7 @@ export default {
         openWithdraw: function(currency, fee, amount) {
             this.showModal = true;
             this.selectedCurrency = currency;
-            this.fee = fee;
+            this.withdraw.fee = fee;
             this.amount = toMoney(amount);
         },
         closeWithdraw: function() {
@@ -230,12 +237,22 @@ export default {
         openDeposit: function(currency) {
             this.depositAddress = this.depositAddresses[currency] || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
+            this.selectedCurrency = currency;
+            this.deposit.fee = undefined;
+
+            this.$axios.retry.get(this.$routing.generate('deposit_fee', {
+                    crypto: currency,
+                }))
+                .then((res) => this.deposit.fee = res.data && parseFloat(res.data) !== 0.0 ?
+                    toMoney(res.data) :
+                    undefined
+                )
+                .catch(() => {
+                    this.$toasted.error('Can not update deposit fee status. Try again later.');
+                });
 
             // TODO: Get rid of hardcoded WEB
-            if (currency === 'WEB') {
-                this.depositDescription += ' Minimal amount to deposit is a 1 WEB.';
-            }
-
+            this.deposit.min = currency === 'WEB' ? toMoney(1) : undefined;
             this.showDepositModal = true;
         },
         closeDeposit: function() {
