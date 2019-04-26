@@ -14,6 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
 
+/** @codeCoverageIgnore  */
 class TokenCreateType extends AbstractType
 {
     /** @var NameTransformer  */
@@ -34,15 +35,7 @@ class TokenCreateType extends AbstractType
                     'pattern' => "[a-zA-Z0-9\-\s]*",
                     'title' => 'Invalid token name.',
                 ],
-                'constraints' => [
-                    new Regex([
-                        'pattern' => '/^[a-zA-Z0-9\-\s]*$/',
-                        'message' => 'Invalid token name.' ,
-                        'match' => true,
-                    ]),
-                ],
-            ])
-        ;
+            ]);
 
         $builder->get('name')
             ->addModelTransformer($this->nameTransformer);

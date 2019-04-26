@@ -1,6 +1,9 @@
 phpunit:
 	./vendor/bin/simple-phpunit
 
+phpunit-c:
+	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
+
 karma:
 	npm run unit
 

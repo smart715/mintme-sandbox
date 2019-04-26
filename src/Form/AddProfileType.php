@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/** @codeCoverageIgnore  */
 class AddProfileType extends AbstractType
 {
     /** @var NameTransformer  */
@@ -21,7 +22,6 @@ class AddProfileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-
             ->add('firstName', TextType::class, [
                 'label' => 'First name:',
                 'attr' => [

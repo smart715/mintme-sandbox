@@ -11,6 +11,7 @@ use Sonata\ClassificationBundle\Entity\BaseCollection;
  * @ORM\Table(name="classification__collection")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_collection")
+ * @codeCoverageIgnore
  */
 class Collection extends BaseCollection
 {

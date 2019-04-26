@@ -14,6 +14,7 @@ use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Exception;
+use Money\Money;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -132,5 +133,10 @@ class Wallet implements WalletInterface
     public function getDepositCredential(User $user, Crypto $crypto): Address
     {
         return $this->getDepositCredentials($user, [$crypto])[$crypto->getSymbol()];
+    }
+
+    public function getFee(Crypto $crypto): Money
+    {
+        return $this->depositCommunicator->getFee($crypto->getSymbol());
     }
 }

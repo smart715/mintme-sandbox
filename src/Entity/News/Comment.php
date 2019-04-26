@@ -11,6 +11,7 @@ use Sonata\NewsBundle\Entity\BaseComment;
  * @ORM\Table(name="news__comment")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_comment")
+ * @codeCoverageIgnore
  */
 class Comment extends BaseComment
 {

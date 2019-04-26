@@ -1,6 +1,6 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
-        <template v-if="allowEdit">
+        <template v-if="editable">
             <input
                 type="text"
                 v-model.trim="$v.newName.$model"
@@ -71,7 +71,12 @@ export default {
     },
     methods: {
         editName: function() {
-            if (!this.allowEdit) {
+            if (!this.editable) {
+                return;
+            }
+
+            if (null === this.isTokenExchanged || this.isTokenExchanged) {
+                this.$toasted.error('You need all your tokens to change token\'s name');
                 return;
             }
 
@@ -95,7 +100,7 @@ export default {
                 this.$toasted.error('Token name can have at least 4 symbols');
                 return;
             } else if (!this.$v.newName.maxLength) {
-                this.$toasted.error('Token name can not be longer than 255 characters');
+                this.$toasted.error('Token name can not be longer than 60 characters');
                 return;
             }
 
@@ -129,18 +134,13 @@ export default {
             this.icon = 'edit';
         },
     },
-    computed: {
-        allowEdit: function() {
-          return this.editable && null !== this.isTokenExchanged && !this.isTokenExchanged;
-        },
-    },
     validations() {
         return {
             newName: {
                 required,
                 tokenContain: tokenContain,
                 minLength: minLength(4),
-                maxLength: maxLength(255),
+                maxLength: maxLength(60),
             },
         };
     },

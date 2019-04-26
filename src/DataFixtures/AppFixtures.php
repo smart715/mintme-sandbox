@@ -6,6 +6,7 @@ use App\DataFixtures\Factory\TokenFixturesFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
+/** @codeCoverageIgnore */
 class AppFixtures extends Fixture
 {
     /** @var TokenFixturesFactory */

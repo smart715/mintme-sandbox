@@ -11,6 +11,7 @@ use Sonata\ClassificationBundle\Entity\BaseTag;
  * @ORM\Table(name="classification__tag")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_tag")
+ * @codeCoverageIgnore
  */
 class Tag extends BaseTag
 {

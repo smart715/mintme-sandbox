@@ -11,6 +11,7 @@ use Sonata\ClassificationBundle\Entity\BaseContext;
  * @ORM\Table(name="classification__context")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_context")
+ * @codeCoverageIgnore
  */
 class Context extends BaseContext
 {
