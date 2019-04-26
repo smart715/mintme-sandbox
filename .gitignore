@@ -22,3 +22,5 @@ public/build
 /phpstan
 
 .vscode
+/coverage-php
+/coverage-js

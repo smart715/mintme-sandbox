@@ -2,7 +2,7 @@ import '../../js/main';
 import {mount} from '../testHelper';
 import TokenTradeChart from '../../js/components/trade/TradeChart';
 
-describe('TokenTradeChart', () => {
+describe('TradeChart', () => {
     describe('data field', () => {
         describe(':chartData', () => {
             context('when fetch market status from server', () => {

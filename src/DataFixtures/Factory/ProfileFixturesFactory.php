@@ -6,6 +6,7 @@ use App\DataFixtures\FakerHelper;
 use App\Entity\Profile;
 use Doctrine\Common\Persistence\ObjectManager;
 
+/** @codeCoverageIgnore */
 class ProfileFixturesFactory extends AbstractFixturesFactory
 {
 

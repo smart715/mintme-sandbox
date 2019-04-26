@@ -84,7 +84,7 @@ export default {
                 labelMap: {
                     '日K': 'Indexes',
                 },
-                showMA: true,
+                showMA: false,
                 showDataZoom: true,
                 start: 70,
                 end: 100,

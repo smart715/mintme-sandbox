@@ -7,6 +7,7 @@ use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/** @codeCoverageIgnore  */
 class CaptchaLoginType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
