@@ -17,9 +17,17 @@
                         </copy-link>
                     </code>
                     <div class="clearfix"></div>
-                    <p class="text-center mt-2">
-                        {{ description }}
-                    </p>
+                    <b-row>
+                        <b-col>
+                            <p class="text-center mt-2">
+                                {{ description }}
+                            </p>
+                        </b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col v-if="min" cols="auto" class="text-left">Minimal value: {{ min }} {{ currency }}</b-col>
+                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ currency }}</b-col>
+                    </b-row>
                 </div>
                 <div class="pt-2 text-center">
                     <button
@@ -47,6 +55,9 @@ export default {
         visible: Boolean,
         address: String,
         description: String,
+        currency: String,
+        min: String,
+        fee: String,
     },
     methods: {
         closeModal: function() {
