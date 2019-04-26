@@ -6,6 +6,7 @@ use App\DataFixtures\FakerHelper;
 use App\Entity\Token\Token;
 use Doctrine\Common\Persistence\ObjectManager;
 
+/** @codeCoverageIgnore */
 class TokenFixturesFactory extends AbstractFixturesFactory
 {
 

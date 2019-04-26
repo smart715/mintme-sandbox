@@ -12,11 +12,16 @@ RUN apt-get update && apt-get install -y \
     libfontconfig \
     netcat
 
+RUN yes | pecl install xdebug \
+    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
+
 RUN touch /usr/local/etc/php/php.ini
 RUN echo 'memory_limit=512M' >> /usr/local/etc/php/php.ini
 
 # NodeJs
-RUN wget -qO- https://deb.nodesource.com/setup_10.x | bash -
+RUN rm -rf /var/lib/apt/lists/ && wget -qO- https://deb.nodesource.com/setup_10.x | bash -
 
 RUN apt-get install -y nodejs
 RUN apt-get install -y build-essential

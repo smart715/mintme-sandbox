@@ -14,6 +14,7 @@ module.exports = function(config) {
     basePath: '',
     frameworks: ['mocha', 'requirejs', 'chai', 'es6-shim'],
     files: [
+      'node_modules/babel-polyfill/dist/polyfill.js',
       'test-main.js',
       {pattern: 'assets/tests/**/*Spec.js', included: false},
       {pattern: 'assets/js/*.js', included: false},

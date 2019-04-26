@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity("name", message="Token name is already taken")
  * @UniqueEntity("address")
  * @ORM\HasLifecycleCallbacks()
+ * @codeCoverageIgnore
  */
 class Token implements TradebleInterface
 {

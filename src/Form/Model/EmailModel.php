@@ -6,6 +6,7 @@ use App\Validator\Constraints\TwoFactorAuth;
 use App\Validator\Constraints\UserEmail;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/** @codeCoverageIgnore  */
 class EmailModel
 {
     /**

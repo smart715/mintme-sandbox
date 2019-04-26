@@ -11,6 +11,7 @@ use Sonata\NewsBundle\Entity\BasePost;
  * @ORM\Table(name="news__post")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_post")
+ * @codeCoverageIgnore
  */
 class Post extends BasePost
 {
