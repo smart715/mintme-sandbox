@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class Transaction
 {
     /** @var \DateTime */

@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\GoogleAuthenticatorEntryRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @codeCoverageIgnore
  */
 class GoogleAuthenticatorEntry
 {
@@ -37,7 +38,7 @@ class GoogleAuthenticatorEntry
      * @var string[]|null
      */
     protected $backupCodes;
-    
+
 
     public function getId(): int
     {

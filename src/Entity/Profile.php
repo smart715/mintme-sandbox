@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @codeCoverageIgnore
  */
 class Profile
 {

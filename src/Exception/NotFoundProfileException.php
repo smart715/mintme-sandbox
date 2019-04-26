@@ -2,6 +2,7 @@
 
 namespace App\Exception;
 
+/** @codeCoverageIgnore  */
 class NotFoundProfileException extends \Exception
 {
 

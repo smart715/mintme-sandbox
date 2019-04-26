@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\PendingWithdrawRepository")
  * @ORM\Table(name="pending_withdraw")
  * @ORM\HasLifecycleCallbacks()
+ * @codeCoverageIgnore
  */
 class PendingWithdraw
 {

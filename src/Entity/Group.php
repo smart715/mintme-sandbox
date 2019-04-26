@@ -11,6 +11,7 @@ use Sonata\UserBundle\Entity\BaseGroup;
  * @ORM\Table(name="fos_user_group")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_group")
+ * @codeCoverageIgnore
  */
 class Group extends BaseGroup
 {
