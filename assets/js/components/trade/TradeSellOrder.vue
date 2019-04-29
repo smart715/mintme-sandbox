@@ -200,7 +200,7 @@ export default {
         },
         showModalAction: function({result, message} = {}) {
             this.modalSuccess = 1 === result;
-            this.modalTitle = message ? message : 'Order Failed';
+            this.modalTitle = message ? message : (1 === result ? 'Order Created' : 'Order Failed');
             this.showModal = true;
         },
         resetOrder: function() {

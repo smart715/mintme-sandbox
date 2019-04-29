@@ -67,4 +67,26 @@ describe('TradeBuyOrder', () => {
             done();
         });
     });
+
+    it('trigger showModalAction correctly', function () {
+        wrapper.vm.showModalAction();
+        expect(wrapper.vm.modalSuccess).to.deep.equals(false);
+        expect(wrapper.vm.modalTitle).to.deep.equals('Order Failed');
+
+        wrapper.vm.showModalAction({result: 2});
+        expect(wrapper.vm.modalSuccess).to.deep.equals(false);
+        expect(wrapper.vm.modalTitle).to.deep.equals('Order Failed');
+
+        wrapper.vm.showModalAction({result: 1});
+        expect(wrapper.vm.modalSuccess).to.deep.equals(true);
+        expect(wrapper.vm.modalTitle).to.deep.equals('Order Created');
+
+        wrapper.vm.showModalAction({result: 2});
+        expect(wrapper.vm.modalSuccess).to.deep.equals(false);
+        expect(wrapper.vm.modalTitle).to.deep.equals('Order Failed');
+
+        wrapper.vm.showModalAction({result: 1, message: 'Done'});
+        expect(wrapper.vm.modalSuccess).to.deep.equals(true);
+        expect(wrapper.vm.modalTitle).to.deep.equals('Done');
+    });
 });
