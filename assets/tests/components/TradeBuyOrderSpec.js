@@ -68,7 +68,7 @@ describe('TradeBuyOrder', () => {
         });
     });
 
-    it('trigger showModalAction correctly', function () {
+    it('trigger showModalAction correctly', function() {
         wrapper.vm.showModalAction();
         expect(wrapper.vm.modalSuccess).to.deep.equals(false);
         expect(wrapper.vm.modalTitle).to.deep.equals('Order Failed');
