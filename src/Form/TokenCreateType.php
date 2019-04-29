@@ -11,6 +11,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\RegexValidator;
 
 /** @codeCoverageIgnore  */
 class TokenCreateType extends AbstractType
@@ -25,8 +27,15 @@ class TokenCreateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, ['label' => 'Token name:', 'attr' => ['maxLength' => 60]])
-        ;
+            ->add('name', TextType::class, [
+                'label' => 'Token name',
+                'attr' => [
+                    'minlength' => Token::NAME_MIN_LENGTH,
+                    'maxlength' => Token::NAME_MAX_LENGTH,
+                    'pattern' => "[a-zA-Z0-9\-\s]*",
+                    'title' => 'Invalid token name.',
+                ],
+            ]);
 
         $builder->get('name')
             ->addModelTransformer($this->nameTransformer);
