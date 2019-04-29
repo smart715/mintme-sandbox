@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Exchange\MarketInfo;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MarketInfoRepository")
