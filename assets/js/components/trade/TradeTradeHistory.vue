@@ -70,9 +70,11 @@ import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
+import WebSocketMixin from '../../mixins/websocket';
 
 export default {
     name: 'TradeTradeHistory',
+    mixins: [WebSocketMixin],
     props: {
         market: Object,
         precision: Number,
@@ -149,18 +151,38 @@ export default {
         },
     },
     mounted: function() {
-        this.updateHistory();
-        this.$store.state.interval.make(this.updateHistory, 10000);
+        this.updateHistory().then(() => {
+            this.addOnOpenHandler(() => {
+                this.sendMessage(JSON.stringify({
+                    method: 'deals.subscribe',
+                    params: [this.market.identifier],
+                    id: parseInt(Math.random().toString().replace('0.', '')),
+                }));
+            });
+
+            this.addMessageHandler((response) => {
+                if ('deals.update' === response.method) {
+                    this.updateHistory();
+                }
+            });
+        });
     },
     methods: {
         updateHistory: function() {
-            this.$axios.single.get(this.$routing.generate('executed_orders', {
-                'base': this.market.base.symbol,
-                'quote': this.market.quote.symbol,
-            })).then((result) => {
-                this.history = result.data;
-                this.$refs.table.refresh();
-            }).catch((error) => { });
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(this.$routing.generate('executed_orders', {
+                    'base': this.market.base.symbol,
+                    'quote': this.market.quote.symbol,
+                })).then((result) => {
+                    this.history = result.data;
+
+                    if (this.$refs.table) {
+                        this.$refs.table.refresh();
+                    }
+
+                    resolve();
+                }).catch(reject);
+            });
         },
         truncateFullName: function(profile) {
             let first = profile.firstName;

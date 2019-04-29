@@ -86,6 +86,7 @@ a
   font-size: 12px
   color: black
   border-radius: 0.6rem
+
   &.tooltip-static-left
     &:before
       content: ''
@@ -186,6 +187,19 @@ a
         padding-left: 1.5rem
 
   tbody
+    scrollbar-color: $primary-light $white
+
+    &::-webkit-scrollbar
+      width: 10px
+      height: 15px
+
+    &::-webkit-scrollbar-track-piece
+      background-color: $white
+
+    &::-webkit-scrollbar-thumb:vertical
+      height: 30px
+      background-color: $primary-light
+
     tr
       &:nth-child(odd)
         background-color: #00334E
