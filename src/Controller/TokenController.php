@@ -12,6 +12,8 @@ use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\String\DashStringStrategy;
+use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -20,6 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +53,7 @@ class TokenController extends Controller
 
     /** @var TraderInterface */
     protected $trader;
+
 
     public function __construct(
         EntityManagerInterface $em,
@@ -84,6 +88,13 @@ class TokenController extends Controller
         ?string $tab,
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
+
+        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
+
+        if ($dashedName != $name) {
+            return $this->redirectToOwnToken($tab);
+        }
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
@@ -127,6 +138,16 @@ class TokenController extends Controller
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
+            
+            if ($this->tokenManager->isExisted($token)) {
+                $form->addError(new FormError('Token name is already exists.'));
+
+                return $this->render('pages/token_creation.html.twig', [
+                    'formHeader' => 'Create your own token',
+                    'form' => $form->createView(),
+                    'profileCreated' => true,
+                ]);
+            }
 
             if (null !== $profile) {
                 $token->setProfile($profile);
@@ -190,7 +211,7 @@ class TokenController extends Controller
         return $response;
     }
 
-    private function redirectToOwnToken(string $showtab): RedirectResponse
+    private function redirectToOwnToken(?string $showtab = 'trade'): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 
@@ -198,8 +219,10 @@ class TokenController extends Controller
             throw $this->createNotFoundException('User doesn\'t have a token created.');
         }
 
+        $tokenDashed = (new StringConverter(new DashStringStrategy()))->convert($token->getName());
+
         return $this->redirectToRoute('token_show', [
-            'name' => $token->getName(),
+            'name' => $tokenDashed,
             'tab' => $showtab,
         ]);
     }
