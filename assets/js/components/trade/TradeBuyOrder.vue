@@ -127,6 +127,7 @@
         </div>
         <order-modal
             :type="modalSuccess"
+            :title="modalTitle"
             :visible="showModal"
             @close="showModal = false"
         />
@@ -165,6 +166,7 @@ export default {
             useMarketPrice: false,
             action: 'buy',
             showModal: false,
+            modalTitle: '',
             modalSuccess: false,
         };
     },
@@ -182,17 +184,24 @@ export default {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
                 }), data)
-                    .then((response) => {
-                        if (response.data.result === 1) {
+                    .then(({data}) => {
+                        if (data.result === 1) {
                             this.resetOrder();
                         }
-                        this.showModalAction(response.data.result);
+                        this.showModalAction(data);
                     })
-                    .catch((error) => this.showModalAction());
+                    .catch((error) => {
+                        if (!error.status) {
+                            this.$toasted.error('Network Error!');
+                        } else {
+                            this.showModalAction(error)
+                        }
+                    });
             }
         },
-        showModalAction: function(result) {
+        showModalAction: function ({result, message}) {
             this.modalSuccess = 1 === result;
+            this.modalTitle = message ? message : 'Order Failed';
             this.showModal = true;
         },
         resetOrder: function() {

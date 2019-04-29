@@ -28,12 +28,8 @@ export default {
     },
     props: {
         type: Boolean,
+        title: String,
         visible: Boolean,
-    },
-    computed: {
-        title: function() {
-            return (this.type) ? 'Order Created' : 'Insufficient Balance';
-        },
     },
     methods: {
         closeModal: function() {

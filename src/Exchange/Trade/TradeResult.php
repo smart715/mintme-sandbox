@@ -12,14 +12,14 @@ class TradeResult
 
     private const MESSAGES = [
         self::SUCCESS =>
-            'Order has been placed.',
+            'ORDER CREATED',
 
         self::FAILED =>
             'Order has failed. Try again later.',
 
         self::INSUFFICIENT_BALANCE =>
-            'Order has failed because of insufficient balance',
-        
+            'Insufficient Balance',
+
         self::ORDER_NOT_FOUND =>
             'Order has not been found',
 
