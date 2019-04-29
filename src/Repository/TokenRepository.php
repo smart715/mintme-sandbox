@@ -13,6 +13,15 @@ class TokenRepository extends EntityRepository
         return $this->findOneBy(['name' => $name]);
     }
 
+    public function findByUrl(string $name): ?Token
+    {
+        return $this->createQueryBuilder('token')
+            ->where('REPLACE(token.name, \' \', \'-\' ) = (:name)')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /** @return Token[] */
     public function findTokensByPattern(string $pattern): array
     {
@@ -22,7 +31,6 @@ class TokenRepository extends EntityRepository
             ->orderBy('token.name', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 }

@@ -8,8 +8,8 @@
                     :precision="precision"
             />
         </div>
-        <div class="row px-0 mt-3">
-            <div class="col-12 col-lg-6 pr-lg-2">
+        <div class="row">
+            <div class="col-12 col-lg-6 mt-3 pr-lg-2">
                 <trade-buy-order
                         v-if="balanceLoaded"
                         :websocket-url="websocketUrl"
@@ -28,7 +28,7 @@
                     </div>
                 </template>
             </div>
-            <div class="col-12 col-lg-6 pl-lg-2">
+            <div class="col-12 col-lg-6 mt-3 pl-lg-2">
                 <trade-sell-order
                         v-if="balanceLoaded"
                         :websocket-url="websocketUrl"
@@ -50,15 +50,13 @@
             </div>
         </div>
         <div class="row">
-            <div class="col">
-                <trade-orders
-                        :orders-loaded="ordersLoaded"
-                        :buy-orders="buyOrders"
-                        :sell-orders="sellOrders"
-                        :market="market"
-                        :user-id="userId"
-                        :precision="precision" />
-            </div>
+            <trade-orders
+                :orders-loaded="ordersLoaded"
+                :buy-orders="buyOrders"
+                :sell-orders="sellOrders"
+                :market="market"
+                :user-id="userId"
+                :precision="precision" />
         </div>
         <div class="row px-0 mt-3">
             <trade-trade-history

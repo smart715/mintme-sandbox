@@ -197,7 +197,7 @@ services:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 
-    App\EventSubscriber\RequestSubscriber:
+    App\EventSubscriber\KernelSubscriber:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 
