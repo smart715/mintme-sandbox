@@ -331,7 +331,7 @@ class MarketHandler implements MarketHandlerInterface
                 break;
             }
 
-            $marketInfo = new MarketStatus($crypto, $token, $market);
+            $marketInfo = new MarketStatus($crypto, $market);
             $this->entityManager->persist($marketInfo);
             $this->entityManager->flush();
         }

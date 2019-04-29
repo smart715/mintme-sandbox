@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20190429195414 extends AbstractMigration
+final class Version20190429215204 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -22,9 +22,7 @@ final class Version20190429195414 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE market_status ADD token_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE market_status ADD CONSTRAINT FK_5BA4CE1041DEE7B9 FOREIGN KEY (token_id) REFERENCES token (id)');
-        $this->addSql('CREATE INDEX IDX_5BA4CE1041DEE7B9 ON market_status (token_id)');
+        $this->addSql('ALTER TABLE market_status ADD token_name VARCHAR(255) NOT NULL');
     }
 
     public function down(Schema $schema) : void
@@ -32,8 +30,6 @@ final class Version20190429195414 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE market_status DROP FOREIGN KEY FK_5BA4CE1041DEE7B9');
-        $this->addSql('DROP INDEX IDX_5BA4CE1041DEE7B9 ON market_status');
-        $this->addSql('ALTER TABLE market_status DROP token_id');
+        $this->addSql('ALTER TABLE market_status DROP token_name');
     }
 }

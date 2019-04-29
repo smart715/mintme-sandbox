@@ -31,11 +31,11 @@ class MarketStatus
     private $crypto;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token",cascade={"merge", "refresh", "persist"})
+     * @ORM\Column(type="string")
      * @Groups({"API"})
-     * @var Token|null
+     * @var string
      */
-    protected $token;
+    protected $tokenName;
 
     /**
      * @ORM\Column(type="string")
@@ -58,10 +58,10 @@ class MarketStatus
      */
     protected $dayVolume;
 
-    public function __construct(Crypto $crypto, Token $token, MarketInfo $marketInfo)
+    public function __construct(Crypto $crypto, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
-        $this->token = $token;
+        $this->tokenName = $marketInfo->getTokenName();
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getVolume()->getAmount();
