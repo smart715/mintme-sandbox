@@ -8,6 +8,10 @@ use App\Entity\Token\Token;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
 use App\Repository\TokenRepository;
+use App\Utils\Converter\String\ParseStringStrategy;
+use App\Utils\Converter\String\StringConverter;
+use App\Utils\Converter\TokenNameConverter;
+use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -50,7 +54,6 @@ class TokenManager implements TokenManagerInterface
         return $this->repository->find($id - $this->config->getOffset());
     }
 
-
     public function findByName(string $name): ?Token
     {
         if (!in_array(
@@ -63,12 +66,22 @@ class TokenManager implements TokenManagerInterface
             )
         )
         ) {
-            return $this->repository->findByName($name);
+            $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+            $token = $this->repository->findByName($name);
+
+            return $token ?? $this->repository->findByUrl($name);
         }
 
         return (new Token())->setName(strtoupper($name))->setCrypto(
             $this->cryptoManager->findBySymbol(strtoupper($name))
         );
+    }
+
+    /** {@inheritdoc} */
+    public function getTokensByPattern(string $pattern): array
+    {
+        return $this->repository->findTokensByPattern($pattern);
     }
 
     /** {@inheritdoc} */
@@ -101,7 +114,8 @@ class TokenManager implements TokenManagerInterface
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult
     {
-        if ($token !== $this->getOwnToken() || $token->getProfile()->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
+        if ($token !== $this->getOwnToken() ||
+            $token->getProfile()->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
             return $balanceResult;
         }
 
@@ -126,9 +140,12 @@ class TokenManager implements TokenManagerInterface
             : null;
     }
 
-    /** {@inheritdoc} */
-    public function getTokensByPattern(string $pattern): array
+    public function isExisted(Token $token): bool
     {
-        return $this->repository->findTokensByPattern($pattern);
+        $name = strtoupper(
+            str_replace(' ', '-', $token->getName())
+        );
+
+        return null !== $this->findByName($name);
     }
 }

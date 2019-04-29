@@ -10,6 +10,10 @@ use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Serializer\TradableNormalizer;
+use App\Utils\Converter\String\ParseStringStrategy;
+use App\Utils\Converter\String\StringConverter;
+use App\Utils\Converter\TokenNameConverter;
 use App\Utils\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -50,6 +54,7 @@ class TokensAPIController extends FOSRestController
         $this->cryptoManager = $cryptoManager;
     }
 
+
     /**
      * @Rest\View()
      * @Rest\Patch("/{name}", name="token_update")
@@ -58,8 +63,13 @@ class TokensAPIController extends FOSRestController
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
      */
-    public function update(ParamFetcherInterface $request, BalanceHandlerInterface $balanceHandler, string $name): View
-    {
+    public function update(
+        ParamFetcherInterface $request,
+        BalanceHandlerInterface $balanceHandler,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
@@ -81,6 +91,13 @@ class TokensAPIController extends FOSRestController
             return null !== $value;
         }), false);
 
+        if ($this->tokenManager->isExisted($token)) {
+            return $this->view(
+                'Token name is already exists.',
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
         if (!$form->isValid()) {
             /** @var FormError[] $nameErrors */
             $nameErrors = $form->get('name')->getErrors();
@@ -94,7 +111,7 @@ class TokensAPIController extends FOSRestController
         $this->em->persist($token);
         $this->em->flush();
 
-        return $this->view($token, Response::HTTP_NO_CONTENT);
+        return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
     }
 
     /**
