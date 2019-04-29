@@ -194,12 +194,12 @@ export default {
                         if (!error.status) {
                             this.$toasted.error('Network Error!');
                         } else {
-                            this.showModalAction(error)
+                            this.showModalAction();
                         }
                     });
             }
         },
-        showModalAction: function ({result, message}) {
+        showModalAction: function({result, message} = {}) {
             this.modalSuccess = 1 === result;
             this.modalTitle = message ? message : 'Order Failed';
             this.showModal = true;
