@@ -89,9 +89,11 @@
 <script>
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
-import {required, minLength, maxLength, maxValue, decimal, alphaNum, minValue} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
+
+const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
 export default {
     name: 'WithdrawModal',
@@ -193,7 +195,7 @@ export default {
             },
             address: {
                 required,
-                alphaNum,
+                tokenContain: tokenContain,
                 minLength: minLength(this.addressLength),
                 maxLength: maxLength(this.addressLength),
             },

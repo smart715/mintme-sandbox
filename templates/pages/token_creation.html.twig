@@ -12,9 +12,16 @@
                     </div>
                     <div class="card-body py-2">
                         {{ form_start(form) }}
-                        {{ form_row(form.name, {'attr': {'v-model': '$v.tokenName.$model','class' : 'form-control'}}) }}
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.alphaNum" class="text-danger text-center">
-                            Token name can contain alphabets and numbers
+                        {{ form_errors(form) }}
+                        {{ form_row(form.name, {'attr': {
+                            'v-model': '$v.tokenName.$model',
+                            'class' : 'form-control',
+                            'oninvalid': 'setCustomValidity("Invalid token name.")',
+                            'onchange': 'setCustomValidity("")',
+                            'oninput': 'setCustomValidity("")',
+                        }}) }}
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.tokenContain" class="text-danger text-center">
+                            Token name can contain alphabets, numbers, spaces and dashes
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
                             Token name must have at least 4 symbols
