@@ -30,33 +30,34 @@ class MarketStatus
      */
     private $crypto;
 
-    /**
-     * @ORM\Column(type="string")
-     * @Groups({"API"})
-     * @var string
-     */
-    protected $tokenName;
 
     /**
      * @ORM\Column(type="string")
      * @Groups({"API"})
      * @var string
      */
-    protected $openPrice;
+    private $tokenName;
 
     /**
      * @ORM\Column(type="string")
      * @Groups({"API"})
      * @var string
      */
-    protected $lastPrice;
+    private $openPrice;
 
     /**
      * @ORM\Column(type="string")
      * @Groups({"API"})
      * @var string
      */
-    protected $dayVolume;
+    private $lastPrice;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Groups({"API"})
+     * @var string
+     */
+    private $dayVolume;
 
     public function __construct(Crypto $crypto, MarketInfo $marketInfo)
     {
@@ -75,5 +76,45 @@ class MarketStatus
     public function setCrypto(Crypto $crypto): void
     {
         $this->crypto = $crypto;
+    }
+
+    public function getTokenName(): string
+    {
+        return $this->tokenName;
+    }
+
+    public function setTokenName(string $tokenName): void
+    {
+        $this->tokenName = $tokenName;
+    }
+
+    public function getOpenPrice(): string
+    {
+        return $this->openPrice;
+    }
+
+    public function setOpenPrice(string $openPrice): void
+    {
+        $this->openPrice = $openPrice;
+    }
+
+    public function getLastPrice(): string
+    {
+        return $this->lastPrice;
+    }
+
+    public function setLastPrice(string $lastPrice): void
+    {
+        $this->lastPrice = $lastPrice;
+    }
+
+    public function getDayVolume(): string
+    {
+        return $this->dayVolume;
+    }
+
+    public function setDayVolume(string $dayVolume): void
+    {
+        $this->dayVolume = $dayVolume;
     }
 }
