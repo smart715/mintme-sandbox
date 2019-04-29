@@ -20,12 +20,14 @@
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit} from '@fortawesome/free-solid-svg-icons';
-import {faCheck} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import {required, minLength, maxLength, alphaNum} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+
+const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
+
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -33,7 +35,8 @@ Vue.use(Toasted, {
     duration: 5000,
 });
 
-const HTTP_NO_CONTENT = 204;
+const HTTP_ACCEPTED = 202;
+const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenName',
@@ -90,8 +93,8 @@ export default {
         },
         doEditName: function() {
             this.$v.$touch();
-            if (!this.$v.newName.alphaNum) {
-                this.$toasted.error('Token name can contain alphabets and numbers');
+            if (!this.$v.newName.tokenContain) {
+                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
             } else if (!this.$v.newName.minLength) {
                 this.$toasted.error('Token name can have at least 4 symbols');
@@ -105,8 +108,8 @@ export default {
                 name: this.newName,
             })
             .then((response) => {
-                if (response.status === HTTP_NO_CONTENT) {
-                    this.currentName = this.newName;
+                if (response.status === HTTP_ACCEPTED) {
+                    this.currentName = response.data['tokenName'];
 
                     // TODO: update name in a related components and link path instead of redirecting
                     location.href = this.$routing.generate('token_show', {
@@ -114,9 +117,7 @@ export default {
                     });
                 }
             }, (error) => {
-                if (!error.response) {
-                    this.$toasted.error('Network error');
-                } else if (error.response.data.message) {
+                if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data.message);
                 } else {
                     this.$toasted.error('An error has ocurred, please try again later');
@@ -137,7 +138,7 @@ export default {
         return {
             newName: {
                 required,
-                alphaNum,
+                tokenContain: tokenContain,
                 minLength: minLength(4),
                 maxLength: maxLength(60),
             },
@@ -145,5 +146,4 @@ export default {
     },
 };
 </script>
-
 
