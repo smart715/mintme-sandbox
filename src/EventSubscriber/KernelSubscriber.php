@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -13,7 +14,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
-class RequestSubscriber implements EventSubscriberInterface
+class KernelSubscriber implements EventSubscriberInterface
 {
     /** @var ProfileManagerInterface  */
     private $profileManager;
@@ -42,8 +43,15 @@ class RequestSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST=> 'onRequest',
+            KernelEvents::REQUEST => 'onRequest',
+            KernelEvents::RESPONSE => 'onResponse',
         ];
+    }
+
+    public function onResponse(FilterResponseEvent $event): void
+    {
+        $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
+        $event->getResponse()->headers->set('X-Frame-Options', 'deny');
     }
 
     public function onRequest(GetResponseEvent $request): void
@@ -55,7 +63,7 @@ class RequestSubscriber implements EventSubscriberInterface
             $this->isApiRequest($request->getRequest()) &&
             !$this->isCsrfTokenValid($csrf))
         ) {
-            throw new AccessDeniedHttpException("Invalide token given");
+            throw new AccessDeniedHttpException("Invalid token given");
         }
 
         if (is_object($this->tokenStorage->getToken()) &&
