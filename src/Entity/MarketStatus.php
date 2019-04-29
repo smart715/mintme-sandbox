@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use App\Exchange\MarketInfo;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\MarketInfoRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\MarketStatusRepository")
  * @ORM\Table(name="market_status")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
@@ -30,6 +31,13 @@ class MarketStatus
     private $crypto;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token",cascade={"merge", "refresh", "persist"})
+     * @Groups({"API"})
+     * @var Token|null
+     */
+    protected $token;
+
+    /**
      * @ORM\Column(type="string")
      * @Groups({"API"})
      * @var string
@@ -50,9 +58,10 @@ class MarketStatus
      */
     protected $dayVolume;
 
-    public function __construct(Crypto $crypto, MarketInfo $marketInfo)
+    public function __construct(Crypto $crypto, Token $token, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
+        $this->token = $token;
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getVolume()->getAmount();

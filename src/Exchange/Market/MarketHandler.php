@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Market;
 
+use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -10,10 +11,13 @@ use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use App\Manager\CryptoManager;
+use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
 class MarketHandler implements MarketHandlerInterface
@@ -30,16 +34,31 @@ class MarketHandler implements MarketHandlerInterface
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
 
+    /** @var CryptoManager */
+    private $cryptoManager;
+
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
     public function __construct(
         MarketFetcherInterface $marketFetcher,
         MoneyWrapperInterface $moneyWrapper,
         UserManagerInterface $userManager,
-        MarketNameConverterInterface $marketNameConverter
+        MarketNameConverterInterface $marketNameConverter,
+        CryptoManager $cryptoManager,
+        TokenManagerInterface $tokenManager,
+        EntityManagerInterface $entityManager
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
         $this->userManager = $userManager;
         $this->marketNameConverter = $marketNameConverter;
+        $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
+        $this->entityManager = $entityManager;
     }
 
     /** {@inheritdoc} */
@@ -301,6 +320,20 @@ class MarketHandler implements MarketHandlerInterface
                 ),
                 $result['deal']
             );
+        }
+
+        /** @var MarketInfo $market */
+        foreach ($marketsInfo as $market) {
+            $crypto = $this->cryptoManager->findBySymbol($market->getCryptoSymbol());
+            $token = $this->tokenManager->findByName($market->getTokenName());
+
+            if (!$crypto || !$token) {
+                break;
+            }
+
+            $marketInfo = new MarketStatus($crypto, $token, $market);
+            $this->entityManager->persist($marketInfo);
+            $this->entityManager->flush();
         }
 
         return $marketsInfo;
