@@ -10,25 +10,25 @@ use App\Exchange\Order;
 interface MarketHandlerInterface
 {
     /** @return Order[] */
-    public function getPendingSellOrders(Market $market, int $offset = 0, int $limit = 100): array;
+    public function getPendingSellOrders(Market $market, int $offset = 0, int $limit = 50): array;
 
     /** @return Order[] */
-    public function getPendingBuyOrders(Market $market, int $offset = 0, int $limit = 100): array;
+    public function getPendingBuyOrders(Market $market, int $offset = 0, int $limit = 50): array;
 
     /** @return Order[] */
-    public function getExecutedOrders(Market $market, int $offset = 0, int $limit = 100): array;
+    public function getExecutedOrders(Market $market, int $offset = 0, int $limit = 50): array;
 
     /**
      * @param Market[] $markets
      * @return Order[]
      */
-    public function getUserExecutedHistory(User $userId, array $markets, int $offset = 0, int $limit = 100): array;
+    public function getUserExecutedHistory(User $userId, array $markets, int $offset = 0, int $limit = 50): array;
 
     /**
      * @param Market[] $markets
      * @return Order[]
      */
-    public function getPendingOrdersByUser(User $user, array $markets, int $offset = 0, int $limit = 100): array;
+    public function getPendingOrdersByUser(User $user, array $markets, int $offset = 0, int $limit = 50): array;
 
     /**
      * @param Market[] $markets
