@@ -65,4 +65,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         return $marketsInfo;
     }
+
+    public function createMarketStatus(Market $market): void
+    {
+
+    }
 }

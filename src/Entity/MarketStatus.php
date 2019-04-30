@@ -45,6 +45,12 @@ class MarketStatus
      * @ORM\Column(type="string")
      * @var string
      */
+    private $currency;
+
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
     private $openPrice;
 
     /**
@@ -66,6 +72,7 @@ class MarketStatus
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getVolume()->getAmount();
+        $this->currency = $marketInfo->getCurrency();
     }
 
     public function getCrypto(): Crypto
@@ -126,6 +133,16 @@ class MarketStatus
     public function setDayVolume(string $dayVolume): void
     {
         $this->dayVolume = $dayVolume;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): void
+    {
+        $this->currency = $currency;
     }
 
     public function updateStats(MarketInfo $marketInfo): void
