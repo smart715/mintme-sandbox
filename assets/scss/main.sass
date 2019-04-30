@@ -200,6 +200,12 @@ a
       &:first-child
         padding-left: 1.5rem
 
+  tbody
+    tr
+      &:nth-child(odd)
+        background-color: #00334E
+        border: none
+        
   &, tbody
     scrollbar-color: $primary-light $white
 
@@ -213,11 +219,6 @@ a
     &::-webkit-scrollbar-thumb:vertical
       height: 30px
       background-color: $primary-light
-
-    tr
-      &:nth-child(odd)
-        background-color: #00334E
-        border: none
 
   td
     border: none
