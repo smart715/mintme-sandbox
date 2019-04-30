@@ -4,6 +4,8 @@ namespace App\Manager;
 
 use App\Entity\MarketStatus;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,18 +27,27 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** @var MarketFactoryInterface */
     private $marketFactory;
 
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
+
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        MarketFactoryInterface $marketFactory
+        MarketFactoryInterface $marketFactory,
+        MarketHandlerInterface $marketHandler
     ) {
         $this->repository = $em->getRepository(MarketStatus::class);
         $this->marketNameConverter = $marketNameConverter;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->marketFactory = $marketFactory;
+        $this->marketHandler = $marketHandler;
+        $this->em = $em;
     }
 
     public function getMarketsInfo(): array
@@ -66,8 +77,19 @@ class MarketStatusManager implements MarketStatusManagerInterface
         return $marketsInfo;
     }
 
-    public function createMarketStatus(Market $market): void
+    public function createMarketStatus(array $markets): void
     {
+        /** @var Market $market */
+        foreach ($markets as $market) {
+            $marketInfo = $this->marketHandler->getMarketInfo($market);
+            $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
 
+            if (!$crypto) {
+                new \InvalidArgumentException();
+            }
+
+            $this->em->persist(new MarketStatus($crypto, $marketInfo));
+            $this->em->flush();
+        }
     }
 }

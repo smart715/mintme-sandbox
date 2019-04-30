@@ -2,7 +2,12 @@
 
 namespace App\Manager;
 
+use App\Exchange\Market;
+
 interface MarketStatusManagerInterface
 {
     public function getMarketsInfo(): array;
+
+    /** @var Market[] */
+    public function createMarketStatus(array $market): void;
 }

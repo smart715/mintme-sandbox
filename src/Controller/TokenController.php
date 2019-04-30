@@ -10,6 +10,7 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\String\DashStringStrategy;
@@ -19,6 +20,7 @@ use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Exception\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -126,7 +128,8 @@ class TokenController extends Controller
     public function create(
         Request $request,
         BalanceHandlerInterface $balanceHandler,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        MarketStatusManagerInterface $marketStatusManager
     ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('trade');
@@ -138,7 +141,7 @@ class TokenController extends Controller
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-            
+
             if ($this->tokenManager->isExisted($token)) {
                 $form->addError(new FormError('Token name is already exists.'));
 
@@ -164,6 +167,9 @@ class TokenController extends Controller
                         MoneyWrapper::TOK_SYMBOL
                     )
                 );
+                $market = $this->marketManager->createUserRelated($this->getUser());
+
+                $marketStatusManager->createMarketStatus($market);
 
                 return $this->redirectToOwnToken('intro');
             } catch (\Throwable $exception) {
