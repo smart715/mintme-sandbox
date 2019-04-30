@@ -181,6 +181,7 @@ services:
 
     App\Controller\ResettingController:
         decorates: fos_user.resetting.controller
+        public: true
         arguments:
             - '@event_dispatcher'
             - '@fos_user.resetting.form.factory'
