@@ -181,6 +181,7 @@ services:
 
     App\Controller\ResettingController:
         decorates: fos_user.resetting.controller
+        public: true
         arguments:
             - '@event_dispatcher'
             - '@fos_user.resetting.form.factory'
@@ -197,7 +198,7 @@ services:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 
-    App\EventSubscriber\RequestSubscriber:
+    App\EventSubscriber\KernelSubscriber:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 

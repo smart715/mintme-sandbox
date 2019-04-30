@@ -79,12 +79,12 @@ a
   padding: .3px
 
   @include headers
-    margin: 0px
+    margin: 0
 
     @include font-scale(sm)
 
   p
-    margin: 0px
+    margin: 0
 
 .tooltip-static
   background: white
@@ -98,7 +98,7 @@ a
   color: black
   border-radius: 0.6rem
   margin-top: 9px
-  
+
   @include font-scale(xs)
 
   &.tooltip-static-left
@@ -205,6 +205,20 @@ a
       &:nth-child(odd)
         background-color: #00334E
         border: none
+
+  &, tbody
+    scrollbar-color: $primary-light $white
+
+    &::-webkit-scrollbar
+      width: 10px
+      height: 15px
+
+    &::-webkit-scrollbar-track-piece
+      background-color: $white
+
+    &::-webkit-scrollbar-thumb:vertical
+      height: 30px
+      background-color: $primary-light
 
   td
     border: none

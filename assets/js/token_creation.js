@@ -1,5 +1,8 @@
 import Modal from './components/modal/Modal';
-import {minLength, maxLength, alphaNum} from 'vuelidate/lib/validators';
+
+import {minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+
+const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
 new Vue({
     el: '#token',
@@ -15,7 +18,7 @@ new Vue({
     },
     validations: {
         tokenName: {
-            alphaNum,
+            tokenContain: tokenContain,
             minLength: minLength(4),
             maxLength: maxLength(255),
         },

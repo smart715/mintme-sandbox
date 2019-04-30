@@ -9,93 +9,30 @@
 {% block body_text %}{% endblock %}
 
 {% block body_html %}
-  <style>
-    table {
-      padding: 0;
-      width: 100%;
-      position: relative;
-      display: table;
-      font-size: 18px;
-      font-weight: normal;
-      margin: 0 auto;
-      font-family: Helvetica, Arial, sans-serif;
-      font-weight: normal;
-      text-align:center;
-      color:white;
-    }
-    table th {
-      margin: 0 auto;
-      Margin: 0 auto;
-      padding-left: 16px;
-      padding-bottom: 16px;
-      width: 100%;
-    }
-    table td {
-      padding-left: 0;
-      padding-right: 0;
-    }
-    a {
-      color: #2199e8;
-    }
-    center table {
-        display: table;
-        width: 500px; 
-    }
-    @media (max-width: 500px) {
-    center table {
-        display: table-cell;
-        width: 100%; 
-      }
-    }
-  </style>
-  <table>
-  <tr>
-    <td align="center" valign="top">
-      <center>
-        <table background="{{absolute_url(asset('build/images/body.png'))}}">
-          <tr>
-            <td>
-              <table>
-                <tr style="padding: 20px">
-                  <a href="https://mintme.com/" target=_blank><img src="{{absolute_url(asset('build/images/header.png'))}}" alt="MintMe"></a>
-                </tr>
-              </table>
-              <table>
-               <tr>
-                <th>
-                  <h3 style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;" >Hello</h3>
-                  <h1 style="font-size: 34px; margin-top: 0px; margin-bottom: 0px "><strong>{{user.userName}}</strong></h1>
-                  <h3 style="font-size: 28px; margin-top: 0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;">Welcome to MintMe!</h3>
-                </th>
-              </tr>
-              <tr>
-                <th>
-                  <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; ">To complete your registration, click on the following link:</p>
-                </th>
-              </tr>
-              <tr>
-                <th>
-                  <p style="padding:5px;margin-right:20px;margin-bottom:20px;margin-left:20px;background-color:#152d47; font-weight: normal; " ><a href="{{confirmationUrl}}" target=_blank>{{confirmationUrl}}</a></p>
-                </th>
-              </tr>
-              <tr>
-                <th style="height:20px;font-size:0px;line-height:20px;">&#xA0;</th>
-              </tr>
-            </table>
-            <table background="{{absolute_url(asset('build/images/footer.png'))}}" style="margin: 0px; padding: 0px; width: 100%">
-              <tr style=" margin-bottom:0px">
-                <td>
-                  <div style="text-align: center; margin-top: 20px; margin-bottom: 0px; color: #fff; background: #131313">
-                    2018 - mintMe. All rights reserved
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </td>
+  {% embed 'mail/layout.html.twig' %}
+    {% block content %}
+      <table>
+        <tr>
+          <th>
+            <h3 style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;" >Hello</h3>
+            <h1 style="font-size: 34px; margin-top: 0px; margin-bottom: 0px "><strong>{{user.userName}}</strong></h1>
+            <h3 style="font-size: 28px; margin-top: 0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;">Welcome to MintMe!</h3>
+          </th>
+        </tr>
+        <tr>
+          <th>
+            <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; ">To complete your registration, click on the following link:</p>
+          </th>
+        </tr>
+        <tr>
+          <th>
+            <p style="padding:5px;margin-right:20px;margin-bottom:20px;margin-left:20px;background-color:#152d47; font-weight: normal; " ><a href="{{confirmationUrl}}" target=_blank>{{confirmationUrl}}</a></p>
+          </th>
+        </tr>
+        <tr>
+          <th style="height:20px;font-size:0px;line-height:20px;">&#xA0;</th>
         </tr>
       </table>
-    </center>
-  </td>
-</tr>
-</table>
+    {% endblock %}
+  {% endembed %}
 {% endblock %}

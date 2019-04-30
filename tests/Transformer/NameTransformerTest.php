@@ -3,6 +3,8 @@
 namespace App\Tests\Transformer;
 
 use App\Form\DataTransformer\NameTransformer;
+use App\Utils\Converter\String\ParseStringStrategy;
+use App\Utils\Converter\String\StringConverter;
 use PHPUnit\Framework\TestCase;
 
 class NameTransformerTest extends TestCase

@@ -59,7 +59,12 @@
                 :precision="precision" />
         </div>
         <div class="row px-0 mt-3">
-            <trade-trade-history class="col" :market="market" :precision="precision" />
+            <trade-trade-history
+                    class="col"
+                    :hash="hash"
+                    :websocket-url="websocketUrl"
+                    :market="market"
+                    :precision="precision" />
         </div>
     </div>
 </template>
@@ -129,8 +134,21 @@ export default {
         },
     },
     mounted() {
-        this.updateOrders();
-        this.$store.state.interval.make(this.updateOrders, 10000);
+        this.updateOrders().then(() => {
+            this.authorize().then(() =>
+                this.sendMessage(JSON.stringify({
+                    method: 'order.subscribe',
+                    params: [this.market.identifier],
+                    id: parseInt(Math.random().toString().replace('0.', '')),
+                }))
+            );
+
+            this.addMessageHandler((response) => {
+                if ('order.update' === response.method) {
+                    this.updateOrders();
+                }
+            });
+        });
 
         this.addOnOpenHandler(() => {
             this.sendMessage(JSON.stringify({
@@ -144,13 +162,16 @@ export default {
     },
     methods: {
         updateOrders: function() {
-            this.$axios.single.get(this.$routing.generate('pending_orders', {
-                'base': this.market.base.symbol,
-                'quote': this.market.quote.symbol,
-            })).then((result) => {
-                this.buyOrders = result.data.buy;
-                this.sellOrders = result.data.sell;
-            }).catch((error) => { });
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(this.$routing.generate('pending_orders', {
+                    'base': this.market.base.symbol,
+                    'quote': this.market.quote.symbol,
+                })).then((result) => {
+                    this.buyOrders = result.data.buy;
+                    this.sellOrders = result.data.sell;
+                    resolve();
+                }).catch(reject);
+            });
         },
         updateAssets: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))
