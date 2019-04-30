@@ -59,7 +59,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $info = $this->repository->findAll();
 
         foreach ($info as $marketInfo) {
-            $tokenName = $marketInfo->getTokenName();
+            $tokenName = $marketInfo->getToken()->getName();
             $quote = $this->cryptoManager->findBySymbol($tokenName) ?? $this->tokenManager->findByName($tokenName);
 
             if (!$quote) {
@@ -91,7 +91,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                  : Token::getFromCrypto($quouteCrypto)->setCrypto($quouteCrypto);
 
             if (!$crypto || !$token) {
-                new \InvalidArgumentException();
+                continue;
             }
 
             $this->em->persist(new MarketStatus($crypto, $token, $marketInfo));
