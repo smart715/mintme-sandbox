@@ -229,7 +229,7 @@ export default {
             this.showModal = true;
             this.selectedCurrency = currency;
             this.withdraw.fee = fee;
-            this.amount = toMoney(amount);
+            this.withdraw.amount = toMoney(amount);
         },
         closeWithdraw: function() {
             this.showModal = false;
