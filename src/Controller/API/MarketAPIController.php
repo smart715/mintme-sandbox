@@ -46,7 +46,7 @@ class MarketAPIController extends APIController
         MarketHandlerInterface $marketHandler
     ): View {
         return $this->view(
-            $marketHandler->getMarketsInfo($marketManager->createAll())
+            $marketHandler->getMarketInfo($marketManager->createAll())
         );
     }
 

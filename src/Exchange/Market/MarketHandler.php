@@ -35,13 +35,13 @@ class MarketHandler implements MarketHandlerInterface
     private $marketNameConverter;
 
     /** @var CryptoManager */
-    private $cryptoManager;
+    protected $cryptoManager;
 
     /** @var TokenManagerInterface */
-    private $tokenManager;
+    protected $tokenManager;
 
     /** @var EntityManagerInterface */
-    private $entityManager;
+    protected $entityManager;
 
     public function __construct(
         MarketFetcherInterface $marketFetcher,
