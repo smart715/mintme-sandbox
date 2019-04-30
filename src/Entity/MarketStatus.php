@@ -35,17 +35,17 @@ class MarketStatus
 
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
      * @Groups({"API"})
-     * @var string
+     * @var Token
      */
-    private $tokenName;
+    private $token;
 
     /**
      * @ORM\Column(type="string")
      * @var string
      */
-    private $currency;
+    private $currency = 'TOK';
 
     /**
      * @ORM\Column(type="string")
@@ -65,10 +65,10 @@ class MarketStatus
      */
     private $dayVolume;
 
-    public function __construct(Crypto $crypto, MarketInfo $marketInfo)
+    public function __construct(Crypto $crypto, Token $token, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
-        $this->tokenName = $marketInfo->getTokenName();
+        $this->token = $token;
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getVolume()->getAmount();
@@ -85,14 +85,14 @@ class MarketStatus
         $this->crypto = $crypto;
     }
 
-    public function getTokenName(): string
+    public function getToken(): Token
     {
-        return $this->tokenName;
+        return $this->token;
     }
 
-    public function setTokenName(string $tokenName): void
+    public function setToken(Token $token): void
     {
-        $this->tokenName = $tokenName;
+        $this->token = $token;
     }
 
     /**
@@ -100,7 +100,7 @@ class MarketStatus
      */
     public function getOpenPrice(): Money
     {
-        return new Money($this->openPrice, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->openPrice, new Currency($this->getCurrency()));
     }
 
 
@@ -114,7 +114,7 @@ class MarketStatus
      */
     public function getLastPrice(): Money
     {
-        return new Money($this->lastPrice, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->lastPrice, new Currency($this->getCurrency()));
     }
 
     public function setLastPrice(string $lastPrice): void
@@ -127,7 +127,7 @@ class MarketStatus
      */
     public function getDayVolume(): Money
     {
-        return new Money($this->dayVolume, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->dayVolume, new Currency($this->getCurrency()));
     }
 
     public function setDayVolume(string $dayVolume): void

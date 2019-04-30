@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\MarketStatus;
+use App\Entity\Token\Token;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -83,8 +84,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
         foreach ($markets as $market) {
             $marketInfo = $this->marketHandler->getMarketInfo($market);
             $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
+            $quouteCrypto = $this->cryptoManager->findBySymbol($market->getQuote()->getSymbol());
 
-            if (!$crypto) {
+            $token = !$quouteCrypto
+                 ? $this->tokenManager->findByName($market->getQuote()->getName())
+                 : Token::getFromCrypto($quouteCrypto)->setCrypto($quouteCrypto);
+
+            if (!$crypto || !$token) {
                 new \InvalidArgumentException();
             }
 
