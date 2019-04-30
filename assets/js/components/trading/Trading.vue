@@ -160,18 +160,18 @@ export default {
         updateDataWithMarkets: function() {
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
-                    const cryptoSymbol = this.markets[market].cryptoSymbol;
+                    const cryptoSymbol = this.markets[market].crypto.symbol;
                     const tokenName = this.markets[market].tokenName;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
                         tokenName,
                         this.getPercentage(
-                            parseFloat(this.markets[market].last),
-                            parseFloat(this.markets[market].open)
+                            parseFloat(this.markets[market].lastPrice),
+                            parseFloat(this.markets[market].openPrice)
                         ),
-                        parseFloat(this.markets[market].last),
-                        parseFloat(this.markets[market].volume)
+                        parseFloat(this.markets[market].lastPrice),
+                        parseFloat(this.markets[market].dayVolume)
                     );
 
                     if (marketOnTopIndex > -1) {

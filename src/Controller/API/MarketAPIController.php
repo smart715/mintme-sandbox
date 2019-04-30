@@ -7,6 +7,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Utils\MarketNameParserInterface;
@@ -41,12 +42,10 @@ class MarketAPIController extends APIController
      * @Rest\View()
      * @Rest\Get("/info", name="markets_info", options={"expose"=true})
      */
-    public function getMarketsInfo(
-        MarketFactoryInterface $marketManager,
-        MarketHandlerInterface $marketHandler
-    ): View {
+    public function getMarketsInfo(MarketStatusManagerInterface $marketStatusManager): View
+    {
         return $this->view(
-            $marketHandler->getMarketInfo($marketManager->createAll())
+            $marketStatusManager->getMarketsInfo()
         );
     }
 
