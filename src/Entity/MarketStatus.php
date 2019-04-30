@@ -117,4 +117,11 @@ class MarketStatus
     {
         $this->dayVolume = $dayVolume;
     }
+
+    public function updateStats(MarketInfo $marketInfo): void
+    {
+        $this->openPrice = $marketInfo->getOpen()->getAmount();
+        $this->lastPrice = $marketInfo->getLast()->getAmount();
+        $this->dayVolume = $marketInfo->getVolume()->getAmount();
+    }
 }

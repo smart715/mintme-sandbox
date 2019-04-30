@@ -74,8 +74,20 @@ class MarketAPIController extends APIController
      * @Rest\View()
      * @Rest\Get("/update/{base}/{quote}", name="update_market_status", options={"expose"=true})
      */
-    public function updateMarketStatus(string $base, string $quote, EntityManagerInterface $em): View
-    {
+    public function updateMarketStatus(
+        string $base,
+        string $quote,
+        EntityManagerInterface $em,
+        MarketHandlerInterface $marketHandler
+    ): View {
+        $market = $this->getMarket($base, $quote);
+
+        if (!$market) {
+            throw new InvalidArgumentException();
+        }
+
+        $marketInfo = $marketHandler->getMarketInfo($market);
+
         /** @var MarketStatusRepository $marketRep */
         $marketRep = $em->getRepository(MarketStatus::class);
         $marketStatus = $marketRep->findByName($quote);
@@ -83,7 +95,12 @@ class MarketAPIController extends APIController
         if (!$marketStatus) {
             throw new InvalidArgumentException();
         }
-        
-        return $this->view($marketRep->findByName($quote));
+
+        $marketStatus->updateStats($marketInfo);
+
+        $em->merge($marketStatus);
+        $em->flush();
+
+        return $this->view(true);
     }
 }
