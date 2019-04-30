@@ -2,7 +2,6 @@
 
 namespace App\Manager;
 
-
 interface MarketStatusManagerInterface
 {
     public function getMarketsInfo(): array;

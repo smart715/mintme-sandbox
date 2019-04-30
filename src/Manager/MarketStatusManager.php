@@ -49,7 +49,16 @@ class MarketStatusManager implements MarketStatusManagerInterface
         foreach ($info as $marketInfo) {
             $tokenName = $marketInfo->getTokenName();
             $quote = $this->cryptoManager->findBySymbol($tokenName) ?? $this->tokenManager->findByName($tokenName);
+
+            if (!$quote) {
+                continue;
+            }
+
             $market = $this->marketFactory->create($marketInfo->getCrypto(), $quote);
+
+            if (!$market) {
+                continue;
+            }
 
             $marketsInfo[$this->marketNameConverter->convert($market)] = $marketInfo;
         }
