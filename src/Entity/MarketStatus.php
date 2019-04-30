@@ -4,7 +4,10 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Exchange\MarketInfo;
+use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
+use Money\Currency;
+use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -40,21 +43,18 @@ class MarketStatus
 
     /**
      * @ORM\Column(type="string")
-     * @Groups({"API"})
      * @var string
      */
     private $openPrice;
 
     /**
      * @ORM\Column(type="string")
-     * @Groups({"API"})
      * @var string
      */
     private $lastPrice;
 
     /**
      * @ORM\Column(type="string")
-     * @Groups({"API"})
      * @var string
      */
     private $dayVolume;
@@ -88,19 +88,26 @@ class MarketStatus
         $this->tokenName = $tokenName;
     }
 
-    public function getOpenPrice(): string
+    /**
+     * @Groups({"API"})
+     */
+    public function getOpenPrice(): Money
     {
-        return $this->openPrice;
+        return new Money($this->openPrice, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
+
 
     public function setOpenPrice(string $openPrice): void
     {
         $this->openPrice = $openPrice;
     }
 
-    public function getLastPrice(): string
+    /**
+     * @Groups({"API"})
+     */
+    public function getLastPrice(): Money
     {
-        return $this->lastPrice;
+        return new Money($this->lastPrice, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     public function setLastPrice(string $lastPrice): void
@@ -108,9 +115,12 @@ class MarketStatus
         $this->lastPrice = $lastPrice;
     }
 
-    public function getDayVolume(): string
+    /**
+     * @Groups({"API"})
+     */
+    public function getDayVolume(): Money
     {
-        return $this->dayVolume;
+        return new Money($this->dayVolume, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     public function setDayVolume(string $dayVolume): void
