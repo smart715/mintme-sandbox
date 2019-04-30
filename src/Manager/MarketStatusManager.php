@@ -94,7 +94,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 new \InvalidArgumentException();
             }
 
-            $this->em->persist(new MarketStatus($crypto, $marketInfo));
+            $this->em->persist(new MarketStatus($crypto, $token, $marketInfo));
             $this->em->flush();
         }
     }
