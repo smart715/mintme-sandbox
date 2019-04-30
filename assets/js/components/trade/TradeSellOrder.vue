@@ -137,6 +137,7 @@
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
+import placeOrderMixin from '../../mixins/placeOrder';
 import FiltersMixin from '../../mixins/filters';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -147,7 +148,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [WebSocketMixin, FiltersMixin],
+    mixins: [WebSocketMixin, placeOrderMixin, FiltersMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
@@ -165,9 +166,6 @@ export default {
             sellAmount: 0,
             useMarketPrice: false,
             action: 'sell',
-            showModal: false,
-            modalTitle: '',
-            modalSuccess: false,
         };
     },
     methods: {
@@ -189,19 +187,8 @@ export default {
                         }
                         this.showModalAction(data);
                     })
-                    .catch((error) => {
-                        if (!error.status) {
-                            this.$toasted.error('Network Error!');
-                        } else {
-                            this.showModalAction();
-                        }
-                    });
+                    .catch((error) => this.handleOrderError(error));
             }
-        },
-        showModalAction: function({result, message} = {}) {
-            this.modalSuccess = 1 === result;
-            this.modalTitle = message ? message : (1 === result ? 'Order Created' : 'Order Failed');
-            this.showModal = true;
         },
         resetOrder: function() {
             this.sellPrice = 0;
