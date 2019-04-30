@@ -100,6 +100,6 @@ class MarketAPIController extends APIController
         $em->merge($marketStatus);
         $em->flush();
 
-        return $this->view(true);
+        return $this->view('success');
     }
 }
