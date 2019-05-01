@@ -42,7 +42,7 @@ class MarketAPIController extends APIController
     public function getMarketsInfo(MarketStatusManagerInterface $marketStatusManager): View
     {
         return $this->view(
-            $marketStatusManager->getMarketsInfo()
+            $marketStatusManager->getAllMarketsInfo()
         );
     }
 

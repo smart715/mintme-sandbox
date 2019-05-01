@@ -6,7 +6,7 @@ use App\Exchange\Market;
 
 interface MarketStatusManagerInterface
 {
-    public function getMarketsInfo(): array;
+    public function getAllMarketsInfo(): array;
 
     /** @var Market[] */
     public function createMarketStatus(array $market): void;

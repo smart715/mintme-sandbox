@@ -52,7 +52,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->em = $em;
     }
 
-    public function getMarketsInfo(): array
+    public function getAllMarketsInfo(): array
     {
         $marketsInfo = [];
 
@@ -60,15 +60,10 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $info = $this->repository->findAll();
 
         foreach ($info as $marketInfo) {
-            $quote = $marketInfo->getQuoteCrypto()
-                ? $this->cryptoManager->findBySymbol($marketInfo->getQuoteCrypto()->getSymbol())
-                : $this->tokenManager->findByName($marketInfo->getQuoteToken()->getName());
-
-            if (!$quote) {
-                continue;
-            }
-
-            $market = $this->marketFactory->create($marketInfo->getCrypto(), $quote);
+            $market = $this->marketFactory->create(
+                $marketInfo->getCrypto(),
+                $marketInfo->getQuoteCrypto() ?? $marketInfo->getQuoteToken()
+            );
 
             if (!$market) {
                 continue;
