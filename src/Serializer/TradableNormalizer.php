@@ -2,6 +2,7 @@
 
 namespace App\Serializer;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -16,10 +17,17 @@ class TradableNormalizer implements NormalizerInterface
     /** @var TokenNameConverterInterface */
     private $tokenNameConverter;
 
-    public function __construct(ObjectNormalizer $objectNormalizer, TokenNameConverterInterface $tokenNameConverter)
-    {
+    /** @var int */
+    private $tokenSubunit;
+
+    public function __construct(
+        ObjectNormalizer $objectNormalizer,
+        TokenNameConverterInterface $tokenNameConverter,
+        int $tokenSubunit
+    ) {
         $this->normalizer = $objectNormalizer;
         $this->tokenNameConverter = $tokenNameConverter;
+        $this->tokenSubunit = $tokenSubunit;
     }
 
     /** {@inheritdoc} */
@@ -30,6 +38,10 @@ class TradableNormalizer implements NormalizerInterface
         $tradable['identifier'] = $object instanceof Token ?
             $this->tokenNameConverter->convert($object) :
             $object->getSymbol();
+
+        $tradable['subunit'] = $object instanceof Crypto ?
+            $object->getShowSubunit() :
+            $this->tokenSubunit;
 
         return $tradable;
     }

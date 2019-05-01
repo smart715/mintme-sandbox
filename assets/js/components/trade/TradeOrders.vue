@@ -9,6 +9,7 @@
                         :fields="fields"
                         :sort-by="fields.price.key"
                         :sort-desc="true"
+                        :precision="market.base.subunit"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -24,6 +25,7 @@
                         :fields="fields"
                         :sort-by="fields.price.key"
                         :sort-desc="false"
+                        :precision="market.quote.subunit"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -68,7 +70,6 @@ export default {
         sellOrders: [Array, Object],
         market: Object,
         userId: Number,
-        precision: Number,
     },
     data() {
         return {
@@ -82,8 +83,8 @@ export default {
                 amount: {
                     label: 'Amount',
                 },
-                sumWeb: {
-                    label: 'Sum WEB',
+                sum: {
+                    label: 'Sum ' + this.market.base.symbol,
                 },
                 trader: {
                     label: 'Trader',
@@ -103,9 +104,9 @@ export default {
         ordersList: function(orders) {
             return orders.map((order) => {
                 return {
-                    price: toMoney(order.price, this.precision),
-                    amount: toMoney(order.amount, this.precision),
-                    sumWeb: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.precision),
+                    price: toMoney(order.price, this.market.base.subunit),
+                    amount: toMoney(order.amount, this.market.quote.subunit),
+                    sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
                     trader: order.maker.profile !== null
                         ? this.truncateFullName(order.maker.profile, order.owner)
                         : 'Anonymous',
@@ -174,9 +175,9 @@ export default {
             let orders = row.side === 1 ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
             this.clone(orders).forEach((order) => {
-                if (toMoney(order.price, this.precision) === row.price && order.maker.id === this.userId) {
-                    order.price = toMoney(order.price, this.precision);
-                    order.amount = toMoney(order.amount, this.precision);
+                if (toMoney(order.price, this.market.quote.subunit) === row.price && order.maker.id === this.userId) {
+                    order.price = toMoney(order.price, this.market.quote.subunit);
+                    order.amount = toMoney(order.amount, this.market.quote.subunit);
                     this.removeOrders.push(order);
                 }
             });

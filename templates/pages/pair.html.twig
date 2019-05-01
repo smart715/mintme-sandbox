@@ -45,7 +45,8 @@
                                     class="col-12 col-lg-4 pt-3 pt-lg-0 px-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}">
+                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                    :precision="{{ precision }}">
                                 </token-introduction-statistics>
                                 <token-introduction-description
                                     class="col-12 col-lg-4 pt-3 pt-lg-0 pl-lg-2"

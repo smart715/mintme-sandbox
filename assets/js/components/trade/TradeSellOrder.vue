@@ -21,7 +21,7 @@
                         >
                         Your {{ this.market.quote.symbol }}:
                         <span class="text-white">
-                            {{ immutableBalance | toMoney(precision)  }}
+                            {{ immutableBalance | toMoney(market.quote.subunit)  }}
                             <guide>
                                 <template slot="header">
                                     Your Tokens
@@ -72,7 +72,7 @@
                         </label>
                         <input
                             v-model.number="sellPrice"
-                            step="0.00000001"
+                            :step="'1e-' + market.base.subunit | toMoney(market.base.subunit)"
                             type="number"
                             id="sell-price-input"
                             class="form-control"
@@ -88,7 +88,7 @@
                         </label>
                         <input
                             v-model="sellAmount"
-                            step="0.00000001"
+                            :step="'1e-' + market.quote.subunit | toMoney(market.quote.subunit)"
                             type="number"
                             id="sell-price-amount"
                             class="form-control"
@@ -96,7 +96,7 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(precision) }} {{ this.market.base.symbol }}
+                        Total Price: {{ totalPrice | toMoney(market.base.subunit) }} {{ this.market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -155,7 +155,6 @@ export default {
         marketPrice: [Number, String],
         balance: [String, Boolean],
         isOwner: Boolean,
-        precision: Number,
     },
     data() {
         return {
@@ -172,8 +171,8 @@ export default {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 let data = {
-                    'amountInput': toMoney(this.sellAmount, this.precision),
-                    'priceInput': toMoney(this.sellPrice, this.precision),
+                    'amountInput': toMoney(this.sellAmount, this.market.quote.subunit),
+                    'priceInput': toMoney(this.sellPrice, this.market.base.subunit),
                     'marketPrice': this.useMarketPrice,
                     'action': this.action,
                 };
@@ -209,7 +208,7 @@ export default {
             return new Decimal(this.sellPrice || 0).times(this.sellAmount || 0).toString();
         },
         price: function() {
-            return toMoney(this.marketPrice, this.precision) || null;
+            return toMoney(this.marketPrice, this.market.base.subunit) || null;
         },
         fieldsValid: function() {
             return this.sellPrice > 0 && this.sellAmount > 0;

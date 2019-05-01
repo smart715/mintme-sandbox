@@ -6,9 +6,9 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 
-abstract class APIController extends FOSRestController
+abstract class APIController extends AbstractFOSRestController
 {
     /** @var TokenManagerInterface */
     private $tokenManager;

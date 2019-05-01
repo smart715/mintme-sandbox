@@ -21,7 +21,7 @@
                          class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your {{ this.market.base.symbol }}:
                         <span class="text-white">
-                            {{ immutableBalance | toMoney(precision) }}
+                            {{ immutableBalance | toMoney(market.base.subunit) }}
                             <guide>
                                 <template slot="header">
                                     Your {{ this.market.base.symbol }}
@@ -63,10 +63,10 @@
                         <label
                             for="buy-price-input"
                             class="text-white">
-                            Price in {{ this.market.base.symbol }}:
+                            Price in {{ market.base.symbol }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ this.market.base.symbol }}
+                                    Price in {{ market.base.symbol }}
                                 </template>
                                 <template slot="body">
                                     The price at which you want to buy one {{ this.market.quote.symbol }}.
@@ -75,7 +75,7 @@
                         </label>
                         <input
                             v-model.number="buyPrice"
-                            step="0.00000001"
+                            :step="'1e-' + market.base.subunit | toMoney(market.base.subunit)"
                             type="number"
                             id="buy-price-input"
                             class="form-control"
@@ -91,7 +91,7 @@
                         </label>
                         <input
                             v-model.number="buyAmount"
-                            step="0.00000001"
+                            :step="'1e-' + market.quote.subunit | toMoney(market.quote.subunit)"
                             type="number"
                             id="buy-price-amount"
                             class="form-control"
@@ -99,7 +99,7 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(precision) }} {{ market.base.symbol }}
+                        Total Price: {{ totalPrice | toMoney(market.base.subunit) }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -155,7 +155,6 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
-        precision: Number,
     },
     data() {
         return {
@@ -172,8 +171,8 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 let data = {
-                    'amountInput': toMoney(this.buyAmount, this.precision),
-                    'priceInput': toMoney(this.buyPrice, this.precision),
+                    'amountInput': toMoney(this.buyAmount, this.market.quote.subunit),
+                    'priceInput': toMoney(this.buyPrice, this.market.base.subunit),
                     'marketPrice': this.useMarketPrice,
                     'action': this.action,
                 };
@@ -210,7 +209,7 @@ export default {
             return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
         },
         price: function() {
-            return toMoney(this.marketPrice, this.precision) || null;
+            return toMoney(this.marketPrice, this.market.base.subunit) || null;
         },
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
