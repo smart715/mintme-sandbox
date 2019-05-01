@@ -16,13 +16,13 @@
                     {{ data.item.fullname }} ({{ data.item.name }})
                 </template>
                 <template slot="available" slot-scope="data">
-                    {{ data.value | toMoney }}
+                    {{ data.value | toMoney(data.item.subunit) }}
                 </template>
                 <template slot="action" slot-scope="data">
                     <div
                         class="row">
                         <div class="d-flex flex-row c-pointer pl-2"
-                            @click="openDeposit(data.item.name)">
+                            @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
                             <div>
                                 <span class="pl-2 text-xs align-middle">Deposit</span>
@@ -30,7 +30,7 @@
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
-                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available)">
+                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available, data.item.subunit)">
                                 <div><i class="icon-withdraw"></i></div>
                                 <div>
                                     <span class="pl-2 text-xs align-middle">Withdraw</span>
@@ -56,7 +56,7 @@
                     {{ data.item.name }}
                 </template>
                 <template slot="available" slot-scope="data">
-                    {{ data.value | toMoney }}
+                    {{ data.value | toMoney(data.item.subunit) }}
                 </template>
             </b-table>
         </div>
@@ -88,6 +88,7 @@
             :max-amount="withdraw.amount"
             :address-length="addressLength"
             :twofa="twofa"
+            :subunit="withdraw.subunit"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -150,6 +151,7 @@ export default {
             withdraw: {
                 fee: '0',
                 amount: '0',
+                subunit: 4,
             },
             deposit: {
                 fee: undefined,
@@ -225,16 +227,17 @@ export default {
             });
     },
     methods: {
-        openWithdraw: function(currency, fee, amount) {
+        openWithdraw: function(currency, fee, amount, subunit) {
             this.showModal = true;
             this.selectedCurrency = currency;
-            this.withdraw.fee = fee;
-            this.withdraw.amount = toMoney(amount);
+            this.withdraw.fee = toMoney(fee, subunit);
+            this.withdraw.amount = toMoney(amount, subunit);
+            this.withdraw.subunit = subunit;
         },
         closeWithdraw: function() {
             this.showModal = false;
         },
-        openDeposit: function(currency) {
+        openDeposit: function(currency, subunit) {
             this.depositAddress = this.depositAddresses[currency] || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
@@ -244,7 +247,7 @@ export default {
                     crypto: currency,
                 }))
                 .then((res) => this.deposit.fee = res.data && parseFloat(res.data) !== 0.0 ?
-                    toMoney(res.data) :
+                    toMoney(res.data, subunit) :
                     undefined
                 )
                 .catch(() => {
@@ -252,7 +255,7 @@ export default {
                 });
 
             // TODO: Get rid of hardcoded WEB
-            this.deposit.min = currency === 'WEB' ? toMoney(1) : undefined;
+            this.deposit.min = currency === 'WEB' ? toMoney(1, subunit) : undefined;
             this.showDepositModal = true;
         },
         closeDeposit: function() {
@@ -294,8 +297,8 @@ export default {
         },
     },
     filters: {
-        toMoney: function(val) {
-            return toMoney(val);
+        toMoney: function(val, precision) {
+            return toMoney(val, precision);
         },
     },
 };

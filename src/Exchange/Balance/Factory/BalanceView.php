@@ -22,6 +22,9 @@ class BalanceView
     /** @var Money|null */
     public $fee;
 
+    /** @var int */
+    public $subunit;
+
     /** @var bool */
     public $isNotExchanged;
 
@@ -34,6 +37,7 @@ class BalanceView
         ?Money $frozen,
         string $fullname,
         ?Money $fee,
+        int $subunit,
         bool $isNotExchanged,
         bool $isOwner = false
     ) {
@@ -42,6 +46,7 @@ class BalanceView
         $this->available = $available;
         $this->frozen = $frozen;
         $this->fullname = $fullname;
+        $this->subunit = $subunit;
         $this->fee = $fee;
         $this->isOwner = $isOwner;
     }
@@ -86,5 +91,11 @@ class BalanceView
     public function isOwner(): bool
     {
         return $this->isOwner;
+    }
+
+    /** @Groups({"API"}) */
+    public function getSubunit(): int
+    {
+        return $this->subunit;
     }
 }
