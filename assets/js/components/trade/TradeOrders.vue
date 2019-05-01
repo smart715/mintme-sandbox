@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row px-0 mx-0">
-            <div class="col-12 col-lg-6 pr-lg-2 pl-lg-0 mt-3">
+            <div class="col-12 col-xl-6 col-lg-12 pr-lg-2 pl-lg-0 mt-3">
                 <trade-buy-orders
                         v-if="ordersLoaded"
                         :orders-list="filteredBuyOrders"
@@ -16,7 +16,7 @@
                     </div>
                 </template>
             </div>
-            <div class="col-12 col-lg-6 pr-lg-0 pl-lg-2 mt-3">
+            <div class="col-12 col-xl-6 col-lg-12 pr-lg-0 pl-lg-2 mt-3">
                 <trade-sell-orders
                         v-if="ordersLoaded"
                         :orders-list="filteredSellOrders"
