@@ -10,4 +10,6 @@ interface MarketStatusManagerInterface
 
     /** @var Market[] */
     public function createMarketStatus(array $market): void;
+
+    public function updateMarketStatus(Market $market): void;
 }

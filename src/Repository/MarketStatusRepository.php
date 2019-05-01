@@ -11,4 +11,19 @@ class MarketStatusRepository extends EntityRepository
     {
         return $this->findOneBy(['tokenName' => $tokenName]);
     }
+
+    public function findByBaseQuoteNames(string $base, string $quote): ?MarketStatus
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.crypto', 'c')
+            ->where('c.symbol = :base')
+            ->leftJoin('m.quoteToken', 'qt')
+            ->andWhere('qt.name = :quote')
+            ->leftJoin('m.quoteCrypto', 'qc')
+            ->orWhere('qc.symbol = :quote')
+            ->setParameter('base', $base)
+            ->setParameter('quote', $quote)
+            ->getQuery()
+            ->getResult()[0] ?? null;
+    }
 }

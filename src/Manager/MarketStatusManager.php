@@ -10,6 +10,7 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
@@ -85,16 +86,33 @@ class MarketStatusManager implements MarketStatusManagerInterface
         foreach ($markets as $market) {
             $marketInfo = $this->marketHandler->getMarketInfo($market);
             $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
-
             $quoteToken = $this->tokenManager->findByName($market->getQuote()->getName());
             $quouteCrypto = $this->cryptoManager->findBySymbol($market->getQuote()->getSymbol());
 
-            if (!$quoteToken && !$quouteCrypto) {
+            if (!$crypto || !$quoteToken && !$quouteCrypto) {
                 continue;
             }
 
             $this->em->persist(new MarketStatus($crypto, $quoteToken, $quouteCrypto, $marketInfo));
             $this->em->flush();
         }
+    }
+
+    public function updateMarketStatus(Market $market): void
+    {
+        $marketInfo = $this->marketHandler->getMarketInfo($market);
+        $marketStatus = $this->repository->findByBaseQuoteNames(
+            $market->getBase()->getSymbol(),
+            $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+        );
+
+        if (!$marketStatus) {
+            throw new InvalidArgumentException();
+        }
+
+        $marketStatus->updateStats($marketInfo);
+
+        $this->em->merge($marketStatus);
+        $this->em->flush();
     }
 }
