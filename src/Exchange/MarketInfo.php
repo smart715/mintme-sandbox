@@ -34,9 +34,6 @@ class MarketInfo
     /** @var string */
     private $cryptoSymbol;
 
-    /** @var string */
-    private $currency;
-
     public function __construct(
         string $cryptoSymbol,
         string $tokenName,
@@ -46,8 +43,7 @@ class MarketInfo
         Money $close,
         Money $high,
         Money $low,
-        string $deal,
-        string $currency
+        string $deal
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
         $this->tokenName = $tokenName;
@@ -58,7 +54,6 @@ class MarketInfo
         $this->high = $high;
         $this->low = $low;
         $this->deal = $deal;
-        $this->currency = $currency;
     }
 
     /** @Groups({"Default", "API"}) */
@@ -109,15 +104,5 @@ class MarketInfo
     public function getTokenName(): string
     {
         return $this->tokenName;
-    }
-
-    public function getCurrency(): string
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(string $currency): void
-    {
-        $this->currency = $currency;
     }
 }

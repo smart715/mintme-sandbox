@@ -36,16 +36,19 @@ class MarketStatus
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
+     * @ORM\JoinColumn(name="quote_token_id", referencedColumnName="id", nullable=true)
      * @Groups({"API"})
-     * @var Token
+     * @var Token|null
      */
-    private $token;
+    private $quoteToken;
 
     /**
-     * @ORM\Column(type="string")
-     * @var string
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
+     * @ORM\JoinColumn(name="quote_crypto_id", referencedColumnName="id", nullable=true)
+     * @Groups({"API"})
+     * @var Crypto|null
      */
-    private $currency = 'TOK';
+    private $quoteCrypto;
 
     /**
      * @ORM\Column(type="string")
@@ -65,14 +68,14 @@ class MarketStatus
      */
     private $dayVolume;
 
-    public function __construct(Crypto $crypto, Token $token, MarketInfo $marketInfo)
+    public function __construct(Crypto $crypto, ?Token $quoteToken, ?Crypto $quoteCrypto, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
-        $this->token = $token;
+        $this->quoteToken = $quoteToken;
+        $this->quoteCrypto = $quoteCrypto;
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getVolume()->getAmount();
-        $this->currency = $marketInfo->getCurrency();
     }
 
     public function getCrypto(): Crypto
@@ -85,22 +88,14 @@ class MarketStatus
         $this->crypto = $crypto;
     }
 
-    public function getToken(): Token
-    {
-        return $this->token;
-    }
-
-    public function setToken(Token $token): void
-    {
-        $this->token = $token;
-    }
-
     /**
      * @Groups({"API"})
      */
     public function getOpenPrice(): Money
     {
-        return new Money($this->openPrice, new Currency($this->getCurrency()));
+        return new Money($this->openPrice, new Currency(
+            $this->getQuoteCrypto() ? $this->getQuoteCrypto()->getSymbol() : MoneyWrapper::TOK_SYMBOL
+        ));
     }
 
 
@@ -114,7 +109,9 @@ class MarketStatus
      */
     public function getLastPrice(): Money
     {
-        return new Money($this->lastPrice, new Currency($this->getCurrency()));
+        return new Money($this->lastPrice, new Currency(
+            $this->getQuoteCrypto() ? $this->getQuoteCrypto()->getSymbol() : MoneyWrapper::TOK_SYMBOL
+        ));
     }
 
     public function setLastPrice(string $lastPrice): void
@@ -127,7 +124,9 @@ class MarketStatus
      */
     public function getDayVolume(): Money
     {
-        return new Money($this->dayVolume, new Currency($this->getCurrency()));
+        return new Money($this->dayVolume, new Currency(
+            $this->getQuoteCrypto() ? $this->getQuoteCrypto()->getSymbol() : MoneyWrapper::TOK_SYMBOL
+        ));
     }
 
     public function setDayVolume(string $dayVolume): void
@@ -135,14 +134,24 @@ class MarketStatus
         $this->dayVolume = $dayVolume;
     }
 
-    public function getCurrency(): string
+    public function getQuoteToken(): ?Token
     {
-        return $this->currency;
+        return $this->quoteToken;
     }
 
-    public function setCurrency(string $currency): void
+    public function setQuoteToken(?Token $quoteToken): void
     {
-        $this->currency = $currency;
+        $this->quoteToken = $quoteToken;
+    }
+
+    public function getQuoteCrypto(): ?Crypto
+    {
+        return $this->quoteCrypto;
+    }
+
+    public function setQuoteCrypto(?Crypto $quoteCrypto): void
+    {
+        $this->quoteCrypto = $quoteCrypto;
     }
 
     public function updateStats(MarketInfo $marketInfo): void

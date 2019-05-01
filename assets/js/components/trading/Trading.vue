@@ -161,7 +161,9 @@ export default {
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
                     const cryptoSymbol = this.markets[market].crypto.symbol;
-                    const tokenName = this.markets[market].tokenName;
+                    const tokenName = null !== this.markets[market].quoteCrypto
+                        ? this.markets[market].quoteCrypto.symbol
+                        : this.markets[market].quoteToken.name;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
