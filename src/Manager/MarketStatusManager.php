@@ -84,6 +84,15 @@ class MarketStatusManager implements MarketStatusManagerInterface
     {
         /** @var Market $market */
         foreach ($markets as $market) {
+            $marketStatus = $this->repository->findByBaseQuoteNames(
+                $market->getBase()->getSymbol(),
+                $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+            );
+
+            if ($marketStatus) {
+                continue;
+            }
+
             $marketInfo = $this->marketHandler->getMarketInfo($market);
             $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
             $quoteToken = $this->tokenManager->findByName($market->getQuote()->getName());
