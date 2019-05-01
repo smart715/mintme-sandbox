@@ -179,6 +179,14 @@ services:
         arguments:
             $mail: "%env(MAILER_USER)%"
 
+    App\Exchange\Balance\Factory\BalanceViewFactory:
+        arguments:
+            $tokenSubunit: "%token_precision%"
+
+    App\Serializer\TradableNormalizer:
+        arguments:
+            $tokenSubunit: "%token_precision%"
+
     App\Controller\ResettingController:
         decorates: fos_user.resetting.controller
         public: true

@@ -30,7 +30,9 @@
                             Token balance:
                         </div>
                         <div class="pb-1">
-                            Wallet on exchange: {{ walletBalance }}
+                            Wallet on exchange:
+                            <br>
+                            {{ walletBalance | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Wallet on exchange
@@ -42,7 +44,9 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Active orders: {{ activeOrdersSum }}
+                            Active orders:
+                            <br>
+                            {{ activeOrdersSum | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Active orders
@@ -53,7 +57,9 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Withdrawn: {{ withdrawBalance }}
+                            Withdrawn:
+                            <br>
+                            {{ withdrawBalance | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Withdrawn
@@ -64,7 +70,9 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Sold on the market: {{ soldOrdersSum }}
+                            Sold on the market:
+                            <br>
+                            {{ soldOrdersSum | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Sold on the market
@@ -97,7 +105,9 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Release period: {{ stats.releasePeriod }}
+                            Release period:
+                            <br>
+                            {{ stats.releasePeriod | toMoney(precision) }}
                             <template v-if="stats.releasePeriod !== defaultValue">years</template>
                             <guide>
                                 <template slot="header">
@@ -109,7 +119,9 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Hourly installment: {{ stats.hourlyRate| toMoney }}
+                            Hourly installment:
+                            <br>
+                            {{ stats.hourlyRate | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Hourly installment
@@ -120,7 +132,9 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Already released: {{ stats.releasedAmount | toMoney }}
+                            Already released:
+                            <br>
+                            {{ stats.releasedAmount | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Already released
@@ -132,7 +146,9 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Remaining: {{ stats.frozenAmount| toMoney }}
+                            Remaining:
+                            <br>
+                            {{ stats.frozenAmount | toMoney(precision) }}
                             <guide>
                                 <template slot="header">
                                     Remaining
@@ -184,6 +200,7 @@ export default {
         market: Object,
         releasePeriodRoute: String,
         editable: Boolean,
+        precision: Number,
     },
     data() {
         return {
@@ -277,8 +294,8 @@ export default {
         },
     },
     filters: {
-        toMoney: function(val) {
-            return isNaN(val) ? val : toMoney(val);
+        toMoney: function(val, precision) {
+            return isNaN(val) ? val : toMoney(val, precision);
         },
     },
 };

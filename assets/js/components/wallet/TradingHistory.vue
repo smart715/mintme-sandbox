@@ -57,7 +57,7 @@ export default {
                     label: 'Name',
                     sortable: true,
                     formatter: (market) => {
-                        let name = market.quote.symbol + '/' + market.base.symbol;
+                        let name = market.base.symbol + '/' + market.quote.symbol;
                         return {
                             full: name,
                             truncate: this.truncateFunc(name, 15),
@@ -67,12 +67,12 @@ export default {
                 amount: {
                     label: 'Amount',
                     sortable: true,
-                    formatter: (value) => toMoney(value),
+                    formatter: (value, key, item) => toMoney(value, item.market.quote.subunit),
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
-                    formatter: (value) => toMoney(value),
+                    formatter: (value, key, item) => toMoney(value, item.market.base.subunit),
                 },
                 total: {
                     label: 'Total cost',
@@ -80,13 +80,13 @@ export default {
                     formatter: (value, key, item) => {
                         let tWF = new Decimal(item.amount).times(item.price);
                         let f = new Decimal(item.fee);
-                        return toMoney(tWF.add(f).toString());
+                        return toMoney(tWF.add(f).toString(), item.market.base.subunit);
                     },
                 },
                 fee: {
                     label: 'Fee',
                     sortable: true,
-                    formatter: (value) => toMoney(value),
+                    formatter: (value, key, item) => toMoney(value, item.market.base.subunit),
                 },
             },
         };
