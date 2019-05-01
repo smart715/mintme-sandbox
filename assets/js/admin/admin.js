@@ -1,5 +1,5 @@
 
-var generator = require('generate-password'); 
+let generator = require('generate-password');
 
 window.onload = function() {
     $('.password-generator-button').on('click', function() {
