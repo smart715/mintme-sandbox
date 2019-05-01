@@ -100,12 +100,11 @@ export default {
                         if (this.history.data === null) {
                             this.history.data = JSON.parse(response.request.response);
                         } else if (response.data.length > 0) {
-                            if (this.history.data !== null) {
-                                this.history.data = this.history.data.concat(
-                                    JSON.parse(response.request.response)
-                                );
-                            }
+                            this.history.data = this.history.data.concat(
+                                JSON.parse(response.request.response)
+                            );
                         }
+
                         this.canRequestNextPage = true;
                         this.currentPage++;
                     })
@@ -113,26 +112,27 @@ export default {
             }
         },
         sanitizeHistory: function(historyData) {
-            historyData.forEach((item, index) => {
-                historyData[index]['date'] = item.date
+            historyData.forEach((item) => {
+                item['date'] = item.date
                     ? moment(item.date).format(this.history.dateFormat)
                     : null;
-                historyData[index]['amount'] = item.amount
-                    ? toMoney(item.amount)
+                item['fee'] = item.fee
+                    ? toMoney(item.fee, item.crypto.subunit)
                     : null;
-                historyData[index]['crypto'] = item.crypto.symbol
+                item['amount'] = item.amount
+                    ? toMoney(item.amount, item.crypto.subunit)
+                    : null;
+                item['crypto'] = item.crypto.symbol
                     ? item.crypto.symbol
                     : null;
-                historyData[index]['status'] = item.status.statusCode
+                item['status'] = item.status.statusCode
                     ? item.status.statusCode
                     : null;
-                historyData[index]['type'] = item.type.typeCode
+                item['type'] = item.type.typeCode
                     ? item.type.typeCode
                     : null;
-                historyData[index]['fee'] = item.fee
-                    ? toMoney(item.fee)
-                    : null;
             });
+
             return historyData;
         },
         loadMore: function(evt) {

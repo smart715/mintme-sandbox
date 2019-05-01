@@ -27,7 +27,7 @@ class MarketAPIController extends APIController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/", name="markets", options={"expose"=true})
+     * @Rest\Get(name="markets", options={"expose"=true})
      */
     public function getMarkets(
         MarketFactoryInterface $marketManager

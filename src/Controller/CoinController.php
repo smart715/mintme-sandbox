@@ -52,7 +52,7 @@ class CoinController extends Controller
             'hash' => $this->getUser() ?
                 $this->getUser()->getHash() :
                 '',
-            'precision' => $this->getParameter('market_precision')['coin'],
+            'precision' => $quote->getShowSubunit(),
         ]);
     }
 }
