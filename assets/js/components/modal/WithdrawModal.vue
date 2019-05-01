@@ -60,13 +60,13 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ fee | toMoney }}</span>
+                    <span class="float-right">{{ fee | toMoney(subunit) }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney }}</span>
+                    <span class="float-right">{{ fullAmount | toMoney(subunit) }}</span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
@@ -91,7 +91,6 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {GENERAL} from '../../utils/constants';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
@@ -107,6 +106,7 @@ export default {
         withdrawUrl: String,
         maxAmount: String,
         addressLength: Number,
+        subunit: Number,
         twofa: String,
     },
     data() {
@@ -114,7 +114,7 @@ export default {
             code: '',
             amount: 0,
             address: '',
-            minAmount: toMoney('1e-' + GENERAL.precision),
+            minAmount: toMoney('1e-' + this.subunit),
         };
     },
     computed: {
@@ -125,7 +125,7 @@ export default {
                 new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
             );
 
-            return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString());
+            return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(), this.subunit);
         },
     },
     methods: {
@@ -133,7 +133,7 @@ export default {
             let inputPos = event.target.selectionStart;
             let amount = this.$v.amount.$model.toString();
             let selected = event.view.getSelection().toString();
-            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${GENERAL.precision}})?$`);
+            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${this.subunit}})?$`);
             let key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
 
             if (selected && regex.test(amount.slice(0, inputPos) + key + amount.slice(inputPos + selected.length))) {
@@ -180,7 +180,7 @@ export default {
         setMaxAmount: function() {
             let amount = new Decimal(this.maxAmount);
             this.amount = amount.greaterThan(this.fee) ?
-                toMoney(amount.sub(this.fee).toString()) : toMoney(0);
+                toMoney(amount.sub(this.fee).toString(), this.subunit) : toMoney(0, this.subunit);
         },
     },
     validations() {
@@ -189,7 +189,7 @@ export default {
                 required,
                 decimal,
                 maxValue: maxValue(
-                    toMoney(new Decimal(this.maxAmount).sub(this.fee).toString())
+                    toMoney(new Decimal(this.maxAmount).sub(this.fee).toString(), this.subunit)
                 ),
                 minValue: minValue(this.minAmount),
             },
@@ -202,8 +202,8 @@ export default {
         };
     },
     filters: {
-        toMoney: function(val) {
-            return toMoney(val);
+        toMoney: function(val, subunit) {
+            return toMoney(val, subunit);
         },
     },
 };

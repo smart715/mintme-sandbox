@@ -18,14 +18,19 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     /** @var TokenNameConverterInterface */
     private $tokenNameConverter;
 
+    /** @var int */
+    private $tokenSubunit;
+
     public function __construct(
         TokenStorageInterface $tokenStorage,
         TokenManagerInterface $tokenManager,
-        TokenNameConverterInterface $tokenNameConverter
+        TokenNameConverterInterface $tokenNameConverter,
+        int $tokenSubunit
     ) {
         $this->tokenStorage = $tokenStorage;
         $this->tokenManager = $tokenManager;
         $this->tokenNameConverter = $tokenNameConverter;
+        $this->tokenSubunit = $tokenSubunit;
     }
 
     /** {@inheritdoc} */
@@ -42,10 +47,12 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
 
             $name = $token->getName();
             $fee = null;
+            $subunit = $this->tokenSubunit;
 
             if ($token->getCrypto()) {
                 $fee = $token->getCrypto()->getFee();
                 $name = $token->getCrypto()->getName();
+                $subunit = $token->getCrypto()->getShowSubunit();
             }
 
             $securityToken = $this->tokenStorage->getToken();
@@ -58,6 +65,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
                 $name,
                 $fee,
+                $subunit,
                 $securityToken && $token->getProfile() && $securityToken->getUser() === $token->getProfile()->getUser()
             );
         }

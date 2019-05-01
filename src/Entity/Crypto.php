@@ -43,6 +43,12 @@ class Crypto implements TradebleInterface
     protected $subunit;
 
     /**
+     * @ORM\Column(type="integer")
+     * @var int
+     */
+    protected $showSubunit;
+
+    /**
      * @ORM\Column(type="bigint")
      * @var string
      */
@@ -72,9 +78,15 @@ class Crypto implements TradebleInterface
         return $this->symbol;
     }
 
+    /** @Groups({"API"}) */
     public function getSubunit(): int
     {
         return $this->subunit;
+    }
+
+    public function getShowSubunit(): int
+    {
+        return $this->showSubunit;
     }
 
     /** Show if crypto could be used as `base` currency */
