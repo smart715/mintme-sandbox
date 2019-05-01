@@ -2,19 +2,12 @@
 
 namespace App\Controller\API;
 
-use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Config\Config;
-use App\Exchange\Market;
-use App\Exchange\Order;
-use App\Exchange\Trade\TraderInterface;
-use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
-use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Utils\MarketNameParserInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @Rest\Route("/api/ws")
  * @Security(expression="is_granted('prelaunch')")
  */
-class WebSocketAPIController extends FOSRestController
+class WebSocketAPIController extends AbstractFOSRestController
 {
     /** @var bool */
     private $isAuth;

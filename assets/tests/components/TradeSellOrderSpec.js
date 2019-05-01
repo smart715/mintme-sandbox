@@ -30,11 +30,13 @@ describe('TradeSellOrder', () => {
                 base: {
                     name: 'Webchain',
                     symbol: 'WEB',
+                    subunit: 4,
                     identifier: 'WEB',
                 },
                 quote: {
                     name: 'Betcoin',
                     symbol: 'BTC',
+                    subunit: 8,
                     identifier: 'BTC',
                 },
             },
