@@ -18,9 +18,7 @@ Encore
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('profile_creation', './assets/js/profile_creation.js')
     .addEntry('admin', './assets/js/admin/admin.js')
-    .addEntry('jquery-password', './assets/js/admin/jquery.jquery-password-generator-plugin.min.js')
-
-
+    
     .enablePostCssLoader()
 
     .enableSourceMaps(!Encore.isProduction())
