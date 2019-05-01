@@ -1,4 +1,4 @@
-import Passwordmeter from '../components/PasswordMeter';
+import Passwordmeter from './components/PasswordMeter';
 
 new Vue({
     el: '#passwordmeter',

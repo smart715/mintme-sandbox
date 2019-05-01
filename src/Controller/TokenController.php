@@ -118,7 +118,7 @@ class TokenController extends Controller
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
-            'precision' => $this->getParameter('market_precision')['token'],
+            'precision' => $this->getParameter('token_precision'),
         ]);
     }
 
@@ -138,7 +138,7 @@ class TokenController extends Controller
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-            
+
             if ($this->tokenManager->isExisted($token)) {
                 $form->addError(new FormError('Token name is already exists.'));
 

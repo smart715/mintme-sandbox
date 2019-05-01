@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -12,12 +13,10 @@ use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Serializer\TradableNormalizer;
-use App\Utils\MarketNameParserInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
@@ -25,13 +24,12 @@ use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @Rest\Route("/api/orders")
  * @Security(expression="is_granted('prelaunch')")
  */
-class OrdersAPIController extends FOSRestController
+class OrdersAPIController extends AbstractFOSRestController
 {
     /** @var TraderInterface */
     private $trader;
@@ -240,11 +238,12 @@ class OrdersAPIController extends FOSRestController
 
     private function parseAmount(string $amount, Market $market): string
     {
-        $precisionContainer = $this->getParameter('market_precision');
+        /** @var Crypto $crypto */
+        $crypto = $market->getQuote();
 
         return bcdiv($amount, '1', $market->isTokenMarket() ?
-            $precisionContainer['token'] :
-            $precisionContainer['coin']);
+            $this->getParameter('token_precision') :
+            $crypto->getShowSubunit());
     }
 
     private function getSymbol(TradebleInterface $tradeble): string

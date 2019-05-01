@@ -10,15 +10,12 @@ use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Serializer\TradableNormalizer;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
-use App\Utils\Converter\TokenNameConverter;
 use App\Utils\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -33,7 +30,7 @@ use Symfony\Component\Validator\Validation;
  * @Rest\Route("/api/tokens")
  * @Security(expression="is_granted('prelaunch')")
  */
-class TokensAPIController extends FOSRestController
+class TokensAPIController extends AbstractFOSRestController
 {
     /** @var EntityManagerInterface */
     private $em;
