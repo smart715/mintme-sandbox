@@ -200,6 +200,7 @@ export default {
         resetOrder: function() {
             this.sellPrice = 0;
             this.sellAmount = 0;
+            this.useMarketPrice = false;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {

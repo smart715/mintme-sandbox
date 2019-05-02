@@ -177,6 +177,12 @@ class Trader implements TraderInterface
     {
         $referrencer = $user->getReferrencer();
 
+        if (!in_array($user, $token->getRelatedUsers(), true)) {
+            $user->addRelatedToken($token);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
+
         if ($referrencer && !in_array($referrencer, $token->getRelatedUsers(), true)) {
             $referrencer->addRelatedToken($token);
             $this->entityManager->persist($referrencer);
