@@ -32,3 +32,8 @@ sonata_admin:
                     - sonata.classification.admin.tag
                     - sonata.classification.admin.collection
                     - sonata.classification.admin.context
+
+    templates:
+        layout: admin/custom_layout.html.twig
+        edit: admin/custom_edit.html.twig
+        base_list_field: admin/custom_base_list_field.html.twig
