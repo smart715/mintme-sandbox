@@ -5,6 +5,7 @@ phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
 
 karma:
+	export OPENSSL_CONF=/etc/ssl/
 	npm run unit
 
 syntax_check:
