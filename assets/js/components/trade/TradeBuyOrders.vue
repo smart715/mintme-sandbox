@@ -4,7 +4,7 @@
             <div class="card-header">
                 Buy Orders
                 <span class="card-header-icon">
-                    Total: {{ total }} WEB
+                    Total: {{ total }} {{ tokenName }}
                     <guide>
                         <template slot="header">
                             Buy Orders
@@ -75,7 +75,7 @@ export default {
     computed: {
         total: function() {
             return toMoney(this.ordersList.reduce((sum, order) =>
-                new Decimal(order.sumWeb).add(sum), 0), this.precision
+                new Decimal(order.sum).add(sum), 0), this.precision
             );
         },
         hasOrders: function() {

@@ -5,7 +5,6 @@
                     class="col"
                     :websocket-url="websocketUrl"
                     :market="market"
-                    :precision="precision"
             />
         </div>
         <div class="row">
@@ -20,7 +19,6 @@
                         :market="market"
                         :market-price="marketPriceBuy"
                         :balance="baseBalance"
-                        :precision="precision"
                 />
                 <template v-else>
                     <div class="p-5 text-center text-white">
@@ -40,7 +38,6 @@
                         :market-price="marketPriceSell"
                         :balance="quoteBalance"
                         :is-owner="isOwner"
-                        :precision="precision"
                 />
                 <template v-else>
                     <div class="p-5 text-center text-white">
@@ -55,16 +52,14 @@
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
                 :market="market"
-                :user-id="userId"
-                :precision="precision" />
+                :user-id="userId" />
         </div>
         <div class="row px-0 mt-3">
             <trade-trade-history
-                    class="col"
-                    :hash="hash"
-                    :websocket-url="websocketUrl"
-                    :market="market"
-                    :precision="precision" />
+                class="col"
+                :hash="hash"
+                :websocket-url="websocketUrl"
+                :market="market" />
         </div>
     </div>
 </template>
@@ -147,7 +142,7 @@ export default {
                 if ('order.update' === response.method) {
                     this.updateOrders();
                 }
-            });
+            }, 'trade-update-orders');
         });
 
         this.addOnOpenHandler(() => {

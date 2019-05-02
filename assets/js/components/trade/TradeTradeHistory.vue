@@ -77,7 +77,6 @@ export default {
     mixins: [WebSocketMixin],
     props: {
         market: Object,
-        precision: Number,
     },
     components: {
         Guide,
@@ -95,14 +94,14 @@ export default {
                 orderTrader: {
                     label: 'Order taker',
                 },
-                pricePerToken: {
-                    label: 'Price per token',
+                pricePerQuote: {
+                    label: 'Price per ' + this.market.quote.symbol,
                 },
-                tokenAmount: {
-                    label: 'Token amount',
+                quoteAmount: {
+                    label: this.market.quote.symbol + ' amount',
                 },
-                webAmount: {
-                    label: 'WEB amount',
+                baseAmount: {
+                    label: this.market.base.symbol + ' amount',
                 },
                 dateTime: {
                     label: 'Date & Time',
@@ -137,9 +136,12 @@ export default {
                         ? this.$routing.generate('profile-view', {pageUrl: order.taker.profile.page_url})
                         : '',
                     type: (order.side === WSAPI.order.type.BUY) ? 'Buy' : 'Sell',
-                    pricePerToken: toMoney(order.price, this.precision),
-                    tokenAmount: toMoney(order.amount, this.precision),
-                    webAmount: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.precision),
+                    pricePerQuote: toMoney(order.price, this.market.base.subunit),
+                    quoteAmount: toMoney(order.amount, this.market.quote.subunit),
+                    baseAmount: toMoney(
+                        new Decimal(order.price).mul(order.amount).toString(),
+                        this.market.base.subunit
+                    ),
                 };
             }) : [];
         },
@@ -164,7 +166,7 @@ export default {
                 if ('deals.update' === response.method) {
                     this.updateHistory();
                 }
-            });
+            }, 'trade-history-update-deals');
         });
     },
     methods: {

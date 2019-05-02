@@ -17,9 +17,9 @@ const storage = {
         },
     },
     actions: {
-        addMessageHandler(context, {url, handler}) {
+        addMessageHandler(context, {url, id, handler}) {
             context.commit('init', url);
-            context.commit('addMessageHandler', {url, handler});
+            context.commit('addMessageHandler', {url, id, handler});
         },
         addOnOpenHandler(context, {url, handler}) {
             context.commit('init', url);
@@ -54,14 +54,29 @@ const storage = {
                 state.clients[url].ws = new W3CWebSocket(url);
             }
         },
-        addMessageHandler(state, {url, handler}) {
+        addMessageHandler(state, {url, id, handler}) {
             if (!state.clients[url].handlers.message.includes(handler)) {
-                state.clients[url].handlers.message.push(handler);
+                if (id) {
+                    state.clients[url].handlers.message.forEach((el, i) => {
+                        if (Array.isArray(el) && el[0] === id) {
+                            state.clients[url].handlers.message.splice(i, 1);
+                        }
+                    });
+                    state.clients[url].handlers.message.push([id, handler]);
+                } else {
+                    state.clients[url].handlers.message.push(handler);
+                }
             }
 
             state.clients[url].ws.onmessage = function(result) {
                 result = typeof result.data === 'string' ? JSON.parse(result.data): result;
-                state.clients[url].handlers.message.forEach((handler) => handler(result));
+                state.clients[url].handlers.message.forEach((handler) => {
+                    if (Array.isArray(handler)) {
+                        handler[1](result);
+                    } else {
+                        handler(result);
+                    }
+                });
             };
         },
         addOnOpenHandler(state, {url, handler}) {

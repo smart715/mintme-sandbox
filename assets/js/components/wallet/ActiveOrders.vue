@@ -132,7 +132,7 @@ export default {
                                     this.$refs.table.refresh();
                                 }
                             }
-                        });
+                        }, 'active-orders-update');
                     })
                     .catch(() => {
                         this.$toasted.error('Can not connect to internal services');
@@ -146,10 +146,10 @@ export default {
                 return {
                     date: new Date(order.timestamp * 1000).toDateString(),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: order.market.quote.symbol + '/' + order.market.base.symbol,
-                    amount: toMoney(order.amount),
-                    price: toMoney(order.price),
-                    total: toMoney(new Decimal(order.price).mul(order.amount).toString()),
+                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
+                    amount: toMoney(order.amount, order.market.base.subunit),
+                    price: toMoney(order.price, order.market.base.subunit),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
                     fee: order.fee * 100 + '%',
                     action: this.$routing.generate('orders_сancel', {
                         base: order.market.base.symbol,

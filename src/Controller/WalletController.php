@@ -3,24 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\PendingWithdraw;
-use App\Mailer\Mailer;
-use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingWithdrawRepository;
-use App\Wallet\Exception\NotEnoughAmountException;
-use App\Wallet\Exception\NotEnoughUserAmountException;
-use App\Wallet\Model\Address;
-use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Throwable;
 
 /**
@@ -36,6 +24,7 @@ class WalletController extends Controller
     {
         return $this->render('pages/wallet.html.twig', [
             'hash' => $this->getUser()->getHash(),
+            'precision' => $this->getParameter('token_precision'),
         ]);
     }
 

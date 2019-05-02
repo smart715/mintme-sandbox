@@ -46,7 +46,7 @@
                         :extend="additionalAttributes"
                         :data="chartData"
                         :settings="chartSettings"
-                        :theme="chartTheme(precision)"
+                        :theme="chartTheme(market.base.subunit)"
                         :loading="isKlineEmpty"
                         :resize-delay="0">
                     </ve-candle>
@@ -75,7 +75,6 @@ export default {
     props: {
         websocketUrl: String,
         market: Object,
-        precision: Number,
     },
     data() {
         return {
@@ -121,11 +120,11 @@ export default {
             return this.stats.map((line) => {
                  return [
                     this.getDate(line.time),
-                    toMoney(line.open, this.precision),
-                    toMoney(line.close, this.precision),
-                    toMoney(line.highest, this.precision),
-                    toMoney(line.lowest, this.precision),
-                    toMoney(line.volume, this.precision),
+                    toMoney(line.open, this.market.base.subunit),
+                    toMoney(line.close, this.market.base.subunit),
+                    toMoney(line.highest, this.market.base.subunit),
+                    toMoney(line.lowest, this.market.base.subunit),
+                    toMoney(line.volume, this.market.base.subunit),
                  ];
               });
         },
@@ -166,7 +165,7 @@ export default {
                         volume: result.params[0][5],
                     });
                 }
-            });
+            }, 'trade-chart-state');
 
             this.addOnOpenHandler(() => {
                 this.sendMessage(JSON.stringify({
@@ -180,7 +179,7 @@ export default {
                     id: parseInt(Math.random().toString().replace('0.', '')),
                 }));
             });
-        }).catch((err) => {
+        }).catch(() => {
             this.$toasted.error('Service unavailable now. Can not load the chart data');
         });
     },
@@ -199,7 +198,7 @@ export default {
 
             this.marketStatus = {
                 change: changePercentage.toFixed(2),
-                last: toMoney(marketLastPrice, this.precision),
+                last: toMoney(marketLastPrice, this.market.base.subunit),
                 volume: marketVolume.toFixed(2),
             };
         },

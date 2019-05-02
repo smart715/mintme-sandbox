@@ -17,7 +17,8 @@ Encore
     .addEntry('token_creation', './assets/js/token_creation.js')
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('profile_creation', './assets/js/profile_creation.js')
-
+    .addEntry('admin', './assets/js/admin/admin.js')
+    
     .enablePostCssLoader()
 
     .enableSourceMaps(!Encore.isProduction())
