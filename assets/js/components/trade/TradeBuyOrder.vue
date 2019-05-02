@@ -240,7 +240,7 @@ export default {
             ) {
                 this.immutableBalance = response.params[0][this.market.base.identifier].available;
             }
-        });
+        }, 'trade-buy-order-asset');
     },
     filters: {
         toMoney: function(val, precision) {

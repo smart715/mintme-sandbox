@@ -247,7 +247,7 @@ export default {
                     )
                     .catch(() => {});
             }
-        });
+        }, 'trade-sell-order-asset');
     },
     filters: {
         toMoney: function(val, precision) {

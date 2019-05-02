@@ -166,7 +166,7 @@ export default {
                 if ('deals.update' === response.method) {
                     this.updateHistory();
                 }
-            });
+            }, 'trade-history-update-deals');
         });
     },
     methods: {

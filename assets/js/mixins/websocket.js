@@ -88,9 +88,16 @@ export default {
                 }, 10000);
             });
         },
-        addMessageHandler: function(handler) {
+        /**
+         * Add additional handler for a websocket stream.
+         * @param {function} handler
+         * @param {*} id - uniq identifier for a handler to overwrite duplicated handler
+         * @return {*}
+         */
+        addMessageHandler: function(handler, id = null) {
             return this._addMessageHandler({
                 url: this.websocketUrl,
+                id,
                 handler,
             });
         },

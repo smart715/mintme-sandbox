@@ -203,18 +203,17 @@ export default {
                             if ('asset.update' === response.method) {
                                 this.updateBalances(response.params[0]);
                             }
-                        });
+                        }, 'wallet-asset-update');
+
                         this.sendMessage(JSON.stringify({
                             method: 'asset.subscribe',
                             params: this.allTokensName,
                             id: parseInt(Math.random()),
                         }));
                     })
-                    .catch((err) => {
-                        this.$toasted.error(
-                            'Can not connect to internal services'
-                        );
-                    });
+                    .catch(() => this.$toasted.error(
+                        'Can not connect to internal services'
+                    ));
             })
             .catch(() => {
                 this.$toasted.error('Can not update tokens now. Try again later.');
