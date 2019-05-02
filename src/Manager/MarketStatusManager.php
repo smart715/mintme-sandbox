@@ -60,9 +60,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $info = $this->repository->findAll();
 
         foreach ($info as $marketInfo) {
-            $quote = $marketInfo->getQuoteCrypto()
-                ? $quote = $marketInfo->getQuoteToken()
-                : $quote = $marketInfo->getQuoteCrypto();
+            $quote = $marketInfo->getQuoteCrypto() ?? $quote = $marketInfo->getQuoteToken();
 
             if (!$quote) {
                 continue;
