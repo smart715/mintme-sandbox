@@ -101,7 +101,6 @@
             "ckeditor:install --clear=drop": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "security-checker security:check": "script",
-            "app:database:migrate-markets": "symfony-cmd"
         },
         "post-install-cmd": [
             "@symfony-scripts",
