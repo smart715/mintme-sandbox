@@ -14,7 +14,7 @@ syntax_check:
 	./vendor/bin/phpstan analyse
 
 syntax_check_assets:
-    export OPENSSL_CONF=/etc/ssl/
+	export OPENSSL_CONF=/etc/ssl/
 	npm run stylelint
 	npm run eslint
 
