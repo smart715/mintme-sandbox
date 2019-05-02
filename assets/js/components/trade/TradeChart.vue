@@ -165,7 +165,7 @@ export default {
                         volume: result.params[0][5],
                     });
                 }
-            });
+            }, 'trade-chart-state');
 
             this.addOnOpenHandler(() => {
                 this.sendMessage(JSON.stringify({

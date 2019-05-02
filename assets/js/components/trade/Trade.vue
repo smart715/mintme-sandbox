@@ -142,7 +142,7 @@ export default {
                 if ('order.update' === response.method) {
                     this.updateOrders();
                 }
-            });
+            }, 'trade-update-orders');
         });
 
         this.addOnOpenHandler(() => {

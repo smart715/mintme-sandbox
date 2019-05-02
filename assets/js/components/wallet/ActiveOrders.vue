@@ -132,7 +132,7 @@ export default {
                                     this.$refs.table.refresh();
                                 }
                             }
-                        });
+                        }, 'active-orders-update');
                     })
                     .catch(() => {
                         this.$toasted.error('Can not connect to internal services');
