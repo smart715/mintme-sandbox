@@ -24,9 +24,6 @@ new Vue({
     Tabs,
   },
   methods: {
-    onTabUpdated: function() {
-      store.state.interval.clearAll();
-    },
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
     },
