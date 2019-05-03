@@ -60,7 +60,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $info = $this->repository->findAll();
 
         foreach ($info as $marketInfo) {
-            $quote = $marketInfo->getQuoteCrypto() ?? $quote = $marketInfo->getQuoteToken();
+            $quote = $marketInfo->getQuote();
 
             if (!$quote) {
                 continue;
@@ -93,14 +93,14 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
             $marketInfo = $this->marketHandler->getMarketInfo($market);
             $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
-            $quoteToken = $this->tokenManager->findByName($market->getQuote()->getName());
-            $quouteCrypto = $this->cryptoManager->findBySymbol($market->getQuote()->getSymbol());
+            $quote = $this->tokenManager->findByName($market->getQuote()->getName())
+                ?? $this->cryptoManager->findBySymbol($market->getQuote()->getSymbol());
 
-            if (!$crypto || !$quoteToken && !$quouteCrypto) {
+            if (!$crypto || !$quote) {
                 continue;
             }
 
-            $this->em->persist(new MarketStatus($crypto, $quoteToken, $quouteCrypto, $marketInfo));
+            $this->em->persist(new MarketStatus($crypto, $quote, $marketInfo));
             $this->em->flush();
         }
     }

@@ -68,11 +68,10 @@ class MarketStatus
      */
     private $dayVolume;
 
-    public function __construct(Crypto $crypto, ?Token $quoteToken, ?Crypto $quoteCrypto, MarketInfo $marketInfo)
+    public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
-        $this->quoteToken = $quoteToken;
-        $this->quoteCrypto = $quoteCrypto;
+        $this->setQuote($quote);
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getVolume()->getAmount();
@@ -94,14 +93,8 @@ class MarketStatus
     public function getOpenPrice(): Money
     {
         return new Money($this->openPrice, new Currency(
-            $this->getQuoteCrypto() ? $this->getQuoteCrypto()->getSymbol() : MoneyWrapper::TOK_SYMBOL
+            $this->quoteCrypto ? $this->quoteCrypto->getSymbol() : MoneyWrapper::TOK_SYMBOL
         ));
-    }
-
-
-    public function setOpenPrice(string $openPrice): void
-    {
-        $this->openPrice = $openPrice;
     }
 
     /**
@@ -110,13 +103,8 @@ class MarketStatus
     public function getLastPrice(): Money
     {
         return new Money($this->lastPrice, new Currency(
-            $this->getQuoteCrypto() ? $this->getQuoteCrypto()->getSymbol() : MoneyWrapper::TOK_SYMBOL
+            $this->quoteCrypto ? $this->quoteCrypto->getSymbol() : MoneyWrapper::TOK_SYMBOL
         ));
-    }
-
-    public function setLastPrice(string $lastPrice): void
-    {
-        $this->lastPrice = $lastPrice;
     }
 
     /**
@@ -125,13 +113,22 @@ class MarketStatus
     public function getDayVolume(): Money
     {
         return new Money($this->dayVolume, new Currency(
-            $this->getQuoteCrypto() ? $this->getQuoteCrypto()->getSymbol() : MoneyWrapper::TOK_SYMBOL
+            $this->quoteCrypto ? $this->quoteCrypto->getSymbol() : MoneyWrapper::TOK_SYMBOL
         ));
     }
 
-    public function setDayVolume(string $dayVolume): void
+    public function setQuote(TradebleInterface $quote): void
     {
-        $this->dayVolume = $dayVolume;
+        if ($quote instanceof Crypto) {
+            $this->quoteCrypto = $quote;
+        } else {
+            $this->quoteToken = $quote;
+        }
+    }
+
+    public function getQuote(): TradebleInterface
+    {
+        return $this->quoteCrypto ?? $this->quoteToken;
     }
 
     public function getQuoteToken(): ?Token
@@ -139,19 +136,9 @@ class MarketStatus
         return $this->quoteToken;
     }
 
-    public function setQuoteToken(?Token $quoteToken): void
-    {
-        $this->quoteToken = $quoteToken;
-    }
-
     public function getQuoteCrypto(): ?Crypto
     {
         return $this->quoteCrypto;
-    }
-
-    public function setQuoteCrypto(?Crypto $quoteCrypto): void
-    {
-        $this->quoteCrypto = $quoteCrypto;
     }
 
     public function updateStats(MarketInfo $marketInfo): void
