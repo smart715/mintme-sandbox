@@ -42,7 +42,8 @@
                                 type="checkbox"
                                 id="buy-price"
                                 class="custom-control-input"
-                                >
+                                :disabled="disabledMarketPrice"
+                            >
                             <label
                                 class="custom-control-label"
                                 for="buy-price">
@@ -199,6 +200,9 @@ export default {
             if (this.useMarketPrice) {
                 this.buyPrice = this.price || 0;
             }
+            if (this.disabledMarketPrice) {
+                this.useMarketPrice = false;
+            }
         },
     },
     computed: {
@@ -210,6 +214,9 @@ export default {
         },
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
+        },
+        disabledMarketPrice: function() {
+            return !this.marketPrice > 0;
         },
     },
     watch: {
