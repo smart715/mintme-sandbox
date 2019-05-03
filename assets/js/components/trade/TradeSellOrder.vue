@@ -126,6 +126,7 @@
         </div>
         <order-modal
             :type="modalSuccess"
+            :title="modalTitle"
             :visible="showModal"
             @close="showModal = false"
         />
@@ -136,6 +137,7 @@
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
+import placeOrderMixin from '../../mixins/placeOrder';
 import FiltersMixin from '../../mixins/filters';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -146,7 +148,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [WebSocketMixin, FiltersMixin],
+    mixins: [WebSocketMixin, placeOrderMixin, FiltersMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
@@ -163,8 +165,6 @@ export default {
             sellAmount: 0,
             useMarketPrice: false,
             action: 'sell',
-            showModal: false,
-            modalSuccess: false,
         };
     },
     methods: {
@@ -180,18 +180,14 @@ export default {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
                 }), data)
-                    .then((response) => {
-                        if (response.data.result === 1) {
+                    .then(({data}) => {
+                        if (data.result === 1) {
                             this.resetOrder();
                         }
-                        this.showModalAction(response.data.result);
+                        this.showModalAction(data);
                     })
-                    .catch((error) => this.showModalAction());
+                    .catch((error) => this.handleOrderError(error));
             }
-        },
-        showModalAction: function(result) {
-            this.modalSuccess = 1 === result;
-            this.showModal = true;
         },
         resetOrder: function() {
             this.sellPrice = 0;
