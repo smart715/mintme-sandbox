@@ -126,7 +126,6 @@ export default {
                 marketLastPrice,
                 parseFloat(marketInfo.volume)
             );
-
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex] = market;
             } else {
@@ -205,11 +204,19 @@ export default {
             let result = null;
 
             for (let key in this.markets) {
-                if (this.markets.hasOwnProperty(key) &&
-                    (this.markets[key].tokenName === tokenOrCrypto ||
-                    this.markets[key].cryptoSymbol === tokenOrCrypto)) {
-                    result = key;
-                    break;
+                if (this.markets.hasOwnProperty(key)) {
+                    if (this.markets[key].quoteCrypto !== null) {
+                        if (this.markets[key].quoteCrypto.symbol === tokenOrCrypto) {
+                            result = key;
+                            break;
+                        }
+                    }
+                    if (this.markets[key].quoteToken !== null) {
+                        if (this.markets[key].quoteToken.name === tokenOrCrypto) {
+                            result = key;
+                            break;
+                        }
+                    }
                 }
             }
 
