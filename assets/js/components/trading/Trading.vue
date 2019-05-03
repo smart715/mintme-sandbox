@@ -9,7 +9,7 @@
                     :current-page="currentPage"
                     :per-page="perPage">
                     <template slot="pair" slot-scope="row">
-                        <a class="text-white" v-b-tooltip:title="row.value.full" :href="row.item.tokenUrl">{{ row.value.truncate }}</a>
+                        <a class="d-block text-truncate truncate-responsive text-white" v-b-tooltip:title="row.value" :href="row.item.tokenUrl">{{ row.value }}</a>
                     </template>
                 </b-table>
             </div>
@@ -46,12 +46,6 @@ export default {
                 pair: {
                     label: 'Pair',
                     sortable: true,
-                    formatter: (pair) => {
-                        return {
-                            full: pair,
-                            truncate: this.truncateFunc(pair, 15),
-                        };
-                    },
                 },
                 change: {
                     label: 'Change',
