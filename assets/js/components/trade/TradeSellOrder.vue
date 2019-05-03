@@ -39,7 +39,9 @@
                                 step="0.00000001"
                                 type="checkbox"
                                 id="sell-price"
-                                class="custom-control-input">
+                                class="custom-control-input"
+                                :disabled="disabledMarketPrice"
+                            >
                             <label
                                 class="custom-control-label"
                                 for="sell-price">
@@ -198,6 +200,9 @@ export default {
             if (this.useMarketPrice) {
                 this.sellPrice = this.price || 0;
             }
+            if (this.disabledMarketPrice) {
+                this.useMarketPrice = false;
+            }
         },
     },
     computed: {
@@ -209,6 +214,9 @@ export default {
         },
         fieldsValid: function() {
             return this.sellPrice > 0 && this.sellAmount > 0;
+        },
+        disabledMarketPrice: function() {
+            return !this.marketPrice > 0;
         },
     },
     watch: {
