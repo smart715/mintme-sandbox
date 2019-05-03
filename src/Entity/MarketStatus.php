@@ -117,16 +117,16 @@ class MarketStatus
         ));
     }
 
-    public function setQuote(TradebleInterface $quote): void
+    public function setQuote(?TradebleInterface $quote): void
     {
         if ($quote instanceof Crypto) {
             $this->quoteCrypto = $quote;
-        } else {
+        } elseif ($quote instanceof Token) {
             $this->quoteToken = $quote;
         }
     }
 
-    public function getQuote(): TradebleInterface
+    public function getQuote(): ?TradebleInterface
     {
         return $this->quoteCrypto ?? $this->quoteToken;
     }
