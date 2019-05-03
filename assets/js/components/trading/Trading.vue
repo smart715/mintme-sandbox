@@ -114,8 +114,10 @@ export default {
             const marketLastPrice = parseFloat(marketInfo.last);
             const changePercentage = this.getPercentage(marketLastPrice, parseFloat(marketInfo.open));
 
-            const marketCurrency = this.markets[marketName].cryptoSymbol;
-            const marketToken = this.markets[marketName].tokenName;
+            const marketCurrency = this.markets[marketName].crypto.symbol;
+            const marketToken = this.markets[marketName].quoteToken !== null
+                ? this.markets[marketName].quoteToken.name
+                : this.markets[marketName].quoteCrypto.symbol;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
