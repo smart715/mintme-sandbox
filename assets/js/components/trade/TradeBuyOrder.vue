@@ -18,9 +18,9 @@
             <div class="card-body">
                 <div class="row">
                     <div v-if="immutableBalance"
-                         class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
+                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your {{ this.market.base.symbol }}:
-                        <span class="text-white">
+                        <span class="text-white word-break">
                             {{ immutableBalance | toMoney(market.base.subunit) }}
                             <guide>
                                 <template slot="header">
@@ -33,7 +33,7 @@
                         </span>
                     </div>
                     <div
-                        class="col-12 col-sm-6 col-md-12 col-xl-6
+                        class="col-12 col-sm-4 col-md-12 col-xl-4
                         text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input

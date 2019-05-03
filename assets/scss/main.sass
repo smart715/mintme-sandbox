@@ -232,6 +232,15 @@ a
     &:last-child
       padding-right: 1.5rem
 
+    .text-truncate.truncate-responsive
+      @include media-breakpoint-up(lg)
+        max-width: 200px
+
+      @include media-breakpoint-up(xl)
+        max-width: 300px
+
+      max-width: 100px
+
     img
       height: 22px
 
@@ -479,6 +488,9 @@ meter
 
 .word-break-all
   word-break: break-all
+
+.word-break
+  word-break: break-word
 
 .overflow-wrap-break-word
   overflow-wrap: break-word

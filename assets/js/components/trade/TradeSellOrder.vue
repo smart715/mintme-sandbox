@@ -17,10 +17,10 @@
             <div class="card-body">
                 <div class="row">
                     <div v-if="immutableBalance"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
+                        class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
                         >
                         Your {{ this.market.quote.symbol }}:
-                        <span class="text-white">
+                        <span class="text-white  word-break">
                             {{ immutableBalance | toMoney(market.quote.subunit)  }}
                             <guide>
                                 <template slot="header">
@@ -32,7 +32,7 @@
                             </guide>
                         </span>
                     </div>
-                    <div class="col-12 col-sm-6 col-md-12 col-xl-6 text-sm-right text-md-left text-xl-right">
+                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"

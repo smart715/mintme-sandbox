@@ -60,13 +60,17 @@
                         </b-tab>
                     {% endif %}
                     <template slot="tabs">
-                        <b-nav-item class="float-sm-right" @click="()=>{}">
-                            <token-name
-                                name="{{ market.quote.name }}"
-                                update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                :editable="{{ isOwner ? 'true' : 'false' }}">
-                            </token-name>
-                        </b-nav-item>
+                        <li class="nav-item float-sm-right">
+                            <div class="nav-link">
+                                <token-name
+                                        websocket-url="{{ global_websocket_url }}"
+                                        identifier="{{ market.quote.identifier }}"
+                                        name="{{ market.quote.name }}"
+                                        update-url="{{ path('token_update', {'name': market.quote.name}) }}"
+                                        :editable="{{ isOwner ? 'true' : 'false' }}">
+                                </token-name>
+                            </div>
+                        </li>
                         <div class="clearfix"></div>
                     </template>
                 </b-tabs>
