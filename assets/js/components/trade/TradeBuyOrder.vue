@@ -184,10 +184,6 @@ export default {
                     .then((response) => {
                         if (response.data.result === 1) {
                             this.resetOrder();
-                            this.$axios.single.get(this.$routing.generate('update_market_status', {
-                                base: this.market.base.symbol,
-                                quote: this.market.quote.symbol,
-                            }));
                         }
                         this.showModalAction(response.data.result);
                     })

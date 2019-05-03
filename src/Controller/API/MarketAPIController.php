@@ -65,21 +65,4 @@ class MarketAPIController extends APIController
             $marketHandler->getKLineStatDaily($market)
         );
     }
-
-    /**
-     * @Rest\View()
-     * @Rest\Get("/update/{base}/{quote}", name="update_market_status", options={"expose"=true})
-     */
-    public function updateMarketStatus(string $base, string $quote, MarketStatusManagerInterface $manager): View
-    {
-        $market = $this->getMarket($base, $quote);
-
-        if (!$market) {
-            throw new InvalidArgumentException();
-        }
-
-        $manager->updateMarketStatus($market);
-
-        return $this->view('success');
-    }
 }

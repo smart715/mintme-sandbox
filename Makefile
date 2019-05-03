@@ -5,7 +5,6 @@ phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
 
 karma:
-	export OPENSSL_CONF=/etc/ssl/
 	npm run unit
 
 syntax_check:
@@ -15,7 +14,6 @@ syntax_check:
 	./vendor/bin/phpstan analyse
 
 syntax_check_assets:
-	export OPENSSL_CONF=/etc/ssl/
 	npm run stylelint
 	npm run eslint
 

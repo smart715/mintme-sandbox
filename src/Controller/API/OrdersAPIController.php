@@ -10,6 +10,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -153,6 +154,12 @@ class OrdersAPIController extends AbstractFOSRestController
         );
 
         $tradeResult = $trader->placeOrder($order);
+
+        /** TODO Update marketStatus here */
+//        MarketStatusManagerInterface $marketStatusManager
+//        if (TradeResult::SUCCESS === $tradeResult->getResult()) {
+//            $marketStatusManager->updateMarketStatus($market);
+//        }
 
         return $this->view([
             'result' => $tradeResult->getResult(),
