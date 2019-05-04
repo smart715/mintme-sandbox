@@ -24,10 +24,10 @@ import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
+import WebSocketMixin from '../../mixins/websocket';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
-
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -42,13 +42,14 @@ export default {
     name: 'TokenName',
     props: {
         name: String,
+        identifier: String,
         updateUrl: String,
         editable: Boolean,
     },
     components: {
         FontAwesomeIcon,
     },
-    mixins: [clickaway],
+    mixins: [WebSocketMixin, clickaway],
     data() {
         return {
             editingName: false,
@@ -63,13 +64,22 @@ export default {
             return;
         }
 
-        this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
-                name: this.currentName,
-            }))
-            .then((res) => this.isTokenExchanged = res.data)
-            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
+        this.checkIfTokenExchanged();
+
+        this.addMessageHandler((response) => {
+            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier)) {
+                this.checkIfTokenExchanged();
+            }
+        }, 'token-name-asset-update');
     },
     methods: {
+        checkIfTokenExchanged: function() {
+            this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
+                name: this.currentName,
+            }))
+                .then((res) => this.isTokenExchanged = res.data)
+                .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
+        },
         editName: function() {
             if (!this.editable) {
                 return;

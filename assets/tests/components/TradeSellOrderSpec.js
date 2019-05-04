@@ -69,4 +69,20 @@ describe('TradeSellOrder', () => {
             done();
         });
     });
+
+    describe('useMarketPrice', function() {
+        it('should be disabled if marketPrice not greater than zero', () => {
+            wrapper.vm.marketPrice = 0;
+            expect(wrapper.vm.disabledMarketPrice).to.be.true;
+            wrapper.vm.marketPrice = 2;
+            expect(wrapper.vm.disabledMarketPrice).to.be.false;
+        });
+
+        it('should be unchecked if it is disabled', () => {
+            wrapper.vm.marketPrice = 2;
+            wrapper.vm.useMarketPrice = true;
+            wrapper.vm.marketPrice = 0;
+            expect(wrapper.vm.useMarketPrice).to.be.false;
+        });
+    });
 });
