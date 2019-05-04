@@ -75,7 +75,7 @@ describe('TokenName', () => {
             localVue,
             propsData: {
                 name: 'foo',
-                csrfToken: 'csrfToken',
+                identifier: 'bar',
                 updateUrl: 'updateUrl',
                 editable: false,
             },
@@ -107,9 +107,10 @@ describe('TokenName', () => {
             mocks: {
                 $toasted,
             },
+            methods: {addMessageHandler: () => {}},
             propsData: {
                 name: 'foo',
-                csrfToken: 'csrfToken',
+                identifier: 'bar',
                 updateUrl: 'updateUrl',
                 editable: true,
             },

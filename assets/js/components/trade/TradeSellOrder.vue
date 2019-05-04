@@ -17,10 +17,10 @@
             <div class="card-body">
                 <div class="row">
                     <div v-if="immutableBalance"
-                        class="col-12 col-sm-6 col-md-12 col-xl-6 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
+                        class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
                         >
                         Your {{ this.market.quote.symbol }}:
-                        <span class="text-white">
+                        <span class="text-white  word-break">
                             {{ immutableBalance | toMoney(market.quote.subunit)  }}
                             <guide>
                                 <template slot="header">
@@ -32,14 +32,16 @@
                             </guide>
                         </span>
                     </div>
-                    <div class="col-12 col-sm-6 col-md-12 col-xl-6 text-sm-right text-md-left text-xl-right">
+                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-sm-right text-md-left text-xl-right">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"
                                 step="0.00000001"
                                 type="checkbox"
                                 id="sell-price"
-                                class="custom-control-input">
+                                class="custom-control-input"
+                                :disabled="disabledMarketPrice"
+                            >
                             <label
                                 class="custom-control-label"
                                 for="sell-price">
@@ -126,6 +128,7 @@
         </div>
         <order-modal
             :type="modalSuccess"
+            :title="modalTitle"
             :visible="showModal"
             @close="showModal = false"
         />
@@ -136,6 +139,7 @@
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
+import placeOrderMixin from '../../mixins/placeOrder';
 import FiltersMixin from '../../mixins/filters';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -146,7 +150,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [WebSocketMixin, FiltersMixin],
+    mixins: [WebSocketMixin, placeOrderMixin, FiltersMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
@@ -163,8 +167,6 @@ export default {
             sellAmount: 0,
             useMarketPrice: false,
             action: 'sell',
-            showModal: false,
-            modalSuccess: false,
         };
     },
     methods: {
@@ -180,18 +182,14 @@ export default {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
                 }), data)
-                    .then((response) => {
-                        if (response.data.result === 1) {
+                    .then(({data}) => {
+                        if (data.result === 1) {
                             this.resetOrder();
                         }
-                        this.showModalAction(response.data.result);
+                        this.showModalAction(data);
                     })
-                    .catch((error) => this.showModalAction());
+                    .catch((error) => this.handleOrderError(error));
             }
-        },
-        showModalAction: function(result) {
-            this.modalSuccess = 1 === result;
-            this.showModal = true;
         },
         resetOrder: function() {
             this.sellPrice = 0;
@@ -201,6 +199,9 @@ export default {
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.sellPrice = this.price || 0;
+            }
+            if (this.disabledMarketPrice) {
+                this.useMarketPrice = false;
             }
         },
     },
@@ -213,6 +214,9 @@ export default {
         },
         fieldsValid: function() {
             return this.sellPrice > 0 && this.sellAmount > 0;
+        },
+        disabledMarketPrice: function() {
+            return !this.marketPrice > 0;
         },
     },
     watch: {
