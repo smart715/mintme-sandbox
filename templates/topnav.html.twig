@@ -13,23 +13,29 @@
                     <li class="search nav-item align-self-end align-self-lg-center py-3 py-lg-0 pr-0 pr-lg-3">
                         <token-searcher class="justify-content-end pr-0" search-url="{{ path('token_search') }}"></token-searcher>
                     </li>
-                    <b-nav-item class="menu-token align-self-end align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
-                        <span class="icon-token float-left mt-1 mr-1"></span>
-                        <span>My Token</span>
-                    </b-nav-item>
+                    {% if app.user %}
+                        <b-nav-item class="menu-token align-self-end align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
+                            <span class="icon-token float-left mt-1 mr-1"></span>
+                            <span>My Token</span>
+                        </b-nav-item>
+                    {% endif %}
                     <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'trading' ? 'active' : '' }}" href="{{ path('trading') }}">
                         Trading
                     </b-nav-item>
-                    <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
-                        Wallet
-                    </b-nav-item>
+                    {% if app.user %}
+                        <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
+                            Wallet
+                        </b-nav-item>
+                    {% endif %}
                     <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') starts with 'sonata_news' ? 'active' : '' }}" href="{{ path('sonata_news_archive') }}">
                         News
                     </b-nav-item>
                 {% endif %}
-                <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
-                    Referrals
-                </b-nav-item>
+                {% if app.user %}
+                    <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
+                        Referrals
+                    </b-nav-item>
+                {% endif %}
                 {% if not app.user %}
                     <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
                         Log In
