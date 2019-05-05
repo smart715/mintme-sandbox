@@ -145,7 +145,8 @@ class TokenManager implements TokenManagerInterface
         $name = strtoupper(
             str_replace(' ', '-', $token->getName())
         );
-
-        return null !== $this->findByName($name);
+        $otherToken = $this->findByName($name);
+        
+        return null !== $otherToken && $token !== $otherToken;
     }
 }
