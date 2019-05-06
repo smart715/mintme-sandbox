@@ -75,13 +75,13 @@
                             </guide>
                         </label>
                         <input
-                            v-model.number="buyPrice"
-                            :step="'1e-' + market.base.subunit | toMoney(market.base.subunit)"
-                            type="number"
+                            v-model="buyPrice"
+                            type="text"
                             id="buy-price-input"
                             class="form-control"
+                            @keypress="$emit('check-input', market.base.subunit)"
+                            @paste="$emit('check-input', market.base.subunit)"
                             :disabled="useMarketPrice"
-                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-2">
@@ -91,12 +91,12 @@
                             Amount:
                         </label>
                         <input
-                            v-model.number="buyAmount"
-                            :step="'1e-' + market.quote.subunit | toMoney(market.quote.subunit)"
-                            type="number"
+                            v-model="buyAmount"
+                            type="text"
                             id="buy-price-amount"
+                            @keypress="$emit('check-input', market.quote.subunit)"
+                            @paste="$emit('check-input', market.quote.subunit)"
                             class="form-control"
-                            min="0"
                         >
                     </div>
                     <div class="col-12 pt-2">
