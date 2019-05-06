@@ -28,6 +28,7 @@
                             v-model="$v.amount.$model"
                             type="text"
                             @keypress="checkAmount"
+                            @paste="checkAmount"
                             :class="{ 'is-invalid': $v.amount.$error }"
                             class="form-control text-left input-custom-padding">
                         <button
@@ -132,14 +133,16 @@ export default {
         checkAmount: function(event) {
             let inputPos = event.target.selectionStart;
             let amount = this.$v.amount.$model.toString();
-            let selected = event.view.getSelection().toString();
+            let selected = getSelection().toString();
             let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${this.subunit}})?$`);
-            let key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            let input = event instanceof ClipboardEvent
+                ? event.clipboardData.getData('text')
+                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
 
-            if (selected && regex.test(amount.slice(0, inputPos) + key + amount.slice(inputPos + selected.length))) {
+            if (selected && regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos + selected.length))) {
                 return true;
             }
-            if (!regex.test(amount.slice(0, inputPos) + key + amount.slice(inputPos))) {
+            if (!regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos))) {
                 event.preventDefault();
                 return false;
             }
