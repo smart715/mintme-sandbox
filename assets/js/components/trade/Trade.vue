@@ -19,6 +19,7 @@
                         :market="market"
                         :market-price="marketPriceBuy"
                         :balance="baseBalance"
+                        @check-input="checkInput"
                 />
                 <template v-else>
                     <div class="p-5 text-center text-white">
@@ -38,6 +39,7 @@
                         :market-price="marketPriceSell"
                         :balance="quoteBalance"
                         :is-owner="isOwner"
+                        @check-input="checkInput"
                 />
                 <template v-else>
                     <div class="p-5 text-center text-white">
@@ -156,6 +158,23 @@ export default {
         });
     },
     methods: {
+        checkInput: function(precision) {
+            let inputPos = event.target.selectionStart;
+            let amount = event.srcElement.value;
+            let selected = getSelection().toString();
+            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${precision}})?$`);
+            let input = event instanceof ClipboardEvent
+                ? event.clipboardData.getData('text')
+                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+            if (selected && regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos + selected.length))) {
+                return true;
+            }
+            if (!regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos))) {
+                event.preventDefault();
+                return false;
+            }
+        },
         updateOrders: function() {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('pending_orders', {

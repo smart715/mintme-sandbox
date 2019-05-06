@@ -217,3 +217,5 @@ services:
     App\EventListener\RegistrationCompletedListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed }
+
+    FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'
