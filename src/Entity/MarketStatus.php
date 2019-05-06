@@ -13,7 +13,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MarketStatusRepository")
  * @ORM\Table(name="market_status")
- * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
 class MarketStatus

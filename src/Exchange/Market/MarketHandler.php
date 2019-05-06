@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Market;
 
-use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -11,13 +10,10 @@ use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
-use App\Manager\CryptoManager;
-use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
 class MarketHandler implements MarketHandlerInterface
@@ -34,31 +30,16 @@ class MarketHandler implements MarketHandlerInterface
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
 
-    /** @var CryptoManager */
-    protected $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    protected $tokenManager;
-
-    /** @var EntityManagerInterface */
-    protected $entityManager;
-
     public function __construct(
         MarketFetcherInterface $marketFetcher,
         MoneyWrapperInterface $moneyWrapper,
         UserManagerInterface $userManager,
-        MarketNameConverterInterface $marketNameConverter,
-        CryptoManager $cryptoManager,
-        TokenManagerInterface $tokenManager,
-        EntityManagerInterface $entityManager
+        MarketNameConverterInterface $marketNameConverter
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
         $this->userManager = $userManager;
         $this->marketNameConverter = $marketNameConverter;
-        $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
-        $this->entityManager = $entityManager;
     }
 
     /** {@inheritdoc} */
@@ -281,7 +262,7 @@ class MarketHandler implements MarketHandlerInterface
         $result = $this->marketFetcher->getMarketInfo($this->marketNameConverter->convert($market));
 
         if (!$result) {
-            new InvalidArgumentException();
+            throw new InvalidArgumentException();
         }
 
         return new MarketInfo(
