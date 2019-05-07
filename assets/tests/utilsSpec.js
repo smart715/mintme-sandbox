@@ -1,4 +1,4 @@
-import {deepFlatten, isValidUrl} from '../js/utils/utils';
+import {deepFlatten, isValidUrl} from '../js/utils';
 
 describe('utils', () => {
     describe('#deepFlatten()', () => {

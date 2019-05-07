@@ -91,7 +91,7 @@
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 

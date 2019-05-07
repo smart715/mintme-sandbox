@@ -30,7 +30,7 @@
 
 <script>
 import {Decimal} from 'decimal.js';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 import {WSAPI} from '../../utils/constants';
 import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
