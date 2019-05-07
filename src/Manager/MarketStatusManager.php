@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\MarketInfo;
 use App\Repository\MarketStatusRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,30 +53,25 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->em = $em;
     }
 
+    public function getMarketsCount(): int
+    {
+        return $this->repository->count([]);
+    }
+
+    /** {@inheritDoc} */
+    public function getMarketsInfo(int $offset, int $limit): array
+    {
+        return $this->parseMarketStatuses(
+            $this->repository->findBy([], null, $limit, $offset)
+        );
+    }
+
+    /** {@inheritDoc} */
     public function getAllMarketsInfo(): array
     {
-        $marketsInfo = [];
-
-        /** @var MarketStatus[] $info */
-        $info = $this->repository->findAll();
-
-        foreach ($info as $marketInfo) {
-            $quote = $marketInfo->getQuote();
-
-            if (!$quote) {
-                continue;
-            }
-
-            $market = $this->marketFactory->create($marketInfo->getCrypto(), $quote);
-
-            if (!$market) {
-                continue;
-            }
-
-            $marketsInfo[$this->marketNameConverter->convert($market)] = $marketInfo;
-        }
-
-        return $marketsInfo;
+        return $this->parseMarketStatuses(
+            $this->repository->findAll()
+        );
     }
 
     public function createMarketStatus(array $markets): void
@@ -121,5 +117,32 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $this->em->merge($marketStatus);
         $this->em->flush();
+    }
+
+    /**
+     * @param array<MarketInfo> $marketStatuses
+     * @return array<MarketInfo>
+     */
+    private function parseMarketStatuses(array $marketStatuses): array
+    {
+        $info = [];
+
+        foreach ($marketStatuses as $marketStatus) {
+            $quote = $marketStatus->getQuote();
+
+            if (!$quote) {
+                continue;
+            }
+
+            $market = $this->marketFactory->create($marketStatus->getCrypto(), $quote);
+
+            if (!$market) {
+                continue;
+            }
+
+            $info[$this->marketNameConverter->convert($market)] = $marketStatus;
+        }
+
+        return $info;
     }
 }

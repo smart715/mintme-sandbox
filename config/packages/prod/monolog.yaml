@@ -26,6 +26,16 @@ monolog:
             path: "%kernel.logs_dir%/rabbitmq.log"
             level: info
             channels: ['rabbitmq']
+        rabbitmq_stdout:
+            type: stream
+            path: "php://stdout"
+            level: debug
+            channels: ['rabbitmq']
+        rabbitmq_stderr:
+            type: stream
+            path: "php://stderr"
+            level: warning
+            channels: ['rabbitmq']
         payments:
             type: stream
             path: "%kernel.logs_dir%/payments.log"

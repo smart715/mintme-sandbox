@@ -5,19 +5,21 @@
             <div class="table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
-                    :fields="fields"
-                    :current-page="currentPage"
-                    :per-page="perPage">
+                    :fields="fields">
                     <template slot="pair" slot-scope="row">
-                        <a class="d-block text-truncate truncate-responsive text-white" v-b-tooltip:title="row.value" :href="row.item.tokenUrl">{{ row.value }}</a>
+                        <a class="d-block text-truncate truncate-responsive text-white"
+                            v-b-tooltip:title="row.value"
+                            :href="row.item.tokenUrl">
+                            {{ row.value }}
+                        </a>
                     </template>
                 </b-table>
             </div>
             <div class="row justify-content-center">
                 <b-pagination
+                    @change="updateData"
                     :total-rows="totalRows"
                     :per-page="perPage"
-                    v-model="currentPage"
                     class="my-0" />
             </div>
         </template>
@@ -30,8 +32,7 @@
 </template>
 
 <script>
-import WebSocketMixin from '../../mixins/websocket';
-import FiltersMixin from '../../mixins/filters';
+import {FiltersMixin, WebSocketMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 
 export default {
@@ -40,8 +41,8 @@ export default {
     data() {
         return {
             markets: null,
-            currentPage: 1,
             perPage: 25,
+            totalRows: 25,
             fields: {
                 pair: {
                     label: 'Pair',
@@ -68,9 +69,6 @@ export default {
         };
     },
     computed: {
-        totalRows: function() {
-            return Object.keys(this.markets).length;
-        },
         marketsHiddenNames: function() {
             return Object.keys(this.markets);
         },
@@ -80,7 +78,7 @@ export default {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
 
-            tokens.sort((first, second) => parseFloat(first.volume) < parseFloat(second.volume));
+            tokens.sort((first, second) => parseFloat(second.volume) - parseFloat(first.volume));
 
             return this.sanitizedMarketsOnTop.concat(tokens);
         },
@@ -88,15 +86,27 @@ export default {
             return this.markets !== null;
         },
     },
-    mounted() {
-        this.$axios.retry.get(this.$routing.generate('markets_info'))
-            .then((res) => {
-                this.markets = res.data;
-                this.updateDataWithMarkets();
-            })
-            .catch(() => this.$toasted.error('Can not update the markets data. Try again later.'));
+    mounted: function() {
+        this.updateData(1);
     },
     methods: {
+        updateData: function(page) {
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(this.$routing.generate('markets_info', {page}))
+                    .then((res) => {
+                        this.markets = res.data.markets;
+                        this.perPage = res.data.limit;
+                        this.totalRows = res.data.rows;
+                        this.updateDataWithMarkets();
+
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.$toasted.error('Can not update the markets data. Try again later.');
+                        reject(err);
+                    });
+            });
+        },
         sanitizeMarket: function(marketData) {
             if (!marketData.params) {
                 return;
@@ -109,9 +119,7 @@ export default {
             const changePercentage = this.getPercentage(marketLastPrice, parseFloat(marketInfo.open));
 
             const marketCurrency = this.markets[marketName].crypto.symbol;
-            const marketToken = this.markets[marketName].quoteToken !== null
-                ? this.markets[marketName].quoteToken.name
-                : this.markets[marketName].quoteCrypto.symbol;
+            const marketToken = this.markets[marketName].quote.symbol;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -157,9 +165,7 @@ export default {
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
                     const cryptoSymbol = this.markets[market].crypto.symbol;
-                    const tokenName = null !== this.markets[market].quoteCrypto
-                        ? this.markets[market].quoteCrypto.symbol
-                        : this.markets[market].quoteToken.name;
+                    const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
@@ -200,18 +206,10 @@ export default {
             let result = null;
 
             for (let key in this.markets) {
-                if (this.markets.hasOwnProperty(key)) {
-                    if (this.markets[key].quoteCrypto !== null) {
-                        if (this.markets[key].quoteCrypto.symbol === tokenOrCrypto) {
-                            result = key;
-                            break;
-                        }
-                    }
-                    if (this.markets[key].quoteToken !== null) {
-                        if (this.markets[key].quoteToken.name === tokenOrCrypto) {
-                            result = key;
-                            break;
-                        }
+                if (this.markets.hasOwnProperty(key) && this.markets[key].quote !== null) {
+                    if (this.markets[key].quote.symbol === tokenOrCrypto) {
+                        result = key;
+                        break;
                     }
                 }
             }

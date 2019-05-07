@@ -21,6 +21,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
  */
 class MarketAPIController extends APIController
 {
+    private const OFFSET = 50;
 
     /**
      * @Rest\View()
@@ -37,13 +38,15 @@ class MarketAPIController extends APIController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/info", name="markets_info", options={"expose"=true})
+     * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      */
-    public function getMarketsInfo(MarketStatusManagerInterface $marketStatusManager): View
+    public function getMarketsInfo(int $page, MarketStatusManagerInterface $marketStatusManager): View
     {
-        return $this->view(
-            $marketStatusManager->getAllMarketsInfo()
-        );
+        return $this->view([
+            'markets' => $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET),
+            'rows' => $marketStatusManager->getMarketsCount(),
+            'limit' => self::OFFSET,
+        ]);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Communications\AMQP\MarketAMQPInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
@@ -23,9 +24,11 @@ use FOS\RestBundle\View\View;
 use InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Throwable;
 
 /**
  * @Rest\Route("/api/orders")
@@ -52,18 +55,23 @@ class OrdersAPIController extends AbstractFOSRestController
     /** @var MarketFactoryInterface */
     private $marketManager;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         TraderInterface $trader,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         MarketHandlerInterface $marketHandler,
-        MarketFactoryInterface $marketManager
+        MarketFactoryInterface $marketManager,
+        LoggerInterface $logger
     ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -114,7 +122,8 @@ class OrdersAPIController extends AbstractFOSRestController
         string $quote,
         ParamFetcherInterface $request,
         TraderInterface $trader,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        MarketAMQPInterface $marketProducer
     ): View {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -160,11 +169,13 @@ class OrdersAPIController extends AbstractFOSRestController
 
         $tradeResult = $trader->placeOrder($order);
 
-        /** TODO Update marketStatus here */
-//        MarketStatusManagerInterface $marketStatusManager
-//        if (TradeResult::SUCCESS === $tradeResult->getResult()) {
-//            $marketStatusManager->updateMarketStatus($market);
-//        }
+        try {
+            $marketProducer->send($market);
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                "Failed to update '${base}/${quote}' market status. Reason: {$exception->getMessage()}"
+            );
+        }
 
         return $this->view([
             'result' => $tradeResult->getResult(),
