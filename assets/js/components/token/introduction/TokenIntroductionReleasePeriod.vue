@@ -65,7 +65,7 @@
 
 <script>
 import vueSlider from 'vue-slider-component';
-import {deepFlatten} from '../../../utils';
+import {deepFlatten} from '../../../utils/utils';
 import Guide from '../../Guide';
 
 export default {

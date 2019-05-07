@@ -222,3 +222,5 @@ services:
         class: App\EventListener\ConsoleCommandsListener
         tags:
             - { name: kernel.event_listener, event: console.terminate }
+
+    FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'

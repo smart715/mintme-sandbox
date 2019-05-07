@@ -73,13 +73,13 @@
                             </guide>
                         </label>
                         <input
-                            v-model.number="sellPrice"
-                            :step="'1e-' + market.base.subunit | toMoney(market.base.subunit)"
-                            type="number"
+                            v-model="sellPrice"
+                            type="text"
                             id="sell-price-input"
                             class="form-control"
                             :disabled="useMarketPrice"
-                            min="0"
+                            @keypress="$emit('check-input', market.base.subunit)"
+                            @paste="$emit('check-input', market.base.subunit)"
                         >
                     </div>
                     <div class="col-12 pt-2">
@@ -90,11 +90,11 @@
                         </label>
                         <input
                             v-model="sellAmount"
-                            :step="'1e-' + market.quote.subunit | toMoney(market.quote.subunit)"
-                            type="number"
+                            type="text"
                             id="sell-price-amount"
                             class="form-control"
-                            min="0"
+                            @keypress="$emit('check-input', market.quote.subunit)"
+                            @paste="$emit('check-input', market.quote.subunit)"
                         >
                     </div>
                     <div class="col-12 pt-2">
@@ -141,7 +141,7 @@ import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
 import placeOrderMixin from '../../mixins/placeOrder';
 import FiltersMixin from '../../mixins/filters';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
 import Decimal from 'decimal.js';
 
 export default {

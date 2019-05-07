@@ -1,42 +1,38 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="table-responsive">
+            <div class="table-responsive table-restricted" ref="table">
+                <b-table
+                    ref="btable"
+                    v-if="hasOrders"
+                    :items="getHistory"
+                    :fields="fields">
+                    <template slot="name" slot-scope="row">
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                    </template>
+                    <template slot="action" slot-scope="row">
+                        <a @click="removeOrderModal(row.item)">
+                            <span class="icon-cancel c-pointer"></span>
+                        </a>
+                    </template>
+                </b-table>
+                <div v-if="!hasOrders">
+                    <p class="text-center p-5">No order was added yet</p>
+                </div>
+            </div>
+            <div v-if="loading" class="p-1 text-center">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
             <confirm-modal
-                :visible="confirmModal"
-                @close="switchConfirmModal(false)"
-                @confirm="removeOrder"
+                    :visible="confirmModal"
+                    @close="switchConfirmModal(false)"
+                    @confirm="removeOrder"
             >
                 <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
             </confirm-modal>
-            <b-table v-if="hasOrders" ref="table"
-                :items="getHistory"
-                :fields="fields"
-                :current-page="currentPage"
-                :per-page="perPage">
-                <template slot="name" slot-scope="row">
-                    <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
-                </template>
-                <template slot="action" slot-scope="row">
-                    <a @click="removeOrderModal(row.item)">
-                        <span class="icon-cancel c-pointer"></span>
-                    </a>
-                </template>
-            </b-table>
-            <div v-if="!hasOrders">
-                <p class="text-center p-5">No order was added yet</p>
-            </div>
-        </div>
-        <div v-if="hasOrders" class="row justify-content-center">
-            <b-pagination
-                :total-rows="totalRows"
-                :per-page="perPage"
-                v-model="currentPage"
-                class="my-0" />
-        </div>
         </template>
         <template v-else>
             <div class="p-5 text-center">
@@ -51,23 +47,22 @@ import FiltersMixin from '../../mixins/filters';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
+import {LazyScrollTableMixin} from '../../mixins';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin],
+    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
     components: {
         ConfirmModal,
     },
     data() {
         return {
             markets: null,
-            orders: null,
+            tableData: null,
             currentRow: {},
             actionUrl: '',
-            currentPage: 1,
-            perPage: 10,
-            pageOptions: [10, 20, 30],
+            currentPage: 2,
             confirmModal: false,
             tokenName: null,
             amount: null,
@@ -95,7 +90,7 @@ export default {
     },
     computed: {
         totalRows: function() {
-            return this.orders.length;
+            return this.tableData.length;
         },
         marketNames: function() {
             return this.markets.map((market) => market.identifier);
@@ -104,7 +99,7 @@ export default {
             return this.totalRows > 0;
         },
         loaded: function() {
-            return this.markets !== null && this.orders !== null;
+            return this.markets !== null && this.tableData !== null;
         },
     },
     mounted: function() {
@@ -113,7 +108,7 @@ export default {
                     this.markets = typeof res.data === 'object' ? Object.values(res.data) : res.data
                 ),
                 this.$axios.retry.get(this.$routing.generate('orders')).then((res) =>
-                    this.orders = typeof res.data === 'object' ? Object.values(res.data) : res.data
+                    this.tableData = typeof res.data === 'object' ? Object.values(res.data) : res.data
                 ),
             ])
             .then(() => {
@@ -128,11 +123,11 @@ export default {
                         this.addMessageHandler((response) => {
                             if ('order.update' === response.method) {
                                 this.updateOrders(response.params[1], response.params[0]);
-                                if (this.$refs.table) {
-                                    this.$refs.table.refresh();
+                                if (this.$refs.btable) {
+                                    this.$refs.btable.refresh();
                                 }
                             }
-                        }, 'active-orders-update');
+                        }, 'active-tableData-update');
                     })
                     .catch(() => {
                         this.$toasted.error('Can not connect to internal services');
@@ -141,8 +136,34 @@ export default {
             .catch(() => this.$toasted.error('Can not update order list now. Try again later'));
     },
     methods: {
+        updateTableData: function() {
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(this.$routing.generate('orders', {page: this.currentPage}))
+                    .then((res) => {
+                        res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
+
+                        if (this.tableData === null) {
+                            this.tableData = res.data;
+                            this.currentPage++;
+                        } else if (res.data.length > 0) {
+                            this.tableData = this.tableData.concat(res.data);
+                            this.currentPage++;
+                        }
+
+                        if (this.$refs.btable) {
+                            this.$refs.btable.refresh();
+                        }
+
+                        resolve(this.tableData);
+                    })
+                    .catch(() => {
+                        this.$toasted.error('Can not update orders history. Try again later.');
+                        reject([]);
+                    });
+            });
+        },
         getHistory: function() {
-            return this.orders.map((order) => {
+            return this.tableData.map((order) => {
                 return {
                     date: new Date(order.timestamp * 1000).toDateString(),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
@@ -177,11 +198,11 @@ export default {
             return this.markets.find((market) => market.identifier === name);
         },
         updateOrders: function(data, type) {
-            let order = this.orders.find((order) => data.id === order.id);
+            let order = this.tableData.find((order) => data.id === order.id);
 
             switch (type) {
                 case WSAPI.order.status.PUT:
-                    this.orders.push({
+                    this.tableData.unshift({
                         amount: data.left,
                         price: data.price,
                         fee: WSAPI.order.type.SELL === parseInt(data.type)
@@ -197,24 +218,24 @@ export default {
                         return;
                     }
 
-                    let index = this.orders.indexOf(order);
+                    let index = this.tableData.indexOf(order);
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
-                    this.orders[index] = order;
+                    this.tableData[index] = order;
                     break;
                 case WSAPI.order.status.FINISH:
                     if (typeof order === 'undefined') {
                         return;
                     }
 
-                    this.orders.splice(this.orders.indexOf(order), 1);
+                    this.tableData.splice(this.tableData.indexOf(order), 1);
                     break;
             }
 
-            this.orders.sort((a, b) => a.timestamp < b.timestamp);
-            if (this.$refs.table) {
-                this.$refs.table.refresh();
+            this.tableData.sort((a, b) => a.timestamp < b.timestamp);
+            if (this.$refs.btable) {
+                this.$refs.btable.refresh();
             }
         },
     },

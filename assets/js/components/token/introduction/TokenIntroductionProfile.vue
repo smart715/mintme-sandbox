@@ -69,7 +69,7 @@
 
                     <div class="col-12 my-3 text-left d-flex align-items-center" v-if="!editingUrls">
                         <b-dropdown id="share" text="Share" variant="primary" class="mt-3">
-                            <social-sharing :url="profileUrl"
+                            <social-sharing :url="tokenUrl"
                                     title="MINTME"
                                     description="Check my new cryptocurrency."
                                     quote="Check my new token."
@@ -184,7 +184,7 @@ import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {isValidUrl} from '../../../utils';
+import {isValidUrl} from '../../../utils/utils';
 import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
@@ -212,6 +212,7 @@ export default {
         updateUrl: String,
         editable: Boolean,
         profileUrl: String,
+        tokenUrl: String,
     },
     components: {
         bDropdown,

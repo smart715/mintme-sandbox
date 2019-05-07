@@ -1,32 +1,24 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="table-responsive">
-            <b-table
-                v-if="hasHistory"
-                :items="history"
-                :fields="fields"
-                :current-page="currentPage"
-                :per-page="perPage">
-                <template slot="market" slot-scope="row">
-                    <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
-                </template>
-                 <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
-                 <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
-            </b-table>
-            <div v-if="!hasHistory">
-                <p class="text-center p-5">No deal was made yet</p>
+            <div class="table-responsive table-restricted" ref="table">
+                <b-table
+                    v-if="hasHistory"
+                    :items="tableData"
+                    :fields="fields">
+                    <template slot="market" slot-scope="row">
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                    </template>
+                     <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
+                     <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
+                </b-table>
+                <div v-if="!hasHistory">
+                    <p class="text-center p-5">No deal was made yet</p>
+                </div>
             </div>
-        </div>
-        <div
-            class="row justify-content-center"
-            v-if="hasHistory">
-            <b-pagination
-                :total-rows="totalRows"
-                :per-page="perPage"
-                v-model="currentPage"
-                class="my-0" />
-        </div>
+            <div v-if="loading" class="p-1 text-center">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
         </template>
         <template v-else>
             <div class="p-5 text-center">
@@ -38,18 +30,17 @@
 
 <script>
 import {Decimal} from 'decimal.js';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
 import {WSAPI} from '../../utils/constants';
-import FiltersMixin from '../../mixins/filters';
+import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
 export default {
     name: 'TradingHistory',
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin],
     data() {
         return {
-            history: null,
+            tableData: null,
             currentPage: 1,
-            perPage: 10,
             fields: {
                 timestamp: {label: 'Date', sortable: true},
                 side: {label: 'Type', sortable: true},
@@ -92,24 +83,39 @@ export default {
         };
     },
     computed: {
-        totalRows: function() {
-            return this.history.length;
-        },
         loaded: function() {
-            return this.history !== null;
+            return this.tableData !== null;
         },
         hasHistory: function() {
-            return (this.totalRows > 0);
+            return !!(Array.isArray(this.tableData) && this.tableData.length);
         },
     },
     mounted: function() {
-        this.$axios.retry.get(this.$routing.generate('executed_user_orders'))
-            .then((res) =>
-                this.history = typeof res.data === 'object' ? Object.values(res.data) : res.data
-            )
-            .catch(() => this.$toasted.error('Can not update history now. Try again later.'));
+        this.updateTableData();
     },
     methods: {
+        updateTableData: function() {
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
+                    .then((res) => {
+                        res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
+
+                        if (this.tableData === null) {
+                            this.tableData = res.data;
+                            this.currentPage++;
+                        } else if (res.data.length > 0) {
+                            this.tableData = this.tableData.concat(res.data);
+                            this.currentPage++;
+                        }
+
+                        resolve(this.tableData);
+                    })
+                    .catch(() => {
+                        this.$toasted.error('Can not update trading history. Try again later.');
+                        reject([]);
+                    });
+            });
+        },
         getDate: function(timestamp) {
            return new Date(timestamp * 1000).toDateString();
         },
