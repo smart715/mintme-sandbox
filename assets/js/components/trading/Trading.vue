@@ -32,7 +32,7 @@
 <script>
 import WebSocketMixin from '../../mixins/websocket';
 import FiltersMixin from '../../mixins/filters';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
 
 export default {
     name: 'Trading',

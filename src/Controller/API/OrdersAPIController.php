@@ -19,6 +19,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -31,6 +32,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class OrdersAPIController extends AbstractFOSRestController
 {
+    private const OFFSET = 20;
+    private const PENDING_OFFSET = 100;
+    private const WALLET_OFFSET = 20;
+
     /** @var TraderInterface */
     private $trader;
 
@@ -74,7 +79,7 @@ class OrdersAPIController extends AbstractFOSRestController
         $market = $this->getMarket($base, $quote);
 
         if (!$market) {
-            throw new \InvalidArgumentException();
+            throw new InvalidArgumentException();
         }
 
         foreach ($request->get('orderData') as $id) {
@@ -128,7 +133,7 @@ class OrdersAPIController extends AbstractFOSRestController
 
         if ($request->get('marketPrice')) {
             /** @var Order[] $orders */
-            $orders = $this->getPendingOrders($base, $quote)[$isSellSide ? 'buy' : 'sell'];
+            $orders = $this->getPendingOrders($base, $quote, 1)[$isSellSide ? 'buy' : 'sell'];
 
             if ($orders) {
                 $price = $orders[0]->getPrice();
@@ -161,16 +166,30 @@ class OrdersAPIController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Get("/{base}/{quote}/pending", name="pending_orders", options={"expose"=true})
+     * @Rest\Get(
+     *     "/{base}/{quote}/pending/page/{page}", name="pending_orders", defaults={"page"=1}, options={"expose"=true}
+     * )
      * @Rest\View()
      * @return mixed[]
      */
-    public function getPendingOrders(string $base, string $quote): array
+    public function getPendingOrders(string $base, string $quote, int $page): array
     {
         $market = $this->getMarket($base, $quote);
 
-        $pendingBuyOrders = $market ? $this->marketHandler->getPendingBuyOrders($market) : [];
-        $pendingSellOrders = $market ? $this->marketHandler->getPendingSellOrders($market) : [];
+        $pendingBuyOrders = $market ?
+            $this->marketHandler->getPendingBuyOrders(
+                $market,
+                ($page - 1) * self::PENDING_OFFSET,
+                self::PENDING_OFFSET
+            ) :
+            [];
+        $pendingSellOrders = $market ?
+            $this->marketHandler->getPendingSellOrders(
+                $market,
+                ($page - 1) * self::PENDING_OFFSET,
+                self::PENDING_OFFSET
+            ) :
+            [];
 
         return [
             'sell' => $pendingSellOrders,
@@ -179,25 +198,25 @@ class OrdersAPIController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Get("/{base}/{quote}/executed", name="executed_orders", options={"expose"=true})
+     * @Rest\Get(
+     *     "/{base}/{quote}/executed/page/{page}", name="executed_orders", defaults={"page"=1}, options={"expose"=true}
+     * )
      * @Rest\View()
-     * @return Order[]
      */
-    public function getExecutedOrders(string $base, string $quote): array
+    public function getExecutedOrders(string $base, string $quote, int $page): array
     {
         $market = $this->getMarket($base, $quote);
 
         return $market
-            ? $this->marketHandler->getExecutedOrders($market)
+            ? $this->marketHandler->getExecutedOrders($market, ($page - 1) * self::OFFSET, self::OFFSET)
             : [];
     }
 
     /**
-     * @Rest\Get("/executed", name="executed_user_orders", options={"expose"=true})
+     * @Rest\Get("/executed/page/{page}", name="executed_user_orders", defaults={"page"=1}, options={"expose"=true})
      * @Rest\View()
-     * @return Order[]
      */
-    public function getExecutedUserOrders(): array
+    public function getExecutedUserOrders(int $page): array
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -212,16 +231,48 @@ class OrdersAPIController extends AbstractFOSRestController
 
         return $this->marketHandler->getUserExecutedHistory(
             $user,
-            $markets
+            $markets,
+            ($page - 1) * self::WALLET_OFFSET,
+            self::WALLET_OFFSET
         );
     }
 
     /**
-     * @Rest\Get("/pending", name="orders", options={"expose"=true})
+     * @Rest\Get("/{base}/{quote}/executed/{id}", name="executed_order_details", options={"expose"=true})
+     * @Rest\View()
+     */
+    public function getExecutedOrderDetails(string $base, string $quote, int $id): View
+    {
+        $market = $this->getMarket($base, $quote);
+
+        if (!$market) {
+            throw new InvalidArgumentException();
+        }
+
+        return $this->view($this->marketHandler->getExecutedOrder($market, $id));
+    }
+
+    /**
+     * @Rest\Get("/{base}/{quote}/pending/{id}", name="pending_order_details", options={"expose"=true})
+     * @Rest\View()
+     */
+    public function getPendingOrderDetails(string $base, string $quote, int $id): View
+    {
+        $market = $this->getMarket($base, $quote);
+
+        if (!$market) {
+            throw new InvalidArgumentException();
+        }
+
+        return $this->view($this->marketHandler->getPendingOrder($market, $id));
+    }
+
+    /**
+     * @Rest\Get("/pending/page/{page}", name="orders", defaults={"page"=1}, options={"expose"=true})
      * @Rest\View()
      * @return Order[]
      */
-    public function getPendingUserOrders(): array
+    public function getPendingUserOrders(int $page): array
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -232,7 +283,9 @@ class OrdersAPIController extends AbstractFOSRestController
 
         return $this->marketHandler->getPendingOrdersByUser(
             $user,
-            $this->marketManager->createUserRelated($user)
+            $this->marketManager->createUserRelated($user),
+            ($page - 1) * self::WALLET_OFFSET,
+            self::WALLET_OFFSET
         );
     }
 

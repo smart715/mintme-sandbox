@@ -4,6 +4,7 @@
             <div class="col-12 col-xl-6 col-lg-12 pr-lg-2 pl-lg-0 mt-3">
                 <trade-buy-orders
                         v-if="ordersLoaded"
+                        @update-data="updateBuyOrders"
                         :orders-list="filteredBuyOrders"
                         :token-name="market.base.symbol"
                         :fields="fields"
@@ -20,6 +21,7 @@
             <div class="col-12 col-xl-6 col-lg-12 pr-lg-0 pl-lg-2 mt-3">
                 <trade-sell-orders
                         v-if="ordersLoaded"
+                        @update-data="updateSellOrders"
                         :orders-list="filteredSellOrders"
                         :token-name="market.quote.symbol"
                         :fields="fields"
@@ -55,7 +57,7 @@ import TradeBuyOrders from './TradeBuyOrders';
 import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {toMoney} from '../../../js/utils';
+import {toMoney} from '../../utils/utils';
 
 export default {
     name: 'TokenTradeOrders',
@@ -101,6 +103,15 @@ export default {
         },
     },
     methods: {
+        updateBuyOrders: function({attach, resolve}) {
+            return this.updateOrders(attach, 'buy', resolve);
+        },
+        updateSellOrders: function({attach, resolve}) {
+            return this.updateOrders(attach, 'sell', resolve);
+        },
+        updateOrders: function(isAttached, type, resolve) {
+            return this.$emit('update-data', {isAttached, type, resolve});
+        },
         ordersList: function(orders) {
             return orders.map((order) => {
                 return {

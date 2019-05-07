@@ -16,11 +16,11 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table" ref="ordersList">
+                <div class="table-responsive fixed-head-table">
                     <b-table v-if="hasOrders" ref="table"
                          :sort-by.sync="sortBy"
                          :sort-desc.sync="sortDesc"
-                         :items="ordersList"
+                         :items="tableData"
                          :fields="fields">
                         <template slot="trader" slot-scope="row">
                         <a :href="row.item.traderUrl">
@@ -41,6 +41,9 @@
                     <div v-if="!hasOrders">
                         <p class="text-center p-5">No order was added yet</p>
                     </div>
+                    <div v-if="loading" class="p-1 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
                 </div>
                 <div class="text-center pb-2" v-if="showDownArrow">
                     <img
@@ -56,44 +59,55 @@
 
 <script>
 import Guide from '../Guide';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
 import Decimal from 'decimal.js';
-import FiltersMixin from '../../mixins/filters';
+import {LazyScrollTableMixin, FiltersMixin} from '../../mixins';
 
 export default {
     name: 'TradeSellOrders',
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin],
     props: {
-        ordersList: [Array, Object],
+        ordersList: [Array],
         tokenName: String,
         fields: Object,
         sortBy: String,
         sortDesc: Boolean,
         precision: Number,
     },
+    data() {
+        return {
+            tableData: this.ordersList,
+        };
+    },
     components: {
         Guide,
     },
+    mounted: function() {
+        this.startScrollListeningOnce(this.ordersList);
+    },
     computed: {
         total: function() {
-            return toMoney(this.ordersList.reduce((sum, order) =>
+            return toMoney(this.tableData.reduce((sum, order) =>
                 new Decimal(order.amount).add(sum), 0), this.precision
             );
         },
         hasOrders: function() {
-            return this.ordersList.length > 0;
-        },
-        showDownArrow: function() {
-            return (this.ordersList.length > 7);
+            return this.tableData.length > 0;
         },
     },
     methods: {
-        scrollDown: function() {
-            let parentDiv = this.$refs.table.$el.tBodies[0];
-            parentDiv.scrollTop = parentDiv.scrollHeight;
-        },
         removeOrderModal: function(row) {
             this.$emit('modal', row);
+        },
+        updateTableData: function(attach = false) {
+            return new Promise((resolve) => {
+                this.$emit('update-data', {attach, resolve});
+            });
+        },
+    },
+    watch: {
+        ordersList: function(val) {
+            this.tableData = val;
         },
     },
 };

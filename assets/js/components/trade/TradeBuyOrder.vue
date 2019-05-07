@@ -140,7 +140,7 @@ import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
 import placeOrderMixin from '../../mixins/placeOrder';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
 import Decimal from 'decimal.js';
 
 export default {
