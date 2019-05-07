@@ -60,11 +60,10 @@
 </template>
 
 <script>
-import VeLineTheme from '../../../js/utils/echart-theme';
 import VeLine from 'v-charts';
 import Guide from '../Guide';
 import WebSocketMixin from '../../../js/mixins/websocket';
-import {toMoney} from '../../utils/utils';
+import {toMoney, EchartTheme as VeLineTheme} from '../../utils';
 import moment from 'moment';
 
 Vue.use(VeLine);

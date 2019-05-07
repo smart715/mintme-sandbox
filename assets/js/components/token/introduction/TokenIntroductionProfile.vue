@@ -184,7 +184,7 @@ import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {isValidUrl} from '../../../utils/utils';
+import {isValidUrl} from '../../../utils';
 import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
