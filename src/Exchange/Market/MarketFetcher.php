@@ -16,6 +16,7 @@ class MarketFetcher implements MarketFetcherInterface
     private const USER_EXECUTED_HISTORY = 'market.user_deals';
     private const MARKET_STATUS = 'market.status';
     private const KLINE = 'market.kline';
+    private const PENDING_ORDER_DETAIL_METHOD = 'order.pending_detail';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -126,6 +127,24 @@ class MarketFetcher implements MarketFetcherInterface
 
             return $order;
         }, $response->getResult()['orders']);
+    }
+
+    public function getPendingOrder(string $market, int $id): array
+    {
+        $response = $this->jsonRpc->send(self::PENDING_ORDER_DETAIL_METHOD, [
+            $market,
+            $id,
+        ]);
+
+        if ($response->hasError()) {
+            throw new FetchException($response->getError()['message'] ?? '');
+        }
+
+        $order = $response->getResult();
+
+        $order['user'] -= $this->config->getOffset();
+
+        return $order;
     }
 
     public function getKLineStat(string $market, int $start, int $end, int $interval): array

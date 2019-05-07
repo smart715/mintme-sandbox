@@ -15,9 +15,12 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table" ref="history">
+                <div class="table-responsive fixed-head-table" ref="tableData">
                     <template v-if="loaded">
-                        <b-table v-if="hasOrders" class="w-100" ref="table"
+                        <b-table
+                            v-if="hasOrders"
+                            class="w-100"
+                            ref="table"
                             :items="ordersList"
                             :fields="fields">
                             <template slot="orderMaker" slot-scope="row">
@@ -46,6 +49,9 @@
                         <div v-if="!hasOrders">
                             <p class="text-center p-5">No deal was made yet</p>
                         </div>
+                        <div v-if="loading" class="p-1 text-center">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </div>
                     </template>
                     <template v-else>
                         <div class="p-5 text-center">
@@ -67,14 +73,14 @@
 
 <script>
 import Guide from '../Guide';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
-import WebSocketMixin from '../../mixins/websocket';
+import {WebSocketMixin, LazyScrollTableMixin} from '../../mixins';
 
 export default {
     name: 'TradeTradeHistory',
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, LazyScrollTableMixin],
     props: {
         market: Object,
     },
@@ -83,7 +89,6 @@ export default {
     },
     data() {
         return {
-            history: null,
             fields: {
                 type: {
                     label: 'Type',
@@ -107,6 +112,7 @@ export default {
                     label: 'Date & Time',
                 },
             },
+            page: 1,
         };
     },
     computed: {
@@ -114,7 +120,7 @@ export default {
             return this.ordersList.length > 0;
         },
         ordersList: function() {
-            return this.history !== false ? this.history.map((order) => {
+            return this.tableData !== false ? this.tableData.map((order) => {
                 return {
                     dateTime: new Date(order.timestamp * 1000).toDateString(),
                     orderMaker: order.maker && order.maker.profile
@@ -146,14 +152,11 @@ export default {
             }) : [];
         },
         loaded: function() {
-            return this.history !== null;
-        },
-        showDownArrow: function() {
-            return (this.loaded && this.history.length > 7);
+            return this.tableData !== null;
         },
     },
     mounted: function() {
-        this.updateHistory().then(() => {
+        this.updateTableData().then((res) => {
             this.addOnOpenHandler(() => {
                 this.sendMessage(JSON.stringify({
                     method: 'deals.subscribe',
@@ -162,27 +165,51 @@ export default {
                 }));
             });
 
+            let isFirstUpdate = !!res.length;
             this.addMessageHandler((response) => {
                 if ('deals.update' === response.method) {
-                    this.updateHistory();
+                    if (isFirstUpdate) {
+                        isFirstUpdate = false;
+                        return;
+                    }
+
+                    response.params[1].forEach((deal) => {
+                        this.$axios.retry.get(this.$routing.generate('executed_order_details', {
+                            base: this.market.base.symbol,
+                            quote: this.market.quote.symbol,
+                            id: parseInt(deal.id),
+                        })).then((res) => {
+                            this.tableData.unshift(res.data);
+                        });
+                    });
                 }
-            }, 'trade-history-update-deals');
+            }, 'trade-tableData-update-deals');
         });
     },
     methods: {
-        updateHistory: function() {
+        updateTableData: function(attach = false) {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_orders', {
-                    'base': this.market.base.symbol,
-                    'quote': this.market.quote.symbol,
+                    base: this.market.base.symbol,
+                    quote: this.market.quote.symbol,
+                    page: this.page,
                 })).then((result) => {
-                    this.history = result.data;
+                    if (!result.data.length) {
+                        if (!attach) {
+                            this.tableData = result.data;
+                        }
+
+                        return resolve([]);
+                    }
+
+                    this.tableData = !attach ? result.data : this.tableData.concat(result.data);
+                    this.page++;
 
                     if (this.$refs.table) {
                         this.$refs.table.refresh();
                     }
 
-                    resolve();
+                    resolve(result.data);
                 }).catch(reject);
             });
         },
@@ -196,10 +223,6 @@ export default {
             } else {
                 return first + ' ' + second;
             }
-        },
-        scrollDown: function() {
-            let parentDiv = this.$refs.table.$el.tBodies[0];
-            parentDiv.scrollTop = parentDiv.scrollHeight;
         },
     },
 };

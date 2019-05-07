@@ -1,6 +1,6 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TradeOrders from '../../js/components/trade/TradeOrders';
-import {toMoney} from '../../js/utils';
+import {toMoney} from '../../js/utils/utils';
 import moxios from 'moxios';
 import Axios from '../../js/axios';
 

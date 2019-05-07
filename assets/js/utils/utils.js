@@ -1,5 +1,5 @@
-import Decimal from 'decimal.js';
-import {GENERAL} from './utils/constants';
+import Decimal from 'decimal.js/decimal.js';
+import {GENERAL} from './constants';
 
 /**
  * Checks that given url is valid
