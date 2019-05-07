@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class WalletAPIController extends AbstractFOSRestController
 {
-    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 50;
+    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 20;
 
     /**
      * @Rest\View()
@@ -31,6 +31,7 @@ class WalletAPIController extends AbstractFOSRestController
      *     "/history/{page}",
      *     name="payment_history",
      *     requirements={"page"="^[0-9]\d*$"},
+     *     defaults={"page"=1},
      *     options={"expose"=true}
      *     )
      * @return mixed[]
@@ -41,7 +42,7 @@ class WalletAPIController extends AbstractFOSRestController
     ): array {
         return $wallet->getWithdrawDepositHistory(
             $this->getUser(),
-            $page * self::DEPOSIT_WITHDRAW_HISTORY_LIMIT,
+            ($page - 1) * self::DEPOSIT_WITHDRAW_HISTORY_LIMIT,
             self::DEPOSIT_WITHDRAW_HISTORY_LIMIT
         );
     }

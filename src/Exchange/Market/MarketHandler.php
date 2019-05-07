@@ -14,6 +14,7 @@ use App\Manager\UserManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Exception;
 use InvalidArgumentException;
 
 class MarketHandler implements MarketHandlerInterface
@@ -40,6 +41,36 @@ class MarketHandler implements MarketHandlerInterface
         $this->moneyWrapper = $moneyWrapper;
         $this->userManager = $userManager;
         $this->marketNameConverter = $marketNameConverter;
+    }
+
+    public function getExecutedOrder(Market $market, int $id): Order
+    {
+        $orders = $this->parseExecutedOrders(
+            $this->marketFetcher->getExecutedOrders(
+                $this->marketNameConverter->convert($market),
+                0,
+                10
+            ),
+            $market
+        );
+
+        foreach ($orders as $order) {
+            if ($id === $order->getId()) {
+                return $order;
+            }
+        }
+
+        throw new Exception("Order not found");
+    }
+
+    public function getPendingOrder(Market $market, int $id): Order
+    {
+        $order = $this->marketFetcher->getPendingOrder(
+            $this->marketNameConverter->convert($market),
+            $id
+        );
+
+        return $this->parsePendingOrders([$order], $market)[0];
     }
 
     /** {@inheritdoc} */

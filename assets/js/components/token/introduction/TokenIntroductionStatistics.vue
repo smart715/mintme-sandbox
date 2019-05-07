@@ -185,7 +185,7 @@
 import {Decimal} from 'decimal.js';
 import ReleasePeriodComponent from './TokenIntroductionReleasePeriod';
 import Guide from '../../Guide';
-import {toMoney} from '../../../utils';
+import {toMoney} from '../../../utils/utils';
 import {WSAPI} from '../../../utils/constants';
 
 const defaultValue = '-';

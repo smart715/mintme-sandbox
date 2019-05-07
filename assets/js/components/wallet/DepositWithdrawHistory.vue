@@ -1,18 +1,29 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="table-responsive text-nowrap deposit-withdraw-history" @scroll.passive="loadMore">
+        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table">
             <b-table
                 v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
-                ref="table"
             >
+                <template slot="toAddress" slot-scope="row">
+                    <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
+                        <copy-link :content-to-copy="row.value" class="c-pointer">
+                            <div class="text-truncate text-blue">
+                                {{ row.value }}
+                            </div>
+                        </copy-link>
+                    </div>
+                </template>
             </b-table>
             <div v-if="noHistory">
                 <p class="text-center p-5">No transactions were added yet</p>
             </div>
+        </div>
+        <div v-if="loading" class="p-1 text-center">
+            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
         </div>
         </template>
         <template v-else>
@@ -25,10 +36,14 @@
 
 <script>
 import moment from 'moment';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
+import {LazyScrollTableMixin} from '../../mixins';
+import CopyLink from '../CopyLink';
 
 export default {
     name: 'DepositWithdrawHistory',
+    mixins: [LazyScrollTableMixin],
+    components: {CopyLink},
     data() {
         return {
             fields: {
@@ -62,26 +77,25 @@ export default {
                 },
             },
             history: {
-                data: null,
                 dateFormat: 'MM-DD-YYYY',
             },
-            currentPage: 0,
-            canRequestNextPage: true,
+            tableData: null,
+            currentPage: 1,
         };
     },
     computed: {
         sanitizedHistory: function() {
-            return this.sanitizeHistory(this.history.data);
+            return this.sanitizeHistory(JSON.parse(JSON.stringify(this.tableData)));
         },
         noHistory: function() {
-            return this.history.data.length === 0;
+            return this.tableData.length === 0;
         },
         loaded: function() {
-            return this.history.data !== null;
+            return this.tableData !== null;
         },
     },
     mounted: function() {
-        this.getHistory();
+        this.updateTableData();
     },
     methods: {
         addDetailsForEmptyMessageToHistory: function(historyData) {
@@ -90,26 +104,25 @@ export default {
             }
             return historyData;
         },
-        getHistory: function() {
-            if (this.canRequestNextPage) {
-                this.canRequestNextPage = false;
-                this.$axios.retry.get(
-                        this.$routing.generate('payment_history', {page: this.currentPage})
-                    )
+        updateTableData: function() {
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(this.$routing.generate('payment_history', {page: this.currentPage}))
                     .then((response) => {
-                        if (this.history.data === null) {
-                            this.history.data = JSON.parse(response.request.response);
+                        if (this.tableData === null) {
+                            this.tableData = response.data;
+                            this.currentPage++;
                         } else if (response.data.length > 0) {
-                            this.history.data = this.history.data.concat(
-                                JSON.parse(response.request.response)
-                            );
+                            this.tableData = this.tableData.concat(response.data);
+                            this.currentPage++;
                         }
 
-                        this.canRequestNextPage = true;
-                        this.currentPage++;
+                        resolve(this.tableData);
                     })
-                    .catch((error) => this.$toasted.error('Can not update payment history. Try again later.'));
-            }
+                    .catch(() => {
+                        this.$toasted.error('Can not update payment history. Try again later.');
+                        reject([]);
+                    });
+            });
         },
         sanitizeHistory: function(historyData) {
             historyData.forEach((item) => {
@@ -134,11 +147,6 @@ export default {
             });
 
             return historyData;
-        },
-        loadMore: function(evt) {
-            if (this.$refs.table.$el.offsetHeight - evt.target.offsetHeight - evt.target.scrollTop < 150) {
-                this.getHistory();
-            }
         },
     },
 };
