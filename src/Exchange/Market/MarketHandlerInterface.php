@@ -40,4 +40,7 @@ interface MarketHandlerInterface
      * @return Market\Model\LineStat[]
      */
     public function getKLineStatDaily(Market $market): array;
+
+    public function getExecutedOrder(Market $market, int $id): Order;
+    public function getPendingOrder(Market $market, int $id): Order;
 }

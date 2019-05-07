@@ -191,7 +191,7 @@ a
       display: table-cell
       width: 120px
 
-.table
+.table, .table-responsive
   thead
     th
       border: none
@@ -211,10 +211,13 @@ a
 
     &::-webkit-scrollbar
       width: 10px
-      height: 15px
+      height: 10px
 
     &::-webkit-scrollbar-track-piece
       background-color: $white
+
+    &::-webkit-scrollbar-thumb:horizontal
+      background-color: $primary-light
 
     &::-webkit-scrollbar-thumb:vertical
       height: 30px

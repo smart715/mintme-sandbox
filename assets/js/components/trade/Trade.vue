@@ -50,6 +50,7 @@
         </div>
         <div class="row">
             <trade-orders
+                @update-data="updateOrders"
                 :orders-loaded="ordersLoaded"
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
@@ -75,7 +76,8 @@ import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
-import {toMoney} from '../../utils';
+import {toMoney} from '../../utils/utils';
+import {WSAPI} from '../../utils/constants';
 
 export default {
     name: 'Trade',
@@ -106,6 +108,8 @@ export default {
             buyOrders: null,
             sellOrders: null,
             balances: null,
+            sellPage: 2,
+            buyPage: 2,
         };
     },
     computed: {
@@ -142,7 +146,7 @@ export default {
 
             this.addMessageHandler((response) => {
                 if ('order.update' === response.method) {
-                    this.updateOrders();
+                    this.processOrders(response.params[1], response.params[0]);
                 }
             }, 'trade-update-orders');
         });
@@ -175,16 +179,48 @@ export default {
                 return false;
             }
         },
-        updateOrders: function() {
+        /**
+         * @param {undefined|{type, isAssigned, resolve}} context
+         * @return {Promise}
+         */
+        updateOrders: function(context) {
             return new Promise((resolve, reject) => {
-                this.$axios.retry.get(this.$routing.generate('pending_orders', {
-                    'base': this.market.base.symbol,
-                    'quote': this.market.quote.symbol,
-                })).then((result) => {
-                    this.buyOrders = result.data.buy;
-                    this.sellOrders = result.data.sell;
-                    resolve();
-                }).catch(reject);
+                if (!context) {
+                    this.$axios.retry.get(this.$routing.generate('pending_orders', {
+                        base: this.market.base.symbol, quote: this.market.quote.symbol,
+                    })).then((result) => {
+                        this.buyOrders = result.data.buy;
+                        this.sellOrders = result.data.sell;
+                        resolve();
+                    }).catch(reject);
+                } else {
+                    this.$axios.retry.get(this.$routing.generate('pending_orders', {
+                        base: this.market.base.symbol,
+                        quote: this.market.quote.symbol,
+                        page: context.type === 'sell' ?
+                            this.sellPage :
+                            this.buyPage,
+                    })).then((result) => {
+                        if (!result.data.sell.length && !result.data.buy.length) {
+                            context.resolve();
+                            return resolve([]);
+                        }
+
+                        switch (context.type) {
+                            case 'sell':
+                                this.sellOrders = this.sellOrders.concat(result.data.sell);
+                                this.sellPage++;
+                                break;
+                            case 'buy':
+                                this.buyOrders = this.buyOrders.concat(result.data.buy);
+                                this.buyPage++;
+                                break;
+                        }
+
+                        context.resolve();
+                        resolve(result.data);
+                    }).catch(reject);
+                }
             });
         },
         updateAssets: function() {
@@ -217,6 +253,53 @@ export default {
                         this.$toasted.error('Can not load current balance. Try again later.');
                     }
                 });
+        },
+        processOrders: function(data, type) {
+            const isSell = WSAPI.order.type.SELL === parseInt(data.side);
+            let orders = isSell ? this.sellOrders : this.buyOrders;
+            let order = orders.find((order) => data.id === order.id);
+
+            switch (type) {
+                case WSAPI.order.status.PUT:
+                    this.$axios.retry.get(this.$routing.generate('pending_order_details', {
+                        base: this.market.base.symbol,
+                        quote: this.market.quote.symbol,
+                        id: data.id,
+                    }))
+                    .then((res) => {
+                        orders.push(res.data);
+                        this.saveOrders(orders, isSell);
+                    })
+                    .catch(() => this.$toasted.error('Something went wrong. Can not update orders.'));
+                    break;
+                case WSAPI.order.status.UPDATE:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    let index = orders.indexOf(order);
+                    order.amount = data.left;
+                    order.price = data.price;
+                    order.timestamp = data.mtime;
+                    orders[index] = order;
+                    break;
+                case WSAPI.order.status.FINISH:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    orders.splice(orders.indexOf(order), 1);
+                    break;
+            }
+
+            this.saveOrders(orders, isSell);
+        },
+        saveOrders: function(orders, isSell) {
+            if (isSell) {
+                this.sellOrders = orders;
+            } else {
+                this.buyOrders = orders;
+            }
         },
     },
 };
