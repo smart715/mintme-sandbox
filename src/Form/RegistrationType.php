@@ -20,6 +20,7 @@ class RegistrationType extends AbstractType
                         'theme' => 'dark',
                         'size' => 'normal',
                         'type'  => 'image',
+                        'injectScript' => false,
                     ],
                 ],
                 'mapped' => false,
