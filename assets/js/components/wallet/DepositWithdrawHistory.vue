@@ -36,7 +36,7 @@
 
 <script>
 import moment from 'moment';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 import {LazyScrollTableMixin} from '../../mixins';
 import CopyLink from '../CopyLink';
 

@@ -1,12 +1,14 @@
 import Decimal from 'decimal.js/decimal.js';
-import {GENERAL} from './constants';
+import * as Constants from './constants';
+import Interval from './interval';
+import EchartTheme from './echart-theme';
 
 /**
  * Checks that given url is valid
  * @param {string} url
  * @return {boolean} whether is valid or not
  */
-export function isValidUrl(url) {
+function isValidUrl(url) {
     let regex = new RegExp(
         '^' +
           // protocol identifier
@@ -51,7 +53,7 @@ export function isValidUrl(url) {
  * @param {object|Array} object
  * @return {Array}
  */
-export function deepFlatten(object) {
+function deepFlatten(object) {
     if (typeof object === 'object') {
         object = Array.from(Object.keys(object), (k) => object[k]);
     }
@@ -74,7 +76,16 @@ export function deepFlatten(object) {
  * @param {int} precision
  * @return {string}
  */
-export function toMoney(val, precision = GENERAL.precision) {
+function toMoney(val, precision = Constants.GENERAL.precision) {
     Decimal.set({rounding: Decimal.ROUND_DOWN});
     return new Decimal(val).toFixed(precision);
 }
+
+export {
+    isValidUrl,
+    deepFlatten,
+    toMoney,
+    Constants,
+    EchartTheme,
+    Interval,
+};

@@ -57,7 +57,7 @@ import TradeBuyOrders from './TradeBuyOrders';
 import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 
 export default {
     name: 'TokenTradeOrders',

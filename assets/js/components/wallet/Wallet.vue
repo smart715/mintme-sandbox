@@ -108,7 +108,7 @@ import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
 import WebSocketMixin from '../../mixins/websocket';
 import Decimal from 'decimal.js';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 
 export default {
     name: 'Wallet',

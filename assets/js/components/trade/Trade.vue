@@ -75,9 +75,10 @@ import TradeOrders from './TradeOrders';
 import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
-import WebSocketMixin from '../../mixins/websocket';
-import {toMoney} from '../../utils/utils';
-import {WSAPI} from '../../utils/constants';
+import {WebSocketMixin} from '../../mixins';
+import {toMoney, Constants} from '../../utils';
+
+const WSAPI = Constants.WSAPI;
 
 export default {
     name: 'Trade',
@@ -268,6 +269,11 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
+                        orders = orders.sort((a, b) => {
+                            return isSell ?
+                                parseFloat(a.price) - parseFloat(b.price) :
+                                parseFloat(b.price) - parseFloat(a.price);
+                        });
                         this.saveOrders(orders, isSell);
                     })
                     .catch(() => this.$toasted.error('Something went wrong. Can not update orders.'));
