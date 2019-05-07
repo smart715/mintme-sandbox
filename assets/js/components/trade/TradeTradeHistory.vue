@@ -73,7 +73,7 @@
 
 <script>
 import Guide from '../Guide';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
 import {WebSocketMixin, LazyScrollTableMixin} from '../../mixins';

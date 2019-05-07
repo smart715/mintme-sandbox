@@ -47,7 +47,7 @@ import FiltersMixin from '../../mixins/filters';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 import {LazyScrollTableMixin} from '../../mixins';
 
 export default {

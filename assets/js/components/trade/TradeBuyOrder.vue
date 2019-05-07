@@ -140,7 +140,7 @@ import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
 import WebSocketMixin from '../../mixins/websocket';
 import placeOrderMixin from '../../mixins/placeOrder';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 
 export default {
@@ -154,7 +154,6 @@ export default {
         loginUrl: String,
         signupUrl: String,
         loggedIn: Boolean,
-        placeOrderUrl: String,
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],

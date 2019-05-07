@@ -1,6 +1,6 @@
 import {shallowMount} from '@vue/test-utils';
 import TradeSellOrders from '../../js/components/trade/TradeSellOrders';
-import {toMoney} from '../../js/utils/utils';
+import {toMoney} from '../../js/utils';
 
 describe('TradeSellOrders', () => {
     const wrapper = shallowMount(TradeSellOrders, {

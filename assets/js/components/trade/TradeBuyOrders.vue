@@ -59,7 +59,7 @@
 
 <script>
 import Guide from '../Guide';
-import {toMoney} from '../../utils/utils';
+import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {LazyScrollTableMixin} from '../../mixins';
 
