@@ -52,8 +52,8 @@ class MarketFetcher implements MarketFetcherInterface
     {
         $response = $this->jsonRpc->send(self::EXECUTED_ORDERS_METHOD, [
             $market,
-            $limit,
             $offset,
+            $limit,
         ]);
 
         if ($response->hasError()) {
