@@ -76,9 +76,13 @@ class PaymentConsumer implements ConsumerInterface
                         $crypto->getSymbol()
                     )->add($crypto->getFee())
                 );
-                $this->logger->info('[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back');
+                $this->logger->info(
+                    '[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back'
+                );
             } catch (\Throwable $exception) {
-                $this->logger->error('[payment-consumer] Failed to resume payment. Retry operation. Reason:'. $exception->getMessage());
+                $this->logger->error(
+                    '[payment-consumer] Failed to resume payment. Retry operation. Reason:'. $exception->getMessage()
+                );
                 sleep(10);
 
                 return false;

@@ -48,6 +48,7 @@ export default {
             currentPage: this.page,
             perPage: 25,
             totalRows: 25,
+            loading: false,
             fields: {
                 pair: {
                     label: 'Pair',
@@ -90,15 +91,16 @@ export default {
                 : tokens;
         },
         loaded: function() {
-            return this.markets !== null;
+            return this.markets !== null && !this.loading;
         },
     },
     mounted: function() {
-        this.updateData(1);
+        this.updateData(this.currentPage);
     },
     methods: {
         updateData: function(page) {
             return new Promise((resolve, reject) => {
+                this.loading = true;
                 this.$axios.retry.get(this.$routing.generate('markets_info', {page}))
                     .then((res) => {
                         this.currentPage = page;
@@ -106,6 +108,7 @@ export default {
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
                         this.updateDataWithMarkets();
+                        this.loading = false;
 
                         resolve();
                     })

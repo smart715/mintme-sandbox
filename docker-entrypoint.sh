@@ -27,6 +27,7 @@ php bin/console doctrine:migrations:migrate --allow-no-migration -n
 php bin/console cron:start
 nohup php bin/console rabbitmq:consumer payment &
 nohup php bin/console rabbitmq:consumer deposit &
+nohup php bin/console rabbitmq:consumer market &
 
 # Fallback to original entrypoint
 docker-php-entrypoint php-fpm

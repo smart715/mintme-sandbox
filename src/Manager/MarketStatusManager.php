@@ -10,6 +10,7 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\MarketInfo;
 use App\Repository\MarketStatusRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
@@ -62,7 +63,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getMarketsInfo(int $offset, int $limit): array
     {
         return $this->parseMarketStatuses(
-            $this->repository->findBy([], null, $limit, $offset)
+            $this->repository->findBy([], ['lastPrice' => Criteria::DESC], $limit, $offset)
         );
     }
 
@@ -70,7 +71,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getAllMarketsInfo(): array
     {
         return $this->parseMarketStatuses(
-            $this->repository->findAll()
+            $this->repository->findBy([], ['lastPrice' => Criteria::DESC])
         );
     }
 

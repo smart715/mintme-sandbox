@@ -6,11 +6,11 @@ old_sound_rabbit_mq:
     consumers:
         payment:
             connection: default
-            queue_options: {name: 'payment-callback', durable: false}
+            queue_options:    {name: 'payment-callback', durable: false}
             callback: payment_consumer
         deposit:
             connection: default
-            queue_options: {name: 'deposit', durable: true}
+            queue_options:    {name: 'deposit', durable: true}
             callback: deposit_consumer
         market:
             connection: default

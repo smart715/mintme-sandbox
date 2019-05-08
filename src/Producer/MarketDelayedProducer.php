@@ -42,7 +42,7 @@ class MarketDelayedProducer extends Producer
                 'x-dead-letter-exchange' => [
                     'S', self::MARKET_EXCHANGE_NAME,
                 ],
-                'x-message-ttl' => ['I', 60000],
+                'x-message-ttl' => ['I', 15000],
             ]
         );
 
