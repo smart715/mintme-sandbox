@@ -90,14 +90,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
             $marketInfo = $this->marketHandler->getMarketInfo($market);
             $crypto = $this->cryptoManager->findBySymbol($market->getBase()->getSymbol());
-            $quote = $this->tokenManager->findByName($market->getQuote()->getName())
-                ?? $this->cryptoManager->findBySymbol($market->getQuote()->getSymbol());
 
-            if (!$crypto || !$quote) {
+            if (!$crypto) {
                 continue;
             }
 
-            $this->em->persist(new MarketStatus($crypto, $quote, $marketInfo));
+            $this->em->persist(new MarketStatus($crypto, $market->getQuote(), $marketInfo));
             $this->em->flush();
         }
     }

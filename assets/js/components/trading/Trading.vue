@@ -95,7 +95,13 @@ export default {
         },
     },
     mounted: function() {
-        this.updateData(this.currentPage);
+        this.updateData(this.currentPage).then(() => {
+            this.addMessageHandler((result) => {
+                if ('state.update' === result.method) {
+                    this.sanitizeMarket(result);
+                }
+            });
+        });
     },
     methods: {
         updateData: function(page) {
@@ -200,21 +206,14 @@ export default {
                 }
             }
 
-            if (this.websocketUrl) {
-                this.addOnOpenHandler(() => {
-                    const request = JSON.stringify({
-                        method: 'state.subscribe',
-                        params: this.marketsHiddenNames,
-                        id: parseInt(Math.random().toString().replace('0.', '')),
-                    });
-                    this.sendMessage(request);
+            this.addOnOpenHandler(() => {
+                const request = JSON.stringify({
+                    method: 'state.subscribe',
+                    params: this.marketsHiddenNames,
+                    id: parseInt(Math.random().toString().replace('0.', '')),
                 });
-                this.addMessageHandler((result) => {
-                    if ('state.update' === result.method) {
-                        this.sanitizeMarket(result);
-                    }
-                });
-            }
+                this.sendMessage(request);
+            });
         },
         findHiddenName: function(tokenOrCrypto) {
             let result = null;

@@ -9,7 +9,7 @@ use PhpAmqpLib\Wire\AMQPTable;
 class MarketDelayedProducer extends Producer
 {
     private const MARKET_DELAYED_QUQUE_NAME     = 'market-delayed';
-    private const MARKET_EXCHANGE_NAME     = 'market-delayed';
+    private const MARKET_EXCHANGE_NAME          = 'market';
 
     private const QUEUE_IS_PASSIVE      = false;
     private const QUEUE_IS_DURABLE      = true;

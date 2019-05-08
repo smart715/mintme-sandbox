@@ -21,7 +21,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
  */
 class MarketAPIController extends APIController
 {
-    private const OFFSET = 2;
+    private const OFFSET = 50;
 
     /**
      * @Rest\View()

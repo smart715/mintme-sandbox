@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Throwable;
 
 /**
  * @Route("/token")
@@ -169,7 +170,7 @@ class TokenController extends Controller
                 $marketStatusManager->createMarketStatus($market);
 
                 return $this->redirectToOwnToken('intro');
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 $this->em->remove($token);
                 $this->em->flush();
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');
