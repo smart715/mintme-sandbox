@@ -210,7 +210,6 @@ export default {
                     }
 
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-                    this.page++;
 
                     if (this.$refs.table) {
                         this.$refs.table.refresh();
