@@ -20,6 +20,7 @@
                     @change="updateData"
                     :total-rows="totalRows"
                     :per-page="perPage"
+                    v-model="currentPage"
                     class="my-0" />
             </div>
         </template>
@@ -38,9 +39,13 @@ import {toMoney} from '../../utils';
 export default {
     name: 'Trading',
     mixins: [WebSocketMixin, FiltersMixin],
+    props: {
+        page: Number,
+    },
     data() {
         return {
             markets: null,
+            currentPage: this.page,
             perPage: 25,
             totalRows: 25,
             fields: {
@@ -80,7 +85,9 @@ export default {
 
             tokens.sort((first, second) => parseFloat(second.volume) - parseFloat(first.volume));
 
-            return this.sanitizedMarketsOnTop.concat(tokens);
+            return 1 === this.currentPage
+                ? this.sanitizedMarketsOnTop.concat(tokens)
+                : tokens;
         },
         loaded: function() {
             return this.markets !== null;
@@ -94,6 +101,7 @@ export default {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('markets_info', {page}))
                     .then((res) => {
+                        this.currentPage = page;
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
@@ -130,9 +138,11 @@ export default {
                 marketLastPrice,
                 parseFloat(marketInfo.volume)
             );
+
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex] = market;
             } else {
+                delete this.sanitizedMarkets[marketName];
                 this.sanitizedMarkets[marketName] = market;
             }
         },
@@ -162,6 +172,7 @@ export default {
             return openPrice ? (lastPrice - openPrice) * 100 / openPrice : 0;
         },
         updateDataWithMarkets: function() {
+            this.sanitizedMarkets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
                     const cryptoSymbol = this.markets[market].crypto.symbol;
