@@ -3,7 +3,6 @@
 namespace App\Manager;
 
 use App\Entity\MarketStatus;
-use App\Entity\Token\Token;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -22,9 +21,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** @var MarketNameConverterInterface */
     protected $marketNameConverter;
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
@@ -40,7 +36,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function __construct(
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
-        TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler
@@ -48,7 +43,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->repository = $em->getRepository(MarketStatus::class);
         $this->marketNameConverter = $marketNameConverter;
         $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
         $this->em = $em;
