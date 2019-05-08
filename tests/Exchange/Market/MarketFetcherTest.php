@@ -152,7 +152,7 @@ class MarketFetcherTest extends TestCase
     public function testGetExecutedOrders(bool $hasError, ?array $rpcResult): void
     {
         $method = 'market.deals';
-        $params = ['TOK000000000001WEB', 0, 100];
+        $params = ['TOK000000000001WEB', 100, 0];
 
         $jsonResponse = $this->createMock(JsonRpcResponse::class);
         $jsonResponse->method('hasError')->willReturn($hasError);

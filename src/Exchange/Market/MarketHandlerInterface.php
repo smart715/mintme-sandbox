@@ -16,7 +16,7 @@ interface MarketHandlerInterface
     public function getPendingBuyOrders(Market $market, int $offset = 0, int $limit = 50): array;
 
     /** @return Order[] */
-    public function getExecutedOrders(Market $market, int $offset = 0, int $limit = 50): array;
+    public function getExecutedOrders(Market $market, int $lastId = 0, int $limit = 50): array;
 
     /**
      * @param Market[] $markets

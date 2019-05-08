@@ -48,12 +48,12 @@ class MarketFetcher implements MarketFetcherInterface
         return $response->getResult();
     }
 
-    public function getExecutedOrders(string $market, int $offset = 0, int $limit = 100): array
+    public function getExecutedOrders(string $market, int $lastId = 0, int $limit = 100): array
     {
         $response = $this->jsonRpc->send(self::EXECUTED_ORDERS_METHOD, [
             $market,
-            $offset,
             $limit,
+            $lastId,
         ]);
 
         if ($response->hasError()) {

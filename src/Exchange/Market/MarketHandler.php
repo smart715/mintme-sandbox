@@ -102,12 +102,12 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getExecutedOrders(Market $market, int $offset = 0, int $limit = 100): array
+    public function getExecutedOrders(Market $market, int $lastId = 0, int $limit = 100): array
     {
         return $this->parseExecutedOrders(
             $this->marketFetcher->getExecutedOrders(
                 $this->marketNameConverter->convert($market),
-                $offset,
+                $lastId,
                 $limit
             ),
             $market
