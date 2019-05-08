@@ -12,7 +12,6 @@ use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
 use App\Wallet\Money\MoneyWrapper;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -73,7 +72,7 @@ class MarketFetcherTest extends TestCase
 
         $this->assertEquals(
             $rpcResult['orders'],
-            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::SELL)
         );
     }
 
@@ -95,7 +94,7 @@ class MarketFetcherTest extends TestCase
         $this->expectException(FetchException::class);
         $this->assertEquals(
             [],
-            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::SELL)
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::SELL)
         );
     }
 
@@ -122,7 +121,7 @@ class MarketFetcherTest extends TestCase
 
         $this->assertEquals(
             $rpcResult['orders'],
-            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::BUY)
         );
     }
 
@@ -144,7 +143,7 @@ class MarketFetcherTest extends TestCase
         $this->expectException(FetchException::class);
         $this->assertEquals(
             [],
-            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, MarketFetcher::BUY)
+            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::BUY)
         );
     }
 
