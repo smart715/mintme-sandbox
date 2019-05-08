@@ -8,8 +8,6 @@ use App\Exchange\Config\Config;
 
 class MarketFetcher implements MarketFetcherInterface
 {
-    public const SELL = 1;
-    public const BUY = 2;
     private const BOOK_ORDERS_METHOD = 'order.book';
     private const PENDING_ORDERS_METHOD = 'order.pending';
     private const EXECUTED_ORDERS_METHOD = 'market.deals';
