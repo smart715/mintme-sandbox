@@ -7,9 +7,17 @@ parameters:
 
     viabtc_rpc: 'http://localhost:8080'
     viabtc_response_timeout_seconds: 10
+    withdraw_auth:
+        - 'user'
+        - 'pass'
+        - 'basic'
 
     withdraw_rpc: 'http://localhost:8081'
     withdraw_response_timeout_seconds: 10
+    deposit_auth:
+        - 'user'
+        - 'pass'
+        - 'basic'
 
     deposit_rpc: 'http://localhost:3000'
     deposit_response_timeout_seconds: 10

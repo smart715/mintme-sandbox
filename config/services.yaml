@@ -43,12 +43,14 @@ services:
         arguments:
             $url: '%deposit_rpc%'
             $timeoutSeconds: '%deposit_response_timeout_seconds%'
+            $auth: '%deposit_auth%'
 
     withdraw.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
             $url: '%withdraw_rpc%'
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
+            $auth: '%withdraw_auth%'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:

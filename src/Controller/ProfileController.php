@@ -45,10 +45,6 @@ class ProfileController extends Controller
 
         $profile->setPageUrl($profileManager->generatePageUrl($profile));
 
-        if (!$profile->isChangesLocked()) {
-            $profile->updateNameChangedDate();
-        }
-
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->merge($profile);
         $entityManager->flush();

@@ -19,6 +19,9 @@ use InvalidArgumentException;
 
 class MarketHandler implements MarketHandlerInterface
 {
+    public const SELL = 1;
+    public const BUY = 2;
+
     /** @var MarketFetcherInterface */
     private $marketFetcher;
 
@@ -81,7 +84,7 @@ class MarketHandler implements MarketHandlerInterface
                 $this->marketNameConverter->convert($market),
                 $offset,
                 $limit,
-                MarketFetcher::SELL
+                self::SELL
             ),
             $market
         );
@@ -95,7 +98,7 @@ class MarketHandler implements MarketHandlerInterface
                 $this->marketNameConverter->convert($market),
                 $offset,
                 $limit,
-                MarketFetcher::BUY
+                self::BUY
             ),
             $market
         );
@@ -215,7 +218,9 @@ class MarketHandler implements MarketHandlerInterface
                     $this->getSymbol($market->getQuote())
                 ),
                 Order::PENDING_STATUS,
-                $orderData['maker_fee'] ? floatval($orderData['maker_fee']) : null,
+                self::SELL === $orderData['side'] ?
+                    floatval($orderData['maker_fee']) :
+                    floatval($orderData['taker_fee']),
                 $orderData['mtime'] ? intval($orderData['mtime']) : null
             );
         }, $orders);

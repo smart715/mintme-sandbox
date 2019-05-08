@@ -20,6 +20,9 @@ class GuzzleWrapper implements JsonRpcInterface
     /** @var string */
     private $url;
 
+    /** @var string[] */
+    private $auth;
+
     /** @var int */
     private $timeoutSeconds;
 
@@ -34,13 +37,15 @@ class GuzzleWrapper implements JsonRpcInterface
         Factory\RpcClientFactoryInterface $clientFactory,
         LoggerInterface $logger,
         string $url,
-        int $timeoutSeconds
+        int $timeoutSeconds,
+        array $auth = []
     ) {
         $this->clientFactory = $clientFactory;
         $this->url = $url;
         $this->logger = $logger;
         $this->timeoutSeconds = $timeoutSeconds;
         $this->random = $randomNumber;
+        $this->auth = $auth;
     }
 
     public function send(string $methodName, array $requestParams): JsonRpcResponse
@@ -96,8 +101,14 @@ class GuzzleWrapper implements JsonRpcInterface
             return;
         }
 
-        $this->client = $this->clientFactory->createClient($this->url, [
+        $parameters = [
             'timeout' => $this->timeoutSeconds,
-        ]);
+        ];
+
+        if ($this->auth) {
+            $parameters['auth'] = $this->auth;
+        }
+
+        $this->client = $this->clientFactory->createClient($this->url, $parameters);
     }
 }
