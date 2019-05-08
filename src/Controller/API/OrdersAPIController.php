@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class OrdersAPIController extends AbstractFOSRestController
 {
-    private const OFFSET = 20;
+    private const OFFSET = 100;
     private const PENDING_OFFSET = 100;
     private const WALLET_OFFSET = 20;
 
@@ -199,16 +199,16 @@ class OrdersAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *     "/{base}/{quote}/executed/page/{page}", name="executed_orders", defaults={"page"=1}, options={"expose"=true}
+     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=0}, options={"expose"=true}
      * )
      * @Rest\View()
      */
-    public function getExecutedOrders(string $base, string $quote, int $page): array
+    public function getExecutedOrders(string $base, string $quote, int $id): array
     {
         $market = $this->getMarket($base, $quote);
 
         return $market
-            ? $this->marketHandler->getExecutedOrders($market, ($page - 1) * self::OFFSET, self::OFFSET)
+            ? $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET)
             : [];
     }
 
