@@ -120,8 +120,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /**
-     * @param array<MarketInfo> $marketStatuses
-     * @return array<MarketInfo>
+     * @param array<MarketStatus> $marketStatuses
+     * @return array<MarketStatus>
      */
     private function parseMarketStatuses(array $marketStatuses): array
     {

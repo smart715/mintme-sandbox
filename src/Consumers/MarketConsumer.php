@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Consumers;
 
@@ -39,7 +39,7 @@ class MarketConsumer implements ConsumerInterface
 
     public function execute(AMQPMessage $msg): bool
     {
-        /** @var Market $market */
+        /** @var ?Market $market */
         $market = unserialize($msg->body);
 
         if (!$market || !($market instanceof Market)) {

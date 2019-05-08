@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Producer;
 
@@ -18,13 +18,13 @@ class MarketDelayedProducer extends Producer
     private const QUEUE_IS_NOWAIT       = false;
 
     /** {@inheritDoc} */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = [], array $headers = null)
+    public function publish($msgBody, $routingKey = '', $additionalProperties = [], ?array $headers = null)
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
 
-        $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
+        $msg = new AMQPMessage($msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
 
         if (!empty($headers)) {
             $headersTable = new AMQPTable($headers);
@@ -47,7 +47,7 @@ class MarketDelayedProducer extends Producer
         );
 
         $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, $this->exchangeOptions['name']);
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
+        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
 
         $this->logger->debug('[Market] Delayed message published', [
             'amqp' => [
