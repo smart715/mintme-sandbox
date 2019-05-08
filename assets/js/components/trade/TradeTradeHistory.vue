@@ -112,7 +112,6 @@ export default {
                     label: 'Date & Time',
                 },
             },
-            page: 1,
         };
     },
     computed: {
@@ -154,6 +153,11 @@ export default {
         loaded: function() {
             return this.tableData !== null;
         },
+        lastId: function() {
+            return this.tableData && this.tableData[0] && this.tableData[0].hasOwnProperty('id') ?
+                this.tableData[0].id :
+                0;
+        },
     },
     mounted: function() {
         this.updateTableData().then((res) => {
@@ -187,12 +191,15 @@ export default {
         });
     },
     methods: {
+        startScrollListeningOnce: function(val) {
+            // Disable listener from mixin
+        },
         updateTableData: function(attach = false) {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_orders', {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
-                    page: this.page,
+                    id: this.lastId,
                 })).then((result) => {
                     if (!result.data.length) {
                         if (!attach) {
@@ -203,7 +210,6 @@ export default {
                     }
 
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-                    this.page++;
 
                     if (this.$refs.table) {
                         this.$refs.table.refresh();

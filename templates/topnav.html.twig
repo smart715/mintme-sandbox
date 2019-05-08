@@ -10,69 +10,69 @@
         <b-collapse is-nav="is-nav" id="topnav_collapse">
             <b-navbar-nav class="ml-auto">
                 {% if prelaunch.isFinished() %}
-                    <li class="search nav-item align-self-end align-self-lg-center py-3 py-lg-0 pr-0 pr-lg-3">
-                        <token-searcher class="justify-content-end pr-0" search-url="{{ path('token_search') }}"></token-searcher>
+                    <li class="search nav-item align-self-center py-3 py-lg-0 pr-0 pr-lg-3">
+                        <token-searcher class="justify-content-center pr-0" search-url="{{ path('token_search') }}"></token-searcher>
                     </li>
                     {% if app.user %}
-                        <b-nav-item class="menu-token align-self-end align-self-lg-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
-                            <span class="icon-token float-left mt-1 mr-1"></span>
+                        <b-nav-item class="menu-token align-self-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
+                            <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline"></span>
                             <span>My Token</span>
                         </b-nav-item>
                     {% endif %}
-                    <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'trading' ? 'active' : '' }}" href="{{ path('trading') }}">
+                    <b-nav-item class="align-self-center {{ app.request.get('_route') == 'trading' ? 'active' : '' }}" href="{{ path('trading') }}">
                         Trading
                     </b-nav-item>
                     {% if app.user %}
-                        <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
+                        <b-nav-item class="align-self-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                             Wallet
                         </b-nav-item>
                     {% endif %}
-                    <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') starts with 'sonata_news' ? 'active' : '' }}" href="{{ path('sonata_news_archive') }}">
+                    <b-nav-item class="align-self-center {{ app.request.get('_route') starts with 'sonata_news' ? 'active' : '' }}" href="{{ path('sonata_news_archive') }}">
                         News
                     </b-nav-item>
                 {% endif %}
                 {% if app.user %}
-                    <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
+                    <b-nav-item class="align-self-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
                         Referrals
                     </b-nav-item>
                 {% endif %}
                 {% if not app.user %}
-                    <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
+                    <b-nav-item class="align-self-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
                         Log In
                     </b-nav-item>
-                    <b-nav-item class="align-self-end align-self-lg-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
+                    <b-nav-item class="align-self-center {{ app.request.get('_route') == 'fos_user_registration_register' ? 'active' : '' }}" href="{{ path('fos_user_registration_register') }}">
                         <span>Sign Up</span>
                     </b-nav-item>
                 {% else %}
-                    <div class="d-lg-none align-self-end ">
+                    <div class="d-lg-none align-self-center ">
                         {% if prelaunch.isFinished() %}
-                            <b-nav-item class="text-right {{ app.request.get('_route') == 'profile' ? 'active' : '' }}" href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
+                            <b-nav-item class="text-center {{ app.request.get('_route') == 'profile' ? 'active' : '' }}" href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
                                 <span>Profile</span>
                             </b-nav-item>
                         {% endif %}
-                        <b-nav-item class="text-right {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
+                        <b-nav-item class="text-center {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
                             <span>Setting</span>
                         </b-nav-item>
-                        <b-nav-item class="text-right {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
+                        <b-nav-item class="text-center {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
                             <span>Log Out</span>
                         </b-nav-item>
                     </div>
                     <b-nav-item-dropdown class="d-none d-lg-block align-self-end align-self-lg-center" right="right">
                         <template slot="button-content">
-                            <i class="d-block icon-user-avatar"></i>
+                            <i class="icon-user-avatar d-none d-lg-block"></i>
                         </template>
                         {% if prelaunch.isFinished() %}
                             <b-dropdown-item href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
-                                <span class="icon-profile float-left mt-1 mr-1"></span>
+                                <span class="icon-profile float-left mt-1 mr-1 d-none d-lg-inline"></span>
                                 Profile
                             </b-dropdown-item>
                         {% endif %}
                         <b-dropdown-item href="{{ path('settings') }}">
-                            <font-awesome-icon icon="cog" class="float-left mt-1 mr-1"></font-awesome-icon>
+                            <font-awesome-icon icon="cog" class="float-left mt-1 mr-1 d-none d-lg-inline"></font-awesome-icon>
                             Settings
                         </b-dropdown-item>
                         <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
-                            <span class="icon-logout float-left mt-1 mr-1"></span>
+                            <span class="icon-logout float-left mt-1 mr-1 d-none d-lg-inline"></span>
                             Log Out
                         </b-dropdown-item>
                     </b-nav-item-dropdown>
