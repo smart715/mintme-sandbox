@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Validator\Constraints\ProfilePeriodLock;
-use DateTime;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -129,9 +129,11 @@ class Profile
     }
 
     /** @ORM\PreUpdate() */
-    public function updateNameChangedDate(): self
+    public function updateNameChangedDate(PreUpdateEventArgs $args): self
     {
-        $this->nameChangedDate = new \DateTimeImmutable('+1 month');
+        if ($args->hasChangedField('firstName') || $args->hasChangedField('lastName')) {
+            $this->nameChangedDate = new \DateTimeImmutable('+1 month');
+        }
 
         return $this;
     }
