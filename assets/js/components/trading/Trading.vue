@@ -115,6 +115,13 @@ export default {
                         this.updateDataWithMarkets();
                         this.loading = false;
 
+                        if (window.history.replaceState) {
+                            // prevents browser from storing history with each change:
+                            window.history.replaceState(
+                                {page}, document.title, this.$routing.generate('trading', {page})
+                            );
+                        }
+
                         resolve();
                     })
                     .catch((err) => {
