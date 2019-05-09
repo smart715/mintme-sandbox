@@ -83,7 +83,6 @@ export default {
             Object.keys(this.sanitizedMarkets).forEach((marketName) => {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
-
             tokens.sort((first, second) => parseFloat(second.volume) - parseFloat(first.volume));
 
             return 1 === this.currentPage
@@ -149,10 +148,9 @@ export default {
             );
 
             if (marketOnTopIndex > -1) {
-                this.sanitizedMarketsOnTop[marketOnTopIndex] = market;
+                Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, market);
             } else {
-                delete this.sanitizedMarkets[marketName];
-                this.sanitizedMarkets[marketName] = market;
+                Vue.set(this.sanitizedMarkets, marketName, market);
             }
         },
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume) {
@@ -199,9 +197,9 @@ export default {
                     );
 
                     if (marketOnTopIndex > -1) {
-                        this.sanitizedMarketsOnTop[marketOnTopIndex] = sanitizedMarket;
+                        Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, market);
                     } else {
-                        this.sanitizedMarkets[market] = sanitizedMarket;
+                        Vue.set(this.sanitizedMarkets, market, sanitizedMarket);
                     }
                 }
             }
