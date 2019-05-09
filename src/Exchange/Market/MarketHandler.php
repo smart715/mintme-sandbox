@@ -293,53 +293,43 @@ class MarketHandler implements MarketHandlerInterface
         }, $result);
     }
 
-    /**
-     * @param  Market[] $markets
-     * @return MarketInfo[]
-     */
-    public function getMarketsInfo(array $markets): array
+    public function getMarketInfo(Market $market): MarketInfo
     {
-        $marketsInfo = [];
+        $result = $this->marketFetcher->getMarketInfo($this->marketNameConverter->convert($market));
 
-        foreach ($markets as $market) {
-            $result = $this->marketFetcher->getMarketInfo($this->marketNameConverter->convert($market));
-
-            if (!$result) {
-                continue;
-            }
-
-            $marketsInfo[$this->marketNameConverter->convert($market)] = new MarketInfo(
-                $market->getBase()->getSymbol(),
-                $market->getQuote()->getSymbol(),
-                $this->moneyWrapper->parse(
-                    $result['last'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $result['volume'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $result['open'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $result['close'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $result['high'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $this->moneyWrapper->parse(
-                    $result['low'],
-                    $this->getSymbol($market->getQuote())
-                ),
-                $result['deal']
-            );
+        if (!$result) {
+            throw new InvalidArgumentException();
         }
 
-        return $marketsInfo;
+        return new MarketInfo(
+            $market->getBase()->getSymbol(),
+            $market->getQuote()->getSymbol(),
+            $this->moneyWrapper->parse(
+                $result['last'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $this->moneyWrapper->parse(
+                $result['volume'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $this->moneyWrapper->parse(
+                $result['open'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $this->moneyWrapper->parse(
+                $result['close'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $this->moneyWrapper->parse(
+                $result['high'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $this->moneyWrapper->parse(
+                $result['low'],
+                $this->getSymbol($market->getQuote())
+            ),
+            $result['deal']
+        );
     }
 
     private function getSymbol(TradebleInterface $tradeble): string

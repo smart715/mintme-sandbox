@@ -24,8 +24,10 @@ parameters:
 
     websocket_url: 'ws://mintme.abchosting.org:8364'
 
-    taker_fee_rate: 0.1
-    maker_fee_rate: 0.01
+    # 0.2%
+    taker_fee_rate: 0.002
+    # 0.1%
+    maker_fee_rate: 0.001
 
     # Max timeout to check user website hash
     verify_timeout_seconds: 10
