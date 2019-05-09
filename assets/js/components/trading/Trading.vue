@@ -136,6 +136,7 @@ export default {
 
             const marketCurrency = this.markets[marketName].crypto.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
+            const marketPrecision = this.markets[marketName].crypto.subunit;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -144,7 +145,8 @@ export default {
                 marketToken,
                 changePercentage,
                 marketLastPrice,
-                parseFloat(marketInfo.volume)
+                parseFloat(marketInfo.volume),
+                marketPrecision
             );
 
             if (marketOnTopIndex > -1) {
@@ -153,13 +155,13 @@ export default {
                 Vue.set(this.sanitizedMarkets, marketName, market);
             }
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, subunit) {
             let hiddenName = this.findHiddenName(token);
 
             return {
                 pair: `${currency}/${token}`,
                 change: changePercentage.toFixed(2) + '%',
-                lastPrice: toMoney(lastPrice) + ' ' + currency,
+                lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 volume: volume.toFixed(2),
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
@@ -193,7 +195,8 @@ export default {
                             parseFloat(this.markets[market].openPrice)
                         ),
                         parseFloat(this.markets[market].lastPrice),
-                        parseFloat(this.markets[market].dayVolume)
+                        parseFloat(this.markets[market].dayVolume),
+                        this.markets[market].crypto.subunit
                     );
 
                     if (marketOnTopIndex > -1) {
