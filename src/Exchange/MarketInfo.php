@@ -28,7 +28,7 @@ class MarketInfo
     /** @var string */
     private $deal;
 
-    /** @var ?string */
+    /** @var string */
     private $tokenName;
 
     /** @var string */
@@ -36,7 +36,7 @@ class MarketInfo
 
     public function __construct(
         string $cryptoSymbol,
-        ?string $tokenName,
+        string $tokenName,
         Money $last,
         Money $volume,
         Money $open,
@@ -101,7 +101,7 @@ class MarketInfo
     }
 
     /** @Groups({"Default", "API"}) */
-    public function getTokenName(): ?string
+    public function getTokenName(): string
     {
         return $this->tokenName;
     }

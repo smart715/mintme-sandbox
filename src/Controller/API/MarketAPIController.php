@@ -6,6 +6,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\MarketNameParserInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -20,6 +21,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
  */
 class MarketAPIController extends APIController
 {
+    private const OFFSET = 50;
 
     /**
      * @Rest\View()
@@ -36,15 +38,15 @@ class MarketAPIController extends APIController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/info", name="markets_info", options={"expose"=true})
+     * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      */
-    public function getMarketsInfo(
-        MarketFactoryInterface $marketManager,
-        MarketHandlerInterface $marketHandler
-    ): View {
-        return $this->view(
-            $marketHandler->getMarketsInfo($marketManager->createAll())
-        );
+    public function getMarketsInfo(int $page, MarketStatusManagerInterface $marketStatusManager): View
+    {
+        return $this->view([
+            'markets' => $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET),
+            'rows' => $marketStatusManager->getMarketsCount(),
+            'limit' => self::OFFSET,
+        ]);
     }
 
     /**

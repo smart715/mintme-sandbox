@@ -18,12 +18,18 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class TradingController extends Controller
 {
     /**
-     * @Route("/trading", name="trading", options={"expose"=true})
+     * @Route("/trading/{page}",
+     *     defaults={"page"="1"},
+     *     requirements={"page"="\d+"},
+     *     name="trading",
+     *     options={"expose"=true}
+     * )
      */
-    public function trading(MarketFactoryInterface $marketManager): Response
+    public function trading(string $page, MarketFactoryInterface $marketManager): Response
     {
         return $this->render('pages/trading.html.twig', [
             'markets' => $marketManager->createAll(),
+            'page' => $page,
         ]);
     }
 }
