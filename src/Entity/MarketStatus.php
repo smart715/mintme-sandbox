@@ -33,7 +33,7 @@ class MarketStatus
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
-     * @ORM\JoinColumn(name="quote_token_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="quote_token_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      * @var Token|null
      */
     private $quoteToken;
