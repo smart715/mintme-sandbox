@@ -88,6 +88,10 @@ services:
             $paymentRetryProducer: '@old_sound_rabbit_mq.payment_retry_producer'
             $service: '%service%'
 
+    App\Communications\AMQP\MarketProducer:
+        arguments:
+            $producer: '@old_sound_rabbit_mq.market_delayed_producer'
+
     FOS\UserBundle\Form\Factory\FormFactory:
         arguments:
             $formFactory: '@form.factory'
@@ -120,6 +124,13 @@ services:
              - [init, ['@fos_user.user_manager', '@App\Manager\ProfileManagerInterface']]
 
     # Required by rabbitmq bundle
+    market_consumer:
+        class: 'App\Consumers\MarketConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
     payment_consumer:
         class: 'App\Consumers\PaymentConsumer'
         arguments:
@@ -219,5 +230,10 @@ services:
     App\EventListener\RegistrationCompletedListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed }
+
+    kernel.listener.command_dispatch:
+        class: App\EventListener\ConsoleCommandsListener
+        tags:
+            - { name: kernel.event_listener, event: console.terminate }
 
     FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'

@@ -36,7 +36,9 @@ You also need to add this to crontab jobs
 ```
 * * * * * /path/to/symfony/install/app/console cron:run 1>> /dev/null 2>&1
 ```
-to launch cron operations to update users lock-in,
+to launch cron operations to update users lock-in.
+
+Additional commands to execute:
 ```
 php bin/console rabbitmq:consumer payment &
 ``` 
@@ -44,7 +46,11 @@ to listen for failed payouts to pay amount quantity back to user and
 ```
 php bin/console rabbitmq:consumer deposit &
 ```
-to listen for incoming deposits.
+to listen for incoming deposits
+```
+php bin/console rabbitmq:consumer market &
+```
+to listen for new data in markets
 
 Contribution
 ------------

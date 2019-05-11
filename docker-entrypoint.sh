@@ -24,9 +24,14 @@ php bin/console doctrine:database:create --if-not-exists
 php bin/console doctrine:migrations:migrate --allow-no-migration -n
 
 # Starting internal services
+echo 'Starting crons...'
 php bin/console cron:start
+echo 'Starting payment consumer...'
 nohup php bin/console rabbitmq:consumer payment &
+echo 'Starting deposit consumer...'
 nohup php bin/console rabbitmq:consumer deposit &
+echo 'Starting market consumer...'
+nohup php bin/console rabbitmq:consumer market &
 
 # Fallback to original entrypoint
 docker-php-entrypoint php-fpm

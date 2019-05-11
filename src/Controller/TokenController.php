@@ -6,10 +6,10 @@ use App\Entity\Token\Token;
 use App\Exception\NotFoundPairException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
-use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\String\DashStringStrategy;
@@ -21,7 +21,6 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Throwable;
 
 /**
  * @Route("/token")
@@ -92,7 +92,7 @@ class TokenController extends Controller
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
-            return $this->redirectToOwnToken($tab);
+            return $this->redirectToRoute('token_show', ['name' => $dashedName]);
         }
 
         $token = $this->tokenManager->findByName($name);
@@ -126,7 +126,8 @@ class TokenController extends Controller
     public function create(
         Request $request,
         BalanceHandlerInterface $balanceHandler,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        MarketStatusManagerInterface $marketStatusManager
     ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('trade');
@@ -164,9 +165,12 @@ class TokenController extends Controller
                         MoneyWrapper::TOK_SYMBOL
                     )
                 );
+                $market = $this->marketManager->createUserRelated($this->getUser());
+
+                $marketStatusManager->createMarketStatus($market);
 
                 return $this->redirectToOwnToken('intro');
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 $this->em->remove($token);
                 $this->em->flush();
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');

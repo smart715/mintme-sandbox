@@ -5,16 +5,19 @@
             <div class="table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
-                    :fields="fields"
-                    :current-page="currentPage"
-                    :per-page="perPage">
+                    :fields="fields">
                     <template slot="pair" slot-scope="row">
-                        <a class="d-block text-truncate truncate-responsive text-white" v-b-tooltip:title="row.value" :href="row.item.tokenUrl">{{ row.value }}</a>
+                        <a class="d-block text-truncate truncate-responsive text-white"
+                            v-b-tooltip:title="row.value"
+                            :href="row.item.tokenUrl">
+                            {{ row.value }}
+                        </a>
                     </template>
                 </b-table>
             </div>
             <div class="row justify-content-center">
                 <b-pagination
+                    @change="updateData"
                     :total-rows="totalRows"
                     :per-page="perPage"
                     v-model="currentPage"
@@ -30,18 +33,22 @@
 </template>
 
 <script>
-import WebSocketMixin from '../../mixins/websocket';
-import FiltersMixin from '../../mixins/filters';
+import {FiltersMixin, WebSocketMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 
 export default {
     name: 'Trading',
     mixins: [WebSocketMixin, FiltersMixin],
+    props: {
+        page: Number,
+    },
     data() {
         return {
             markets: null,
-            currentPage: 1,
+            currentPage: this.page,
             perPage: 25,
+            totalRows: 25,
+            loading: false,
             fields: {
                 pair: {
                     label: 'Pair',
@@ -68,9 +75,6 @@ export default {
         };
     },
     computed: {
-        totalRows: function() {
-            return Object.keys(this.markets).length;
-        },
         marketsHiddenNames: function() {
             return Object.keys(this.markets);
         },
@@ -79,24 +83,53 @@ export default {
             Object.keys(this.sanitizedMarkets).forEach((marketName) => {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
+            tokens.sort((first, second) => parseFloat(second.volume) - parseFloat(first.volume));
 
-            tokens.sort((first, second) => parseFloat(first.volume) < parseFloat(second.volume));
-
-            return this.sanitizedMarketsOnTop.concat(tokens);
+            return 1 === this.currentPage
+                ? this.sanitizedMarketsOnTop.concat(tokens)
+                : tokens;
         },
         loaded: function() {
-            return this.markets !== null;
+            return this.markets !== null && !this.loading;
         },
     },
-    mounted() {
-        this.$axios.retry.get(this.$routing.generate('markets_info'))
-            .then((res) => {
-                this.markets = res.data;
-                this.updateDataWithMarkets();
-            })
-            .catch(() => this.$toasted.error('Can not update the markets data. Try again later.'));
+    mounted: function() {
+        this.updateData(this.currentPage).then(() => {
+            this.addMessageHandler((result) => {
+                if ('state.update' === result.method) {
+                    this.sanitizeMarket(result);
+                }
+            });
+        });
     },
     methods: {
+        updateData: function(page) {
+            return new Promise((resolve, reject) => {
+                this.loading = true;
+                this.$axios.retry.get(this.$routing.generate('markets_info', {page}))
+                    .then((res) => {
+                        this.currentPage = page;
+                        this.markets = res.data.markets;
+                        this.perPage = res.data.limit;
+                        this.totalRows = res.data.rows;
+                        this.updateDataWithMarkets();
+                        this.loading = false;
+
+                        if (window.history.replaceState) {
+                            // prevents browser from storing history with each change:
+                            window.history.replaceState(
+                                {page}, document.title, this.$routing.generate('trading', {page})
+                            );
+                        }
+
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.$toasted.error('Can not update the markets data. Try again later.');
+                        reject(err);
+                    });
+            });
+        },
         sanitizeMarket: function(marketData) {
             if (!marketData.params) {
                 return;
@@ -108,8 +141,9 @@ export default {
             const marketLastPrice = parseFloat(marketInfo.last);
             const changePercentage = this.getPercentage(marketLastPrice, parseFloat(marketInfo.open));
 
-            const marketCurrency = this.markets[marketName].cryptoSymbol;
-            const marketToken = this.markets[marketName].tokenName;
+            const marketCurrency = this.markets[marketName].crypto.symbol;
+            const marketToken = this.markets[marketName].quote.symbol;
+            const marketPrecision = this.markets[marketName].crypto.subunit;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -118,22 +152,23 @@ export default {
                 marketToken,
                 changePercentage,
                 marketLastPrice,
-                parseFloat(marketInfo.volume)
+                parseFloat(marketInfo.volume),
+                marketPrecision
             );
 
             if (marketOnTopIndex > -1) {
-                this.sanitizedMarketsOnTop[marketOnTopIndex] = market;
+                Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, market);
             } else {
-                this.sanitizedMarkets[marketName] = market;
+                Vue.set(this.sanitizedMarkets, marketName, market);
             }
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, subunit) {
             let hiddenName = this.findHiddenName(token);
 
             return {
                 pair: `${currency}/${token}`,
                 change: changePercentage.toFixed(2) + '%',
-                lastPrice: toMoney(lastPrice) + ' ' + currency,
+                lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 volume: volume.toFixed(2),
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
@@ -153,55 +188,50 @@ export default {
             return openPrice ? (lastPrice - openPrice) * 100 / openPrice : 0;
         },
         updateDataWithMarkets: function() {
+            this.sanitizedMarkets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
-                    const cryptoSymbol = this.markets[market].cryptoSymbol;
-                    const tokenName = this.markets[market].tokenName;
+                    const cryptoSymbol = this.markets[market].crypto.symbol;
+                    const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
                         tokenName,
                         this.getPercentage(
-                            parseFloat(this.markets[market].last),
-                            parseFloat(this.markets[market].open)
+                            parseFloat(this.markets[market].lastPrice),
+                            parseFloat(this.markets[market].openPrice)
                         ),
-                        parseFloat(this.markets[market].last),
-                        parseFloat(this.markets[market].volume)
+                        parseFloat(this.markets[market].lastPrice),
+                        parseFloat(this.markets[market].dayVolume),
+                        this.markets[market].crypto.subunit
                     );
 
                     if (marketOnTopIndex > -1) {
-                        this.sanitizedMarketsOnTop[marketOnTopIndex] = sanitizedMarket;
+                        Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, market);
                     } else {
-                        this.sanitizedMarkets[market] = sanitizedMarket;
+                        Vue.set(this.sanitizedMarkets, market, sanitizedMarket);
                     }
                 }
             }
 
-            if (this.websocketUrl) {
-                this.addOnOpenHandler(() => {
-                    const request = JSON.stringify({
-                        method: 'state.subscribe',
-                        params: this.marketsHiddenNames,
-                        id: parseInt(Math.random().toString().replace('0.', '')),
-                    });
-                    this.sendMessage(request);
+            this.addOnOpenHandler(() => {
+                const request = JSON.stringify({
+                    method: 'state.subscribe',
+                    params: this.marketsHiddenNames,
+                    id: parseInt(Math.random().toString().replace('0.', '')),
                 });
-                this.addMessageHandler((result) => {
-                    if ('state.update' === result.method) {
-                        this.sanitizeMarket(result);
-                    }
-                });
-            }
+                this.sendMessage(request);
+            });
         },
         findHiddenName: function(tokenOrCrypto) {
             let result = null;
 
             for (let key in this.markets) {
-                if (this.markets.hasOwnProperty(key) &&
-                    (this.markets[key].tokenName === tokenOrCrypto ||
-                    this.markets[key].cryptoSymbol === tokenOrCrypto)) {
-                    result = key;
-                    break;
+                if (this.markets.hasOwnProperty(key) && this.markets[key].quote !== null) {
+                    if (this.markets[key].quote.symbol === tokenOrCrypto) {
+                        result = key;
+                        break;
+                    }
                 }
             }
 
