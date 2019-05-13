@@ -36,7 +36,7 @@
 
 <script>
 import moment from 'moment';
-import {toMoney} from '../../utils';
+import {toMoney, formatMoney} from '../../utils';
 import {LazyScrollTableMixin} from '../../mixins';
 import CopyLink from '../CopyLink';
 
@@ -66,6 +66,7 @@ export default {
                 amount: {
                     label: 'Amount',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 status: {
                     label: 'Status',
@@ -74,6 +75,7 @@ export default {
                 fee: {
                     label: 'Fee',
                     sortable: true,
+                    formatter: formatMoney,
                 },
             },
             history: {

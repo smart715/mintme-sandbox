@@ -3,7 +3,7 @@
         <div class="card-body p-2">
             <div class="row mx-2">
                 <div class="col text-left">
-                    Last price: {{ marketStatus.last }}
+                    Last price: {{ marketStatus.last | formatMoney }}
                     <guide>
                         <template slot="header">
                             Last price
@@ -25,7 +25,7 @@
                     </guide>
                 </div>
                 <div class="col text-center">
-                    24h volume: {{ marketStatus.volume }} Tokens
+                    24h volume: {{ marketStatus.volume | formatMoney }} Tokens
                     <guide>
                         <template slot="header">
                             24h volume
@@ -62,7 +62,7 @@
 <script>
 import VeLine from 'v-charts';
 import Guide from '../Guide';
-import WebSocketMixin from '../../../js/mixins/websocket';
+import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
 import {toMoney, EchartTheme as VeLineTheme} from '../../utils';
 import moment from 'moment';
 
@@ -70,7 +70,7 @@ Vue.use(VeLine);
 
 export default {
     name: 'TradeChart',
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, MoneyFilterMixin],
     props: {
         websocketUrl: String,
         market: Object,
@@ -100,9 +100,9 @@ export default {
             },
             chartOptions: {},
             marketStatus: {
-                volume: 0,
-                last: 0,
-                change: 0,
+                volume: '0',
+                last: '0',
+                change: '0',
             },
             stats: null,
         };
@@ -198,7 +198,7 @@ export default {
             this.marketStatus = {
                 change: changePercentage.toFixed(2),
                 last: toMoney(marketLastPrice, this.market.base.subunit),
-                volume: marketVolume.toFixed(2),
+                volume: toMoney(marketVolume, this.market.quote.subunit),
             };
         },
         getDate: function(timestamp) {

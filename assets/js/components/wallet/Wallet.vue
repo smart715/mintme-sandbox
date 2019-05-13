@@ -16,7 +16,7 @@
                     {{ data.item.fullname }} ({{ data.item.name }})
                 </template>
                 <template slot="available" slot-scope="data">
-                    {{ data.value | toMoney(data.item.subunit) }}
+                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
                 <template slot="action" slot-scope="data">
                     <div
@@ -56,7 +56,7 @@
                     {{ data.item.name }}
                 </template>
                 <template slot="available" slot-scope="data">
-                    {{ data.value | toMoney(data.item.subunit) }}
+                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
             </b-table>
         </div>
@@ -106,13 +106,13 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import WebSocketMixin from '../../mixins/websocket';
+import {WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, MoneyFilterMixin],
     components: {
         WithdrawModal,
         DepositModal,
@@ -293,11 +293,6 @@ export default {
             });
 
             return Object.values(tokens);
-        },
-    },
-    filters: {
-        toMoney: function(val, precision) {
-            return toMoney(val, precision);
         },
     },
 };

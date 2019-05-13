@@ -42,13 +42,11 @@
     </div>
 </template>
 <script>
-import WebSocketMixin from '../../mixins/websocket';
-import FiltersMixin from '../../mixins/filters';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
-import {toMoney} from '../../utils';
-import {LazyScrollTableMixin} from '../../mixins';
+import {toMoney, formatMoney} from '../../utils';
+import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
 
 export default {
     name: 'ActiveOrders',
@@ -81,8 +79,16 @@ export default {
                     },
                 },
                 amount: {label: 'Amount', sortable: true},
-                price: {label: 'Price', sortable: true},
-                total: {label: 'Total cost', sortable: true},
+                price: {
+                    label: 'Price',
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+                total: {
+                    label: 'Total cost',
+                    sortable: true,
+                    formatter: formatMoney,
+                },
                 fee: {label: 'Fee', sortable: true},
                 action: {label: 'Action', sortable: false},
             },

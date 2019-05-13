@@ -21,7 +21,7 @@
                         >
                         Your {{ this.market.quote.symbol }}:
                         <span class="text-white  word-break">
-                            {{ immutableBalance | toMoney(market.quote.subunit)  }}
+                            {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Your Tokens
@@ -98,7 +98,7 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) }} {{ this.market.base.symbol }}
+                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ this.market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -138,9 +138,7 @@
 <script>
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
-import WebSocketMixin from '../../mixins/websocket';
-import placeOrderMixin from '../../mixins/placeOrder';
-import FiltersMixin from '../../mixins/filters';
+import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 
@@ -150,7 +148,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [WebSocketMixin, placeOrderMixin, FiltersMixin],
+    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin],
     props: {
         loginUrl: String,
         signupUrl: String,

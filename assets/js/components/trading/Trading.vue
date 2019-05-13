@@ -34,7 +34,7 @@
 
 <script>
 import {FiltersMixin, WebSocketMixin} from '../../mixins';
-import {toMoney} from '../../utils';
+import {toMoney, formatMoney} from '../../utils';
 
 export default {
     name: 'Trading',
@@ -61,6 +61,7 @@ export default {
                 lastPrice: {
                     label: 'Last Price',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 volume: {
                     label: '24H Volume',

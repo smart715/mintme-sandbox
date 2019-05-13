@@ -57,7 +57,7 @@ import TradeBuyOrders from './TradeBuyOrders';
 import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {toMoney} from '../../utils';
+import {formatMoney, toMoney} from '../../utils';
 
 export default {
     name: 'TokenTradeOrders',
@@ -81,12 +81,15 @@ export default {
                 price: {
                     label: 'Price',
                     key: 'price',
+                    formatter: formatMoney,
                 },
                 amount: {
                     label: 'Amount',
+                    formatter: formatMoney,
                 },
                 sum: {
                     label: 'Sum ' + this.market.base.symbol,
+                    formatter: formatMoney,
                 },
                 trader: {
                     label: 'Trader',

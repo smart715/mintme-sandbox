@@ -1,5 +1,6 @@
 import LazyScrollTableMixin from './lazy_scroll_table';
 import WebSocketMixin from './websocket';
-import FiltersMixin from './filters';
+import PlaceOrder from './placeOrder';
+import {MoneyFilterMixin, TruncateFilterMixin as FiltersMixin} from './filters';
 
-export {LazyScrollTableMixin, WebSocketMixin, FiltersMixin};
+export {LazyScrollTableMixin, WebSocketMixin, FiltersMixin, MoneyFilterMixin, PlaceOrder};
