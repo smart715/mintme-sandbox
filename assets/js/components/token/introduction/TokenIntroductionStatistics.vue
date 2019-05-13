@@ -81,7 +81,6 @@
                                     The amount of token units currently in circulation.
                                 </template>
                             </guide>
-
                         </div>
                     </div>
                     <div class="col px-1">
@@ -159,6 +158,11 @@
                                 </template>
                             </guide>
                         </div>
+                        <div class="pb-1">
+                            created on:
+                            <br>
+                            {{ tokenCreated }}
+                        </div>
                     </div>
                 </div>
                 <div v-else>
@@ -199,6 +203,7 @@ export default {
         Guide,
     },
     props: {
+        tokenCreated: String,
         market: Object,
         releasePeriodRoute: String,
         editable: Boolean,

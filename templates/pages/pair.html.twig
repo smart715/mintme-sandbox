@@ -47,6 +47,7 @@
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                    token-created="{{ token.getCreated().format('d M Y') }}"
                                     :precision="{{ precision }}">
                                 </token-introduction-statistics>
                                 <token-introduction-description
