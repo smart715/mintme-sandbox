@@ -36,7 +36,6 @@ Vue.use(Toasted, {
 });
 
 const HTTP_ACCEPTED = 202;
-const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenName',
@@ -103,7 +102,10 @@ export default {
         },
         doEditName: function() {
             this.$v.$touch();
-            if (!this.$v.newName.tokenContain) {
+            if (this.currentName === this.newName) {
+                this.cancelEditingMode();
+                return;
+            } else if (!this.$v.newName.tokenContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
             } else if (!this.$v.newName.minLength) {
@@ -126,15 +128,15 @@ export default {
                         name: this.currentName,
                     });
                 }
+                this.cancelEditingMode();
             }, (error) => {
-                if (error.response.status === HTTP_BAD_REQUEST) {
+                if (!error.response) {
+                    this.$toasted.error('Network error');
+                } else if (error.response.data.message) {
                     this.$toasted.error(error.response.data.message);
                 } else {
-                    this.$toasted.error('An error has ocurred, please try again later');
+                    this.$toasted.error('An error has occurred, please try again later');
                 }
-            })
-            .then(() => {
-                this.cancelEditingMode();
             });
         },
         cancelEditingMode: function() {
