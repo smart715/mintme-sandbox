@@ -21,7 +21,7 @@
                          class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your {{ this.market.base.symbol }}:
                         <span class="text-white word-break">
-                            {{ immutableBalance | toMoney(market.base.subunit) }}
+                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Your {{ this.market.base.symbol }}
@@ -100,7 +100,7 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) }} {{ market.base.symbol }}
+                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -138,14 +138,13 @@
 <script>
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
-import WebSocketMixin from '../../mixins/websocket';
-import placeOrderMixin from '../../mixins/placeOrder';
+import {WebSocketMixin, PlaceOrder, MoneyFilterMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, placeOrderMixin],
+    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin],
     components: {
         Guide,
         OrderModal,
@@ -239,11 +238,6 @@ export default {
                 this.immutableBalance = response.params[0][this.market.base.identifier].available;
             }
         }, 'trade-buy-order-asset');
-    },
-    filters: {
-        toMoney: function(val, precision) {
-            return toMoney(val, precision);
-        },
     },
 };
 </script>

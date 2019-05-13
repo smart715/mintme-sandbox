@@ -4,7 +4,7 @@
             <div class="card-header">
                 Buy Orders
                 <span class="card-header-icon">
-                    Total: {{ total }} {{ tokenName }}
+                    Total: {{ total | formatMoney }} {{ tokenName }}
                     <guide>
                         <template slot="header">
                             Buy Orders
@@ -61,11 +61,11 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin} from '../../mixins';
+import {LazyScrollTableMixin, MoneyFilterMixin} from '../../mixins';
 
 export default {
     name: 'TradeBuyOrders',
-    mixins: [LazyScrollTableMixin],
+    mixins: [LazyScrollTableMixin, MoneyFilterMixin],
     props: {
         ordersList: [Array],
         tokenName: String,

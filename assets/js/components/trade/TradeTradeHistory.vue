@@ -73,7 +73,7 @@
 
 <script>
 import Guide from '../Guide';
-import {toMoney} from '../../utils';
+import {formatMoney, toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
 import {WebSocketMixin, LazyScrollTableMixin} from '../../mixins';
@@ -101,12 +101,15 @@ export default {
                 },
                 pricePerQuote: {
                     label: 'Price per ' + this.market.quote.symbol,
+                    formatter: formatMoney,
                 },
                 quoteAmount: {
                     label: this.market.quote.symbol + ' amount',
+                    formatter: formatMoney,
                 },
                 baseAmount: {
                     label: this.market.base.symbol + ' amount',
+                    formatter: formatMoney,
                 },
                 dateTime: {
                     label: 'Date & Time',

@@ -30,7 +30,7 @@
 
 <script>
 import {Decimal} from 'decimal.js';
-import {toMoney} from '../../utils';
+import {toMoney, formatMoney} from '../../utils';
 import {WSAPI} from '../../utils/constants';
 import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
@@ -58,12 +58,12 @@ export default {
                 amount: {
                     label: 'Amount',
                     sortable: true,
-                    formatter: (value, key, item) => toMoney(value, item.market.quote.subunit),
+                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.quote.subunit)),
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
-                    formatter: (value, key, item) => toMoney(value, item.market.base.subunit),
+                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
                 },
                 total: {
                     label: 'Total cost',
@@ -71,13 +71,13 @@ export default {
                     formatter: (value, key, item) => {
                         let tWF = new Decimal(item.amount).times(item.price);
                         let f = new Decimal(item.fee);
-                        return toMoney(tWF.add(f).toString(), item.market.base.subunit);
+                        return formatMoney(toMoney(tWF.add(f).toString(), item.market.base.subunit));
                     },
                 },
                 fee: {
                     label: 'Fee',
                     sortable: true,
-                    formatter: (value, key, item) => toMoney(value, item.market.base.subunit),
+                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
                 },
             },
         };
