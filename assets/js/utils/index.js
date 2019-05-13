@@ -78,13 +78,35 @@ function deepFlatten(object) {
  */
 function toMoney(val, precision = Constants.GENERAL.precision) {
     Decimal.set({rounding: Decimal.ROUND_DOWN});
+
     return new Decimal(val).toFixed(precision);
+}
+
+/**
+ * @param {string} str
+ * @return {string}
+ */
+function formatMoney(str) {
+    str = str ? str.toString() : '';
+    let regx = /(\d{1,3})(\d{3}(?:,|$))/;
+    let currStr;
+
+    do {
+        currStr = (currStr || str.split(`.`)[0]).replace( regx, `$1,$2`);
+    } while (currStr.match(regx));
+
+    let res = ( str.split(`.`)[1] ) ?
+        currStr.concat(`.`, str.split(`.`)[1]) :
+        currStr;
+
+    return res.replace(/,/g, ' ');
 }
 
 export {
     isValidUrl,
     deepFlatten,
     toMoney,
+    formatMoney,
     Constants,
     EchartTheme,
     Interval,

@@ -25,7 +25,7 @@ class Token implements TradebleInterface
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
     public const NAME_MIN_LENGTH = 4;
-    public const NAME_MAX_LENGTH = 255;
+    public const NAME_MAX_LENGTH = 60;
 
     /**
      * @ORM\Id()

@@ -32,7 +32,7 @@
                         <div class="pb-1">
                             Wallet on exchange:
                             <br>
-                            {{ walletBalance | toMoney(precision) }}
+                            {{ walletBalance | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Wallet on exchange
@@ -46,7 +46,7 @@
                         <div class="pb-1">
                             Active orders:
                             <br>
-                            {{ activeOrdersSum | toMoney(precision) }}
+                            {{ activeOrdersSum | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Active orders
@@ -59,7 +59,7 @@
                         <div class="pb-1">
                             Withdrawn:
                             <br>
-                            {{ withdrawBalance | toMoney(precision) }}
+                            {{ withdrawBalance | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Withdrawn
@@ -72,7 +72,7 @@
                         <div class="pb-1">
                             Sold on the market:
                             <br>
-                            {{ soldOrdersSum | toMoney(precision) }}
+                            {{ soldOrdersSum | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Sold on the market
@@ -81,7 +81,6 @@
                                     The amount of token units currently in circulation.
                                 </template>
                             </guide>
-
                         </div>
                     </div>
                     <div class="col px-1">
@@ -107,7 +106,7 @@
                         <div class="pb-1">
                             Release period:
                             <br>
-                            {{ stats.releasePeriod | toMoney(precision) }}
+                            {{ stats.releasePeriod | toMoney(precision) | formatMoney }}
                             <template v-if="stats.releasePeriod !== defaultValue">years</template>
                             <guide>
                                 <template slot="header">
@@ -121,7 +120,7 @@
                         <div class="pb-1">
                             Hourly installment:
                             <br>
-                            {{ stats.hourlyRate | toMoney(precision) }}
+                            {{ stats.hourlyRate | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Hourly installment
@@ -134,7 +133,7 @@
                         <div class="pb-1">
                             Already released:
                             <br>
-                            {{ stats.releasedAmount | toMoney(precision) }}
+                            {{ stats.releasedAmount | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Already released
@@ -148,7 +147,7 @@
                         <div class="pb-1">
                             Remaining:
                             <br>
-                            {{ stats.frozenAmount | toMoney(precision) }}
+                            {{ stats.frozenAmount | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Remaining
@@ -158,6 +157,11 @@
                                     the market and in the general public's hands.
                                 </template>
                             </guide>
+                        </div>
+                        <div class="pb-1">
+                            created on:
+                            <br>
+                            {{ tokenCreated }}
                         </div>
                     </div>
                 </div>
@@ -187,16 +191,19 @@ import ReleasePeriodComponent from './TokenIntroductionReleasePeriod';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
 import {WSAPI} from '../../../utils/constants';
+import {MoneyFilterMixin} from '../../../mixins';
 
 const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
+    mixins: [MoneyFilterMixin],
     components: {
         ReleasePeriodComponent,
         Guide,
     },
     props: {
+        tokenCreated: String,
         market: Object,
         releasePeriodRoute: String,
         editable: Boolean,
