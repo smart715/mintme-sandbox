@@ -1,5 +1,6 @@
 scheb_two_factor:
     google:
+        issuer: MintMe.com
         enabled: true
         template: security/2fa_login.html.twig
 
