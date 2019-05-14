@@ -31,7 +31,6 @@
                         </div>
                         <div class="pb-1">
                             Wallet on exchange:
-                            <br>
                             {{ walletBalance | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
@@ -45,7 +44,6 @@
                         </div>
                         <div class="pb-1">
                             Active orders:
-                            <br>
                             {{ activeOrdersSum | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
@@ -58,7 +56,6 @@
                         </div>
                         <div class="pb-1">
                             Withdrawn:
-                            <br>
                             {{ withdrawBalance | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
@@ -71,7 +68,6 @@
                         </div>
                         <div class="pb-1">
                             Sold on the market:
-                            <br>
                             {{ soldOrdersSum | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
@@ -105,7 +101,6 @@
                         </div>
                         <div class="pb-1">
                             Release period:
-                            <br>
                             {{ stats.releasePeriod | toMoney(precision) | formatMoney }}
                             <template v-if="stats.releasePeriod !== defaultValue">years</template>
                             <guide>
@@ -119,7 +114,6 @@
                         </div>
                         <div class="pb-1">
                             Hourly installment:
-                            <br>
                             {{ stats.hourlyRate | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
@@ -132,7 +126,6 @@
                         </div>
                         <div class="pb-1">
                             Already released:
-                            <br>
                             {{ stats.releasedAmount | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
@@ -146,7 +139,6 @@
                         </div>
                         <div class="pb-1">
                             Remaining:
-                            <br>
                             {{ stats.frozenAmount | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
@@ -160,7 +152,6 @@
                         </div>
                         <div class="pb-1">
                             created on:
-                            <br>
                             {{ tokenCreated }}
                         </div>
                     </div>
