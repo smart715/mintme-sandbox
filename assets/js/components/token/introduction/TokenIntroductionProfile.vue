@@ -13,7 +13,7 @@
                             icon="edit"
                             transform="shrink-4 up-1.5"
                             @click="editingUrls = true"/>
-                        <a :href="profileUrl" target="_blank">
+                        <a :href="profileUrl">
                             Visit token's creator profile
                         </a>
                         <div class="pt-4">
