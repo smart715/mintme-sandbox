@@ -18,7 +18,7 @@
             <div class="card-body">
                 <font-awesome-icon
                     v-if="editable && !showSettings"
-                    class="float-right c-pointer icon-edit icon-edit-absolute"
+                    class="float-right c-pointer icon-edit"
                     icon="edit"
                     transform="shrink-4 up-1.5"
                     @click="switchAction"
