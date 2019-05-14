@@ -71,7 +71,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Length(max="150")
+     * @Assert\Length(max="500")
      * @Groups({"Default", "API"})
      * @var string|null
      */
