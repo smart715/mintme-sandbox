@@ -59,7 +59,7 @@ class EditProfileType extends AbstractType
                 'label' => 'Description:',
                 'required' => false,
                 'attr' => [
-                    'maxlength' => 150,
+                    'maxlength' => 500,
                 ],
             ]);
 
