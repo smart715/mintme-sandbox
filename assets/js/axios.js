@@ -12,7 +12,7 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 const client = axios.create();
 
 axiosRetry(client, {
-    retries: Infinity,
+    retries: 7,
     retryDelay: axiosRetry.exponentialDelay,
 });
 
