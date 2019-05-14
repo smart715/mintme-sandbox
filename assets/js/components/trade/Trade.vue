@@ -75,6 +75,7 @@ import TradeOrders from './TradeOrders';
 import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
+import {isRetryableError} from 'axios-retry';
 import {WebSocketMixin} from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
@@ -248,7 +249,7 @@ export default {
                         });
                 })
                 .catch((err) => {
-                    if (401 === err.response.status) {
+                    if (!isRetryableError(err)) {
                         this.balances = false;
                     } else {
                         this.$toasted.error('Can not load current balance. Try again later.');
