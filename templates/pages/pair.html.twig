@@ -26,7 +26,7 @@
                         <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                             <div class="row">
                                 <token-introduction-profile
-                                    class="col-12 col-lg-4 pr-lg-2"
+                                    class="col-12 col-lg-6 pr-lg-2"
                                     youtube-client-id="{{ global_youtube_client_id }}"
                                     facebook-app-id="{{ global_facebook_app_id }}"
                                     confirm-website-file-url="{{ path('token_website_confirmation', {'name': market.quote.name}) }}"
@@ -43,7 +43,7 @@
                                 </token-introduction-profile>
 
                                 <token-introduction-statistics
-                                    class="col-12 col-lg-4 pt-3 pt-lg-0 px-lg-2"
+                                    class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
@@ -51,7 +51,7 @@
                                     :precision="{{ precision }}">
                                 </token-introduction-statistics>
                                 <token-introduction-description
-                                    class="col-12 col-lg-4 pt-3 pt-lg-0 pl-lg-2"
+                                    class="col-12 pt-3"
                                     @updated="descriptionUpdated"
                                     name="{{ token.name }}"
                                     :description="tokenDescription"
