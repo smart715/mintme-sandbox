@@ -13,6 +13,7 @@ new Vue({
       tabIndex: 0,
       tokenDescription: null,
       editingName: false,
+      tokenName: null,
     };
   },
   components: {
@@ -26,6 +27,17 @@ new Vue({
   methods: {
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
+    },
+    tabUpdated: function(i) {
+      if (window.history.replaceState) {
+        // prevents browser from storing history with each change:
+        window.history.replaceState(
+            {}, document.title, this.$routing.generate('token_show', {
+              name: this.tokenName,
+              tab: i ? 'intro' : 'trade',
+            })
+        );
+      }
     },
   },
   store,
