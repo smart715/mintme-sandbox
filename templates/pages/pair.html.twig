@@ -79,7 +79,7 @@
             </div>
         </div>
         {% if token|default %}
-            <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || '{{ token.description }}'" />
+            <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}" />
         {% endif %}
     </div>
 
