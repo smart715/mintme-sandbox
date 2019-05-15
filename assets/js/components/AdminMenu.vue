@@ -2,7 +2,7 @@
     <sidebar-menu
             @collapse="isClicked = true"
             :class="clickedStyles"
-            :width="!isClicked ? '50px' : '350px'"
+            :width="!isClicked ? '30px' : '350px'"
             :menu="menu" />
 </template>
 
@@ -99,4 +99,7 @@ export default {
 
     .v-sidebar-menu .collapse-btn:after
         content: ">" !important
+
+    .vsm-collapsed
+        width: 30px !important
 </style>
