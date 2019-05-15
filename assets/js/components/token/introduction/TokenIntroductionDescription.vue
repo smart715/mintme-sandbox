@@ -25,7 +25,7 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <p v-if="!editingDescription">{{ currentDescription }}</p>
+                        <p v-if="!editingDescription">{{ description }}</p>
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
@@ -80,7 +80,6 @@ Vue.use(Toasted, {
     duration: 5000,
 });
 
-const HTTP_NO_CONTENT = 204;
 const HTTP_BAD_REQUEST = 400;
 
 export default {
@@ -99,7 +98,6 @@ export default {
     data() {
         return {
             editingDescription: false,
-            currentDescription: this.description,
             newDescription: this.description,
         };
     },
@@ -120,10 +118,7 @@ export default {
                 description: this.newDescription,
             })
                 .then((response) => {
-                    this.currentDescription = this.newDescription;
-                    if (response.status === HTTP_NO_CONTENT) {
-                        this.$emit('updated', this.newDescription);
-                    }
+                    this.$emit('updated', this.newDescription);
                 }, (error) => {
                     if (error.response.status === HTTP_BAD_REQUEST) {
                         this.$toasted.error(error.response.data);
@@ -144,6 +139,11 @@ export default {
                 minLength: minLength(2),
             },
         };
+    },
+    watch: {
+        description: function(val) {
+            this.newDescription = val;
+        },
     },
 };
 </script>

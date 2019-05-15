@@ -7,7 +7,7 @@
         <div class="row pt-5 justify-content-center">
             <div class="col-md-10" v-cloak>
                 {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                <b-tabs no-key-nav :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
+                <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Trade" {% if tab|default and tab == 'trade' %} {{ 'active' }} {% endif %}>
                         <trade
                             websocket-url="{{ global_websocket_url }}"
@@ -80,6 +80,7 @@
         </div>
         {% if token|default %}
             <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}" />
+            <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
         {% endif %}
     </div>
 
