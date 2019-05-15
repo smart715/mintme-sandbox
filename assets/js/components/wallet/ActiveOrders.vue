@@ -45,7 +45,7 @@
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {WSAPI} from '../../utils/constants';
-import {toMoney, formatMoney} from '../../utils';
+import {toMoney, formatMoney, getUserOffset} from '../../utils';
 import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
 
 export default {
@@ -53,6 +53,9 @@ export default {
     mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
     components: {
         ConfirmModal,
+    },
+    props: {
+        userId: Number,
     },
     data() {
         return {
@@ -118,26 +121,21 @@ export default {
                 ),
             ])
             .then(() => {
-                this.authorize()
-                    .then(() => {
-                        this.sendMessage(JSON.stringify({
-                            method: 'order.subscribe',
-                            params: this.marketNames,
-                            id: parseInt(Math.random().toString().replace('0.', '')),
-                        }));
+                this.sendMessage(JSON.stringify({
+                    method: 'order.subscribe',
+                    params: this.marketNames,
+                    id: parseInt(Math.random().toString().replace('0.', '')),
+                }));
 
-                        this.addMessageHandler((response) => {
-                            if ('order.update' === response.method) {
-                                this.updateOrders(response.params[1], response.params[0]);
-                                if (this.$refs.btable) {
-                                    this.$refs.btable.refresh();
-                                }
-                            }
-                        }, 'active-tableData-update');
-                    })
-                    .catch(() => {
-                        this.$toasted.error('Can not connect to internal services');
-                    });
+                this.addMessageHandler((response) => {
+                    if ('order.update' === response.method &&
+                        this.userId + getUserOffset() === response.params[1].user) {
+                        this.updateOrders(response.params[1], response.params[0]);
+                        if (this.$refs.btable) {
+                            this.$refs.btable.refresh();
+                        }
+                    }
+                }, 'active-tableData-update');
             })
             .catch(() => this.$toasted.error('Can not update order list now. Try again later'));
     },
