@@ -24,7 +24,6 @@ class WalletController extends Controller
     {
         return $this->render('pages/wallet.html.twig', [
             'hash' => $this->getUser()->getHash(),
-            'precision' => $this->getParameter('token_precision'),
         ]);
     }
 

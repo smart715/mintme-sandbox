@@ -102,6 +102,20 @@ function formatMoney(str) {
     return res.replace(/,/g, ' ');
 }
 
+/**
+ * Get viabtc server offset
+ * @return {Number}
+ */
+function getUserOffset() {
+    const offset = document.querySelector('meta[name="X-USER-OFFSET"]');
+
+    if (!offset) {
+        return 0;
+    }
+
+    return parseInt(offset.getAttribute('content'));
+}
+
 export {
     isValidUrl,
     deepFlatten,
@@ -110,4 +124,5 @@ export {
     Constants,
     EchartTheme,
     Interval,
+    getUserOffset,
 };

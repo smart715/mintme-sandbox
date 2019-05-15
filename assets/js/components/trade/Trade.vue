@@ -138,13 +138,11 @@ export default {
     },
     mounted() {
         this.updateOrders().then(() => {
-            this.authorize().then(() =>
-                this.sendMessage(JSON.stringify({
-                    method: 'order.subscribe',
-                    params: [this.market.identifier],
-                    id: parseInt(Math.random().toString().replace('0.', '')),
-                }))
-            );
+            this.sendMessage(JSON.stringify({
+                method: 'order.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
 
             this.addMessageHandler((response) => {
                 if ('order.update' === response.method) {
