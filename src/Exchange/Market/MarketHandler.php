@@ -48,19 +48,10 @@ class MarketHandler implements MarketHandlerInterface
 
     public function getExecutedOrder(Market $market, int $id): Order
     {
-        $orders = $this->parseExecutedOrders(
-            $this->marketFetcher->getExecutedOrders(
-                $this->marketNameConverter->convert($market),
-                0,
-                10
-            ),
-            $market
-        );
+        $orders = $this->getExecutedOrders($market, $id - 1, 1);
 
-        foreach ($orders as $order) {
-            if ($id === $order->getId()) {
-                return $order;
-            }
+        if ($orders[0] && $orders[0]->getId() === $id) {
+            return $orders[0];
         }
 
         throw new Exception("Order not found");

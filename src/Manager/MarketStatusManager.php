@@ -103,7 +103,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
 
         if (!$marketStatus) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException(
+                "Nonexistent market: {$market->getBase()->getSymbol()}/{$market->getQuote()->getSymbol()}"
+            );
         }
 
         $marketStatus->updateStats($marketInfo);
