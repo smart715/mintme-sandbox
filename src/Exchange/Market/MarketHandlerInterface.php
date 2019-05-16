@@ -37,6 +37,6 @@ interface MarketHandlerInterface
      */
     public function getKLineStatDaily(Market $market): array;
 
-    public function getExecutedOrder(Market $market, int $id): Order;
+    public function getExecutedOrder(Market $market, int $id, int $limit = 100): Order;
     public function getPendingOrder(Market $market, int $id): Order;
 }
