@@ -125,22 +125,22 @@ export default {
             return this.tableData !== false ? this.tableData.map((order) => {
                 return {
                     dateTime: new Date(order.timestamp * 1000).toDateString(),
-                    orderMaker: order.maker && order.maker.profile
+                    orderMaker: order.maker && order.maker.profile && !order.maker.profile.anonymous
                         ? this.truncateFullName(order.maker.profile)
                         : 'Anonymous',
-                    orderTrader: order.taker && order.taker.profile
+                    orderTrader: order.taker && order.taker.profile && !order.taker.profile.anonymous
                         ? this.truncateFullName(order.taker.profile)
                         : 'Anonymous',
-                    makerFullName: order.maker && order.maker.profile
+                    makerFullName: order.maker && order.maker.profile && !order.maker.profile.anonymous
                         ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
                         : 'Anonymous',
-                    takerFullName: order.taker && order.taker.profile
+                    takerFullName: order.taker && order.taker.profile && !order.taker.profile.anonymous
                         ? order.taker.profile.firstName + ' ' + order.taker.profile.lastName
                         : 'Anonymous',
-                    makerUrl: order.maker && order.maker.profile
+                    makerUrl: order.maker && order.maker.profile && !order.maker.profile.anonymous
                         ? this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url})
                         : '',
-                    takerUrl: order.taker && order.taker.profile
+                    takerUrl: order.taker && order.taker.profile && !order.taker.profile.anonymous
                         ? this.$routing.generate('profile-view', {pageUrl: order.taker.profile.page_url})
                         : '',
                     type: (order.side === WSAPI.order.type.BUY) ? 'Buy' : 'Sell',

@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Profile;
 use App\Form\DataTransformer\NameTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -61,6 +62,14 @@ class EditProfileType extends AbstractType
                 'attr' => [
                     'maxlength' => 500,
                 ],
+            ])
+            ->add('anonymous', CheckboxType::class, [
+                'label' => 'Trade anonymously',
+                'required' => false,
+                'attr' => [
+                  'class' => 'custom-control-input',
+                ],
+                'label_attr' => ['class' => 'custom-control-label'],
             ]);
 
         $builder->get('firstName')
