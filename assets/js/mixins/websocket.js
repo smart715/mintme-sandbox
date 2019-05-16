@@ -43,9 +43,7 @@ export default {
                 switch (auth) {
                     case status.SUCCESS: return resolve();
                     case status.PENDING: setTimeout(() => {
-                        return this.authorize()
-                            .then(() => resolve())
-                            .catch((err) => reject(err));
+                        return this.authorize().then(resolve).catch(reject);
                     }, 2000);
                 }
 
@@ -108,9 +106,11 @@ export default {
             });
         },
         sendMessage: function(message) {
-            return this._sendMessage({
-                url: this.websocketUrl,
-                request: message,
+            return this.addOnOpenHandler(() => {
+                return this._sendMessage({
+                    url: this.websocketUrl,
+                    request: message,
+                });
             });
         },
     },

@@ -164,30 +164,26 @@ export default {
     },
     mounted: function() {
         this.updateTableData().then((res) => {
-            this.addOnOpenHandler(() => {
-                this.sendMessage(JSON.stringify({
-                    method: 'deals.subscribe',
-                    params: [this.market.identifier],
-                    id: parseInt(Math.random().toString().replace('0.', '')),
-                }));
-            });
+            this.sendMessage(JSON.stringify({
+                method: 'deals.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
 
-            let isFirstUpdate = !!res.length;
             this.addMessageHandler((response) => {
                 if ('deals.update' === response.method) {
-                    if (isFirstUpdate) {
-                        isFirstUpdate = false;
+                    const orders = response.params[1];
+
+                    if (orders.length !== 1) {
                         return;
                     }
 
-                    response.params[1].forEach((deal) => {
-                        this.$axios.retry.get(this.$routing.generate('executed_order_details', {
-                            base: this.market.base.symbol,
-                            quote: this.market.quote.symbol,
-                            id: parseInt(deal.id),
-                        })).then((res) => {
-                            this.tableData.unshift(res.data);
-                        });
+                    this.$axios.retry.get(this.$routing.generate('executed_order_details', {
+                        base: this.market.base.symbol,
+                        quote: this.market.quote.symbol,
+                        id: parseInt(orders[0].id),
+                    })).then((res) => {
+                        this.tableData.unshift(res.data);
                     });
                 }
             }, 'trade-tableData-update-deals');

@@ -166,18 +166,16 @@ export default {
                 }
             }, 'trade-chart-state');
 
-            this.addOnOpenHandler(() => {
-                this.sendMessage(JSON.stringify({
-                    method: 'state.subscribe',
-                    params: [this.market.identifier],
-                    id: parseInt(Math.random().toString().replace('0.', '')),
-                }));
-                this.sendMessage(JSON.stringify({
-                    method: 'kline.subscribe',
-                    params: [this.market.identifier, 24*60*60],
-                    id: parseInt(Math.random().toString().replace('0.', '')),
-                }));
-            });
+            this.sendMessage(JSON.stringify({
+                method: 'state.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
+            this.sendMessage(JSON.stringify({
+                method: 'kline.subscribe',
+                params: [this.market.identifier, 24*60*60],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
         }).catch(() => {
             this.$toasted.error('Service unavailable now. Can not load the chart data');
         });

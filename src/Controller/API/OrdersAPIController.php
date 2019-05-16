@@ -267,7 +267,7 @@ class OrdersAPIController extends AbstractFOSRestController
             throw new InvalidArgumentException();
         }
 
-        return $this->view($this->marketHandler->getExecutedOrder($market, $id));
+        return $this->view($this->marketHandler->getExecutedOrder($market, $id, self::OFFSET));
     }
 
     /**

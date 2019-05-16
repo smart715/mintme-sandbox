@@ -101,7 +101,7 @@
                         </div>
                         <div class="pb-1">
                             Release period:
-                            {{ stats.releasePeriod | toMoney(precision) | formatMoney }}
+                            {{ stats.releasePeriod }}
                             <template v-if="stats.releasePeriod !== defaultValue">years</template>
                             <guide>
                                 <template slot="header">
