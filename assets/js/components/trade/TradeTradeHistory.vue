@@ -164,13 +164,11 @@ export default {
     },
     mounted: function() {
         this.updateTableData().then((res) => {
-            this.addOnOpenHandler(() => {
-                this.sendMessage(JSON.stringify({
-                    method: 'deals.subscribe',
-                    params: [this.market.identifier],
-                    id: parseInt(Math.random().toString().replace('0.', '')),
-                }));
-            });
+            this.sendMessage(JSON.stringify({
+                method: 'deals.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
 
             this.addMessageHandler((response) => {
                 if ('deals.update' === response.method) {
