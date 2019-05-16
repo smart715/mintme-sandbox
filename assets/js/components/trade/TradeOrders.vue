@@ -121,13 +121,13 @@ export default {
                     price: toMoney(order.price, this.market.base.subunit),
                     amount: toMoney(order.amount, this.market.quote.subunit),
                     sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
-                    trader: order.maker.profile !== null
+                    trader: order.maker.profile !== null && !order.maker.profile.anonymous
                         ? this.truncateFullName(order.maker.profile, order.owner)
                         : 'Anonymous',
-                    traderFullName: order.maker.profile !== null
+                    traderFullName: order.maker.profile !== null && !order.maker.profile.anonymous
                         ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
                         : 'Anonymous',
-                    traderUrl: order.maker.profile ?
+                    traderUrl: order.maker.profile && !order.maker.profile.anonymous ?
                         this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url}) :
                         '#',
                     side: order.side,

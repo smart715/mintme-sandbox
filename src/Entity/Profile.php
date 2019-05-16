@@ -78,6 +78,13 @@ class Profile
     protected $description;
 
     /**
+     * @ORM\Column(type="boolean")
+     * @Groups({"Default", "API"})
+     * @var bool
+     */
+    protected $anonymous = false;
+
+    /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
      * @var \DateTimeImmutable|null
      */
@@ -166,6 +173,18 @@ class Profile
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function isAnonymous(): bool
+    {
+        return $this->anonymous;
+    }
+
+    public function setAnonymous(bool $anonymous): self
+    {
+        $this->anonymous = $anonymous;
 
         return $this;
     }
