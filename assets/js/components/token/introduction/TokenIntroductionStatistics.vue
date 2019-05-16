@@ -138,15 +138,15 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Remaining:
+                            Not yet released:
                             {{ stats.frozenAmount | toMoney(precision) | formatMoney }}
                             <guide>
                                 <template slot="header">
-                                    Remaining
+                                    Not yet released
                                 </template>
                                 <template slot="body">
-                                    Number of tokens that are circulating in
-                                    the market and in the general public's hands.
+                                    Number of tokens not yet released to token creator
+                                    or sold on the market
                                 </template>
                             </guide>
                         </div>
