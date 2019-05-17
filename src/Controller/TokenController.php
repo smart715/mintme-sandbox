@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
-use App\Exception\NotFoundPairException;
+use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Trade\TraderInterface;
@@ -98,7 +98,7 @@ class TokenController extends Controller
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw new NotFoundPairException();
+            throw new NotFoundTokenException();
         }
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);

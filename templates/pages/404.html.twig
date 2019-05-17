@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Token{% endblock %}
+{% block title %}mintMe | 404{% endblock %}
 
 {% block bodyclass %}errorpage{% endblock %}
 
@@ -10,7 +10,7 @@
     <div class="container h-100 pt-5">
         <div class="row">
             <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
-                Token not found
+                {{ error_message }}
             </div>
         </div>
     </div>
