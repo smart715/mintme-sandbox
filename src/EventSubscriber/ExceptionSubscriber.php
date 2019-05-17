@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Exception\NotFoundPairException;
 use App\Exception\NotFoundProfileException;
+use App\Exception\NotFoundTokenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -33,14 +34,27 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         if ($exception instanceof NotFoundPairException) {
             $event->setResponse(new Response(
-                $this->template->render('pages/pair_404.html.twig'),
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => 'PAIR NOT FOUND',
+                ]),
+                404
+            ));
+        }
+
+        if ($exception instanceof NotFoundTokenException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => 'TOKEN NOT FOUND',
+                ]),
                 404
             ));
         }
 
         if ($exception instanceof NotFoundProfileException) {
             $event->setResponse(new Response(
-                $this->template->render('pages/profile_404.html.twig'),
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => 'PROFILE DOES NOT EXIST',
+                ]),
                 404
             ));
         }
