@@ -50,7 +50,7 @@ class TraderFetcher implements TraderFetcherInterface
                 $takerFee,
                 $makerFee,
                 '',
-                $referralId,
+                $referralId + $this->config->getOffset(),
                 $referralFee,
             ]);
         } catch (FetchException $e) {

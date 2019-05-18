@@ -3,8 +3,11 @@
 namespace App\Controller\API;
 
 use App\Entity\PendingWithdraw;
+use App\Entity\Token\Token;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
@@ -138,5 +141,25 @@ class WalletAPIController extends AbstractFOSRestController
         }
 
         return $this->view($depositCommunicator->getFee($crypto));
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/referral", name="referral_balance", options={"expose"=true})
+     */
+    public function getReferralBalance(
+        BalanceHandlerInterface $balanceHandler,
+        TokenManagerInterface $tokenManager
+    ): View {
+        $webToken = $tokenManager->findByName(Token::WEB_SYMBOL);
+
+        if (!$webToken) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $this->view([
+            'balance' => $balanceHandler->balance($this->getUser(), $webToken)->getReferral(),
+            'token' => $webToken,
+        ]);
     }
 }

@@ -121,7 +121,8 @@ class TokenManager implements TokenManagerInterface
 
         return BalanceResult::success(
             $balanceResult->getAvailable()->subtract($token->getLockIn()->getFrozenAmount()),
-            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount())
+            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount()),
+            $balanceResult->getReferral()
         );
     }
 
@@ -146,7 +147,7 @@ class TokenManager implements TokenManagerInterface
             str_replace(' ', '-', $token->getName())
         );
         $otherToken = $this->findByName($name);
-        
+
         return null !== $otherToken && $token !== $otherToken;
     }
 }

@@ -17,13 +17,17 @@ class BalanceResult
     /** @var Money */
     private $freeze;
 
+    /** @var Money */
+    private $referral;
+
     /** @var bool */
     private $isFailed = false;
 
-    private function __construct(Money $abailable, Money $freeze)
+    private function __construct(Money $available, Money $freeze, Money $referral)
     {
-        $this->available = $abailable;
+        $this->available = $available;
         $this->freeze = $freeze;
+        $this->referral = $referral;
     }
 
     public function getAvailable(): Money
@@ -36,19 +40,25 @@ class BalanceResult
         return $this->freeze;
     }
 
+    public function getReferral(): Money
+    {
+        return $this->referral;
+    }
+
     public function isFailed(): bool
     {
         return $this->isFailed;
     }
 
-    public static function success(Money $available, Money $freeze): self
+    public static function success(Money $available, Money $freeze, Money $referral): self
     {
-        return new self($available, $freeze);
+        return new self($available, $freeze, $referral);
     }
 
     public static function fail(string $symbol): self
     {
         $result = new self(
+            new Money(0, new Currency($symbol)),
             new Money(0, new Currency($symbol)),
             new Money(0, new Currency($symbol))
         );
