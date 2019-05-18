@@ -164,7 +164,7 @@ class OrdersAPIController extends AbstractFOSRestController
             Order::PENDING_STATUS,
             $isSellSide ? $this->getParameter('maker_fee_rate') : $this->getParameter('taker_fee_rate'),
             null,
-            $this->getUser()->getReferrencer() ? $this->getUser()->getReferrencer()->getId() : 0
+            $this->getUser()->getReferrencer() ? (int)$this->getUser()->getReferrencer()->getId() : 0
         );
 
         $tradeResult = $trader->placeOrder($order);

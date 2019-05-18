@@ -29,7 +29,8 @@ class BalanceResultFactory
         foreach ($this->rows as $symbol => $balance) {
             $res[$symbol] = BalanceResult::success(
                 $this->getMoney($balance['available'], $symbol),
-                $this->getMoney($balance['freeze'], $symbol)
+                $this->getMoney($balance['freeze'], $symbol),
+                $this->getMoney($balance['referral'], $symbol)
             );
         }
 

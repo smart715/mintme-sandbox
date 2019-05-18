@@ -170,7 +170,7 @@ class Trader implements TraderInterface
     private function isReferralFeeEnabled(): bool
     {
         return !$this->prelaunchConfig->isEnabled() &&
-            $this->prelaunchConfig->getTradeFinishDate()->getTimestamp() < $this->time->now()->getTimestamp();
+            $this->prelaunchConfig->getTradeFinishDate()->getTimestamp() > $this->time->now()->getTimestamp();
     }
 
     private function updateUserReferrencer(User $user, Token $token): void

@@ -33,6 +33,7 @@ class BalanceFetcherTest extends TestCase
                 'TOK999' => [
                     'available' => '1000000',
                     'freeze' => '100',
+                    'referral' => '495',
                 ],
             ]));
 
@@ -51,6 +52,7 @@ class BalanceFetcherTest extends TestCase
         $this->assertFalse($result->isFailed());
         $this->assertEquals('1000000', $result->getAvailable()->getAmount());
         $this->assertEquals('100', $result->getFreeze()->getAmount());
+        $this->assertEquals('495', $result->getReferral()->getAmount());
     }
 
     public function testBalanceWithException(): void

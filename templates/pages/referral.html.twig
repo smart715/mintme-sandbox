@@ -33,7 +33,11 @@
                             <div class="col-auto p-2 mt-2">
                                 Total earned:
                                 <span>
-                                    0.00000000 <small>WEB</small>
+                                    <span v-if="referralBalance" v-text="balance"></span>
+                                    <span v-else>
+                                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                                    </span>
+                                    <small> WEB</small>
                                 </span>
                             </div>
                             <div class="col-auto p-2 mt-2">
