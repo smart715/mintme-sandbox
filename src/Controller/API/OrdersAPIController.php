@@ -7,6 +7,9 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Factory\BalanceView;
+use App\Exchange\Balance\Factory\BalanceViewFactory;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -123,7 +126,9 @@ class OrdersAPIController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         TraderInterface $trader,
         MoneyWrapperInterface $moneyWrapper,
-        MarketAMQPInterface $marketProducer
+        MarketAMQPInterface $marketProducer,
+        BalanceHandlerInterface $balanceHandler,
+        BalanceViewFactory $balanceViewFactory
     ): View {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -136,6 +141,20 @@ class OrdersAPIController extends AbstractFOSRestController
         }
 
         $isSellSide = Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')];
+
+        if ($isSellSide && $this->exceedAvailableReleased(
+            $quote,
+            $request->get('amountInput'),
+            $balanceHandler,
+            $balanceViewFactory,
+            $moneyWrapper
+        )) {
+            return $this->view([
+                'result' => 3,
+                'message' => (new TradeResult(TradeResult::INSUFFICIENT_BALANCE))->getMessage(),
+            ], Response::HTTP_ACCEPTED);
+        }
+
         $price = $moneyWrapper->parse(
             $this->parseAmount($request->get('priceInput'), $market),
             $this->getSymbol($market->getQuote())
@@ -332,5 +351,28 @@ class OrdersAPIController extends AbstractFOSRestController
         return ($base && $quote) && ($base !== $quote)
             ? $this->marketManager->create($base, $quote)
             : null;
+    }
+
+    private function exceedAvailableReleased(
+        string $quote,
+        string $amount,
+        BalanceHandlerInterface $balanceHandler,
+        BalanceViewFactory $balanceViewFactory,
+        MoneyWrapperInterface $moneyWrapper
+    ): bool {
+        $token = $this->tokenManager->findByName($quote);
+
+        if ($this->getUser() === $token->getProfile()->getUser()) {
+            /** @var BalanceView $balanceViewer */
+            $balanceViewer = $balanceViewFactory->create(
+                $balanceHandler->balances($this->getUser(), [$token])
+            )[$quote];
+
+            return $moneyWrapper
+                ->parse($amount, MoneyWrapper::TOK_SYMBOL)
+                ->greaterThan($balanceViewer->getAvailable());
+        }
+
+        return false;
     }
 }
