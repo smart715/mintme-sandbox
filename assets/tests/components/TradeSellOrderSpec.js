@@ -2,7 +2,8 @@ import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TradeSellOrder from '../../js/components/trade/TradeSellOrder';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
-
+import Vuex from 'vuex';
+import makeOrder from '../../js/storage/modules/makeOrder';
 
 describe('TradeSellOrder', () => {
     beforeEach(() => {
@@ -13,11 +14,15 @@ describe('TradeSellOrder', () => {
     });
 
     const $routing = {generate: () => 'URL'};
-
     const localVue = createLocalVue();
     localVue.use(Axios);
+    localVue.use(Vuex);
+    const store = new Vuex.Store({
+        modules: {makeOrder},
+    });
 
     const wrapper = shallowMount(TradeSellOrder, {
+        store,
         localVue,
         mocks: {
             $routing,
@@ -28,16 +33,16 @@ describe('TradeSellOrder', () => {
             loggedIn: false,
             market: {
                 base: {
-                    name: 'Webchain',
-                    symbol: 'WEB',
-                    subunit: 4,
-                    identifier: 'WEB',
-                },
-                quote: {
                     name: 'Betcoin',
                     symbol: 'BTC',
                     subunit: 8,
                     identifier: 'BTC',
+                },
+                quote: {
+                    name: 'Webchain',
+                    symbol: 'WEB',
+                    subunit: 4,
+                    identifier: 'WEB',
                 },
             },
             marketPrice: 2,
@@ -70,7 +75,7 @@ describe('TradeSellOrder', () => {
         });
     });
 
-    describe('useMarketPrice', function() {
+    describe('useMarketPrice', () => {
         it('should be disabled if marketPrice not greater than zero', () => {
             wrapper.vm.marketPrice = 0;
             expect(wrapper.vm.disabledMarketPrice).to.be.true;
@@ -83,6 +88,17 @@ describe('TradeSellOrder', () => {
             wrapper.vm.useMarketPrice = true;
             wrapper.vm.marketPrice = 0;
             expect(wrapper.vm.useMarketPrice).to.be.false;
+        });
+    });
+
+    describe('balanceClicked', () => {
+        it('should add all the balance to the amount input', () => {
+            wrapper.vm.immutableBalance = 5;
+            wrapper.vm.marketPrice = 7;
+            wrapper.vm.balanceClicked();
+
+            expect(wrapper.vm.sellAmount).to.deep.equal('5.0000');
+            expect(wrapper.vm.sellPrice).to.deep.equal('7.00000000');
         });
     });
 });

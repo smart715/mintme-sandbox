@@ -19,7 +19,7 @@
                 <div class="row">
                     <div v-if="immutableBalance"
                          class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
-                        Your {{ this.market.base.symbol }}:
+                        Your <span class="c-pointer" @click="balanceClicked">{{ this.market.base.symbol }}</span>:
                         <span class="text-white word-break">
                             {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
                             <guide>
@@ -141,6 +141,7 @@ import OrderModal from '../modal/OrderModal';
 import {WebSocketMixin, PlaceOrder, MoneyFilterMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
+import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
@@ -159,10 +160,6 @@ export default {
     },
     data() {
         return {
-            immutableBalance: this.balance,
-            buyPrice: 0,
-            buyAmount: 0,
-            useMarketPrice: false,
             action: 'buy',
         };
     },
@@ -202,6 +199,21 @@ export default {
                 this.useMarketPrice = false;
             }
         },
+        balanceClicked: function() {
+            if (parseFloat(this.price || 0) > 0) {
+                this.buyPrice = this.price;
+                this.buyAmount = toMoney(
+                    new Decimal(this.immutableBalance).div(this.price).toString(),
+                    this.market.quote.subunit
+                );
+            }
+        },
+        ...mapMutations('makeOrder', [
+            'setBuyPriceInput',
+            'setBuyAmountInput',
+            'setBaseBalance',
+            'setUseBuyMarketPrice',
+        ]),
     },
     computed: {
         totalPrice: function() {
@@ -216,6 +228,44 @@ export default {
         disabledMarketPrice: function() {
             return !this.marketPrice > 0;
         },
+        ...mapGetters('makeOrder', [
+            'getBuyPriceInput',
+            'getBuyAmountInput',
+            'getBaseBalance',
+            'getUseBuyMarketPrice',
+        ]),
+        buyPrice: {
+            get() {
+                return this.getBuyPriceInput;
+            },
+            set(val) {
+                this.setBuyPriceInput(val);
+            },
+        },
+        buyAmount: {
+            get() {
+                return this.getBuyAmountInput;
+            },
+            set(val) {
+                this.setBuyAmountInput(val);
+            },
+        },
+        immutableBalance: {
+            get() {
+                return this.getBaseBalance;
+            },
+            set(val) {
+                this.setBaseBalance(val);
+            },
+        },
+        useMarketPrice: {
+            get() {
+                return this.getUseBuyMarketPrice;
+            },
+            set(val) {
+                this.setUseBuyMarketPrice(val);
+            },
+        },
     },
     watch: {
         useMarketPrice: function() {
@@ -226,6 +276,8 @@ export default {
         },
     },
     mounted: function() {
+        this.immutableBalance = this.balance;
+
         if (!this.balance) {
             return;
         }

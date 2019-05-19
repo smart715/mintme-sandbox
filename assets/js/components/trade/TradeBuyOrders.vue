@@ -17,7 +17,9 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive fixed-head-table">
-                    <b-table v-if="hasOrders" ref="table"
+                    <b-table v-if="hasOrders"
+                         ref="table"
+                         @row-clicked="orderClicked"
                          :sort-by.sync="sortBy"
                          :sort-desc.sync="sortDesc"
                          :items="tableData"
@@ -61,11 +63,11 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, MoneyFilterMixin} from '../../mixins';
+import {LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin} from '../../mixins';
 
 export default {
     name: 'TradeBuyOrders',
-    mixins: [LazyScrollTableMixin, MoneyFilterMixin],
+    mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin],
     props: {
         ordersList: [Array],
         tokenName: String,
