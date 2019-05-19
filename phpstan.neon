@@ -27,3 +27,4 @@ parameters:
         - '#Cannot call method (.*) on (.*)\|null\.#'
         - '#Property (.+) \((.+)Repository\) does not accept Doctrine\\ORM\\EntityRepository(.+).#'
         - '#Method (.*)Repository\(\) should return (.*)Repository but returns (.*).#'
+        - '#Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface::section\(\)\.#'

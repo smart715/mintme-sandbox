@@ -32,6 +32,15 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
+    coinmarketcap.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%coinbase_api_url%'
+            $timeoutSeconds: '%coinbase_api_timeout%'
+            $headers:
+                X-CMC_PRO_API_KEY: '%coinbase_api_key%'
+                Accept: application/json
+
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
@@ -51,6 +60,10 @@ services:
             $url: '%withdraw_rpc%'
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
             $auth: '%withdraw_auth%'
+
+    App\Communications\CoinmarketcapCommunicator:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:

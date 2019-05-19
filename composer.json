@@ -5,11 +5,11 @@
     "license": "proprietary",
     "require": {
         "php": "~7.2",
-        "ext-openssl": "*",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
+        "ext-openssl": "*",
         "cron/cron-bundle": "^2.0",
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "excelwebzone/recaptcha-bundle": "^1.5",
