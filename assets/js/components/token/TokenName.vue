@@ -105,6 +105,9 @@ export default {
             if (this.currentName === this.newName) {
                 this.cancelEditingMode();
                 return;
+            } else if (!this.newName) {
+                this.$toasted.error('Token name shouldn\'t be blank');
+                return;
             } else if (!this.$v.newName.tokenContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
