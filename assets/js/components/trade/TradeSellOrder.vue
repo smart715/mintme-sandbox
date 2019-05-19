@@ -19,7 +19,7 @@
                     <div v-if="immutableBalance"
                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
                         >
-                        Your {{ this.market.quote.symbol }}:
+                        Your <span class="c-pointer" @click="balanceClicked">{{ this.market.quote.symbol }}</span>:
                         <span class="text-white  word-break">
                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                             <guide>
@@ -141,6 +141,7 @@ import OrderModal from '../modal/OrderModal';
 import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
+import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeSellOrder',
@@ -160,10 +161,6 @@ export default {
     },
     data() {
         return {
-            immutableBalance: this.balance,
-            sellPrice: 0,
-            sellAmount: 0,
-            useMarketPrice: false,
             action: 'sell',
         };
     },
@@ -192,7 +189,6 @@ export default {
         resetOrder: function() {
             this.sellPrice = 0;
             this.sellAmount = 0;
-            this.useMarketPrice = false;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
@@ -202,6 +198,18 @@ export default {
                 this.useMarketPrice = false;
             }
         },
+        balanceClicked: function() {
+            if (parseFloat(this.price || 0) > 0) {
+                this.sellPrice = this.price;
+                this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
+            }
+        },
+        ...mapMutations('makeOrder', [
+            'setSellPriceInput',
+            'setSellAmountInput',
+            'setQuoteBalance',
+            'setUseSellMarketPrice',
+        ]),
     },
     computed: {
         totalPrice: function() {
@@ -216,6 +224,44 @@ export default {
         disabledMarketPrice: function() {
             return !this.marketPrice > 0;
         },
+        ...mapGetters('makeOrder', [
+            'getSellPriceInput',
+            'getSellAmountInput',
+            'getQuoteBalance',
+            'getUseSellMarketPrice',
+        ]),
+        sellPrice: {
+            get() {
+                return this.getSellPriceInput;
+            },
+            set(val) {
+                this.setSellPriceInput(val);
+            },
+        },
+        sellAmount: {
+            get() {
+                return this.getSellAmountInput;
+            },
+            set(val) {
+                this.setSellAmountInput(val);
+            },
+        },
+        immutableBalance: {
+            get() {
+                return this.getQuoteBalance;
+            },
+            set(val) {
+                this.setQuoteBalance(val);
+            },
+        },
+        useMarketPrice: {
+            get() {
+                return this.getUseSellMarketPrice;
+            },
+            set(val) {
+                this.setUseSellMarketPrice(val);
+            },
+        },
     },
     watch: {
         useMarketPrice: function() {
@@ -226,6 +272,8 @@ export default {
         },
     },
     mounted: function() {
+        this.immutableBalance = this.balance;
+
         if (!this.balance) {
             return;
         }

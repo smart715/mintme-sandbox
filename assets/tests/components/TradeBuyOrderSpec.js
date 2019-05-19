@@ -2,7 +2,8 @@ import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TradeBuyOrder from '../../js/components/trade/TradeBuyOrder';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
-
+import Vuex from 'vuex';
+import makeOrder from '../../js/storage/modules/makeOrder';
 
 describe('TradeBuyOrder', () => {
     beforeEach(() => {
@@ -13,11 +14,15 @@ describe('TradeBuyOrder', () => {
     });
 
     const $routing = {generate: () => 'URL'};
-
     const localVue = createLocalVue();
     localVue.use(Axios);
+    localVue.use(Vuex);
+    const store = new Vuex.Store({
+        modules: {makeOrder},
+    });
 
     const wrapper = shallowMount(TradeBuyOrder, {
+        store,
         localVue,
         mocks: {
             $routing,
@@ -28,16 +33,16 @@ describe('TradeBuyOrder', () => {
             loggedIn: false,
             market: {
                 base: {
-                    name: 'Webchain',
-                    symbol: 'WEB',
-                    subunit: 4,
-                    identifier: 'WEB',
-                },
-                quote: {
                     name: 'Betcoin',
                     symbol: 'BTC',
                     subunit: 8,
                     identifier: 'BTC',
+                },
+                quote: {
+                    name: 'Webchain',
+                    symbol: 'WEB',
+                    subunit: 4,
+                    identifier: 'WEB',
                 },
             },
             marketPrice: 2,
@@ -83,6 +88,17 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.useMarketPrice = true;
             wrapper.vm.marketPrice = 0;
             expect(wrapper.vm.useMarketPrice).to.be.false;
+        });
+
+        describe('balanceClicked', () => {
+            it('should add the correct amount to match the full balance', () => {
+                wrapper.vm.immutableBalance = 10;
+                wrapper.vm.marketPrice = 5;
+                wrapper.vm.balanceClicked();
+
+                expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
+                expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
+            });
         });
     });
 });
