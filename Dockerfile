@@ -18,7 +18,7 @@ RUN yes | pecl install xdebug \
     && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN touch /usr/local/etc/php/php.ini
-RUN echo 'memory_limit=512M' >> /usr/local/etc/php/php.ini
+RUN echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
 
 # NodeJs
 RUN rm -rf /var/lib/apt/lists/ && wget -qO- https://deb.nodesource.com/setup_10.x | bash -

@@ -4,7 +4,6 @@ namespace App\Admin;
 
 use App\Admin\Form\PasswordGeneratorButtonType;
 use App\Entity\User;
-use App\Manager\ProfileManagerInterface;
 use Exception;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;

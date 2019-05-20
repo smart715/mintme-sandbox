@@ -14,31 +14,22 @@ class CoinmarketcapCommunicator implements CryptoSynchronizerInterface
         $this->rpc = $rpc;
     }
 
-    public function fetchCryptos(int $offset = 1, int $limit = 100): array
+    public function fetchCryptos(): array
     {
-        assert($offset > 0);
-        assert($limit >= 1 && $limit <= 5000);
-
         $response = $this->rpc->send(
-            'cryptocurrency/listings/latest',
-            Request::METHOD_GET,
-            [
-                'query' => [
-                    'limit' => $limit,
-                    'start' => $offset,
-                ],
-            ]
+            'coins/list',
+            Request::METHOD_GET
         );
 
-        $cryptos = json_decode($response, true)['data'];
+        $cryptos = json_decode($response, true);
         $names = [];
 
         array_walk($cryptos, function (array $res) use (&$names): void {
+            $names[] = trim(strtolower($res['id']));
             $names[] = trim(strtolower($res['symbol']));
             $names[] = trim(strtolower($res['name']));
-            $names[] = trim(strtolower($res['slug']));
         });
 
-        return $names;
+        return array_unique($names);
     }
 }

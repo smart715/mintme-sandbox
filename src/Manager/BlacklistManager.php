@@ -5,7 +5,6 @@ namespace App\Manager;
 use App\Entity\Blacklist;
 use App\Repository\BlacklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Throwable;
 
 class BlacklistManager implements BlacklistManagerInterface
 {
@@ -26,10 +25,13 @@ class BlacklistManager implements BlacklistManagerInterface
         return $this->repository->matchValue($value, $type, $sensetive);
     }
 
-    public function addToBlacklist(string $value, string $type): void
+    public function addToBlacklist(string $value, string $type, bool $flush = true): void
     {
         $this->add($value, $type);
-        $this->em->flush();
+
+        if ($flush) {
+            $this->em->flush();
+        }
     }
 
     /** {@inheritDoc} */
@@ -44,32 +46,8 @@ class BlacklistManager implements BlacklistManagerInterface
         ]);
     }
 
-    public function migrate(array $names, string $type): void
-    {
-        $list = $this->getList($type);
-
-        foreach (array_unique($names) as $name) {
-            if (!$this->isValueExists($name, $list)) {
-                $this->add($name, $type);
-                $this->em->flush();
-            }
-        }
-    }
-
     private function add(string $value, string $type): void
     {
         $this->em->persist(new Blacklist($value, $type));
-    }
-
-    /** @param array<Blacklist> $list */
-    private function isValueExists(string $value, array $list): bool
-    {
-        foreach ($list as $item) {
-            if ($item->getValue() === $value) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

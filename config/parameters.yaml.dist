@@ -57,6 +57,5 @@ parameters:
     # SET TO FALSE ON PRODUCTION
     is_hacker_allowed: true
 
-    coinbase_api_url: 'https://pro-api.coinmarketcap.com/v1'
+    coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
-    coinbase_api_key: '4b096a6c-bef9-432a-9a46-b2dd57cfe9f8'

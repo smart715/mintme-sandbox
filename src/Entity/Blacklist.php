@@ -22,13 +22,13 @@ class Blacklist
 
     /**
      * @ORM\Column(type="string", nullable=false)
-     * @var string
+     * @var string|null
      */
     protected $type;
 
     /**
      * @ORM\Column(type="string", nullable=false)
-     * @var string
+     * @var string|null
      */
     protected $value;
 
@@ -38,13 +38,39 @@ class Blacklist
         $this->type = $type;
     }
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     public function getValue(): string
     {
-        return $this->value;
+        return $this->value ?? '';
     }
 
     public function getType(): string
     {
-        return $this->type;
+        return $this->type ?? '';
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function setValue(string $value): self
+    {
+        $this->value = $value;
+
+        return $this;
     }
 }

@@ -66,9 +66,11 @@ class HackerController extends AbstractController
             return $this->redirect($referer);
         }
 
-        $user->setRoles(['user' === $role ? User::ROLE_DEFAULT : User::ROLE_SUPER_ADMIN]);
+        $user->setRoles(['user' === $role ? User::ROLE_DEFAULT : 'ROLE_ADMIN']);
 
         $userManager->updateUser($user);
+
+        $request->getSession()->invalidate();
 
         return $this->redirect($referer);
     }

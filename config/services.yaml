@@ -38,7 +38,6 @@ services:
             $url: '%coinbase_api_url%'
             $timeoutSeconds: '%coinbase_api_timeout%'
             $headers:
-                X-CMC_PRO_API_KEY: '%coinbase_api_key%'
                 Accept: application/json
 
     viabtc.json_rpc:
@@ -135,6 +134,16 @@ services:
         public: true
         calls:
              - [init, ['@fos_user.user_manager', '@App\Manager\ProfileManagerInterface']]
+
+    admin.blacklist:
+        class: App\Admin\BlacklistAdmin
+        arguments:
+            - null
+            - App\Entity\Blacklist
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Blacklist }
+        public: true
 
     # Required by rabbitmq bundle
     market_consumer:

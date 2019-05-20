@@ -7,11 +7,8 @@ use App\Entity\Blacklist;
 interface BlacklistManagerInterface
 {
     public function isBlacklisted(string $value, string $type, bool $sensetive = true): bool;
-    public function addToBlacklist(string $value, string $type): void;
+    public function addToBlacklist(string $value, string $type, bool $flush = true): void;
 
     /** @return array<Blacklist> */
     public function getList(?string $type = null): array;
-
-    /** @param array<string> $names */
-    public function migrate(array $names, string $type): void;
 }

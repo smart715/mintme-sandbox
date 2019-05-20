@@ -9,6 +9,11 @@ sonata_admin:
 
         groups:
 
+            blacklist:
+                label: Blacklist
+                items:
+                    - admin.blacklist
+
             usergroup:
                 label: Users Administration
                 items:
