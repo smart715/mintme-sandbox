@@ -92,13 +92,15 @@ export default {
             },
             additionalAttributes: {
                 grid: {
-                    top: 55,
+                    top: 20,
                     bottom: 60,
                     left: '8%',
                     right: '8%',
                 },
+                xAxis: {
+                    boundaryGap: true,
+                },
             },
-            chartOptions: {},
             marketStatus: {
                 volume: '0',
                 last: '0',

@@ -15,33 +15,33 @@ export default function(precision) {
         ],
 
         legend: {
-            show: true,
-                textStyle: {
+            show: false,
+            textStyle: {
                 color: '#fff',
             },
-            top: 20,
+            top: 0,
         },
 
         tooltip: {
             trigger: 'item',
-                showDelay: 20,
-                hideDelay: 100,
-                transitionDuration: 0.4,
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                borderColor: '#333',
-                borderRadius: 4,
-                borderWidth: 0,
-                padding: 5,
-                axisPointer: {
+            showDelay: 20,
+            hideDelay: 100,
+            transitionDuration: 0.4,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            borderColor: '#333',
+            borderRadius: 4,
+            borderWidth: 0,
+            padding: 5,
+            axisPointer: {
                 type: 'line',
-                    lineStyle: {
+                lineStyle: {
                     color: 'rgba(0,0,0,0)',
-                        width: 1,
-                        type: 'solid',
+                    width: 1,
+                    type: 'solid',
                 },
                 shadowStyle: {
                     width: 'auto',
-                        color: 'rgba(150,150,150,0.3)',
+                    color: 'rgba(150,150,150,0.3)',
                 },
             },
             textStyle: {
@@ -51,67 +51,68 @@ export default function(precision) {
 
         dataZoom: {
             orient: 'horizontal',
-                fillerColor: 'rgba(0,89,127,0.3)',
-                handleStyle: {
+            fillerColor: 'rgba(0,89,127,0.3)',
+            handleStyle: {
                 color: '#00597F',
-                    opacity: 0.5,
+                opacity: 0.5,
             },
             borderColor: 'rgba(0,0,0,0)',
-                dataBackground: {
+            dataBackground: {
                 areaStyle: {
                     color: '#e6e6e6',
-                        opacity: 1,
+                    opacity: 1,
                 },
             },
             backgroundColor: '#768897',
-
-                textStyle: {
+            textStyle: {
                 color: '#0083af',
             },
+            realtime: true,
         },
 
         axisPointer: {
             link: {xAxisIndex: 'all'},
             label: {
                 backgroundColor: 'rgba(0,0,0,0.7)',
-                    showMinLabel: false,
-                    precision: precision,
+                showMinLabel: false,
+                precision: precision,
             },
         },
 
         categoryAxis: {
             position: 'bottom',
-                nameLocation: 'end',
-                boundaryGap: false,
-                axisLine: {
+            nameLocation: 'end',
+            boundaryGap: true,
+            axisLine: {
                 show: false,
             },
             axisTick: {
                 show: true,
-                    interval: 'auto',
-                    inside: false,
-                    length: 5,
-                    lineStyle: {
+                interval: 'auto',
+                inside: false,
+                length: 5,
+                lineStyle: {
                     color: ['#fff'],
-                        width: 1,
+                    width: 1,
                 },
+                alignWithLabel: true,
             },
             axisLabel: {
                 show: true,
-                    interval: 'auto',
-                    rotate: 0,
-                    margin: 8,
+                interval: 'auto',
+                rotate: 0,
+                margin: 8,
 
-                    textStyle: {
+                textStyle: {
                     color: '#fff',
                 },
             },
             splitLine: {
                 show: true,
 
-                    lineStyle: {
+                lineStyle: {
                     width: 1,
-                        type: 'solid',
+                    type: 'solid',
                 },
             },
             splitArea: {
@@ -122,16 +123,16 @@ export default function(precision) {
 
         valueAxis: {
             position: 'left',
-                nameLocation: 'end',
-                nameTextStyle: {},
+            nameLocation: 'end',
+            nameTextStyle: {},
             boundaryGap: [0, 0],
-                splitNumber: 5,
-                axisLine: {
+            splitNumber: 5,
+            axisLine: {
                 show: true,
-                    lineStyle: {
+                lineStyle: {
                     color: '#fff',
-                        width: 1,
-                        type: 'solid',
+                    width: 1,
+                    type: 'solid',
                 },
             },
             axisTick: {
@@ -139,20 +140,20 @@ export default function(precision) {
             },
             axisLabel: {
                 show: true,
-                    rotate: 0,
-                    margin: 8,
-                    formatter: '{value} kg',
+                rotate: 0,
+                margin: 8,
+                formatter: '{value} kg',
 
-                    textStyle: {
+                textStyle: {
                     color: '#fff',
                 },
             },
             splitLine: {
                 show: true,
-                    lineStyle: {
+                lineStyle: {
                     color: ['#fff'],
-                        width: 1,
-                        type: 'solid',
+                    width: 1,
+                    type: 'solid',
                 },
             },
             splitArea: {
@@ -162,11 +163,11 @@ export default function(precision) {
 
         textStyle: {
             decoration: 'none',
-                fontFamily: 'Arial, Verdana, sans-serif',
-                fontFamily2: '微软雅黑',
-                fontSize: 12,
-                fontStyle: 'normal',
-                fontWeight: 'normal',
+            fontFamily: 'Arial, Verdana, sans-serif',
+            fontFamily2: '微软雅黑',
+            fontSize: 12,
+            fontStyle: 'normal',
+            fontWeight: 'normal',
         },
 
 
@@ -174,7 +175,7 @@ export default function(precision) {
             'circle', 'rectangle', 'triangle', 'diamond',
             'emptyCircle', 'emptyRectangle', 'emptyTriangle', 'emptyDiamond',
         ],
-            loadingText: 'Loading...',
+        loadingText: 'Loading...',
 
         calculable: false,
         calculableColor: 'rgba(255,165,0,0.6)',
