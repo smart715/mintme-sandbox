@@ -52,6 +52,21 @@ const storage = {
                     message: [], open: [],
                 }};
                 state.clients[url].ws = new W3CWebSocket(url);
+
+                const ping = () => {
+                    state.clients[url].ws.send(JSON.stringify({
+                        method: 'server.ping',
+                        params: [],
+                        id: parseInt(Math.random().toString().replace('0.', '')),
+                    }));
+                };
+
+                state.clients[url].handlers.open.push(ping);
+                state.clients[url].handlers.message.push((result) => {
+                    if ('pong' === result.result) {
+                        setTimeout(ping, 30000);
+                    }
+                });
             }
         },
         addMessageHandler(state, {url, id, handler}) {
@@ -80,10 +95,6 @@ const storage = {
             };
         },
         addOnOpenHandler(state, {url, handler}) {
-            if (state.clients[url].handlers.open.includes(handler)) {
-                return;
-            }
-
             state.clients[url].handlers.open.push(handler);
 
             if (state.clients[url].ws.readyState === state.clients[url].ws.OPEN) {
