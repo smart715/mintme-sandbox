@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="row px-0 mx-0">
+        <div class="row px-lg-0 mx-lg-0">
             <div class="col-12 col-xl-6 col-lg-12 pr-lg-2 pl-lg-0 mt-3">
                 <trade-buy-orders
                         v-if="ordersLoaded"

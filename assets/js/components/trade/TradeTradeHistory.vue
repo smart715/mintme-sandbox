@@ -30,7 +30,7 @@
                                     </span>
                                     <img
                                         src="../../../img/avatar.png"
-                                        class="pl-3"
+                                        class="pl-3 pl-lg-0 float-lg-right"
                                         alt="avatar">
                                 </a>
                             </template>
@@ -41,7 +41,7 @@
                                     </span>
                                     <img
                                         src="../../../img/avatar.png"
-                                        class="pl-3"
+                                        class="pl-3 pl-lg-0 float-lg-right"
                                         alt="avatar">
                                 </a>
                             </template>
