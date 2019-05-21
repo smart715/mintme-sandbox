@@ -24,7 +24,7 @@
                             Token name can contain alphabets, numbers, spaces and dashes
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
-                            Token name must have at least 4 symbols
+                            Token name should have at least 4 symbols
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
                             Token name can't be longer than 255 characters
