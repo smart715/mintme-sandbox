@@ -45,12 +45,14 @@
                                 <textarea
                                     class="form-control"
                                     v-model="$v.newDescription.$model"
-                                    max="20000"
                                     :class="{ 'is-invalid': $v.$invalid }"
                                 >
                                 </textarea>
-                                <div v-if="$v.$invalid" class="text-sm text-danger">
+                                <div v-if="!$v.newDescription.minLength || !$v.newDescription.required" class="text-sm text-danger">
                                     Token Description must be more than one character
+                                </div>
+                                <div v-if="!$v.newDescription.maxLength" class="text-sm text-danger">
+                                    Token Description must be less than {{ maxDescriptionLength }} character
                                 </div>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription">Save</button>
@@ -72,7 +74,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
-import {required, minLength} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 
 library.add(faEdit);
 Vue.use(Toasted, {
@@ -99,6 +101,7 @@ export default {
         return {
             editingDescription: false,
             newDescription: this.description,
+            maxDescriptionLength: 10000,
         };
     },
     computed: {
@@ -110,7 +113,11 @@ export default {
         editDescription: function() {
             this.$v.$touch();
             if (this.$v.$invalid) {
-                this.$toasted.error('Token Description must be more than one character');
+                if (!this.$v.newDescription.minLength || !this.$v.newDescription.required) {
+                    this.$toasted.error('Token Description must be more than one character');
+                } else if (!this.$v.newDescription.maxLength) {
+                    this.$toasted.error('Token Description must be less than '+this.maxDescriptionLength+' character');
+                }
                 return;
             }
 
@@ -137,6 +144,7 @@ export default {
             newDescription: {
                 required,
                 minLength: minLength(2),
+                maxLength: maxLength(this.maxDescriptionLength),
             },
         };
     },

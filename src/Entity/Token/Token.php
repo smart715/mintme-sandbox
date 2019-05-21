@@ -73,7 +73,7 @@ class Token implements TradebleInterface
     protected $youtubeChannelId;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="string", length=10000, nullable=true)
      * @var string|null
      */
     protected $description;
