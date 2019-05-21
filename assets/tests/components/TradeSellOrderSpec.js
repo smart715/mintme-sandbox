@@ -3,7 +3,7 @@ import TradeSellOrder from '../../js/components/trade/TradeSellOrder';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
 import Vuex from 'vuex';
-import makeOrder from '../../js/storage/modules/makeOrder';
+import makeOrder from '../../js/storage/modules/make_order';
 
 describe('TradeSellOrder', () => {
     beforeEach(() => {

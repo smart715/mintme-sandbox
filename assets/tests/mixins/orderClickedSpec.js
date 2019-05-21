@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import Vuex from 'vuex';
-import makeOrder from '../../js/storage/modules/makeOrder';
-import orderClickedMixin from '../../js/mixins/orderClicked';
+import makeOrder from '../../js/storage/modules/make_order';
+import orderClickedMixin from '../../js/mixins/order_clicked';
 import {toMoney} from '../../js/utils';
 
 describe('OrderClicked', function() {
