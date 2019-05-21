@@ -56,6 +56,7 @@ export default {
             currentName: this.name,
             newName: this.name,
             isTokenExchanged: true,
+            minLength: 4,
         };
     },
     mounted: function() {
@@ -105,14 +106,14 @@ export default {
             if (this.currentName === this.newName) {
                 this.cancelEditingMode();
                 return;
-            } else if (!this.newName) {
+            } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');
                 return;
             } else if (!this.$v.newName.tokenContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
-            } else if (!this.$v.newName.minLength) {
-                this.$toasted.error('Token name can have at least 4 symbols');
+            } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
+                this.$toasted.error('Token name should have at least 4 symbols');
                 return;
             } else if (!this.$v.newName.maxLength) {
                 this.$toasted.error('Token name can not be longer than 60 characters');
@@ -154,7 +155,7 @@ export default {
             newName: {
                 required,
                 tokenContain: tokenContain,
-                minLength: minLength(4),
+                minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
             },
         };
