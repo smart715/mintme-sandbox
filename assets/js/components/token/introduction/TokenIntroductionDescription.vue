@@ -52,7 +52,7 @@
                                     Token Description must be more than one character
                                 </div>
                                 <div v-if="!$v.newDescription.maxLength" class="text-sm text-danger">
-                                    Token Description must be less than {{ maxDescriptionLength }} character
+                                    Token Description must be less than {{ maxDescriptionLength }} characters
                                 </div>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription">Save</button>
@@ -116,7 +116,7 @@ export default {
                 if (!this.$v.newDescription.minLength || !this.$v.newDescription.required) {
                     this.$toasted.error('Token Description must be more than one character');
                 } else if (!this.$v.newDescription.maxLength) {
-                    this.$toasted.error('Token Description must be less than '+this.maxDescriptionLength+' character');
+                    this.$toasted.error('Token Description must be less than '+this.maxDescriptionLength+' characters');
                 }
                 return;
             }
