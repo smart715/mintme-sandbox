@@ -6,6 +6,17 @@
                 <b-table
                     :items="tokens"
                     :fields="fields">
+                    <template slot="HEAD_volume" slot-scope="data">
+                        {{ data.label }}
+                        <guide>
+                            <template slot="header">
+                                24h volume
+                            </template>
+                            <template slot="body">
+                                The amount of crypto that has been traded in the last 24 hours.
+                            </template>
+                        </guide>
+                    </template>
                     <template slot="pair" slot-scope="row">
                         <a class="d-block text-truncate truncate-responsive text-white"
                             v-b-tooltip:title="row.value"
@@ -33,6 +44,7 @@
 </template>
 
 <script>
+import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 
@@ -41,6 +53,9 @@ export default {
     mixins: [WebSocketMixin, FiltersMixin],
     props: {
         page: Number,
+    },
+    components: {
+        Guide,
     },
     data() {
         return {
@@ -66,6 +81,7 @@ export default {
                 volume: {
                     label: '24H Volume',
                     sortable: true,
+                    formatter: formatMoney,
                 },
             },
             sanitizedMarkets: {},
@@ -84,7 +100,7 @@ export default {
             Object.keys(this.sanitizedMarkets).forEach((marketName) => {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
-            tokens.sort((first, second) => parseFloat(second.volume) - parseFloat(first.volume));
+            tokens.sort((first, second) => parseFloat(second.deal) - parseFloat(first.deal));
 
             return 1 === this.currentPage
                 ? this.sanitizedMarketsOnTop.concat(tokens)
@@ -153,7 +169,7 @@ export default {
                 marketToken,
                 changePercentage,
                 marketLastPrice,
-                parseFloat(marketInfo.volume),
+                parseFloat(marketInfo.deal),
                 marketPrecision
             );
 
@@ -170,7 +186,7 @@ export default {
                 pair: `${currency}/${token}`,
                 change: changePercentage.toFixed(2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: volume.toFixed(2),
+                volume: toMoney(volume, subunit) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),

@@ -361,8 +361,9 @@ class OrdersAPIController extends AbstractFOSRestController
         MoneyWrapperInterface $moneyWrapper
     ): bool {
         $token = $this->tokenManager->findByName($quote);
+        $profile = $token->getProfile();
 
-        if ($this->getUser() === $token->getProfile()->getUser()) {
+        if ($profile && $this->getUser() === $profile->getUser()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $balanceViewFactory->create(
                 $balanceHandler->balances($this->getUser(), [$token])

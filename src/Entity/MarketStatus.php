@@ -142,7 +142,7 @@ class MarketStatus
     {
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
-        $this->dayVolume = $marketInfo->getVolume()->getAmount();
+        $this->dayVolume = $marketInfo->getDeal();
 
         return $this;
     }
