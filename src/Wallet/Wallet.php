@@ -66,7 +66,7 @@ class Wallet implements WalletInterface
     {
         $token = Token::getFromCrypto($crypto);
         $available = $this->balanceHandler->balance($user, $token)->getAvailable();
-        $this->logger->debug(
+        $this->logger->info(
             "Created a new withdraw request for '{$user->getEmail()}' to 
             send {$amount->getAmount()->getAmount()} {$crypto->getSymbol()} on {$address->getAddress()}"
         );
