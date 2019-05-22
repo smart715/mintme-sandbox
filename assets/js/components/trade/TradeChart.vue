@@ -36,7 +36,15 @@
                     </guide>
                 </div>
                 <div class="col text-right">
-                    [Volume] {{ market.base.symbol }} ({{ marketStatus.change }}%)
+                    24h volume: {{ marketStatus.amount | formatMoney }} {{ market.base.symbol }}
+                    <guide>
+                        <template slot="header">
+                            24h volume
+                        </template>
+                        <template slot="body">
+                            The amount of {{ market.base.symbol }} that has been traded in the last 24 hours.
+                        </template>
+                    </guide>
                 </div>
             </div>
             <div class="row">
@@ -105,6 +113,7 @@ export default {
                 volume: '0',
                 last: '0',
                 change: '0',
+                amount: '0',
             },
             stats: null,
         };
@@ -192,6 +201,7 @@ export default {
             const marketOpenPrice = parseFloat(marketInfo.open);
             const marketLastPrice = parseFloat(marketInfo.last);
             const marketVolume = parseFloat(marketInfo.volume);
+            const marketAmount = parseFloat(marketInfo.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
 
@@ -199,6 +209,7 @@ export default {
                 change: changePercentage.toFixed(2),
                 last: toMoney(marketLastPrice, this.market.base.subunit),
                 volume: toMoney(marketVolume, this.market.quote.subunit),
+                amount: toMoney(marketAmount, this.market.base.subunit),
             };
         },
         getDate: function(timestamp) {
