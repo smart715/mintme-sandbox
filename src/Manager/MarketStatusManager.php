@@ -56,8 +56,23 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** {@inheritDoc} */
     public function getMarketsInfo(int $offset, int $limit): array
     {
+        $predefinedMarketStatus = array_map(function (Market $market) {
+            return $this->repository->findByBaseQuoteNames(
+                $market->getBase()->getSymbol(),
+                $market->getQuote()->getSymbol()
+            );
+        }, $this->marketFactory->createPredefined());
+
         return $this->parseMarketStatuses(
-            $this->repository->findBy([], ['lastPrice' => Criteria::DESC], $limit, $offset)
+            array_merge(
+                $predefinedMarketStatus,
+                $this->repository->findBy(
+                    [],
+                    ['lastPrice' => Criteria::DESC],
+                    $limit - count($predefinedMarketStatus),
+                    $offset
+                )
+            )
         );
     }
 
