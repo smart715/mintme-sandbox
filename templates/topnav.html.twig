@@ -63,16 +63,16 @@
                         </template>
                         {% if prelaunch.isFinished() %}
                             <b-dropdown-item href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
-                                <span class="icon-profile float-left mt-1 mr-1 d-none d-lg-inline"></span>
+                                <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                 Profile
                             </b-dropdown-item>
                         {% endif %}
                         <b-dropdown-item href="{{ path('settings') }}">
-                            <font-awesome-icon icon="cog" class="float-left mt-1 mr-1 d-none d-lg-inline"></font-awesome-icon>
+                            <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                             Settings
                         </b-dropdown-item>
                         <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
-                            <span class="icon-logout float-left mt-1 mr-1 d-none d-lg-inline"></span>
+                            <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
                             Log Out
                         </b-dropdown-item>
                     </b-nav-item-dropdown>
