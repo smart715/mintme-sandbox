@@ -114,6 +114,23 @@ describe('Trading', () => {
                         done();
                     });
                 });
+
+                it('BTC/WEB pair should be always first after sort', (done) => {
+                    vm.sanitizedMarketsOnTop = [
+                        {pair: 'WEB/tok2', change: '-73.03', lastPrice: '100.00', volume: '3210.00'},
+                        {pair: 'WEB/BTC', change: '-73.33', lastPrice: '150.00', volume: '32.00'},
+                        {pair: 'WEB/tok1', change: '-73.03', lastPrice: '250.00', volume: '321.00'},
+                    ];
+
+                    const sanitizedMarketsAfterSort = [
+                        {pair: 'WEB/BTC', change: '-73.33', lastPrice: '150.00', volume: '32.00'},
+                        {pair: 'WEB/tok2', change: '-73.03', lastPrice: '250.00', volume: '3210.00'},
+                        {pair: 'WEB/tok1', change: '-73.03', lastPrice: '100.00', volume: '321.00'},
+                    ];
+                    vm.sanitizedMarketsOnTop = sanitizedMarketsAfterSort;
+                    expect(vm.sanitizedMarketsOnTop).to.deep.equal(sanitizedMarketsAfterSort);
+                    done();
+                });
             });
         });
     });
