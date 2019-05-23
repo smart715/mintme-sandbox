@@ -72,6 +72,10 @@
     background-image: url('../img/logout-sprite.png')
     @extend .icon
 
+  .icon-settings
+    background-image: url('../img/settings-sprite.png')
+    @extend .icon
+
   .dropdown-menu
     min-width: auto
     padding: 0.15rem
@@ -84,11 +88,11 @@
       border-radius: 0.2em
       transition: background-color 500ms
       border: none
-      padding: .25rem 1.8rem .25rem 0.65rem
+      padding: .25rem 2.2rem .25rem 0.65rem
 
       &:hover, &:focus, &.active, &:active
         background-color: transparent
-        color: $color-link-hover
+        color: $color-nav-hover
         border: none
 
         .icon-profile
@@ -97,6 +101,9 @@
         .icon-logout
           background-position: -18px 0
 
+        .icon-settings
+          background-position: -18px 0
+          
     &:before 
       content: ""
       width: 0
