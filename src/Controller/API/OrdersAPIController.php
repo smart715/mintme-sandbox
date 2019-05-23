@@ -16,6 +16,7 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
+use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -61,13 +62,17 @@ class OrdersAPIController extends AbstractFOSRestController
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
     public function __construct(
         TraderInterface $trader,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        UserActionLogger $userActionLogger
     ) {
         $this->trader = $trader;
         $this->cryptoManager = $cryptoManager;
@@ -75,6 +80,7 @@ class OrdersAPIController extends AbstractFOSRestController
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->logger = $logger;
+        $this->userActionLogger = $userActionLogger;
     }
 
     /**
@@ -107,6 +113,7 @@ class OrdersAPIController extends AbstractFOSRestController
             );
 
             $this->trader->cancelOrder($order);
+            $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
         }
 
         return $this->view(Response::HTTP_OK);
@@ -169,15 +176,17 @@ class OrdersAPIController extends AbstractFOSRestController
             }
         }
 
+        $amount = $moneyWrapper->parse(
+            $this->parseAmount($request->get('amountInput'), $market),
+            $this->getSymbol($market->getQuote())
+        );
+
         $order = new Order(
             null,
             $this->getUser(),
             null,
             $market,
-            $moneyWrapper->parse(
-                $this->parseAmount($request->get('amountInput'), $market),
-                $this->getSymbol($market->getQuote())
-            ),
+            $amount,
             Order::SIDE_MAP[$request->get('action')],
             $price,
             Order::PENDING_STATUS,
@@ -195,6 +204,13 @@ class OrdersAPIController extends AbstractFOSRestController
                 "Failed to update '${base}/${quote}' market status. Reason: {$exception->getMessage()}"
             );
         }
+
+        $this->userActionLogger->info(sprintf('Create %s order', $request->get('action')), [
+            'base' => $market->getBase()->getSymbol(),
+            'quote' => $market->getQuote()->getSymbol(),
+            'amount' => $amount->getAmount(),
+            'price' => $price->getAmount(),
+        ]);
 
         return $this->view([
             'result' => $tradeResult->getResult(),

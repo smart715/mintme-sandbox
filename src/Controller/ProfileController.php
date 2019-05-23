@@ -6,11 +6,13 @@ use App\Entity\Profile;
 use App\Exception\NotFoundProfileException;
 use App\Form\AddProfileType;
 use App\Form\EditProfileType;
+use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/profile")
@@ -18,6 +20,15 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ProfileController extends Controller
 {
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
+    public function __construct(NormalizerInterface $normalizer, UserActionLogger $userActionLogger)
+    {
+        parent::__construct($normalizer);
+        $this->userActionLogger = $userActionLogger;
+    }
+
     /** @Route("/{pageUrl}", name="profile-view", options={"expose"=true}) */
     public function profileView(
         Request $request,
@@ -49,6 +60,8 @@ class ProfileController extends Controller
         $entityManager->merge($profile);
         $entityManager->flush();
 
+        $this->userActionLogger->info('Edit profile');
+
         return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }
 
@@ -78,6 +91,8 @@ class ProfileController extends Controller
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
+
+        $this->userActionLogger->info('Create profile');
 
         return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }

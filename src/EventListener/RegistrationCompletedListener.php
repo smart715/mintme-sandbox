@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Entity\User;
+use App\Logger\UserActionLogger;
 use App\Manager\UserManagerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 
@@ -14,9 +15,13 @@ class RegistrationCompletedListener
     /** @var FilterUserResponseEvent|null */
     private $event;
 
-    public function __construct(UserManagerInterface $userManager)
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
+    public function __construct(UserManagerInterface $userManager, UserActionLogger $userActionLogger)
     {
         $this->userManager = $userManager;
+        $this->userActionLogger = $userActionLogger;
     }
 
     public function onFosuserRegistrationCompleted(FilterUserResponseEvent $event): void
@@ -24,6 +29,8 @@ class RegistrationCompletedListener
         $this->event = $event;
         $this->updateReferral();
         $this->event = null;
+
+        $this->userActionLogger->info('Register ' . $event->getUser()->getEmail());
     }
 
     private function updateReferral(): void

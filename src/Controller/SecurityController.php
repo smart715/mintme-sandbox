@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\CaptchaLoginType;
+use App\Logger\UserActionLogger;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
@@ -20,12 +21,17 @@ class SecurityController extends FOSSecurityController
     /** @var FormInterface|null */
     private $form;
 
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
 
     public function __construct(
         ContainerInterface $container,
+        UserActionLogger $userActionLogger,
         ?CsrfTokenManagerInterface $tokenManager = null
     ) {
         $this->container = $container;
+        $this->userActionLogger = $userActionLogger;
         parent::__construct($tokenManager);
     }
 
@@ -43,9 +49,9 @@ class SecurityController extends FOSSecurityController
         $this->form->handleRequest($request);
 
         if ($this->form->isSubmitted() && $this->form->isValid()) {
-                return $this->redirectToRoute('fos_user_security_check', [
-                    'request' => $request,
-                ], 307);
+            return $this->redirectToRoute('fos_user_security_check', [
+                'request' => $request,
+            ], 307);
         }
 
         return parent::loginAction($request);
@@ -54,6 +60,8 @@ class SecurityController extends FOSSecurityController
     /** @Route("/login_success", name="login_success") */
     public function postLoginRedirectAction(PrelaunchConfig $prelaunchConfig): Response
     {
+        $this->userActionLogger->info('Log in');
+
          return $prelaunchConfig->isFinished()
          ? $this->redirectToRoute("trading")
          : $this->redirectToRoute("referral-program");

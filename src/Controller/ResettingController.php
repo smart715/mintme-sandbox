@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\ResetRequestType;
+use App\Logger\UserActionLogger;
 use FOS\UserBundle\Controller\ResettingController  as FOSResettingController;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\Mailer\MailerInterface;
@@ -14,14 +15,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResettingController extends FOSResettingController
 {
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
         UserManagerInterface $userManager,
         TokenGeneratorInterface $tokenGenerator,
         MailerInterface $mailer,
-        int $retryTtl
+        int $retryTtl,
+        UserActionLogger $userActionLogger
     ) {
+        $this->userActionLogger = $userActionLogger;
         parent::__construct(
             $eventDispatcher,
             $formFactory,
@@ -38,6 +44,8 @@ class ResettingController extends FOSResettingController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->userActionLogger->info('Forgot password');
+
             return parent::sendEmailAction($request);
         }
 

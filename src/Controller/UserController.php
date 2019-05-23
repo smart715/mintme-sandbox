@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\TwoFactorType;
+use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -26,12 +27,17 @@ class UserController extends AbstractController
     /** @var ProfileManagerInterface */
     protected $profileManager;
 
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
     public function __construct(
         UserManagerInterface $userManager,
-        ProfileManagerInterface $profileManager
+        ProfileManagerInterface $profileManager,
+        UserActionLogger $userActionLogger
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
+        $this->userActionLogger = $userActionLogger;
     }
 
     /**
@@ -145,6 +151,7 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
         $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
+        $this->userActionLogger->info('Enable Two-Factor Authentication');
 
         return $backupCodes;
     }
@@ -158,5 +165,6 @@ class UserController extends AbstractController
         $entityManager->remove($googleAuth);
         $entityManager->flush();
         $this->addFlash('success', 'You have disabled two-factor authentication!');
+        $this->userActionLogger->info('Disable Two-Factor Authentication');
     }
 }

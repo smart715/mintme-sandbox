@@ -8,6 +8,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
+use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
@@ -54,6 +55,9 @@ class TokenController extends Controller
     /** @var TraderInterface */
     protected $trader;
 
+    /** @var UserActionLogger  */
+    private $userActionLogger;
+
 
     public function __construct(
         EntityManagerInterface $em,
@@ -62,7 +66,8 @@ class TokenController extends Controller
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketManager,
         TraderInterface $trader,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        UserActionLogger $userActionLogger
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -70,6 +75,7 @@ class TokenController extends Controller
         $this->cryptoManager = $cryptoManager;
         $this->marketManager = $marketManager;
         $this->trader = $trader;
+        $this->userActionLogger = $userActionLogger;
 
         parent::__construct($normalizer);
     }
@@ -150,6 +156,8 @@ class TokenController extends Controller
                 ]);
             }
 
+            $this->em->beginTransaction();
+
             if (null !== $profile) {
                 $token->setProfile($profile);
                 $this->em->persist($token);
@@ -169,10 +177,12 @@ class TokenController extends Controller
 
                 $marketStatusManager->createMarketStatus($market);
 
+                $this->em->commit();
+                $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
+
                 return $this->redirectToOwnToken('intro');
             } catch (Throwable $exception) {
-                $this->em->remove($token);
-                $this->em->flush();
+                $this->em->rollback();
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');
             }
         }

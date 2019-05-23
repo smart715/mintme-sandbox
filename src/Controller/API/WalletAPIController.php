@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -27,6 +28,14 @@ use Symfony\Component\HttpFoundation\Response;
 class WalletAPIController extends AbstractFOSRestController
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 20;
+
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
+    public function __construct(UserActionLogger $userActionLogger)
+    {
+        $this->userActionLogger = $userActionLogger;
+    }
 
     /**
      * @Rest\View()
@@ -101,6 +110,11 @@ class WalletAPIController extends AbstractFOSRestController
         $entityManager->flush();
 
         $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+
+        $this->userActionLogger->info("Sent withdrawal email for {$crypto->getSymbol()}", [
+            'address' => $pendingWithdraw->getAddress()->getAddress(),
+            'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+        ]);
 
         return $this->view();
     }
