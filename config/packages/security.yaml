@@ -12,7 +12,8 @@ security:
             security: false
         main:
             pattern: ^/
-            logout: true
+            logout:
+                handlers: [logout_listner]
             anonymous: true
             remember_me:
                 secret:      "%env(APP_SECRET)%"

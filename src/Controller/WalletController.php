@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\PendingWithdraw;
+use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Wallet\WalletInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
 /**
@@ -17,6 +19,16 @@ use Throwable;
  */
 class WalletController extends Controller
 {
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
+    public function __construct(UserActionLogger $userActionLogger, NormalizerInterface $normalizer)
+    {
+        $this->userActionLogger = $userActionLogger;
+
+        parent::__construct($normalizer);
+    }
+
     /**
      * @Route(name="wallet")
      */
@@ -61,6 +73,11 @@ class WalletController extends Controller
                 'Something went wrong during withdrawal. Contact us or try again later!'
             );
         }
+
+        $this->userActionLogger->info("Confirm withdrawal for {$pendingWithdraw->getCrypto()->getSymbol()}.", [
+            'address' => $pendingWithdraw->getAddress()->getAddress(),
+            'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+        ]);
 
         return $this->createWalletRedirection(
             'success',

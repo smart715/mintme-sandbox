@@ -8,6 +8,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
+use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
@@ -41,14 +42,19 @@ class TokensAPIController extends AbstractFOSRestController
     /** @var CryptoManagerInterface */
     protected $cryptoManager;
 
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        UserActionLogger $userActionLogger
     ) {
         $this->em = $entityManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
+        $this->userActionLogger = $userActionLogger;
     }
 
 
@@ -108,6 +114,8 @@ class TokensAPIController extends AbstractFOSRestController
         $this->em->persist($token);
         $this->em->flush();
 
+        $this->userActionLogger->info('Change token info');
+
         return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
     }
 
@@ -155,6 +163,10 @@ class TokensAPIController extends AbstractFOSRestController
         if ($isVerified) {
             $token->setWebsiteUrl($url);
             $this->em->flush();
+        }
+
+        if ($isVerified) {
+            $this->userActionLogger->info('Confirmed website');
         }
 
         return $this->view([
@@ -213,6 +225,8 @@ class TokensAPIController extends AbstractFOSRestController
 
         $this->em->persist($lock);
         $this->em->flush();
+
+        $this->userActionLogger->info('Set token release period', ['period' => $lock->getReleasePeriod()]);
 
         return $this->view($lock);
     }

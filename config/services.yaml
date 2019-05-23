@@ -259,3 +259,22 @@ services:
             - { name: kernel.event_listener, event: console.terminate }
 
     FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'
+
+    App\Logger\UserActionProcessor:
+        autowire: true
+        tags:
+            - { name: monolog.processor, channel: user_action }
+
+    monolog.formatter.user_action:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%extra.ip_address%%|%%extra.username%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
+    App\Logger\UserActionLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: user_action }
+
+    logout_listner:
+        class: App\EventListener\LogoutListener
