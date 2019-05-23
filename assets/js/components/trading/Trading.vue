@@ -2,10 +2,11 @@
     <div class="trading">
         <slot name="title"></slot>
         <template v-if="loaded">
-            <div class="table-responsive text-nowrap">
+            <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
-                    :fields="fields">
+                    :fields="fields"
+                    :sort-compare="sortCompare">
                     <template slot="HEAD_volume" slot-scope="data">
                         {{ data.label }}
                         <guide>
@@ -102,9 +103,7 @@ export default {
             });
             tokens.sort((first, second) => parseFloat(second.deal) - parseFloat(first.deal));
 
-            return 1 === this.currentPage
-                ? this.sanitizedMarketsOnTop.concat(tokens)
-                : tokens;
+            return this.sanitizedMarketsOnTop.concat(tokens);
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
@@ -120,6 +119,23 @@ export default {
         });
     },
     methods: {
+        sortCompare: function(a, b, key) {
+            let pair = false;
+
+            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+                // If both compared fields are native numbers
+                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
+            } else {
+                this.marketsOnTop.forEach((market)=> {
+                    if (b.pair === market.currency + '/' + market.token) {
+                        pair = true;
+                    }
+                 });
+                return pair ? 0 : a[key].localeCompare(b[key], undefined, {
+                    numeric: true,
+                });
+            }
+        },
         updateData: function(page) {
             return new Promise((resolve, reject) => {
                 this.loading = true;
@@ -224,7 +240,7 @@ export default {
                     );
 
                     if (marketOnTopIndex > -1) {
-                        Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, market);
+                        Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
                     } else {
                         Vue.set(this.sanitizedMarkets, market, sanitizedMarket);
                     }

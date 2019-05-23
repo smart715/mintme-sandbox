@@ -17,4 +17,7 @@ interface MarketFactoryInterface
 
     /** @return Market[] */
     public function createUserRelated(User $user): array;
+
+    /** @return Market[] */
+    public function createPredefined(): array;
 }
