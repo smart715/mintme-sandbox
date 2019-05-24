@@ -94,13 +94,6 @@ class TokensAPIController extends AbstractFOSRestController
             return null !== $value;
         }), false);
 
-        if ($this->tokenManager->isExisted($token)) {
-            return $this->view(
-                'Token name is already exists.',
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-
         if (!$form->isValid()) {
             /** @var FormError[] $nameErrors */
             $nameErrors = $form->get('name')->getErrors();
