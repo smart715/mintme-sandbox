@@ -321,7 +321,10 @@ class MarketHandler implements MarketHandlerInterface
                 $result['low'],
                 $this->getSymbol($market->getQuote())
             ),
-            $result['deal']
+            $this->moneyWrapper->parse(
+                $result['deal'],
+                $this->getSymbol($market->getQuote())
+            )
         );
     }
 
