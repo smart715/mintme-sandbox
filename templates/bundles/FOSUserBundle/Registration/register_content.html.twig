@@ -10,7 +10,11 @@
         {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required'} }) }}
         <div>
             <passwordmeter :password="password" @toggle-error="toggleError">
-                {{ form_row(form.plainPassword.first, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
+                {{ form_row(form.plainPassword.first, {
+                        'inline': false,
+                        'attr': {'v-model': 'password', 'style': 'margin-bottom: -6.5px;' }
+                    })
+                }}
             </passwordmeter>
         </div>
         {{ form_row(form.plainPassword.second, { 'inline': false }) }}
