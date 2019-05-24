@@ -140,7 +140,7 @@ export default {
         },
         chartData: function() {
             return {
-                columns: ['date', 'open', 'close', 'lowest', 'highest', 'vol'],
+                columns: ['date', 'open', 'close', 'highest', 'lowest', 'vol'],
                 rows: this.chartRows,
             };
         },
