@@ -31,22 +31,17 @@ class DepositConsumer implements ConsumerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
         CryptoManagerInterface $cryptoManager,
         LoggerInterface $logger,
-        UserActionLogger $userActionLogger,
         MoneyWrapperInterface $moneyWrapper
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
         $this->cryptoManager = $cryptoManager;
         $this->logger = $logger;
-        $this->userActionLogger = $userActionLogger;
         $this->moneyWrapper = $moneyWrapper;
     }
 
@@ -83,8 +78,7 @@ class DepositConsumer implements ConsumerInterface
                 )
             );
 
-            $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') returned back');
-            $this->userActionLogger->info('Deposit ' . $crypto->getSymbol());
+            $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
             $this->logger->error(
                 '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
