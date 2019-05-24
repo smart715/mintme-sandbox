@@ -32,7 +32,8 @@ export default {
             tbodyEl.onscroll = (evt) => {
                 let boundings = evt.target.getBoundingClientRect();
 
-                if (evt.target.scrollTop + boundings.height >= evt.target.scrollHeight - 1 && !this.loading) {
+                if (evt.target.scrollTop && evt.target.scrollTop + boundings.height >=
+                    evt.target.scrollHeight - 1 && !this.loading) {
                     this.loading = true;
                     this.updateTableData(true).then(() => this.loading = false);
                 }
