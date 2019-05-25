@@ -120,7 +120,7 @@ export default {
                 return;
             }
 
-            this.$axios.single.patch(this.updateUrl, {
+            this.$axios.single.post(this.updateUrl, {
                 name: this.newName,
             })
             .then((response) => {
