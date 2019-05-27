@@ -199,8 +199,8 @@ export default {
             }
         },
         balanceClicked: function() {
-            if (parseFloat(this.price || 0) > 0) {
-                this.sellPrice = this.price;
+            if (this.immutableBalance > 0) {
+                this.sellPrice = this.price || 0;
                 this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
             }
         },

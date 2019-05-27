@@ -200,7 +200,7 @@ export default {
             }
         },
         balanceClicked: function() {
-            if (parseFloat(this.price || 0) > 0) {
+            if (this.price > 0) {
                 this.buyPrice = this.price;
                 this.buyAmount = toMoney(
                     new Decimal(this.immutableBalance).div(this.price).toString(),

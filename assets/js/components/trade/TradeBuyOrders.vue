@@ -74,7 +74,7 @@ export default {
         fields: Object,
         sortBy: String,
         sortDesc: Boolean,
-        precision: Number,
+        basePrecision: Number,
     },
     data() {
         return {
@@ -90,7 +90,7 @@ export default {
     computed: {
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
-                new Decimal(order.sum).add(sum), 0), this.precision
+                new Decimal(order.sum).add(sum), 0), this.basePrecision
             );
         },
         hasOrders: function() {
