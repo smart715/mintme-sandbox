@@ -69,7 +69,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="2">Create <a :href="createTokenUrl">own token</a></td>
+                    <td colspan="2">Create <a :href="createTokenUrl">your own token</a></td>
                 </tr>
                 <tr>
                     <td colspan="2">
