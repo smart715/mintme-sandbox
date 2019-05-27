@@ -112,7 +112,7 @@
                         <button
                             v-if="loggedIn"
                             class="btn btn-primary"
-                            :disabled="!fieldsValid"
+                            :disabled="!buttonValid"
                             @click="placeOrder"
                         >
                             Create sell order
@@ -162,11 +162,13 @@ export default {
     data() {
         return {
             action: 'sell',
+            hasOrderPlaced: false,
         };
     },
     methods: {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
+                this.hasOrderPlaced = true;
                 let data = {
                     'amountInput': toMoney(this.sellAmount, this.market.quote.subunit),
                     'priceInput': toMoney(this.sellPrice, this.market.base.subunit),
@@ -182,8 +184,12 @@ export default {
                             this.resetOrder();
                         }
                         this.showModalAction(data);
+                        this.hasOrderPlaced = false;
                     })
-                    .catch((error) => this.handleOrderError(error));
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.hasOrderPlaced = false;
+                    });
             }
         },
         resetOrder: function() {
@@ -220,6 +226,9 @@ export default {
         },
         fieldsValid: function() {
             return this.sellPrice > 0 && this.sellAmount > 0;
+        },
+        buttonValid: function() {
+            return this.fieldsValid && !this.hasOrderPlaced;
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0;
