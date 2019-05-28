@@ -140,7 +140,7 @@ export default {
         },
         chartData: function() {
             return {
-                columns: ['date', 'open', 'close', 'lowest', 'highest', 'vol'],
+                columns: ['date', 'open', 'close', 'highest', 'lowest', 'vol'],
                 rows: this.chartRows,
             };
         },
@@ -170,8 +170,8 @@ export default {
                         time: result.params[0][0],
                         open: result.params[0][1],
                         close: result.params[0][2],
-                        lowest: result.params[0][3],
-                        highest: result.params[0][4],
+                        highest: result.params[0][3],
+                        lowest: result.params[0][4],
                         volume: result.params[0][5],
                     });
                 }
