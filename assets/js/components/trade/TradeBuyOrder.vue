@@ -161,13 +161,13 @@ export default {
     data() {
         return {
             action: 'buy',
-            hasOrderPlaced: false,
+            placingOrder: false,
         };
     },
     methods: {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
-                this.hasOrderPlaced = true;
+                this.placingOrder = true;
                 let data = {
                     'amountInput': toMoney(this.buyAmount, this.market.quote.subunit),
                     'priceInput': toMoney(this.buyPrice, this.market.base.subunit),
@@ -184,12 +184,10 @@ export default {
                             this.resetOrder();
                         }
                         this.showModalAction(data);
-                        this.hasOrderPlaced = false;
+                        this.placingOrder = false;
                     })
-                    .catch((error) => {
-                        this.handleOrderError(error);
-                        this.hasOrderPlaced = false;
-                    });
+                    .catch((error) => this.handleOrderError(error));
+                    .then(() => this.hasOrderPlaced = false)
             }
         },
         resetOrder: function() {
@@ -232,7 +230,7 @@ export default {
             return this.buyPrice > 0 && this.buyAmount > 0;
         },
         buttonValid: function() {
-            return this.fieldsValid && !this.hasOrderPlaced;
+            return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0;
