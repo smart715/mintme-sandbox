@@ -170,8 +170,8 @@ export default {
                         time: result.params[0][0],
                         open: result.params[0][1],
                         close: result.params[0][2],
-                        lowest: result.params[0][3],
-                        highest: result.params[0][4],
+                        highest: result.params[0][3],
+                        lowest: result.params[0][4],
                         volume: result.params[0][5],
                     });
                 }
