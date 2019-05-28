@@ -60,7 +60,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\POST("/{name}", name="token_update")
+     * @Rest\Patch("/{name}", name="token_update")
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
@@ -101,7 +101,10 @@ class TokensAPIController extends AbstractFOSRestController
                 ? $nameErrors[0]->getMessage()
                 : 'Invalid name';
 
-            throw new BadRequestHttpException($message);
+            return $this->view(
+                $message,
+                Response::HTTP_ALREADY_REPORTED
+            );
         }
 
         $this->em->persist($token);

@@ -36,6 +36,7 @@ Vue.use(Toasted, {
 });
 
 const HTTP_ACCEPTED = 202;
+const HTTP_ALREADY_REPORTED = 208;
 
 export default {
     name: 'TokenName',
@@ -120,7 +121,7 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.updateUrl, {
+            this.$axios.single.patch(this.updateUrl, {
                 name: this.newName,
             })
             .then((response) => {
@@ -131,8 +132,10 @@ export default {
                     location.href = this.$routing.generate('token_show', {
                         name: this.currentName,
                     });
+                    this.cancelEditingMode();
+                } else if (response.status === HTTP_ALREADY_REPORTED) {
+                    this.$toasted.error(response.data);
                 }
-                this.cancelEditingMode();
             }, (error) => {
                 if (!error.response) {
                     this.$toasted.error('Network error');
