@@ -10,7 +10,8 @@
                         :fields="fields"
                         :sort-by="fields.price.key"
                         :sort-desc="true"
-                        :precision="market.base.subunit"
+                        :basePrecision="market.base.subunit"
+                        :quotePrecision="market.quote.subunit"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -27,7 +28,8 @@
                         :fields="fields"
                         :sort-by="fields.price.key"
                         :sort-desc="false"
-                        :precision="market.quote.subunit"
+                        :basePrecision="market.base.subunit"
+                        :quotePrecision="market.quote.subunit"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
