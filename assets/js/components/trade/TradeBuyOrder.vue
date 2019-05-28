@@ -19,17 +19,19 @@
                 <div class="row">
                     <div v-if="immutableBalance"
                          class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
-                        Your <span class="c-pointer" @click="balanceClicked">{{ this.market.base.symbol }}</span>:
-                        <span class="text-white word-break">
-                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                            <guide>
-                                <template slot="header">
-                                    Your {{ this.market.base.symbol }}
-                                </template>
-                                <template slot="body">
-                                    Your {{ this.market.base.symbol }} balance.
-                                </template>
-                            </guide>
+                        Your
+                        <span class="c-pointer" @click="balanceClicked">{{ this.market.base.symbol }}:
+                            <span class="text-white word-break">
+                                {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                <guide>
+                                    <template slot="header">
+                                        Your {{ this.market.base.symbol }}
+                                    </template>
+                                    <template slot="body">
+                                        Your {{ this.market.base.symbol }} balance.
+                                    </template>
+                                </guide>
+                            </span>
                         </span>
                     </div>
                     <div
@@ -204,13 +206,11 @@ export default {
             }
         },
         balanceClicked: function() {
-            if (this.price > 0) {
-                this.buyPrice = this.price;
-                this.buyAmount = toMoney(
-                    new Decimal(this.immutableBalance).div(this.price).toString(),
-                    this.market.quote.subunit
-                );
-            }
+            this.buyAmount = toMoney(
+                new Decimal(this.immutableBalance).div(parseFloat(this.price)|| 1).toString(),
+                this.market.quote.subunit
+            );
+            this.buyPrice = this.price || 0;
         },
         ...mapMutations('makeOrder', [
             'setBuyPriceInput',
@@ -221,7 +221,7 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
+            return new Decimal(parseFloat(this.buyPrice) || 0).times(parseFloat(this.buyAmount) || 0).toString();
         },
         price: function() {
             return toMoney(this.marketPrice, this.market.base.subunit) || null;
