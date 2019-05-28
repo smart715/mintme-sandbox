@@ -127,10 +127,11 @@ export default {
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             } else {
                 this.marketsOnTop.forEach((market)=> {
-                    if (b.pair === market.currency + '/' + market.token) {
+                    if (b.pair === market.currency + '/' + market.token ||
+                        a.pair === market.currency + '/' + market.token) {
                         pair = true;
                     }
-                 });
+                });
                 return pair ? 0 : a[key].localeCompare(b[key], undefined, {
                     numeric: true,
                 });

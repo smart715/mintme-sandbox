@@ -25,7 +25,7 @@ class MarketInfo
     /** @var Money */
     private $low;
 
-    /** @var string */
+    /** @var Money */
     private $deal;
 
     /** @var string */
@@ -43,7 +43,7 @@ class MarketInfo
         Money $close,
         Money $high,
         Money $low,
-        string $deal
+        Money $deal
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
         $this->tokenName = $tokenName;
@@ -62,7 +62,7 @@ class MarketInfo
         return $this->last;
     }
 
-    public function getDeal(): string
+    public function getDeal(): Money
     {
         return $this->deal;
     }

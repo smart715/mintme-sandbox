@@ -4,7 +4,8 @@ import {toMoney} from '../utils';
 
 export default {
     props: {
-        precision: Number,
+        basePrecision: Number,
+        quotePrecision: Number,
     },
     computed: {
         ...mapGetters('makeOrder', [
@@ -17,21 +18,23 @@ export default {
     methods: {
         orderClicked: function(order) {
             if (!this.getUseSellMarketPrice) {
-                this.setSellPriceInput(order.price);
+                this.setSellPriceInput(toMoney(order.price, this.basePrecision));
             }
 
             if (!this.getUseBuyMarketPrice) {
-                this.setBuyPriceInput(order.price);
+                this.setBuyPriceInput(toMoney(order.price, this.basePrecision));
             }
 
             this.setSellAmountInput(
-                parseFloat(order.amount) > parseFloat(this.getQuoteBalance) ? this.getQuoteBalance : order.amount
+                parseFloat(order.amount) > parseFloat(this.getQuoteBalance)
+                    ? toMoney(this.getQuoteBalance, this.quotePrecision)
+                    : toMoney(order.amount, this.quotePrecision)
             );
 
             this.setBuyAmountInput(
                 new Decimal(order.amount).mul(order.price).greaterThan(this.getBaseBalance)
-                    ? toMoney(new Decimal(this.getBaseBalance).div(order.price).toString(), this.precision)
-                    : order.amount
+                    ? toMoney(new Decimal(this.getBaseBalance).div(order.price).toString(), this.quotePrecision)
+                    : toMoney(order.amount, this.quotePrecision)
             );
         },
         ...mapMutations('makeOrder', [

@@ -278,3 +278,7 @@ services:
 
     logout_listner:
         class: App\EventListener\LogoutListener
+
+    App\EventListener\ChangePasswordListener:
+        tags:
+            - { name: kernel.event_listener, event: fos_user.change_password.edit.success }
