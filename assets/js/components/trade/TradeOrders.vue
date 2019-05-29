@@ -188,11 +188,13 @@ export default {
             return filtered;
         },
         removeOrderModal: function(row) {
-            let orders = row.side === 1 ? this.sellOrders : this.buyOrders;
+            let isSellSide = row.side === 1;
+            let orders = isSellSide ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
+
             this.clone(orders).forEach((order) => {
-                if (toMoney(order.price, this.market.quote.subunit) === row.price && order.maker.id === this.userId) {
-                    order.price = toMoney(order.price, this.market.quote.subunit);
+                if (toMoney(order.price, this.market.base.subunit) === row.price && order.maker.id === this.userId) {
+                    order.price = toMoney(order.price, this.market.base.subunit);
                     order.amount = toMoney(order.amount, this.market.quote.subunit);
                     this.removeOrders.push(order);
                 }
@@ -201,12 +203,12 @@ export default {
         },
         removeOrder: function() {
             let deleteOrdersUrl = this.$routing.generate('orders_сancel', {
-                base: this.removeOrders[0].market.base.symbol,
-                quote: this.removeOrders[0].market.quote.symbol,
+                base: this.market.base.symbol,
+                quote: this.market.quote.symbol,
             });
             this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
                 .catch(() => {
-                    this.$toasted.show('Service unavailable, try again later');
+                    this.$toasted.error('Service unavailable, try again later');
                 });
         },
         switchConfirmModal: function(val) {

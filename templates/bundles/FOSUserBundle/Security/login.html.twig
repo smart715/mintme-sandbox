@@ -3,3 +3,9 @@
 {% block fos_user_content %}
     {{ include('@FOSUser/Security/login_content.html.twig') }}
 {% endblock fos_user_content %}
+
+{% block messageContainer %} {% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/login.js') }}"></script>
+{% endblock %}
