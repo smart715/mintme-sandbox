@@ -15,11 +15,6 @@ security:
             logout:
                 handlers: [logout_listner]
             anonymous: true
-            remember_me:
-                secret:      "%env(APP_SECRET)%"
-                lifetime: 31536000 # 365 days in seconds
-                path:     /
-                domain:   ~ # Defaults to the current domain from $_SERVER
             form_login:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
@@ -30,6 +25,7 @@ security:
                 check_path: 2fa_login_check
                 default_target_path: /login_success
                 always_use_default_target_path: false
+                multi_factor: true
 
     role_hierarchy:
         ROLE_ADMIN_NEWS_ADMIN:

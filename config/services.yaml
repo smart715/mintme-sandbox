@@ -210,7 +210,8 @@ services:
         arguments:
             $isHackerAllowed: "%is_hacker_allowed%"
 
-    App\Mailer\Mailer:
+    app.mailer:
+        class: App\Mailer\Mailer
         arguments:
             $mail: "%env(MAILER_USER)%"
 
@@ -245,6 +246,15 @@ services:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 
+    App\EventListener\BruteForceListener:
+        arguments:
+            $session: '@session'
+            $secret: '%env(APP_SECRET)%'
+        tags:
+            - { name: kernel.event_listener, event: scheb_two_factor.authentication.attempt }
+            - { name: kernel.event_listener, event: scheb_two_factor.authentication.failure }
+            - { name: kernel.event_listener, event: scheb_two_factor.authentication.success }
+
     App\EventListener\RegistrationInitializedListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.initialize }
@@ -268,7 +278,7 @@ services:
     monolog.formatter.user_action:
         class: Monolog\Formatter\LineFormatter
         arguments:
-            - "%%datetime%%|%%extra.ip_address%%|%%extra.username%%|%%message%%|%%context%%\n"
+            - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%message%%|%%context%%\n"
             - "Y-m-d H:i:s"
 
     App\Logger\UserActionLogger:
