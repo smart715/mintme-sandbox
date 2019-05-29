@@ -9,7 +9,7 @@ use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\UserBundle\Event\FormEvent;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Form\Type\ChangePasswordFormType;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -138,10 +138,9 @@ class UserController extends AbstractController
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
             $this->addFlash('success', 'Password was updated successfully');
-            $event = new FormEvent($passwordForm, $request);
             $this->eventDispatcher->dispatch(
-                FOSUserEvents::CHANGE_PASSWORD_SUCCESS,
-                $event
+                FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
+                new FilterUserResponseEvent($user, $request, $this->renderSettings($passwordForm))
             );
         }
 

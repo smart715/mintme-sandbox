@@ -15,8 +15,9 @@ class ChangePasswordListener
         $this->userActionLogger = $userActionLogger;
     }
 
-    public function onFosuserChangepasswordEditSuccess(): void
+
+    public function onFosuserChangepasswordEditCompleted(FilterUserResponseEvent $event): void
     {
-        $this->userActionLogger->info('Change password');
+        $this->userActionLogger->info('Change password', ['email' => $event->getUser()->getEmail()]);
     }
 }
