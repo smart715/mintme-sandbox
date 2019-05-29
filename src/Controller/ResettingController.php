@@ -44,7 +44,7 @@ class ResettingController extends FOSResettingController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->userActionLogger->info('Forgot password');
+            $this->userActionLogger->info('Forgot password', ['username' => $form->get('username')->getData()]);
 
             return parent::sendEmailAction($request);
         }

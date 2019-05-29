@@ -114,7 +114,7 @@ class TokensAPIController extends AbstractFOSRestController
         $this->em->persist($token);
         $this->em->flush();
 
-        $this->userActionLogger->info('Change token info');
+        $this->userActionLogger->info('Change token info', $request->all());
 
         return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
     }
@@ -163,10 +163,11 @@ class TokensAPIController extends AbstractFOSRestController
         if ($isVerified) {
             $token->setWebsiteUrl($url);
             $this->em->flush();
-        }
 
-        if ($isVerified) {
-            $this->userActionLogger->info('Confirmed website');
+            $this->userActionLogger->info('Website confirmed', [
+                'token' => $token->getName(),
+                'website' => $url,
+            ]);
         }
 
         return $this->view([
