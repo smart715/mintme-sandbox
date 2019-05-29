@@ -6,3 +6,14 @@ scheb_two_factor:
 
     backup_codes:
         enabled: true
+
+    email:
+        enabled: true
+        sender_email: '%env(MAILER_USER)%'
+        sender_name: MintMe.com
+        digits: 6
+        template: security/email_login.html.twig
+        mailer: app.mailer
+
+#    ip_whitelist:
+#        - 127.0.0.1

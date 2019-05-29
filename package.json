@@ -39,7 +39,7 @@
     "vue-range-slider": "^0.6.0",
     "vue-sidebar-menu": "^3.7.0",
     "vue-slider-component": "^2.8.3",
-    "vue-social-sharing": "^2.3.3",
+    "vue-social-sharing": "^2.4.4",
     "vue-tippy": "^2.0.24",
     "vuelidate": "^0.7.4",
     "vuex": "^3.1.0",
@@ -47,7 +47,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-env": "^7.4.5",
     "@symfony/webpack-encore": "^0.20.1",
     "@vue/test-utils": "^1.0.0-beta.29",
     "autoprefixer": "^9.4.3",
@@ -87,7 +87,7 @@
     "stylelint_fix": "./node_modules/stylelint/bin/stylelint.js \"assets/scss/**/*.(scss|sass)\" \"assets/components/**/*.vue\" --fix",
     "eslint": "./node_modules/.bin/eslint assets/**/*.{js,vue}",
     "eslint_fix": "./node_modules/.bin/eslint assets/**/*.{js,vue} --fix",
-    "unit": "./node_modules/karma/bin/karma start karma.conf.js"
+    "unit": "node --max_old_space_size=4096 node_modules/karma/bin/karma start karma.conf.js"
   },
   "repository": {
     "type": "git",

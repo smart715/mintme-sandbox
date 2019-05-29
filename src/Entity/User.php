@@ -9,7 +9,9 @@ use FOS\UserBundle\Model\User as BaseUser;
 use JMS\Serializer\Annotation as Serializer;
 use Ramsey\Uuid\Uuid;
 use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
+use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -20,7 +22,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_group")
  */
-class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
+class User extends BaseUser implements
+    TwoFactorInterface,
+    EmailTwoFactorInterface,
+    BackupCodeInterface,
+    PreferredProviderInterface
 {
     /**
      * @ORM\Id
@@ -88,6 +94,12 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     protected $googleAuthenticatorEntry;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @var string|null
+     */
+    private $authCode;
+
+    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token", inversedBy="relatedUsers")
      * @ORM\JoinTable(name="user_tokens",
      *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
@@ -115,6 +127,11 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
      * @var ArrayCollection
      */
     protected $pendingWithdrawals;
+
+    public function getPreferredTwoFactorProvider(): ?string
+    {
+        return 'email';
+    }
 
     /** @return Token[] */
     public function getRelatedTokens(): array
@@ -271,5 +288,25 @@ class User extends BaseUser implements TwoFactorInterface, BackupCodeInterface
     public function prePersist(): void
     {
         $this->referralCode = Uuid::uuid1()->toString();
+    }
+
+    public function isEmailAuthEnabled(): bool
+    {
+        return true;
+    }
+
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    public function getEmailAuthCode(): string
+    {
+        return (string)$this->authCode;
+    }
+
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->authCode = $authCode;
     }
 }

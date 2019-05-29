@@ -1,6 +1,7 @@
 @import 'variables'
 @import 'mixins'
 @import '~bootstrap/scss/bootstrap'
+@import '~bootstrap-vue/src/index.scss'
 @import '~vue-range-slider/dist/vue-range-slider'
 @import url('https://fonts.googleapis.com/css?family=Lato')
 @import '../fonts/AlphaCloud/AlphaCloud.css'
@@ -28,7 +29,7 @@ html
 
 body
   @include font-scale(sm)
-  color: $body-background
+  color: $white
   font-family: $lato-font
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
@@ -130,7 +131,7 @@ a
     margin-bottom: .5rem
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
-    background-color: $card-input-color
+    background-color: $card-input-color !important
     color: $white
     border-radius: 0
     border: none
@@ -193,6 +194,8 @@ a
       width: 120px
 
 .table, .table-responsive
+  color: inherit
+
   thead
     th
       border: none
@@ -203,6 +206,9 @@ a
 
   tbody
     tr
+      &:hover
+        color: inherit
+
       &:nth-child(odd)
         background-color: #00334E
         border: none

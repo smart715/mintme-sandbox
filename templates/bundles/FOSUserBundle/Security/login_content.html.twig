@@ -6,7 +6,17 @@
 
 {% block formBody %}
     <form action="{{ path("login") }}" method="post">
-        {% if error %}
+        {% if app.session.flashbag.peekAll() is not empty %}
+            <div class="row">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="col">
+                            <div class="p-2 mb-2 bg-{{ label }} text-center text-white">{{ message }}</div>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% elseif error %}
             <div class="row">
                 <div class="col">
                     <div class="p-2 mb-2 bg-danger text-center text-white">Invalid credentials.</div>
@@ -31,21 +41,8 @@
                     <div class="col-12  text-left">
                         <label for="inputPassword" class="d-block label-featured">Password:</label>
                     </div>
-                    <div class="col">
-                        <input type="password" name="_password" required="required" id="inputPassword" class="form-control">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group row my-1">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-12  text-left"></div>
-                    <div class="col">
-                        <label class="custom-control custom-checkbox">
-                            <input type="checkbox" id="remember_me" name="_remember_me" class="custom-control-input">
-                            <label class="custom-control-label" for="remember_me">Remember me</label>
-                        </label>
+                    <div id="login-password" class="col">
+                        <input type="password" autocomplete="off" name="_password" required="required" id="inputPassword" class="form-control">
                     </div>
                 </div>
             </div>

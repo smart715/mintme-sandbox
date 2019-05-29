@@ -5,7 +5,6 @@ namespace App\Consumers;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
