@@ -186,8 +186,8 @@ export default {
                         this.showModalAction(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error));
-                    .then(() => this.hasOrderPlaced = false)
+                    .catch((error) => this.handleOrderError(error))
+                    .then(() => this.hasOrderPlaced = false);
             }
         },
         resetOrder: function() {
