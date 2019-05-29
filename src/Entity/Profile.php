@@ -70,7 +70,7 @@ class Profile
     protected $country;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string", length=500, nullable=true)
      * @Assert\Length(max="500")
      * @Groups({"Default", "API"})
      * @var string|null
