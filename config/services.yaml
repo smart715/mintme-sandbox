@@ -291,4 +291,4 @@ services:
 
     App\EventListener\ChangePasswordListener:
         tags:
-            - { name: kernel.event_listener, event: fos_user.change_password.edit.success }
+            - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
