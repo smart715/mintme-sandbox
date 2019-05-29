@@ -17,7 +17,7 @@ class SecurityController extends FOSSecurityController
 {
     /** @var ContainerInterface $container */
     protected $container;
-    
+
     /** @var FormInterface|null */
     private $form;
 
@@ -44,7 +44,7 @@ class SecurityController extends FOSSecurityController
             $securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
                 return $this->redirectToRoute('login_success');
         }
-        
+
         $this->form = $this->createForm(CaptchaLoginType::class);
         $this->form->handleRequest($request);
 
@@ -66,7 +66,7 @@ class SecurityController extends FOSSecurityController
          ? $this->redirectToRoute("trading")
          : $this->redirectToRoute("referral-program");
     }
-    
+
     /**
      * @param array $data
      * @return Response

@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block contentClass %}wrap-main-form py-4{% endblock %}
+
+{% set formHeader = 'Email Authentication' %}
+
+{% block title %}{{ formHeader }} | mintMe{% endblock %}
+
+{% block content %}
+    <div class="container text-center">
+        <div class="row pt-5 justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        {{ formHeader }}
+                    </div>
+                    <div class="card-body">
+                        {% if authenticationError %}
+                            <div class="p-2 mb-2 bg-danger text-center text-white">
+                                {{ authenticationError|trans(authenticationErrorData) }}
+                            </div>
+                        {% endif %}
+                        {% block formBody %}
+                            <form action="{{ path("2fa_login_check") }}" method="post">
+                                <div class="form-group">
+                                    <label for="code">Verification code:</label>
+                                    <input
+                                        type="text" name="{{ authCodeParameterName }}" required="required"
+                                        class="form-control form-control-md" id="code" autofocus
+                                        >
+                                </div>
+                                <div class="form-group">
+                                    <p>An email has been sent to your address</p>
+                                    <p class="pb-0 mb-0">
+                                        it contains verification code you must fill to log in into your account <br/>
+                                        Do not forget to check your spam folder
+                                    </p>
+                                </div>
+                                <div class="form-group">
+                                    <input
+                                        type="submit" id="_submit" name="_submit"
+                                        class="btn btn-primary" value="Verify Code"
+                                        >
+                                </div>
+                            </form>
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
