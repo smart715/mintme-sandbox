@@ -2,8 +2,6 @@
 
 {% block title %}mintMe | Settings{% endblock %}
 
-{% block messageContainer %}{% endblock %}
-
 {% block content %}
     <div id="settings" class="container">
         <div class="row justify-content-center pt-5">
@@ -11,16 +9,6 @@
                 <div class="card">
                     <div class="card-header">Account settings</div>
                     <div class="card-body m-0">
-                        <div class="{% block messageClass %}{% endblock %}">
-                            {% for label, messages in app.flashes %}
-                                {% for message in messages %}
-                                    <div class="w-100 mx-auto mb-3 alert alert-{{ label }}">
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-                            {% endfor %}
-                        </div>
-                        <div class="clearfix"></div>
                         <div id="settings" class="mt-3">
                             {{ form_start(passwordForm) }}
                                 {{ form_row(passwordForm.current_password) }}
