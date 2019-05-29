@@ -116,7 +116,7 @@
                         <button @click="placeOrder"
                             v-if="loggedIn"
                             class="btn btn-primary"
-                            :disabled="!fieldsValid">
+                            :disabled="!buttonValid">
                             Create buy order
                         </button>
                         <template v-else>
@@ -163,11 +163,13 @@ export default {
     data() {
         return {
             action: 'buy',
+            placingOrder: false,
         };
     },
     methods: {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
+                this.placingOrder = true;
                 let data = {
                     'amountInput': toMoney(this.buyAmount, this.market.quote.subunit),
                     'priceInput': toMoney(this.buyPrice, this.market.base.subunit),
@@ -184,8 +186,10 @@ export default {
                             this.resetOrder();
                         }
                         this.showModalAction(data);
+                        this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error));
+                    .catch((error) => this.handleOrderError(error))
+                    .then(() => this.hasOrderPlaced = false);
             }
         },
         resetOrder: function() {
@@ -224,6 +228,9 @@ export default {
         },
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
+        },
+        buttonValid: function() {
+            return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0;
