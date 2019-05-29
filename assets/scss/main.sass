@@ -401,10 +401,16 @@ nav.top-navbar
 .modal-dialog
   @extend .modal-dialog-centered
 
-.alert.alert-danger
-  border-color: $red
-  background-color: $red
-  color: $white
+.alert
+  &.alert-danger
+    border-color: $red
+    background-color: $red
+    color: $white
+
+  &.alert-success
+    border-color: $green
+    background-color: $green
+    color: $white
 
 .empty-table
   .b-table-has-details
