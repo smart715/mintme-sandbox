@@ -215,6 +215,8 @@ services:
         arguments:
             $mail: "%env(MAILER_USER)%"
 
+    App\Mailer\MailerInterface: "@app.mailer"
+
     App\Exchange\Balance\Factory\BalanceViewFactory:
         arguments:
             $tokenSubunit: "%token_precision%"
