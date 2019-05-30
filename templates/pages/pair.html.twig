@@ -38,7 +38,7 @@
                                     update-url="{{ path('token_update', {'name': market.quote.name}) }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
-                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name})) }}"
+                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
                                 >
                                 </token-introduction-profile>
 
