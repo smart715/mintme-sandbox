@@ -10,7 +10,7 @@
                         </template>
                         <template slot="body">
                             Form used to create  an order so you can
-                            buy {{ this.market.base.symbol }} or make offer.
+                            buy {{ market.base.symbol }} or make offer.
                         </template>
                     </guide>
                 </span>
@@ -19,17 +19,19 @@
                 <div class="row">
                     <div v-if="immutableBalance"
                          class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
-                        Your <span class="c-pointer" @click="balanceClicked">{{ this.market.base.symbol }}</span>:
-                        <span class="text-white word-break">
-                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                            <guide>
-                                <template slot="header">
-                                    Your {{ this.market.base.symbol }}
-                                </template>
-                                <template slot="body">
-                                    Your {{ this.market.base.symbol }} balance.
-                                </template>
-                            </guide>
+                        Your
+                        <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol }}:
+                            <span class="text-white word-break">
+                                {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                <guide>
+                                    <template slot="header">
+                                        Your {{ market.base.symbol }}
+                                    </template>
+                                    <template slot="body">
+                                        Your {{ market.base.symbol }} balance.
+                                    </template>
+                                </guide>
+                            </span>
                         </span>
                     </div>
                     <div
@@ -54,7 +56,7 @@
                                     </template>
                                     <template slot="body">
                                         Checking this box fetches current best market price
-                                        for which you can buy {{ this.market.base.symbol }}.
+                                        for which you can buy {{ market.base.symbol }}.
                                     </template>
                                 </guide>
                             </label>
@@ -70,7 +72,7 @@
                                     Price in {{ market.base.symbol }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to buy one {{ this.market.quote.symbol }}.
+                                    The price at which you want to buy one {{ market.quote.symbol }}.
                                 </template>
                             </guide>
                         </label>
@@ -88,7 +90,7 @@
                         <label
                             for="buy-price-amount"
                             class="text-white">
-                            Amount:
+                            Amount in {{ market.base.symbol }}:
                         </label>
                         <input
                             v-model="buyAmount"
@@ -114,7 +116,7 @@
                         <button @click="placeOrder"
                             v-if="loggedIn"
                             class="btn btn-primary"
-                            :disabled="!fieldsValid">
+                            :disabled="!buttonValid">
                             Create buy order
                         </button>
                         <template v-else>
@@ -161,11 +163,21 @@ export default {
     data() {
         return {
             action: 'buy',
+            placingOrder: false,
         };
     },
     methods: {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
+                if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
+                    this.showModalAction({
+                        result: 2,
+                        message: `Total amount has to be at least ${this.minTotalPrice} ${this.market.base.symbol}`,
+                    });
+                    return;
+                }
+
+                this.placingOrder = true;
                 let data = {
                     'amountInput': toMoney(this.buyAmount, this.market.quote.subunit),
                     'priceInput': toMoney(this.buyPrice, this.market.base.subunit),
@@ -182,8 +194,10 @@ export default {
                             this.resetOrder();
                         }
                         this.showModalAction(data);
+                        this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error));
+                    .catch((error) => this.handleOrderError(error))
+                    .then(() => this.hasOrderPlaced = false);
             }
         },
         resetOrder: function() {
@@ -200,13 +214,11 @@ export default {
             }
         },
         balanceClicked: function() {
-            if (this.price > 0) {
-                this.buyPrice = this.price;
-                this.buyAmount = toMoney(
-                    new Decimal(this.immutableBalance).div(this.price).toString(),
-                    this.market.quote.subunit
-                );
-            }
+            this.buyAmount = toMoney(
+                new Decimal(this.immutableBalance).div(parseFloat(this.price)|| 1).toString(),
+                this.market.quote.subunit
+            );
+            this.buyPrice = this.price || 0;
         },
         ...mapMutations('makeOrder', [
             'setBuyPriceInput',
@@ -217,13 +229,21 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(this.buyPrice || 0).times(this.buyAmount || 0).toString();
+            return new Decimal(!isNaN(this.buyPrice) ? this.buyPrice : 0)
+                .times(!isNaN(this.buyAmount) ? this.buyAmount : 0)
+                .toString();
         },
         price: function() {
             return toMoney(this.marketPrice, this.market.base.subunit) || null;
         },
+        minTotalPrice: function() {
+            return toMoney('1e-' + this.market.base.subunit, this.market.base.subunit);
+        },
         fieldsValid: function() {
             return this.buyPrice > 0 && this.buyAmount > 0;
+        },
+        buttonValid: function() {
+            return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0;

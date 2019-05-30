@@ -78,11 +78,13 @@
                     {% block main %}
                         {% block messageContainer %}
                             {% if app.session.flashbag.peekAll() is not empty %}
-                                <div class="{% block messageClass %}{% endblock %}">
+                                <div class="text-center {% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
-                                            <div class="w-50 mx-auto mb-3 text-white text-center bg-{{ label }} alert alert-{{ label }}">
-                                                {{ message }}
+                                            <div class="d-block mb-3">
+                                                <div class="d-inline-block mx-auto text-white text-center bg-{{ label }} alert alert-{{ label }}">
+                                                    {{ message }}
+                                                </div>
                                             </div>
                                         {% endfor %}
                                     {% endfor %}

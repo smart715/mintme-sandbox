@@ -10,7 +10,7 @@
                     <template slot="body">
                         Statistics associated with {{ market.quote.symbol }},
                         here you can find out how token creator
-                        manage his tokens and if he set any restriction
+                        manages his tokens and if he set any restrictions
                         on token release.
                     </template>
                 </guide>

@@ -189,14 +189,16 @@ class MarketHandler implements MarketHandlerInterface
             ? $result['orders']
             : $result;
 
-        return array_map(function (array $orderData) use ($market) {
+        $filtered = [];
+
+        array_walk($orders, function (array $orderData) use ($market, &$filtered): void {
             $user = $this->userManager->find($orderData['user']);
 
             if (!$user) {
-                throw new InvalidArgumentException();
+                return;
             }
 
-            return new Order(
+            $filtered[] = new Order(
                 $orderData['id'],
                 $user,
                 null,
@@ -216,7 +218,9 @@ class MarketHandler implements MarketHandlerInterface
                     floatval($orderData['taker_fee']),
                 $orderData['mtime'] ? intval($orderData['mtime']) : null
             );
-        }, $orders);
+        });
+
+        return $filtered;
     }
 
     /** @return Order[] */

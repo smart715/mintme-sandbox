@@ -7,17 +7,17 @@ use FOS\UserBundle\Event\FilterUserResponseEvent;
 
 class ChangePasswordListener
 {
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
     public function __construct(UserActionLogger $userActionLogger)
     {
         $this->userActionLogger = $userActionLogger;
     }
 
-    /** @var UserActionLogger */
-    private $userActionLogger;
 
-
-    public function onFosuserChangepasswordEditSuccess(): void
+    public function onFosuserChangepasswordEditCompleted(FilterUserResponseEvent $event): void
     {
-        $this->userActionLogger->info('Change password');
+        $this->userActionLogger->info('Change password', ['email' => $event->getUser()->getEmail()]);
     }
 }

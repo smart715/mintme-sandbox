@@ -69,16 +69,25 @@
 
                     <div class="col-12 my-3 text-left d-flex align-items-center" v-if="!editingUrls">
                         <b-dropdown id="share" text="Share" variant="primary" class="mt-3">
-                            <social-sharing :url="tokenUrl"
-                                    title="MINTME"
-                                    description="Check my new cryptocurrency."
-                                    quote="Check my new token."
-                                    hashtags="mintme"
+                            <social-sharing
+                                    url=""
+                                    title="MintMe"
+                                    :description="description"
                                     inline-template>
                                 <div class="px-2">
                                     <network class="d-block c-pointer" network="email">
                                         <font-awesome-icon icon="envelope"></font-awesome-icon> Email
                                     </network>
+                                </div>
+                            </social-sharing>
+                            <social-sharing
+                                    :title="twitterDescription"
+                                    :description="description"
+                                    :quote="description"
+                                    hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,
+                                        Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
+                                    inline-template>
+                                <div class="px-2">
                                     <network class="d-block c-pointer" network="facebook">
                                         <font-awesome-icon :icon="['fab', 'facebook']"></font-awesome-icon> Facebook
                                     </network>
@@ -234,9 +243,13 @@ export default {
             parsedWebsite: '',
             websitePath: '/mintme.html',
             fileError: {},
+            twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
         };
     },
     computed: {
+        description: function() {
+           return this.twitterDescription + this.tokenUrl;
+        },
         siteRequestUrl: function() {
             return this.parsedWebsite + '/mintme.html';
         },

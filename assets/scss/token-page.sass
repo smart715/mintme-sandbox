@@ -3,10 +3,12 @@
     @include media-breakpoint-up('xl')
       flex: 0 0 35%
       max-width: 35%
+      
   .chart
     @include media-breakpoint-up('xl')
       flex: 0 0 30%
       max-width: 30%
+      
   .fix-height
     max-height: 20.7rem
     overflow-y: auto
@@ -26,6 +28,7 @@
   -ms-flex: 1 1 auto
   flex: 1 1 auto
   width: 1%
+
 .input-group-text
   background: $white
   border: none
@@ -37,6 +40,7 @@
 .chat
   &:nth-child(even)
     background-color: #00334E
+    
   img
     height: 22px
 
@@ -47,16 +51,27 @@
       width: 100%
       table-layout: fixed
       justify-content: space-between
+      
   tbody
     max-height: 17.7rem
     display: inline-block
     width: 100%
     position: relative
     overflow-y: auto
+    
     tr
       width: 100%
       table-layout: fixed
       display: table
+      
       td:last-child
         padding-left: 0
         padding-right: 10px
+
+.token-name-input
+  background-color: $card-input-color !important
+  cursor: url('../img/input-cursor.png'), auto
+  color: $white
+  border-radius: 0
+  border: none
+

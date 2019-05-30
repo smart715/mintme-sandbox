@@ -94,13 +94,6 @@ class TokensAPIController extends AbstractFOSRestController
             return null !== $value;
         }), false);
 
-        if ($this->tokenManager->isExisted($token)) {
-            return $this->view(
-                'Token name is already exists.',
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-
         if (!$form->isValid()) {
             /** @var FormError[] $nameErrors */
             $nameErrors = $form->get('name')->getErrors();
@@ -108,13 +101,16 @@ class TokensAPIController extends AbstractFOSRestController
                 ? $nameErrors[0]->getMessage()
                 : 'Invalid name';
 
-            throw new BadRequestHttpException($message);
+            return $this->view(
+                $message,
+                Response::HTTP_ALREADY_REPORTED
+            );
         }
 
         $this->em->persist($token);
         $this->em->flush();
 
-        $this->userActionLogger->info('Change token info');
+        $this->userActionLogger->info('Change token info', $request->all());
 
         return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
     }
@@ -163,10 +159,11 @@ class TokensAPIController extends AbstractFOSRestController
         if ($isVerified) {
             $token->setWebsiteUrl($url);
             $this->em->flush();
-        }
 
-        if ($isVerified) {
-            $this->userActionLogger->info('Confirmed website');
+            $this->userActionLogger->info('Website confirmed', [
+                'token' => $token->getName(),
+                'website' => $url,
+            ]);
         }
 
         return $this->view([

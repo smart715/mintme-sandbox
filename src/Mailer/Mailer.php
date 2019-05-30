@@ -4,12 +4,14 @@ namespace App\Mailer;
 
 use App\Entity\PendingWithdraw;
 use App\Entity\User;
+use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
 
-class Mailer implements MailerInterface
+class Mailer implements MailerInterface, AuthCodeMailerInterface
 {
     /** @var string */
     protected $mail;
@@ -51,6 +53,22 @@ class Mailer implements MailerInterface
         $msg = (new Swift_Message('Confirm withdraw'))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
+            ->setBody($body)
+            ->setContentType('text/html');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendAuthCode(TwoFactorInterface $user): void
+    {
+        $body = $this->twigEngine->render('mail/auth_verification_code.html.twig', [
+            'email' => $user->getEmailAuthRecipient(),
+            'code' => $user->getEmailAuthCode(),
+        ]);
+
+        $msg = (new Swift_Message('Confirm authentication'))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmailAuthRecipient())
             ->setBody($body)
             ->setContentType('text/html');
 
