@@ -9,6 +9,7 @@ class TradeResult
     public const INSUFFICIENT_BALANCE = 3;
     public const ORDER_NOT_FOUND = 4;
     public const USER_NOT_MATCH = 5;
+    public const SMALL_AMOUNT = 11;
 
     private const MESSAGES = [
         self::SUCCESS =>
@@ -25,6 +26,9 @@ class TradeResult
 
         self::USER_NOT_MATCH =>
             'You don\'t match with this order',
+
+        self::SMALL_AMOUNT =>
+            'Amount is too small',
     ];
 
     /** @var int */

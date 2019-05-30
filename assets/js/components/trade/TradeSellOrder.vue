@@ -9,7 +9,7 @@
                             Sell Order
                         </template>
                         <template slot="body">
-                            Form used to create  an order so you can sell {{ this.market.quote.symbol }} or make offer.
+                            Form used to create  an order so you can sell {{ market.quote.symbol }} or make offer.
                         </template>
                     </guide>
                 </span>
@@ -20,7 +20,7 @@
                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
                         >
                         Your
-                        <span class="c-pointer" @click="balanceClicked">{{ this.market.quote.symbol }}:
+                        <span class="c-pointer" @click="balanceClicked">{{ market.quote.symbol }}:
                             <span class="text-white  word-break">
                                 {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                 <guide>
@@ -28,7 +28,7 @@
                                         Your Tokens
                                     </template>
                                     <template slot="body">
-                                        Your {{ this.market.quote.symbol }} balance.
+                                        Your {{ market.quote.symbol }} balance.
                                     </template>
                                 </guide>
                             </span>
@@ -54,7 +54,7 @@
                                     </template>
                                     <template slot="body">
                                         Checking this box fetches current best market price
-                                        for which you can sell {{ this.market.quote.symbol }}.
+                                        for which you can sell {{ market.quote.symbol }}.
                                     </template>
                                 </guide>
                             </label>
@@ -64,13 +64,13 @@
                         <label
                             for="sell-price-input"
                             class="text-white">
-                            Price in {{ this.market.base.symbol }}:
+                            Price in {{ market.base.symbol }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ this.market.base.symbol }}
+                                    Price in {{ market.base.symbol }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {{ this.market.quote.symbol }}.
+                                    The price at which you want to sell one {{ market.quote.symbol }}.
                                 </template>
                             </guide>
                         </label>
@@ -88,7 +88,7 @@
                         <label
                             for="sell-price-amount"
                             class="text-white">
-                            Amount:
+                            Amount in {{ market.base.symbol }}:
                         </label>
                         <input
                             v-model="sellAmount"
@@ -100,7 +100,7 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ this.market.base.symbol }}
+                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -170,6 +170,14 @@ export default {
     methods: {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
+                if ((new Decimal(this.sellPrice)).times(this.sellAmount).lessThan(this.minTotalPrice)) {
+                    this.showModalAction({
+                        result: 2,
+                        message: `Total amount has to be at least ${this.minTotalPrice} ${this.market.base.symbol}`,
+                    });
+                    return;
+                }
+
                 this.placingOrder = true;
                 let data = {
                     'amountInput': toMoney(this.sellAmount, this.market.quote.subunit),
@@ -219,10 +227,15 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(parseFloat(this.sellPrice) || 0).times(parseFloat(this.sellAmount) || 0).toString();
+            return new Decimal(!isNaN(this.sellPrice) ? this.sellPrice : 0)
+                .times(!isNaN(this.sellAmount) ? this.sellAmount : 0)
+                .toString();
         },
         price: function() {
             return toMoney(this.marketPrice, this.market.base.subunit) || null;
+        },
+        minTotalPrice: function() {
+            return toMoney('1e-' + this.market.base.subunit, this.market.base.subunit);
         },
         fieldsValid: function() {
             return this.sellPrice > 0 && this.sellAmount > 0;
