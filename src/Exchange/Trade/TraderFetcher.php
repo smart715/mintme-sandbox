@@ -16,6 +16,7 @@ class TraderFetcher implements TraderFetcherInterface
     private const INSUFFICIENT_BALANCE_CODE = 10;
     private const ORDER_NOT_FOUND_CODE = 10;
     private const USER_NOT_MATCH_CODE = 11;
+    private const SMALL_AMOUNT_CODE = 11;
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -58,9 +59,7 @@ class TraderFetcher implements TraderFetcherInterface
         }
 
         if ($response->hasError()) {
-            return self::INSUFFICIENT_BALANCE_CODE === $response->getError()['code']
-                ? new TradeResult(TradeResult::INSUFFICIENT_BALANCE)
-                : new TradeResult(TradeResult::FAILED);
+            return $this->getPlaceOrderErrorResult($response->getError()['code']);
         }
 
         return new TradeResult(TradeResult::SUCCESS);
@@ -133,6 +132,18 @@ class TraderFetcher implements TraderFetcherInterface
         $errorMapping = [
             self::ORDER_NOT_FOUND_CODE => TradeResult::ORDER_NOT_FOUND,
             self::USER_NOT_MATCH_CODE => TradeResult::USER_NOT_MATCH,
+        ];
+
+        return array_key_exists($errorCode, $errorMapping)
+            ? new TradeResult($errorMapping[$errorCode])
+            : new TradeResult(TradeResult::FAILED);
+    }
+
+    private function getPlaceOrderErrorResult(int $errorCode): TradeResult
+    {
+        $errorMapping = [
+            self::INSUFFICIENT_BALANCE_CODE => TradeResult::INSUFFICIENT_BALANCE,
+            self::SMALL_AMOUNT_CODE => TradeResult::SMALL_AMOUNT,
         ];
 
         return array_key_exists($errorCode, $errorMapping)
