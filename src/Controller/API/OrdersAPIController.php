@@ -19,6 +19,7 @@ use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Validator\MinOrderValidator;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -159,6 +160,18 @@ class OrdersAPIController extends AbstractFOSRestController
             return $this->view([
                 'result' => 3,
                 'message' => (new TradeResult(TradeResult::INSUFFICIENT_BALANCE))->getMessage(),
+            ], Response::HTTP_ACCEPTED);
+        }
+
+        if (!(new MinOrderValidator(
+            $market->getBase(),
+            $market->getQuote(),
+            $request->get('priceInput'),
+            $request->get('amountInput')
+        ))->validate()) {
+            return $this->view([
+                'result' => TradeResult::SMALL_AMOUNT,
+                'message' => (new TradeResult(TradeResult::SMALL_AMOUNT))->getMessage(),
             ], Response::HTTP_ACCEPTED);
         }
 
