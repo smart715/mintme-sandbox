@@ -102,7 +102,8 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        Total Price:
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
