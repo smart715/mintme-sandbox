@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /** @codeCoverageIgnore  */
-class EditProfileType extends AbstractType
+class ProfileType extends AbstractType
 {
     /** @var NameTransformer  */
     private $nameTransformer;
