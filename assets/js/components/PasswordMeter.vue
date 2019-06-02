@@ -69,7 +69,7 @@ export default {
 
                 if (number + uppercase + lowercase !== 3) {
                     this.strengthtext = 2;
-                } else if (val.length > 255) {
+                } else if (val.length > 72) {
                     this.strengthtext = 3;
                 } else {
                     this.strengthtext = 0;
