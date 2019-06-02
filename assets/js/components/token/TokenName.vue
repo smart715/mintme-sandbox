@@ -6,6 +6,7 @@
                 v-model.trim="$v.newName.$model"
                 v-if="editingName"
                 ref="tokenNameInput"
+                class="token-name-input"
                 :class="{ 'is-invalid': $v.$invalid }">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
