@@ -67,11 +67,8 @@ export default {
             this.redirectToToken();
         },
         onInputChange: function(val) {
-            if (val && val.length <= 5) {
-
-                this.input = val;
-                this.items = [];
-            }
+            this.input = val;
+            this.items = [];
         },
     },
 };
