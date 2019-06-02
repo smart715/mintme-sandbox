@@ -10,7 +10,7 @@
                     @change="onInputChange"
                     :items="items"
                     :min-len="3"
-
+                    :input-attrs="inputAttrs"
             >
             </autocomplete>
         </div>
@@ -37,6 +37,9 @@ export default {
         return {
             input: '',
             items: [],
+            inputAttrs: {
+                maxlength: 60,
+            },
         };
     },
     methods: {
@@ -64,8 +67,11 @@ export default {
             this.redirectToToken();
         },
         onInputChange: function(val) {
-            this.input = val;
-            this.items = [];
+            if (val && val.length <= 5) {
+
+                this.input = val;
+                this.items = [];
+            }
         },
     },
 };
