@@ -20,7 +20,9 @@
                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
                         >
                         Your
-                        <span class="c-pointer" @click="balanceClicked">{{ market.quote.symbol }}:
+                        <span class="c-pointer" @click="balanceClicked"
+                              v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
+                            {{ market.quote.symbol | truncate(7) }}:
                             <span class="text-white  word-break">
                                 {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                 <guide>
