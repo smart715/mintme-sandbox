@@ -15,7 +15,9 @@
                 @click="editName"
             />
         </template>
-        <span v-if="!editingName">{{ currentName }}</span>
+        <span v-if="!editingName" v-b-tooltip="{title: currentName, boundary:'viewport'}">
+            {{ currentName | truncate(7) }}
+        </span>
     </div>
 </template>
 
@@ -25,7 +27,7 @@ import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import WebSocketMixin from '../../mixins/websocket';
+import {WebSocketMixin, FiltersMixin} from '../../mixins';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
@@ -50,7 +52,7 @@ export default {
     components: {
         FontAwesomeIcon,
     },
-    mixins: [WebSocketMixin, clickaway],
+    mixins: [WebSocketMixin, FiltersMixin, clickaway],
     data() {
         return {
             editingName: false,
