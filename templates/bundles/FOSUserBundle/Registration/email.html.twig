@@ -1,38 +1,42 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
 {% block subject %}
-  {%- autoescape false -%}
-  {{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
-  {%- endautoescape -%}
+    {%- autoescape false -%}
+        {{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
+    {%- endautoescape -%}
 {% endblock %}
 
 {% block body_text %}{% endblock %}
 
 {% block body_html %}
-  {% embed 'mail/layout.html.twig' %}
-    {% block content %}
-      <table>
-        <tr>
-          <th>
-            <h3 style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;" >Hello</h3>
-            <h1 style="font-size: 34px; margin-top: 0px; margin-bottom: 0px "><strong>{{user.userName}}</strong></h1>
-            <h3 style="font-size: 28px; margin-top: 0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;">Welcome to MintMe!</h3>
-          </th>
-        </tr>
-        <tr>
-          <th>
-            <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; ">To complete your registration, click on the following link:</p>
-          </th>
-        </tr>
-        <tr>
-          <th>
-            <p style="padding:5px;margin-right:20px;margin-bottom:20px;margin-left:20px;background-color:#152d47; font-weight: normal; " ><a href="{{confirmationUrl}}" target=_blank>{{confirmationUrl}}</a></p>
-          </th>
-        </tr>
-        <tr>
-          <th style="height:20px;font-size:0px;line-height:20px;">&#xA0;</th>
-        </tr>
-      </table>
-    {% endblock %}
-  {% endembed %}
+    {% embed 'mail/layout.html.twig' %}
+        {% block content %}
+            <table width="100%">
+                <tr>
+                    <th>
+                        <h3 style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif; font-weight: normal; color: #fff" >Hello</h3>
+                        <h1 style="font-size: 34px; margin-top: 0px; margin-bottom: 0px; color: #fff">
+                            <strong> {{user.userName}} </strong>
+                        </h1>
+                        <h3 style="font-size: 28px; margin-top: 0px; font-family: Helvetica, Arial, sans-serif; font-weight: normal; color: #fff">
+                            Welcome to MintMe!
+                        </h3>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; color: #fff">To complete your registration, click on the following link:</p>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p style="padding:5px;margin-right:20px;margin-bottom:20px;margin-left:20px; background-color:#152d47; font-weight: normal; color: #fff" ><a href="{{confirmationUrl}}" target=_blank>{{confirmationUrl}}</a></p>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="height:20px; font-size:0px; line-height:20px; ">&#xA0;</th>
+                </tr>
+            </table>
+        {% endblock %}
+    {% endembed %}
 {% endblock %}
