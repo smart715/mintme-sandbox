@@ -48,7 +48,8 @@
                                     :class="{ 'is-invalid': $v.$invalid }"
                                 >
                                 </textarea>
-                                <div v-if="!$v.newDescription.minLength || !$v.newDescription.required" class="text-sm text-danger">
+                                <div v-if="!$v.newDescription.minLength || !$v.newDescription.required"
+                                     class="text-sm text-danger">
                                     Token Description must be more than one character
                                 </div>
                                 <div v-if="!$v.newDescription.maxLength" class="text-sm text-danger">
