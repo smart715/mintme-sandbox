@@ -72,6 +72,7 @@
                 <div class="col-12 pt-2 text-center">
                     <button
                         class="btn btn-primary"
+                        :disabled="withdrawing"
                         @click="onWithdraw">
                         Withdraw
                     </button>
@@ -112,6 +113,7 @@ export default {
     },
     data() {
         return {
+            withdrawing: false,
             code: '',
             amount: 0,
             address: '',
@@ -160,6 +162,8 @@ export default {
                 return;
             }
 
+            this.withdrawing = true;
+
             this.$axios.single.post(this.withdrawUrl, {
                 'crypto': this.currency,
                 'amount': this.amount,
@@ -172,7 +176,8 @@ export default {
             })
             .catch((error) => {
                 this.$toasted.error(error.response.data.error);
-            });
+            })
+            .then(() => this.withdrawing = false);
 
             this.$emit('withdraw', this.currency, this.amount, this.address);
         },
