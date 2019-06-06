@@ -4,8 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Profile;
 use App\Exception\NotFoundProfileException;
-use App\Form\AddProfileType;
-use App\Form\EditProfileType;
+use App\Form\ProfileType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -41,11 +40,11 @@ class ProfileController extends Controller
             throw new NotFoundProfileException();
         }
 
-        $form = $this->createForm(EditProfileType::class, $profile);
+        $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
-            return $this->render('pages/profile_view.html.twig', [
+            return $this->render('pages/profile.html.twig', [
                 'token' => $profile->getToken(),
                 'profile' => $profile,
                 'form' =>  $form->createView(),
@@ -77,12 +76,16 @@ class ProfileController extends Controller
         }
 
         $profile  = new Profile($this->getUser());
-        $form = $this->createForm(AddProfileType::class, $profile);
+        $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile.html.twig', [
-                'form' => $form->createView(),
+                'form' =>  $form->createView(),
+                'token' => null,
+                'profile' => $profile,
+                'canEdit' => true,
+                'editFormShowFirst' => true,
             ]);
         }
 

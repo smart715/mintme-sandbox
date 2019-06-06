@@ -76,14 +76,17 @@ describe('TradeOrders', () => {
 
     it('should group by price', function() {
         expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-            {price: toMoney(2), amount: toMoney(4), sum: toMoney(8), trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+            {price: toMoney(2), amount: toMoney(4), sum: toMoney(8),
+                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
         ]);
 
         wrapper.vm.sellOrders.push({...order, price: toMoney(3)});
 
         expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-            {price: toMoney(2), amount: toMoney(4), sum: toMoney(8), trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
-            {price: toMoney(3), amount: toMoney(2), sum: toMoney(6), trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+            {price: toMoney(2), amount: toMoney(4), sum: toMoney(8),
+                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+            {price: toMoney(3), amount: toMoney(2), sum: toMoney(6),
+                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
         ]);
     });
 
@@ -95,7 +98,8 @@ describe('TradeOrders', () => {
             wrapper.vm.sellOrders = [order];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4), trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
+                    trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
             ]);
         });
 
@@ -106,7 +110,8 @@ describe('TradeOrders', () => {
             wrapper.vm.sellOrders = [newOrder];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4), trader: 'fooBaz b..', traderFullName: 'fooBaz bar', traderUrl: 'URL', side: 1, owner: false},
+                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
+                    trader: 'fooBaz b..', traderFullName: 'fooBaz bar', traderUrl: 'URL', side: 1, owner: false},
             ]);
         });
 
@@ -116,7 +121,8 @@ describe('TradeOrders', () => {
             wrapper.vm.sellOrders = [newOrder];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4), trader: 'f bar', traderFullName: 'f bar', traderUrl: 'URL', side: 1, owner: true},
+                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
+                    trader: 'f bar', traderFullName: 'f bar', traderUrl: 'URL', side: 1, owner: true},
             ]);
         });
 
@@ -126,7 +132,8 @@ describe('TradeOrders', () => {
             wrapper.vm.sellOrders = [newOrder];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4), trader: 'foo bar', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: false},
+                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
+                    trader: 'foo bar', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: false},
             ]);
         });
 
@@ -136,7 +143,8 @@ describe('TradeOrders', () => {
             wrapper.vm.sellOrders = [newOrder];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4), trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true},
+                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
+                    trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true},
             ]);
         });
 
@@ -145,13 +153,15 @@ describe('TradeOrders', () => {
             wrapper.vm.sellOrders = [newOrder];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4), trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
+                    trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
             ]);
 
             newOrder.maker.profile.anonymous = true;
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4), trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true},
+                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
+                    trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true},
             ]);
         });
     });

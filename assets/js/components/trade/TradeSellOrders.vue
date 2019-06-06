@@ -4,7 +4,8 @@
             <div class="card-header">
                 Sell Orders
                 <span class="card-header-icon">
-                    Total: {{ total | formatMoney }} <span v-b-tooltip="{title: tokenName, boundary:'viewport'}">
+                    Total: {{ total | formatMoney }}
+                    <span v-b-tooltip="{title: tokenName, boundary:'viewport'}">
                     {{ tokenName | truncate(7) }}
                 </span>
                     <guide>

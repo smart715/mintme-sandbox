@@ -30,7 +30,12 @@
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
-                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available, data.item.subunit)">
+                            @click="openWithdraw(
+                                        data.item.name,
+                                        data.item.fee,
+                                        data.item.available,
+                                        data.item.subunit)"
+                        >
                                 <div><i class="icon-withdraw"></i></div>
                                 <div>
                                     <span class="pl-2 text-xs align-middle">Withdraw</span>
