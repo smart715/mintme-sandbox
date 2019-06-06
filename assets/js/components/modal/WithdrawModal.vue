@@ -94,7 +94,7 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
+const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 
 export default {
     name: 'WithdrawModal',

@@ -64,7 +64,11 @@ class WalletAPIController extends AbstractFOSRestController
      * @Rest\Post("/withdraw", name="withdraw")
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
-     * @Rest\RequestParam(name="address", allowBlank=false)
+     * @Rest\RequestParam(
+     *     name="address",
+     *      allowBlank=false,
+     *      requirements="^[a-zA-Z0-9]+$"
+     *     )
      * @Rest\RequestParam(name="code")
      */
     public function withdraw(
