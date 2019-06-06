@@ -166,7 +166,7 @@ export default {
             let inputPos = event.target.selectionStart;
             let amount = event.srcElement.value;
             let selected = getSelection().toString();
-            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${precision}})?$`);
+            let regex = new RegExp(`^[0-9]{0,8}(\\.[0-9]{0,${precision}})?$`);
             let input = event instanceof ClipboardEvent
                 ? event.clipboardData.getData('text')
                 : String.fromCharCode(!event.charCode ? event.which : event.charCode);
