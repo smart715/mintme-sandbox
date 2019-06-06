@@ -62,7 +62,8 @@ class User extends BaseUser implements
      * @Assert\NotBlank()
      * @Assert\Email(
      *     message = "Invalid email address.",
-     *     checkMX = true
+     *     checkMX = true,
+     *     mode = "strict"
      * )
      * @var string
      */
