@@ -121,7 +121,7 @@ a
 
 .margin-neg-15
   margin-top: -15px
-
+  
 .card, .modal, .box
   label
     margin: 0
@@ -132,7 +132,6 @@ a
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
     background-color: $card-input-color !important
-    cursor: url('../img/input-cursor.png'), auto
     color: $white
     border-radius: 0
     border: none
@@ -141,6 +140,7 @@ a
   textarea
     height: auto
     border: none
+    cursor: url('../img/input-cursor.png'), auto
 
   .custom-select, .form-control
     border: none
@@ -518,3 +518,7 @@ meter
 
 .is-invalid
   border: 1px solid $red !important
+
+input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
+  cursor: url('../img/input-cursor.png'), auto   
+
