@@ -10,7 +10,7 @@
                     @change="onInputChange"
                     :items="items"
                     :min-len="3"
-
+                    :input-attrs="inputAttrs"
             >
             </autocomplete>
         </div>
@@ -37,6 +37,9 @@ export default {
         return {
             input: '',
             items: [],
+            inputAttrs: {
+                maxlength: 60,
+            },
         };
     },
     methods: {

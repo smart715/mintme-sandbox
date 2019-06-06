@@ -103,7 +103,8 @@
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        Total Price:
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -230,8 +231,8 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(!isNaN(this.buyPrice) ? this.buyPrice : 0)
-                .times(!isNaN(this.buyAmount) ? this.buyAmount : 0)
+            return new Decimal(this.buyPrice && !isNaN(this.buyPrice) ? this.buyPrice : 0)
+                .times(this.buyAmount && !isNaN(this.buyAmount) ? this.buyAmount : 0)
                 .toString();
         },
         price: function() {

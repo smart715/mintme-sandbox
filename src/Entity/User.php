@@ -62,7 +62,8 @@ class User extends BaseUser implements
      * @Assert\NotBlank()
      * @Assert\Email(
      *     message = "Invalid email address.",
-     *     checkMX = true
+     *     checkMX = true,
+     *     mode = "strict"
      * )
      * @var string
      */
@@ -70,7 +71,7 @@ class User extends BaseUser implements
 
     /**
      * @Assert\NotBlank()
-     * @Assert\Length(min="8", max="255")
+     * @Assert\Length(min="8", max="72")
      * @Assert\Regex(
      *     pattern="/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/",
      *     match=true,

@@ -26,21 +26,20 @@
     a {
         color: #2199e8;
     }
-    center table {
-        display: table;
-        width: 500px;
-    }
+    
 </style>
-<table>
+<table width="100%">
     <tr>
         <td align="center" valign="top">
             <center>
-                <table background="{{absolute_url(asset('build/images/body.png'))}}">
+                <table width="500px" background="{{absolute_url(asset('build/images/body.png'))}}">
                     <tr>
-                        <td>
-                            <table>
+                        <td cellpadding="0">
+                            <table width="100%">
                                 <tr style="padding: 20px">
-                                    <a href="{{ absolute_url('/') }}" target=_blank><img width="200px" height="80px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe"></a>
+                                    <td cellpadding="" align="middle">
+                                        <a href="{{ absolute_url('/') }}" target=_blank><img width="200px" height="80px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe"></a>
+                                    </td>
                                 </tr>
                             </table>
                             {% block content %}{% endblock %}

@@ -22,7 +22,7 @@ parameters:
     deposit_rpc: 'http://localhost:3000'
     deposit_response_timeout_seconds: 10
 
-    websocket_url: 'ws://mintme.abchosting.org:8364'
+    websocket_url: 'ws://10.81.142.6:8364'
 
     # 0.2%
     taker_fee_rate: 0.002
@@ -36,7 +36,7 @@ parameters:
     token_quantity: 10000000
 
     # Show all hidden from prelaunch content automatically when prelaunch finishes
-    prelaunch_autostart: false
+    prelaunch_autostart: true
     # Datetime to finish prelaunch period. Format `Y-m-d H:i:s`
     prelaunch_finish_datetime: '2019-04-01 10:00:00'
     # Set date interval in ISO_8601 format
