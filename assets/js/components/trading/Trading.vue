@@ -142,6 +142,16 @@ export default {
                 this.loading = true;
                 this.$axios.retry.get(this.$routing.generate('markets_info', {page}))
                     .then((res) => {
+                        if (null !== this.markets) {
+                            this.addOnOpenHandler(() => {
+                                const request = JSON.stringify({
+                                    method: 'state.unsubscribe',
+                                    params: [],
+                                    id: parseInt(Math.random().toString().replace('0.', '')),
+                                });
+                                this.sendMessage(request);
+                            });
+                        }
                         this.currentPage = page;
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
