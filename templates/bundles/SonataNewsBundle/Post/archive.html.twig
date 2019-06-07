@@ -13,7 +13,7 @@
                     {% for post in pager.getResults() %}
                         <div class="news-box p-4 mb-4">
                             <header>
-                                <h2>
+                                <h2 class="word-break-all">
                                     <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">{{ post.title }}</a>
                                 </h2>
 
@@ -24,7 +24,7 @@
                                 <div class="center-block col-12">
                                     {% media post.image, 'wide' with {'class': 'img-fluid'} %}
                                 </div>
-                                <p class="mt-3 mb-1 col-12">
+                                <p class="mt-3 mb-1 col-12 word-break-all">
                                     {{ post.abstract }}
                                 </p>
                                 <div class="col-12 pt-3 read-more">
