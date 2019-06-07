@@ -29,7 +29,7 @@
                         <template v-if="editable">
                             <div  v-if="editingDescription">
                                 <div class="pb-1">
-                                    About your plan
+                                    About your plan:
                                     <guide>
                                         <template slot="header">
                                             About your plan
