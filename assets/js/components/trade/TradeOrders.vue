@@ -12,6 +12,7 @@
                         :sort-desc="true"
                         :basePrecision="market.base.subunit"
                         :quotePrecision="market.quote.subunit"
+                        :logged-in="loggedIn"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -30,6 +31,7 @@
                         :sort-desc="false"
                         :basePrecision="market.base.subunit"
                         :quotePrecision="market.quote.subunit"
+                        :logged-in="loggedIn"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -74,6 +76,7 @@ export default {
         sellOrders: [Array, Object],
         market: Object,
         userId: Number,
+        loggedIn: Boolean,
     },
     data() {
         return {
