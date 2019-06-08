@@ -45,10 +45,10 @@
                                 <textarea
                                     class="form-control"
                                     v-model="$v.newDescription.$model"
-                                    :class="{ 'is-invalid': $v.$invalid }"
+                                    :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
                                 >
                                 </textarea>
-                                <div v-if="!$v.newDescription.minLength || !$v.newDescription.required"
+                                <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
                                      class="text-sm text-danger">
                                     Token Description must be more than one character
                                 </div>
@@ -56,7 +56,8 @@
                                     Token Description must be less than {{ maxDescriptionLength }} characters
                                 </div>
                                 <div class="text-left pt-3">
-                                    <button class="btn btn-primary" @click="editDescription">Save</button>
+                                    <button class="btn btn-primary" @click="editDescription"
+                                            :disabled="$v.$invalid">Save</button>
                                     <a class="btn-cancel pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
                                 </div>
                             </div>
@@ -101,7 +102,7 @@ export default {
     data() {
         return {
             editingDescription: false,
-            newDescription: this.description,
+            newDescription: this.description || '',
             maxDescriptionLength: 10000,
         };
     },
