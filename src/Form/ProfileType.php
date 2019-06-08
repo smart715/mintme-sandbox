@@ -48,7 +48,7 @@ class ProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[A-Za-z\s-]+',
+                    'pattern' => '[A-Za-zÁ-Źá-ź\s-]+',
                 ],
             ])
             ->add('country', CountryType::class, [
