@@ -75,6 +75,7 @@ export default {
         sortBy: String,
         sortDesc: Boolean,
         basePrecision: Number,
+        loggedIn: Boolean,
     },
     data() {
         return {

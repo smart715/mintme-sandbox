@@ -83,7 +83,7 @@
                             class="form-control"
                             @keypress="$emit('check-input', market.base.subunit)"
                             @paste="$emit('check-input', market.base.subunit)"
-                            :disabled="useMarketPrice"
+                            :disabled="useMarketPrice || !loggedIn"
                         >
                     </div>
                     <div class="col-12 pt-2">
@@ -99,6 +99,7 @@
                             @keypress="$emit('check-input', market.quote.subunit)"
                             @paste="$emit('check-input', market.quote.subunit)"
                             class="form-control"
+                            :disabled="!loggedIn"
                         >
                     </div>
                     <div class="col-12 pt-2">
@@ -247,7 +248,7 @@ export default {
             return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
-            return !this.marketPrice > 0;
+            return !this.marketPrice > 0 || !this.loggedIn;
         },
         ...mapGetters('makeOrder', [
             'getBuyPriceInput',
