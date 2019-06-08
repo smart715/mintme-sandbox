@@ -55,7 +55,8 @@
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
                 :market="market"
-                :user-id="userId" />
+                :user-id="userId"
+                :logged-in="loggedIn"/>
         </div>
         <div class="row px-0 mt-3">
             <trade-trade-history

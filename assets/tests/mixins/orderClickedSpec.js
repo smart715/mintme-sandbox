@@ -21,6 +21,7 @@ describe('OrderClicked', function() {
         propsData: {
             basePrecision: 8,
             quotePrecision: 4,
+            loggedIn: true,
         },
     });
 
