@@ -10,6 +10,7 @@ use App\Wallet\Deposit\Model\DepositCredentials;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 
@@ -21,6 +22,9 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     private const GET_DEPOSIT_CREDENTIALS_METHOD = "get_deposit_credentials";
     private const GET_DEPOSIT_FEE_METHOD = "get_fee";
 
@@ -28,10 +32,12 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
 
     public function __construct(
         JsonRpcInterface $jsonRpc,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->cryptoManager = $cryptoManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function getDepositCredentials(int $userId, array $predefinedTokens): DepositCredentials
@@ -98,7 +104,10 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                 $transaction['hash'],
                 $transaction['from'],
                 $transaction['to'],
-                new Money($transaction['amount'], new Currency($transaction['crypto'])),
+                new Money(
+                    $this->moneyWrapper->convertToDecimalIfNotation($transaction['amount'], $transaction['crypto']),
+                    new Currency($transaction['crypto'])
+                ),
                 new Money($transaction['fee'] ?? 0, new Currency($transaction['crypto'])),
                 $this->cryptoManager->findBySymbol(
                     strtoupper($transaction['crypto'])

@@ -16,6 +16,7 @@
 config/parameters.yaml
 node_modules
 public/build
+/maintenance_on
 
 /.idea
 /.phplint-cache
