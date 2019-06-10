@@ -36,7 +36,8 @@ class DepositGatewayCommunicatorTest extends TestCase
 
         $depositCommunicator = new DepositGatewayCommunicator(
             $this->mockRpcInterface($fakeTransactions),
-            $this->mockCryptoManager($this->mockCrypto())
+            $this->mockCryptoManager($this->mockCrypto()),
+            $this->mockMoneyWrapper()
         );
 
         $transactions = $depositCommunicator->getTransactions($this->mockUser(), 0, 1);
@@ -116,5 +117,16 @@ class DepositGatewayCommunicatorTest extends TestCase
         $user->method('getSymbol')->willReturn($symbol);
 
         return $user;
+    }
+
+    public function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        $wrapper = $this->createMock(MoneyWrapperInterface::class);
+
+        $wrapper->method('convertToDecimalIfNotation')->willReturnCallback(function (string $val) {
+            return $val;
+        });
+
+        return $wrapper;
     }
 }

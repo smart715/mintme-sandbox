@@ -176,7 +176,7 @@ class OrdersAPIController extends AbstractFOSRestController
         }
 
         $price = $moneyWrapper->parse(
-            $this->parseAmount($request->get('priceInput'), $market),
+            $this->parseAmount($request->get('priceInput'), $market, true),
             $this->getSymbol($market->getQuote())
         );
 
@@ -355,10 +355,12 @@ class OrdersAPIController extends AbstractFOSRestController
         );
     }
 
-    private function parseAmount(string $amount, Market $market): string
+    private function parseAmount(string $amount, Market $market, bool $useBase = false): string
     {
         /** @var Crypto $crypto */
-        $crypto = $market->getQuote();
+        $crypto = $useBase ?
+            $market->getBase() :
+            $market->getQuote();
 
         return bcdiv($amount, '1', $market->isTokenMarket() ?
             $this->getParameter('token_precision') :

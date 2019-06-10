@@ -10,4 +10,5 @@ interface MoneyWrapperInterface
     public function getRepository(): Currencies;
     public function format(Money $money): string;
     public function parse(string $value, string $symbol): Money;
+    public function convertToDecimalIfNotation(string $notation, string $symbol): string;
 }

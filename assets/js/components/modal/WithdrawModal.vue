@@ -37,13 +37,13 @@
                             @click="setMaxAmount">
                             All
                         </button>
-                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center mt-n4">
+                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
                             You don't have enough {{ currency }}
                         </div>
-                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center mt-n4">
+                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
                             Minimum withdraw amount is {{ minAmount }} {{ currency }}
                         </div>
-                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center mt-n4">
+                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center mt-4">
                             Invalid amount.
                         </div>
                 </div>
