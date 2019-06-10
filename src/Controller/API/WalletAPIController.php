@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class WalletAPIController extends AbstractFOSRestController
 {
-    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 20;
+    private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 100;
 
     /** @var UserActionLogger */
     private $userActionLogger;

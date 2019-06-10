@@ -35,7 +35,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
         return (new DecimalMoneyFormatter($this->getRepository()))->format($money);
     }
 
-    private function convertToDecimalIfNotation(string $notation, string $symbol): string
+    public function convertToDecimalIfNotation(string $notation, string $symbol): string
     {
         $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) ) [eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';
 

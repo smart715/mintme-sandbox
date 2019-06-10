@@ -90,7 +90,7 @@
                         <label
                             for="buy-price-amount"
                             class="text-white">
-                            Amount in {{ market.base.symbol }}:
+                            Amount in {{ market.quote.symbol }}:
                         </label>
                         <input
                             v-model="buyAmount"
