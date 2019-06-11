@@ -94,7 +94,7 @@ export default {
     computed: {
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
-                new Decimal(order.amount).add(sum), 0), this.basePrecision
+                new Decimal(order.amount).add(sum), 0), this.quotePrecision
             );
         },
         hasOrders: function() {
