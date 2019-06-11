@@ -32,4 +32,20 @@ class DefaultController extends Controller
     {
         throw new \Exception('Exception to test 500 error page in production');
     }
+
+    /**
+     * @Route("/privacy-policy", name="privacy_policy")
+     */
+    public function privacyPolicy(): Response
+    {
+        return $this->render('pages/privacy_policy.html.twig');
+    }
+
+    /**
+     * @Route("/terms-of-service", name="terms_of_service")
+     */
+    public function termsOfService(): Response
+    {
+        return $this->render('pages/terms_of_service.html.twig');
+    }
 }
