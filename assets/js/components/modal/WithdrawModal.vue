@@ -76,12 +76,11 @@
                         @click="onWithdraw">
                         Withdraw
                     </button>
-                    <a
-                        href="#"
-                        class="btn-cancel pl-3"
+                    <span
+                        class="btn-cancel pl-3 c-pointer"
                         @click="onCancel">
                         <slot name="cancel">Cancel</slot>
-                    </a>
+                    </span>
                 </div>
             </div>
         </template>
