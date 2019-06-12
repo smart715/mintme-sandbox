@@ -2,7 +2,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8 box news-box p-4">
             <header>
-                <h2 class="word-break-all">
+                <h2 class="word-break">
                     {{ post.title }}
                 </h2>
 
@@ -14,7 +14,7 @@
                 <div class="center-block col-12">
                     {% media post.image, 'wide' with {'class': 'img-fluid'} %}
                 </div>
-                <div class="col-12 mt-3 post word-break-all">
+                <div class="col-12 mt-3 post word-break">
                     {{ post.content|raw }}
                 </div>
             </div>
