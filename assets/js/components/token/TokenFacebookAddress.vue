@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-12 text-center pt-2">
                         <button class="btn btn-primary" @click="savePage">Confirm</button>
-                        <a class="btn-cancel c-pointer pl-3" @click="showConfirmModal = false">Cancel</a>
+                        <span class="btn-cancel c-pointer pl-3" @click="showConfirmModal = false">Cancel</span>
                     </div>
                 </div>
             </template>

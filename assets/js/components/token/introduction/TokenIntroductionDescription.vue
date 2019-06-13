@@ -58,7 +58,7 @@
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription"
                                             :disabled="$v.$invalid">Save</button>
-                                    <a class="btn-cancel pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
+                                    <span class="btn-cancel pl-3 c-pointer" @click="editingDescription = false">Cancel</span>
                                 </div>
                             </div>
                         </template>
