@@ -28,7 +28,7 @@ class TradingController extends Controller
     public function trading(string $page, MarketFactoryInterface $marketManager): Response
     {
         return $this->render('pages/trading.html.twig', [
-            'markets' => $marketManager->createAll(),
+            'marketsLength' => count($marketManager->createAll()),
             'page' => $page,
         ]);
     }

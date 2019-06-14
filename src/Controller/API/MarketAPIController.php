@@ -11,6 +11,7 @@ use App\Manager\TokenManagerInterface;
 use App\Utils\MarketNameParserInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -39,12 +40,24 @@ class MarketAPIController extends APIController
     /**
      * @Rest\View()
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
+     * @Rest\QueryParam(name="user")
      */
-    public function getMarketsInfo(int $page, MarketStatusManagerInterface $marketStatusManager): View
-    {
+    public function getMarketsInfo(
+        int $page,
+        ParamFetcherInterface $request,
+        MarketStatusManagerInterface $marketStatusManager
+    ): View {
+        $markets = $request->get('user')
+            ? $marketStatusManager->getUserMarketStatus(
+                $this->getUser(),
+                ($page - 1) * self::OFFSET,
+                self::OFFSET
+            )
+            : $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
+
         return $this->view([
-            'markets' => $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET),
-            'rows' => $marketStatusManager->getMarketsCount(),
+            'markets' => $markets['markets'] ?? $markets,
+            'rows' => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
             'limit' => self::OFFSET,
         ]);
     }

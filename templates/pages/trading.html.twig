@@ -13,11 +13,12 @@
                         Trading
                     </div>
                     <div class="card-body p-0">
-                        <trading websocket-url="{{ global_websocket_url }}" v-cloak :page="{{ page }}">
+                        <trading
+                            websocket-url="{{ global_websocket_url }}" v-cloak
+                            :page="{{ page }}"
+                            :markets-count="{{ marketsLength }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}">
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                            <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-                                Top {{ markets | length }} tokens
-                            </div>
                         </trading>
                     </div>
                 </div>
