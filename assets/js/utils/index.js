@@ -74,12 +74,15 @@ function deepFlatten(object) {
 /**
  * @param {string|int|float} val
  * @param {int} precision
+ * @param {boolean} fixedPoint
  * @return {string}
  */
-function toMoney(val, precision = Constants.GENERAL.precision) {
+function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true) {
     Decimal.set({rounding: Decimal.ROUND_DOWN});
 
-    return new Decimal(val).toFixed(precision);
+    return fixedPoint
+        ? new Decimal(val).toFixed(precision)
+        : new Decimal(val).toDP(precision);
 }
 
 /**
