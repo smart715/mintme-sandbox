@@ -42,9 +42,10 @@
     </div>
 </template>
 <script>
+import moment from 'moment';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
 import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
 
@@ -169,7 +170,7 @@ export default {
         getHistory: function() {
             return this.tableData.map((order) => {
                 return {
-                    date: new Date(order.timestamp * 1000).toDateString(),
+                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
                     name: order.market.base.symbol + '/' + order.market.quote.symbol,
                     amount: toMoney(order.amount, order.market.base.subunit),
