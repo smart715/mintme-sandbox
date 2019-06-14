@@ -37,13 +37,13 @@
                             @click="setMaxAmount">
                             All
                         </button>
-                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
+                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
                             You don't have enough {{ currency }}
                         </div>
-                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
+                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center">
                             Minimum withdraw amount is {{ minAmount }} {{ currency }}
                         </div>
-                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center mt-4">
+                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center">
                             Invalid amount.
                         </div>
                 </div>
@@ -116,10 +116,12 @@ export default {
             code: '',
             amount: 0,
             address: '',
-            minAmount: toMoney('1e-' + this.subunit),
         };
     },
     computed: {
+        minAmount: function() {
+            return toMoney('1e-' + this.subunit, this.subunit);
+        },
         fullAmount: function() {
             Decimal.set({precision: 36});
 
