@@ -39,6 +39,8 @@ import moment from 'moment';
 import {toMoney, formatMoney} from '../../utils';
 import {LazyScrollTableMixin} from '../../mixins';
 import CopyLink from '../CopyLink';
+import {GENERAL} from '../../utils/constants';
+
 
 export default {
     name: 'DepositWithdrawHistory',
@@ -77,9 +79,6 @@ export default {
                     sortable: true,
                     formatter: formatMoney,
                 },
-            },
-            history: {
-                dateFormat: 'MM-DD-YYYY',
             },
             tableData: null,
             currentPage: 1,
@@ -129,7 +128,7 @@ export default {
         sanitizeHistory: function(historyData) {
             historyData.forEach((item) => {
                 item['date'] = item.date
-                    ? moment(item.date).format(this.history.dateFormat)
+                    ? moment(item.date).format(GENERAL.dateFormat)
                     : null;
                 item['fee'] = item.fee
                     ? toMoney(item.fee, item.crypto.subunit)

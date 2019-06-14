@@ -1,5 +1,6 @@
 export const GENERAL = {
     precision: 8,
+    dateFormat: 'DD.MM.YYYY hh:mm:ss',
 };
 
 export const WSAPI = {

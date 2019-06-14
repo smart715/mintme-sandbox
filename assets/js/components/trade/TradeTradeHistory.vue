@@ -85,10 +85,11 @@
 </template>
 
 <script>
+import moment from 'moment';
 import Guide from '../Guide';
 import {formatMoney, toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI} from '../../utils/constants';
 import {WebSocketMixin, FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
 export default {
@@ -135,7 +136,7 @@ export default {
         ordersList: function() {
             return this.tableData !== false ? this.tableData.map((order) => {
                 return {
-                    dateTime: new Date(order.timestamp * 1000).toDateString(),
+                    dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     orderMaker: order.maker && order.maker.profile && !order.maker.profile.anonymous
                         ? this.truncateFullName(order.maker.profile)
                         : 'Anonymous',
