@@ -2,7 +2,7 @@
     <div class="input-group">
         <div ref="tokenSearch" @keyup.enter="redirectToToken">
             <autocomplete
-                    input-class="search-input form-control"
+                    :input-class="inputClass"
                     placeholder="Search for the token"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
@@ -25,6 +25,8 @@
 <script>
 import Autocomplete from 'v-autocomplete';
 
+const tokenRegEx = new RegExp('^[a-zA-Z0-9\\-\\s]*$');
+
 export default {
     name: 'TokenSearcher',
     components: {
@@ -35,6 +37,7 @@ export default {
     },
     data() {
         return {
+            validName: true,
             input: '',
             items: [],
             inputAttrs: {
@@ -56,6 +59,9 @@ export default {
             });
         },
         redirectToToken: function() {
+            if (!tokenRegEx.test(this.input)) {
+                return;
+            }
             if (this.input.trim().length === 0) {
                 location.href = this.$routing.generate('trading');
                 return;
@@ -67,8 +73,14 @@ export default {
             this.redirectToToken();
         },
         onInputChange: function(val) {
+            this.validName = tokenRegEx.test(val);
             this.input = val;
             this.items = [];
+        },
+    },
+    computed: {
+        inputClass: function() {
+            return 'search-input form-control pr-3 no-bg-img ' + (this.validName ? '' : 'is-invalid');
         },
     },
 };
