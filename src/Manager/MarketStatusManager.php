@@ -3,6 +3,8 @@
 namespace App\Manager;
 
 use App\Entity\MarketStatus;
+use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -56,12 +58,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** {@inheritDoc} */
     public function getMarketsInfo(int $offset, int $limit): array
     {
-        $predefinedMarketStatus = array_map(function (Market $market) {
-            return $this->repository->findByBaseQuoteNames(
-                $market->getBase()->getSymbol(),
-                $market->getQuote()->getSymbol()
-            );
-        }, $this->marketFactory->createPredefined());
+        $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
         return $this->parseMarketStatuses(
             array_merge(
@@ -127,6 +124,45 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $this->em->merge($marketStatus);
         $this->em->flush();
+    }
+
+    /** {@inheritDoc} */
+    public function getUserMarketStatus(User $user, int $offset, int $limit): array
+    {
+        $userTokenIds = [];
+        $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
+        $markets = $this->marketFactory->createUserRelated($user);
+
+        foreach ($markets as $market) {
+            if ($market->getQuote() instanceof Token) {
+                array_push($userTokenIds, $market->getQuote()->getId());
+            }
+        }
+
+        return [
+            'markets' => $this->parseMarketStatuses(
+                array_merge(
+                    $predefinedMarketStatus,
+                    $this->repository->findBy(
+                        ['quoteToken' => $userTokenIds],
+                        ['lastPrice' => Criteria::DESC],
+                        $limit - count($predefinedMarketStatus),
+                        $offset
+                    )
+                )
+            ),
+            'count' => count($markets),
+        ];
+    }
+
+    private function getPredefinedMarketStatuses(): array
+    {
+        return array_map(function (Market $market) {
+            return $this->repository->findByBaseQuoteNames(
+                $market->getBase()->getSymbol(),
+                $market->getQuote()->getSymbol()
+            );
+        }, $this->marketFactory->getCoinMarkets());
     }
 
     /**
