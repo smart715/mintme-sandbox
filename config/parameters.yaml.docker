@@ -1,0 +1,34 @@
+# This file is auto-generated during the composer install
+parameters:
+    locale: en
+    version: V1.0.0
+    is_beta_version: true
+    viabtc_rpc: 'http://btc:8080'
+    viabtc_response_timeout_seconds: 10
+    withdraw_auth:
+        - user
+        - pass
+        - basic
+    withdraw_rpc: 'http://nginx:8000'
+    withdraw_response_timeout_seconds: 10
+    deposit_auth:
+        - user
+        - pass
+        - basic
+    deposit_rpc: 'http://deposit:3000'
+    deposit_response_timeout_seconds: 10
+    websocket_url: 'ws://localhost:18364'
+    taker_fee_rate: 0.1
+    maker_fee_rate: 0.01
+    verify_timeout_seconds: 10
+    token_quantity: 10000000
+    prelaunch_autostart: true
+    prelaunch_finish_datetime: '2019-04-01 10:00:00'
+    prelaunch_referral_trading_period: P1Y
+    prelaunch_referral_fee: 0.5
+    google_tracking_id: UA-2289508-20
+    tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
+    token_precision: 4
+    is_hacker_allowed: true
+    coinbase_api_url: 'https://api.coingecko.com/api/v3'
+    coinbase_api_timeout: 10

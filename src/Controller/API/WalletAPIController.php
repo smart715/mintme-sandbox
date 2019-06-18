@@ -126,7 +126,7 @@ class WalletAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\GET("/addresses", name="deposit_addresses", options={"expose"=true})
+     * @Rest\Get("/addresses", name="deposit_addresses", options={"expose"=true})
      */
     public function getDepositAddresses(
         WalletInterface $depositCommunicator,
