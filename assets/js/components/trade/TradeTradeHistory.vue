@@ -15,7 +15,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table" ref="tableData">
+                <div class="table-responsive text-nowrap" ref="tableData">
                     <template v-if="loaded">
                         <b-table
                             v-if="hasOrders"

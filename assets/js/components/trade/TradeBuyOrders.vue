@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table">
+                <div class="table-responsive text-nowrap">
                     <b-table v-if="hasOrders"
                          ref="table"
                          @row-clicked="orderClicked"

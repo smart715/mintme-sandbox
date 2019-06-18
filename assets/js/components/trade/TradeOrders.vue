@@ -1,7 +1,7 @@
 <template>
-    <div class="container">
-        <div class="row px-lg-0 mx-lg-0">
-            <div class="col-12 col-xl-6 col-lg-12 pr-lg-0 pl-lg-0 pr-xl-2 mt-3">
+    <div class="container p-0 m-0">
+        <div class="row p-0 m-0">
+            <div class="col-12 col-xl-6 pr-xl-2 mt-3">
                 <trade-buy-orders
                         v-if="ordersLoaded"
                         @update-data="updateBuyOrders"
@@ -20,7 +20,7 @@
                     </div>
                 </template>
             </div>
-            <div class="col-12 col-xl-6 col-lg-12 pr-lg-0 pl-lg-0 pl-xl-2 mt-3">
+            <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
                         v-if="ordersLoaded"
                         @update-data="updateSellOrders"
