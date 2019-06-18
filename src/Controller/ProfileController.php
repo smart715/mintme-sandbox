@@ -40,13 +40,14 @@ class ProfileController extends Controller
             throw new NotFoundProfileException();
         }
 
+        $profileClone = clone $profile;
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('pages/profile.html.twig', [
                 'token' => $profile->getToken(),
-                'profile' => $profile,
+                'profile' => $profileClone,
                 'form' =>  $form->createView(),
                 'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
                 'editFormShowFirst' => !! $form->getErrors(true)->count(),
