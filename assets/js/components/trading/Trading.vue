@@ -110,6 +110,10 @@ export default {
     },
     computed: {
         marketsHiddenNames: function() {
+            if (undefined === typeof this.markets) {
+                return {};
+            }
+
             return Object.keys(this.markets);
         },
         tokens: function() {
