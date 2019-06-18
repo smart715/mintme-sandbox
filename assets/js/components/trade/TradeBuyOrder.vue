@@ -220,7 +220,7 @@ export default {
                 new Decimal(this.immutableBalance).div(parseFloat(this.price)|| 1).toString(),
                 this.market.quote.subunit
             );
-            this.buyPrice = this.price || 0;
+            this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
         },
         ...mapMutations('makeOrder', [
             'setBuyPriceInput',
