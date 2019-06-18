@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid px-0">
-        <div class="row px-0">
+        <div class="row">
             <trade-chart
                     class="col"
                     :websocket-url="websocketUrl"
@@ -8,7 +8,7 @@
             />
         </div>
         <div class="row">
-            <div class="col-12 col-lg-6 mt-3 pr-lg-2">
+            <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
                         v-if="balanceLoaded"
                         :websocket-url="websocketUrl"
@@ -27,7 +27,7 @@
                     </div>
                 </template>
             </div>
-            <div class="col-12 col-lg-6 mt-3 pl-lg-2">
+            <div class="col-12 col-lg-6 pl-lg-2 mt-3">
                 <trade-sell-order
                         v-if="balanceLoaded"
                         :websocket-url="websocketUrl"
@@ -58,7 +58,7 @@
                 :user-id="userId"
                 :logged-in="loggedIn"/>
         </div>
-        <div class="row px-0 mt-3">
+        <div class="row mt-3">
             <trade-trade-history
                 class="col"
                 :hash="hash"
