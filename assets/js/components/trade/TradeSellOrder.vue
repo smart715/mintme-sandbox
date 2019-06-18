@@ -218,9 +218,7 @@ export default {
         },
         balanceClicked: function() {
             this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
-            if (parseFloat(this.price || 0) > 0) {
-                this.sellPrice = this.price;
-            }
+            this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
         },
         ...mapMutations('makeOrder', [
             'setSellPriceInput',
