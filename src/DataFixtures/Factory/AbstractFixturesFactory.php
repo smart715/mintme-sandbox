@@ -4,6 +4,7 @@ namespace App\DataFixtures\Factory;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+/** @codeCoverageIgnore */
 abstract class AbstractFixturesFactory
 {
     /** @var ObjectManager */

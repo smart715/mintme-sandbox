@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *     @ORM\UniqueConstraint(name="assignment_unique", columns={"type", "value"})
  * })
  * @ORM\Entity(repositoryClass="App\Repository\BlacklistRepository")
+ * @codeCoverageIgnore
  */
 class Blacklist
 {

@@ -129,17 +129,22 @@ class User extends BaseUser implements
      */
     protected $pendingWithdrawals;
 
+    /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
     {
         return 'email';
     }
 
-    /** @return Token[] */
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
     public function getRelatedTokens(): array
     {
         return $this->relatedTokens->toArray();
     }
 
+    /** @codeCoverageIgnore */
     public function addRelatedToken(Token $token): self
     {
         $this->relatedTokens->add($token);
@@ -147,6 +152,7 @@ class User extends BaseUser implements
         return $this;
     }
 
+    /** @codeCoverageIgnore */
     public function removeRelatedToken(Token $token): self
     {
         $this->relatedTokens->removeElement($token);
@@ -154,12 +160,16 @@ class User extends BaseUser implements
         return $this;
     }
 
-    /** @Groups({"API"}) */
+    /**
+     * @codeCoverageIgnore
+     * @Groups({"API"})
+     */
     public function getProfile(): ?Profile
     {
         return $this->profile;
     }
 
+    /** @codeCoverageIgnore */
     public function setProfile(Profile $profile): self
     {
         $this->profile = $profile;
@@ -167,7 +177,10 @@ class User extends BaseUser implements
         return $this;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * @codeCoverageIgnore
+     * {@inheritdoc}
+     */
     public function setEmail($email)
     {
         $this->username = $email;
@@ -180,6 +193,7 @@ class User extends BaseUser implements
         return null !== $this->googleAuthenticatorEntry;
     }
 
+    /** @codeCoverageIgnore */
     public function getGoogleAuthenticatorUsername(): string
     {
         return $this->username;
@@ -189,7 +203,7 @@ class User extends BaseUser implements
     {
         $googleAuth = $this->googleAuthenticatorEntry;
 
-        return null !== $googleAuth && null !==  $googleAuth->getSecret()
+        return null !== $googleAuth && null !== $googleAuth->getSecret()
             ? $googleAuth->getSecret()
             : '';
     }
@@ -203,6 +217,7 @@ class User extends BaseUser implements
             : false;
     }
 
+    /** @codeCoverageIgnore */
     public function invalidateBackupCode(string $code): void
     {
         if (null !== $this->googleAuthenticatorEntry) {
@@ -217,14 +232,104 @@ class User extends BaseUser implements
         return null !== $googleAuth ? $googleAuth->getBackupCodes() : [];
     }
 
+    /** @codeCoverageIgnore */
     public function setGoogleAuthenticatorSecret(string $secret): void
     {
         $this->getGoogleAuthenticatorEntry()->setSecret($secret);
     }
 
+    /** @codeCoverageIgnore */
     public function setGoogleAuthenticatorBackupCodes(array $codes): void
     {
         $this->getGoogleAuthenticatorEntry()->setBackupCodes($codes);
+    }
+
+    /** @codeCoverageIgnore */
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setHash(?string $hash): self
+    {
+        $this->hash = $hash;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getReferrencer(): ?self
+    {
+        return $this->referencer;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setReferrencer(User $user): self
+    {
+        $this->referencer = $user;
+
+        return $this;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @return User[]
+     */
+    public function getReferrals(): array
+    {
+        return $this->referrals->toArray();
+    }
+
+    /** @codeCoverageIgnore */
+    public function getReferralCode(): string
+    {
+        return $this->referralCode ?? '';
+    }
+
+    /** @codeCoverageIgnore */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getTawkHash(string $api_key): string
+    {
+        return hash_hmac('sha256', $this->getUsername(), $api_key);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @ORM\PrePersist()
+     */
+    public function prePersist(): void
+    {
+        $this->referralCode = Uuid::uuid1()->toString();
+    }
+
+    /** @codeCoverageIgnore */
+    public function isEmailAuthEnabled(): bool
+    {
+        return true;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getEmailAuthCode(): string
+    {
+        return (string)$this->authCode;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->authCode = $authCode;
     }
 
     private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
@@ -238,76 +343,5 @@ class User extends BaseUser implements
         }
 
         return $this->googleAuthenticatorEntry;
-    }
-
-    public function getHash(): ?string
-    {
-        return $this->hash;
-    }
-
-    public function setHash(?string $hash): self
-    {
-        $this->hash = $hash;
-
-        return $this;
-    }
-
-    public function getReferrencer(): ?self
-    {
-        return $this->referencer;
-    }
-
-    public function setReferrencer(User $user): self
-    {
-        $this->referencer = $user;
-
-        return $this;
-    }
-
-    /** @return User[] */
-    public function getReferrals(): array
-    {
-        return $this->referrals->toArray();
-    }
-
-    public function getReferralCode(): string
-    {
-        return $this->referralCode ?? '';
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
-    public function getTawkHash(string $api_key): string
-    {
-        return hash_hmac('sha256', $this->getUsername(), $api_key);
-    }
-
-    /** @ORM\PrePersist() */
-    public function prePersist(): void
-    {
-        $this->referralCode = Uuid::uuid1()->toString();
-    }
-
-    public function isEmailAuthEnabled(): bool
-    {
-        return true;
-    }
-
-    public function getEmailAuthRecipient(): string
-    {
-        return $this->email;
-    }
-
-    public function getEmailAuthCode(): string
-    {
-        return (string)$this->authCode;
-    }
-
-    public function setEmailAuthCode(string $authCode): void
-    {
-        $this->authCode = $authCode;
     }
 }
