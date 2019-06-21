@@ -84,7 +84,6 @@ Vue.use(Toasted, {
 });
 
 const HTTP_NO_CONTENT = 204;
-const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenFacebookAddress',
@@ -164,10 +163,12 @@ export default {
                     this.$toasted.success(`Facebook paged saved as ${this.currentAddress}`);
                 }
             }, (error) => {
-                if (error.response.status === HTTP_BAD_REQUEST) {
-                    this.$toasted.error(error.response.data[0][0].message);
+                if (!error.response) {
+                    this.$toasted.error('Network error');
+                } else if (error.response.data.message) {
+                    this.$toasted.error(error.response.data.message);
                 } else {
-                    this.$toasted.error('An error has ocurred, please try again later');
+                    this.$toasted.error('An error has occurred, please try again later');
                 }
             })
             .then(() => {
