@@ -37,7 +37,7 @@
                             </template>
 
                             <template slot="orderMaker" slot-scope="row">
-                                <a :href="row.item.makerUrl">
+                                <a v-if="!row.item.isMakerAnonymous" :href="row.item.makerUrl">
                                     <span v-b-tooltip="{title: row.item.makerFullName, boundary:'viewport'}">
                                         {{ row.value }}
                                     </span>
@@ -46,9 +46,10 @@
                                         class="pl-3 pl-lg-0 float-lg-right"
                                         alt="avatar">
                                 </a>
+                                <span v-else>{{ row.value }}</span>
                             </template>
                             <template slot="orderTrader" slot-scope="row">
-                                <a :href="row.item.takerUrl">
+                                <a v-if="!row.item.isTakerAnonymous" :href="row.item.takerUrl">
                                     <span v-b-tooltip="{title: row.item.takerFullName, boundary:'viewport'}">
                                         {{ row.value }}
                                     </span>
@@ -57,6 +58,7 @@
                                         class="pl-3 pl-lg-0 float-lg-right"
                                         alt="avatar">
                                 </a>
+                                <span v-else>{{ row.value }}</span>
                             </template>
                         </b-table>
                         <div v-if="!hasOrders">
@@ -162,6 +164,8 @@ export default {
                         new Decimal(order.price).mul(order.amount).toString(),
                         this.market.base.subunit
                     ),
+                    isMakerAnonymous: !order.maker || !order.maker.profile || order.maker.profile.anonymous,
+                    isTakerAnonymous: !order.taker || !order.taker.profile || order.taker.profile.anonymous,
                 };
             }) : [];
         },

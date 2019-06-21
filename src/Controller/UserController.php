@@ -77,8 +77,8 @@ class UserController extends AbstractController
     public function registerReferral(string $code, AuthorizationCheckerInterface $authorizationChecker): Response
     {
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
-            ? $this->redirectToRoute('homepage')
-            : $this->redirectToRoute('fos_user_registration_register');
+            ? $this->redirectToRoute('homepage', [], 301)
+            : $this->redirectToRoute('fos_user_registration_register', [], 301);
 
         $response->headers->setCookie(
             new Cookie('referral-code', $code)

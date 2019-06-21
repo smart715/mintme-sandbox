@@ -3,6 +3,8 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
+use App\Exception\ApiBadRequestException;
+use App\Exception\ApiNotFoundException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
@@ -76,13 +78,13 @@ class TokensAPIController extends AbstractFOSRestController
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw new ApiNotFoundException('Token does not exist');
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
 
         if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new BadRequestHttpException("You need all your tokens to change token's name");
+            throw new ApiBadRequestException('You need all your tokens to change token\'s name');
         }
 
         $form = $this->createForm(TokenType::class, $token, [
@@ -95,16 +97,16 @@ class TokensAPIController extends AbstractFOSRestController
         }), false);
 
         if (!$form->isValid()) {
-            /** @var FormError[] $nameErrors */
-            $nameErrors = $form->get('name')->getErrors();
-            $message = count($nameErrors) > 0
-                ? $nameErrors[0]->getMessage()
-                : 'Invalid name';
+            foreach ($form->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $form->get($childForm->getName())->getErrors();
 
-            return $this->view(
-                $message,
-                Response::HTTP_ALREADY_REPORTED
-            );
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException('Invalid argument');
         }
 
         $this->em->persist($token);
