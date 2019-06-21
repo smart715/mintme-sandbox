@@ -142,8 +142,6 @@ export default function(precision) {
                 show: true,
                 rotate: 0,
                 margin: 8,
-                formatter: '{value} kg',
-
                 textStyle: {
                     color: '#fff',
                 },
