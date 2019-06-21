@@ -137,6 +137,7 @@ export default {
                         '#',
                     side: order.side,
                     owner: order.owner,
+                    isAnonymous: !order.maker.profile || order.maker.profile.anonymous,
                 };
             });
         },

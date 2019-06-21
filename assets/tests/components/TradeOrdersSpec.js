@@ -4,6 +4,8 @@ import {toMoney} from '../../js/utils';
 import moxios from 'moxios';
 import Axios from '../../js/axios';
 
+chai.config.truncateThreshold = 0;
+
 describe('TradeOrders', () => {
     beforeEach(() => {
         moxios.install();
@@ -40,6 +42,7 @@ describe('TradeOrders', () => {
                 },
             },
             userId: 1,
+            isAnonymous: false,
         },
     });
 
@@ -77,16 +80,19 @@ describe('TradeOrders', () => {
     it('should group by price', function() {
         expect(wrapper.vm.filteredSellOrders).to.deep.equal([
             {price: toMoney(2), amount: toMoney(4), sum: toMoney(8),
-                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
+                isAnonymous: false},
         ]);
 
         wrapper.vm.sellOrders.push({...order, price: toMoney(3)});
 
         expect(wrapper.vm.filteredSellOrders).to.deep.equal([
             {price: toMoney(2), amount: toMoney(4), sum: toMoney(8),
-                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
+                isAnonymous: false},
             {price: toMoney(3), amount: toMoney(2), sum: toMoney(6),
-                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
+                isAnonymous: false},
         ]);
     });
 
@@ -99,7 +105,8 @@ describe('TradeOrders', () => {
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+                    trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
+                    isAnonymous: false},
             ]);
         });
 
@@ -111,7 +118,8 @@ describe('TradeOrders', () => {
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'fooBaz b..', traderFullName: 'fooBaz bar', traderUrl: 'URL', side: 1, owner: false},
+                    trader: 'fooBaz b..', traderFullName: 'fooBaz bar', traderUrl: 'URL', side: 1, owner: false,
+                    isAnonymous: false},
             ]);
         });
 
@@ -122,7 +130,8 @@ describe('TradeOrders', () => {
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'f bar', traderFullName: 'f bar', traderUrl: 'URL', side: 1, owner: true},
+                    trader: 'f bar', traderFullName: 'f bar', traderUrl: 'URL', side: 1, owner: true,
+                    isAnonymous: false},
             ]);
         });
 
@@ -133,18 +142,21 @@ describe('TradeOrders', () => {
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'foo bar', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: false},
+                    trader: 'foo bar', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: false,
+                    isAnonymous: false},
             ]);
         });
 
         it('should add  Anonymous if the profile is null', function() {
             let newOrder = JSON.parse(JSON.stringify(order));
             newOrder.maker.profile = null;
+            wrapper.vm.isAnonymous = true;
             wrapper.vm.sellOrders = [newOrder];
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true},
+                    trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true,
+                    isAnonymous: true},
             ]);
         });
 
@@ -154,14 +166,17 @@ describe('TradeOrders', () => {
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true},
+                    trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
+                    isAnonymous: false},
             ]);
 
             newOrder.maker.profile.anonymous = true;
+            wrapper.vm.isAnonymous = true;
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true},
+                    trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true,
+                    isAnonymous: true},
             ]);
         });
     });
