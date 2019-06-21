@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapperInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
@@ -30,18 +31,23 @@ class DepositConsumer implements ConsumerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var ClockInterface */
+    private $clock;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
         CryptoManagerInterface $cryptoManager,
         LoggerInterface $logger,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        ClockInterface $clock
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
         $this->cryptoManager = $cryptoManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
+        $this->clock = $clock;
     }
 
     /** {@inheritdoc} */
@@ -50,12 +56,25 @@ class DepositConsumer implements ConsumerInterface
         /** @var string|null $body */
         $body = $msg->body;
 
-        $clbResult = DepositCallbackMessage::parse(
-            json_decode((string)$body, true)
-        );
+        try {
+            $clbResult = DepositCallbackMessage::parse(
+                json_decode((string)$body, true)
+            );
+        } catch (\Throwable $exception) {
+            return true;
+        }
 
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $this->userManager->find($clbResult->getUserId());
+
+        if (!$user) {
+            $this->logger->warning(
+                '[deposit-consumer] Received new message with undefined user',
+                $clbResult->toArray()
+            );
+
+            return true;
+        }
 
         try {
             $this->logger->info('[deposit-consumer] Received new message: '.json_encode($clbResult->toArray()));
@@ -82,7 +101,7 @@ class DepositConsumer implements ConsumerInterface
             $this->logger->error(
                 '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
             );
-            sleep(10);
+            $this->clock->sleep(10);
 
             return false;
         }

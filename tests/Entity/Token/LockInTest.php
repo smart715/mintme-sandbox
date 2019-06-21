@@ -33,6 +33,7 @@ class LockInTest extends TestCase
         $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
     }
 
+    /** @runInSeparateProcess */
     public function testUpdateFrozenAmount(): void
     {
         $li = new LockIn($this->mockToken());
