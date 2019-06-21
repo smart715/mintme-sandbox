@@ -102,11 +102,16 @@ export default {
                 grid: {
                     top: 20,
                     bottom: 60,
-                    left: '8%',
+                    left: 75,
                     right: '8%',
                 },
                 xAxis: {
                     boundaryGap: true,
+                },
+                yAxis: {
+                    axisLabel: {
+                        formatter: (val) => toMoney(val, this.market.base.subunit),
+                    },
                 },
             },
             marketStatus: {
