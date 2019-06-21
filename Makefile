@@ -1,5 +1,5 @@
 phpunit:
-	find tests/ -name "*Test.php" | ./vendor/bin/fastest "./vendor/bin/simple-phpunit -c phpunit.xml {};"
+	find tests/ -name "*Test.php" | ./vendor/bin/fastest "./vendor/bin/simple-phpunit -c phpunit.xml.dist {};"
 
 phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
