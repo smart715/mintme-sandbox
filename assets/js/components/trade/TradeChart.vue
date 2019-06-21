@@ -92,11 +92,11 @@ export default {
                 },
                 showMA: false,
                 showDataZoom: true,
-                start: 70,
-                end: 100,
                 downColor: '#ff6961',
                 upColor: '#77DD77',
                 showVol: false,
+                start: 0,
+                end: 100,
             },
             additionalAttributes: {
                 grid: {
@@ -121,6 +121,7 @@ export default {
                 amount: '0',
             },
             stats: null,
+            maxAvailableDays: 30,
         };
     },
     computed: {
@@ -159,6 +160,7 @@ export default {
             quote: this.market.quote.symbol,
         })).then((res) => {
             this.stats = res.data;
+            this.chartSettings.start = this.getStartTradingPeriod();
 
             this.addMessageHandler((result) => {
                 if (result.method === 'state.update') {
@@ -219,6 +221,13 @@ export default {
         },
         getDate: function(timestamp) {
             return moment.utc((timestamp + 3600) * 1000).format('YYYY-MM-DD');
+        },
+        getStartTradingPeriod: function() {
+            if (this.stats.length > this.maxAvailableDays) {
+                return Math.floor((this.stats.length - this.maxAvailableDays) / this.stats.length * 100);
+            }
+
+            return 0;
         },
     },
     components: {
