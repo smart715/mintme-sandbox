@@ -15,7 +15,7 @@
 
             </div>
             <div class="card-body">
-                <div class="row fix-height">
+                <div class="row">
                     <div class="col-12">
                         <span class="card-header-icon">
                             <font-awesome-icon
@@ -25,9 +25,9 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <p v-if="!editingDescription">{{ description }}</p>
+                        <bbcode-view v-if="!editingDescription" :description="description"></bbcode-view>
                         <template v-if="editable">
-                            <div  v-if="editingDescription">
+                            <div  v-show="editingDescription">
                                 <div class="pb-1">
                                     About your plan:
                                     <guide>
@@ -46,6 +46,7 @@
                                     class="form-control"
                                     v-model="$v.newDescription.$model"
                                     :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
+                                    rows="5"
                                 >
                                 </textarea>
                                 <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
@@ -74,6 +75,9 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
+import BbcodeView from '../../BbcodeView';
+import markitup from 'markitup';
+import markitupSet from '../../../markitup.js';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
@@ -98,6 +102,7 @@ export default {
         FontAwesomeIcon,
         Guide,
         LimitedTextarea,
+        BbcodeView,
     },
     data() {
         return {
@@ -154,6 +159,9 @@ export default {
         description: function(val) {
             this.newDescription = val;
         },
+    },
+    mounted: function() {
+        markitup('textarea', markitupSet);
     },
 };
 </script>

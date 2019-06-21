@@ -1,4 +1,7 @@
 import LimitedTextarea from './components/LimitedTextarea.vue';
+import BbcodeView from './components/BbcodeView.vue';
+import markitupSet from './markitup.js';
+import markitup from 'markitup';
 import {minLength, helpers} from 'vuelidate/lib/validators';
 const names = helpers.regex('names', /^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u);
 const city = helpers.regex('city', /^[A-Za-zÁ-Źá-ź\s-]+$/u);
@@ -19,6 +22,7 @@ new Vue({
     },
     components: {
         LimitedTextarea,
+        BbcodeView,
     },
     validations: {
         firstName: {
@@ -36,3 +40,4 @@ new Vue({
     },
 });
 
+markitup('textarea', markitupSet);
