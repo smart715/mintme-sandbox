@@ -88,8 +88,6 @@ Vue.use(Toasted, {
     duration: 5000,
 });
 
-const HTTP_BAD_REQUEST = 400;
-
 export default {
     name: 'TokenIntroductionDescription',
     props: {
@@ -134,8 +132,10 @@ export default {
                 .then((response) => {
                     this.$emit('updated', this.newDescription);
                 }, (error) => {
-                    if (error.response.status === HTTP_BAD_REQUEST) {
-                        this.$toasted.error(error.response.data);
+                    if (!error.response) {
+                        this.$toasted.error('Network error');
+                    } else if (error.response.data.message) {
+                        this.$toasted.error(error.response.data.message);
                     } else {
                         this.$toasted.error('An error has occurred, please try again later');
                     }

@@ -45,7 +45,6 @@ import Guide from '../Guide';
 library.add(faYoutubeSquare);
 
 const HTTP_NO_CONTENT = 204;
-const HTTP_BAD_REQUEST = 400;
 
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
@@ -115,10 +114,12 @@ export default {
                             this.renderYtSubscribeButton(channelId);
                         }
                     }, (error) => {
-                        if (error.response.status === HTTP_BAD_REQUEST) {
-                            this.$toasted.error(error.response.data[0][0].message);
+                        if (!error.response) {
+                            this.$toasted.error('Network error');
+                        } else if (error.response.data.message) {
+                            this.$toasted.error(error.response.data.message);
                         } else {
-                            this.$toasted.error('An error has ocurred, please try again later');
+                            this.$toasted.error('An error has occurred, please try again later');
                         }
                     });
                 }));
