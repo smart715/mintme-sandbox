@@ -6,7 +6,8 @@
                     ref="btable"
                     v-if="hasOrders"
                     :items="getHistory"
-                    :fields="fields">
+                    :fields="fields"
+                    :sort-compare="sortCompare">
                     <template slot="name" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
                     </template>
@@ -24,9 +25,9 @@
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
             <confirm-modal
-                    :visible="confirmModal"
-                    @close="switchConfirmModal(false)"
-                    @confirm="removeOrder"
+                :visible="confirmModal"
+                @close="switchConfirmModal(false)"
+                @confirm="removeOrder"
             >
                 <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
@@ -201,6 +202,27 @@ export default {
         },
         getMarketFromName: function(name) {
             return this.markets.find((market) => market.identifier === name);
+        },
+        sortCompare: function(a, b, key) {
+            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
+            }
+
+            return toString(a[key]).localeCompare(toString(b[key]), undefined, {
+                numeric: true,
+            });
+        },
+        toString: function(value) {
+            if (!value) {
+                return '';
+            } else if (value instanceof Object) {
+                return keys(value)
+                .sort()
+                .map((key) => toString(value[key]))
+                .join(' ');
+            }
+
+            return String(value);
         },
         updateOrders: function(data, type) {
             let order = this.tableData.find((order) => data.id === order.id);

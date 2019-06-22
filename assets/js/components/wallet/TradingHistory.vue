@@ -5,7 +5,8 @@
                 <b-table
                     v-if="hasHistory"
                     :items="tableData"
-                    :fields="fields">
+                    :fields="fields"
+                    :sort-compare="sortCompare">
                     <template slot="market" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
                     </template>
@@ -116,6 +117,27 @@ export default {
                         reject([]);
                     });
             });
+        },
+        sortCompare: function(a, b, key) {
+            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
+            }
+
+            return toString(a[key]).localeCompare(toString(b[key]), undefined, {
+                numeric: true,
+            });
+        },
+        toString: function(value) {
+            if (!value) {
+                return '';
+            } else if (value instanceof Object) {
+                return keys(value)
+                .sort()
+                .map((key) => toString(value[key]))
+                .join(' ');
+            }
+
+            return String(value);
         },
         getDate: function(timestamp) {
            return moment.unix(timestamp).format(GENERAL.dateFormat);
