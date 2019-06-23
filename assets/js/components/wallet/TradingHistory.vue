@@ -123,7 +123,7 @@ export default {
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             }
 
-            return toString(a[key]).localeCompare(toString(b[key]), undefined, {
+            return this.toString(a[key]).localeCompare(toString(b[key]), undefined, {
                 numeric: true,
             });
         },
@@ -133,7 +133,7 @@ export default {
             } else if (value instanceof Object) {
                 return keys(value)
                 .sort()
-                .map((key) => toString(value[key]))
+                .map((key) => this.toString(value[key]))
                 .join(' ');
             }
 
