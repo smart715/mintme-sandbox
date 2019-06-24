@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Token{% endblock %}
+{% block title %}
+    {% if tab == 'intro' %}Information about {% endif %}
+    {{ token.name }} token | mintMe
+{% endblock %}
 
 {% block content %}
     <div id="token" class="container">

@@ -67,14 +67,31 @@ sonata_media:
         local:
             directory:  '%kernel.root_dir%/../public/uploads/media'
             create:     true
-
+        
     providers:
         # ...
         file:
             # the resizer must be set to false, otherwhise this can delete icon files from the fs
             resizer:    false
+            allowed_extensions: ['pdf', 'txt', 'rtf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pttx', 'odt', 'odg', 'odp', 'ods', 'odc', 'odf', 'odb', 'csv', 'xml']
+            allowed_mime_types: ['application/pdf', 'application/x-pdf', 'application/rtf', 'text/html', 'text/rtf', 'text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']
+
         image:
-           thumbnail: sonata.media.thumbnail.format
+            thumbnail: sonata.media.thumbnail.format
+            allowed_extensions: ['jpg', 'png', 'jpeg', 'gif']
+            allowed_mime_types: ['image/pjpeg', 'image/jpeg', 'image/png', 'image/gif', 'image/x-png']
+
+        dailymotion:
+            service:    sonata.media.provider.dailymotion
+            resizer:    false
+            filesystem: sonata.media.filesystem.local
+            cdn:        sonata.media.cdn.server
+            generator:  sonata.media.generator.default
+            thumbnail:  sonata.media.thumbnail.format
+
+
+    buzz:
+        connector:  sonata.media.buzz.connector.file_get_contents # sonata.media.buzz.connector.curl
 
 
 # Enable Doctrine to map the provided entities
