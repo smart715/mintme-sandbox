@@ -53,6 +53,8 @@ class DepositConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
+        $this->logger->info('[deposit-consumer] Received new message: '.json_encode($msg->body));
+        
         /** @var string|null $body */
         $body = $msg->body;
 
@@ -61,6 +63,11 @@ class DepositConsumer implements ConsumerInterface
                 json_decode((string)$body, true)
             );
         } catch (\Throwable $exception) {
+            $this->logger->warning(
+                '[deposit-consumer] Failed to parse incoming message',
+                [$msg->body]
+            );
+
             return true;
         }
 
@@ -77,8 +84,6 @@ class DepositConsumer implements ConsumerInterface
         }
 
         try {
-            $this->logger->info('[deposit-consumer] Received new message: '.json_encode($clbResult->toArray()));
-
             $crypto = $this->cryptoManager->findBySymbol($clbResult->getCrypto());
 
             if (!$crypto) {

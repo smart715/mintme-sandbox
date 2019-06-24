@@ -2,7 +2,7 @@
 
 namespace App\Tests\Consumer;
 
-use App\Consumers\DepositConsumer;
+use App\Consumers\PaymentConsumer;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -17,15 +17,15 @@ use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class DepositConsumerTest extends TestCase
+class PaymentConsumerTest extends TestCase
 {
     public function testExecute(): void
     {
         $cryptoSymbol = 'WEB';
-        $dc = new DepositConsumer(
-            $this->mockBalanceHandler($this->once()),
+        $dc = new PaymentConsumer(
+            $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
+            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -33,7 +33,10 @@ class DepositConsumerTest extends TestCase
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'userId' => 1,
+                'id' => 1,
+                'status' => 'success',
+                'tx_hash' => 'x01234123',
+                'retries' => 0,
                 'crypto' => $cryptoSymbol,
                 'amount' => '10000',
             ])))
@@ -43,10 +46,10 @@ class DepositConsumerTest extends TestCase
     public function testExecuteWithoutUser(): void
     {
         $cryptoSymbol = 'WEB';
-        $dc = new DepositConsumer(
+        $dc = new PaymentConsumer(
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager(null),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
+            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -54,7 +57,10 @@ class DepositConsumerTest extends TestCase
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'userId' => 1,
+                'id' => 1,
+                'status' => 'success',
+                'tx_hash' => 'x01234123',
+                'retries' => 0,
                 'crypto' => $cryptoSymbol,
                 'amount' => '10000',
             ])))
@@ -64,10 +70,10 @@ class DepositConsumerTest extends TestCase
     public function testExecuteWithoutCrypto(): void
     {
         $cryptoSymbol = 'WEB';
-        $dc = new DepositConsumer(
+        $dc = new PaymentConsumer(
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager(null),
+            $this->mockCryptoManager(null, $this->once()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -75,7 +81,10 @@ class DepositConsumerTest extends TestCase
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'userId' => 1,
+                'id' => 1,
+                'status' => 'fail',
+                'tx_hash' => 'x01234123',
+                'retries' => 0,
                 'crypto' => $cryptoSymbol,
                 'amount' => '10000',
             ])))
@@ -85,10 +94,10 @@ class DepositConsumerTest extends TestCase
     public function testExecuteFailedParse(): void
     {
         $cryptoSymbol = 'WEB';
-        $dc = new DepositConsumer(
+        $dc = new PaymentConsumer(
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
+            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -96,7 +105,10 @@ class DepositConsumerTest extends TestCase
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
-                'userId' => 1,
+                'id' => 1,
+                'status' => 'success',
+                'tx_hash' => 'x01234123',
+                'retries' => 0,
                 'crypto' => $cryptoSymbol,
             ])))
         );
@@ -107,14 +119,13 @@ class DepositConsumerTest extends TestCase
         $cryptoSymbol = 'WEB';
 
         $bh = $this->createMock(BalanceHandlerInterface::class);
-        $bh->expects($this->once())
-            ->method('deposit')
+        $bh->method('deposit')
             ->willThrowException(new \Exception());
 
-        $dc = new DepositConsumer(
+        $dc = new PaymentConsumer(
             $bh,
             $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
+            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -122,7 +133,38 @@ class DepositConsumerTest extends TestCase
 
         $this->assertFalse(
             $dc->execute($this->mockMessage((string)json_encode([
-                'userId' => 1,
+                'id' => 1,
+                'status' => 'fail',
+                'tx_hash' => 'x01234123',
+                'retries' => 0,
+                'crypto' => $cryptoSymbol,
+                'amount' => '10000',
+            ])))
+        );
+    }
+
+    public function testExecuteFailedToDeposit(): void
+    {
+        $cryptoSymbol = 'WEB';
+
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+        $bh->expects($this->once())->method('deposit');
+
+        $dc = new PaymentConsumer(
+            $bh,
+            $this->mockUserManager($this->createMock(User::class)),
+            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
+            $this->mockLogger(),
+            $this->mockMoneyWrapper(),
+            $this->createMock(ClockInterface::class)
+        );
+
+        $this->assertTrue(
+            $dc->execute($this->mockMessage((string)json_encode([
+                'id' => 1,
+                'status' => 'fail',
+                'tx_hash' => 'x01234123',
+                'retries' => 0,
                 'crypto' => $cryptoSymbol,
                 'amount' => '10000',
             ])))
@@ -133,6 +175,7 @@ class DepositConsumerTest extends TestCase
     {
         $crypto = $this->createMock(Crypto::class);
         $crypto->method('getSymbol')->willReturn($symbol);
+        $crypto->method('getFee')->willReturn(new Money(1, new Currency($symbol)));
 
         return $crypto;
     }
@@ -161,10 +204,10 @@ class DepositConsumerTest extends TestCase
         return $um;
     }
 
-    private function mockCryptoManager(?Crypto $crypto): CryptoManagerInterface
+    private function mockCryptoManager(?Crypto $crypto, Invocation $invocation): CryptoManagerInterface
     {
         $cm = $this->createMock(CryptoManagerInterface::class);
-        $cm->method('findBySymbol')->willReturn($crypto);
+        $cm->expects($invocation)->method('findBySymbol')->willReturn($crypto);
 
         return $cm;
     }
