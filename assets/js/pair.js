@@ -37,6 +37,7 @@ new Vue({
               tab: i ? 'intro' : 'trade',
             })
         );
+        document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';
       }
     },
   },
