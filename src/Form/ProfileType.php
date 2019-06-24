@@ -31,7 +31,7 @@ class ProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => "[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*",
+                    'pattern' => "[\p{L}]+[\p{L}\s'‘’`´-]*",
                 ],
             ])
             ->add('lastName', TextType::class, [
@@ -39,7 +39,7 @@ class ProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => "[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*",
+                    'pattern' => "[\p{L}]+[\p{L}\s'‘’`´-]*",
                 ],
             ])
             ->add('city', TextType::class, [
@@ -48,7 +48,7 @@ class ProfileType extends AbstractType
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
-                    'pattern' => '[A-Za-zÁ-Źá-ź\s-]+',
+                    'pattern' => '[\p{L}\s-]+',
                 ],
             ])
             ->add('country', CountryType::class, [

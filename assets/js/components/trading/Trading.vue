@@ -19,6 +19,8 @@
                 <b-table
                     :items="tokens"
                     :fields="fields"
+                    :sort-by="fields.lastPrice.key"
+                    :sort-desc="true"
                     :sort-compare="sortCompare">
                     <template slot="HEAD_volume" slot-scope="data">
                         {{ data.label }}
@@ -92,6 +94,7 @@ export default {
                 },
                 lastPrice: {
                     label: 'Last Price',
+                    key: 'lastPrice',
                     sortable: true,
                     formatter: formatMoney,
                 },
