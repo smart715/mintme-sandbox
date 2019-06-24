@@ -1,6 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Profile{% endblock %}
+{% block title %}
+    {% if profile.firstName is empty %}
+        Create your profile | mintMe
+    {% else %}
+        {{ profile.firstName }} {{ profile.lastName }}
+        {{ profile.city is empty ? '' : ' (from ' ~ profile.city ~ ')' }} profile | mintMe
+    {% endif %}
+{% endblock %}
 
 {% block bodyclass %}profile-view{% endblock %}
 
