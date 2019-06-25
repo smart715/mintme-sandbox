@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Twig\Environment;
 
+/** @codeCoverageIgnore */
 class ExceptionSubscriber implements EventSubscriberInterface
 {
     /** @var Environment */

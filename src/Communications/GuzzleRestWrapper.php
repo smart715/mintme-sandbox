@@ -4,6 +4,7 @@ namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\Factory\HttpClientFactory;
+use App\Communications\Factory\HttpClientFactoryInterface;
 use Exception;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,7 +13,7 @@ use Throwable;
 
 class GuzzleRestWrapper implements RestRpcInterface
 {
-    /** @var HttpClientFactory */
+    /** @var HttpClientFactoryInterface */
     private $clientFactory;
 
     /** @var ClientInterface|null */
@@ -34,7 +35,7 @@ class GuzzleRestWrapper implements RestRpcInterface
     private $headers;
 
     public function __construct(
-        HttpClientFactory $clientFactory,
+        HttpClientFactoryInterface $clientFactory,
         int $timeoutSeconds,
         string $url,
         LoggerInterface $logger,
