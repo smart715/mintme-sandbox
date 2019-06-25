@@ -79,6 +79,7 @@ class SummaryResult
         return new self($name, $total, $available, $availableCount, $freeze, $freezeCount);
     }
 
+    /** @codeCoverageIgnore */
     public static function fail(): self
     {
         return new self('', 0, 0, 0, 0, 0);

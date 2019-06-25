@@ -5,6 +5,7 @@ namespace App\Exchange\Balance\Factory;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class BalanceView
 {
     /** @var string */
