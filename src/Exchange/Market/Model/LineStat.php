@@ -6,6 +6,7 @@ use App\Exchange\Market;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class LineStat
 {
     /** @var \DateTimeImmutable */
