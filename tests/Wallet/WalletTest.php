@@ -5,15 +5,17 @@ namespace App\Tests\Wallet;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Manager\CryptoManager;
+use App\Manager\PendingManagerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
-use App\Wallet\Model\Status;
+use App\Wallet\Model\Address;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Wallet;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -34,6 +36,8 @@ class WalletTest extends TestCase
             $this->mockWithdrawGatewayInterface($withdrawTransactions),
             $this->mockBalanceHandler(),
             $this->mockDepositCommunicator($depositTransactions),
+            $this->createMock(PendingManagerInterface::class),
+            $this->createMock(EntityManagerInterface::class),
             $this->createMock(LoggerInterface::class)
         );
 
@@ -169,5 +173,14 @@ class WalletTest extends TestCase
     private function mockUser(): User
     {
         return $this->createMock(User::class);
+    }
+
+    public function mockAddress(string $str): Address
+    {
+        $address = $this->createMock(Address::class);
+
+        $address->method('getAddress')->willReturn($str);
+
+        return $address;
     }
 }
