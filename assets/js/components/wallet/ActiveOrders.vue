@@ -205,7 +205,7 @@ export default {
         },
         sortCompare: function(a, b, key) {
             return a[key].name.localeCompare(b[key].name, undefined, {
-                numeric: true
+                numeric: true,
             });
         },
         updateOrders: function(data, type) {
