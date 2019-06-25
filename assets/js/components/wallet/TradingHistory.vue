@@ -122,7 +122,7 @@ export default {
             if (typeof a[key] === 'number' && typeof b[key] === 'number') {
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             } else {
-                return a[key].localeCompare(b[key]);
+                return a[key].toString().localeCompare(b[key].toString());
             }
         },
         getDate: function(timestamp) {
