@@ -41,7 +41,7 @@ class UpdateTokenRelease extends Command
     /** {@inheritdoc} */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $this->logger->info('Update job started..');
+        $this->logger->info('[release] Update job started..');
 
         /** @var LockIn[] $locked */
         $locked = $this->getLockInTokenRepository()->findAllUnreleased();
@@ -53,12 +53,12 @@ class UpdateTokenRelease extends Command
 
         $updateMessage = count($locked) . ' tokens were updated. Saving to DB..';
 
-        $this->logger->info($updateMessage);
+        $this->logger->info('[release] '.$updateMessage);
         $output->writeln($updateMessage);
 
         $this->em->flush();
 
-        $this->logger->info('Finished.');
+        $this->logger->info('[release] Finished.');
     }
 
     private function getLockInTokenRepository(): LockInRepository

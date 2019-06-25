@@ -3,9 +3,11 @@
 namespace App\Wallet;
 
 use App\Entity\Crypto;
+use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\PendingManagerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
@@ -13,6 +15,7 @@ use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Money\Money;
 use Psr\Log\LoggerInterface;
@@ -29,6 +32,12 @@ class Wallet implements WalletInterface
     /** @var DepositGatewayCommunicator */
     private $depositCommunicator;
 
+    /** @var PendingManagerInterface */
+    private $pendingManager;
+
+    /** @var EntityManagerInterface */
+    private $em;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -36,11 +45,15 @@ class Wallet implements WalletInterface
         WithdrawGatewayInterface $withdrawGateway,
         BalanceHandlerInterface $balanceHandler,
         DepositGatewayCommunicator $depositCommunicator,
+        PendingManagerInterface $pendingManager,
+        EntityManagerInterface $em,
         LoggerInterface $logger
     ) {
         $this->withdrawGateway = $withdrawGateway;
         $this->balanceHandler = $balanceHandler;
         $this->depositCommunicator = $depositCommunicator;
+        $this->pendingManager = $pendingManager;
+        $this->em = $em;
         $this->logger = $logger;
     }
 
@@ -62,7 +75,7 @@ class Wallet implements WalletInterface
     }
 
     /** @throws Throwable */
-    public function withdraw(User $user, Address $address, Amount $amount, Crypto $crypto): void
+    public function withdrawInit(User $user, Address $address, Amount $amount, Crypto $crypto): PendingWithdraw
     {
         $token = Token::getFromCrypto($crypto);
         $available = $this->balanceHandler->balance($user, $token)->getAvailable();
@@ -81,42 +94,45 @@ class Wallet implements WalletInterface
             throw new NotEnoughUserAmountException();
         }
 
-        $balance = $this->withdrawGateway->getBalance($crypto);
-
-        if ($balance->lessThan($amount->getAmount()->add($crypto->getFee()))) {
-            $this->logger->warning(
-                "Requested withdraw-gateway balance to pay '{$user->getEmail()}'.
-                Not enough amount to pay {$amount->getAmount()->getAmount()} {$crypto->getSymbol()}
-                Available withdraw amount: {$balance->getAmount()} {$crypto->getSymbol()}"
-            );
-
+        if (!$this->validateAmount($crypto, $amount, $user)) {
             throw new NotEnoughAmountException();
         }
 
         $this->balanceHandler->withdraw($user, $token, $amount->getAmount()->add($crypto->getFee()));
 
+        return $this->pendingManager->create($user, $address, $amount, $crypto);
+    }
+
+    /** @throws Throwable */
+    public function withdrawCommit(PendingWithdraw $pendingWithdraw): void
+    {
+        $crypto = $pendingWithdraw->getCrypto();
+        $user = $pendingWithdraw->getUser();
+        $amount = $pendingWithdraw->getAmount();
+        $address = $pendingWithdraw->getAddress();
+
+        if (!$this->validateAmount($crypto, $amount, $user)) {
+            throw new NotEnoughAmountException();
+        }
+
+        $this->em->beginTransaction();
+
         try {
             $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $crypto);
+            $this->em->remove($pendingWithdraw);
+            $this->em->flush();
         } catch (Throwable $exception) {
+            $this->em->rollback();
+
             $this->logger->error(
                 "Failed to pay '{$user->getEmail()}' amount {$amount->getAmount()->getAmount()} {$crypto->getSymbol()}.
-                Withdraw-gateway failed with the next errror: {$exception->getMessage()}. Trying to rollback payment.."
+                Withdraw-gateway failed with the next errror: {$exception->getMessage()}. Payment has been rollbacked"
             );
-
-            try {
-                $this->balanceHandler->deposit($user, $token, $amount->getAmount()->add($crypto->getFee()));
-            } catch (Throwable $exception) {
-                $this->logger->critical(
-                    "Failed to rollback payment. Requires to do it manually.
-                    User: {$user->getEmail()}; 
-                    Amount: {$amount->getAmount()->getAmount()}; 
-                    Crypto: {$crypto->getSymbol()}.
-                    Reason: {$exception->getMessage()}"
-                );
-            }
 
             throw new Exception();
         }
+
+        $this->em->commit();
     }
 
     /** {@inheritDoc} */
@@ -138,5 +154,22 @@ class Wallet implements WalletInterface
     public function getFee(Crypto $crypto): Money
     {
         return $this->depositCommunicator->getFee($crypto->getSymbol());
+    }
+
+    private function validateAmount(Crypto $crypto, Amount $amount, User $user): bool
+    {
+        $balance = $this->withdrawGateway->getBalance($crypto);
+
+        if ($balance->lessThan($amount->getAmount()->add($crypto->getFee()))) {
+            $this->logger->warning(
+                "Requested withdraw-gateway balance to pay '{$user->getEmail()}'.
+                Not enough amount to pay {$amount->getAmount()->getAmount()} {$crypto->getSymbol()}
+                Available withdraw amount: {$balance->getAmount()} {$crypto->getSymbol()}"
+            );
+
+            return false;
+        }
+
+        return true;
     }
 }
