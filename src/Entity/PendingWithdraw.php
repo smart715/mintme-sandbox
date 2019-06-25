@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class PendingWithdraw
 {
-    public const EXPIRES_HOURS = 4;
+    public const EXPIRES_HOURS = 1;
 
     /**
      * @ORM\Id()
