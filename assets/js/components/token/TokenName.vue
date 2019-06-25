@@ -39,7 +39,6 @@ Vue.use(Toasted, {
 });
 
 const HTTP_ACCEPTED = 202;
-const HTTP_ALREADY_REPORTED = 208;
 
 export default {
     name: 'TokenName',
@@ -136,8 +135,6 @@ export default {
                         name: this.currentName,
                     });
                     this.cancelEditingMode();
-                } else if (response.status === HTTP_ALREADY_REPORTED) {
-                    this.$toasted.error(response.data);
                 }
             }, (error) => {
                 if (!error.response) {

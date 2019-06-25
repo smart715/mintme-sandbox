@@ -2,6 +2,7 @@ parameters:
     service: 'mintme'
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     locale: 'en'
+    sonata.media.admin.media.class: App\Admin\MediaAdmin
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
@@ -116,6 +117,12 @@ services:
             $timeoutSeconds: '%verify_timeout_seconds%'
 
     App\Command\UpdateTokenRelease:
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: cron }
+
+    App\Command\UpdatePendingWithdrawals:
         arguments:
             $logger: '@logger'
         tags:

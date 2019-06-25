@@ -2,15 +2,18 @@
 
 namespace App\EventSubscriber;
 
+use App\Exception\ApiExceptionInterface;
 use App\Exception\NotFoundPairException;
 use App\Exception\NotFoundProfileException;
 use App\Exception\NotFoundTokenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Twig\Environment;
 
+/** @codeCoverageIgnore */
 class ExceptionSubscriber implements EventSubscriberInterface
 {
     /** @var Environment */
@@ -57,6 +60,17 @@ class ExceptionSubscriber implements EventSubscriberInterface
                 ]),
                 404
             ));
+        }
+
+        if ($event->getException() instanceof ApiExceptionInterface) {
+            /** @var ApiExceptionInterface $e */
+            $e = $event->getException();
+            $response = new JsonResponse(
+                $e->getData(),
+                $e->getStatusCode()
+            );
+            $response->headers->set('Content-Type', 'application/problem+json');
+            $event->setResponse($response);
         }
     }
 }

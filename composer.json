@@ -53,6 +53,7 @@
         "vasek-purchart/doctrine-date-time-immutable-types": "^1.0"
     },
     "require-dev": {
+        "liuggio/fastest": "^1.6",
         "overtrue/phplint": "^1.1",
         "phpstan/phpstan": "^0.10.1",
         "phpstan/phpstan-doctrine": "^0.10.0",

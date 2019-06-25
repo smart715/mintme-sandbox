@@ -123,8 +123,10 @@ class MarketStatus
     {
         if ($quote instanceof Crypto) {
             $this->quoteCrypto = $quote;
+            $this->quoteToken = null;
         } elseif ($quote instanceof Token) {
             $this->quoteToken = $quote;
+            $this->quoteCrypto = null;
         }
 
         return $this;
