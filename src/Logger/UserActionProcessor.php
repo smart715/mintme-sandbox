@@ -7,6 +7,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 /**
  * Invokable class which adds remote IP address and username to the log entry.
+ *
+ * @codeCoverageIgnore
  */
 class UserActionProcessor
 {
