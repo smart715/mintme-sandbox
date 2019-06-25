@@ -3,6 +3,7 @@
 namespace App\Wallet;
 
 use App\Entity\Crypto;
+use App\Entity\PendingWithdraw;
 use App\Entity\User;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
@@ -21,7 +22,9 @@ interface WalletInterface
      * @throws NotEnoughAmountException
      * @throws NotEnoughUserAmountException
      */
-    public function withdraw(User $user, Address $address, Amount $amount, Crypto $crypto): void;
+    public function withdrawInit(User $user, Address $address, Amount $amount, Crypto $crypto): PendingWithdraw;
+
+    public function withdrawCommit(PendingWithdraw $pendingWithdraw): void;
 
 
     /** @return array<Address> */
