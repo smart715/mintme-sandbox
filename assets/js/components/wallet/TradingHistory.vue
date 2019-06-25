@@ -119,9 +119,13 @@ export default {
             });
         },
         sortCompare: function(a, b, key) {
-            return a[key].name.localeCompare(b[key].name, undefined, {
-                numeric: true,
-            });
+            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
+            } else {
+                return a[key].localeCompare(b[key], undefined, {
+                    numeric: true,
+                });
+            }
         },
         getDate: function(timestamp) {
            return moment.unix(timestamp).format(GENERAL.dateFormat);

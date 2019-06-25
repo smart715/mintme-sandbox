@@ -204,9 +204,13 @@ export default {
             return this.markets.find((market) => market.identifier === name);
         },
         sortCompare: function(a, b, key) {
-            return a[key].name.localeCompare(b[key].name, undefined, {
-                numeric: true,
-            });
+            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
+            } else {
+                return a[key].localeCompare(b[key], undefined, {
+                    numeric: true,
+                });
+            }
         },
         updateOrders: function(data, type) {
             let order = this.tableData.find((order) => data.id === order.id);
