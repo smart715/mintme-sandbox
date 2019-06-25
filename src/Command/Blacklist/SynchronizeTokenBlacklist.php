@@ -13,6 +13,10 @@ use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * @codeCoverageIgnore
+ * Ignored due the conflicting ConsoleSectionOutput class.
+ */
 class SynchronizeTokenBlacklist extends Command
 {
     /** @var BlacklistManagerInterface */

@@ -58,6 +58,7 @@ class LockIn
         $this->token = $token;
     }
 
+    /** @codeCoverageIgnore */
     public function getId(): ?int
     {
         return $this->id;
@@ -65,6 +66,7 @@ class LockIn
 
     /**
      * @Groups({"Default", "API"})
+     * @codeCoverageIgnore
      */
     public function getReleasePeriod(): int
     {
@@ -94,12 +96,14 @@ class LockIn
 
     /**
      * @Groups({"Default", "API"})
+     * @codeCoverageIgnore
      */
     public function getFrozenAmount(): Money
     {
         return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
+    /** @codeCoverageIgnore */
     public function setReleasedAtStart(int $releasedAtStart): self
     {
         $this->releasedAtStart = (string)$releasedAtStart;
@@ -107,6 +111,7 @@ class LockIn
         return $this;
     }
 
+    /** @codeCoverageIgnore */
     public function setReleasePeriod(int $releasePeriod): self
     {
         $this->releasePeriod = $releasePeriod;
@@ -114,6 +119,7 @@ class LockIn
         return $this;
     }
 
+    /** @codeCoverageIgnore */
     public function setAmountToRelease(Money $amount): self
     {
         $this->amountToRelease =  $amount->getAmount();
