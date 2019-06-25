@@ -54,7 +54,7 @@ class DepositConsumer implements ConsumerInterface
     public function execute(AMQPMessage $msg)
     {
         $this->logger->info('[deposit-consumer] Received new message: '.json_encode($msg->body));
-        
+
         /** @var string|null $body */
         $body = $msg->body;
 

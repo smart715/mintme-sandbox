@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Trade\Config;
 
+/** @codeCoverageIgnore */
 class LimitOrderConfig
 {
     /** @var float */

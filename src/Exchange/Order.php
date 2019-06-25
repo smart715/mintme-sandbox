@@ -6,6 +6,7 @@ use App\Entity\User;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class Order
 {
     public const ALL_SIDE = 0;
