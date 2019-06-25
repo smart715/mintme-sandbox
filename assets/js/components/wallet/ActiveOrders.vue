@@ -207,9 +207,7 @@ export default {
             if (typeof a[key] === 'number' && typeof b[key] === 'number') {
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             } else {
-                return a[key].localeCompare(b[key], undefined, {
-                    numeric: true,
-                });
+                return a[key].localeCompare(b[key]);
             }
         },
         updateOrders: function(data, type) {
