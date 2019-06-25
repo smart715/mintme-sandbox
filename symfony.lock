@@ -197,6 +197,9 @@
     "lcobucci/jwt": {
         "version": "3.2.4"
     },
+    "liuggio/fastest": {
+        "version": "v1.6.1"
+    },
     "michelf/php-markdown": {
         "version": "1.8.0"
     },
