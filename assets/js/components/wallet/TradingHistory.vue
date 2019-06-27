@@ -81,9 +81,6 @@ export default {
                     sortable: true,
                     formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
                 },
-                marketsOnTop: [
-                    {currency: 'BTC', token: 'WEB'},
-                ],
             },
         };
     },
@@ -122,19 +119,11 @@ export default {
             });
         },
         sortCompare: function(a, b, key) {
-            let pair = false;
-
-            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+           if (typeof a[key] === 'number' && typeof b[key] === 'number') {
                 // If both compared fields are native numbers
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             } else {
-                this.marketsOnTop.forEach((market)=> {
-                    if (b.pair === market.currency + '/' + market.token ||
-                        a.pair === market.currency + '/' + market.token) {
-                        pair = true;
-                    }
-                });
-                return pair ? 0 : a[key].localeCompare(b[key], undefined, {
+                return typeof a[key] === 'undefined' ? 0 : a[key].localeCompare(b[key], undefined, {
                     numeric: true,
                 });
             }
