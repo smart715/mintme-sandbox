@@ -123,7 +123,7 @@ export default {
                 // If both compared fields are native numbers
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             } else {
-                return typeof a[key] === 'undefined' ? 0 : a[key].localeCompare(b[key], undefined, {
+                return typeof a[key] === 'undefined' ? 0 : a[key].toString().localeCompare(b[key], undefined, {
                     numeric: true,
                 });
             }
