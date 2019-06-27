@@ -5,6 +5,7 @@ namespace App\Exchange;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class Deal
 {
     public const SELL_SIDE = 1;
