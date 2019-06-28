@@ -82,12 +82,7 @@
                     <div class="col px-1">
                         <div class="font-weight-bold pb-4">
                             Token release:
-                            <guide max-width="500px">
-                                <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
+                            <guide>
                                 <template slot="header">
                                     Token Release Period
                                 </template>
