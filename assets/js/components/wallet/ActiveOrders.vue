@@ -86,12 +86,10 @@ export default {
                 price: {
                     label: 'Price',
                     sortable: true,
-                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
-                    formatter: formatMoney,
                 },
                 fee: {label: 'Fee', sortable: true},
                 action: {label: 'Action', sortable: false},
@@ -173,10 +171,10 @@ export default {
                     date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
                     name: order.market.base.symbol + '/' + order.market.quote.symbol,
-                    amount: toMoney(order.amount, order.market.base.subunit),
-                    price: toMoney(order.price, order.market.base.subunit),
-                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
-                    fee: order.fee * 100 + '%',
+                    amount: formatMoney(toMoney(order.amount, order.market.base.subunit)),
+                    price: formatMoney(toMoney(order.price, order.market.base.subunit)),
+                    total: formatMoney(toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit)),
+                    fee: formatMoney(toMoney(order.fee * 100 + '%')),
                     action: this.$routing.generate('orders_сancel', {
                         base: order.market.base.symbol,
                         quote: order.market.quote.symbol,
