@@ -29,9 +29,10 @@
 </template>
 
 <script>
+import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI} from '../../utils/constants';
 import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
 export default {
@@ -117,7 +118,7 @@ export default {
             });
         },
         getDate: function(timestamp) {
-           return new Date(timestamp * 1000).toDateString();
+           return moment.unix(timestamp).format(GENERAL.dateFormat);
         },
         getType: function(type) {
            return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';
