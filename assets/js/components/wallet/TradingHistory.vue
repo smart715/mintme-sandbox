@@ -5,8 +5,7 @@
                 <b-table
                     v-if="hasHistory"
                     :items="tableData"
-                    :fields="fields"
-                    :sort-compare="sortCompare">
+                    :fields="fields">
                     <template slot="market" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
                     </template>
@@ -30,10 +29,9 @@
 </template>
 
 <script>
-import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI} from '../../utils/constants';
+import {WSAPI} from '../../utils/constants';
 import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
 export default {
@@ -118,18 +116,8 @@ export default {
                     });
             });
         },
-        sortCompare: function(a, b, key) {
-           if (typeof a[key] === 'number' && typeof b[key] === 'number') {
-                // If both compared fields are native numbers
-                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
-            } else {
-                return typeof a[key] === 'undefined' ? 0 : a[key].toString().localeCompare(b[key].toString(), undefined, {
-                    numeric: true,
-                });
-            }
-        },
         getDate: function(timestamp) {
-           return moment.unix(timestamp).format(GENERAL.dateFormat);
+           return new Date(timestamp * 1000).toDateString();
         },
         getType: function(type) {
            return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';

@@ -6,8 +6,7 @@
                     ref="btable"
                     v-if="hasOrders"
                     :items="getHistory"
-                    :fields="fields"
-                    :sort-compare="sortCompare">
+                    :fields="fields">
                     <template slot="name" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
                     </template>
@@ -25,9 +24,9 @@
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
             <confirm-modal
-                :visible="confirmModal"
-                @close="switchConfirmModal(false)"
-                @confirm="removeOrder"
+                    :visible="confirmModal"
+                    @close="switchConfirmModal(false)"
+                    @confirm="removeOrder"
             >
                 <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
@@ -43,10 +42,9 @@
     </div>
 </template>
 <script>
-import moment from 'moment';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {GENERAL, WSAPI} from '../../utils/constants';
+import {WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
 import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
 
@@ -171,7 +169,7 @@ export default {
         getHistory: function() {
             return this.tableData.map((order) => {
                 return {
-                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                    date: new Date(order.timestamp * 1000).toDateString(),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
                     name: order.market.base.symbol + '/' + order.market.quote.symbol,
                     amount: toMoney(order.amount, order.market.base.subunit),
@@ -202,13 +200,6 @@ export default {
         },
         getMarketFromName: function(name) {
             return this.markets.find((market) => market.identifier === name);
-        },
-        sortCompare: function(a, b, key) {
-            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
-                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
-            } else {
-                return a[key].toString().localeCompare(b[key].toString());
-            }
         },
         updateOrders: function(data, type) {
             let order = this.tableData.find((order) => data.id === order.id);
