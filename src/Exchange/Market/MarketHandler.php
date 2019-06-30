@@ -216,7 +216,7 @@ class MarketHandler implements MarketHandlerInterface
                 self::SELL === $orderData['side'] ?
                     floatval($orderData['maker_fee']) :
                     floatval($orderData['taker_fee']),
-                $orderData['mtime'] ? intval($orderData['mtime']) : null
+                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null
             );
         });
 
@@ -238,7 +238,7 @@ class MarketHandler implements MarketHandlerInterface
             return new Order(
                 $orderData['id'],
                 $user,
-                array_key_exists('taker_id', $orderData)
+                !empty($orderData['taker_id'])
                     ? $this->userManager->find($orderData['taker_id'])
                     : null,
                 $market,
@@ -252,8 +252,8 @@ class MarketHandler implements MarketHandlerInterface
                     $this->getSymbol($market->getQuote())
                 ),
                 Order::FINISHED_STATUS,
-                array_key_exists('fee', $orderData) ? $orderData['fee'] : 0,
-                $orderData['time'] ? intval($orderData['time']) : null
+                !empty($orderData['fee']) ? $orderData['fee'] : 0,
+                isset($orderData['time']) ? intval($orderData['time']) : null
             );
         }, $result);
     }

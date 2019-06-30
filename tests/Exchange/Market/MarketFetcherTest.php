@@ -19,6 +19,162 @@ use PHPUnit\Framework\TestCase;
 
 class MarketFetcherTest extends TestCase
 {
+    /** @dataProvider getKLineStatProvider */
+    public function testGetKLineStat(bool $hasError, ?array $rpcResult): void
+    {
+        $method = 'market.kline';
+        $params = ["TOK000000000001WEB", 1, 100, 1000];
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($rpcResult);
+
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
+
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
+        $this->assertEquals(
+            $rpcResult,
+            $marketFetcher->getKLineStat('TOK000000000001WEB', 1, 100, 1000)
+        );
+    }
+
+    public function getKLineStatProvider(): array
+    {
+        return [
+            [false, ['foo']],
+            [true, ['foo']],
+        ];
+    }
+
+    /** @dataProvider getPendingOrderProvider */
+    public function testGetPendingOrder(bool $hasError, ?array $rpcResult): void
+    {
+        $method = 'order.pending_detail';
+        $params = ["TOK000000000001WEB", 12];
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($rpcResult);
+
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
+
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
+        $this->assertEquals(
+            $rpcResult,
+            $marketFetcher->getPendingOrder('TOK000000000001WEB', 12)
+        );
+    }
+
+    public function getPendingOrderProvider(): array
+    {
+        return [
+            [false, ['user' => 1]],
+            [true, ['user' => 1]],
+        ];
+    }
+
+    /** @dataProvider getPendingOrdersByUserProvider */
+    public function testGetPendingOrdersByUser(bool $hasError, ?array $rpcResult): void
+    {
+        $method = 'order.pending';
+        $params = [3, "TOK000000000001WEB", 0, 100];
+        $offset = 1;
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($rpcResult);
+
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig($offset));
+
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
+        $this->assertEquals(
+            array_map(function (array $arr) use ($offset) {
+                $arr['user'] -= $offset;
+
+                return $arr;
+            }, $rpcResult['records']),
+            $marketFetcher->getPendingOrdersByUser(
+                2,
+                'TOK000000000001WEB'
+            )
+        );
+    }
+
+    public function getPendingOrdersByUserProvider(): array
+    {
+        return [
+            [false, $this->getUserPendingResult(1)],
+            [true, $this->getUserPendingResult(1)],
+        ];
+    }
+
+    /** @dataProvider userExecutedHistoryProvider */
+    public function testUserExecutedHistory(bool $hasError, ?array $rpcResult): void
+    {
+        $method = 'market.user_deals';
+        $params = [3, "TOK000000000001WEB", 0, 100];
+        $offset = 1;
+
+        $jsonResponse = $this->createMock(JsonRpcResponse::class);
+        $jsonResponse->method('hasError')->willReturn($hasError);
+        $jsonResponse->method('getResult')->willReturn($rpcResult);
+
+        $jsonRpc = $this->createMock(JsonRpcInterface::class);
+        $jsonRpc->method('send')
+            ->with($this->equalTo($method), $this->equalTo($params))
+            ->willReturn($jsonResponse);
+
+        $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig($offset));
+
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
+        $this->assertEquals(
+            array_map(function (array $arr) use ($offset) {
+                $arr['id'] -= $offset;
+                
+                return $arr;
+            }, $rpcResult['records']),
+            $marketFetcher->getUserExecutedHistory(
+                2,
+                'TOK000000000001WEB'
+            )
+        );
+    }
+
+    public function userExecutedHistoryProvider(): array
+    {
+        return [
+            [false, $this->getUserExecutedResult(2)],
+            [true, $this->getUserExecutedResult(2)],
+        ];
+    }
+
     /** @dataProvider marketInfoProvider */
     public function testGetMarketInfo(bool $hasError, ?array $rpcResult): void
     {
@@ -36,6 +192,10 @@ class MarketFetcherTest extends TestCase
 
         $marketFetcher = new MarketFetcher($jsonRpc, $this->mockConfig(0));
 
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
+
         $this->assertEquals(
             $rpcResult,
             $marketFetcher->getMarketInfo('TOK000000000001WEB', 86400)
@@ -46,6 +206,7 @@ class MarketFetcherTest extends TestCase
     {
         return [
             [false, $this->getMarketInfoResult()],
+            [true, $this->getMarketInfoResult()],
         ];
     }
 
@@ -221,6 +382,24 @@ class MarketFetcherTest extends TestCase
     private function createMoney(int $value): Money
     {
         return new Money($value, new Currency(MoneyWrapper::TOK_SYMBOL));
+    }
+
+    private function getUserPendingResult(int $id): array
+    {
+        return [
+            'records' => [
+                ['user' => $id],
+            ],
+        ];
+    }
+
+    private function getUserExecutedResult(int $id): array
+    {
+        return [
+            'records' => [
+                ['id' => $id],
+            ],
+        ];
     }
 
     private function getMarketInfoResult(): array

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class TwoFactorAuthValidator extends ConstraintValidator
 {
     /** @var User */
-    protected $user;
+    public $user;
 
     /** @var TwoFactorManager  */
     protected $twoFactorManager;
