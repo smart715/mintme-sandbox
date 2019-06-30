@@ -4,25 +4,58 @@ namespace App\Tests\Exchange\Factory;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Factory\MarketFactory;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MarketFactoryTest extends TestCase
 {
-    public function testGetAllMarkets(): void
+    public function testCreateUserRelated(): void
     {
+        $crypto = $this->mockCrypto('WEB', true);
+
         $tokens = [
             $this->mockToken(123, 'tok1'),
             $this->mockToken(456, 'tok2'),
             $this->mockToken(789, 'tok3'),
+            $crypto,
         ];
 
-        $cryptoManager = $this->mockCryptoManager($this->mockCrypto('WEB', true));
-        $tokenManager = $this->mockTokenManager($tokens);
+        $cryptoManager = $this->mockCryptoManager($crypto);
+        $tokenManager = $this->mockTokenManager([], $this->never());
+
+        /** @var MarketFactoryInterface $marketManager */
+        $marketManager = new MarketFactory($cryptoManager, $tokenManager);
+        $markets = $marketManager->createUserRelated(
+            $this->mockUser($tokens)
+        );
+
+        $this->assertCount(3, $markets);
+        $this->assertEquals([['tok1', 'WEB'], ['tok2', 'WEB'], ['tok3', 'WEB']], [
+            [$markets[0]->getQuote()->getSymbol(), $markets[0]->getBase()->getSymbol()],
+            [$markets[1]->getQuote()->getSymbol(), $markets[1]->getBase()->getSymbol()],
+            [$markets[2]->getQuote()->getSymbol(), $markets[2]->getBase()->getSymbol()],
+        ]);
+    }
+
+    public function testGetAllMarkets(): void
+    {
+        $crypto = $this->mockCrypto('WEB', true);
+
+        $tokens = [
+            $this->mockToken(123, 'tok1'),
+            $this->mockToken(456, 'tok2'),
+            $this->mockToken(789, 'tok3'),
+            $crypto,
+        ];
+
+        $cryptoManager = $this->mockCryptoManager($crypto);
+        $tokenManager = $this->mockTokenManager($tokens, $this->exactly(1));
 
         /** @var MarketFactoryInterface $marketManager */
         $marketManager = new MarketFactory($cryptoManager, $tokenManager);
@@ -41,13 +74,21 @@ class MarketFactoryTest extends TestCase
         $tokens = [$this->mockToken(123, 'tok1'),];
 
         $cryptoManager = $this->mockCryptoManager($this->mockCrypto('WEB', false));
-        $tokenManager = $this->mockTokenManager($tokens);
+        $tokenManager = $this->mockTokenManager($tokens, $this->exactly(1));
 
         /** @var MarketFactoryInterface $marketManager */
         $marketManager = new MarketFactory($cryptoManager, $tokenManager);
         $markets = $marketManager->createAll();
 
         $this->assertEmpty($markets);
+    }
+
+    private function mockUser(array $toks): User
+    {
+        $user = $this->createMock(User::class);
+        $user->method('getRelatedTokens')->willReturn($toks);
+
+        return $user;
     }
 
     /** @return MockObject|CryptoManagerInterface */
@@ -64,14 +105,13 @@ class MarketFactoryTest extends TestCase
     }
 
     /**
-     * @param Token[] $tokens
      * @return MockObject|TokenManagerInterface
      */
-    private function mockTokenManager(array $tokens): TokenManagerInterface
+    private function mockTokenManager(array $tokens, Invocation $invocation): TokenManagerInterface
     {
         $tokenManagerMock = $this->createMock(TokenManagerInterface::class);
         $tokenManagerMock
-            ->expects($this->exactly(1))
+            ->expects($invocation)
             ->method('findAll')
             ->willReturn($tokens)
         ;
