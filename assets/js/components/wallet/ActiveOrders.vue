@@ -6,7 +6,8 @@
                     ref="btable"
                     v-if="hasOrders"
                     :items="getHistory"
-                    :fields="fields">
+                    :fields="fields"
+                    :sort-compare="sortCompare">
                     <template slot="name" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
                     </template>
@@ -24,9 +25,9 @@
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
             <confirm-modal
-                    :visible="confirmModal"
-                    @close="switchConfirmModal(false)"
-                    @confirm="removeOrder"
+                :visible="confirmModal"
+                @close="switchConfirmModal(false)"
+                @confirm="removeOrder"
             >
                 <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
@@ -86,10 +87,12 @@ export default {
                 price: {
                     label: 'Price',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 fee: {label: 'Fee', sortable: true},
                 action: {label: 'Action', sortable: false},
@@ -129,10 +132,7 @@ export default {
                 this.addMessageHandler((response) => {
                     if ('order.update' === response.method &&
                         this.userId + getUserOffset() === response.params[1].user) {
-                        this.updateOrders(response.params[1], response.params[0]);
-                        if (this.$refs.btable) {
-                            this.$refs.btable.refresh();
-                        }
+                        this.updateOrders(response.params[1], response.params[0]);                        
                     }
                 }, 'active-tableData-update');
             })
@@ -171,9 +171,9 @@ export default {
                     date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
                     name: order.market.base.symbol + '/' + order.market.quote.symbol,
-                    amount: formatMoney(toMoney(order.amount, order.market.base.subunit)),
-                    price: formatMoney(toMoney(order.price, order.market.base.subunit)),
-                    total: formatMoney(toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit)),
+                    amount: toMoney(order.amount, order.market.base.subunit),
+                    price: toMoney(order.price, order.market.base.subunit),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
                     fee: order.fee * 100 + '%',
                     action: this.$routing.generate('orders_сancel', {
                         base: order.market.base.symbol,
@@ -200,46 +200,12 @@ export default {
         getMarketFromName: function(name) {
             return this.markets.find((market) => market.identifier === name);
         },
-        updateOrders: function(data, type) {
-            let order = this.tableData.find((order) => data.id === order.id);
-
-            switch (type) {
-                case WSAPI.order.status.PUT:
-                    this.tableData.unshift({
-                        amount: data.left,
-                        price: data.price,
-                        fee: WSAPI.order.type.SELL === parseInt(data.type)
-                            ? data.maker_fee : data.taker_fee,
-                        id: data.id,
-                        side: data.side,
-                        timestamp: data.mtime,
-                        market: this.getMarketFromName(data.market),
-                    });
-                    break;
-                case WSAPI.order.status.UPDATE:
-                    if (typeof order === 'undefined') {
-                        return;
-                    }
-
-                    let index = this.tableData.indexOf(order);
-                    order.amount = data.left;
-                    order.price = data.price;
-                    order.timestamp = data.mtime;
-                    this.tableData[index] = order;
-                    break;
-                case WSAPI.order.status.FINISH:
-                    if (typeof order === 'undefined') {
-                        return;
-                    }
-
-                    this.tableData.splice(this.tableData.indexOf(order), 1);
-                    break;
-            }
-
-            this.tableData.sort((a, b) => a.timestamp < b.timestamp);
-            if (this.$refs.btable) {
-                this.$refs.btable.refresh();
-            }
+        sortCompare: function(a, b, key) {
+            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
+            } else {
+                return a[key].toString().localeCompare(b[key].toString());
+    z
         },
     },
 };
