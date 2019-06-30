@@ -6,8 +6,7 @@
                     ref="btable"
                     v-if="hasOrders"
                     :items="getHistory"
-                    :fields="fields"
-                    :sort-compare="sortCompare">
+                    :fields="fields">
                     <template slot="name" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
                     </template>
@@ -25,9 +24,9 @@
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
             <confirm-modal
-                :visible="confirmModal"
-                @close="switchConfirmModal(false)"
-                @confirm="removeOrder"
+                    :visible="confirmModal"
+                    @close="switchConfirmModal(false)"
+                    @confirm="removeOrder"
             >
                 <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
@@ -153,10 +152,6 @@ export default {
                             this.currentPage++;
                         }
 
-                        if (this.$refs.btable) {
-                            this.$refs.btable.refresh();
-                        }
-
                         resolve(this.tableData);
                     })
                     .catch(() => {
@@ -200,12 +195,43 @@ export default {
         getMarketFromName: function(name) {
             return this.markets.find((market) => market.identifier === name);
         },
-        sortCompare: function(a, b, key) {
-            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
-                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
-            } else {
-                return a[key].toString().localeCompare(b[key].toString());
-    z
+        updateOrders: function(data, type) {
+            let order = this.tableData.find((order) => data.id === order.id);
+
+            switch (type) {
+                case WSAPI.order.status.PUT:
+                    this.tableData.unshift({
+                        amount: data.left,
+                        price: data.price,
+                        fee: WSAPI.order.type.SELL === parseInt(data.type)
+                            ? data.maker_fee : data.taker_fee,
+                        id: data.id,
+                        side: data.side,
+                        timestamp: data.mtime,
+                        market: this.getMarketFromName(data.market),
+                    });
+                    break;
+                case WSAPI.order.status.UPDATE:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    let index = this.tableData.indexOf(order);
+                    order.amount = data.left;
+                    order.price = data.price;
+                    order.timestamp = data.mtime;
+                    this.tableData[index] = order;
+                    break;
+                case WSAPI.order.status.FINISH:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    this.tableData.splice(this.tableData.indexOf(order), 1);
+                    break;
+            }
+
+            this.tableData.sort((a, b) => a.timestamp < b.timestamp);
         },
     },
 };
