@@ -320,7 +320,7 @@ class MarketHandlerTest extends TestCase
     {
         $fetcher = $this->mockMarketFetcher();
         $fetcher->method('getKLineStat')
-            ->with('convertedmarket', 43200, time(), 86400)
+            ->with('convertedmarket', 43200, $this->anything(), 86400)
             ->willReturn(
                 $this->getKlineStats()
             );
