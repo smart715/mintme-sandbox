@@ -3,7 +3,6 @@
         <template v-if="loaded">
             <div class="table-responsive table-restricted" ref="table">
                 <b-table
-                    ref="btable"
                     v-if="hasOrders"
                     :items="getHistory"
                     :fields="fields">
@@ -131,7 +130,7 @@ export default {
                 this.addMessageHandler((response) => {
                     if ('order.update' === response.method &&
                         this.userId + getUserOffset() === response.params[1].user) {
-                        this.updateOrders(response.params[1], response.params[0]);                        
+                        this.updateOrders(response.params[1], response.params[0]);
                     }
                 }, 'active-tableData-update');
             })
