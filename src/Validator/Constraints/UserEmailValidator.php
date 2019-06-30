@@ -10,7 +10,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class UserEmailValidator extends ConstraintValidator
 {
     /** @var mixed */
-    private $user;
+    public $user;
 
     /** @var UserManagerInterface */
     private $userManager;
