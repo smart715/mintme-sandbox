@@ -174,7 +174,7 @@ export default {
                     amount: formatMoney(toMoney(order.amount, order.market.base.subunit)),
                     price: formatMoney(toMoney(order.price, order.market.base.subunit)),
                     total: formatMoney(toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit)),
-                    fee: formatMoney(toMoney(order.fee * 100 + '%')),
+                    fee: order.fee * 100 + '%',
                     action: this.$routing.generate('orders_сancel', {
                         base: order.market.base.symbol,
                         quote: order.market.quote.symbol,
