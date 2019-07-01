@@ -6,13 +6,11 @@
                     v-if="hasHistory"
                     :items="getHistory"
                     :fields="fields">
-                    <template slot="market" slot-scope="row">
+                    <template slot="name" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
-                            <a :href="generatePairUrl(row.item.market)" class="text-white">{{ row.value.truncate }}</a>
+                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
                         </div>
                     </template>
-                     <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
-                     <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
                 </b-table>
                 <div v-if="!hasHistory">
                     <p class="text-center p-5">No deal was made yet</p>
@@ -45,7 +43,7 @@ export default {
             tableData: null,
             currentPage: 1,
             fields: {
-                timestamp: {label: 'Date', sortable: true},
+                date: {label: 'Date', sortable: true},
                 side: {label: 'Type', sortable: true},
                 market: {
                     label: 'Name',
@@ -91,12 +89,13 @@ export default {
             return this.tableData.map((history) => {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
-                    side: history.side,
+                    side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
                     market: history.market.base.symbol + '/' + history.market.quote.symbol,
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
                     total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
                     fee: toMoney(history.fee, history.market.base.subunit),
+                    pairUrl: this.generatePairUrl(history.market),
                 };
             });
         },
@@ -125,12 +124,6 @@ export default {
                         reject([]);
                     });
             });
-        },
-        getDate: function(timestamp) {
-           return moment.unix(timestamp).format(GENERAL.dateFormat);
-        },
-        getType: function(type) {
-           return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';
         },
         generatePairUrl: function(market) {
             if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
