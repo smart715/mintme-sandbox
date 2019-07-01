@@ -4,7 +4,7 @@
             <div class="table-responsive table-restricted" ref="table">
                 <b-table
                     v-if="hasHistory"
-                    :items="tableData"
+                    :items="getHistory"
                     :fields="fields">
                     <template slot="market" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
@@ -50,37 +50,32 @@ export default {
                 market: {
                     label: 'Name',
                     sortable: true,
-                    formatter: (market) => {
-                        let name = market.base.symbol + '/' + market.quote.symbol;
+                    formatter: (name) => {
                         return {
                             full: name,
-                            truncate: this.truncateFunc(name, 15),
+                            truncate: this.truncateFunc(name, 7),
                         };
                     },
                 },
                 amount: {
                     label: 'Amount',
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.quote.subunit)),
+                    formatter: formatMoney,
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
+                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
-                    formatter: (value, key, item) => {
-                        let tWF = new Decimal(item.amount).times(item.price);
-                        let f = new Decimal(item.fee);
-                        return formatMoney(toMoney(tWF.add(f).toString(), item.market.base.subunit));
-                    },
+                    formatter: formatMoney,
                 },
                 fee: {
                     label: 'Fee',
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
+                    formatter: formatMoney,
                 },
             },
         };
@@ -91,6 +86,19 @@ export default {
         },
         hasHistory: function() {
             return !!(Array.isArray(this.tableData) && this.tableData.length);
+        },
+        getHistory: function() {
+            return this.tableData.map((history) => {
+                return {
+                    date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
+                    side: history.side,
+                    market: history.market.base.symbol + '/' + history.market.quote.symbol,
+                    amount: toMoney(history.amount, history.market.base.subunit),
+                    price: toMoney(history.price, history.market.base.subunit),
+                    total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
+                    fee: toMoney(history.fee, history.market.base.subunit),
+                };
+            });
         },
     },
     mounted: function() {
