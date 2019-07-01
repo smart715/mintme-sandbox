@@ -3,6 +3,7 @@
         <template v-if="loaded">
             <div class="table-responsive table-restricted" ref="table">
                 <b-table
+                    ref="btable"
                     v-if="hasOrders"
                     :items="getHistory"
                     :fields="fields">
@@ -112,6 +113,25 @@ export default {
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
         },
+        getHistory: function() {
+            return this.tableData.map((order) => {
+                return {
+                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
+                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
+                    amount: toMoney(order.amount, order.market.base.subunit),
+                    price: toMoney(order.price, order.market.base.subunit),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
+                    fee: order.fee * 100 + '%',
+                    action: this.$routing.generate('orders_сancel', {
+                        base: order.market.base.symbol,
+                        quote: order.market.quote.symbol,
+                    }),
+                    id: order.id,
+                    pairUrl: this.generatePairUrl(order.market),
+                };
+            });
+        },
     },
     mounted: function() {
         Promise.all([
@@ -133,6 +153,9 @@ export default {
                     if ('order.update' === response.method &&
                         this.userId + getUserOffset() === response.params[1].user) {
                         this.updateOrders(response.params[1], response.params[0]);
+                        if (this.$refs.btable) {
+                            this.$refs.btable.refresh();
+                        }
                     }
                 }, 'active-tableData-update');
             })
@@ -153,31 +176,16 @@ export default {
                             this.currentPage++;
                         }
 
+                        if (this.$refs.btable) {
+                            this.$refs.btable.refresh();
+                        }
+
                         resolve(this.tableData);
                     })
                     .catch(() => {
                         this.$toasted.error('Can not update orders history. Try again later.');
                         reject([]);
                     });
-            });
-        },
-        getHistory: function() {
-            return this.tableData.map((order) => {
-                return {
-                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
-                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
-                    amount: toMoney(order.amount, order.market.base.subunit),
-                    price: toMoney(order.price, order.market.base.subunit),
-                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
-                    fee: order.fee * 100 + '%',
-                    action: this.$routing.generate('orders_сancel', {
-                        base: order.market.base.symbol,
-                        quote: order.market.quote.symbol,
-                    }),
-                    id: order.id,
-                    pairUrl: this.generatePairUrl(order.market),
-                };
             });
         },
         generatePairUrl: function(market) {
@@ -240,6 +248,9 @@ export default {
             }
 
             this.tableData.sort((a, b) => a.timestamp < b.timestamp);
+            if (this.$refs.btable) {
+                this.$refs.btable.refresh();
+            }
         },
     },
 };
