@@ -68,13 +68,11 @@
 </template>
 
 <script>
-import VeLine from 'v-charts';
+import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
 import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
 import {toMoney, EchartTheme as VeLineTheme} from '../../utils';
 import moment from 'moment';
-
-Vue.use(VeLine);
 
 export default {
     name: 'TradeChart',
@@ -232,6 +230,7 @@ export default {
     },
     components: {
         Guide,
+        VeCandle,
     },
 };
 </script>

@@ -142,6 +142,7 @@ export default function(precision) {
                 show: true,
                 rotate: 0,
                 margin: 8,
+                padding: [5, 0, 0, 0],
                 textStyle: {
                     color: '#fff',
                 },
