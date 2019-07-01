@@ -45,7 +45,7 @@ export default {
             fields: {
                 date: {label: 'Date', sortable: true},
                 side: {label: 'Type', sortable: true},
-                market: {
+                name: {
                     label: 'Name',
                     sortable: true,
                     formatter: (name) => {
@@ -90,7 +90,7 @@ export default {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
                     side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
-                    market: history.market.base.symbol + '/' + history.market.quote.symbol,
+                    name: history.market.base.symbol + '/' + history.market.quote.symbol,
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
                     total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
