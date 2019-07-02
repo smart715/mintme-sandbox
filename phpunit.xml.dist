@@ -16,6 +16,7 @@
         <env name="APP_DEBUG" value="1"/>
         <env name="APP_SECRET" value="632318237b6d7a41e40c6ee83f8e6385"/>
         <env name="KERNEL_CLASS" value="App\Kernel" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
         <!-- env name="TRUSTED_PROXIES" value="127.0.0.1,127.0.0.2" -->
         <!-- env name="TRUSTED_HOSTS" value="localhost,example.com" -->
         <!-- ###- symfony/framework-bundle ### -->
@@ -32,8 +33,6 @@
         <!-- For a generic SMTP server, use: "smtp://localhost:25?encryption=&auth_mode=" -->
         <!-- Delivery is disabled by default via "null://localhost" -->
         <env name="MAILER_URL" value="null://localhost"/>
-        <!-- ###- symfony/swiftmailer-bundle ### -->
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>
 
         <!-- ###+ google/recaptcha ### -->
         <!-- To use Google Recaptcha, you must register a site on Recaptcha's admin panel: -->
@@ -57,6 +56,7 @@
             <directory>tests/Controller</directory>
             <directory>tests/Repository</directory>
         </testsuite>
+        <testsuite name="nothing"></testsuite>
     </testsuites>
 
     <filter>
