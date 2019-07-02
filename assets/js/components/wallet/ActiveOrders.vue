@@ -48,7 +48,7 @@ import moment from 'moment';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {toMoney, formatMoney, getUserOffset} from '../../utils';
+import {toMoney, getUserOffset} from '../../utils';
 import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
 
 export default {

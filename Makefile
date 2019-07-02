@@ -1,24 +1,24 @@
 phpunit:
-	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" | ./vendor/bin/fastest "./vendor/bin/simple-phpunit -c phpunit.xml.dist {};"
+	find tests\ -name "*Test.php" | vendor\bin\fastest "vendor\bin\simple-phpunit -c phpunit.xml.dist {};"
 
 phpunit-c:
-	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
+	vendor\bin\simple-phpunit --coverage-html coverage-php
 
 karma:
 	npm run unit
 
 syntax_check:
-	php bin/console cache:warmup
-	./vendor/bin/phplint
-	./vendor/bin/phpcs -n
-	./vendor/bin/phpstan analyse
+	php bin\console cache:warmup
+	vendor\bin\phplint
+	vendor\bin\phpcs -n
+	vendor\bin\phpstan analyse
 
 syntax_check_assets:
 	npm run stylelint
 	npm run eslint
 
 syntax_correction:
-	./vendor/bin/phpcbf
+	vendor\bin\phpcbf
 
 syntax_correction_assets:
 	npm run eslint_fix

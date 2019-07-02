@@ -31,7 +31,7 @@
 <script>
 import moment from 'moment';
 import {Decimal} from 'decimal.js';
-import {toMoney, formatMoney} from '../../utils';
+import {toMoney} from '../../utils';
 import {GENERAL, WSAPI} from '../../utils/constants';
 import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
