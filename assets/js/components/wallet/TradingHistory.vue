@@ -4,7 +4,7 @@
             <div class="table-responsive table-restricted" ref="table">
                 <b-table
                     v-if="hasHistory"
-                    :items="getHistory"
+                    :items="history"
                     :fields="fields">
                     <template slot="name" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
@@ -51,29 +51,25 @@ export default {
                     formatter: (name) => {
                         return {
                             full: name,
-                            truncate: this.truncateFunc(name, 7),
+                            truncate: this.truncateFunc(name, 15),
                         };
                     },
                 },
                 amount: {
                     label: 'Amount',
                     sortable: true,
-                    formatter: formatMoney,
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
-                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
-                    formatter: formatMoney,
                 },
                 fee: {
                     label: 'Fee',
                     sortable: true,
-                    formatter: formatMoney,
                 },
             },
         };
@@ -85,7 +81,7 @@ export default {
         hasHistory: function() {
             return !!(Array.isArray(this.tableData) && this.tableData.length);
         },
-        getHistory: function() {
+        history: function() {
             return this.tableData.map((history) => {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),

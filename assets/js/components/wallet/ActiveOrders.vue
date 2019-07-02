@@ -5,7 +5,7 @@
                 <b-table
                     ref="btable"
                     v-if="hasOrders"
-                    :items="getHistory"
+                    :items="history"
                     :fields="fields">
                     <template slot="name" slot-scope="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
@@ -88,12 +88,10 @@ export default {
                 price: {
                     label: 'Price',
                     sortable: true,
-                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
-                    formatter: formatMoney,
                 },
                 fee: {label: 'Fee', sortable: true},
                 action: {label: 'Action', sortable: false},
@@ -113,7 +111,7 @@ export default {
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
         },
-        getHistory: function() {
+        history: function() {
             return this.tableData.map((order) => {
                 return {
                     date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
