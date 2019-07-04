@@ -2,10 +2,9 @@ import '../scss/main.sass';
 import Vue from 'vue';
 import VueBootstrap from 'bootstrap-vue';
 import fontawesome from '@fortawesome/fontawesome';
-import fas from '@fortawesome/fontawesome-free-solid';
 import fab from '@fortawesome/fontawesome-free-brands';
 import far from '@fortawesome/fontawesome-free-regular';
-import {faSearch, faCog} from '@fortawesome/free-solid-svg-icons';
+import {faSearch, faCog, fas} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import VueClipboard from 'vue-clipboard2';
 import VueTippy from 'vue-tippy';
@@ -67,4 +66,8 @@ new Vue({
 
 new Vue({
     el: '#footer',
+    components: {
+        FontAwesomeIcon,
+        FontAwesomeLayers,
+    },
 });
