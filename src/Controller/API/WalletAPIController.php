@@ -70,7 +70,7 @@ class WalletAPIController extends AbstractFOSRestController
      *      allowBlank=false,
      *      requirements="^[a-zA-Z0-9]+$"
      *     )
-     * @Rest\RequestParam(name="code")
+     * @Rest\RequestParam(name="code", allowBlank=false)
      */
     public function withdraw(
         ParamFetcherInterface $request,
@@ -98,7 +98,13 @@ class WalletAPIController extends AbstractFOSRestController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
+        if (!$user->isGoogleAuthenticatorEnabled()) {
+            return $this->view([
+                'error' => '2FA is not enabled',
+                ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$twoFactorManager->checkCode($user, $request->get('code'))) {
             return $this->view([
                 'error' => 'Invalid 2fa code',
                 ], Response::HTTP_UNAUTHORIZED);

@@ -232,6 +232,10 @@ export default {
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit) {
+            if (!this.twofa) {
+                this.$toasted.info('Please enable 2FA before withdrawing');
+                return;
+            }
             this.showModal = true;
             this.selectedCurrency = currency;
             this.withdraw.fee = toMoney(fee, subunit);
