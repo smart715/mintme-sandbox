@@ -13,7 +13,9 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template slot="name" slot-scope="data">
-                    {{ data.item.fullname }} ({{ data.item.name }})
+                    <a :href="generateCoinUrl(data.item)" class="text-white">
+                        {{ data.item.fullname }} ({{ data.item.name }})
+                    </a>
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -58,7 +60,7 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template slot="name" slot-scope="data">
-                    {{ data.item.name }}
+                    <a :href="generatePairUrl(data.item)" class="text-white">{{ data.item.name }}</a>
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -232,6 +234,10 @@ export default {
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit) {
+            if (!this.twofa) {
+                this.$toasted.info('Please enable 2FA before withdrawing');
+                return;
+            }
             this.showModal = true;
             this.selectedCurrency = currency;
             this.withdraw.fee = toMoney(fee, subunit);
@@ -298,6 +304,16 @@ export default {
             });
 
             return Object.values(tokens);
+        },
+        generatePairUrl: function(market) {
+            return this.$routing.generate('token_show', {name: market.name});
+        },
+        generateCoinUrl: function(coin) {
+            let params = {
+                base: !coin.exchangeble ? coin.name : this.predefinedTokens.BTC.name,
+                quote: coin.exchangeble && coin.tradable ? coin.name : this.predefinedTokens.WEB.name,
+            };
+            return this.$routing.generate('coin', params);
         },
     },
 };

@@ -90,12 +90,14 @@ class Crypto implements TradebleInterface
     }
 
     /** Show if crypto could be used as `base` currency */
+    /** @Groups({"API"}) */
     public function isTradable(): bool
     {
         return $this->tradable;
     }
 
     /** Show if crypto could be used as `quote` currency */
+    /** @Groups({"API"}) */
     public function isExchangeble(): bool
     {
         return $this->exchangeble;

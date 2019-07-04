@@ -7,7 +7,9 @@
                     :items="tableData"
                     :fields="fields">
                     <template slot="market" slot-scope="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <a :href="generatePairUrl(row.item.market)" class="text-white">{{ row.value.truncate }}</a>
+                        </div>
                     </template>
                      <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
                      <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
@@ -100,7 +102,6 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
                     .then((res) => {
                         res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
-
                         if (this.tableData === null) {
                             this.tableData = res.data;
                             this.currentPage++;
@@ -122,6 +123,13 @@ export default {
         },
         getType: function(type) {
            return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';
+        },
+        generatePairUrl: function(market) {
+            if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
+                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+            }
+
+            return this.$routing.generate('token_show', {name: market.quote.name});
         },
     },
 };
