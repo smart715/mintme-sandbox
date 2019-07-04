@@ -9,9 +9,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class BalanceViewFactory implements BalanceViewFactoryInterface
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
     /** @var TokenManagerInterface */
     private $tokenManager;
 
@@ -22,12 +19,10 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     private $tokenSubunit;
 
     public function __construct(
-        TokenStorageInterface $tokenStorage,
         TokenManagerInterface $tokenManager,
         TokenNameConverterInterface $tokenNameConverter,
         int $tokenSubunit
     ) {
-        $this->tokenStorage = $tokenStorage;
         $this->tokenManager = $tokenManager;
         $this->tokenNameConverter = $tokenNameConverter;
         $this->tokenSubunit = $tokenSubunit;
@@ -55,7 +50,6 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $subunit = $token->getCrypto()->getShowSubunit();
             }
 
-            $securityToken = $this->tokenStorage->getToken();
             $result[$token->getName()] = new BalanceView(
                 $this->tokenNameConverter->convert($token),
                 $this->tokenManager->getRealBalance(
@@ -66,7 +60,8 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $name,
                 $fee,
                 $subunit,
-                $securityToken && $token->getProfile() && $securityToken->getUser() === $token->getProfile()->getUser()
+                $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
+                $token->getCrypto() ? $token->getCrypto()->isTradable() : false
             );
         }
 

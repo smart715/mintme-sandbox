@@ -28,10 +28,10 @@ class BalanceViewFactoryTest extends TestCase
             ['name' => 'baz', 'hidden' => false, 'crypto' => false, 'lockIn' => true],
             ['name' => 'qux', 'hidden' => true, 'crypto' => false, 'lockIn' => false],
             ['name' => 'empty', 'hidden' => null, 'crypto' => false, 'lockIn' => false],
+            ['name' => 'lok', 'hidden' => false, 'crypto' => true, 'lockIn' => true],
         ];
 
         $factory = new BalanceViewFactory(
-            $this->mockTokenStorage(true, true),
             $this->mockTokenManager($tokens),
             $this->mockTokenNameConverter(),
             4
@@ -44,10 +44,11 @@ class BalanceViewFactoryTest extends TestCase
         );
 
         $this->assertEquals([
-            'foo' => ['1', '1', '1', 'FOO', 'fooBAR', 4, false, false],
-            'bar' => ['1', '1', null, 'FOO', 'barBAR', 4, false, false],
+            'foo' => ['1', '1', '1', 'FOO', 'fooBAR', 4, false, true],
+            'bar' => ['1', '1', null, 'FOO', 'barBAR', 4, true, true],
             'baz' => ['1', null, '1', 'baz', 'bazBAR', 4, false, false],
             'qux' => ['1', null, null, 'qux', 'quxBAR', 4, false, false],
+            'lok' => ['1', '1', '1', 'FOO', 'lokBAR', 4, true, true],
         ], array_map(function (BalanceView $view): array {
             return [
                 $view->getAvailable()->getAmount(),
@@ -56,8 +57,8 @@ class BalanceViewFactoryTest extends TestCase
                 $view->getFullname(),
                 $view->getIdentifier(),
                 $view->getSubunit(),
-                $view->isOwner(),
-                $view->isNotExchanged(),
+                $view->isExchangeble(),
+                $view->isTradable(),
             ];
         }, $view));
     }
@@ -72,17 +73,6 @@ class BalanceViewFactoryTest extends TestCase
         return $brc;
     }
 
-    private function mockTokenStorage(bool $hasToken, bool $hasUser): TokenStorageInterface
-    {
-        $ts = $this->createMock(TokenStorageInterface::class);
-        $tok = $this->createMock(TokenInterface::class);
-
-        $tok->method('getUser')->willReturn($hasUser ? $this->createMock(User::class) : null);
-        $ts->method('getToken')->willReturn($hasToken ? $tok : null);
-
-        return $ts;
-    }
-
     private function mockTokenManager(array $tokens): TokenManagerInterface
     {
         $tm = $this->createMock(TokenManagerInterface::class);
@@ -90,7 +80,7 @@ class BalanceViewFactoryTest extends TestCase
         $tm->method('findByName')->willReturnCallback(function ($name) use ($tokens): ?Token {
             foreach ($tokens as $token) {
                 if (false === $token['hidden'] && $token['name'] === $name) {
-                    return $this->mockToken($name, $token['crypto'], $token['lockIn']);
+                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden']);
                 }
             }
 
@@ -100,7 +90,7 @@ class BalanceViewFactoryTest extends TestCase
         $tm->method('findByHiddenName')->willReturnCallback(function ($name) use ($tokens): ?Token {
             foreach ($tokens as $token) {
                 if (true === $token['hidden'] && $token['name'] === $name) {
-                    return $this->mockToken($name, $token['crypto'], $token['lockIn']);
+                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden']);
                 }
             }
 
@@ -125,12 +115,12 @@ class BalanceViewFactoryTest extends TestCase
         return $converter;
     }
 
-    private function mockToken(string $name, bool $hasCrypto, bool $hasLockIn): Token
+    private function mockToken(string $name, bool $hasCrypto, bool $hasLockIn, bool $isHidden): Token
     {
         $tok = $this->createMock(Token::class);
         $tok->method('getName')->willReturn($name);
         $tok->method('getCrypto')->willReturn(
-            $hasCrypto ? $this->mockCrypto() : null
+            $hasCrypto ? $this->mockCrypto($isHidden) : null
         );
 
         $lockIn = $this->createMock(LockIn::class);
@@ -141,12 +131,14 @@ class BalanceViewFactoryTest extends TestCase
         return $tok;
     }
 
-    private function mockCrypto(): Crypto
+    private function mockCrypto(bool $isHidden): Crypto
     {
         $crypto = $this->createMock(Crypto::class);
         $crypto->method('getName')->willReturn('FOO');
         $crypto->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
         $crypto->method('getShowSubunit')->willReturn(4);
+        $crypto->method('isTradable')->willReturn(true);
+        $crypto->method('isExchangeble')->willReturn($isHidden ? false : true);
 
         return $crypto;
     }

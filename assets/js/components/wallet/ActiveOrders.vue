@@ -8,7 +8,9 @@
                     :items="getHistory"
                     :fields="fields">
                     <template slot="name" slot-scope="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
+                        </div>
                     </template>
                     <template slot="action" slot-scope="row">
                         <a @click="removeOrderModal(row.item)">
@@ -182,8 +184,15 @@ export default {
                         quote: order.market.quote.symbol,
                     }),
                     id: order.id,
+                    pairUrl: this.generatePairUrl(order.market),
                 };
             });
+        },
+        generatePairUrl: function(market) {
+            if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
+                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+            }
+            return this.$routing.generate('token_show', {name: market.quote.name});
         },
         removeOrderModal: function(row) {
             this.currentRow = row;
