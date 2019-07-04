@@ -70,7 +70,6 @@ class User extends BaseUser implements
     protected $email;
 
     /**
-     * @Assert\NotBlank()
      * @Assert\Length(min="8", max="72")
      * @Assert\Regex(
      *     pattern="/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/",
