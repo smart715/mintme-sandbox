@@ -201,6 +201,7 @@ class TokenController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $token = $em->getRepository(Token::class)->findOneBy(["name" => $name]);
+
         if ($token) {
             $em->remove($token);
             $em->flush();
