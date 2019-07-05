@@ -1,5 +1,8 @@
 <template>
     <div v-on-clickaway="cancelEditingMode">
+        <button v-if="editable" class="btn p-1" @click="deleteToken">
+            <img :src="deleteImage" alt="x" style="height: 20px;">
+        </button>
         <template v-if="editable">
             <input
                 type="text"
@@ -47,6 +50,7 @@ export default {
         identifier: String,
         updateUrl: String,
         editable: Boolean,
+        deleteImage: String,
     },
     components: {
         FontAwesomeIcon,
@@ -76,6 +80,18 @@ export default {
         }, 'token-name-asset-update');
     },
     methods: {
+        deleteToken: function() {
+            if (confirm('Are you sure to remove token?')) {
+                this.$axios.single.post('/token/' + this.name + '/delete')
+                    .then((response) => {
+                        if (response.data.result) {
+                            location.href = '/profile';
+                        } else {
+                            alert('Error delete token');
+                        }
+                    });
+            }
+        },
         checkIfTokenExchanged: function() {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
                 name: this.currentName,

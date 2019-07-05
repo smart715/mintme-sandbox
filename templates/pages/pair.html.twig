@@ -42,6 +42,7 @@
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
                                     token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
+                                    token-name="{{ token.name }}"
                                 >
                                 </token-introduction-profile>
 
@@ -71,6 +72,7 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
+                                        delete-image="{{ asset('build/images/x-icon.png') }}"
                                         update-url="{{ path('token_update', {'name': market.quote.name}) }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>
