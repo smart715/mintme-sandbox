@@ -83,7 +83,9 @@ class HackerController extends AbstractController
         $user = $this->getUser();
 
         /** @var string $referer */
-        $referer = null === $redirect ?$request->headers->get('referer') : $router->generate($redirect);
+        $referer = null === $redirect
+            ? $request->headers->get('referer')
+            : $router->generate($redirect);
 
         if (!$user || !$user->getProfile() || !($token = $user->getProfile()->getToken())) {
             return $this->redirect($referer);
