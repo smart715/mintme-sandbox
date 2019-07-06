@@ -195,22 +195,6 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/delete", methods={"POST"}, name="token_delete")
-     */
-    public function deleteAction(string $name): Response
-    {
-        $em = $this->getDoctrine()->getManager();
-        $token = $em->getRepository(Token::class)->findOneBy(["name" => $name]);
-
-        if ($token) {
-            $em->remove($token);
-            $em->flush();
-        }
-
-        return new Response(json_encode(["result" => true]));
-    }
-
-    /**
      * @Route("/{name}/website-confirmation", name="token_website_confirmation")
      */
     public function getWebsiteConfirmationFile(string $name): Response

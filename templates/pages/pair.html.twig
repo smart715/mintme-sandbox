@@ -42,7 +42,6 @@
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
                                     token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
-                                    token-name="{{ token.name }}"
                                 >
                                 </token-introduction-profile>
 
@@ -72,10 +71,17 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
-                                        delete-image="{{ asset('build/images/x-icon.png') }}"
                                         update-url="{{ path('token_update', {'name': market.quote.name}) }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>
+                            </div>
+                        </li>
+                        <li class="nav-item float-sm-right">
+                            <div class="nav-link px-0">
+                                <a href="{{ path('hacker-delete-token', { redirect: 'profile' }) }}" class="btn px-1 py-0">
+                                    <img src="{{ asset('build/images/x-icon.png') }}" alt="&times;"
+                                         style="height: 18px;" class="d-block my-auto">
+                                </a>
                             </div>
                         </li>
                         <div class="clearfix"></div>

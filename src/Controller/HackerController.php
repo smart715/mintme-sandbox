@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @Route("/hacker")
@@ -75,14 +76,14 @@ class HackerController extends AbstractController
         return $this->redirect($referer);
     }
 
-    /** @Route("/token/delete", name="hacker-delete-token", options={"expose"=true}) */
-    public function deleteToken(Request $request): RedirectResponse
+    /** @Route("/token/delete/{redirect}", name="hacker-delete-token", options={"expose"=true}) */
+    public function deleteToken(Request $request, UrlGeneratorInterface $router, ?string $redirect = null): RedirectResponse
     {
         /** @var User|null $user */
         $user = $this->getUser();
 
         /** @var string $referer */
-        $referer = $request->headers->get('referer');
+        $referer = null === $redirect ?$request->headers->get('referer') : $router->generate($redirect);
 
         if (!$user || !$user->getProfile() || !($token = $user->getProfile()->getToken())) {
             return $this->redirect($referer);
