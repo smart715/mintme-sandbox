@@ -76,12 +76,13 @@
                                 </token-name>
                             </div>
                         </li>
-                        <li class="nav-item float-sm-right">
+                        <li class="nav-item float-sm-right" v-if="{{ isOwner ? 'true' : 'false' }}">
                             <div class="nav-link px-0">
-                                <a href="{{ path('hacker-delete-token', { redirect: 'profile' }) }}" class="btn px-1 py-0">
-                                    <img src="{{ asset('build/images/x-icon.png') }}" alt="&times;"
-                                         style="height: 18px;" class="d-block my-auto">
-                                </a>
+                                <token-delete
+                                    delete-url="{{ path('token_delete', {'name': market.quote.name}) }}"
+                                    delete-image="{{ asset('build/images/x-icon.png') }}"
+                                >    
+                                </token-delete>
                             </div>
                         </li>
                         <div class="clearfix"></div>

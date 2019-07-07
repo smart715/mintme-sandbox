@@ -12,6 +12,7 @@ use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
@@ -330,5 +331,35 @@ class TokensAPIController extends AbstractFOSRestController
         return $this->view(
             !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Delete("/{name}/delete", name="token_delete")
+     * @Rest\RequestParam(name="name", nullable=true)
+     */
+    public function delete(
+        ParamFetcherInterface $request,
+        ProfileManagerInterface $profileManager,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($token);
+        $em->flush();
+
+        $this->userActionLogger->info('Delete token', $request->all());
+
+        $profile = $profileManager->getProfile($this->getUser());
+        $pageUrl = $profile->getPageUrl();
+
+        return $this->view(['pageUrl' => $pageUrl], 202);
     }
 }

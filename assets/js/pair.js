@@ -4,6 +4,7 @@ import TokenIntroductionProfile from './components/token/introduction/TokenIntro
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenName from './components/token/TokenName';
+import TokenDelete from './components/token/TokenDelete';
 import store from './storage';
 
 new Vue({
@@ -22,6 +23,7 @@ new Vue({
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
     TokenName,
+    TokenDelete,
     Tabs,
   },
   methods: {

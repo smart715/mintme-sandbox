@@ -13,7 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @Route("/hacker")
@@ -72,28 +71,6 @@ class HackerController extends AbstractController
         $userManager->updateUser($user);
 
         $request->getSession()->invalidate();
-
-        return $this->redirect($referer);
-    }
-
-    /** @Route("/token/delete/{redirect}", name="hacker-delete-token", options={"expose"=true}) */
-    public function deleteToken(Request $request, UrlGeneratorInterface $router, ?string $redirect = null): RedirectResponse
-    {
-        /** @var User|null $user */
-        $user = $this->getUser();
-
-        /** @var string $referer */
-        $referer = null === $redirect
-            ? $request->headers->get('referer')
-            : $router->generate($redirect);
-
-        if (!$user || !$user->getProfile() || !($token = $user->getProfile()->getToken())) {
-            return $this->redirect($referer);
-        }
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($token);
-        $em->flush();
 
         return $this->redirect($referer);
     }
