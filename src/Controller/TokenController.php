@@ -125,6 +125,7 @@ class TokenController extends Controller
                 $tokenNameConverter->convert($token) :
                 '',
             'precision' => $this->getParameter('token_precision'),
+            'deploy_cost' => $this->getParameter('deploy_cost'),
         ]);
     }
 

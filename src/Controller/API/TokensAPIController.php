@@ -331,4 +331,21 @@ class TokensAPIController extends AbstractFOSRestController
             !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
         );
     }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/is-deployed", name="is_token_deployed", options={"expose"=true})
+     */
+    public function isTokenDeployed(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(
+            false
+        );
+    }
 }

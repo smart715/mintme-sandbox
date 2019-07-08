@@ -81,7 +81,8 @@
                                 <token-deploy
                                     :is-owner="{{ isOwner ? 'true' : 'false' }}"
                                     name="{{ market.quote.name }}"
-                                    :cost="99512"
+                                    :precision="{{ precision }}"
+                                    :usd-cost="{{ deploy_cost }}"
                                 />
                             </div>
                         </li>
