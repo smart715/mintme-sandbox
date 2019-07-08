@@ -65,7 +65,7 @@
                         </b-tab>
                     {% endif %}
                     <template slot="tabs">
-                        <li class="nav-item float-sm-right">
+                        <li class="nav-item float-md-right">
                             <div class="nav-link">
                                 <token-name
                                         websocket-url="{{ global_websocket_url }}"
@@ -74,6 +74,15 @@
                                         update-url="{{ path('token_update', {'name': market.quote.name}) }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>
+                            </div>
+                        </li>
+                        <li class="nav-item float-md-right">
+                            <div class="nav-link pr-md-0">
+                                <token-deploy
+                                    :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                    name="{{ market.quote.name }}"
+                                    :cost="99512"
+                                />
                             </div>
                         </li>
                         <div class="clearfix"></div>
