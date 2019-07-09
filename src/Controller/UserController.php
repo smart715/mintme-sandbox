@@ -125,7 +125,10 @@ class UserController extends AbstractController
         $backupCodes = $this->turnOnAuthenticator($twoFactorManager, $user)?: [];
 
         if (!empty($backupCodes)) {
-            return $this->redirectToRoute('backup_codes', ['backupCodes' => json_encode($backupCodes),]);
+            $session = $this->getRequest()->getSession();
+            $session->set('backupCodes' => json_encode($backupCodes));
+
+            return $this->redirectToRoute('backup_codes');
         }
 
         return $this->render('security/2fa_manager.html.twig', $parameters);
@@ -136,7 +139,8 @@ class UserController extends AbstractController
      */
     public function renderBackupCodes(Request $request): Response
     {
-        $backupCodes = json_decode($request->request->get('backupCodes'))?:[];
+        $session = $this->getRequest()->getSession();
+        $backupCodes = json_decode($session->get('backupCodes'))?: [];
 
         return $this->render('security/2fa_backup_codes.html.twig', ['backupCodes' => $backupCodes,]);
     }
