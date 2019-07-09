@@ -22,7 +22,6 @@ export default {
     name: 'passwordmeter',
     props: {
         password: String,
-        inline: Boolean,
     },
     data: function() {
         return {
