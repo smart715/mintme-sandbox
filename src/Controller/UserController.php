@@ -126,7 +126,7 @@ class UserController extends AbstractController
 
         if (!empty($backupCodes)) {
             $session = $this->getRequest()->getSession();
-            $session->set('backupCodes' => json_encode($backupCodes));
+            $session->set('backupCodes', json_encode($backupCodes));
 
             return $this->redirectToRoute('backup_codes');
         }
