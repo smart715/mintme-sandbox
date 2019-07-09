@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityRepository;
 
 class PendingWithdrawRepository extends EntityRepository
 {
+    /** @codeCoverageIgnore */
     public function getWithdrawByHash(string $hash): ?PendingWithdraw
     {
         $datetime = new DateTimeImmutable('now - '.PendingWithdraw::EXPIRES_HOURS.' hours');
