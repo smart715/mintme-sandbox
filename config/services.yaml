@@ -205,8 +205,7 @@ services:
     App\Exchange\Trade\Config\PrelaunchConfig:
         arguments:
             - "%prelaunch_finish_datetime%"
-            - "%prelaunch_referral_trading_period%"
-            - "%prelaunch_referral_fee%"
+            - "%referral_fee%"
             - "%prelaunch_autostart%"
 
     App\Security\PrelaunchVoter:

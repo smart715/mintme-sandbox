@@ -24,8 +24,7 @@ parameters:
     token_quantity: 10000000
     prelaunch_autostart: true
     prelaunch_finish_datetime: '2019-04-01 10:00:00'
-    prelaunch_referral_trading_period: P1Y
-    prelaunch_referral_fee: 0.5
+    referral_fee: 0.5
     google_tracking_id: UA-2289508-20
     tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
     token_precision: 4

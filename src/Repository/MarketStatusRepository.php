@@ -7,11 +7,13 @@ use Doctrine\ORM\EntityRepository;
 
 class MarketStatusRepository extends EntityRepository
 {
+    /** @codeCoverageIgnore */
     public function findByName(string $tokenName): ?MarketStatus
     {
         return $this->findOneBy(['tokenName' => $tokenName]);
     }
 
+    /** @codeCoverageIgnore */
     public function findByBaseQuoteNames(string $base, string $quote): ?MarketStatus
     {
         return $this->createQueryBuilder('m')
