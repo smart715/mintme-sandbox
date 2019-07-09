@@ -108,7 +108,6 @@ class UserController extends AbstractController
             'form' => $form->createView(),
             'imgUrl' => $imgUrl ?? '',
             'formHeader' => $formHeader ?? 'Disable two-factor authentication',
-            'backupCodes' => [],
             'isTwoFactor' => $isTwoFactor,
             'twoFactorKey' => $user->getGoogleAuthenticatorSecret(),
         ];
@@ -123,8 +122,11 @@ class UserController extends AbstractController
             return $this->redirectToRoute('settings');
         }
 
-        $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
-        unset($form);
+        $backupCodes = $this->turnOnAuthenticator($twoFactorManager, $user)?: [];
+
+        if (!empty($backupCodes)) {
+            return $this->render('security/2fa_backup_codes.html.twig', ['backupCodes' => $backupCodes,]);
+        }
 
         return $this->render('security/2fa_manager.html.twig', $parameters);
     }
