@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -36,16 +37,21 @@ class UserController extends AbstractController
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var SessionInterface */
+    private $session;
+
     public function __construct(
         UserManagerInterface $userManager,
         ProfileManagerInterface $profileManager,
         UserActionLogger $userActionLogger,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        SessionInterface $session
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
+        $this->session = $session;
     }
 
     /**
@@ -125,8 +131,7 @@ class UserController extends AbstractController
         $backupCodes = $this->turnOnAuthenticator($twoFactorManager, $user)?: [];
 
         if (!empty($backupCodes)) {
-            $session = $this->getRequest()->getSession();
-            $session->set('backupCodes', json_encode($backupCodes));
+            $this->session->set('backupCodes', json_encode($backupCodes));
 
             return $this->redirectToRoute('backup_codes');
         }
@@ -139,8 +144,7 @@ class UserController extends AbstractController
      */
     public function renderBackupCodes(Request $request): Response
     {
-        $session = $this->getRequest()->getSession();
-        $backupCodes = json_decode($session->get('backupCodes'))?: [];
+        $backupCodes = json_decode($this->session->get('backupCodes'))?: [];
 
         return $this->render('security/2fa_backup_codes.html.twig', ['backupCodes' => $backupCodes,]);
     }
