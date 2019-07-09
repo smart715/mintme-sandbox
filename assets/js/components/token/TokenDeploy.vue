@@ -19,7 +19,7 @@
                         </p>
                         <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) }}</p>
                         <div class="pt-3">
-                            <button :disabled="costExceed" class="btn btn-info">Deploy to blockchain</button>
+                            <button :disabled="costExceed" @click="deploy" class="btn btn-info">Deploy to blockchain</button>
                             <span class="btn-cancel pl-3 c-pointer" @click="setModalVisible(false)">Cancel</span>
                         </div>
                     </div>
@@ -44,11 +44,12 @@ export default {
         name: String,
         isOwner: Boolean,
         precision: Number,
+        deployedProp: Boolean,
         usdCost: Number,
     },
     data() {
         return {
-            deployed: null,
+            deployed: this.deployedProp,
             modalVisible: false,
             webCost: null,
         };
@@ -58,22 +59,16 @@ export default {
             return this.isOwner && !this.deployed;
         },
         visible: function() {
-            return this.deployed !== null && this.webCost !== null;
+            return this.webCost !== null;
         },
         costExceed: function() {
-            return this.webCost > this.baseBalance;
+            return new Decimal(this.webCost).greaterThan(this.baseBalance);
         },
         ...mapGetters('makeOrder', {
             baseBalance: 'getBaseBalance',
         }),
     },
     methods: {
-        checkIfDeployed: function() {
-            this.$axios.retry.get(this.$routing.generate('is_token_deployed', {
-                name: this.name,
-            }))
-            .then(({data}) => this.deployed = data);
-        },
         convertCostToWeb: function() {
             this.$axios.single.get(API_URL, {
                 params: {
@@ -82,6 +77,17 @@ export default {
                 },
             })
             .then(({data}) => this.webCost = new Decimal(this.usdCost).div(data.webchain.usd));
+        },
+        deploy: function() {
+            this.$axios.single.patch(this.$routing.generate('token_deploy', {
+                name: this.name,
+            }))
+            .then(() => {
+                this.deploy = true;
+                this.setModalVisible(false);
+                this.$toasted.success('Deployed successfully');
+            })
+            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
         },
         setModalVisible: function(visible) {
             this.modalVisible = visible;
@@ -93,7 +99,6 @@ export default {
         },
     },
     mounted() {
-        this.checkIfDeployed();
         this.convertCostToWeb();
     },
     components: {

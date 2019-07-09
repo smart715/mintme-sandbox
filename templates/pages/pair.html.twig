@@ -82,7 +82,8 @@
                                     :is-owner="{{ isOwner ? 'true' : 'false' }}"
                                     name="{{ market.quote.name }}"
                                     :precision="{{ precision }}"
-                                    :usd-cost="{{ deploy_cost }}"
+                                    :deployed-prop="{{ token.isDeployed | json_encode }}"
+                                    :usd-cost="{{ deployCost }}"
                                 />
                             </div>
                         </li>

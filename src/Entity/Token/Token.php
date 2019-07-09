@@ -105,6 +105,12 @@ class Token implements TradebleInterface
     protected $crypto;
 
     /**
+     * @ORM\Column(type="boolean")
+     * @var bool
+     */
+    protected $deployed;
+
+    /**
      * @ORM\Column(type="datetime_immutable")
      * @var \DateTimeImmutable
      */
@@ -241,6 +247,18 @@ class Token implements TradebleInterface
     public function getProfile(): ?Profile
     {
         return $this->profile;
+    }
+
+    public function setDeployed(): self
+    {
+        $this->deployed = true;
+
+        return $this;
+    }
+    
+    public function isDeployed(): bool
+    {
+        return $this->deployed;
     }
 
     public static function getFromCrypto(Crypto $crypto): self

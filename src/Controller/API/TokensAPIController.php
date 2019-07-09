@@ -334,18 +334,27 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{name}/is-deployed", name="is_token_deployed", options={"expose"=true})
+     * @Rest\Patch("/{name}/deploy", name="token_deploy", options={"expose"=true})
      */
-    public function isTokenDeployed(string $name): View
-    {
+    public function deploy(
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw new ApiNotFoundException('Token does not exist');
         }
 
-        return $this->view(
-            false
-        );
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        $token->setDeployed();
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $this->userActionLogger->info('Deploy Token', ['name' => $name]);
+
+        return $this->view([], Response::HTTP_ACCEPTED);
     }
 }
