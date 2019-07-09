@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Entity\Token\LockIn;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
@@ -347,7 +348,9 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        $this->denyAccessUnlessGranted('edit', $token);
+        if (!$this->isGranted('edit', $token)) {
+            throw new ApiUnauthorizedException('Unauthorized');
+        }
 
         $token->setDeployed();
         $this->em->persist($token);
@@ -355,6 +358,6 @@ class TokensAPIController extends AbstractFOSRestController
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
 
-        return $this->view([], Response::HTTP_ACCEPTED);
+        return $this->view();
     }
 }
