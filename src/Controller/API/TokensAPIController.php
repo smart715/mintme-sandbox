@@ -352,6 +352,8 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiUnauthorizedException('Unauthorized');
         }
 
+        //TODO: deploy the token to blockchain
+
         $token->setDeployed();
         $this->em->persist($token);
         $this->em->flush();
