@@ -10,9 +10,7 @@ use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
 use App\Exchange\Trade\Config\PrelaunchConfig;
-use App\Repository\UserRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Utils\DateTimeInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,9 +36,6 @@ class Trader implements TraderInterface
     /** @var PrelaunchConfig */
     private $prelaunchConfig;
 
-    /** @var DateTimeInterface */
-    private $time;
-
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
 
@@ -56,7 +51,6 @@ class Trader implements TraderInterface
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
         PrelaunchConfig $prelaunchConfig,
-        DateTimeInterface $time,
         MarketNameConverterInterface $marketNameConverter,
         NormalizerInterface $normalizer,
         LoggerInterface $logger
@@ -66,7 +60,6 @@ class Trader implements TraderInterface
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->prelaunchConfig = $prelaunchConfig;
-        $this->time = $time;
         $this->marketNameConverter = $marketNameConverter;
         $this->normalizer = $normalizer;
         $this->logger = $logger;
@@ -169,8 +162,7 @@ class Trader implements TraderInterface
 
     private function isReferralFeeEnabled(): bool
     {
-        return !$this->prelaunchConfig->isEnabled() &&
-            $this->prelaunchConfig->getTradeFinishDate()->getTimestamp() > $this->time->now()->getTimestamp();
+        return !$this->prelaunchConfig->isEnabled();
     }
 
     private function updateUserReferrencer(User $user, Token $token): void
