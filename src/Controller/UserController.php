@@ -118,7 +118,6 @@ class UserController extends AbstractController
         }
 
         if ($isTwoFactor &&  $twoFactorManager->checkCode($user, $form->get('code')->getData())) {
-            )
             $this->turnOffAuthenticator($twoFactorManager);
 
             return $this->redirectToRoute('settings');
