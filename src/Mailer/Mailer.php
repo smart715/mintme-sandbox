@@ -11,6 +11,7 @@ use Swift_Message;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
 
+/** @codeCoverageIgnore */
 class Mailer implements MailerInterface, AuthCodeMailerInterface
 {
     /** @var string */
