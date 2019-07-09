@@ -7,6 +7,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
+/** @codeCoverageIgnore */
 class PaymentProducer extends Producer
 {
     private const QUEUE_NAME = 'payment';

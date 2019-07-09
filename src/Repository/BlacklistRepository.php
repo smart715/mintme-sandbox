@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 
 class BlacklistRepository extends EntityRepository
 {
+    /** @codeCoverageIgnore */
     public function matchValue(string $value, string $type, bool $isSensetive = true): bool
     {
         $valCondition = $isSensetive ?

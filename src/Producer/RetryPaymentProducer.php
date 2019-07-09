@@ -7,6 +7,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
+/** @codeCoverageIgnore */
 class RetryPaymentProducer extends Producer
 {
     private const CALLBACK_EXCHANGE_NAME        = 'payment-callback-exchange';
