@@ -48,7 +48,7 @@ import moment from 'moment';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {toMoney, getUserOffset} from '../../utils';
+import {toMoney, formatMoney, getUserOffset} from '../../utils';
 import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
 
 export default {
@@ -88,10 +88,12 @@ export default {
                 price: {
                     label: 'Price',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 fee: {label: 'Fee', sortable: true},
                 action: {label: 'Action', sortable: false},

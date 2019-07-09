@@ -31,7 +31,7 @@
 <script>
 import moment from 'moment';
 import {Decimal} from 'decimal.js';
-import {toMoney} from '../../utils';
+import {toMoney, formatMoney} from '../../utils';
 import {GENERAL, WSAPI} from '../../utils/constants';
 import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
@@ -58,18 +58,22 @@ export default {
                 amount: {
                     label: 'Amount',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
+                    formatter: formatMoney,
                 },
                 fee: {
                     label: 'Fee',
                     sortable: true,
+                    formatter: formatMoney,
                 },
             },
         };
