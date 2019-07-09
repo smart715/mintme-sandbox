@@ -8,11 +8,13 @@ use Doctrine\ORM\EntityRepository;
 
 class TokenRepository extends EntityRepository
 {
+    /** @codeCoverageIgnore */
     public function findByName(string $name): ?Token
     {
         return $this->findOneBy(['name' => $name]);
     }
 
+    /** @codeCoverageIgnore */
     public function findByUrl(string $name): ?Token
     {
         return $this->createQueryBuilder('token')
@@ -22,7 +24,10 @@ class TokenRepository extends EntityRepository
             ->getOneOrNullResult();
     }
 
-    /** @return Token[] */
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
     public function findTokensByPattern(string $pattern): array
     {
         return $this->createQueryBuilder('token')
