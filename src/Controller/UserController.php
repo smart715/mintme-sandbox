@@ -140,7 +140,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/2fa/backup-codes", name="backup_codes")
+     * @Route("/settings/codes", name="backup_codes")
      */
     public function renderBackupCodes(Request $request): Response
     {
