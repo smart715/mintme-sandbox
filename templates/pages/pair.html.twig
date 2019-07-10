@@ -80,8 +80,11 @@
                             <div class="nav-link px-0">
                                 <token-delete
                                     delete-url="{{ path('token_delete', {'name': market.quote.name}) }}"
+                                    send-code-url="{{ path('token_send_code', {'name': market.quote.name}) }}"
                                     delete-image="{{ asset('build/images/x-icon.png') }}"
-                                >    
+                                    unavailable-delete-image="{{ asset('build/images/x-icon-grey.png') }}"
+                                    name="{{ market.quote.name }}"
+                                >
                                 </token-delete>
                             </div>
                         </li>

@@ -116,6 +116,12 @@ class Token implements TradebleInterface
      */
     protected $relatedUsers;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @var int|null
+     */
+    protected $confirmCode;
+
     /** @return User[] */
     public function getRelatedUsers(): array
     {
@@ -259,5 +265,26 @@ class Token implements TradebleInterface
         $this->created = new \DateTimeImmutable();
 
         return $this;
+    }
+
+    public function getConfirmCode(): ?int
+    {
+        return $this->confirmCode;
+    }
+
+    /**
+     * @param int|null $confirmCode
+     * @return Token
+     */
+    public function setConfirmCode(?int $confirmCode): self
+    {
+        $this->confirmCode = $confirmCode;
+
+        return $this;
+    }
+
+    public function checkConfirmCode(?int $confirmCode): bool
+    {
+        return $confirmCode === $this->confirmCode;
     }
 }

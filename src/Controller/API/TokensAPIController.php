@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
+use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -11,9 +12,11 @@ use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
+use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\TwoFactorManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
@@ -335,12 +338,14 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Delete("/{name}/delete", name="token_delete")
+     * @Rest\Post("/{name}/delete", name="token_delete")
      * @Rest\RequestParam(name="name", nullable=true)
+     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function delete(
         ParamFetcherInterface $request,
-        ProfileManagerInterface $profileManager,
+        TwoFactorManagerInterface $twoFactorManager,
+        BalanceHandlerInterface $balanceHandler,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -351,15 +356,65 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($token);
-        $em->flush();
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user->isGoogleAuthenticatorEnabled()) {
+            if (!$twoFactorManager->checkCode($user, $request->get('code'))) {
+                throw new ApiNotFoundException('Invalid 2fa code');
+            }
+        } else {
+            if (!$token->checkConfirmCode((int) $request->get('code'))) {
+                throw new ApiNotFoundException('Invalid 2fa code');
+            }
+        }
+
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new ApiBadRequestException('You need all your tokens to change token\'s name');
+        }
+
+        $this->em->remove($token);
+        $this->em->flush();
 
         $this->userActionLogger->info('Delete token', $request->all());
 
-        $profile = $profileManager->getProfile($this->getUser());
-        $pageUrl = $profile->getPageUrl();
+        return $this->view(['message' => 'Token successfully deleted'], 202);
+    }
 
-        return $this->view(['pageUrl' => $pageUrl], 202);
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/send-code", name="token_send_code")
+     */
+    public function sendCode(
+        MailerInterface $mailer,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (null === $user) {
+            throw new ApiNotFoundException('Invalid user');
+        }
+
+        $message = null;
+
+        if (!$user->isGoogleAuthenticatorEnabled()) {
+            $token->setConfirmCode(rand(100000, 999999));
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($token);
+            $em->flush();
+            $mailer->sendTokenDeletionConfirmCode($user, $token);
+            $message = "Code for confirmation of token deletion was send to email.";
+        }
+
+        return $this->view(['message' => $message], 202);
     }
 }

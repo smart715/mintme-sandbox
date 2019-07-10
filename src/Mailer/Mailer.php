@@ -3,6 +3,7 @@
 namespace App\Mailer;
 
 use App\Entity\PendingWithdraw;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
@@ -68,6 +69,24 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         ]);
 
         $msg = (new Swift_Message('Confirm authentication'))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmailAuthRecipient())
+            ->setBody($body)
+            ->setContentType('text/html');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendTokenDeletionConfirmCode(
+        TwoFactorInterface $user,
+        Token $token
+    ): void {
+        $body = $this->twigEngine->render('mail/token_deletion_code.html.twig', [
+            'email' => $user->getEmailAuthRecipient(),
+            'code' => $token->getConfirmCode(),
+        ]);
+
+        $msg = (new Swift_Message('Confirm token deletion'))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmailAuthRecipient())
             ->setBody($body)
