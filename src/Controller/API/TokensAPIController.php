@@ -397,7 +397,6 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        /** @var User $user */
         $user = $this->getUser();
 
         if (!$user) {
