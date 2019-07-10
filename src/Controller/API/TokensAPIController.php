@@ -400,7 +400,7 @@ class TokensAPIController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
-        if (null === $user) {
+        if (!$user) {
             throw new ApiNotFoundException('Invalid user');
         }
 
