@@ -6,7 +6,7 @@
                 v-model.trim="$v.newName.$model"
                 v-if="editingName"
                 ref="tokenNameInput"
-                class="token-name-input"
+                class="token-name-input token-name-font"
                 :class="{ 'is-invalid': $v.$invalid }">
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -15,7 +15,7 @@
                 @click="editName"
             />
         </template>
-        <span v-if="!editingName" v-b-tooltip="{title: currentName, boundary:'viewport'}">
+        <span v-if="!editingName" class="token-name-font" v-b-tooltip="{title: currentName, boundary:'viewport'}">
             {{ currentName | truncate(7) }}
         </span>
     </div>
