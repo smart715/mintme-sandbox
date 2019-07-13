@@ -95,8 +95,6 @@ import {toMoney} from '../../utils';
 
 const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
-
 export default {
     name: 'WithdrawModal',
     components: {
