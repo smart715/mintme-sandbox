@@ -15,6 +15,8 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use App\Serializer\TradableNormalizer;
+use App\Utils\Converter\TokenNameConverter;
 use App\Utils\Verify\WebsiteVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -95,6 +97,13 @@ class TokensAPIController extends AbstractFOSRestController
         $form->submit(array_filter($request->all(), function ($value) {
             return null !== $value;
         }), false);
+
+        if ($this->tokenManager->isExisted($token)) {
+            return $this->view(
+                'Token name is already exists.',
+                Response::HTTP_BAD_REQUEST
+            );
+        }
 
         if (!$form->isValid()) {
             foreach ($form->all() as $childForm) {

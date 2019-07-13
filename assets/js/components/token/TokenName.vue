@@ -39,6 +39,7 @@ Vue.use(Toasted, {
 });
 
 const HTTP_ACCEPTED = 202;
+const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenName',
@@ -137,9 +138,7 @@ export default {
                     this.cancelEditingMode();
                 }
             }, (error) => {
-                if (!error.response) {
-                    this.$toasted.error('Network error');
-                } else if (error.response.data.message) {
+                if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data.message);
                 } else {
                     this.$toasted.error('An error has occurred, please try again later');
@@ -159,7 +158,7 @@ export default {
                 required,
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
-                maxLength: maxLength(60),
+                maxLength: maxLength(this.maxLength),
             },
         };
     },
