@@ -97,7 +97,7 @@ class TokenController extends Controller
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
-            return $this->redirectToOwnToken($tab);
+            return $this->redirectToRoute('token_show', ['name' => $dashedName]);
         }
 
         $token = $this->tokenManager->findByName($name);
