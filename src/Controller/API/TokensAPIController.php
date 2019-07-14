@@ -410,7 +410,12 @@ class TokensAPIController extends AbstractFOSRestController
             $em = $this->getDoctrine()->getManager();
             $em->persist($token);
             $em->flush();
-            $mailer->sendTokenDeletionConfirmCode($user, $token);
+            $mailer->sendAuthCodeToMail(
+                'Confirm token deletion',
+                'Your code to confirm token deletion:',
+                $user,
+                (string) $token->getConfirmCode()
+            );
             $message = "Code for confirmation of token deletion was send to email.";
         }
 

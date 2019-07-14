@@ -63,30 +63,27 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
     public function sendAuthCode(TwoFactorInterface $user): void
     {
-        $body = $this->twigEngine->render('mail/auth_verification_code.html.twig', [
-            'email' => $user->getEmailAuthRecipient(),
-            'code' => $user->getEmailAuthCode(),
-        ]);
-
-        $msg = (new Swift_Message('Confirm authentication'))
-            ->setFrom([$this->mail => 'Mintme'])
-            ->setTo($user->getEmailAuthRecipient())
-            ->setBody($body)
-            ->setContentType('text/html');
-
-        $this->mailer->send($msg);
+        $this->sendAuthCodeToMail(
+            'Confirm authentication',
+            'You verification code:',
+            $user,
+            $user->getEmailAuthCode()
+        );
     }
 
-    public function sendTokenDeletionConfirmCode(
+    public function sendAuthCodeToMail(
+        string $subject,
+        string $label,
         TwoFactorInterface $user,
-        Token $token
+        string $code
     ): void {
-        $body = $this->twigEngine->render('mail/token_deletion_code.html.twig', [
+        $body = $this->twigEngine->render('mail/auth_verification_code.html.twig', [
+            'label' => $label,
             'email' => $user->getEmailAuthRecipient(),
-            'code' => $token->getConfirmCode(),
+            'code' => $code,
         ]);
 
-        $msg = (new Swift_Message('Confirm token deletion'))
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmailAuthRecipient())
             ->setBody($body)

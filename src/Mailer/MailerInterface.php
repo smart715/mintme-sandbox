@@ -10,5 +10,5 @@ use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 interface MailerInterface
 {
     public function sendWithdrawConfirmationMail(User $user, PendingWithdraw $withdrawData): void;
-    public function sendTokenDeletionConfirmCode(TwoFactorInterface $user, Token $token): void;
+    public function sendAuthCodeToMail(string $subject, string $label, TwoFactorInterface $user, string $code): void;
 }
