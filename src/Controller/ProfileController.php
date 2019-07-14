@@ -59,10 +59,17 @@ class ProfileController extends Controller
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->merge($profile);
         $entityManager->flush();
+        
+        $pageUrl = $profile->getPageUrl();
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            unset($form);
+            $form = $this->createForm(ProfileType::class, $profile);
+        }
 
         $this->userActionLogger->info('Edit profile');
 
-        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $pageUrl ]);
     }
 
     /** @Route(name="profile") */
