@@ -6,6 +6,7 @@ use App\Entity\Token\LockIn;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
@@ -359,14 +360,10 @@ class TokensAPIController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
-        if ($user->isGoogleAuthenticatorEnabled()) {
-            if (!$twoFactorManager->checkCode($user, $request->get('code'))) {
-                throw new ApiNotFoundException('Invalid 2fa code');
-            }
-        } else {
-            if (!$token->checkConfirmCode((int) $request->get('code'))) {
-                throw new ApiNotFoundException('Invalid 2fa code');
-            }
+        if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
+            throw new ApiUnauthorizedException('Invalid 2fa code');
+        } else if (!$token->checkConfirmCode((int) $request->get('code'))) {
+            throw new ApiUnauthorizedException('Invalid 2fa code');
         }
 
         if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
@@ -400,7 +397,7 @@ class TokensAPIController extends AbstractFOSRestController
         $user = $this->getUser();
 
         if (!$user) {
-            throw new ApiNotFoundException('Invalid user');
+            throw new ApiUnauthorizedException('Invalid user');
         }
 
         $message = null;
