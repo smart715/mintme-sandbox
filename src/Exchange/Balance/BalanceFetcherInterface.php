@@ -17,4 +17,5 @@ interface BalanceFetcherInterface
 
     public function summary(string $tokenName): SummaryResult;
     public function balance(int $userId, array $tokenName): BalanceResultContainer;
+    public function topBalances(string $tokenName, int $limit): array;
 }

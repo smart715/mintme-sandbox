@@ -3,11 +3,13 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
+use App\Entity\Token\Token;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
+use App\Exchange\Balance\Factory\TraderBalanceView;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
@@ -289,6 +291,25 @@ class TokensAPIController extends AbstractFOSRestController
             'common' => $viewFactory->create($common),
             'predefined' => $viewFactory->create($predefined),
         ]);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/top-traders", name="top_traders", options={"expose"=true})
+     */
+    public function getTopTraders(
+        string $name,
+        BalanceHandlerInterface $balanceHandler
+    ): View {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        $topTraders = $balanceHandler->topTraders($token, 10);
+
+        return $this->view($topTraders, Response::HTTP_ACCEPTED);
     }
 
     /**

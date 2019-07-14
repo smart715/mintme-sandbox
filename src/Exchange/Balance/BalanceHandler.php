@@ -6,9 +6,12 @@ use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\TraderBalanceView;
+use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
+use App\Manager\UserManager;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +32,9 @@ class BalanceHandler implements BalanceHandlerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var TraderBalanceViewFactoryInterface */
+    private $traderBalanceViewFactory;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -37,12 +43,14 @@ class BalanceHandler implements BalanceHandlerInterface
         BalanceFetcherInterface $balanceFetcher,
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
+        TraderBalanceViewFactoryInterface $traderBalanceViewFactory,
         LoggerInterface $logger
     ) {
         $this->converter = $converter;
         $this->balanceFetcher = $balanceFetcher;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->traderBalanceViewFactory = $traderBalanceViewFactory;
         $this->logger = $logger;
     }
 
@@ -78,6 +86,14 @@ class BalanceHandler implements BalanceHandlerInterface
     {
         return $this->balances($user, [$token])
             ->get($this->converter->convert($token));
+    }
+
+    /** @inheritDoc */
+    public function topTraders(Token $token, int $limit, int $extend = 15, int $incrementer = 5): array
+    {
+        $result = $this->balanceFetcher->topBalances($this->converter->convert($token), $extend);
+
+        return $this->traderBalanceViewFactory->create($this, $result, $token, $limit, $extend, $incrementer);
     }
 
     public function isNotExchanged(Token $token, int $amount): bool

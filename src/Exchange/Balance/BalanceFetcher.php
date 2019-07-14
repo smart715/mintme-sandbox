@@ -17,6 +17,7 @@ class BalanceFetcher implements BalanceFetcherInterface
     private const UPDATE_BALANCE_METHOD = 'balance.update';
     private const SUMMARY_METHOD = 'asset.summary';
     private const BALANCE_METHOD = 'balance.query';
+    private const BALANCE_TOP_METHOD = 'balance.top';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -78,6 +79,20 @@ class BalanceFetcher implements BalanceFetcherInterface
             (int)$result['freeze_balance'],
             $result['freeze_count']
         );
+    }
+
+    public function topBalances(string $tokenName, int $limit): array
+    {
+        $response = $this->jsonRpc->send(self::BALANCE_TOP_METHOD, [
+            $tokenName,
+            $limit,
+        ]);
+
+        if ($response->hasError()) {
+            throw new BalanceException($response->getError()['message'] ?? 'get error response');
+        }
+
+        return $response->getResult();
     }
 
     public function balance(int $userId, array $tokenNames): BalanceResultContainer

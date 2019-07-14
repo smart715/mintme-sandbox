@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceFetcherInterface;
 use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -36,6 +37,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -62,6 +64,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -85,6 +88,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -115,6 +119,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -147,6 +152,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -176,6 +182,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $em,
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -205,6 +212,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $em,
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -231,6 +239,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -257,6 +266,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -284,6 +294,7 @@ class BalanceHandlerTest extends TestCase
             $fetcher,
             $this->mockEm(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -323,6 +334,12 @@ class BalanceHandlerTest extends TestCase
     private function mockLogger(): LoggerInterface
     {
         return $this->createMock(LoggerInterface::class);
+    }
+
+    /** @return MockObject|TraderBalanceViewFactoryInterface */
+    private function mockTraderBalanceViewFactory(): TraderBalanceViewFactoryInterface
+    {
+        return $this->createMock(TraderBalanceViewFactoryInterface::class);
     }
 
     private function mockMoneyWrapper(): MoneyWrapperInterface

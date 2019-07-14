@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\TraderBalanceView;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
@@ -29,4 +30,13 @@ interface BalanceHandlerInterface
     public function balance(User $user, Token $token): BalanceResult;
     public function balances(User $user, array $tokens): BalanceResultContainer;
     public function isNotExchanged(Token $token, int $amount): bool;
+
+    /**
+     * @param  Token $token
+     * @param  int $limit
+     * @param  int $extend
+     * @param  int $incrementer
+     * @return TraderBalanceView[]
+     */
+    public function topTraders(Token $token, int $limit, int $extend = 15, int $incrementer = 5): array;
 }
