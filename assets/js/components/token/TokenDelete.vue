@@ -2,7 +2,7 @@
     <div>
         <template v-if="isTokenExchanged">
             <span class="btn px-1 py-0">
-                <img :src="unavailableDeleteImage" alt="&times;" style="height: 18px;" class="d-block my-auto">
+                <img src="../../../img/x-icon-grey.png" alt="x" style="height: 18px;" class="d-block my-auto">
             </span>
             <guide class="float-right">
                 <div slot="header">Token deletion</div>
@@ -13,7 +13,7 @@
         </template>
         <template v-else>
             <button class="btn px-1 py-0" @click="openTwoFactorModal">
-                <img :src="deleteImage" alt="&times;" style="height: 18px;" class="d-block my-auto">
+                <img src="../../../img/x-icon.png" alt="x" style="height: 18px;" class="d-block my-auto">
             </button>
         </template>
         <two-factor-modal
@@ -42,9 +42,7 @@ export default {
         name: String,
         sendCodeUrl: String,
         deleteUrl: String,
-        unavailableDeleteImage: String,
-        deleteImage: String,
-        editable: Boolean,
+        twofaEnabled: String,
     },
     components: {
         Guide,
@@ -54,24 +52,28 @@ export default {
         return {
             isTokenExchanged: true,
             showTwoFactorModal: false,
+            needToSendCode: true,
         };
     },
     methods: {
         openTwoFactorModal: function() {
-            this.$axios.single.post(this.sendCodeUrl)
-                .then((response) => {
-                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
-                        this.$toasted.success(response.data.message);
-                    }
-                }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
-                });
+            if (this.needToSendCode) {
+                this.$axios.single.post(this.sendCodeUrl)
+                    .then((response) => {
+                        if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
+                            this.$toasted.success(response.data.message);
+                            this.needToSendCode = false;
+                        }
+                    }, (error) => {
+                        if (!error.response) {
+                            this.$toasted.error('Network error');
+                        } else if (error.response.data.message) {
+                            this.$toasted.error(error.response.data.message);
+                        } else {
+                            this.$toasted.error('An error has occurred, please try again later');
+                        }
+                    });
+            }
             this.showTwoFactorModal = true;
         },
         closeTwoFactorModal: function() {
@@ -81,9 +83,7 @@ export default {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
                 name: this.name,
             }))
-                .then((res) => {
-                    this.isTokenExchanged = null === res.data ? true : res.data;
-                })
+                .then((res) => this.isTokenExchanged = res.data)
                 .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
         },
         deleteToken: function(code = '') {
@@ -107,18 +107,8 @@ export default {
         },
     },
     mounted: function() {
-        if (!this.editable) {
-            return;
-        }
-
+        this.needToSendCode = 'false' === this.twofaEnabled;
         this.checkIfTokenExchanged();
-    },
-    watch: {
-        isTokenExchanged: function(val) {
-            if (val) {
-                this.$toasted.error('You need all your tokens to change token\'s name');
-            }
-        },
     },
 };
 </script>
