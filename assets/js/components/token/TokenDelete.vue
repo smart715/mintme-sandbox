@@ -26,6 +26,7 @@
 
 <script>
 
+import Toasted from 'vue-toasted';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 
