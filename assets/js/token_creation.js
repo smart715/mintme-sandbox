@@ -13,6 +13,11 @@ new Vue({
         tokenName: '',
         domLoaded: false,
     },
+    methods: {
+        redirectToProfile: function() {
+            location.href = this.$routing.generate('profile-view');
+        },
+    },
     mounted: function() {
         window.onload = () => this.domLoaded = true;
     },
