@@ -64,7 +64,7 @@ class ProfileController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             unset($form);
-            $form = $this->createForm(ProfileType::class, $profile);
+            unset($profile);
         }
 
         $this->userActionLogger->info('Edit profile');
