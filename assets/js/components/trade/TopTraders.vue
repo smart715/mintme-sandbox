@@ -5,10 +5,10 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive fix-height" ref="traders">
-                <b-table
+                <template v-if="loaded">
+                    <b-table
                     :items="traders"
-                    :fields="fields"
-                    :current-page="currentPage">
+                    :fields="fields">
                     <template slot="trader" slot-scope="row">
                         {{ row.value }}
                         <img
@@ -17,6 +17,12 @@
                             alt="avatar">
                     </template>
                 </b-table>
+                </template>
+                <template v-else>
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
             <div class="text-center pb-2" v-if="showDownArrow">
                 <img
@@ -30,13 +36,14 @@
 </template>
 
 <script>
-import Guide from '../Guide';
 export default {
     name: 'TopTraders',
+    props: {
+      tokenName: String,
+    },
     data() {
         return {
-            traders: [],
-            currentPage: 0,
+            traders: null,
             fields: {
                 trader: {
                     label: 'Trader',
@@ -50,28 +57,35 @@ export default {
             },
         };
     },
-    components: {
-        Guide,
-    },
     computed: {
         showDownArrow: function() {
-            return (this.traders.length > 7);
+            return null !== this.traders && this.traders.length > 7;
         },
-    },
-    created: function() {
-        for (let i = 1; i < 9; i++) {
-            this.traders.push({
-                trader: '0' + i + ' John Doe',
-                date: '2019-01-05',
-                amount: Math.floor(Math.random() * 99) + 10,
-            });
-        }
+        loaded: function() {
+            return null !== this.traders;
+        },
     },
     methods: {
         scrollDown: function() {
             let parentDiv = this.$refs.traders;
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
+        getTraders: function() {
+            this.$axios.single.get(this.$routing.generate('top_traders', {
+                name: this.tokenName,
+            }))
+            .then(({data}) => this.traders = data.map((row) => {
+                return {
+                    trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
+                    date: '2019-01-05',
+                    amount: Math.round(row.balance),
+                };
+            }));
+        },
+    },
+    mounted: function() {
+        this.getTraders();
+        setInterval(() => this.getTraders(), 20 * 1000);
     },
 };
 </script>

@@ -39,10 +39,13 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         $isMax = count($tradersBalance) < $extend;
 
         foreach ($tradersBalance as $item) {
-            if (isset($item[0]) && isset($item[1]) && null != ($user = $this->getUserIfNotIgnored($item[0], $token))) {
-                $traderBalanceViews[] = new TraderBalanceView($user, $item[1]);
-                $count++;
+            if (!isset($item[0]) || !isset($item[1])
+                || null === ($user = $this->getUserIfNotIgnored($item[0], $token))) {
+                continue;
             }
+
+            $traderBalanceViews[] = new TraderBalanceView($user, $item[1]);
+            $count++;
 
             if ($count >= $limit) {
                 return $traderBalanceViews;
@@ -74,6 +77,6 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
 
     private function isOwner(Token $token, int $userId): bool
     {
-        return $userId !== $token->getProfile()->getUser()->getId();
+        return ($userId - $this->config->getOffset()) === $token->getProfile()->getUser()->getId();
     }
 }
