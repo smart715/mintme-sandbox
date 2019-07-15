@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
+use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -13,6 +14,7 @@ use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\TwoFactorManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
@@ -67,10 +69,12 @@ class TokensAPIController extends AbstractFOSRestController
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
+      *@Rest\RequestParam(name="code", nullable=true)
      */
     public function update(
         ParamFetcherInterface $request,
         BalanceHandlerInterface $balanceHandler,
+        TwoFactorManagerInterface $twoFactorManager,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -79,6 +83,11 @@ class TokensAPIController extends AbstractFOSRestController
 
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
+        }
+        
+        if ($request->get('name')
+            && ($errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager))) {
+                throw new ApiNotFoundException($errorMessage);
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
@@ -177,18 +186,26 @@ class TokensAPIController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in")
+     * @Rest\RequestParam(name="code", nullable=true)
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
         string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        TwoFactorManagerInterface $twoFactorManager
     ): View {
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             throw $this->createNotFoundException('Token does not exist');
+        }
+
+        $errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager);
+
+        if ($errorMessage) {
+            return $this->view($errorMessage, Response::HTTP_UNAUTHORIZED);
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
@@ -330,5 +347,21 @@ class TokensAPIController extends AbstractFOSRestController
         return $this->view(
             !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
         );
+    }
+
+    private function getGoogleAuthenticatorErrorMessage(string $code, TwoFactorManagerInterface $twoFactorManager): ?string
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return 'Invalid user';
+        }
+
+        if ($user->isGoogleAuthenticatorEnabled()
+            && !$twoFactorManager->checkCode($user, $code)) {
+            return 'Invalid 2fa code';
+        }
+
+        return null;
     }
 }
