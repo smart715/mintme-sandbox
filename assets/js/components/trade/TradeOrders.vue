@@ -42,6 +42,7 @@
         </div>
         <confirm-modal
                 :visible="confirmModal"
+                :no-close="false"
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
         >

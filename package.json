@@ -47,6 +47,7 @@
     "vuelidate": "^0.7.4",
     "vuex": "^3.1.0",
     "websocket": "^1.0.28",
+    "xregexp": "^4.2.4",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
