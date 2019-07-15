@@ -111,7 +111,7 @@ class Token implements TradebleInterface
     protected $created;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="relatedTokens")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserToken", mappedBy="token")
      * @var ArrayCollection
      */
     protected $relatedUsers;

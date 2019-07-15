@@ -100,11 +100,7 @@ class User extends BaseUser implements
     private $authCode;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token", inversedBy="relatedUsers")
-     * @ORM\JoinTable(name="user_tokens",
-     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="token_id", referencedColumnName="id")}
-     * )
+     * @ORM\OneToMany(targetEntity="UserToken", mappedBy="user")
      * @var ArrayCollection
      */
     protected $relatedTokens;
