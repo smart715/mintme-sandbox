@@ -3,6 +3,7 @@
 namespace App\Exchange\Balance\Factory;
 
 use App\Entity\User;
+use DateTimeImmutable;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /** @codeCoverageIgnore */
@@ -20,15 +21,22 @@ class TraderBalanceView
      */
     private $balance;
 
-    public function __construct(User $user, string $balance)
+    /**
+     * @var DateTimeImmutable
+     * @Groups({"API"})
+     */
+    private $date;
+
+    public function __construct(User $user, string $balance, DateTimeImmutable $date)
     {
         $this->user = $user;
         $this->balance = $balance;
+        $this->date = $date;
     }
 
-    public function setBalance(): string
+    public function getDate(): DateTimeImmutable
     {
-        return $this->balance;
+        return $this->date;
     }
 
     public function getUser(): User

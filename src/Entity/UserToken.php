@@ -7,7 +7,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserTokenRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="userToken")
  */
