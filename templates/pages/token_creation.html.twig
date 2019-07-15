@@ -41,7 +41,8 @@
             </div>
         </div>
         <modal
-            no-close-on-backdrop
+            :no-close="false"
+            @close="redirectToProfile"
             :visible="domLoaded && {{ profileCreated ? 'false' : 'true' }}">
             <template slot="close"> &nbsp; </template>
             <template slot="body">
