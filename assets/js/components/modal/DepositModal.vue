@@ -2,6 +2,7 @@
     <modal
         id="modal"
         :visible="visible"
+        :no-close="noClose"
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
@@ -58,6 +59,7 @@ export default {
         currency: String,
         min: String,
         fee: String,
+        noClose: Boolean,
     },
     methods: {
         closeModal: function() {
