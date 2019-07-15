@@ -136,13 +136,15 @@ class User extends BaseUser implements
      */
     public function getRelatedTokens(): array
     {
-        return $this->relatedTokens->toArray();
+        return array_map(function (UserToken $userToken) {
+            return $userToken->getToken();
+        }, $this->relatedTokens->toArray());
     }
 
     /** @codeCoverageIgnore */
-    public function addRelatedToken(Token $token): self
+    public function addRelatedToken(UserToken $userToken): self
     {
-        $this->relatedTokens->add($token);
+        $this->relatedTokens->add($userToken);
 
         return $this;
     }

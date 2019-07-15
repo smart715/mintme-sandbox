@@ -5,6 +5,7 @@ namespace App\Exchange\Trade;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
@@ -170,13 +171,17 @@ class Trader implements TraderInterface
         $referrencer = $user->getReferrencer();
 
         if (!in_array($user, $token->getRelatedUsers(), true)) {
-            $user->addRelatedToken($token);
+            $userToken = (new UserToken())->setToken($token)->setUser($user);
+            $this->entityManager->persist($userToken);
+            $user->addRelatedToken($userToken);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         }
 
         if ($referrencer && !in_array($referrencer, $token->getRelatedUsers(), true)) {
-            $referrencer->addRelatedToken($token);
+            $userToken = (new UserToken())->setToken($token)->setUser($user);
+            $this->entityManager->persist($userToken);
+            $referrencer->addRelatedToken($userToken);
             $this->entityManager->persist($referrencer);
             $this->entityManager->flush();
         }

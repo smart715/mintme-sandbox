@@ -5,6 +5,7 @@ namespace App\Exchange\Balance;
 use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\TraderBalanceView;
 use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
@@ -127,7 +128,9 @@ class BalanceHandler implements BalanceHandlerInterface
         }
 
         if (!in_array($token, $user->getRelatedTokens()) && $token->getId()) {
-            $user->addRelatedToken($token);
+            $userToken = (new UserToken())->setToken($token)->setUser($user);
+            $this->entityManager->persist($userToken);
+            $user->addRelatedToken($userToken);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         }

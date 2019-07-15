@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Entity;
 
@@ -54,6 +54,8 @@ class UserToken
     public function setUser(User $user): self
     {
         $this->user = $user;
+
+        return $this;
     }
 
     public function getToken(): Token
@@ -64,6 +66,8 @@ class UserToken
     public function setToken(Token $token): self
     {
         $this->token = $token;
+
+        return $this;
     }
 
     public function getCreated(): DateTimeImmutable
