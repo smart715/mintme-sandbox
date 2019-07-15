@@ -15,7 +15,6 @@ use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
@@ -362,7 +361,7 @@ class TokensAPIController extends AbstractFOSRestController
 
         if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
             throw new ApiUnauthorizedException('Invalid 2fa code');
-        } else if (!$token->checkConfirmCode((int) $request->get('code'))) {
+        } elseif (!$token->checkConfirmCode((int) $request->get('code'))) {
             throw new ApiUnauthorizedException('Invalid 2fa code');
         }
 
@@ -375,7 +374,7 @@ class TokensAPIController extends AbstractFOSRestController
 
         $this->userActionLogger->info('Delete token', $request->all());
 
-        return $this->view(['message' => 'Token successfully deleted'], 202);
+        return $this->view(['message' => 'Token successfully deleted'], Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -416,6 +415,6 @@ class TokensAPIController extends AbstractFOSRestController
             $message = "Code for confirmation of token deletion was send to email.";
         }
 
-        return $this->view(['message' => $message], 202);
+        return $this->view(['message' => $message], Response::HTTP_ACCEPTED);
     }
 }
