@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import {mount} from '@vue/test-utils';
 import Vuelidate from 'vuelidate';
+import Toasted from 'vue-toasted';
 Vue.use(Vuelidate);
+Vue.use(Toasted);
 import TwoFactorModal from '../../js/components/modal/TwoFactorModal';
 
 describe('TwoFactorModal', () => {
@@ -18,17 +20,14 @@ describe('TwoFactorModal', () => {
         expect(textInput.exists()).to.deep.equal(true);
     });
 
-    it('it can be verified if user input a auth code value', () => {
-        textInput.setValue('AX12347');
-        expect(wrapper.vm.code).to.equal('AX12347');
+    it('throw required error when value is  not set', () => {
+        textInput.setValue('');
+        wrapper.vm.onVerify();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(true);
     });
 
-    it('it can be verified if user input a auth code value', () => {
-        textInput.setValue('ADFGRT');
-        expect(wrapper.vm.code).to.equal('ADFGRT');
-    });
-
-    it('emit verify if user click on verify button', () => {
+    it('emit verify if user click on verify button when  value is set', () => {
         textInput.setValue('123');
         wrapper.vm.onVerify();
         expect(wrapper.emitted().verify[0]).to.deep.equal(['123']);

@@ -50,6 +50,7 @@
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                    twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                     token-created="{{ token.getCreated().format('d M Y') }}"
                                     :precision="{{ precision }}">
                                 </token-introduction-statistics>
@@ -72,6 +73,7 @@
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
                                         update-url="{{ path('token_update', {'name': market.quote.name}) }}"
+                                        twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>
                             </div>

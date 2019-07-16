@@ -1,4 +1,5 @@
 <template>
+<div>
     <b-row>
         <b-col cols="12" class="statistic-description mb-2">
             <div>
@@ -61,12 +62,20 @@
             </div>
         </b-col>
     </b-row>
+    <two-factor-modal
+        :visible="showTwoFactorModal"
+        :twofa="twofa"
+        @verify="doSaveReleasePeriod"
+        @close="closeTwoFactorModal"
+    />
+    </div>
 </template>
 
 <script>
 import vueSlider from 'vue-slider-component';
 import {deepFlatten} from '../../../utils';
 import Guide from '../../Guide';
+import TwoFactorModal from '../../modal/TwoFactorModal';
 
 export default {
     name: 'TokenIntroductionReleasePeriod',
@@ -74,25 +83,39 @@ export default {
         releasePeriodRoute: String,
         releasedDisabled: {type: Boolean, default: false},
         period: {type: Number, default: 10},
+        twofa: String,
     },
     data() {
         return {
             released: 1,
             currentPeriod: this.period,
+            showTwoFactorModal: false,
         };
     },
     components: {
         vueSlider,
         Guide,
+        TwoFactorModal,
     },
     methods: {
+        closeTwoFactorModal: function() {
+            this.showTwoFactorModal = false;
+        },
         cancelAction: function() {
             this.$emit('cancel');
         },
         saveReleasePeriod: function() {
+            if (!this.twofa) {
+                return this.doSaveReleasePeriod();
+            }
+
+            return this.showTwoFactorModal = true;
+        },
+        doSaveReleasePeriod: function(code = '') {
             this.$axios.single.post(this.releasePeriodRoute, {
                 'released': this.released,
                 'releasePeriod': this.currentPeriod,
+                'code': code,
             }).then((response) => {
                 this.$emit('onStatsUpdate', response);
                 this.$toasted.success('Release period updated.');
@@ -102,6 +125,8 @@ export default {
                     deepFlatten(error.response.data.errors).forEach((err) => {
                         this.$toasted.error(err);
                     });
+                } else if (401 === error.response.status) {
+                    this.$toasted.error(error.response.data);
                 } else {
                     this.$toasted.error('Connection problem. Try again later.');
                 }
