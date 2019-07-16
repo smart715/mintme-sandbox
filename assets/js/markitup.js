@@ -1,5 +1,8 @@
 export default {
     preview: false,
+    afterInsert: function() {
+        this.textarea.dispatchEvent(new Event('change'));
+    },
     tabs: '    ',
     previewRefreshOn: ['markitup.insertion', 'keyup'],
     shortcuts: {},
@@ -17,9 +20,6 @@ export default {
             shortcut: 'Ctrl Shift P',
             before: '[img]',
             after: '[/img]',
-        },
-        {
-            separator: true,
         },
         {
             name: 'Headings',
@@ -92,9 +92,6 @@ export default {
             after: '[/s]',
         },
         {
-            separator: true,
-        },
-        {
             name: 'Unordered list',
             icon: 'list-ul',
             before: '[ul]\n',
@@ -113,9 +110,6 @@ export default {
             icon: 'check',
             before: '[li]',
             after: '[/li]',
-        },
-        {
-            separator: true,
         },
         {
             name: 'Paragraph',
