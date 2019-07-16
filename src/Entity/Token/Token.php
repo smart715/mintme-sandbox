@@ -105,12 +105,6 @@ class Token implements TradebleInterface
     protected $crypto;
 
     /**
-     * @ORM\Column(type="boolean", options={"default": 0})
-     * @var bool
-     */
-    protected $deployed = false;
-
-    /**
      * @ORM\Column(type="datetime_immutable")
      * @var \DateTimeImmutable
      */
@@ -175,6 +169,13 @@ class Token implements TradebleInterface
     public function getAddress(): ?string
     {
         return $this->address;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
     }
 
     public function getWebsiteUrl(): ?string
@@ -248,22 +249,20 @@ class Token implements TradebleInterface
     {
         return $this->profile;
     }
-
-    public function setDeployed(): self
-    {
-        $this->deployed = true;
-
-        return $this;
-    }
     
     public function isDeployed(): bool
     {
-        return $this->deployed;
+        return !!$this->address;
     }
 
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());
+    }
+
+    public static function getBySymbol(string $symbol): self
+    {
+        return (new self())->setName($symbol);
     }
 
     public function getCreated(): \DateTimeImmutable

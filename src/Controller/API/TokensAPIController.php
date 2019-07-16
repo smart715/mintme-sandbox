@@ -2,7 +2,9 @@
 
 namespace App\Controller\API;
 
+use App\Communications\DeployCostFetcher;
 use App\Entity\Token\LockIn;
+use App\Entity\Token\Token;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
@@ -14,9 +16,11 @@ use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -26,9 +30,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
+use Throwable;
 
 /**
  * @Rest\Route("/api/tokens")
@@ -335,10 +339,14 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}/deploy", name="token_deploy", options={"expose"=true})
+     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
      */
     public function deploy(
-        string $name
+        string $name,
+        BalanceHandlerInterface $balanceHandler,
+        MoneyWrapperInterface $moneyWrapper,
+        TokenDeployInterface $tokenDeploy,
+        DeployCostFetcher $costFetcher
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
@@ -352,11 +360,23 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiUnauthorizedException('Unauthorized');
         }
 
-        //TODO: deploy the token to blockchain
+        try {
+            $deployResult = $tokenDeploy->deploy($token);
 
-        $token->setDeployed();
-        $this->em->persist($token);
-        $this->em->flush();
+            $cost = $costFetcher->getDeployWebCost();
+
+            $balanceHandler->withdraw(
+                $this->getUser(),
+                Token::getBySymbol(Token::WEB_SYMBOL),
+                $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
+            );
+
+            $token->setAddress($deployResult->getAddress());
+            $this->em->persist($token);
+            $this->em->flush();
+        } catch (Throwable $ex) {
+            return $this->view(null, Response::HTTP_BAD_REQUEST);
+        }
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
 

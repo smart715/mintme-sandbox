@@ -1,12 +1,14 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\SmartContract;
 
 use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
 use App\SmartContract\Config\Config;
+use App\SmartContract\Model\TokenDeployResult;
 use App\Utils\Converter\TokenNameConverterInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 
 class TokenDeploy implements TokenDeployInterface
 {
@@ -21,17 +23,22 @@ class TokenDeploy implements TokenDeployInterface
     /** @var TokenNameConverterInterface */
     private $tokenNameConverter;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         JsonRpcInterface $rpc,
         Config $config,
-        TokenNameConverterInterface $tokenNameConverter
+        TokenNameConverterInterface $tokenNameConverter,
+        LoggerInterface $logger
     ) {
         $this->rpc = $rpc;
         $this->config = $config;
         $this->tokenNameConverter = $tokenNameConverter;
+        $this->logger = $logger;
     }
 
-    public function deploy(Token $token): array
+    public function deploy(Token $token): TokenDeployResult
     {
         $response = $this->rpc->send(
             self::DEPLOY,
@@ -48,14 +55,19 @@ class TokenDeploy implements TokenDeployInterface
         );
 
         if ($response->hasError()) {
+            $this->logger->error("Failed to deploy token '{$token->getName()}");
+
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
 
         $result = $response->getResult();
 
-        var_dump($result);
-        exit;
+        if (!isset($result['address']) || !isset($result['transactionHash'])) {
+            $this->logger->error("Failed to deploy token '{$token->getName()}");
 
-        return [];
+            throw new Exception('get error response');
+        }
+
+        return new TokenDeployResult($result['address'], $result['transactionHash']);
     }
 }

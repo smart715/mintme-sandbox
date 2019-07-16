@@ -71,6 +71,11 @@ services:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
 
+    App\Communications\DeployCostFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+            $usdCost: '%deploy_cost%'
+
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
             $jsonRpc: '@deposit.json_rpc'

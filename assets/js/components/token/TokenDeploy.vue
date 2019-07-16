@@ -34,7 +34,7 @@
             </modal>
         </div>
         <div v-else-if="deployed" class="text-white">deployed</div>
-        <div v-else>
+        <div v-else-if="isOwner">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
         </div>
     </div>
@@ -100,7 +100,7 @@ export default {
         },
         deploy: function() {
             this.deploying = true;
-            this.$axios.single.patch(this.$routing.generate('token_deploy', {
+            this.$axios.single.post(this.$routing.generate('token_deploy', {
                 name: this.name,
             }))
             .then(() => {
@@ -111,8 +111,6 @@ export default {
             .catch(({response}) => {
                 if (!response) {
                     this.$toasted.error('Network error');
-                } else if (response.data.message) {
-                    this.$toasted.error(response.data.message);
                 } else {
                     this.$toasted.error('An error has occurred, please try again later');
                 }
