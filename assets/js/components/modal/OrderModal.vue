@@ -1,6 +1,7 @@
 <template>
     <modal
         :visible="visible"
+        :no-close="false"
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
