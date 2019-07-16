@@ -105,10 +105,10 @@ class Token implements TradebleInterface
     protected $crypto;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", options={"default": 0})
      * @var bool
      */
-    protected $deployed;
+    protected $deployed = false;
 
     /**
      * @ORM\Column(type="datetime_immutable")
