@@ -16,7 +16,7 @@
                             This process is irreversible, once confirm payment there is no going back.
                         </p>
                         <p class="mt-5">
-                            Your current balance: {{ baseBalance | toMoney(precision) | formatMoney }} WEB coins <br>
+                            Your current balance: {{ balance | toMoney(precision) | formatMoney }} WEB coins <br>
                             <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
                         </p>
                         <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
@@ -33,7 +33,7 @@
                 </template>
             </modal>
         </div>
-        <div v-else-if="deployed" class="text-white">deployed</div>
+        <div class="deployed-icon" v-else-if="deployed"><img class="h-100" src="../../../img/webchain_W.svg" alt="deployed"></div>
         <div v-else-if="isOwner">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
         </div>
@@ -42,16 +42,18 @@
 
 <script>
 import Modal from '../modal/Modal';
-import {mapGetters} from 'vuex';
 import {toMoney, formatMoney} from '../../utils';
+import {WebSocketMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 
-const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
+const WEB = 'web';
 
 export default {
     name: 'TokenDeploy',
+    mixins: [WebSocketMixin],
     props: {
         name: String,
+        hasReleasePeriod: Boolean,
         isOwner: Boolean,
         precision: Number,
         deployedProp: Boolean,
@@ -62,41 +64,33 @@ export default {
             deployed: this.deployedProp,
             deploying: false,
             modalVisible: false,
-            balanceFetched: false,
+            balance: null,
             webCost: null,
         };
     },
     computed: {
         btnEnabled: function() {
-            return this.isOwner && !this.deployed && this.balanceFetched;
+            return this.isOwner && !this.deployed;
         },
         btnDisableModal: function() {
             return this.costExceed || this.deploying;
         },
         visible: function() {
-            return this.webCost !== null;
+            return this.webCost !== null || this.balance !== null;
         },
         costExceed: function() {
-            return new Decimal(this.webCost).greaterThan(this.baseBalance);
-        },
-        ...mapGetters('makeOrder', {
-            baseBalance: 'getBaseBalance',
-        }),
-    },
-    watch: {
-        baseBalance: function() {
-            this.balanceFetched = true;
+            return new Decimal(this.webCost).greaterThan(this.balance);
         },
     },
     methods: {
-        convertCostToWeb: function() {
-            this.$axios.single.get(API_URL, {
-                params: {
-                    ids: 'webchain',
-                    vs_currencies: 'usd',
-                },
-            })
-            .then(({data}) => this.webCost = new Decimal(this.usdCost).div(data.webchain.usd));
+        fetchBalances: function() {
+            this.$axios.retry.get(this.$routing.generate('token_deploy_balances', {
+                name: this.name,
+            }))
+            .then(({data}) => {
+                this.balance = data.balance;
+                this.webCost = data.webCost;
+            });
         },
         deploy: function() {
             this.deploying = true;
@@ -118,6 +112,11 @@ export default {
             .then(() => this.deploying = false);
         },
         setModalVisible: function(visible) {
+            if (visible && !this.hasReleasePeriod) {
+                this.$toasted.info('Please edit token release period before deploying.');
+                return;
+            }
+
             this.modalVisible = visible;
         },
     },
@@ -130,7 +129,16 @@ export default {
         },
     },
     mounted() {
-        this.convertCostToWeb();
+        this.fetchBalances();
+
+        this.addMessageHandler((response) => {
+            if (
+                'asset.update' === response.method &&
+                response.params[0].hasOwnProperty(WEB)
+            ) {
+                this.balance = response.params[0][WEB].available;
+            }
+        }, 'trade-buy-order-asset');
     },
     components: {
         Modal,

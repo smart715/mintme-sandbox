@@ -27,6 +27,8 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Money\Currency;
+use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
@@ -371,6 +373,42 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
+     * @Rest\Get("/{name}/deploy", name="token_deploy_balances", options={"expose"=true})
+     */
+    public function TokenDeployBalances(
+        string $name,
+        BalanceHandlerInterface $balanceHandler,
+        MoneyWrapperInterface $moneyWrapper,
+        DeployCostFetcherInterface $costFetcher
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$this->getUser()) {
+            throw new ApiUnauthorizedException('Unauthorized');
+        }
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        try {
+            $balances = [
+              'balance' => $moneyWrapper->format(
+                  $balanceHandler->balance($this->getUser(), Token::getBySymbol(Token::WEB_SYMBOL))->getAvailable()
+              ),
+              'webCost' => $costFetcher->getDeployWebCost(),
+            ];
+        } catch (Throwable $ex) {
+            return $this->view(null, Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->view($balances, Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\View()
      * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
      */
     public function deploy(
@@ -396,10 +434,19 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiUnauthorizedException('Unauthorized');
         }
 
-        try {
-            $deployResult = $tokenDeploy->deploy($token);
+        $paid = false;
+        $cost = 0;
 
+        try {
             $cost = $costFetcher->getDeployWebCost();
+            $balance = $balanceHandler->balance($this->getUser(), Token::getBySymbol(Token::WEB_SYMBOL))->getAvailable();
+
+            if ($balanceHandler->balance(
+                $this->getUser(),
+                Token::getBySymbol(Token::WEB_SYMBOL)
+            )->getAvailable()->greaterThan($balance)) {
+                throw new ApiBadRequestException('Low balance');
+            }
 
             $balanceHandler->withdraw(
                 $this->getUser(),
@@ -407,10 +454,22 @@ class TokensAPIController extends AbstractFOSRestController
                 $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
             );
 
+            $paid = true;
+
+            $deployResult = $tokenDeploy->deploy($token);
+
             $token->setAddress($deployResult->getAddress());
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
+            if (true === $paid) {
+                $balanceHandler->deposit(
+                    $this->getUser(),
+                    Token::getBySymbol(Token::WEB_SYMBOL),
+                    $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
+                );
+            }
+
             return $this->view(null, Response::HTTP_BAD_REQUEST);
         }
 

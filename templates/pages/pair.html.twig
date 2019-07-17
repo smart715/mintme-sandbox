@@ -66,7 +66,20 @@
                         </b-tab>
                     {% endif %}
                     <template slot="tabs">
-                        <li class="nav-item float-md-right">
+                        <li class="nav-item">
+                            <div class="nav-link pr-md-0">
+                                <token-deploy
+                                        websocket-url="{{ global_websocket_url }}"
+                                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                        name="{{ market.quote.name }}"
+                                        :hasReleasePeriod="{{ token.getLockIn ? 'true' : 'false' }}"
+                                        :precision="{{ precision }}"
+                                        :deployed-prop="{{ token.isDeployed | json_encode }}"
+                                        :usd-cost="{{ deployCost }}"
+                                />
+                            </div>
+                        </li>
+                        <li class="nav-item float-sm-right">
                             <div class="nav-link">
                                 <token-name
                                         websocket-url="{{ global_websocket_url }}"
@@ -76,17 +89,6 @@
                                         twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>
-                            </div>
-                        </li>
-                        <li class="nav-item float-md-right">
-                            <div class="nav-link pr-md-0">
-                                <token-deploy
-                                    :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                    name="{{ market.quote.name }}"
-                                    :precision="{{ precision }}"
-                                    :deployed-prop="{{ token.isDeployed | json_encode }}"
-                                    :usd-cost="{{ deployCost }}"
-                                />
                             </div>
                         </li>
                         <div class="clearfix"></div>
