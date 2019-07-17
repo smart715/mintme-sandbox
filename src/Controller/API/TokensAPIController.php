@@ -389,7 +389,7 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         if (!$token->getLockIn()) {
-            throw new ApiBadRequestException('Token Not released yet');
+            throw new ApiBadRequestException('Token not has released period');
         }
 
         if (!$this->isGranted('edit', $token)) {
