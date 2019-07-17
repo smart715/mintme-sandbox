@@ -43,7 +43,7 @@ export default {
         name: String,
         sendCodeUrl: String,
         deleteUrl: String,
-        twofaEnabled: String,
+        twofaEnabled: Boolean,
     },
     components: {
         Guide,
@@ -58,24 +58,27 @@ export default {
     },
     methods: {
         openTwoFactorModal: function() {
-            if (this.needToSendCode) {
-                this.$axios.single.post(this.sendCodeUrl)
-                    .then((response) => {
-                        if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
-                            this.$toasted.success(response.data.message);
-                            this.needToSendCode = false;
-                        }
-                    }, (error) => {
-                        if (!error.response) {
-                            this.$toasted.error('Network error');
-                        } else if (error.response.data.message) {
-                            this.$toasted.error(error.response.data.message);
-                        } else {
-                            this.$toasted.error('An error has occurred, please try again later');
-                        }
-                    });
-            }
             this.showTwoFactorModal = true;
+            
+            if (!this.needToSendCode) {
+                return;
+            }
+
+            this.$axios.single.post(this.sendCodeUrl)
+                .then((response) => {
+                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
+                        this.$toasted.success(response.data.message);
+                        this.needToSendCode = false;
+                    }
+                }, (error) => {
+                    if (!error.response) {
+                        this.$toasted.error('Network error');
+                    } else if (error.response.data.message) {
+                        this.$toasted.error(error.response.data.message);
+                    } else {
+                        this.$toasted.error('An error has occurred, please try again later');
+                    }
+                });
         },
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
@@ -108,7 +111,7 @@ export default {
         },
     },
     mounted: function() {
-        this.needToSendCode = 'false' === this.twofaEnabled;
+        this.needToSendCode = !this.twofaEnabled;
         this.checkIfTokenExchanged();
     },
 };

@@ -35,7 +35,7 @@ describe('TokenDelete', () => {
                 name: 'foo',
                 sendCodeUrl: 'sendCodeUrl',
                 deleteUrl: 'deleteUrl',
-                twofaEnabled: 'false',
+                twofaEnabled: false,
             },
         });
 
@@ -62,7 +62,7 @@ describe('TokenDelete', () => {
                 name: 'foo',
                 sendCodeUrl: 'sendCodeUrl',
                 deleteUrl: 'deleteUrl',
-                twofaEnabled: 'false',
+                twofaEnabled: false,
             },
         });
 
@@ -88,7 +88,7 @@ describe('TokenDelete', () => {
                 name: 'foo',
                 sendCodeUrl: 'sendCodeUrl',
                 deleteUrl: 'deleteUrl',
-                twofaEnabled: 'false',
+                twofaEnabled: false,
             },
         });
 
@@ -114,7 +114,7 @@ describe('TokenDelete', () => {
                 name: 'foo',
                 sendCodeUrl: 'sendCodeUrl',
                 deleteUrl: 'deleteUrl',
-                twofaEnabled: 'true',
+                twofaEnabled: true,
             },
         });
 
@@ -130,7 +130,7 @@ describe('TokenDelete', () => {
                 name: 'foo',
                 sendCodeUrl: 'sendCodeUrl',
                 deleteUrl: 'deleteUrl',
-                twofaEnabled: 'false',
+                twofaEnabled: false,
             },
         });
 
@@ -146,7 +146,7 @@ describe('TokenDelete', () => {
                 name: 'foo',
                 sendCodeUrl: 'sendCodeUrl',
                 deleteUrl: 'deleteUrl',
-                twofaEnabled: 'false',
+                twofaEnabled: false,
             },
         });
 

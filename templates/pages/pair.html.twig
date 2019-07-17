@@ -84,7 +84,7 @@
                                     delete-url="{{ path('token_delete', {'name': market.quote.name}) }}"
                                     send-code-url="{{ path('token_send_code', {'name': market.quote.name}) }}"
                                     name="{{ market.quote.name }}"
-                                    twofa-enabled="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
+                                    :twofa-enabled="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                 >
                                 </token-delete>
                             </div>
