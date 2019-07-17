@@ -40,6 +40,12 @@ class TokenDeploy implements TokenDeployInterface
 
     public function deploy(Token $token): TokenDeployResult
     {
+        if (!$token->getLockIn()) {
+            $this->logger->error("Failed to deploy token '{$token->getName()}' because It has not a release period");
+
+            throw new Exception('Token dose not has release period');
+        }
+
         $response = $this->rpc->send(
             self::DEPLOY,
             [
@@ -47,15 +53,16 @@ class TokenDeploy implements TokenDeployInterface
                 'symbol' => $this->tokenNameConverter->convert($token),
                 'decimals' => $this->config->getTokenPrecision(),
                 'mintDestination' => $this->config->getMintmeAddress(),
-                'releasedAtCreation' => $this->config->getTokenQuantity(),
-                'releasePeriod' => $token->getLockIn()
-                    ? $token->getLockIn()->getReleasePeriod()
-                    : '0',
+                'releasedAtCreation' => bcmul(
+                    $this->config->getTokenQuantity(),
+                    bcpow('10', (string)$this->config->getTokenPrecision())
+                ),
+                'releasedPeriod' => $token->getLockIn()->getReleasePeriod(),
             ]
         );
 
         if ($response->hasError()) {
-            $this->logger->error("Failed to deploy token '{$token->getName()}");
+            $this->logger->error("Failed to deploy token '{$token->getName()}'");
 
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
@@ -63,7 +70,7 @@ class TokenDeploy implements TokenDeployInterface
         $result = $response->getResult();
 
         if (!isset($result['address']) || !isset($result['transactionHash'])) {
-            $this->logger->error("Failed to deploy token '{$token->getName()}");
+            $this->logger->error("Failed to deploy token '{$token->getName()}'");
 
             throw new Exception('get error response');
         }

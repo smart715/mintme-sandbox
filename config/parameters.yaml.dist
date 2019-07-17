@@ -60,8 +60,7 @@ parameters:
     coinbase_api_timeout: 10
 
     # the cost of deploying token to blockchain in USD
-    deploy_cost: 39
-
+    deploy_cost: 49
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
     mintme_address: ''

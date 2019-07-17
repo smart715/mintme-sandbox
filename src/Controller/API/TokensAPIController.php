@@ -388,6 +388,10 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        if (!$token->getLockIn()) {
+            throw new ApiBadRequestException('Token Not released yet');
+        }
+
         if (!$this->isGranted('edit', $token)) {
             throw new ApiUnauthorizedException('Unauthorized');
         }
