@@ -46,7 +46,7 @@
                                 </token-introduction-profile>
 
                                 <token-introduction-statistics
-                                    @token-period-added="setTokenPeriod(true)"
+                                    v-on:period-updated="updateTokenPeriod"
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"

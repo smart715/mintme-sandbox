@@ -43,8 +43,8 @@ new Vue({
         document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';
       }
     },
-    setTokenPeriod: function(isAdded) {
-      this.tokenPeriodAdded = isAdded;
+    updateTokenPeriod: function() {
+      this.tokenPeriodAdded = true;
     },
     isTokenPeriodAdded: function(isAdded) {
       return null !== this.tokenPeriodAdded ? this.tokenPeriodAdded : isAdded;

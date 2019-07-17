@@ -386,11 +386,11 @@ class TokensAPIController extends AbstractFOSRestController
         $token = $this->tokenManager->findByName($name);
 
         if (!$this->getUser()) {
-            throw new ApiUnauthorizedException('Unauthorized');
+            return $this->view(null, Response::HTTP_BAD_REQUEST);
         }
 
         if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
+            return $this->view(null, Response::HTTP_BAD_REQUEST);
         }
 
         try {
