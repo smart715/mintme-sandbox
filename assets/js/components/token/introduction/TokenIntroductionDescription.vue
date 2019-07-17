@@ -161,7 +161,11 @@ export default {
         },
     },
     mounted: function() {
-        markitup('textarea', markitupSet);
+        const textarea = document.querySelector('textarea');
+        markitup(textarea, markitupSet);
+        textarea.addEventListener('change', () => {
+            this.$v.newDescription.$model = textarea.value;
+        });
     },
 };
 </script>
