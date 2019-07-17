@@ -15,9 +15,7 @@ export default {
         description: String,
     },
     data() {
-        return {
-            parser: null,
-        };
+        return {};
     },
     computed: {
         parsedDescription: function() {

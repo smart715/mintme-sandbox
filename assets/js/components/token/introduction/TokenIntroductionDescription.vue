@@ -47,6 +47,7 @@
                                     v-model="$v.newDescription.$model"
                                     :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
                                     rows="5"
+                                    ref="description"
                                 >
                                 </textarea>
                                 <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
@@ -161,10 +162,9 @@ export default {
         },
     },
     mounted: function() {
-        const textarea = document.querySelector('textarea');
-        markitup(textarea, markitupSet);
-        textarea.addEventListener('change', () => {
-            this.$v.newDescription.$model = textarea.value;
+        markitup(this.$refs.description, markitupSet);
+        this.$refs.description.addEventListener('change', (e) => {
+            this.$v.newDescription.$model = e.target.value;
         });
     },
 };
