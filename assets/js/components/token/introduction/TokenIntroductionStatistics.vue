@@ -156,6 +156,7 @@
                         :release-period-route="releasePeriodRoute"
                         :period="statsPeriod"
                         :released-disabled="releasedDisabled"
+                        :twofa="twofa"
                         @cancel="switchAction"
                         @onStatsUpdate="statsUpdated">
                     </release-period-component>
@@ -194,6 +195,7 @@ export default {
         releasePeriodRoute: String,
         editable: Boolean,
         precision: Number,
+        twofa: String,
     },
     data() {
         return {
