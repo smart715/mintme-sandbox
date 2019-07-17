@@ -62,7 +62,7 @@ class TokenDeployTest extends TestCase
             $this->mockLoggerInterface()
         );
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Throwable::class);
 
         $handler->deploy($this->mockToken(false));
     }
@@ -91,7 +91,7 @@ class TokenDeployTest extends TestCase
             $this->mockLoggerInterface()
         );
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Throwable::class);
 
         $handler->deploy($this->mockToken(true));
     }
@@ -123,7 +123,7 @@ class TokenDeployTest extends TestCase
             $this->mockLoggerInterface()
         );
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Throwable::class);
 
         $handler->deploy($this->mockToken(true));
     }
