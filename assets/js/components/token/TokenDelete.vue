@@ -59,7 +59,7 @@ export default {
     methods: {
         openTwoFactorModal: function() {
             this.showTwoFactorModal = true;
-            
+
             if (!this.needToSendCode) {
                 return;
             }
