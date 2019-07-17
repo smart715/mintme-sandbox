@@ -414,5 +414,4 @@ class TokensAPIController extends AbstractFOSRestController
 
         return $this->view();
     }
-
 }
