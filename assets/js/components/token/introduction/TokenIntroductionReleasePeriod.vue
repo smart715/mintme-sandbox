@@ -120,6 +120,7 @@ export default {
                 this.$emit('onStatsUpdate', response);
                 this.$toasted.success('Release period updated.');
                 this.cancelAction();
+                this.$emit('success');
             }).catch((error) => {
                 if (400 === error.response.status) {
                     deepFlatten(error.response.data.errors).forEach((err) => {

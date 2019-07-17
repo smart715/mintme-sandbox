@@ -46,6 +46,7 @@
                                 </token-introduction-profile>
 
                                 <token-introduction-statistics
+                                    @token-period-added="setTokenPeriod(true)"
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
@@ -72,7 +73,7 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         :is-owner="{{ isOwner ? 'true' : 'false' }}"
                                         name="{{ market.quote.name }}"
-                                        :hasReleasePeriod="{{ token.getLockIn ? 'true' : 'false' }}"
+                                        :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
                                         :precision="{{ precision }}"
                                         :deployed-prop="{{ token.isDeployed | json_encode }}"
                                         :usd-cost="{{ deployCost }}"

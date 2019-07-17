@@ -15,6 +15,7 @@ new Vue({
       tokenDescription: null,
       editingName: false,
       tokenName: null,
+      tokenPeriodAdded: null,
     };
   },
   components: {
@@ -41,6 +42,12 @@ new Vue({
         );
         document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';
       }
+    },
+    setTokenPeriod: function(isAdded) {
+      this.tokenPeriodAdded = isAdded;
+    },
+    isTokenPeriodAdded: function(isAdded) {
+      return null !== this.tokenPeriodAdded ? this.tokenPeriodAdded : isAdded;
     },
   },
   store,

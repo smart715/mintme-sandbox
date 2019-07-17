@@ -158,6 +158,7 @@
                         :released-disabled="releasedDisabled"
                         :twofa="twofa"
                         @cancel="switchAction"
+                        @done="tokenPeriodAdded"
                         @onStatsUpdate="statsUpdated">
                     </release-period-component>
                 </div>
@@ -246,6 +247,9 @@ export default {
         },
         statsUpdated: function(res) {
             this.stats = res.data;
+        },
+        tokenPeriodAdded: function() {
+            this.$emit('tokenPeriodAdded');
         },
     },
     computed: {
