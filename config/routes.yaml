@@ -52,7 +52,7 @@ _sonata_admin:
 controllers:
     resource: ../src/Controller/
     type: annotation
-    
+
 gallery:
     resource: '@SonataMediaBundle/Resources/config/routing/gallery.xml'
     prefix: /media/gallery
@@ -60,3 +60,7 @@ gallery:
 media:
     resource: '@SonataMediaBundle/Resources/config/routing/media.xml'
     prefix: /media
+
+PrestaSitemapBundle:
+    resource: "@PrestaSitemapBundle/Resources/config/routing.yml"
+    prefix: /
