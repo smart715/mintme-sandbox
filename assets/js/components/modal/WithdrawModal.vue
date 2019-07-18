@@ -1,6 +1,7 @@
 <template>
     <modal
         :visible="visible"
+        :no-close="noClose"
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
@@ -109,6 +110,7 @@ export default {
         addressLength: Number,
         subunit: Number,
         twofa: String,
+        noClose: Boolean,
     },
     data() {
         return {

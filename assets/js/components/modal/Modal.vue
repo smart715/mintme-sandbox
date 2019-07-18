@@ -4,8 +4,8 @@
         :size="size"
         @hidden="closeModal"
         hide-footer
-        no-close-on-backdrop
-        no-close-on-esc>
+        :no-close-on-backdrop="noClose"
+        :no-close-on-esc="noClose">
         <div slot="modal-header">
             <slot name="header"></slot>
             <slot name="close">
@@ -26,6 +26,7 @@ export default {
     props: {
         visible: Boolean,
         size: String,
+        noClose: Boolean,
     },
     methods: {
         closeModal: function() {

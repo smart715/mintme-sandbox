@@ -96,6 +96,7 @@
             :address-length="addressLength"
             :twofa="twofa"
             :subunit="withdraw.subunit"
+            :no-close="true"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -105,6 +106,7 @@
             :currency="selectedCurrency"
             :fee="deposit.fee"
             :min="deposit.min"
+            :no-close="false"
             @close="closeDeposit()"
         />
     </div>
@@ -140,6 +142,7 @@ export default {
             depositAddress: null,
             depositDescription: null,
             showDepositModal: null,
+            noClose: false,
             tooltipOptions: {
                 placement: 'bottom',
                 arrow: true,
