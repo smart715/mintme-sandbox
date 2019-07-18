@@ -6,18 +6,18 @@ use App\Entity\Token\Token;
 use App\Entity\UserToken;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\Config;
-use App\Manager\UserManager;
+use App\Manager\UserManagerInterface;
 
 class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
 {
-    /**  @var UserManager */
+    /**  @var UserManagerInterface */
     private $userManager;
 
     /** @var Config */
     private $config;
 
     public function __construct(
-        UserManager $userManager,
+        UserManagerInterface $userManager,
         Config $config
     ) {
         $this->userManager = $userManager;

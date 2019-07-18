@@ -98,6 +98,31 @@ class BalanceHandlerTest extends TestCase
         );
     }
 
+    public function testTopTraders(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+        $converter->expects($this->once())->method('convert');
+
+        $fetcher = $this->mockBalanceFetcher();
+        $fetcher->expects($this->once())->method('topBalances')->with('fooFOO', 4);
+
+        $handler = new BalanceHandler(
+            $converter,
+            $fetcher,
+            $this->mockEm(),
+            $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
+            $this->mockLogger()
+        );
+
+        $handler->topTraders(
+            $this->mockToken('foo'),
+            3,
+            4,
+            1
+        );
+    }
+
     public function testIsExchanged(): void
     {
         $converter = $this->mockTokenNameConverter();
