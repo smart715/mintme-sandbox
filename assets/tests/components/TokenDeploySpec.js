@@ -176,7 +176,7 @@ describe('TokenDeploy', () => {
                 done();
             });
         });
-        it('should be called on mounted if isOwner and token not deployed', (done) => {
+        it('should be called on mounted if isOwner and token is not deployed', (done) => {
             moxios.stubRequest('token_deploy_balances', {status: 200, response: {
                     balance: 999,
                     webCost: 99,
@@ -188,15 +188,29 @@ describe('TokenDeploy', () => {
                 expect(wrapper.vm.webCost).to.deep.equal(99);
                 done();
             });
+        });
 
-            wrapper = mockTokenDeploy(false, true, true);
+        it('should not be called on mounted if isOwner and token is deployed', (done) => {
+            moxios.stubRequest('token_deploy_balances', {status: 200, response: {
+                    balance: 999,
+                    webCost: 99,
+                }});
+
+            let wrapper = mockTokenDeploy(false, true, true);
             moxios.wait(() => {
                 expect(wrapper.vm.balance).to.deep.equal(null);
                 expect(wrapper.vm.webCost).to.deep.equal(null);
                 done();
             });
+        });
 
-            wrapper = mockTokenDeploy(false, false, true);
+        it('should not be called on mounted if is not owner', (done) => {
+            moxios.stubRequest('token_deploy_balances', {status: 200, response: {
+                    balance: 999,
+                    webCost: 99,
+                }});
+
+            let wrapper = mockTokenDeploy(false, false, false);
             moxios.wait(() => {
                 expect(wrapper.vm.balance).to.deep.equal(null);
                 expect(wrapper.vm.webCost).to.deep.equal(null);
