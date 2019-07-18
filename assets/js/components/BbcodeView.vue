@@ -14,9 +14,6 @@ export default {
     props: {
         description: String,
     },
-    data() {
-        return {};
-    },
     computed: {
         parsedDescription: function() {
             if (null === this.description) return '';
