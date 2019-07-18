@@ -434,12 +434,10 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiUnauthorizedException('Unauthorized');
         }
 
-        $paid = false;
-        $cost = 0;
-
         try {
             $cost = $costFetcher->getDeployWebCost();
-            $balance = $balanceHandler->balance($this->getUser(), Token::getBySymbol(Token::WEB_SYMBOL))->getAvailable();
+            $balance = $balanceHandler
+                ->balance($this->getUser(), Token::getBySymbol(Token::WEB_SYMBOL))->getAvailable();
 
             if ($balanceHandler->balance(
                 $this->getUser(),
@@ -454,22 +452,12 @@ class TokensAPIController extends AbstractFOSRestController
                 $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
             );
 
-            $paid = true;
-
             $deployResult = $tokenDeploy->deploy($token);
 
             $token->setAddress($deployResult->getAddress());
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
-            if (true === $paid) {
-                $balanceHandler->deposit(
-                    $this->getUser(),
-                    Token::getBySymbol(Token::WEB_SYMBOL),
-                    $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
-                );
-            }
-
             return $this->view(null, Response::HTTP_BAD_REQUEST);
         }
 
