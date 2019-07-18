@@ -176,15 +176,32 @@ describe('TokenDeploy', () => {
                 done();
             });
         });
-        it('should be called on mounted if isOwner and token not deployed', () => {
+        it('should be called on mounted if isOwner and token not deployed', (done) => {
+            moxios.stubRequest('token_deploy_balances', {status: 200, response: {
+                    balance: 999,
+                    webCost: 99,
+                }});
+
             let wrapper = mockTokenDeploy(false, true, false);
-            expect(wrapper.vm.fetchBalances).to.be.not.called;
+            moxios.wait(() => {
+                expect(wrapper.vm.balance).to.deep.equal(999);
+                expect(wrapper.vm.webCost).to.deep.equal(99);
+                done();
+            });
 
             wrapper = mockTokenDeploy(false, true, true);
-            expect(wrapper.vm.fetchBalances).to.be.not.called;
+            moxios.wait(() => {
+                expect(wrapper.vm.balance).to.deep.equal(null);
+                expect(wrapper.vm.webCost).to.deep.equal(null);
+                done();
+            });
 
             wrapper = mockTokenDeploy(false, false, true);
-            expect(wrapper.vm.fetchBalances).to.be.not.called;
+            moxios.wait(() => {
+                expect(wrapper.vm.balance).to.deep.equal(null);
+                expect(wrapper.vm.webCost).to.deep.equal(null);
+                done();
+            });
         });
     });
 });
