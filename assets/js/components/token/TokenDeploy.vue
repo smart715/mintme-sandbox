@@ -126,7 +126,7 @@ export default {
         },
     },
     mounted() {
-        if (!this.deploy && this.isOwner) {
+        if (!this.deployed && this.isOwner) {
             this.fetchBalances();
             this.addMessageHandler((response) => {
                 if (
