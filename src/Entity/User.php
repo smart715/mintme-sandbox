@@ -308,7 +308,7 @@ class User extends BaseUser implements
     /** @codeCoverageIgnore */
     public function isEmailAuthEnabled(): bool
     {
-        return true;
+        return !$this->isGoogleAuthenticatorEnabled();
     }
 
     /** @codeCoverageIgnore */

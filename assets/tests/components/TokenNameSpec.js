@@ -78,6 +78,7 @@ describe('TokenName', () => {
                 identifier: 'bar',
                 updateUrl: 'updateUrl',
                 editable: false,
+                twofa: null,
             },
         });
 
@@ -87,12 +88,12 @@ describe('TokenName', () => {
         });
 
         moxios.wait(() => {
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.find('input').exists()).to.deep.equal(true);
             expect(wrapper.vm.editingName).to.deep.equal(false);
 
             wrapper.vm.editName();
 
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.find('input').exists()).to.deep.equal(true);
             expect(wrapper.vm.editingName).to.deep.equal(false);
 
             done();
@@ -113,6 +114,7 @@ describe('TokenName', () => {
                 identifier: 'bar',
                 updateUrl: 'updateUrl',
                 editable: true,
+                twofa: null,
             },
         });
 
@@ -122,12 +124,12 @@ describe('TokenName', () => {
         });
 
         moxios.wait(() => {
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.find('input').exists()).to.deep.equal(true);
             expect(wrapper.vm.editingName).to.deep.equal(false);
 
             wrapper.vm.editName();
 
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
+            expect(wrapper.find('input').exists()).to.deep.equal(true);
             expect(wrapper.vm.editingName).to.deep.equal(false);
 
             done();
