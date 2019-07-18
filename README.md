@@ -52,6 +52,11 @@ php bin/console rabbitmq:consumer market &
 ```
 to listen for new data in markets
 
+Developing
+----------
+Use [docker build](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/docker-dev-build) to run project locally.
+//TODO: move docker configuration to this repo
+
 Contribution
 ------------
 1. Take an issue from the [Redmine](https://redmine.abchosting.org/projects/mintme/issues);
