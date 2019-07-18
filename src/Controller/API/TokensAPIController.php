@@ -27,8 +27,6 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Money\Currency;
-use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
@@ -375,7 +373,7 @@ class TokensAPIController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/{name}/deploy", name="token_deploy_balances", options={"expose"=true})
      */
-    public function TokenDeployBalances(
+    public function tokenDeployBalances(
         string $name,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
