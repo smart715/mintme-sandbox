@@ -22,7 +22,7 @@
                         <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
                         <div class="pt-3">
                             <button
-                                :disabled="btnDisableModal"
+                                :disabled="btnModalDisabled"
                                 @click="deploy"
                                 class="btn btn-info">
                                 Deploy to blockchain
@@ -33,10 +33,7 @@
                 </template>
             </modal>
         </div>
-        <div class="deployed-icon" v-else-if="deployed"><img class="h-100" src="../../../img/webchain_W.svg" alt="deployed"></div>
-        <div v-else-if="isOwner">
-            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-        </div>
+        <div v-else-if="deployed" class="deployed-icon"><img class="h-100" src="../../../img/webchain_W.svg" alt="deployed"></div>
     </div>
 </template>
 
@@ -72,11 +69,11 @@ export default {
         btnEnabled: function() {
             return this.isOwner && !this.deployed;
         },
-        btnDisableModal: function() {
+        btnModalDisabled: function() {
             return this.costExceed || this.deploying;
         },
         visible: function() {
-            return this.webCost !== null || this.balance !== null;
+            return null !== this.webCost || null !== this.balance;
         },
         costExceed: function() {
             return new Decimal(this.webCost).greaterThan(this.balance);
@@ -129,16 +126,17 @@ export default {
         },
     },
     mounted() {
-        this.fetchBalances();
-
-        this.addMessageHandler((response) => {
-            if (
-                'asset.update' === response.method &&
-                response.params[0].hasOwnProperty(WEB)
-            ) {
-                this.balance = response.params[0][WEB].available;
-            }
-        }, 'trade-buy-order-asset');
+        if (!this.deploy && this.isOwner) {
+            this.fetchBalances();
+            this.addMessageHandler((response) => {
+                if (
+                    'asset.update' === response.method &&
+                    response.params[0].hasOwnProperty(WEB)
+                ) {
+                    this.balance = response.params[0][WEB].available;
+                }
+            }, 'trade-buy-order-asset');
+        }
     },
     components: {
         Modal,
