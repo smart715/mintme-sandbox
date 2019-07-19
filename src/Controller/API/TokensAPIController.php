@@ -383,5 +383,4 @@ class TokensAPIController extends AbstractFOSRestController
 
         return $this->view($topTraders, Response::HTTP_ACCEPTED);
     }
-
 }

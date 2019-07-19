@@ -8,4 +8,5 @@ interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterfac
 {
     public function find(int $id): ?User;
     public function findByReferralCode(string $code): ?User;
+    public function getUserToken(int $token, array $userIds): array;
 }
