@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="knowledge_base")
+ * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
  */
 class KnowledgeBase
 {
