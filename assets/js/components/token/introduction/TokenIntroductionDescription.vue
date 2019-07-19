@@ -39,6 +39,7 @@
                                             identity and everything that may interest buyers.
                                         </template>
                                     </guide>
+                                    <bbcode-help class="d-inline"></bbcode-help>
                                 </div>
                                 <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
@@ -76,7 +77,8 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
-import BbcodeView from '../../BbcodeView';
+import BbcodeView from '../../bbcode/BbcodeView';
+import BbcodeHelp from '../../bbcode/BbcodeHelp';
 import markitup from 'markitup';
 import markitupSet from '../../../markitup.js';
 import LimitedTextarea from '../../LimitedTextarea';
@@ -102,6 +104,7 @@ export default {
         Guide,
         LimitedTextarea,
         BbcodeView,
+        BbcodeHelp,
     },
     data() {
         return {

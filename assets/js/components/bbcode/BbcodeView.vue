@@ -18,7 +18,11 @@ export default {
         parsedDescription: function() {
             if (null === this.description) return '';
 
-            return bbob(presetHTML5()).process(this.description, {render}).html;
+            return bbob(presetHTML5())
+                .process(this.description, {render})
+                .html
+                .replace('<img src="', '<img style="max-width: 100%;" src="')
+                .replace('<a href="', '<a rel="nofollow" href="');
         },
     },
 };

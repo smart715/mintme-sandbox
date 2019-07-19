@@ -1,5 +1,6 @@
 import LimitedTextarea from './components/LimitedTextarea.vue';
-import BbcodeView from './components/BbcodeView.vue';
+import BbcodeView from './components/bbcode/BbcodeView.vue';
+import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import markitupSet from './markitup.js';
 import markitup from 'markitup';
 import {minLength, helpers} from 'vuelidate/lib/validators';
@@ -24,6 +25,7 @@ new Vue({
     components: {
         LimitedTextarea,
         BbcodeView,
+        BbcodeHelp,
     },
     validations: {
         firstName: {
