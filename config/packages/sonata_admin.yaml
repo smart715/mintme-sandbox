@@ -8,7 +8,10 @@ sonata_admin:
             - { position: left, type: sonata.admin.block.admin_list }
 
         groups:
-
+            knowledge.base:
+                label: Knowledge Base
+                items:
+                    - admin.knowledgebase
             blacklist:
                 label: Blacklist
                 items:
