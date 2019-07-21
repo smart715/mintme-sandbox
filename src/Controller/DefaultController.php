@@ -36,7 +36,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/privacy-policy", 
+     * @Route("/privacy-policy",
      *      name="privacy_policy",
      *      options={"sitemap" = true}
      * )
