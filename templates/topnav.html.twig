@@ -53,7 +53,7 @@
                         <b-nav-item class="text-center {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
                             <span>Settings</span>
                         </b-nav-item>
-                        <b-nav-item class="text-center {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
+                        <b-nav-item class="text-center {{ app.request.get('_route') == 'logout' ? 'active' : '' }}" href="{{ path('logout') }}">
                             <span>Log Out</span>
                         </b-nav-item>
                     </div>
@@ -71,7 +71,7 @@
                             <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                             Settings
                         </b-dropdown-item>
-                        <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
+                        <b-dropdown-item href="{{ path('logout') }}">
                             <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
                             Log Out
                         </b-dropdown-item>

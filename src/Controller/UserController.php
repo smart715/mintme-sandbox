@@ -49,6 +49,18 @@ class UserController extends AbstractController
     }
 
     /**
+     * @Route("/logout", name="logout")
+     */
+    public function logout(): Response
+    {
+        $response = $this->getUser();
+            ? $this->redirectToRoute('homepage')
+            : $this->redirectToRoute('fos_user_security_logout');
+
+        return $response;
+    }
+
+    /**
      * @Route("/settings", name="settings")
      * @Route("/settings/update", name="fos_user_profile_show")
      */
