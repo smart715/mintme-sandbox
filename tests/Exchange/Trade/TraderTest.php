@@ -53,7 +53,7 @@ class TraderTest extends TestCase
 
         $user = $this->mockUser(1);
         $user->method('getReferrencer')->willReturn($user);
-//        $user->expects($this->exactly(2))->method('addRelatedToken')->with($quote);
+        $user->expects($this->exactly(2))->method('addRelatedToken');
 
         $trader->placeOrder(
             $this->mockOrder($user, 1, 100, 50, 2, $this->mockMarket(

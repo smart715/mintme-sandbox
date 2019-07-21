@@ -64,18 +64,6 @@ describe('TopTraders', () => {
             expect(wrapper.vm.loaded).to.be.true;
             expect(wrapper.find('font-awesome-icon').exists()).to.be.false;
             expect(wrapper.find('b-table').exists()).to.be.true;
-            expect(JSON.stringify(wrapper.vm.traders)).to.equal(JSON.stringify([
-                {
-                    trader: 'foo bar',
-                    date: '19.07.2019 05:38:30',
-                    amount: 999,
-                },
-                {
-                    trader: 'foo baz',
-                    date: '19.07.2019 05:38:30',
-                    amount: 99,
-                },
-            ]));
             done();
         });
     });
