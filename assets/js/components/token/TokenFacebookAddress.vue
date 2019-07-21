@@ -42,6 +42,7 @@
         </div>
         <modal
             :visible="showConfirmModal"
+            :no-close="true"
             @close="showConfirmModal = false">
             <template slot="body">
                 <div class="row">

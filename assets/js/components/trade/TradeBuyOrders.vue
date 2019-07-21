@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive text-nowrap">
+                <div class="table-responsive fixed-head-table">
                     <b-table v-if="hasOrders"
                          ref="table"
                          @row-clicked="orderClicked"
@@ -45,16 +45,16 @@
                     <div v-if="!hasOrders">
                         <p class="text-center p-5">No order was added yet</p>
                     </div>
-                    <div v-if="loading" class="p-1 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
                 </div>
-                <div class="text-center pb-2" v-if="showDownArrow">
+                <div class="text-center pb-2" v-if="showDownArrow && !loading">
                     <img
                         src="../../../img/down-arrows.png"
                         class="icon-arrows-down c-pointer"
                         alt="arrow down"
                         @click="scrollDown">
+                </div>
+                <div v-if="loading" class="p-1 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                 </div>
             </div>
         </div>

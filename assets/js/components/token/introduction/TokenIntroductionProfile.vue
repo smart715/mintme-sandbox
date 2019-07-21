@@ -146,6 +146,7 @@
         <modal
             class="text-white"
             :visible="showConfirmWebsiteModal"
+            :no-close="false"
             @close="showConfirmWebsiteModal = false">
             <template slot="body">
                 <h5 class="modal-title text-center mb-2">Website Confirmation</h5>
