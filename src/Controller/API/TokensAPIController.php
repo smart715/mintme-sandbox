@@ -375,8 +375,6 @@ class TokensAPIController extends AbstractFOSRestController
     ): View {
         $tradable = $this->cryptoManager->findBySymbol($name);
 
-
-
         if (null === $tradable) {
             $tradable = $this->tokenManager->findByName($name);
         }

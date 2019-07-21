@@ -87,8 +87,7 @@ class Trader implements TraderInterface
         if (TradeResult::SUCCESS === $result->getResult()) {
             if ($quote instanceof Token) {
                 $this->updateUserTokenReferrencer($order->getMaker(), $quote);
-            }
-            else if ($quote instanceof Crypto) {
+            } elseif ($quote instanceof Crypto) {
                 $this->updateUserCrypto($order->getMaker(), $quote);
             }
         }

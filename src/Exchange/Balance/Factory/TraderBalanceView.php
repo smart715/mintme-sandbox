@@ -21,9 +21,7 @@ class TraderBalanceView
      */
     private $balance;
 
-    /**
-     * @var DateTimeImmutable
-     */
+    /** @var DateTimeImmutable */
     private $date;
 
     public function __construct(User $user, string $balance, DateTimeImmutable $date)

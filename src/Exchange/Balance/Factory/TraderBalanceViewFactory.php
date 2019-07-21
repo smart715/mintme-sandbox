@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Balance\Factory;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\UserCrypto;
@@ -43,11 +44,11 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         $isMax = count($balances) < $extend;
         $balances = $this->refactorBalances($balances);
 
+        $usersTradables = [];
+
         if ($tradable instanceof Token) {
-            /** @var UserTradebleInterface[] $usersTradables */
             $usersTradables = $this->userManager->getUserToken($tradable, array_keys($balances));
-        } else {
-            /** @var UserTradebleInterface[] $usersTradables */
+        } elseif ($tradable instanceof Crypto) {
             $usersTradables = $this->userManager->getUserCrypto($tradable, array_keys($balances));
         }
 
