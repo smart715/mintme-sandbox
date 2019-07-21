@@ -376,7 +376,7 @@ class TokensAPIController extends AbstractFOSRestController
 
         if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
             throw new ApiUnauthorizedException('Invalid 2fa code');
-        } elseif (!$token->checkConfirmCode((int) $request->get('code'))) {
+        } elseif (!$user->isGoogleAuthenticatorEnabled() && !$token->checkConfirmCode((int) $request->get('code'))) {
             throw new ApiUnauthorizedException('Invalid 2fa code');
         }
 
