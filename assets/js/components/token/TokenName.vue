@@ -72,6 +72,7 @@ export default {
             newName: this.name,
             isTokenExchanged: true,
             minLength: 4,
+            maxLength: 60,
             showTwoFactorModal: false,
         };
     },
