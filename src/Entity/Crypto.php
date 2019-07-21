@@ -73,6 +73,11 @@ class Crypto implements TradebleInterface
      */
     protected $relatedUsers;
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     /** @return User[] */
     public function getRelatedUsers(): array
     {

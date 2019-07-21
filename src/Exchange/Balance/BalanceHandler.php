@@ -4,6 +4,7 @@ namespace App\Exchange\Balance;
 
 use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Exchange\Balance\Exception\BalanceException;
@@ -90,11 +91,15 @@ class BalanceHandler implements BalanceHandlerInterface
     }
 
     /** @inheritDoc */
-    public function topTraders(Token $token, int $limit, int $extend = 15, int $incrementer = 5): array
+    public function topTraders(TradebleInterface $tradable, int $limit, int $extend = 15, int $incrementer = 5): array
     {
-        $result = $this->balanceFetcher->topBalances($this->converter->convert($token), $extend);
+        $tradableName = $tradable instanceof Token
+            ? $this->converter->convert($tradable)
+            : $tradable->getSymbol();
 
-        return $this->traderBalanceViewFactory->create($this, $result, $token, $limit, $extend, $incrementer);
+        $result = $this->balanceFetcher->topBalances($tradableName, $extend);
+
+        return $this->traderBalanceViewFactory->create($this, $result, $tradable, $limit, $extend, $incrementer);
     }
 
     public function isNotExchanged(Token $token, int $amount): bool

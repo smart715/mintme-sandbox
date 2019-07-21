@@ -3,7 +3,10 @@
 namespace App\Exchange\Balance\Factory;
 
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
+use App\Entity\UserCrypto;
 use App\Entity\UserToken;
+use App\Entity\UserTradebleInterface;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\Config;
 use App\Manager\UserManagerInterface;
@@ -28,39 +31,44 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
     public function create(
         BalanceHandlerInterface $balanceHandler,
         array $balances,
-        Token $token,
+        TradebleInterface $tradable,
         int $limit,
         int $extend,
         int $incrementer
     ): array {
-        if (null === $token->getId()) {
+        if ($tradable instanceof Token && null === $tradable->getId()) {
             return [];
         }
 
         $isMax = count($balances) < $extend;
         $balances = $this->refactorBalances($balances);
 
-        /** @var UserToken[] $tokenUsers */
-        $usersTokens = $this->userManager->getUserToken($token->getId(), array_keys($balances));
-
-        if ($isMax || count($usersTokens) >= $limit) {
-            return $this->getTraderBalancesView(array_slice($usersTokens, 0, $limit), $balances);
+        if ($tradable instanceof Token) {
+            /** @var UserTradebleInterface[] $usersTradables */
+            $usersTradables = $this->userManager->getUserToken($tradable, array_keys($balances));
+        } else {
+            /** @var UserTradebleInterface[] $usersTradables */
+            $usersTradables = $this->userManager->getUserCrypto($tradable, array_keys($balances));
         }
 
-        return $balanceHandler->topTraders($token, $limit, $extend + $incrementer, $incrementer);
+        if ($isMax || count($usersTradables) >= $limit) {
+            return $this->getTraderBalancesView(array_slice($usersTradables, 0, $limit), $balances);
+        }
+
+        return $balanceHandler->topTraders($tradable, $limit, $extend + $incrementer, $incrementer);
     }
 
     /**
-     * @param UserToken[] $usersTokens
+     * @param UserTradebleInterface[] $usersTokens
      * @param string[] $balances
      * @return TraderBalanceView[]
      */
     private function getTraderBalancesView(array $usersTokens, array $balances): array
     {
-        return array_map(function (UserToken $userToken) use ($balances) {
-            $user = $userToken->getUser();
+        return array_map(function (UserTradebleInterface $userTradable) use ($balances) {
+            $user = $userTradable->getUser();
 
-            return new TraderBalanceView($user, $balances[$user->getId()], $userToken->getCreated());
+            return new TraderBalanceView($user, $balances[$user->getId()], $userTradable->getCreated());
         }, $usersTokens);
     }
 

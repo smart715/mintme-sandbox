@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="user_crypto")
  */
-class UserCrypto
+class UserCrypto implements UserTradebleInterface
 {
     /**
      * @ORM\Id
@@ -62,7 +62,7 @@ class UserCrypto
         return $this->crypto;
     }
 
-    public function setToken(Crypto $crypto): self
+    public function setCrypto(Crypto $crypto): self
     {
         $this->crypto = $crypto;
 

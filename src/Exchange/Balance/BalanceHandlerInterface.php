@@ -4,6 +4,7 @@ namespace App\Exchange\Balance;
 
 use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\TraderBalanceView;
@@ -32,11 +33,11 @@ interface BalanceHandlerInterface
     public function isNotExchanged(Token $token, int $amount): bool;
 
     /**
-     * @param  Token $token
+     * @param  TradebleInterface $tradable
      * @param  int $limit
      * @param  int $extend
      * @param  int $incrementer
      * @return TraderBalanceView[]
      */
-    public function topTraders(Token $token, int $limit, int $extend = 15, int $incrementer = 5): array;
+    public function topTraders(TradebleInterface $tradable, int $limit, int $extend = 15, int $incrementer = 5): array;
 }

@@ -2,9 +2,11 @@
 
 namespace App\Exchange\Trade;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Entity\UserCrypto;
 use App\Entity\UserToken;
 use App\Exchange\Market;
 use App\Exchange\Order;
@@ -82,8 +84,13 @@ class Trader implements TraderInterface
 
         $quote = $order->getMarket()->getQuote();
 
-        if (TradeResult::SUCCESS === $result->getResult() && $quote instanceof Token) {
-            $this->updateUserReferrencer($order->getMaker(), $quote);
+        if (TradeResult::SUCCESS === $result->getResult()) {
+            if ($quote instanceof Token) {
+                $this->updateUserTokenReferrencer($order->getMaker(), $quote);
+            }
+            else if ($quote instanceof Crypto) {
+                $this->updateUserCrypto($order->getMaker(), $quote);
+            }
         }
 
         if (TradeResult::FAILED === $result->getResult()) {
@@ -166,7 +173,7 @@ class Trader implements TraderInterface
         return !$this->prelaunchConfig->isEnabled();
     }
 
-    private function updateUserReferrencer(User $user, Token $token): void
+    private function updateUserTokenReferrencer(User $user, Token $token): void
     {
         $referrencer = $user->getReferrencer();
 
@@ -183,6 +190,17 @@ class Trader implements TraderInterface
             $this->entityManager->persist($userToken);
             $referrencer->addRelatedToken($userToken);
             $this->entityManager->persist($referrencer);
+            $this->entityManager->flush();
+        }
+    }
+
+    private function updateUserCrypto(User $user, Crypto $crypto): void
+    {
+        if (!in_array($user, $crypto->getRelatedUsers(), true)) {
+            $userCrypto = (new UserCrypto())->setCrypto($crypto)->setUser($user);
+            $this->entityManager->persist($userCrypto);
+            $user->addRelatedCrypto($userCrypto);
+            $this->entityManager->persist($user);
             $this->entityManager->flush();
         }
     }

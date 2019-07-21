@@ -2,7 +2,7 @@
 
 namespace App\Exchange\Balance\Factory;
 
-use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Exchange\Balance\BalanceHandlerInterface;
 
 interface TraderBalanceViewFactoryInterface
@@ -10,7 +10,7 @@ interface TraderBalanceViewFactoryInterface
     /**
      * @param BalanceHandlerInterface $balanceHandler
      * @param array $traderBalances
-     * @param Token $token
+     * @param TradebleInterface $tradable
      * @param int $limit
      * @param int $extend
      * @param int $incrementer
@@ -19,7 +19,7 @@ interface TraderBalanceViewFactoryInterface
     public function create(
         BalanceHandlerInterface $balanceHandler,
         array $traderBalances,
-        Token $token,
+        TradebleInterface $tradable,
         int $limit,
         int $extend,
         int $incrementer

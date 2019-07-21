@@ -373,13 +373,19 @@ class TokensAPIController extends AbstractFOSRestController
         string $name,
         BalanceHandlerInterface $balanceHandler
     ): View {
-        $token = $this->tokenManager->findByName($name);
+        $tradable = $this->cryptoManager->findBySymbol($name);
 
-        if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+
+
+        if (null === $tradable) {
+            $tradable = $this->tokenManager->findByName($name);
         }
 
-        $topTraders = $balanceHandler->topTraders($token, 10);
+        if (null == $tradable) {
+            throw $this->createNotFoundException('Not Found');
+        }
+
+        $topTraders = $balanceHandler->topTraders($tradable, 10);
 
         return $this->view($topTraders, Response::HTTP_ACCEPTED);
     }

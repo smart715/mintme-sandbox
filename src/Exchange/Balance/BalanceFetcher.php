@@ -81,10 +81,10 @@ class BalanceFetcher implements BalanceFetcherInterface
         );
     }
 
-    public function topBalances(string $tokenName, int $limit): array
+    public function topBalances(string $tradableName, int $limit): array
     {
         $response = $this->jsonRpc->send(self::BALANCE_TOP_METHOD, [
-            $tokenName,
+            $tradableName,
             $limit,
         ]);
 

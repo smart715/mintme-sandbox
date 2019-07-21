@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="user_token")
  */
-class UserToken
+class UserToken implements UserTradebleInterface
 {
     /**
      * @ORM\Id
