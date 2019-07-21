@@ -58,13 +58,13 @@ class SecurityController extends FOSSecurityController
     }
 
     /** @Route("/logout", name="logout") */
-    public function logoutAction(Request $request): Response
+    public function logoutAction(): Response
     {
         $securityContext = $this->container->get('security.authorization_checker');
 
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ||
             $securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
-                return parent::logoutAction($request);
+                return parent::logoutAction();
         }
         
         return $this->redirectToRoute('login');
