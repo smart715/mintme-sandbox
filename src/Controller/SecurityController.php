@@ -64,7 +64,7 @@ class SecurityController extends FOSSecurityController
 
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ||
             $securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
-                return parent::logoutAction();
+                return $this->redirectToRoute('settings');
         }
         
         return $this->redirectToRoute('login');
