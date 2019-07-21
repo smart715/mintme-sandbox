@@ -106,6 +106,12 @@ class User extends BaseUser implements
     protected $relatedTokens;
 
     /**
+     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="user")
+     * @var ArrayCollection
+     */
+    protected $relatedCryptos;
+
+    /**
      * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
      * @var ArrayCollection
      */
@@ -150,9 +156,9 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
-    public function removeRelatedToken(Token $token): self
+    public function addRelatedCrypto(UserCrypto $userCrypto): self
     {
-        $this->relatedTokens->removeElement($token);
+        $this->relatedCryptos->add($userCrypto);
 
         return $this;
     }

@@ -2,16 +2,15 @@
 
 namespace App\Entity;
 
-use App\Entity\Token\Token;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
- * @ORM\Table(name="user_token")
+ * @ORM\Table(name="user_crypto")
  */
-class UserToken
+class UserCrypto
 {
     /**
      * @ORM\Id
@@ -29,11 +28,11 @@ class UserToken
     protected $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="relatedTokens")
+     * @ORM\ManyToOne(targetEntity="Crypto", inversedBy="relatedCryptos")
      * @ORM\JoinColumn(nullable=false)
-     * @var Token
+     * @var Crypto
      */
-    protected $token;
+    protected $crypto;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -58,14 +57,14 @@ class UserToken
         return $this;
     }
 
-    public function getToken(): Token
+    public function getCrypto(): Crypto
     {
-        return $this->token;
+        return $this->crypto;
     }
 
-    public function setToken(Token $token): self
+    public function setToken(Crypto $crypto): self
     {
-        $this->token = $token;
+        $this->crypto = $crypto;
 
         return $this;
     }
