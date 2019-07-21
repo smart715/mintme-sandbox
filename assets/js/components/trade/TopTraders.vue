@@ -6,7 +6,7 @@
         <div class="card-body p-0">
             <div class="table-responsive fix-height" ref="traders">
                 <template v-if="loaded">
-                    <b-table
+                    <b-table v-if="hasTraders"
                     :items="traders"
                     :fields="fields">
                     <template slot="trader" slot-scope="row">
@@ -17,6 +17,9 @@
                             alt="avatar">
                     </template>
                 </b-table>
+                    <div v-else>
+                        <p class="text-center p-5">No Traders yet</p>
+                    </div>
                 </template>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -36,6 +39,8 @@
 </template>
 
 <script>
+import moment from 'moment';
+import {GENERAL} from '../../utils/constants';
 export default {
     name: 'TopTraders',
     props: {
@@ -64,6 +69,9 @@ export default {
         loaded: function() {
             return null !== this.traders;
         },
+        hasTraders: function() {
+            return this.traders.length > 0;
+        },
     },
     methods: {
         scrollDown: function() {
@@ -77,7 +85,7 @@ export default {
             .then(({data}) => this.traders = data.map((row) => {
                 return {
                     trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
-                    date: '2019-01-05',
+                    date: moment.unix(row.timestamp).format(GENERAL.dateFormat),
                     amount: Math.round(row.balance),
                 };
             }));

@@ -23,7 +23,6 @@ class TraderBalanceView
 
     /**
      * @var DateTimeImmutable
-     * @Groups({"API"})
      */
     private $date;
 
@@ -37,6 +36,15 @@ class TraderBalanceView
     public function getDate(): DateTimeImmutable
     {
         return $this->date;
+    }
+
+    /**
+     * @Groups({"API"})
+     * @return int
+     */
+    public function getTimestamp(): int
+    {
+        return $this->date->getTimestamp();
     }
 
     public function getUser(): User
