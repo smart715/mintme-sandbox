@@ -4,6 +4,8 @@ fos_user_security:
 fos_user_security_login:
     controller: App\Controller\SecurityController:loginAction
     path: /login
+    options:
+        sitemap: true
 
 fos_user_change_password:
     resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"

@@ -22,7 +22,9 @@ class TradingController extends Controller
      *     defaults={"page"="1"},
      *     requirements={"page"="\d+"},
      *     name="trading",
-     *     options={"expose"=true}
+     *     options={"expose"=true,
+     *          "sitemap" = true
+     *     }
      * )
      */
     public function trading(string $page, MarketFactoryInterface $marketManager): Response

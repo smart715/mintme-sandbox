@@ -301,27 +301,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
 
-    App\EventListener\SitemapDefaultListener:
-        arguments:
+    App\EventSubscriber\SitemapSubscriber:
+        arguments: 
             - "@router"
         tags:
-            - { name: "kernel.event_listener", event: "presta_sitemap.populate" }
-
-    App\EventListener\SitemapTokenListener:
-        arguments:
-            - "@router"
-        tags:
-            - { name: "kernel.event_listener", event: "presta_sitemap.populate" }
-
-    App\EventListener\SitemapNewsListener:
-        arguments:
-            - "@router"
-        tags:
-            - { name: "kernel.event_listener", event: "presta_sitemap.populate" }
-
-    App\EventListener\SitemapProfileListener:
-        arguments:
-            - "@router"
-        tags:
-            - { name: "kernel.event_listener", event: "presta_sitemap.populate" }
+            - { name: "kernel.event_subscriber", priority: 100 }
 
