@@ -21,8 +21,8 @@ export default {
             return bbob(presetHTML5())
                 .process(this.description, {render})
                 .html
-                .replace('<img src="', '<img style="max-width: 100%;" src="')
-                .replace('<a href="', '<a rel="nofollow" href="');
+                .replace(/<img src="/g, '<img style="max-width: 100%;" src="')
+                .replace(/<a href="/g, '<a rel="nofollow" href="');
         },
     },
 };
