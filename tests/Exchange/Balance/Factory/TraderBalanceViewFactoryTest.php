@@ -64,7 +64,7 @@ class TraderBalanceViewFactoryTest extends TestCase
         ]);
     }
 
-    public function testCreateSort(): void
+    public function testCreateWithSort(): void
     {
         $user1 = $this->mockUser(1);
         $user2 = $this->mockUser(2);
