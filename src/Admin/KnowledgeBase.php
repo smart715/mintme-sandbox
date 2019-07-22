@@ -29,21 +29,24 @@ final class KnowledgeBase extends AbstractAdmin
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
-            ->add('type')
-            ->add('value');
+            ->add('title')
+            ->add('shortUrl')
+            ->add('description');
     }
 
     protected function configureFormFields(FormMapper $form): void
     {
         $form
-            ->add('type', TextType::class)
-            ->add('value', TextType::class);
+            ->add('title', TextType::class)
+            ->add('shortUrl', TextType::class)
+            ->add('description', TextType::class);
     }
 
     protected function configureListFields(ListMapper $listMapper): void
     {
         $listMapper->addIdentifier('id', null)
-            ->add('type', TextType::class)
-            ->add('value', TextType::class);
+            ->add('title', TextType::class)
+            ->add('shortUrl', TextType::class)
+            ->add('description', TextType::class);
     }
 }
