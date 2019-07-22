@@ -14,6 +14,7 @@ interface TraderBalanceViewFactoryInterface
      * @param int $limit
      * @param int $extend
      * @param int $incrementer
+     * @param int $max
      * @return TraderBalanceView[]
      */
     public function create(
@@ -22,6 +23,7 @@ interface TraderBalanceViewFactoryInterface
         TradebleInterface $tradable,
         int $limit,
         int $extend,
-        int $incrementer
+        int $incrementer,
+        int $max
     ): array;
 }

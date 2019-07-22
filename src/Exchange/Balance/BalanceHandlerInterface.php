@@ -37,7 +37,14 @@ interface BalanceHandlerInterface
      * @param  int $limit
      * @param  int $extend
      * @param  int $incrementer
+     * @param  int $max
      * @return TraderBalanceView[]
      */
-    public function topTraders(TradebleInterface $tradable, int $limit, int $extend = 15, int $incrementer = 5): array;
+    public function topTraders(
+        TradebleInterface $tradable,
+        int $limit,
+        int $extend = 15,
+        int $incrementer = 5,
+        int $max = 40
+    ): array;
 }

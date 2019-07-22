@@ -91,15 +91,20 @@ class BalanceHandler implements BalanceHandlerInterface
     }
 
     /** @inheritDoc */
-    public function topTraders(TradebleInterface $tradable, int $limit, int $extend = 15, int $incrementer = 5): array
-    {
+    public function topTraders(
+        TradebleInterface $tradable,
+        int $limit,
+        int $extend = 15,
+        int $incrementer = 5,
+        int $max = 40
+    ): array {
         $tradableName = $tradable instanceof Token
             ? $this->converter->convert($tradable)
             : $tradable->getSymbol();
 
         $result = $this->balanceFetcher->topBalances($tradableName, $extend);
 
-        return $this->traderBalanceViewFactory->create($this, $result, $tradable, $limit, $extend, $incrementer);
+        return $this->traderBalanceViewFactory->create($this, $result, $tradable, $limit, $extend, $incrementer, $max);
     }
 
     public function isNotExchanged(Token $token, int $amount): bool

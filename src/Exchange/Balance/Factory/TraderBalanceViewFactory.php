@@ -35,13 +35,14 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         TradebleInterface $tradable,
         int $limit,
         int $extend,
-        int $incrementer
+        int $incrementer,
+        int $max
     ): array {
         if ($tradable instanceof Token && null === $tradable->getId()) {
             return [];
         }
 
-        $isMax = count($balances) < $extend;
+        $isMax = $max < $extend || count($balances) < $extend;
         $balances = $this->refactorBalances($balances);
 
         $usersTradables = [];
@@ -56,7 +57,7 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
             return $this->getTraderBalancesView(array_slice($usersTradables, 0, $limit), $balances);
         }
 
-        return $balanceHandler->topTraders($tradable, $limit, $extend + $incrementer, $incrementer);
+        return $balanceHandler->topTraders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
     }
 
     /**
@@ -73,11 +74,7 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         }, $usersTokens);
 
         usort($traderBalanceViews, function (TraderBalanceView $a, TraderBalanceView $b) {
-            return (float)$a->getBalance() > (float)$b->getBalance()
-                ? 1
-                : (float)$a->getBalance() < (float)$b->getBalance()
-                    ? -1
-                    : 0;
+            return -((float)$a->getBalance() <=> (float)$b->getBalance());
         });
 
         return $traderBalanceViews;
