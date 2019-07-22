@@ -15,5 +15,4 @@ class KnowledgeBaseController extends Controller
     {
         return $this->render('pages/knowledge_base.html.twig');
     }
-
 }
