@@ -3,13 +3,11 @@
 namespace App\Manager;
 
 use App\Entity\Crypto;
-use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserCrypto;
 use App\Entity\UserToken;
 use App\Repository\UserRepository;
-use Doctrine\ORM\Query\Expr\Join;
 
 class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserManagerInterface
 {
