@@ -66,11 +66,21 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
      */
     private function getTraderBalancesView(array $usersTokens, array $balances): array
     {
-        return array_map(function (UserTradebleInterface $userTradable) use ($balances) {
+        $traderBalanceViews = array_map(function (UserTradebleInterface $userTradable) use ($balances) {
             $user = $userTradable->getUser();
 
             return new TraderBalanceView($user, $balances[$user->getId()], $userTradable->getCreated());
         }, $usersTokens);
+
+        usort($traderBalanceViews, function (TraderBalanceView $a, TraderBalanceView $b) {
+            return (float)$a->getBalance() > (float)$b->getBalance()
+                ? 1
+                : (float)$a->getBalance() < (float)$b->getBalance()
+                    ? -1
+                    : 0;
+        });
+
+        return $traderBalanceViews;
     }
 
     /**
