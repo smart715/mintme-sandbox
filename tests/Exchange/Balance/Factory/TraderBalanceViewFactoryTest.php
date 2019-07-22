@@ -110,7 +110,7 @@ class TraderBalanceViewFactoryTest extends TestCase
         ], [
             [$user1, '999', $date1],
             [$user2, '99', $date2],
-            [$user2, '9', $date2],
+            [$user3, '9', $date3],
         ]);
     }
 
