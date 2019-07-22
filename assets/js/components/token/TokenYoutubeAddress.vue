@@ -122,7 +122,9 @@ export default {
                             this.$toasted.error('An error has occurred, please try again later');
                         }
                     });
-                }));
+                }), (error) => {
+                    this.$toasted.info('Operation canceled');
+                });
         },
         signInYoutube: function() {
             let options = new gapi.auth2.SigninOptionsBuilder();
