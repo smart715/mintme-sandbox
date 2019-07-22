@@ -49,7 +49,8 @@ class TraderBalanceViewFactoryTest extends TestCase
             $token,
             2,
             3,
-            1
+            1,
+            5
         );
 
         $this->assertCount(2, $result);
@@ -60,6 +61,56 @@ class TraderBalanceViewFactoryTest extends TestCase
         ], [
             [$user1, '999', $date1],
             [$user2, '99', $date2],
+        ]);
+    }
+
+    public function testCreateSort(): void
+    {
+        $user1 = $this->mockUser(1);
+        $user2 = $this->mockUser(2);
+        $user3 = $this->mockUser(3);
+
+        $date1 = $this->mockDate();
+        $date2 = $this->mockDate();
+        $date3 = $this->mockDate();
+
+        $factory = new TraderBalanceViewFactory($this->mockUserManager([
+            $this->mockUserToken($user1, $date1),
+            $this->mockUserToken($user2, $date2),
+            $this->mockUserToken($user3, $date3),
+        ]), $this->mockConfig());
+
+        $balances = [
+            [1, '99'],
+            [2, '999'],
+            [3, '9'],
+        ];
+
+        $token = $this->mockToken();
+        $balanceHandler = $this->mockBalanceHandler();
+        $balanceHandler->expects($this->never())->method('topTraders');
+
+        /** @var TraderBalanceView[] $result */
+        $result = $factory->create(
+            $balanceHandler,
+            $balances,
+            $token,
+            3,
+            3,
+            1,
+            5
+        );
+
+        $this->assertCount(3, $result);
+
+        $this->assertEquals([
+            [$result[0]->getUser(), $result[0]->getBalance(), $result[0]->getDate()],
+            [$result[1]->getUser(), $result[1]->getBalance(), $result[1]->getDate()],
+            [$result[2]->getUser(), $result[2]->getBalance(), $result[2]->getDate()],
+        ], [
+            [$user1, '999', $date1],
+            [$user2, '99', $date2],
+            [$user2, '9', $date2],
         ]);
     }
 
@@ -100,7 +151,8 @@ class TraderBalanceViewFactoryTest extends TestCase
             $token,
             2,
             3,
-            1
+            1,
+            5
         );
 
         $this->assertCount(0, $result);
@@ -108,12 +160,8 @@ class TraderBalanceViewFactoryTest extends TestCase
 
     public function testCreateWithManyFetch(): void
     {
-        $user1 = $this->mockUser(1);
-
-        $date1 = $this->mockDate();
-
         $factory = new TraderBalanceViewFactory($this->mockUserManager([
-            $this->mockUserToken($user1, $date1),
+            $this->mockUserToken($this->mockUser(1), $this->mockDate()),
         ]), $this->mockConfig());
 
         $balances = [
@@ -133,14 +181,14 @@ class TraderBalanceViewFactoryTest extends TestCase
             $token,
             2,
             3,
-            1
+            1,
+            5
         );
     }
 
     public function testCreateWithMaxBalances(): void
     {
         $user1 = $this->mockUser(1);
-
         $date1 = $this->mockDate();
 
         $factory = new TraderBalanceViewFactory($this->mockUserManager([
@@ -163,7 +211,47 @@ class TraderBalanceViewFactoryTest extends TestCase
             $token,
             2,
             3,
-            1
+            1,
+            5
+        );
+
+        $this->assertCount(1, $result);
+
+        $this->assertEquals([
+            [$result[0]->getUser(), $result[0]->getBalance(), $result[0]->getDate()],
+        ], [
+            [$user1, '999', $date1],
+        ]);
+    }
+
+    public function testCreateMaxArgument(): void
+    {
+        $user1 = $this->mockUser(1);
+        $date1 = $this->mockDate();
+
+        $factory = new TraderBalanceViewFactory($this->mockUserManager([
+            $this->mockUserToken($user1, $date1),
+        ]), $this->mockConfig());
+
+        $balances = [
+            [1, '999'],
+            [2, '99'],
+            [3, '9'],
+        ];
+
+        $token = $this->mockToken();
+        $balanceHandler = $this->mockBalanceHandler();
+        $balanceHandler->expects($this->never())->method('topTraders');
+
+        /** @var TraderBalanceView[] $result */
+        $result = $factory->create(
+            $balanceHandler,
+            $balances,
+            $token,
+            2,
+            3,
+            1,
+            3
         );
 
         $this->assertCount(1, $result);

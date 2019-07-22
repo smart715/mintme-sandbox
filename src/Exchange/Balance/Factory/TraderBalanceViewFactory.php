@@ -42,7 +42,7 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
             return [];
         }
 
-        $isMax = $max < $extend || count($balances) < $extend;
+        $isMax = $max <= $extend || count($balances) < $extend;
         $balances = $this->refactorBalances($balances);
 
         $usersTradables = [];
