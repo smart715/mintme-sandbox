@@ -351,7 +351,7 @@ class BalanceHandlerTest extends TestCase
     {
         $user = $this->createMock(User::class);
         $user->method('getId')->willReturn($id);
-        $user->method('getRelatedTokens')->willReturn($toks);
+        $user->method('getTokens')->willReturn($toks);
 
         return $user;
     }
