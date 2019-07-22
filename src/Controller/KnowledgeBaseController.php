@@ -9,7 +9,7 @@ class KnowledgeBaseController extends Controller
 {
 
     /**
-     * @Route(path="/faq", name="faq")
+     * @Route(path="/kb", name="kb")
      */
     public function showAll(): Response
     {

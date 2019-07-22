@@ -6,6 +6,8 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 final class KnowledgeBase extends AbstractAdmin
@@ -39,14 +41,14 @@ final class KnowledgeBase extends AbstractAdmin
         $form
             ->add('title', TextType::class)
             ->add('shortUrl', TextType::class)
-            ->add('description', TextType::class);
+            ->add('description', TextareaType::class);
     }
 
     protected function configureListFields(ListMapper $listMapper): void
     {
-        $listMapper->addIdentifier('id', null)
+        $listMapper->addIdentifier('id', IntegerType::class)
             ->add('title', TextType::class)
             ->add('shortUrl', TextType::class)
-            ->add('description', TextType::class);
+            ->add('description', TextareaType::class);
     }
 }
