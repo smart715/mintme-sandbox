@@ -159,7 +159,7 @@ services:
             - App\Entity\KnowledgeBase
             - Sonata\AdminBundle\Controller\CRUDController
         tags:
-            - { name: sonata.admin, manager_type: orm, label: Blacklist }
+            - { name: sonata.admin, manager_type: orm, label: Knowledge Base }
         public: true
 
     # Required by rabbitmq bundle

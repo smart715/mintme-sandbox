@@ -44,7 +44,7 @@ class KnowledgeBase
 
     public function getTitle(): string
     {
-        return $this->title;
+        return $this->title ?? '';
     }
 
     public function setTitle(string $title): void
@@ -54,7 +54,7 @@ class KnowledgeBase
 
     public function getShortUrl(): string
     {
-        return $this->shortUrl;
+        return $this->shortUrl ?? '';
     }
 
     public function setShortUrl(string $shortUrl): void
@@ -64,7 +64,7 @@ class KnowledgeBase
 
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->description ?? '';
     }
 
     public function setDescription(string $description): void
