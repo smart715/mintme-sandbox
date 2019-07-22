@@ -5,7 +5,6 @@ namespace App\Entity\KnowledgeBase;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 /**
  * @ORM\Table(name="knowledge_base")
  * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
@@ -87,7 +86,7 @@ class KnowledgeBase
     {
         return $this->category;
     }
-    
+
     public function setCategory(Category $category): void
     {
         $this->category = $category;

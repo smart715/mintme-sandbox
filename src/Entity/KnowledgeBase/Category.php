@@ -43,5 +43,4 @@ class Category
     {
         $this->id = $id;
     }
-
 }
