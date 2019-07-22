@@ -12,6 +12,7 @@ sonata_admin:
                 label: Knowledge Base
                 items:
                     - admin.knowledgebase
+                    - admin.knowledgebase.category
 
             blacklist:
                 label: Blacklist

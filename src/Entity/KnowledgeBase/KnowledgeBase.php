@@ -1,8 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace App\Entity;
+namespace App\Entity\KnowledgeBase;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Table(name="knowledge_base")
@@ -17,6 +19,16 @@ class KnowledgeBase
      * @var int
      */
     protected $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\KnowledgeBase\Category")
+     * @ORM\JoinColumns({
+     *     @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     *  })
+     * @Assert\NotBlank
+     * @var Category
+     */
+    protected $category;
 
     /**
      * @ORM\Column(type="string")
@@ -69,5 +81,15 @@ class KnowledgeBase
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getCategory(): Category
+    {
+        return $this->category;
+    }
+    
+    public function setCategory(Category $category): void
+    {
+        $this->category = $category;
     }
 }

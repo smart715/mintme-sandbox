@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-final class KnowledgeBase extends AbstractAdmin
+final class KnowledgeBaseAdmin extends AbstractAdmin
 {
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
@@ -31,6 +31,7 @@ final class KnowledgeBase extends AbstractAdmin
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
+            ->add('category', null)
             ->add('title')
             ->add('shortUrl')
             ->add('description');
@@ -39,6 +40,7 @@ final class KnowledgeBase extends AbstractAdmin
     protected function configureFormFields(FormMapper $form): void
     {
         $form
+            ->add('category', null)
             ->add('title', TextType::class)
             ->add('shortUrl', TextType::class)
             ->add('description', TextareaType::class);
@@ -47,6 +49,7 @@ final class KnowledgeBase extends AbstractAdmin
     protected function configureListFields(ListMapper $listMapper): void
     {
         $listMapper->addIdentifier('id', IntegerType::class)
+            ->add('category', null)
             ->add('title', TextType::class)
             ->add('shortUrl', TextType::class)
             ->add('description', TextareaType::class);
