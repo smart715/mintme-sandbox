@@ -150,7 +150,10 @@ export default {
     },
     methods: {
         parse: function(val) {
-            return bbob(presetHTML5()).process(val, {render}).html;
+            return bbob(presetHTML5())
+                .process(val, {render})
+                .html
+                .replace(/<a href="/g, '<a style="pointer-events: none;" href="');
         },
     },
 };
