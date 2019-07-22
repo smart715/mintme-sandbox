@@ -68,4 +68,17 @@ describe('TokenName', () => {
     //         done();
     //     });
     // });
+
+    it('can not be edited if not editable', () => {
+        const localVue = mockVue();
+        const wrapper = mount(TokenName, {
+            localVue,
+            propsData: {
+                name: 'foo',
+                identifier: 'bar',
+                editable: false,
+            },
+        });
+        expect(wrapper.find('svg').exists()).to.equal(false);
+    });
 });

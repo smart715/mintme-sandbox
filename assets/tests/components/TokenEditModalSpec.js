@@ -1,33 +1,14 @@
 import Vue from 'vue';
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
+import TokenEditModal from '../../js/components/modal/TokenEditModal';
 Vue.use(Vuelidate);
 Vue.use(Toasted);
-import TokenEditModal from '../../js/components/modal/TokenEditModal';
-import moxios from 'moxios';
-import axios from 'axios';
-
-/**
- * @return {Wrapper<Vue>}
- */
-function mockVue() {
-    const localVue = createLocalVue();
-    localVue.use(axios);
-    localVue.use({
-        install(Vue, options) {
-            Vue.prototype.$axios = {retry: axios, single: axios};
-            Vue.prototype.$routing = {generate: (val) => val};
-        },
-    });
-    return localVue;
-}
 
 describe('TokenEditModal', () => {
     it('renders correctly with assigned props', () => {
-        const localVue = mockVue();
         const wrapper = mount(TokenEditModal, {
-            localVue,
             propsData: {
                 visible: true,
                 currentName: 'foo',
@@ -43,9 +24,7 @@ describe('TokenEditModal', () => {
     });
 
     it('throw required error when value is not set', () => {
-        const localVue = mockVue();
         const wrapper = mount(TokenEditModal, {
-            localVue,
             propsData: {
                 visible: true,
                 currentName: 'foo',
@@ -79,5 +58,4 @@ describe('TokenEditModal', () => {
         const unavailable = btn.at(1).text().indexOf('Token deletion') !== -1;
         expect(unavailable).to.equal(wrapper.vm.isTokenExchanged);
     });
-
 });
