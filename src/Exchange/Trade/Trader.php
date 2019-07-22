@@ -176,18 +176,18 @@ class Trader implements TraderInterface
     {
         $referrencer = $user->getReferrencer();
 
-        if (!in_array($user, $token->getRelatedUsers(), true)) {
+        if (!in_array($user, $token->getUsers(), true)) {
             $userToken = (new UserToken())->setToken($token)->setUser($user);
             $this->entityManager->persist($userToken);
-            $user->addRelatedToken($userToken);
+            $user->addToken($userToken);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         }
 
-        if ($referrencer && !in_array($referrencer, $token->getRelatedUsers(), true)) {
+        if ($referrencer && !in_array($referrencer, $token->getUsers(), true)) {
             $userToken = (new UserToken())->setToken($token)->setUser($user);
             $this->entityManager->persist($userToken);
-            $referrencer->addRelatedToken($userToken);
+            $referrencer->addToken($userToken);
             $this->entityManager->persist($referrencer);
             $this->entityManager->flush();
         }
@@ -195,10 +195,10 @@ class Trader implements TraderInterface
 
     private function updateUserCrypto(User $user, Crypto $crypto): void
     {
-        if (!in_array($user, $crypto->getRelatedUsers(), true)) {
+        if (!in_array($user, $crypto->getUsers(), true)) {
             $userCrypto = (new UserCrypto())->setCrypto($crypto)->setUser($user);
             $this->entityManager->persist($userCrypto);
-            $user->addRelatedCrypto($userCrypto);
+            $user->addCrypto($userCrypto);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         }

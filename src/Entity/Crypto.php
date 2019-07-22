@@ -71,7 +71,7 @@ class Crypto implements TradebleInterface
      * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="crypto")
      * @var ArrayCollection
      */
-    protected $relatedUsers;
+    protected $users;
 
     public function getId(): int
     {
@@ -79,11 +79,11 @@ class Crypto implements TradebleInterface
     }
 
     /** @return User[] */
-    public function getRelatedUsers(): array
+    public function getUsers(): array
     {
         return array_map(function (UserCrypto $userCrypto) {
             return $userCrypto->getUser();
-        }, $this->relatedUsers->toArray());
+        }, $this->users->toArray());
     }
 
     /** {@inheritdoc} */

@@ -21,14 +21,14 @@ class UserCrypto implements UserTradebleInterface
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="relatedUsers")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
      * @var User
      */
     protected $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Crypto", inversedBy="relatedCryptos")
+     * @ORM\ManyToOne(targetEntity="Crypto", inversedBy="cryptos")
      * @ORM\JoinColumn(nullable=false)
      * @var Crypto
      */

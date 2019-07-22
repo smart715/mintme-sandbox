@@ -103,13 +103,13 @@ class User extends BaseUser implements
      * @ORM\OneToMany(targetEntity="UserToken", mappedBy="user")
      * @var ArrayCollection
      */
-    protected $relatedTokens;
+    protected $tokens;
 
     /**
      * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="user")
      * @var ArrayCollection
      */
-    protected $relatedCryptos;
+    protected $cryptos;
 
     /**
      * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
@@ -140,25 +140,25 @@ class User extends BaseUser implements
      * @codeCoverageIgnore
      * @return Token[]
      */
-    public function getRelatedTokens(): array
+    public function getTokens(): array
     {
         return array_map(function (UserToken $userToken) {
             return $userToken->getToken();
-        }, $this->relatedTokens->toArray());
+        }, $this->tokens->toArray());
     }
 
     /** @codeCoverageIgnore */
-    public function addRelatedToken(UserToken $userToken): self
+    public function addToken(UserToken $userToken): self
     {
-        $this->relatedTokens->add($userToken);
+        $this->tokens->add($userToken);
 
         return $this;
     }
 
     /** @codeCoverageIgnore */
-    public function addRelatedCrypto(UserCrypto $userCrypto): self
+    public function addCrypto(UserCrypto $userCrypto): self
     {
-        $this->relatedCryptos->add($userCrypto);
+        $this->cryptos->add($userCrypto);
 
         return $this;
     }

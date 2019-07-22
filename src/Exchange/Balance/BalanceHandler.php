@@ -137,10 +137,10 @@ class BalanceHandler implements BalanceHandlerInterface
             throw $exception;
         }
 
-        if (!in_array($token, $user->getRelatedTokens()) && $token->getId()) {
+        if (!in_array($token, $user->getTokens()) && $token->getId()) {
             $userToken = (new UserToken())->setToken($token)->setUser($user);
             $this->entityManager->persist($userToken);
-            $user->addRelatedToken($userToken);
+            $user->addToken($userToken);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         }

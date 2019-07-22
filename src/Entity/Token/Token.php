@@ -115,14 +115,14 @@ class Token implements TradebleInterface
      * @ORM\OneToMany(targetEntity="App\Entity\UserToken", mappedBy="token")
      * @var ArrayCollection
      */
-    protected $relatedUsers;
+    protected $users;
 
     /** @return User[] */
-    public function getRelatedUsers(): array
+    public function getUsers(): array
     {
         return array_map(function (UserToken $userToken) {
             return $userToken->getUser();
-        }, $this->relatedUsers->toArray());
+        }, $this->users->toArray());
     }
 
     /** {@inheritdoc} */

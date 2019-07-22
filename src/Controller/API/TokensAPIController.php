@@ -287,7 +287,7 @@ class TokensAPIController extends AbstractFOSRestController
         try {
             $common = $balanceHandler->balances(
                 $this->getUser(),
-                $this->getUser()->getRelatedTokens()
+                $this->getUser()->getTokens()
             );
         } catch (BalanceException $exception) {
             if (BalanceException::EMPTY == $exception->getCode()) {
@@ -373,11 +373,8 @@ class TokensAPIController extends AbstractFOSRestController
         string $name,
         BalanceHandlerInterface $balanceHandler
     ): View {
-        $tradable = $this->cryptoManager->findBySymbol($name);
-
-        if (null === $tradable) {
-            $tradable = $this->tokenManager->findByName($name);
-        }
+        $tradable = $this->cryptoManager->findBySymbol($name) ??
+            $this->tokenManager->findByName($name);
 
         if (null == $tradable) {
             throw $this->createNotFoundException('Not Found');
