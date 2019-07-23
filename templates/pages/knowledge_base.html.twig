@@ -5,13 +5,18 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-lg-4">
-                <div class="nav nav-pills faq-nav" id="faq-tabs" role="tablist" aria-orientation="vertical">
+            <div class="col-12">
+                <ul class="list-group">
                     {% for kb in articles %}
-                        <a href="#tab1" class="nav-link active" data-toggle="pill" role="tab" aria-controls="tab1" aria-selected="true">
-                            <i class="mdi mdi-help-circle"></i> {{ kb.title }}
-                        </a>
+                        <li class="list-group-item"><span class="text-danger">{{ kb.title }}</span></li>
                     {% endfor %}
-                </div>
+                    <li class="list-group-item">Dapibus ac facilisis in</li>
+                    <li class="list-group-item">Morbi leo risus</li>
+                    <li class="list-group-item">Porta ac consectetur ac</li>
+                    <li class="list-group-item">Vestibulum at eros</li>
+                </ul>
+
             </div>
+        </div>
+    </div>
 {% endblock %}
