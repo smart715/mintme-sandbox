@@ -96,7 +96,7 @@ class BalanceHandler implements BalanceHandlerInterface
         int $limit,
         int $extend = 15,
         int $incrementer = 5,
-        int $max = 15
+        int $max = 30
     ): array {
         $tradableName = $tradable instanceof Token
             ? $this->converter->convert($tradable)
