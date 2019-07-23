@@ -38,7 +38,7 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         int $incrementer,
         int $max
     ): array {
-        if ($tradable instanceof Token && null === $tradable->getId()) {
+        if (0 === count($balances) || $tradable instanceof Token && null === $tradable->getId()) {
             return [];
         }
 
