@@ -45,19 +45,31 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         $isMax = $max <= $extend || count($balances) < $extend;
         $balances = $this->refactorBalances($balances);
 
-        $usersTradables = 0 > count($balances)
-            ? $tradable instanceof Token
-                ? $this->userManager->getUserToken($tradable, array_keys($balances))
-                : $tradable instanceof Crypto
-                    ? $this->userManager->getUserCrypto($tradable, array_keys($balances))
-                    : []
-            : [];
+        $usersTradables = count($balances) > 0 ? $this->getUserTradables($tradable, array_keys($balances)) : [];
 
         if ($isMax || count($usersTradables) >= $limit) {
             return $this->getTraderBalancesView(array_slice($usersTradables, 0, $limit), $balances);
         }
 
         return $balanceHandler->topTraders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
+    }
+
+    /**
+     * @param TradebleInterface $tradeble
+     * @param int[] $userIds
+     * @return array
+     */
+    private function getUserTradables(TradebleInterface $tradeble, array $userIds): array
+    {
+        if ($tradeble instanceof Token) {
+            return $this->userManager->getUserToken($tradeble, $userIds);
+        }
+
+        if ($tradeble instanceof Crypto) {
+            return $this->userManager->getUserCrypto($tradeble, $userIds);
+        }
+
+         return [];
     }
 
     /**

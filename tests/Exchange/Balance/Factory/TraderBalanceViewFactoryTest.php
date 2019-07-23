@@ -60,7 +60,7 @@ class TraderBalanceViewFactoryTest extends TestCase
     {
         $userManager = $this->mockUserManager([]);
         $userManager->expects($this->never())->method('getUserToken');
-        $userManager->expects($this->once())->method('getUserCrypto');
+        $userManager->expects($this->never())->method('getUserCrypto');
 
         $factory = new TraderBalanceViewFactory($userManager, $this->mockConfig());
 
