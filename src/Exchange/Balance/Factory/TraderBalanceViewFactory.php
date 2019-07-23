@@ -45,13 +45,13 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
         $isMax = $max <= $extend || count($balances) < $extend;
         $balances = $this->refactorBalances($balances);
 
-        $usersTradables = [];
-
-        if ($tradable instanceof Token) {
-            $usersTradables = $this->userManager->getUserToken($tradable, array_keys($balances));
-        } elseif ($tradable instanceof Crypto) {
-            $usersTradables = $this->userManager->getUserCrypto($tradable, array_keys($balances));
-        }
+        $usersTradables = 0 > count($balances)
+            ? $tradable instanceof Token
+                ? $this->userManager->getUserToken($tradable, array_keys($balances))
+                : $tradable instanceof Crypto
+                    ? $this->userManager->getUserCrypto($tradable, array_keys($balances))
+                    : []
+            : [];
 
         if ($isMax || count($usersTradables) >= $limit) {
             return $this->getTraderBalancesView(array_slice($usersTradables, 0, $limit), $balances);
@@ -90,7 +90,7 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
 
         foreach ($balances as $balance) {
             if (isset($balance[0]) && isset($balance[1])
-                && 0 < ($userId =(int)$balance[0] - $this->config->getOffset())) {
+                && 0 < ($userId = (int)$balance[0] - $this->config->getOffset())) {
                 $refactoredBalances[$userId] = $balance[1];
             }
         }

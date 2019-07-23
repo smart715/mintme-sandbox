@@ -56,6 +56,34 @@ class TraderBalanceViewFactoryTest extends TestCase
         ]);
     }
 
+    public function testCreateWithEmptyBalances(): void
+    {
+        $userManager = $this->mockUserManager([]);
+        $userManager->expects($this->never())->method('getUserToken');
+        $userManager->expects($this->once())->method('getUserCrypto');
+
+        $factory = new TraderBalanceViewFactory($userManager, $this->mockConfig());
+
+        $balances = [];
+
+        $token = $this->mockToken();
+        $balanceHandler = $this->mockBalanceHandler();
+        $balanceHandler->expects($this->never())->method('topTraders');
+
+        /** @var TraderBalanceView[] $result */
+        $result = $factory->create(
+            $balanceHandler,
+            $balances,
+            $token,
+            2,
+            3,
+            1,
+            5
+        );
+
+        $this->assertEquals($result, []);
+    }
+
     public function testCreateWithSort(): void
     {
         $factory = new TraderBalanceViewFactory($this->mockUserManager([
