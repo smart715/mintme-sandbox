@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\News\Post;
 use App\Entity\Profile;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
@@ -12,6 +13,9 @@ use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 class SitemapSubscriber implements EventSubscriberInterface
 {
     /** @var UrlGeneratorInterface */
@@ -23,14 +27,19 @@ class SitemapSubscriber implements EventSubscriberInterface
     /** @var TokenManagerInterface  */
     private $tokenRepository;
 
+    /** @var MarketFactoryInterface  */
+    private $MarketFactory;
+
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         EntityManagerInterface $entityManager,
-        TokenManagerInterface $tokenRepository
+        TokenManagerInterface $tokenRepository,
+        MarketFactoryInterface $MarketFactory
     ) {
         $this->urlGenerator = $urlGenerator;
         $this->entityManager = $entityManager;
         $this->tokenRepository = $tokenRepository;
+        $this->MarketFactory = $MarketFactory;
     }
 
     /**
@@ -49,9 +58,10 @@ class SitemapSubscriber implements EventSubscriberInterface
         $this->registerNewsUrls($event->getUrlContainer());
         $this->registerProfilesUrls($event->getUrlContainer());
         $this->registerTokensUrls($event->getUrlContainer());
+        $this->registerMarketsUrls($event->getUrlContainer());
     }
 
-    public function registerDefaultUrls(UrlContainerInterface $urls): void
+    private function registerDefaultUrls(UrlContainerInterface $urls): void
     {
         $lastUrls = [
             $this->urlGenerator->generate(
@@ -62,11 +72,6 @@ class SitemapSubscriber implements EventSubscriberInterface
             $this->urlGenerator->generate(
                 'fos_user_registration_register',
                 [],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ),
-            $this->urlGenerator->generate(
-                'coin',
-                ['base' => 'BTC', 'quote' => 'WEB'],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
         ];
@@ -84,7 +89,7 @@ class SitemapSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function registerNewsUrls(UrlContainerInterface $urls): void
+    private function registerNewsUrls(UrlContainerInterface $urls): void
     {
         $newsRepository = $this->entityManager->getRepository(Post::class);
 
@@ -104,7 +109,7 @@ class SitemapSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function registerProfilesUrls(UrlContainerInterface $urls): void
+    private function registerProfilesUrls(UrlContainerInterface $urls): void
     {
         $profilesRepository = $this->entityManager->getRepository(Profile::class);
 
@@ -123,8 +128,8 @@ class SitemapSubscriber implements EventSubscriberInterface
             );
         }
     }
-    
-    public function registerTokensUrls(UrlContainerInterface $urls): void
+
+    private function registerTokensUrls(UrlContainerInterface $urls): void
     {
         $tokens = $this->tokenRepository->findAll();
 
@@ -138,6 +143,23 @@ class SitemapSubscriber implements EventSubscriberInterface
                     )
                 ),
                 'tokens'
+            );
+        }
+    }
+    private function registerMarketsUrls(UrlContainerInterface $urls): void
+    {
+        $markets = $this->MarketFactory->getCoinMarkets();
+
+        foreach ($markets as $market) {
+            $urls->addUrl(
+                new UrlConcrete(
+                    $this->urlGenerator->generate(
+                        'coin',
+                        ['base' => $market->getBase()->getSymbol(), 'quote' => $market->getQuote()->getSymbol()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ) //$market->getBase()  $market->getQuote()
+                ),
+                'markets'
             );
         }
     }
