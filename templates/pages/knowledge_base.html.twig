@@ -3,7 +3,15 @@
 {% block title %}Knowledge Base | mintMe{% endblock %}
 
 {% block content %}
-    <div id="knowledge_base" class="container">
-        еуые
-    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="nav nav-pills faq-nav" id="faq-tabs" role="tablist" aria-orientation="vertical">
+                    {% for kb in articles %}
+                        <a href="#tab1" class="nav-link active" data-toggle="pill" role="tab" aria-controls="tab1" aria-selected="true">
+                            <i class="mdi mdi-help-circle"></i> {{ kb.title }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
 {% endblock %}
