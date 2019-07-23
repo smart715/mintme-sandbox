@@ -43,4 +43,9 @@ class Category
     {
         $this->id = $id;
     }
+
+    public function __toString(): string
+    {
+        return $this->getName();
+    }
 }

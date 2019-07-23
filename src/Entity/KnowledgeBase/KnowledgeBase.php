@@ -21,9 +21,7 @@ class KnowledgeBase
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\KnowledgeBase\Category")
-     * @ORM\JoinColumns({
-     *     @ORM\JoinColumn(name="category_id", referencedColumnName="id")
-     *  })
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      * @Assert\NotBlank
      * @var Category
      */
@@ -82,9 +80,12 @@ class KnowledgeBase
         $this->description = $description;
     }
 
-    public function getCategory(): Category
+    /**
+     * @return Category|string
+     */
+    public function getCategory()
     {
-        return $this->category;
+        return $this->category ?? '';
     }
 
     public function setCategory(Category $category): void
