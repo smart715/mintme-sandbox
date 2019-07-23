@@ -14,6 +14,7 @@ security:
             pattern: ^/
             logout:
                 path: /logout
+                target: /logout_success
                 handlers: [logout_listner]
             anonymous: true
             form_login:
