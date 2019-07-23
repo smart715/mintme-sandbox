@@ -69,11 +69,11 @@ export default {
 
         this.checkIfTokenExchanged();
 
-        // this.addMessageHandler((response) => {
-        //     if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier)) {
-        //         this.checkIfTokenExchanged();
-        //     }
-        // }, 'token-name-asset-update');
+        this.addMessageHandler((response) => {
+            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier)) {
+                this.checkIfTokenExchanged();
+            }
+        }, 'token-name-asset-update');
     },
     methods: {
         closeTokenEditModal: function() {

@@ -9,10 +9,11 @@
             </template>
             <template slot="body">
                 <div class="col-12 pb-3">
-                    <label for="twofactor" class="d-block text-left">
+                    <label for="tokenName" class="d-block text-left">
                         Edit your token name:
                     </label>
                     <input
+                        id="tokenName"
                         type="text"
                         v-model.trim="newName"
                         ref="tokenNameInput"
@@ -30,24 +31,11 @@
                         @click="closeModal">
                         <slot name="cancel">Cancel</slot>
                     </span>
-                    <template v-if="isTokenExchanged">
-                        <guide class="btn-cancel float-right">
-                            <template slot="icon">
-                                <span class="text-muted">Delete token</span>
-                            </template>
-                            <div slot="header">Token deletion</div>
-                            <template slot="body">
-                                To delete your token, you need to have all released tokens in your possession and no open sell orders.
-                            </template>
-                        </guide>
-                    </template>
-                    <template v-else>
-                        <span
-                            class="btn-cancel pl-3 c-pointer float-right"
-                            @click="deleteToken">
-                            Delete token
-                        </span>
-                    </template>
+                    <span
+                        class="btn-cancel pl-3 c-pointer float-right"
+                        @click="deleteToken">
+                        Delete token
+                    </span>
                 </div>
             </template>
         </modal>
@@ -79,7 +67,6 @@ export default {
     props: {
         currentName: String,
         deleteUrl: String,
-        isTokenExchanged: Boolean,
         sendCodeUrl: String,
         twofa: Boolean,
         updateUrl: String,
@@ -89,13 +76,10 @@ export default {
         return {
             minLength: 4,
             mode: null,
-            needToSendCode: true,
+            needToSendCode: !this.twofa,
             newName: this.currentName,
             showTwoFactorModal: false,
         };
-    },
-    mounted: function() {
-        this.needToSendCode = !this.twofa;
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -113,11 +97,6 @@ export default {
             }
         },
         editName: function() {
-            if (null === this.isTokenExchanged || this.isTokenExchanged) {
-                this.$toasted.error('You need all your tokens to change token\'s name or delete token');
-                return;
-            }
-
             this.$v.$touch();
             if (this.currentName === this.newName) {
                 this.cancelEditingMode();
