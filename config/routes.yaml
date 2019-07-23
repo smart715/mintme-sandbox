@@ -1,6 +1,10 @@
 fos_user_security:
     resource: "@FOSUserBundle/Resources/config/routing/security.xml"
 
+fos_user_security_login:
+    controller: App\Controller\SecurityController:loginAction
+    path: /login
+
 fos_user_change_password:
     resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"
     prefix: /profile
