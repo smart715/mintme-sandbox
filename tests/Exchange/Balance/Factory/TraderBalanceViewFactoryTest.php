@@ -18,18 +18,10 @@ class TraderBalanceViewFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $user1 = $this->mockUser(1);
-        $user2 = $this->mockUser(2);
-        $user3 = $this->mockUser(3);
-
-        $date1 = $this->mockDate();
-        $date2 = $this->mockDate();
-        $date3 = $this->mockDate();
-
         $factory = new TraderBalanceViewFactory($this->mockUserManager([
-            $this->mockUserToken($user1, $date1),
-            $this->mockUserToken($user2, $date2),
-            $this->mockUserToken($user3, $date3),
+            $this->mockUserToken($this->mockUser(1), $this->mockDate()),
+            $this->mockUserToken($this->mockUser(2), $this->mockDate()),
+            $this->mockUserToken($this->mockUser(3), $this->mockDate()),
         ]), $this->mockConfig());
 
         $balances = [
@@ -56,33 +48,25 @@ class TraderBalanceViewFactoryTest extends TestCase
         $this->assertCount(2, $result);
 
         $this->assertEquals([
-            [$result[0]->getUser(), $result[0]->getBalance(), $result[0]->getDate()],
-            [$result[1]->getUser(), $result[1]->getBalance(), $result[1]->getDate()],
+            [$result[0]->getUser()->getId(), $result[0]->getBalance()],
+            [$result[1]->getUser()->getId(), $result[1]->getBalance()],
         ], [
-            [$user1, '999', $date1],
-            [$user2, '99', $date2],
+            [1, '999'],
+            [2, '99'],
         ]);
     }
 
     public function testCreateWithSort(): void
     {
-        $user1 = $this->mockUser(1);
-        $user2 = $this->mockUser(2);
-        $user3 = $this->mockUser(3);
-
-        $date1 = $this->mockDate();
-        $date2 = $this->mockDate();
-        $date3 = $this->mockDate();
-
         $factory = new TraderBalanceViewFactory($this->mockUserManager([
-            $this->mockUserToken($user1, $date1),
-            $this->mockUserToken($user2, $date2),
-            $this->mockUserToken($user3, $date3),
+            $this->mockUserToken($this->mockUser(2), $this->mockDate()),
+            $this->mockUserToken($this->mockUser(1), $this->mockDate()),
+            $this->mockUserToken($this->mockUser(3), $this->mockDate()),
         ]), $this->mockConfig());
 
         $balances = [
-            [1, '99'],
-            [2, '999'],
+            [1, '999'],
+            [2, '99'],
             [3, '9'],
         ];
 
@@ -104,30 +88,22 @@ class TraderBalanceViewFactoryTest extends TestCase
         $this->assertCount(3, $result);
 
         $this->assertEquals([
-            [$result[0]->getUser(), $result[0]->getBalance(), $result[0]->getDate()],
-            [$result[1]->getUser(), $result[1]->getBalance(), $result[1]->getDate()],
-            [$result[2]->getUser(), $result[2]->getBalance(), $result[2]->getDate()],
+            [$result[0]->getUser()->getId(), $result[0]->getBalance()],
+            [$result[1]->getUser()->getId(), $result[1]->getBalance()],
+            [$result[2]->getUser()->getId(), $result[2]->getBalance()],
         ], [
-            [$user1, '999', $date1],
-            [$user2, '99', $date2],
-            [$user3, '9', $date3],
+            [1, '999'],
+            [2, '99'],
+            [3, '9'],
         ]);
     }
 
     public function testCreateWhenTokenIdIsNull(): void
     {
-        $user1 = $this->mockUser(1);
-        $user2 = $this->mockUser(2);
-        $user3 = $this->mockUser(3);
-
-        $date1 = $this->mockDate();
-        $date2 = $this->mockDate();
-        $date3 = $this->mockDate();
-
         $userManager = $this->mockUserManager([
-            $this->mockUserToken($user1, $date1),
-            $this->mockUserToken($user2, $date2),
-            $this->mockUserToken($user3, $date3),
+            $this->mockUserToken($this->mockUser(1), $this->mockDate()),
+            $this->mockUserToken($this->mockUser(2), $this->mockDate()),
+            $this->mockUserToken($this->mockUser(3), $this->mockDate()),
         ]);
 
         $userManager->expects($this->never())->method('getUserToken');
@@ -188,11 +164,8 @@ class TraderBalanceViewFactoryTest extends TestCase
 
     public function testCreateWithMaxBalances(): void
     {
-        $user1 = $this->mockUser(1);
-        $date1 = $this->mockDate();
-
         $factory = new TraderBalanceViewFactory($this->mockUserManager([
-            $this->mockUserToken($user1, $date1),
+            $this->mockUserToken($this->mockUser(1), $this->mockDate()),
         ]), $this->mockConfig());
 
         $balances = [
@@ -218,19 +191,16 @@ class TraderBalanceViewFactoryTest extends TestCase
         $this->assertCount(1, $result);
 
         $this->assertEquals([
-            [$result[0]->getUser(), $result[0]->getBalance(), $result[0]->getDate()],
+            [$result[0]->getUser()->getId(), $result[0]->getBalance()],
         ], [
-            [$user1, '999', $date1],
+            [1, '999'],
         ]);
     }
 
     public function testCreateMaxArgument(): void
     {
-        $user1 = $this->mockUser(1);
-        $date1 = $this->mockDate();
-
         $factory = new TraderBalanceViewFactory($this->mockUserManager([
-            $this->mockUserToken($user1, $date1),
+            $this->mockUserToken($this->mockUser(1), $this->mockDate()),
         ]), $this->mockConfig());
 
         $balances = [
@@ -257,9 +227,9 @@ class TraderBalanceViewFactoryTest extends TestCase
         $this->assertCount(1, $result);
 
         $this->assertEquals([
-            [$result[0]->getUser(), $result[0]->getBalance(), $result[0]->getDate()],
+            [$result[0]->getUser()->getId(), $result[0]->getBalance()],
         ], [
-            [$user1, '999', $date1],
+            [1, '999'],
         ]);
     }
 
