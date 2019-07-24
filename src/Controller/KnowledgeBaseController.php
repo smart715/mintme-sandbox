@@ -15,7 +15,7 @@ class KnowledgeBaseController extends Controller
     public function showAll(KnowledgeBaseManagerInterface $kbManager): Response
     {
         return $this->render('pages/knowledge_base.html.twig', [
-            'articles' => $kbManager->getAll(),
+            'knowledgeBases' => $kbManager->getAll(),
         ]);
     }
 

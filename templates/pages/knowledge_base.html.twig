@@ -3,19 +3,25 @@
 {% block title %}Knowledge Base | mintMe{% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div id="kb" class="container">
         <div class="row">
             <div class="col-12">
-                <ul class="list-group">
-                    {% for kb in articles %}
-                        <li class="list-group-item">
-                            <span class="text-danger">
-                                <a href="{{ path('kb_show', {'url': kb.shortUrl}) }}">{{ kb.title}}</a>
-                            </span>
-                        </li>
-                    {% endfor %}
-                </ul>
-
+                {% for category in knowledgeBases %}
+                    <div class="pt-4">
+                        <h1>{{ category[0].category.name }}</h1>
+                        <ul class="list-group">
+                            {% for kb in category %}
+                                    <li class="list-group-item bg-primary">
+                                        <span class="text-danger">
+                                            <a href="{{ path('kb_show', {'url': kb.shortUrl}) }}" class="text-light">
+                                                {{ kb.title}}
+                                            </a>
+                                        </span>
+                                    </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

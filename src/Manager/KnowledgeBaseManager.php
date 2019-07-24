@@ -18,7 +18,7 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 
     public function getAll(): array
     {
-        return $this->kbRepository->findAll();
+        return $this->parseKnowledgeBases($this->kbRepository->findAll());
     }
 
     public function getByUrl(string $shortUrl): ?KnowledgeBase
@@ -26,5 +26,21 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
         return $this->kbRepository->findOneBy([
             'shortUrl' => (string)$shortUrl,
         ]);
+    }
+
+    /**
+     * @param KnowledgeBase[] $knowledgeBases
+     * @return array
+     */
+    private function parseKnowledgeBases(array $knowledgeBases): array
+    {
+        $parsedKb = [];
+
+        foreach ($knowledgeBases as $kb) {
+            $parsedKb[$kb->getCategory()->getId()] = $parsedKb[$kb->getCategory()->getId()] ?? [];
+            array_push($parsedKb[$kb->getCategory()->getId()], $kb);
+        }
+
+        return $parsedKb;
     }
 }
