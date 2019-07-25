@@ -17,6 +17,7 @@ use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
+use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
@@ -413,12 +414,12 @@ class TokensAPIController extends AbstractFOSRestController
         string $name,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
-        TokenDeployInterface $tokenDeploy,
+        ContractHandlerInterface $contractHandler,
         DeployCostFetcherInterface $costFetcher
     ): View {
-        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
-
-        $token = $this->tokenManager->findByName($name);
+        $token = $this->tokenManager->findByName(
+            (new StringConverter(new ParseStringStrategy()))->convert($name)
+        );
 
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
@@ -444,22 +445,68 @@ class TokensAPIController extends AbstractFOSRestController
                 throw new ApiBadRequestException('Low balance');
             }
 
+            $deployResult = $contractHandler->deploy($token);
+
             $balanceHandler->withdraw(
                 $this->getUser(),
                 Token::getBySymbol(Token::WEB_SYMBOL),
                 $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
             );
 
-            $deployResult = $tokenDeploy->deploy($token);
-
             $token->setAddress($deployResult->getAddress());
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
-            return $this->view(null, Response::HTTP_BAD_REQUEST);
+            throw new ApiBadRequestException('Internal error,Please try again later');
         }
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
+
+        return $this->view();
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"expose"=true})
+     * @Rest\RequestParam(name="address")
+     * @Rest\RequestParam(name="lock",requirements="true|false")
+     */
+    public function contractUpdate(
+        string $name,
+        ParamFetcherInterface $request,
+        ContractHandlerInterface $contractHandler
+    ): View {
+        $token = $this->tokenManager->findByName(
+            (new StringConverter(new ParseStringStrategy()))->convert($name)
+        );
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        if ($token->isMinDestinationLocked()) {
+            throw new ApiBadRequestException('Can\'t change the address');
+        }
+
+        if (!$this->isGranted('edit', $token)) {
+            throw new ApiUnauthorizedException('Unauthorized');
+        }
+
+        try {
+            $contractHandler->updateMinDestination($token, $request->get('address'), $request->get('lock'));
+            $token->setMinDestination($request->get('address'));
+
+            if (true === $request->get('lock')) {
+                $token->lockMinDestination();
+            }
+
+            $this->em->persist($token);
+            $this->em->flush();
+        } catch (Throwable $ex) {
+            throw new ApiBadRequestException('Internal error,Please try again later');
+        }
+
+        $this->userActionLogger->info('Update token minDestination', ['name' => $name]);
 
         return $this->view();
     }

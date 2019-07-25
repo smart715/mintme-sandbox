@@ -6,13 +6,13 @@ use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
 use App\SmartContract\Config\Config;
 use App\SmartContract\Model\TokenDeployResult;
-use App\Utils\Converter\TokenNameConverterInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 
-class TokenDeploy implements TokenDeployInterface
+class ContractHandler implements ContractHandlerInterface
 {
     private const DEPLOY = 'deploy';
+    private const UPDATE_MIN_DESTINATION = 'updateMintDestination';
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -20,21 +20,16 @@ class TokenDeploy implements TokenDeployInterface
     /** @var Config */
     private $config;
 
-    /** @var TokenNameConverterInterface */
-    private $tokenNameConverter;
-
     /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
         JsonRpcInterface $rpc,
         Config $config,
-        TokenNameConverterInterface $tokenNameConverter,
         LoggerInterface $logger
     ) {
         $this->rpc = $rpc;
         $this->config = $config;
-        $this->tokenNameConverter = $tokenNameConverter;
         $this->logger = $logger;
     }
 
@@ -50,7 +45,6 @@ class TokenDeploy implements TokenDeployInterface
             self::DEPLOY,
             [
                 'name' => $token->getName(),
-                'symbol' => $this->tokenNameConverter->convert($token),
                 'decimals' => $this->config->getTokenPrecision(),
                 'mintDestination' => $this->config->getMintmeAddress(),
                 'releasedAtCreation' => bcmul(
@@ -69,12 +63,36 @@ class TokenDeploy implements TokenDeployInterface
 
         $result = $response->getResult();
 
-        if (!isset($result['address']) || !isset($result['transactionHash'])) {
+        if (!isset($result['address'])) {
             $this->logger->error("Failed to deploy token '{$token->getName()}'");
 
             throw new Exception('get error response');
         }
 
-        return new TokenDeployResult($result['address'], $result['transactionHash']);
+        return new TokenDeployResult($result['address']);
+    }
+
+    public function updateMinDestination(Token $token, string $address, bool $lock): void
+    {
+        if ($token->isMinDestinationLocked()) {
+            $this->logger->error("Failed to Update minDestination for '{$token->getName()}' because It is locked");
+
+            throw new Exception('Token dose not has release period');
+        }
+
+        $response = $this->rpc->send(
+            self::UPDATE_MIN_DESTINATION,
+            [
+                'tokenContract' => $token->getAddress(),
+                'mintDestination' => $address,
+                'lock'=> $lock,
+            ]
+        );
+
+        if ($response->hasError()) {
+            $this->logger->error("Failed to update minDestination for '{$token->getName()}'");
+
+            throw new Exception($response->getError()['message'] ?? 'get error response');
+        }
     }
 }

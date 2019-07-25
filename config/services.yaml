@@ -102,7 +102,7 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
-    App\SmartContract\TokenDeploy:
+    App\SmartContract\ContractHandler:
         $rpc: '@deploy.json_rpc'
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'

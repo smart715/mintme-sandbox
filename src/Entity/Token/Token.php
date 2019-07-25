@@ -54,6 +54,18 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    protected $minDestination;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     * @var bool
+     */
+    protected $minDestinationLocked;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
      * @var string|null
      */
@@ -174,6 +186,30 @@ class Token implements TradebleInterface
     public function setAddress(string $address): self
     {
         $this->address = $address;
+
+        return $this;
+    }
+
+    public function getMinDestination(): ?string
+    {
+        return $this->minDestination;
+    }
+
+    public function setMinDestination(string $minDestination): self
+    {
+        $this->minDestination = $minDestination;
+
+        return $this;
+    }
+
+    public function isMinDestinationLocked(): bool
+    {
+        return $this->minDestinationLocked;
+    }
+
+    public function lockMinDestination(): self
+    {
+        $this->minDestinationLocked= true;
 
         return $this;
     }

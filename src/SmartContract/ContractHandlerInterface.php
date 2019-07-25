@@ -6,7 +6,7 @@ use App\Entity\Token\Token;
 use App\SmartContract\Model\TokenDeployResult;
 use Exception;
 
-interface TokenDeployInterface
+interface ContractHandlerInterface
 {
     /**
      * @throws Exception
@@ -14,4 +14,6 @@ interface TokenDeployInterface
      * @return TokenDeployResult
      */
     public function deploy(Token $token): TokenDeployResult;
+
+    public function updateMinDestination(Token $token, string $address, bool $lock): void;
 }
