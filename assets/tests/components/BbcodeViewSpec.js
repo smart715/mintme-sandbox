@@ -23,6 +23,6 @@ describe('BbcodeView', () => {
              propsData: {description: '[url=foo]bar[/url]'},
         });
 
-        expect(wrapper.vm.parsedDescription).to.equal('<a rel="nofollow" href="foo">bar</a>');
+        expect(wrapper.vm.parsedDescription).to.equal('<a rel="nofollow" target="_blank" href="https://foo">bar</a>');
     });
 });
