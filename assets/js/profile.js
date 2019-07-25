@@ -2,7 +2,6 @@ import LimitedTextarea from './components/LimitedTextarea.vue';
 import {minLength, helpers} from 'vuelidate/lib/validators';
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
-const city = helpers.regex('city', xRegExp('^[\\p{L}\\s-]+$', 'u'));
 
 new Vue({
     el: '#profile',
@@ -31,7 +30,7 @@ new Vue({
             minLength: minLength(2),
         },
         city: {
-            helpers: city,
+            helpers: names,
             minLength: minLength(2),
         },
     },
