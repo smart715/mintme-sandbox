@@ -395,7 +395,7 @@ class TokensAPIController extends AbstractFOSRestController
         try {
             $balances = [
               'balance' => $moneyWrapper->format(
-                  $balanceHandler->balance($this->getUser(), Token::getBySymbol(Token::WEB_SYMBOL))->getAvailable()
+                  $balanceHandler->balance($this->getUser(), Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable()
               ),
               'webCost' => $costFetcher->getDeployWebCost(),
             ];
@@ -436,11 +436,11 @@ class TokensAPIController extends AbstractFOSRestController
         try {
             $cost = $costFetcher->getDeployWebCost();
             $balance = $balanceHandler
-                ->balance($this->getUser(), Token::getBySymbol(Token::WEB_SYMBOL))->getAvailable();
+                ->balance($this->getUser(), Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable();
 
             if ($balanceHandler->balance(
                 $this->getUser(),
-                Token::getBySymbol(Token::WEB_SYMBOL)
+                Token::getFromSymbol(Token::WEB_SYMBOL)
             )->getAvailable()->greaterThan($balance)) {
                 throw new ApiBadRequestException('Low balance');
             }
@@ -449,7 +449,7 @@ class TokensAPIController extends AbstractFOSRestController
 
             $balanceHandler->withdraw(
                 $this->getUser(),
-                Token::getBySymbol(Token::WEB_SYMBOL),
+                Token::getFromSymbol(Token::WEB_SYMBOL),
                 $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
             );
 
