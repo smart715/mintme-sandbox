@@ -153,7 +153,7 @@ services:
         public: true
 
     admin.knowledgebase:
-        class: App\Admin\KnowledgeBaseAdmin
+        class: App\Admin\KnowledgeBase\KnowledgeBaseAdmin
         arguments:
             - null
             - App\Entity\KnowledgeBase\KnowledgeBase
@@ -163,13 +163,23 @@ services:
         public: true
 
     admin.knowledgebase.category:
-        class: App\Admin\KnowledgeBaseCategoryAdmin
+        class: App\Admin\KnowledgeBase\KnowledgeBaseCategoryAdmin
         arguments:
             - null
             - App\Entity\KnowledgeBase\Category
             - Sonata\AdminBundle\Controller\CRUDController
         tags:
             - { name: sonata.admin, manager_type: orm, label: KB Categories }
+        public: true
+
+    admin.knowledgebase.subcategory:
+        class: App\Admin\KnowledgeBase\KnowledgeBaseSubcategoryAdmin
+        arguments:
+            - null
+            - App\Entity\KnowledgeBase\Subcategory
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: KB Subcategories }
         public: true
 
     # Required by rabbitmq bundle

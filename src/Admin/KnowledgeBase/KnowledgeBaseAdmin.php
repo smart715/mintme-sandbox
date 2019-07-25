@@ -1,15 +1,16 @@
 <?php declare(strict_types = 1);
 
-namespace App\Admin;
+namespace App\Admin\KnowledgeBase;
 
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-final class KnowledgeBaseCategoryAdmin extends AbstractAdmin
+final class KnowledgeBaseAdmin extends AbstractAdmin
 {
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
@@ -29,17 +30,28 @@ final class KnowledgeBaseCategoryAdmin extends AbstractAdmin
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
-        $datagridMapper->add('name');
+        $datagridMapper
+            ->add('category', null)
+            ->add('title')
+            ->add('shortUrl')
+            ->add('description');
     }
 
     protected function configureFormFields(FormMapper $form): void
     {
-        $form->add('name', TextType::class);
+        $form
+            ->add('category', null)
+            ->add('title', TextType::class)
+            ->add('shortUrl', TextType::class)
+            ->add('description', TextareaType::class);
     }
 
     protected function configureListFields(ListMapper $listMapper): void
     {
         $listMapper->addIdentifier('id', IntegerType::class)
-            ->add('name', TextType::class);
+            ->add('category', null)
+            ->add('title', TextType::class)
+            ->add('shortUrl', TextType::class)
+            ->add('description', TextareaType::class);
     }
 }
