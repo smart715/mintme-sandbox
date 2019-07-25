@@ -2,6 +2,7 @@
 
 namespace App\Manager;
 
+use App\Entity\KnowledgeBase\Category;
 use App\Entity\KnowledgeBase\KnowledgeBase;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -24,7 +25,7 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
     public function getByUrl(string $shortUrl): ?KnowledgeBase
     {
         return $this->kbRepository->findOneBy([
-            'shortUrl' => (string)$shortUrl,
+            'shortUrl' => $shortUrl,
         ]);
     }
 
@@ -36,9 +37,12 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
     {
         $parsedKb = [];
 
+        /** @var KnowledgeBase $kb */
         foreach ($knowledgeBases as $kb) {
-            $parsedKb[$kb->getCategory()->getId()] = $parsedKb[$kb->getCategory()->getId()] ?? [];
-            array_push($parsedKb[$kb->getCategory()->getId()], $kb);
+            if ($kb instanceof KnowledgeBase) {
+                $parsedKb[$kb->getCategory()->getId()] = $parsedKb[$kb->getCategory()->getId()] ?? [];
+                array_push($parsedKb[$kb->getCategory()->getId()], $kb);
+            }
         }
 
         return $parsedKb;
