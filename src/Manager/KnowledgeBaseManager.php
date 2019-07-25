@@ -39,7 +39,7 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 
         /** @var KnowledgeBase $kb */
         foreach ($knowledgeBases as $kb) {
-            if ($kb instanceof KnowledgeBase) {
+            if ($kb->getCategory() instanceof Category) {
                 $parsedKb[$kb->getCategory()->getId()] = $parsedKb[$kb->getCategory()->getId()] ?? [];
                 array_push($parsedKb[$kb->getCategory()->getId()], $kb);
             }
