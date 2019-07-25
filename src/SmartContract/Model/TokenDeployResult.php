@@ -2,6 +2,7 @@
 
 namespace App\SmartContract\Model;
 
+/** @codeCoverageIgnore */
 class TokenDeployResult
 {
     /** @var string */
