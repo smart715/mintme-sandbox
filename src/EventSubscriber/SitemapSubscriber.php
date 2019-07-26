@@ -28,18 +28,18 @@ class SitemapSubscriber implements EventSubscriberInterface
     private $tokenRepository;
 
     /** @var MarketFactoryInterface  */
-    private $MarketFactory;
+    private $marketFactory;
 
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenRepository,
-        MarketFactoryInterface $MarketFactory
+        MarketFactoryInterface $marketFactory
     ) {
         $this->urlGenerator = $urlGenerator;
         $this->entityManager = $entityManager;
         $this->tokenRepository = $tokenRepository;
-        $this->MarketFactory = $MarketFactory;
+        $this->marketFactory = $marketFactory;
     }
 
     /**
@@ -148,7 +148,7 @@ class SitemapSubscriber implements EventSubscriberInterface
     }
     private function registerMarketsUrls(UrlContainerInterface $urls): void
     {
-        $markets = $this->MarketFactory->getCoinMarkets();
+        $markets = $this->marketFactory->getCoinMarkets();
 
         foreach ($markets as $market) {
             $urls->addUrl(
