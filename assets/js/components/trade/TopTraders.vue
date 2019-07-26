@@ -40,6 +40,7 @@
 
 <script>
 import moment from 'moment';
+import {formatMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
 export default {
     name: 'TopTraders',
@@ -58,6 +59,7 @@ export default {
                 },
                 amount: {
                     label: 'Amount',
+                    formatter: formatMoney,
                 },
             },
         };
