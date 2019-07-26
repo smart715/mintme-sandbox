@@ -65,4 +65,9 @@ class Subcategory
     {
         $this->name = $name;
     }
+
+    public function __toString(): string
+    {
+        return $this->getName();
+    }
 }

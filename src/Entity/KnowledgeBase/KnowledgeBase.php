@@ -28,6 +28,14 @@ class KnowledgeBase
     protected $category;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\KnowledgeBase\Subcategory")
+     * @ORM\JoinColumn(name="subcategory_id", referencedColumnName="id")
+     * @Assert\NotBlank
+     * @var Subcategory
+     */
+    protected $subcategory;
+
+    /**
      * @ORM\Column(type="string")
      * @var string
      */
@@ -91,5 +99,18 @@ class KnowledgeBase
     public function setCategory(Category $category): void
     {
         $this->category = $category;
+    }
+
+    /**
+     * @return Subcategory|string
+     */
+    public function getSubcategory()
+    {
+        return $this->subcategory ?? '';
+    }
+
+    public function setSubcategory(Subcategory $subcategory): void
+    {
+        $this->subcategory = $subcategory;
     }
 }

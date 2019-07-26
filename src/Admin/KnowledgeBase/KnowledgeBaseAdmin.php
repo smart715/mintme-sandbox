@@ -32,6 +32,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     {
         $datagridMapper
             ->add('category', null)
+            ->add('subcategory', null)
             ->add('title')
             ->add('shortUrl')
             ->add('description');
@@ -41,6 +42,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     {
         $form
             ->add('category', null)
+            ->add('subcategory', null)
             ->add('title', TextType::class)
             ->add('shortUrl', TextType::class)
             ->add('description', TextareaType::class);
@@ -50,6 +52,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     {
         $listMapper->addIdentifier('id', IntegerType::class)
             ->add('category', null)
+            ->add('subcategory', null)
             ->add('title', TextType::class)
             ->add('shortUrl', TextType::class)
             ->add('description', TextareaType::class);
