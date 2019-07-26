@@ -7,12 +7,6 @@
                     :market="market"
             />
         </div>
-        <div class="row mt-3">
-            <top-traders
-                    class="col"
-                    :token-name="market.quote.symbol"
-            />
-        </div>
         <div class="row">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
@@ -79,7 +73,6 @@ import TradeBuyOrder from './TradeBuyOrder';
 import TradeSellOrder from './TradeSellOrder';
 import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
-import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
@@ -97,7 +90,6 @@ export default {
         TradeChart,
         TradeOrders,
         TradeTradeHistory,
-        TopTraders,
         OrderModal,
     },
     props: {

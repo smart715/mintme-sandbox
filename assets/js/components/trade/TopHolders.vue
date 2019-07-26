@@ -1,7 +1,7 @@
 <template>
     <div class="card h-100">
         <div class="card-header">
-            Top Traders
+            Top Holders
         </div>
         <div class="card-body p-0">
             <div class="table-responsive fix-height" ref="traders">
@@ -43,7 +43,7 @@ import moment from 'moment';
 import {formatMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
 export default {
-    name: 'TopTraders',
+    name: 'TopHolders',
     props: {
       tokenName: String,
     },

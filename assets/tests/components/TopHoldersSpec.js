@@ -1,5 +1,5 @@
 import {createLocalVue, mount} from '@vue/test-utils';
-import TopTraders from '../../js/components/trade/TopTraders';
+import TopHolders from '../../js/components/trade/TopHolders';
 import moxios from 'moxios';
 import axios from 'axios';
 
@@ -21,8 +21,9 @@ function mockVue() {
 /**
  * @return {Wrapper<Vue>}
  */
-function mockTopTraders() {
-    return mount(TopTraders, {
+function mockTopHolders()
+{
+    return mount(TopHolders, {
         localVue: mockVue(),
         propsData: {
             name: 'TOK1',
@@ -30,7 +31,7 @@ function mockTopTraders() {
     });
 }
 
-describe('TopTraders', () => {
+describe('TopHolders', () => {
     beforeEach(() => {
         moxios.install();
     });
@@ -40,7 +41,7 @@ describe('TopTraders', () => {
     });
 
     it('should show loading before getting the traders', (done) => {
-        const wrapper = mockTopTraders();
+        const wrapper = mockTopHolders();
 
         expect(wrapper.vm.loaded).to.be.false;
         expect(wrapper.find('font-awesome-icon').exists()).to.be.true;
@@ -69,7 +70,7 @@ describe('TopTraders', () => {
     });
 
     it('should show arrow button if traders is null or more than 7', () => {
-        const wrapper = mockTopTraders();
+        const wrapper = mockTopHolders();
         const trader = {
                 trader: 'foo baz',
                 date: '19.07.2019 05:38:30',
@@ -86,7 +87,7 @@ describe('TopTraders', () => {
     });
 
     it('should hide the table if there are not traders', () => {
-        const wrapper = mockTopTraders();
+        const wrapper = mockTopHolders();
         wrapper.vm.traders = [];
         expect(wrapper.vm.hasTraders).to.be.false;
         expect(wrapper.find('b-table').exists()).to.be.false;
