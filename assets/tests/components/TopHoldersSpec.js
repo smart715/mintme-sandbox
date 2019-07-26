@@ -21,8 +21,7 @@ function mockVue() {
 /**
  * @return {Wrapper<Vue>}
  */
-function mockTopHolders()
-{
+function mockTopHolders() {
     return mount(TopHolders, {
         localVue: mockVue(),
         propsData: {
