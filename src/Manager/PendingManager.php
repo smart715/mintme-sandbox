@@ -2,8 +2,11 @@
 
 namespace App\Manager;
 
-use App\Entity\Crypto;
+use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
+use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
@@ -19,9 +22,11 @@ class PendingManager implements PendingManagerInterface
         $this->em = $em;
     }
 
-    public function create(User $user, Address $address, Amount $amount, Crypto $crypto): PendingWithdraw
+    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable): PendingWithdrawInterface
     {
-        $pending = new PendingWithdraw($user, $crypto, $amount, $address);
+        $pending = $tradable instanceof Token
+            ? new PendingTokenWithdraw($user, $tradable, $amount, $address)
+            : new PendingWithdraw($user, $tradable, $amount, $address);
 
         $this->em->persist($pending);
         $this->em->flush();

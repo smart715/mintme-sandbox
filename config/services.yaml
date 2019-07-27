@@ -259,6 +259,7 @@ services:
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
+            $tokenWithdrawFee: "%token_withdraw_fee%"
 
     App\SmartContract\Config\Config:
         arguments:

@@ -2,7 +2,7 @@
 
 namespace App\Mailer;
 
-use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
@@ -38,7 +38,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function sendWithdrawConfirmationMail(User $user, PendingWithdraw $withdrawData): void
+    public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void
     {
         $confirmLink = $this->urlGenerator->generate(
             'withdraw-confirm',

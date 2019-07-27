@@ -16,7 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/hacker")
- * @Security(expression="is_granted('hacker')")
  */
 class HackerController extends AbstractController
 {
@@ -40,7 +39,7 @@ class HackerController extends AbstractController
         $balanceHandler->deposit(
             $this->getUser(),
             Token::getFromCrypto($crypto),
-            $moneyWrapper->parse('100', $crypto->getSymbol())
+            $moneyWrapper->parse('100000', $crypto->getSymbol())
         );
 
         return $this->redirect($referer);

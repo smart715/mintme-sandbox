@@ -82,7 +82,8 @@
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
-                                        data.item.subunit)"
+                                        data.item.subunit,
+                                        true)"
                         >
                                 <div><i class="icon-withdraw"></i></div>
                                 <div>
@@ -207,7 +208,7 @@ export default {
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },
-        allTokens: function() {src/Wallet/Wallet.php
+        allTokens: function() {
             return Object.assign({}, this.tokens || {}, this.predefinedTokens || {});
         },
         allTokensName: function() {
@@ -265,14 +266,14 @@ export default {
             });
     },
     methods: {
-        openWithdraw: function(currency, fee, amount, subunit) {
+        openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
             if (!this.twofa) {
                 this.$toasted.info('Please enable 2FA before withdrawing');
                 return;
             }
             this.showModal = true;
             this.selectedCurrency = currency;
-            this.withdraw.fee = toMoney(fee, subunit);
+            this.withdraw.fee = toMoney(isToken ? this.TokenWithdrawFee: fee, subunit);
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use DateTimeImmutable;
@@ -14,11 +15,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PendingWithdrawRepository")
- * @ORM\Table(name="pending_withdraw")
+ * @ORM\Table(name="pending_token_withdraw")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class PendingWithdraw implements PendingWithdrawInterface
+class PendingTokenWithdraw implements PendingWithdrawInterface
 {
     public const EXPIRES_HOURS = 1;
 
@@ -38,11 +39,11 @@ class PendingWithdraw implements PendingWithdrawInterface
     private $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
      * @Groups({"API"})
-     * @var Crypto
+     * @var Token
      */
-    private $crypto;
+    private $token;
 
     /**
      * @ORM\Column(type="string")
@@ -70,10 +71,10 @@ class PendingWithdraw implements PendingWithdrawInterface
      */
     protected $hash;
 
-    public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address)
+    public function __construct(User $user, Token $token, Amount $amount, Address $address)
     {
         $this->user = $user;
-        $this->crypto = $crypto;
+        $this->token = $token;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
     }
@@ -83,9 +84,9 @@ class PendingWithdraw implements PendingWithdrawInterface
         return $this->hash;
     }
 
-    public function getCrypto(): Crypto
+    public function getToken(): Token
     {
-        return $this->crypto;
+        return $this->token;
     }
 
     public function getAmount(): Amount
@@ -93,7 +94,7 @@ class PendingWithdraw implements PendingWithdrawInterface
         return new Amount(
             new Money(
                 $this->amount,
-                new Currency($this->crypto->getSymbol())
+                new Currency(Token::WEB_SYMBOL)
             )
         );
     }

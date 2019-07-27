@@ -4,9 +4,12 @@ namespace App\Wallet;
 
 use App\Entity\Crypto;
 use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\Config;
 use App\Manager\PendingManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
@@ -18,6 +21,7 @@ use App\Wallet\Model\Transaction;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -81,32 +85,44 @@ class Wallet implements WalletInterface
     }
 
     /** @throws Throwable */
-    public function withdrawInit(User $user, Address $address, Amount $amount, Crypto $crypto): PendingWithdraw
-    {
-        $token = Token::getFromCrypto($crypto);
-        $available = $this->balanceHandler->balance($user, $token)->getAvailable();
+    public function withdrawInit(
+        User $user,
+        Address $address,
+        Amount $amount,
+        TradebleInterface $tradable,
+        Config $config
+    ): PendingWithdrawInterface {
+        $tradable = $tradable instanceof Token
+            ? $tradable
+            : Token::getFromCrypto($tradable);
+
+        $fee = $tradable instanceof Crypto
+            ? $tradable->getFee()
+            : new Money($config->getTokenWithdrawFee(), new Currency('TOK'));
+
+        $available = $this->balanceHandler->balance($user, $tradable)->getAvailable();
         $this->logger->info(
             "Created a new withdraw request for '{$user->getEmail()}' to 
-            send {$amount->getAmount()->getAmount()} {$crypto->getSymbol()} on {$address->getAddress()}"
+            send {$amount->getAmount()->getAmount()} {$tradable->getSymbol()} on {$address->getAddress()}"
         );
 
-        if ($available->lessThan($amount->getAmount()->add($crypto->getFee()))) {
+        if ($available->lessThan($amount->getAmount()->add($fee))) {
             $this->logger->warning(
                 "Requested balance for user '{$user->getEmail()}'. 
-                Not enough amount to pay {$amount->getAmount()->getAmount()} {$crypto->getSymbol()}
-                Available amount: {$available->getAmount()} {$crypto->getSymbol()}"
+                Not enough amount to pay {$amount->getAmount()->getAmount()} {$tradable->getSymbol()}
+                Available amount: {$available->getAmount()} {$tradable->getSymbol()}"
             );
 
             throw new NotEnoughUserAmountException();
         }
 
-        if (!$this->validateAmount($crypto, $amount, $user)) {
+        if (!$this->validateAmount($tradable, $amount, $user)) {
             throw new NotEnoughAmountException();
         }
 
-        $this->balanceHandler->withdraw($user, $token, $amount->getAmount()->add($crypto->getFee()));
+        $this->balanceHandler->withdraw($user, $tradable, $amount->getAmount()->add($fee));
 
-        return $this->pendingManager->create($user, $address, $amount, $crypto);
+        return $this->pendingManager->create($user, $address, $amount, $tradable);
     }
 
     /** @throws Throwable */

@@ -75,6 +75,7 @@ class WalletAPIController extends AbstractFOSRestController
     public function withdraw(
         ParamFetcherInterface $request,
         CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
         TwoFactorManagerInterface $twoFactorManager,
         MoneyWrapperInterface $moneyWrapper,
         WalletInterface $wallet,
@@ -88,13 +89,12 @@ class WalletAPIController extends AbstractFOSRestController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $crypto = $cryptoManager->findBySymbol(
-            $request->get('crypto')
-        );
+        $tradable = $tokenManager->findByName($request->get('crypto'))
+            ?? $cryptoManager->findBySymbol($request->get('crypto'));
 
-        if (!$crypto) {
+        if (!$tradable) {
             return $this->view([
-                'error' => 'Not found currency',
+                'error' => 'Not found',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -114,8 +114,11 @@ class WalletAPIController extends AbstractFOSRestController
             $pendingWithdraw = $wallet->withdrawInit(
                 $user,
                 new Address(trim((string)$request->get('address'))),
-                new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
-                $crypto
+                new Amount($moneyWrapper->parse(
+                    $request->get('amount'),
+                    $tradable instanceof Token ? 'TOK' : $tradable->getSymbol())
+                ),
+                $tradable
             );
         } catch (Throwable $exception) {
             return $this->view([
@@ -125,7 +128,7 @@ class WalletAPIController extends AbstractFOSRestController
 
         $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
-        $this->userActionLogger->info("Sent withdrawal email for {$crypto->getSymbol()}", [
+        $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);

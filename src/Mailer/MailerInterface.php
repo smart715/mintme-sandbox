@@ -2,10 +2,10 @@
 
 namespace App\Mailer;
 
-use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
 
 interface MailerInterface
 {
-    public function sendWithdrawConfirmationMail(User $user, PendingWithdraw $withdrawData): void;
+    public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void;
 }
