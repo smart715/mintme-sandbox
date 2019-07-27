@@ -12,6 +12,8 @@
                     {{ include("loader.html.twig", {vCloak:'v-cloak--block'}) }}
                     <b-tab title="Wallet" active>
                         <wallet
+                            :token_deposit_fee="{{ token_deposit_fee }}"
+                            :token_withdraw_fee="{{ token_withdraw_fee }}"
                             hash="{{ hash }}"
                             websocket-url="{{ global_websocket_url }}"
                             create-token-url="{{ path('token_create') }}"

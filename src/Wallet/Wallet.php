@@ -8,6 +8,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\PendingManagerInterface;
+use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
@@ -32,6 +33,9 @@ class Wallet implements WalletInterface
     /** @var DepositGatewayCommunicator */
     private $depositCommunicator;
 
+    /** @var ContractHandlerInterface */
+    private $contractHandler;
+
     /** @var PendingManagerInterface */
     private $pendingManager;
 
@@ -45,6 +49,7 @@ class Wallet implements WalletInterface
         WithdrawGatewayInterface $withdrawGateway,
         BalanceHandlerInterface $balanceHandler,
         DepositGatewayCommunicator $depositCommunicator,
+        ContractHandlerInterface $contractHandler,
         PendingManagerInterface $pendingManager,
         EntityManagerInterface $em,
         LoggerInterface $logger
@@ -52,6 +57,7 @@ class Wallet implements WalletInterface
         $this->withdrawGateway = $withdrawGateway;
         $this->balanceHandler = $balanceHandler;
         $this->depositCommunicator = $depositCommunicator;
+        $this->contractHandler = $contractHandler;
         $this->pendingManager = $pendingManager;
         $this->em = $em;
         $this->logger = $logger;
@@ -143,6 +149,14 @@ class Wallet implements WalletInterface
         }, $this->depositCommunicator->getDepositCredentials($user->getId(), array_map(function ($crypto) {
             return Token::getFromCrypto($crypto);
         }, $cryptos))->toArray());
+    }
+
+    /** {@inheritDoc} */
+    public function getTokenDepositCredentials(User $user): array
+    {
+        return array_map(function (string $address) {
+            return new Address($address);
+        }, $this->contractHandler->getDepositCredentials($user)->toArray());
     }
 
     /** {@inheritDoc} */

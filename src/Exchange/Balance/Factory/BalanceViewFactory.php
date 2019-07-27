@@ -61,7 +61,8 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $fee,
                 $subunit,
                 $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
-                $token->getCrypto() ? $token->getCrypto()->isTradable() : false
+                $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
+                $token->isDeployed()
             );
         }
 

@@ -142,13 +142,14 @@ class WalletAPIController extends AbstractFOSRestController
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
+         $depositAddresses = $depositCommunicator->getDepositCredentials(
+             $this->getUser(),
+             $cryptoManager->findAll()
+         );
 
-        $depositAddresses = $depositCommunicator->getDepositCredentials(
-            $this->getUser(),
-            $cryptoManager->findAll()
-        );
+        $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($this->getUser());
 
-        return $this->view($depositAddresses);
+         return $this->view(array_merge($depositAddresses, $tokenDepositAddresses));
     }
 
     /**

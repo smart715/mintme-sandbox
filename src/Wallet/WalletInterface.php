@@ -30,6 +30,9 @@ interface WalletInterface
     /** @return array<Address> */
     public function getDepositCredentials(User $user, array $cryptos): array;
 
+    /** @return array<Address> */
+    public function getTokenDepositCredentials(User $user): array;
+
     public function getDepositCredential(User $user, Crypto $crypto): Address;
 
     public function getFee(Crypto $crypto): Money;

@@ -4,15 +4,19 @@ namespace App\SmartContract;
 
 use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\SmartContract\Config\Config;
 use App\SmartContract\Model\TokenDeployResult;
+use App\Wallet\Deposit\Model\DepositCredentials;
+use App\Wallet\Model\Address;
 use Exception;
 use Psr\Log\LoggerInterface;
 
 class ContractHandler implements ContractHandlerInterface
 {
     private const DEPLOY = 'deploy';
-    private const UPDATE_MIN_DESTINATION = 'updateMintDestination';
+    private const UPDATE_MIN_DESTINATION = 'update_mint_destination';
+    private const DEPOSIT_CREDENTIAL = 'get_deposit_credential';
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -51,7 +55,7 @@ class ContractHandler implements ContractHandlerInterface
                     $this->config->getTokenQuantity(),
                     bcpow('10', (string)$this->config->getTokenPrecision())
                 ),
-                'releasedPeriod' => $token->getLockIn()->getReleasePeriod(),
+                'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
             ]
         );
 
@@ -94,5 +98,25 @@ class ContractHandler implements ContractHandlerInterface
 
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
+    }
+
+    public function getDepositCredentials(User $user): DepositCredentials
+    {
+        $credentials = [];
+
+        foreach ($user->getRelatedTokens() as $token) {
+            $response = $this->rpc->send(
+                self::DEPOSIT_CREDENTIAL,
+                [
+                    'userId' => $user->getId(),
+                    'tokenName' => $token->getName(),
+                ]
+            );
+            $credentials[$token->getName()] = $response->hasError()
+                ? "Address unavailable."
+                : $response->getResult();
+        }
+
+        return new DepositCredentials($credentials);
     }
 }

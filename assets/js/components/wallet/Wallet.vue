@@ -65,6 +65,32 @@
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
+                <template slot="action" slot-scope="data">
+                    <div
+                        v-if="data.item.deployed"
+                        class="row">
+                        <div class="d-flex flex-row c-pointer pl-2"
+                            @click="openDeposit(data.item.name, data.item.subunit, true)">
+                            <div><i class="icon-deposit"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                            </div>
+                        </div>
+                        <div
+                            class="d-flex flex-row c-pointer pl-2"
+                            @click="openWithdraw(
+                                        data.item.name,
+                                        data.item.fee,
+                                        data.item.available,
+                                        data.item.subunit)"
+                        >
+                                <div><i class="icon-withdraw"></i></div>
+                                <div>
+                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                </div>
+                        </div>
+                    </div>
+                </template>
             </b-table>
         </div>
         <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover">
@@ -131,6 +157,8 @@ export default {
         createTokenUrl: String,
         tradingUrl: String,
         twofa: String,
+        TokenDepositFee: Number,
+        TokenWithdrawFee: Number,
     },
     data() {
         return {
@@ -157,6 +185,7 @@ export default {
             tokenFields: {
                 name: {label: 'Name'},
                 available: {label: 'Amount'},
+                action: {label: 'Actions', sortable: false},
             },
             withdraw: {
                 fee: '0',
@@ -178,7 +207,7 @@ export default {
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },
-        allTokens: function() {
+        allTokens: function() {src/Wallet/Wallet.php
             return Object.assign({}, this.tokens || {}, this.predefinedTokens || {});
         },
         allTokensName: function() {
@@ -250,11 +279,17 @@ export default {
         closeWithdraw: function() {
             this.showModal = false;
         },
-        openDeposit: function(currency, subunit) {
+        openDeposit: function(currency, subunit, isToken = false) {
             this.depositAddress = this.depositAddresses[currency] || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
+
+            if (isToken) {
+                this.deposit.fee = this.TokendepositFee;
+                this.showDepositModal = true;
+                return;
+            }
 
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
                     crypto: currency,
