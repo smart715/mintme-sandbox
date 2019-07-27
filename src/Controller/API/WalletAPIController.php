@@ -116,8 +116,8 @@ class WalletAPIController extends AbstractFOSRestController
                 new Address(trim((string)$request->get('address'))),
                 new Amount($moneyWrapper->parse(
                     $request->get('amount'),
-                    $tradable instanceof Token ? 'TOK' : $tradable->getSymbol())
-                ),
+                    $tradable instanceof Token ? 'TOK' : $tradable->getSymbol()
+                )),
                 $tradable
             );
         } catch (Throwable $exception) {

@@ -46,6 +46,9 @@ class Wallet implements WalletInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var Config */
+    private $config;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -56,6 +59,7 @@ class Wallet implements WalletInterface
         ContractHandlerInterface $contractHandler,
         PendingManagerInterface $pendingManager,
         EntityManagerInterface $em,
+        Config $config,
         LoggerInterface $logger
     ) {
         $this->withdrawGateway = $withdrawGateway;
@@ -64,6 +68,7 @@ class Wallet implements WalletInterface
         $this->contractHandler = $contractHandler;
         $this->pendingManager = $pendingManager;
         $this->em = $em;
+        $this->config = $config;
         $this->logger = $logger;
     }
 
@@ -89,8 +94,7 @@ class Wallet implements WalletInterface
         User $user,
         Address $address,
         Amount $amount,
-        TradebleInterface $tradable,
-        Config $config
+        TradebleInterface $tradable
     ): PendingWithdrawInterface {
         $tradable = $tradable instanceof Token
             ? $tradable
@@ -98,7 +102,7 @@ class Wallet implements WalletInterface
 
         $fee = $tradable instanceof Crypto
             ? $tradable->getFee()
-            : new Money($config->getTokenWithdrawFee(), new Currency('TOK'));
+            : new Money($this->config->getTokenWithdrawFee(), new Currency('TOK'));
 
         $available = $this->balanceHandler->balance($user, $tradable)->getAvailable();
         $this->logger->info(
@@ -116,7 +120,7 @@ class Wallet implements WalletInterface
             throw new NotEnoughUserAmountException();
         }
 
-        if (!$this->validateAmount($tradable, $amount, $user)) {
+        if ($tradable instanceof Crypto && !$this->validateAmount($tradable, $amount, $user)) {
             throw new NotEnoughAmountException();
         }
 
