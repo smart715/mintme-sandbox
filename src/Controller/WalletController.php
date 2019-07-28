@@ -52,7 +52,6 @@ class WalletController extends Controller
         /** @var PendingWithdrawRepository $withdrawTokenRepo */
         $withdrawTokenRepo = $entityManager->getRepository(PendingTokenWithdraw::class);
 
-
         /** @var PendingWithdrawInterface|null */
         $pendingWithdraw = $withdrawRepo->getWithdrawByHash($hash) ?? $withdrawTokenRepo->getWithdrawByHash($hash);
 

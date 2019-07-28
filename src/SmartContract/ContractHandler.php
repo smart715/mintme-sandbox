@@ -74,7 +74,9 @@ class ContractHandler implements ContractHandlerInterface
                     $this->moneyWrapper->getRepository()->subunitFor(new Currency(MoneyWrapper::TOK_SYMBOL)),
                 'mintDestination' => $this->config->getMintmeAddress(),
                 'releasedAtCreation' =>
-                    $this->moneyWrapper->parse($this->config->getTokenQuantity(), MoneyWrapper::TOK_SYMBOL)->getAmount(),
+                    $this->moneyWrapper
+                        ->parse($this->config->getTokenQuantity(), MoneyWrapper::TOK_SYMBOL)
+                        ->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
             ]
         );

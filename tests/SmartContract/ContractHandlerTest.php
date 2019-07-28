@@ -9,7 +9,11 @@ use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandler;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Currencies;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -36,7 +40,7 @@ class ContractHandlerTest extends TestCase
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
-            $this->createMock(MoneyWrapperInterface::class),
+            $this->mockMoneyWrapper(),
             $this->createMock(CryptoManagerInterface::class)
         );
 
@@ -55,7 +59,7 @@ class ContractHandlerTest extends TestCase
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
-            $this->createMock(MoneyWrapperInterface::class),
+            $this->mockMoneyWrapper(),
             $this->createMock(CryptoManagerInterface::class)
         );
 
@@ -84,7 +88,7 @@ class ContractHandlerTest extends TestCase
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
-            $this->createMock(MoneyWrapperInterface::class),
+            $this->mockMoneyWrapper(),
             $this->createMock(CryptoManagerInterface::class)
         );
 
@@ -113,7 +117,7 @@ class ContractHandlerTest extends TestCase
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
-            $this->createMock(MoneyWrapperInterface::class),
+            $this->mockMoneyWrapper(),
             $this->createMock(CryptoManagerInterface::class)
         );
 
@@ -139,7 +143,7 @@ class ContractHandlerTest extends TestCase
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
-            $this->createMock(MoneyWrapperInterface::class),
+            $this->mockMoneyWrapper(),
             $this->createMock(CryptoManagerInterface::class)
         );
 
@@ -156,7 +160,7 @@ class ContractHandlerTest extends TestCase
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
-            $this->createMock(MoneyWrapperInterface::class),
+            $this->mockMoneyWrapper(),
             $this->createMock(CryptoManagerInterface::class)
         );
 
@@ -183,7 +187,7 @@ class ContractHandlerTest extends TestCase
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
-            $this->createMock(MoneyWrapperInterface::class),
+            $this->mockMoneyWrapper(),
             $this->createMock(CryptoManagerInterface::class)
         );
 
@@ -197,11 +201,24 @@ class ContractHandlerTest extends TestCase
     {
         $config = $this->createMock(Config::class);
 
-        $config->method('getTokenPrecision')->willReturn(4);
         $config->method('getMintmeAddress')->willReturn('foobarbaz');
         $config->method('getTokenQuantity')->willReturn('1000000');
 
         return $config;
+    }
+
+    /** @return MoneyWrapperInterface|MockObject */
+    private function mockMoneyWrapper(): MockObject
+    {
+        $currencies = $this->createMock(Currencies::class);
+        $currencies->method('subunitFor')->willReturn(4);
+        $moneyWrapper = $this->createMock(MoneyWrapperInterface::class);
+        $moneyWrapper->method('getRepository')->willReturn($currencies);
+        $moneyWrapper->method('parse')->willReturnCallback(function () {
+            return new Money('10000000000', new Currency(MoneyWrapper::TOK_SYMBOL));
+        });
+
+        return $moneyWrapper;
     }
 
     /** @return Token|MockObject */
