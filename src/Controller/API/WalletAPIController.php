@@ -11,6 +11,7 @@ use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -116,7 +117,7 @@ class WalletAPIController extends AbstractFOSRestController
                 new Address(trim((string)$request->get('address'))),
                 new Amount($moneyWrapper->parse(
                     $request->get('amount'),
-                    $tradable instanceof Token ? 'TOK' : $tradable->getSymbol()
+                    $tradable instanceof Token ? MoneyWrapper::TOK_SYMBOL : $tradable->getSymbol()
                 )),
                 $tradable
             );

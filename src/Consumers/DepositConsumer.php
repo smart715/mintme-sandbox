@@ -6,10 +6,15 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\SmartContract\Config\Config;
 use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Currency;
+use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -28,8 +33,14 @@ class DepositConsumer implements ConsumerInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
+
+    /** @var Config */
+    private $contractConfig;
 
     /** @var ClockInterface */
     private $clock;
@@ -38,15 +49,19 @@ class DepositConsumer implements ConsumerInterface
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
         CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
+        Config $contractConfig,
         ClockInterface $clock
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
         $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
+        $this->contractConfig = $contractConfig;
         $this->clock = $clock;
     }
 
@@ -84,9 +99,10 @@ class DepositConsumer implements ConsumerInterface
         }
 
         try {
-            $crypto = $this->cryptoManager->findBySymbol($clbResult->getCrypto());
+            $tradable = $this->tokenManager->findByName($clbResult->getCrypto())
+                ?? $this->cryptoManager->findBySymbol($clbResult->getCrypto());
 
-            if (!$crypto) {
+            if (!$tradable) {
                 $this->logger->info('[deposit-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
 
                 return true;
@@ -94,11 +110,16 @@ class DepositConsumer implements ConsumerInterface
 
             $this->balanceHandler->deposit(
                 $user,
-                Token::getFromCrypto($crypto),
-                $this->moneyWrapper->parse(
-                    $clbResult->getAmount(),
-                    $crypto->getSymbol()
-                )
+                $tradable instanceof Token? $tradable: Token::getFromCrypto($tradable),
+                $tradable instanceof Token
+                    ? (new Money($clbResult->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL)))
+                        ->subtract(
+                            $this->moneyWrapper->parse(
+                                (string)$this->contractConfig->getWithdrawFee(),
+                                MoneyWrapper::TOK_SYMBOL
+                            )
+                        )
+                    : $this->moneyWrapper->parse($clbResult->getAmount(), $tradable->getSymbol())
             );
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');

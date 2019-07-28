@@ -3,14 +3,15 @@
 namespace App\Wallet;
 
 use App\Entity\Crypto;
+use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Config\Config;
 use App\Manager\PendingManagerInterface;
+use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
@@ -18,10 +19,11 @@ use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -37,50 +39,57 @@ class Wallet implements WalletInterface
     /** @var DepositGatewayCommunicator */
     private $depositCommunicator;
 
-    /** @var ContractHandlerInterface */
-    private $contractHandler;
-
     /** @var PendingManagerInterface */
     private $pendingManager;
 
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var ContractHandlerInterface */
+    private $contractHandler;
+
     /** @var Config */
-    private $config;
+    private $contractConfig;
 
     /** @var LoggerInterface */
     private $logger;
+
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
 
     public function __construct(
         WithdrawGatewayInterface $withdrawGateway,
         BalanceHandlerInterface $balanceHandler,
         DepositGatewayCommunicator $depositCommunicator,
-        ContractHandlerInterface $contractHandler,
         PendingManagerInterface $pendingManager,
         EntityManagerInterface $em,
-        Config $config,
-        LoggerInterface $logger
+        ContractHandlerInterface $contractHandler,
+        Config $contractConfig,
+        LoggerInterface $logger,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->withdrawGateway = $withdrawGateway;
         $this->balanceHandler = $balanceHandler;
         $this->depositCommunicator = $depositCommunicator;
-        $this->contractHandler = $contractHandler;
         $this->pendingManager = $pendingManager;
         $this->em = $em;
-        $this->config = $config;
+        $this->contractHandler = $contractHandler;
+        $this->contractConfig = $contractConfig;
         $this->logger = $logger;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
     public function getWithdrawDepositHistory(User $user, int $offset, int $limit): array
     {
-        $limit = intval($limit / 2);
+        $limit = intval($limit / 3);
 
         $depositHistory = $this->depositCommunicator->getTransactions($user, $offset, $limit);
         $withdrawHistory = $this->withdrawGateway->getHistory($user, $offset, $limit);
 
-        $history = array_merge($depositHistory, $withdrawHistory);
+        $tokenTransactionHistory = $this->contractHandler->getTransactions($user, $offset, $limit);
+
+        $history = array_merge($depositHistory, $withdrawHistory, $tokenTransactionHistory);
 
         usort($history, function (Transaction $first, Transaction $second): bool {
             return $first->getDate()->getTimestamp() < $second->getDate()->getTimestamp();
@@ -99,10 +108,9 @@ class Wallet implements WalletInterface
         Amount $amount,
         TradebleInterface $tradable
     ): PendingWithdrawInterface {
-        // TODO: convert float fee to currency
         $fee = $tradable instanceof Crypto
             ? $tradable->getFee()
-            : new Money((int)$this->config->getTokenWithdrawFee(), new Currency('TOK'));
+            : $this->moneyWrapper->parse((string)$this->contractConfig->getWithdrawFee(), MoneyWrapper::TOK_SYMBOL);
 
         if ($tradable instanceof Crypto) {
             $crypto = $tradable;
@@ -134,29 +142,40 @@ class Wallet implements WalletInterface
         return $this->pendingManager->create($user, $address, $amount, $tradable);
     }
 
-    /** @throws Throwable */
-    public function withdrawCommit(PendingWithdraw $pendingWithdraw): void
+    /**
+     * @param PendingWithdraw|PendingTokenWithdraw $pendingWithdraw
+     * @throws Throwable
+     */
+    public function withdrawCommit(PendingWithdrawInterface $pendingWithdraw): void
     {
-        $crypto = $pendingWithdraw->getCrypto();
+        /** @var Crypto|Token $tradable */
+        $tradable = $pendingWithdraw instanceof PendingWithdraw
+            ? $pendingWithdraw->getCrypto()
+            : $pendingWithdraw->getToken();
         $user = $pendingWithdraw->getUser();
         $amount = $pendingWithdraw->getAmount();
         $address = $pendingWithdraw->getAddress();
 
-        if (!$this->validateAmount($crypto, $amount, $user)) {
+        if ($tradable instanceof Crypto && !$this->validateAmount($tradable, $amount, $user)) {
             throw new NotEnoughAmountException();
         }
 
         $this->em->beginTransaction();
 
         try {
-            $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $crypto);
+            if ($tradable instanceof Crypto) {
+                $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+            } else {
+                $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+            }
+
             $this->em->remove($pendingWithdraw);
             $this->em->flush();
         } catch (Throwable $exception) {
             $this->em->rollback();
 
             $this->logger->error(
-                "Failed to pay '{$user->getEmail()}' amount {$amount->getAmount()->getAmount()} {$crypto->getSymbol()}.
+                "Failed to pay '{$user->getEmail()}' amount {$amount->getAmount()->getAmount()} {$tradable->getSymbol()}.
                 Withdraw-gateway failed with the next errror: {$exception->getMessage()}. Payment has been rollbacked"
             );
 

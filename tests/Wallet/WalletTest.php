@@ -5,19 +5,18 @@ namespace App\Tests\Wallet;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Config\Config;
 use App\Manager\PendingManagerInterface;
+use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Wallet;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
-use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -38,11 +37,12 @@ class WalletTest extends TestCase
             $this->mockWithdrawGatewayInterface($withdrawTransactions),
             $this->mockBalanceHandler(),
             $this->mockDepositCommunicator($depositTransactions),
-            $this->createMock(ContractHandlerInterface::class),
             $this->createMock(PendingManagerInterface::class),
             $this->createMock(EntityManagerInterface::class),
+            $this->createMock(ContractHandlerInterface::class),
             $this->createMock(Config::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(MoneyWrapperInterface::class)
         );
 
         $history = $wallet->getWithdrawDepositHistory($this->mockUser(), 0, 10);

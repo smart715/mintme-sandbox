@@ -264,8 +264,9 @@ services:
     App\SmartContract\Config\Config:
         arguments:
             $mintmeAddress: "%mintme_address%"
-            $tokenPrecision: "%token_precision%"
             $tokenQuantity: "%token_quantity%"
+            $depositFee: "%token_deposit_fee%"
+            $withdrawFee: "%token_withdraw_fee%"
 
     App\Controller\API\WebSocketAPIController:
         arguments:

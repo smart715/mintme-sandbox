@@ -26,7 +26,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
     public function getRepository(): Currencies
     {
         return new Currencies\CurrencyList(
-            array_merge($this->fetchCurrencies(), [ 'TOK' => self::TOK_SUBUNIT ])
+            array_merge($this->fetchCurrencies(), [ self::TOK_SYMBOL => self::TOK_SUBUNIT ])
         );
     }
 

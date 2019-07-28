@@ -12,4 +12,8 @@ interface PendingWithdrawInterface
     public function getAmount(): Amount;
 
     public function getHash(): string;
+
+    public function getUser(): User;
+
+    public function getSymbol(): string;
 }

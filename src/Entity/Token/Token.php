@@ -62,7 +62,7 @@ class Token implements TradebleInterface
      * @ORM\Column(type="boolean", options={"default": 0})
      * @var bool
      */
-    protected $minDestinationLocked;
+    protected $minDestinationLocked = false;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)

@@ -3,11 +3,9 @@
 namespace App\Wallet;
 
 use App\Entity\Crypto;
-use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
-use App\Exchange\Config\Config;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
@@ -32,7 +30,7 @@ interface WalletInterface
         TradebleInterface $tradable
     ): PendingWithdrawInterface;
 
-    public function withdrawCommit(PendingWithdraw $pendingWithdraw): void;
+    public function withdrawCommit(PendingWithdrawInterface $pendingWithdraw): void;
 
 
     /** @return array<Address> */

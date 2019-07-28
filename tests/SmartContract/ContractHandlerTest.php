@@ -6,8 +6,10 @@ use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Manager\CryptoManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandler;
+use App\Wallet\Money\MoneyWrapperInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -33,7 +35,9 @@ class ContractHandlerTest extends TestCase
         $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
-            $this->mockLoggerInterface()
+            $this->mockLoggerInterface(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $result = $handler->deploy($this->mockToken(true));
@@ -50,7 +54,9 @@ class ContractHandlerTest extends TestCase
         $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
-            $this->mockLoggerInterface()
+            $this->mockLoggerInterface(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $this->expectException(\Throwable::class);
@@ -77,7 +83,9 @@ class ContractHandlerTest extends TestCase
         $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
-            $this->mockLoggerInterface()
+            $this->mockLoggerInterface(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $this->expectException(\Throwable::class);
@@ -104,7 +112,9 @@ class ContractHandlerTest extends TestCase
         $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
-            $this->mockLoggerInterface()
+            $this->mockLoggerInterface(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $this->expectException(\Throwable::class);
@@ -128,7 +138,9 @@ class ContractHandlerTest extends TestCase
         $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
-            $this->mockLoggerInterface()
+            $this->mockLoggerInterface(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $handler->updateMinDestination($this->mockToken(true), '0x456', false);
@@ -143,7 +155,9 @@ class ContractHandlerTest extends TestCase
         $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
-            $this->mockLoggerInterface()
+            $this->mockLoggerInterface(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $this->expectException(\Throwable::class);
@@ -168,7 +182,9 @@ class ContractHandlerTest extends TestCase
         $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
-            $this->mockLoggerInterface()
+            $this->mockLoggerInterface(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $this->expectException(\Throwable::class);

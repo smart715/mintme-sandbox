@@ -114,6 +114,11 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         return $this->user;
     }
 
+    public function getSymbol(): string
+    {
+        return $this->getToken()->getSymbol();
+    }
+
     /** @ORM\PrePersist() */
     public function init(): self
     {

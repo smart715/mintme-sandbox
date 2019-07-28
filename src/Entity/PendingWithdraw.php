@@ -113,6 +113,11 @@ class PendingWithdraw implements PendingWithdrawInterface
         return $this->user;
     }
 
+    public function getSymbol(): string
+    {
+        return $this->getCrypto()->getSymbol();
+    }
+
     /** @ORM\PrePersist() */
     public function init(): self
     {
