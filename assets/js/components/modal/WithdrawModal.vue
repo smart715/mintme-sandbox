@@ -175,7 +175,7 @@ export default {
             })
             .then((response) => {
                 this.$toasted.success('Confirmation email has been sent to your email. It will expire in 4 hours.');
-                // this.closeModal();
+                this.closeModal();
             })
             .catch((error) => {
                 this.$toasted.error(error.response.data.error);
