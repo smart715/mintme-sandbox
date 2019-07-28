@@ -89,20 +89,25 @@ class Wallet implements WalletInterface
         return $history;
     }
 
-    /** @throws Throwable */
+    /**
+     * @param Crypto|Token $tradable
+     * @throws Throwable
+     */
     public function withdrawInit(
         User $user,
         Address $address,
         Amount $amount,
         TradebleInterface $tradable
     ): PendingWithdrawInterface {
-        $tradable = $tradable instanceof Token
-            ? $tradable
-            : Token::getFromCrypto($tradable);
-
+        // TODO: convert float fee to currency
         $fee = $tradable instanceof Crypto
             ? $tradable->getFee()
-            : new Money($this->config->getTokenWithdrawFee(), new Currency('TOK'));
+            : new Money((int)$this->config->getTokenWithdrawFee(), new Currency('TOK'));
+
+        if ($tradable instanceof Crypto) {
+            $crypto = $tradable;
+            $tradable = Token::getFromCrypto($tradable);
+        }
 
         $available = $this->balanceHandler->balance($user, $tradable)->getAvailable();
         $this->logger->info(
@@ -120,7 +125,7 @@ class Wallet implements WalletInterface
             throw new NotEnoughUserAmountException();
         }
 
-        if ($tradable instanceof Crypto && !$this->validateAmount($tradable, $amount, $user)) {
+        if (isset($crypto) && !$this->validateAmount($crypto, $amount, $user)) {
             throw new NotEnoughAmountException();
         }
 

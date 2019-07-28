@@ -2,6 +2,7 @@
 
 namespace App\Manager;
 
+use App\Entity\Crypto;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
@@ -22,6 +23,7 @@ class PendingManager implements PendingManagerInterface
         $this->em = $em;
     }
 
+    /** @param Crypto|Token $tradable */
     public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable): PendingWithdrawInterface
     {
         $pending = $tradable instanceof Token

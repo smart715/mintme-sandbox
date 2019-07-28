@@ -5,7 +5,9 @@ namespace App\Tests\Wallet;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\Config;
 use App\Manager\PendingManagerInterface;
+use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Transaction;
@@ -36,8 +38,10 @@ class WalletTest extends TestCase
             $this->mockWithdrawGatewayInterface($withdrawTransactions),
             $this->mockBalanceHandler(),
             $this->mockDepositCommunicator($depositTransactions),
+            $this->createMock(ContractHandlerInterface::class),
             $this->createMock(PendingManagerInterface::class),
             $this->createMock(EntityManagerInterface::class),
+            $this->createMock(Config::class),
             $this->createMock(LoggerInterface::class)
         );
 

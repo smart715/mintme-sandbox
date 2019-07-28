@@ -25,7 +25,7 @@ class ContractHandlerTest extends TestCase
                     'decimals' => 4,
                     'mintDestination' => 'foobarbaz',
                     'releasedAtCreation' => '10000000000',
-                    'releasedPeriod' => 10,
+                    'releasePeriod' => 10,
                 ]
             )
             ->willReturn($this->mockResponse(false, ['address' => 'foo123']));
@@ -69,7 +69,7 @@ class ContractHandlerTest extends TestCase
                     'decimals' => 4,
                     'mintDestination' => 'foobarbaz',
                     'releasedAtCreation' => '10000000000',
-                    'releasedPeriod' => 10,
+                    'releasePeriod' => 10,
                 ]
             )
             ->willReturn($this->mockResponse(false, ['Bar']));
@@ -96,7 +96,7 @@ class ContractHandlerTest extends TestCase
                     'decimals' => 4,
                     'mintDestination' => 'foobarbaz',
                     'releasedAtCreation' => '10000000000',
-                    'releasedPeriod' => 10,
+                    'releasePeriod' => 10,
                 ]
             )
             ->willReturn($this->mockResponse(true, ['address' => 'foo123']));
@@ -117,7 +117,7 @@ class ContractHandlerTest extends TestCase
         $rpc = $this->mockRpc();
         $rpc
             ->expects($this->once())->method('send')->with(
-                'updateMintDestination',
+                'update_mint_destination',
                 [
                     'tokenContract' => '0x123',
                     'mintDestination' => '0x456',
@@ -156,7 +156,7 @@ class ContractHandlerTest extends TestCase
         $rpc = $this->mockRpc();
         $rpc
             ->expects($this->once())->method('send')->with(
-                'updateMintDestination',
+                'update_mint_destination',
                 [
                     'tokenContract' => '0x123',
                     'mintDestination' => '0x456',
