@@ -18,7 +18,7 @@
                     </template>
                 </b-table>
                     <div v-else>
-                        <p class="text-center p-5">No Traders yet</p>
+                        <p class="text-center p-5">No Holders yet</p>
                     </div>
                 </template>
                 <template v-else>
