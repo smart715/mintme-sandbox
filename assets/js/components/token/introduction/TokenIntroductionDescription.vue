@@ -48,6 +48,7 @@
                                     v-model="$v.newDescription.$model"
                                     :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
                                     rows="5"
+                                    @change="onTextareaChange"
                                     ref="description"
                                 >
                                 </textarea>
@@ -79,8 +80,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import BbcodeView from '../../bbcode/BbcodeView';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
-import markitup from 'markitup';
-import markitupSet from '../../../markitup.js';
+import {useMarkitup} from '../../../utils/markitup.js';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
@@ -119,6 +119,9 @@ export default {
         },
     },
     methods: {
+        onTextareaChange: function() {
+            this.newDescription = this.$refs.description.value;
+        },
         editDescription: function() {
             this.$v.$touch();
             if (this.$v.$invalid) {
@@ -165,10 +168,7 @@ export default {
         },
     },
     mounted: function() {
-        markitup(this.$refs.description, markitupSet);
-        this.$refs.description.addEventListener('change', (e) => {
-            this.$v.newDescription.$model = e.target.value;
-        });
+        useMarkitup(this.$refs.description);
     },
 };
 </script>
