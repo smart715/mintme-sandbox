@@ -180,7 +180,8 @@ export default {
                 .then((response) => {
                     if (HTTP_ACCEPTED === response.status) {
                         this.$toasted.success(response.data.message);
-                        this.closeModal();
+                        this.showTwoFactorModal = false;
+                        location.href = this.$routing.generate('homepage');
                     }
                 }, (error) => {
                     if (!error.response) {
