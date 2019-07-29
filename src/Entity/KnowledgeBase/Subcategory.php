@@ -20,14 +20,6 @@ class Subcategory
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\KnowledgeBase\Category")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
-     * @Assert\NotBlank()
-     * @var Category
-     */
-    protected $category;
-
-    /**
      * @ORM\Column(type="string")
      * @var string
      */
@@ -41,19 +33,6 @@ class Subcategory
     public function setId(int $id): void
     {
         $this->id = $id;
-    }
-
-    /**
-     * @return Category|string
-     */
-    public function getCategory()
-    {
-        return $this->category ?? '';
-    }
-
-    public function setCategory(Category $category): void
-    {
-        $this->category = $category;
     }
 
     public function getName(): string

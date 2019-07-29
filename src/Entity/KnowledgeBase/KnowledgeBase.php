@@ -29,9 +29,8 @@ class KnowledgeBase
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\KnowledgeBase\Subcategory")
-     * @ORM\JoinColumn(name="subcategory_id", referencedColumnName="id")
-     * @Assert\NotBlank
-     * @var Subcategory
+     * @ORM\JoinColumn(name="subcategory_id", referencedColumnName="id", nullable=true)
+     * @var Subcategory|null
      */
     protected $subcategory;
 
@@ -48,7 +47,7 @@ class KnowledgeBase
     protected $shortUrl;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      * @var string
      */
     protected $description;
@@ -109,7 +108,7 @@ class KnowledgeBase
         return $this->subcategory ?? '';
     }
 
-    public function setSubcategory(Subcategory $subcategory): void
+    public function setSubcategory(?Subcategory $subcategory): void
     {
         $this->subcategory = $subcategory;
     }

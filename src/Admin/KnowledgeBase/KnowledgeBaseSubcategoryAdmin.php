@@ -29,22 +29,17 @@ class KnowledgeBaseSubcategoryAdmin extends AbstractAdmin
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
-        $datagridMapper
-            ->add('category', null)
-            ->add('name');
+        $datagridMapper->add('name');
     }
 
     protected function configureFormFields(FormMapper $form): void
     {
-        $form
-            ->add('category', null)
-            ->add('name', TextType::class);
+        $form->add('name', TextType::class);
     }
 
     protected function configureListFields(ListMapper $listMapper): void
     {
         $listMapper->addIdentifier('id', IntegerType::class)
-            ->add('category', null)
             ->add('name', TextType::class);
     }
 }
