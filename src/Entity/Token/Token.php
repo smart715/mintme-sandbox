@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints\DashedUniqueName;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
@@ -41,6 +42,7 @@ class Token implements TradebleInterface
      * @Assert\Regex(pattern="/^[a-zA-Z0-9\-\s]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
      * @AppAssert\IsNotBlacklisted(type="token", message="This value is not allowed")
+     * @DashedUniqueName()
      * @Groups({"API"})
      * @var string
      */
