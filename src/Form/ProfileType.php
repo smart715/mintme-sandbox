@@ -74,6 +74,9 @@ class ProfileType extends AbstractType
 
         $builder->get('lastName')
             ->addModelTransformer($this->nameTransformer);
+
+        $builder->get('city')
+            ->addModelTransformer($this->nameTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
