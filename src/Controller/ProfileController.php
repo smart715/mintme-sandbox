@@ -60,15 +60,13 @@ class ProfileController extends Controller
         $entityManager->merge($profile);
         $entityManager->flush();
         
-        $pageUrl = $profile->getPageUrl();
-
         if ($form->isSubmitted() && $form->isValid()) {
             $this->get("security.csrf.token_manager")->refreshToken("form_intention");
         }
 
         $this->userActionLogger->info('Edit profile');
 
-        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $pageUrl ]);
+        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
     }
 
     /** @Route(name="profile") */
