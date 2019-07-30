@@ -45,11 +45,9 @@
 
                                 <textarea
                                     class="form-control"
-                                    v-model="$v.newDescription.$model"
+                                    v-model.lazy="$v.newDescription.$model"
                                     :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
                                     rows="5"
-                                    @change="onTextareaChange"
-                                    ref="description"
                                 >
                                 </textarea>
                                 <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
@@ -119,9 +117,6 @@ export default {
         },
     },
     methods: {
-        onTextareaChange: function() {
-            this.newDescription = this.$refs.description.value;
-        },
         editDescription: function() {
             this.$v.$touch();
             if (this.$v.$invalid) {
@@ -168,7 +163,7 @@ export default {
         },
     },
     mounted: function() {
-        useMarkitup(this.$refs.description);
+        useMarkitup('textarea');
     },
 };
 </script>
