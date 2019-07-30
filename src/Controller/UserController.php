@@ -19,7 +19,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -37,21 +36,16 @@ class UserController extends AbstractController
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /** @var SessionInterface */
-    private $session;
-
     public function __construct(
         UserManagerInterface $userManager,
         ProfileManagerInterface $profileManager,
         UserActionLogger $userActionLogger,
-        EventDispatcherInterface $eventDispatcher,
-        SessionInterface $session
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
-        $this->session = $session;
     }
 
     /**
@@ -114,6 +108,7 @@ class UserController extends AbstractController
             'form' => $form->createView(),
             'imgUrl' => $imgUrl ?? '',
             'formHeader' => $formHeader ?? 'Disable two-factor authentication',
+            'backupCodes' => [],
             'isTwoFactor' => $isTwoFactor,
             'twoFactorKey' => $user->getGoogleAuthenticatorSecret(),
         ];
@@ -128,25 +123,13 @@ class UserController extends AbstractController
             return $this->redirectToRoute('settings');
         }
 
-        $backupCodes = $this->turnOnAuthenticator($twoFactorManager, $user)?: [];
-
-        if (!empty($backupCodes)) {
-            $this->session->set('backupCodes', json_encode($backupCodes));
-
-            return $this->redirectToRoute('backup_codes');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->get("security.csrf.token_manager")->refreshToken("form_intention");
         }
 
+        $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
+
         return $this->render('security/2fa_manager.html.twig', $parameters);
-    }
-
-    /**
-     * @Route("/settings/codes", name="backup_codes")
-     */
-    public function renderBackupCodes(Request $request): Response
-    {
-        $backupCodes = json_decode($this->session->get('backupCodes'))?: [];
-
-        return $this->render('security/2fa_backup_codes.html.twig', ['backupCodes' => $backupCodes,]);
     }
 
     private function getPasswordForm(Request $request): FormInterface
