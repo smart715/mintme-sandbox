@@ -63,8 +63,7 @@ class ProfileController extends Controller
         $pageUrl = $profile->getPageUrl();
 
         if ($form->isSubmitted() && $form->isValid()) {
-            unset($form);
-            unset($profile);
+            $this->get("security.csrf.token_manager")->refreshToken("form_intention");
         }
 
         $this->userActionLogger->info('Edit profile');
