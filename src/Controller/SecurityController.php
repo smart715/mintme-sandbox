@@ -69,8 +69,8 @@ class SecurityController extends FOSSecurityController
         $this->session->clear();
 
         return $hasAuthenticated
-        ? $this->redirectToRoute("homepage")
-        : $this->redirectToRoute("login");
+            ? $this->redirectToRoute("homepage")
+            : $this->redirectToRoute("login");
     }
 
     /** @Route("/login_success", name="login_success") */
@@ -79,8 +79,8 @@ class SecurityController extends FOSSecurityController
         $this->userActionLogger->info('Log in');
 
         return $prelaunchConfig->isFinished()
-        ? $this->redirectToRoute("trading")
-        : $this->redirectToRoute("referral-program");
+            ? $this->redirectToRoute("trading")
+            : $this->redirectToRoute("referral-program");
     }
 
     /**
