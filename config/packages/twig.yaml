@@ -15,5 +15,3 @@ twig:
         google_tracking_id: '%google_tracking_id%'
         tawk_api_key: '%tawk_api_key%'
         is_hacker_allowed: '%is_hacker_allowed%'
-        token_deposit_fee: '%token_deposit_fee%'
-        token_withdraw_fee: '%token_withdraw_fee%'

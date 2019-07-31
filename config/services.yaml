@@ -259,14 +259,11 @@ services:
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
-            $tokenWithdrawFee: "%token_withdraw_fee%"
 
     App\SmartContract\Config\Config:
         arguments:
             $mintmeAddress: "%mintme_address%"
             $tokenQuantity: "%token_quantity%"
-            $depositFee: "%token_deposit_fee%"
-            $withdrawFee: "%token_withdraw_fee%"
 
     App\Controller\API\WebSocketAPIController:
         arguments:

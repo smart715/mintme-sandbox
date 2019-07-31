@@ -29,9 +29,6 @@ parameters:
     # 0.1%
     maker_fee_rate: 0.001
 
-    token_deposit_fee: 0.04
-    token_withdraw_fee: 0.04
-
     # Max timeout to check user website hash
     verify_timeout_seconds: 10
 
