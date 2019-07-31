@@ -70,7 +70,10 @@ export default {
         this.checkIfTokenExchanged();
 
         this.addMessageHandler((response) => {
-            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier)) {
+            if (
+                ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier))
+                || 'order.update' === response.method
+            ) {
                 this.checkIfTokenExchanged();
             }
         }, 'token-name-asset-update');
