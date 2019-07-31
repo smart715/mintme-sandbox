@@ -300,3 +300,10 @@ services:
     App\EventListener\ChangePasswordListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
+
+    App\EventSubscriber\SitemapSubscriber:
+        arguments: 
+            - "@router"
+        tags:
+            - { name: "kernel.event_subscriber", priority: 100 }
+
