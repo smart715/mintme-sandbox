@@ -66,7 +66,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}", name="token_update")
+     * @Rest\Patch("/{name}", name="token_update", options={"expose"=true})
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
@@ -86,7 +86,7 @@ class TokensAPIController extends AbstractFOSRestController
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
         }
-        
+
         if ($request->get('name')
             && ($errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager))) {
                 throw new ApiNotFoundException($errorMessage);
@@ -353,7 +353,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/delete", name="token_delete")
+     * @Rest\Post("/{name}/delete", name="token_delete", options={"expose"=true})
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */
@@ -394,7 +394,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/send-code", name="token_send_code")
+     * @Rest\Post("/{name}/send-code", name="token_send_code", options={"expose"=true})
      */
     public function sendCode(
         MailerInterface $mailer,

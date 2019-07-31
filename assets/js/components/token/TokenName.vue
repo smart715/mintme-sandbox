@@ -16,9 +16,6 @@
             :twofa="twofa"
             :visible="showTokenEditModal"
             :current-name="currentName"
-            :update-url="updateUrl"
-            :delete-url="deleteUrl"
-            :send-code-url="sendCodeUrl"
             @close="closeTokenEditModal">
         </token-edit-modal>
     </div>
@@ -44,11 +41,8 @@ export default {
     props: {
         name: String,
         identifier: String,
-        updateUrl: String,
         editable: Boolean,
         twofa: Boolean,
-        sendCodeUrl: String,
-        deleteUrl: String,
     },
     components: {
         FontAwesomeIcon,

@@ -72,9 +72,6 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
-                                        update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                        delete-url="{{ path('token_delete', {'name': market.quote.name}) }}"
-                                        send-code-url="{{ path('token_send_code', {'name': market.quote.name}) }}"
                                         :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>

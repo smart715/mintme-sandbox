@@ -66,10 +66,7 @@ export default {
     },
     props: {
         currentName: String,
-        deleteUrl: String,
-        sendCodeUrl: String,
         twofa: Boolean,
-        updateUrl: String,
         visible: Boolean,
     },
     data() {
@@ -123,7 +120,9 @@ export default {
             }
         },
         doEditName: function(code = '') {
-            this.$axios.single.patch(this.updateUrl, {
+            this.$axios.single.patch(this.$routing.generate('token_update', {
+                    name: this.currentName,
+                }), {
                     name: this.newName,
                     code: code,
                 })
@@ -157,7 +156,9 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.sendCodeUrl)
+            this.$axios.single.post(this.$routing.generate('token_send_code', {
+                    name: this.currentName,
+                }))
                 .then((response) => {
                     if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
                         this.$toasted.success(response.data.message);
@@ -174,7 +175,9 @@ export default {
                 });
         },
         doDeleteToken: function(code = '') {
-            this.$axios.single.post(this.deleteUrl, {
+            this.$axios.single.post(this.$routing.generate('token_delete', {
+                    name: this.currentName,
+                }), {
                     code: code,
                 })
                 .then((response) => {
