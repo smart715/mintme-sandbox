@@ -27,7 +27,7 @@
                     </b-row>
                     <b-row>
                         <b-col v-if="min" cols="auto" class="text-left">Minimal value: {{ min }} {{ currency }}</b-col>
-                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ currency }}</b-col>
+                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ feeCurrency }}</b-col>
                     </b-row>
                 </div>
                 <div class="pt-2 text-center">
@@ -46,6 +46,8 @@
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
 
+const WEB_SYMBOL = 'WEB';
+
 export default {
     name: 'DepositModal',
     components: {
@@ -57,9 +59,15 @@ export default {
         address: String,
         description: String,
         currency: String,
+        isToken: Boolean,
         min: String,
         fee: String,
         noClose: Boolean,
+    },
+    computed: {
+      feeCurrency: function() {
+          return this.isToken ? WEB_SYMBOL : this.currency;
+      },
     },
     methods: {
         closeModal: function() {

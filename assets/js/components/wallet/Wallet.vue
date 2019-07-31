@@ -117,7 +117,9 @@
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
+            :is-token="isTokenModal"
             :fee="withdraw.fee"
+            :available-web="withdraw.availableWeb"
             :withdraw-url="withdrawUrl"
             :max-amount="withdraw.amount"
             :address-length="addressLength"
@@ -131,6 +133,7 @@
             :visible="showDepositModal"
             :description="depositDescription"
             :currency="selectedCurrency"
+            :is-token="isTokenModal"
             :fee="deposit.fee"
             :min="deposit.min"
             :no-close="false"
@@ -146,6 +149,7 @@ import {WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
+const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
@@ -192,6 +196,7 @@ export default {
                 fee: '0',
                 amount: '0',
                 subunit: 4,
+                availableWeb: '0',
             },
             deposit: {
                 fee: undefined,
@@ -275,7 +280,8 @@ export default {
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
-            this.withdraw.fee = toMoney(isToken ? '0': fee, subunit);
+            this.withdraw.fee = toMoney(isToken ? this.predefinedTokens[WEB_SYMBOL].fee : fee, subunit);
+            this.withdraw.availableWeb = this.predefinedTokens[WEB_SYMBOL].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
@@ -288,16 +294,10 @@ export default {
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
-            this.selectedCurrency = isToken;
-
-            if (isToken) {
-                this.deposit.fee = '0';
-                this.showDepositModal = true;
-                return;
-            }
+            this.isTokenModal = isToken;
 
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
-                    crypto: currency,
+                    crypto: isToken ? WEB_SYMBOL : currency,
                 }))
                 .then((res) => this.deposit.fee = res.data && parseFloat(res.data) !== 0.0 ?
                     toMoney(res.data, subunit) :

@@ -62,13 +62,13 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ fee | toMoney(subunit) }}</span>
+                    <span class="float-right">{{ fee | toMoney(subunit) }} {{ feeCurrency }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney(subunit) }}</span>
+                    <span class="float-right">{{ fullAmount | toMoney(subunit) }} {{currency}}</span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
@@ -95,6 +95,7 @@ import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} fr
 import {toMoney} from '../../utils';
 
 const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
+const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'WithdrawModal',
@@ -104,9 +105,11 @@ export default {
     props: {
         visible: Boolean,
         currency: String,
+        isToken: Boolean,
         fee: String,
         withdrawUrl: String,
         maxAmount: String,
+        availableWeb: String,
         addressLength: Number,
         subunit: Number,
         twofa: String,
@@ -132,6 +135,9 @@ export default {
             );
 
             return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(), this.subunit);
+        },
+        feeCurrency: function() {
+            return this.isToken ? WEB_SYMBOL : this.currency;
         },
     },
     methods: {
@@ -162,6 +168,11 @@ export default {
             this.$v.$touch();
             if (this.$v.$error) {
                 this.$toasted.error('Correct your form fields');
+                return;
+            }
+
+            if (this.isToken && new Decimal(this.availableWeb).lessThan(this.fee)) {
+                this.$toasted.error('You don\'t have enough web to pay fee');
                 return;
             }
 
