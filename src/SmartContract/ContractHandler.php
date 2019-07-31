@@ -7,7 +7,6 @@ use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\Model\TokenDeployResult;
 use App\Wallet\Deposit\Model\DepositCredentials;
@@ -122,24 +121,18 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function getDepositCredentials(User $user): DepositCredentials
+    public function getDepositCredentials(User $user): string
     {
-        $credentials = [];
+        $response = $this->rpc->send(
+            self::DEPOSIT_CREDENTIAL,
+            [
+                'userId' => $user->getId(),
+            ]
+        );
 
-        foreach ($user->getRelatedTokens() as $token) {
-            $response = $this->rpc->send(
-                self::DEPOSIT_CREDENTIAL,
-                [
-                    'userId' => $user->getId(),
-                    'tokenName' => $token->getName(),
-                ]
-            );
-            $credentials[$token->getName()] = $response->hasError()
-                ? "Address unavailable."
-                : $response->getResult();
-        }
-
-        return new DepositCredentials($credentials);
+        return $response->hasError() || !isset($response->getResult()['address'])
+            ? 'Address unavailable.'
+            : $response->getResult()['address'];
     }
 
     public function withdraw(User $user, Money $balance, string $address, Token $token): void
@@ -187,11 +180,6 @@ class ContractHandler implements ContractHandlerInterface
 
     private function parseTransactions(array $transactions): array
     {
-//        new Money(
-//            'withdraw' == $transaction['type']
-//                ? $this->config->getWithdrawFee()
-//                : $this->config->getDepositFee(),
-//            new Currency(MoneyWrapper::TOK_SYMBOL)
         return array_map(function (array $transaction) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),

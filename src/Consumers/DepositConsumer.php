@@ -8,7 +8,6 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\SmartContract\Config\Config;
 use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapper;
@@ -39,9 +38,6 @@ class DepositConsumer implements ConsumerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var Config */
-    private $contractConfig;
-
     /** @var ClockInterface */
     private $clock;
 
@@ -52,7 +48,6 @@ class DepositConsumer implements ConsumerInterface
         TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
-        Config $contractConfig,
         ClockInterface $clock
     ) {
         $this->balanceHandler = $balanceHandler;
@@ -61,7 +56,6 @@ class DepositConsumer implements ConsumerInterface
         $this->tokenManager = $tokenManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
-        $this->contractConfig = $contractConfig;
         $this->clock = $clock;
     }
 
@@ -113,12 +107,6 @@ class DepositConsumer implements ConsumerInterface
                 $tradable instanceof Token? $tradable: Token::getFromCrypto($tradable),
                 $tradable instanceof Token
                     ? (new Money($clbResult->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL)))
-                        ->subtract(
-                            $this->moneyWrapper->parse(
-                                (string)$this->contractConfig->getWithdrawFee(),
-                                MoneyWrapper::TOK_SYMBOL
-                            )
-                        )
                     : $this->moneyWrapper->parse($clbResult->getAmount(), $tradable->getSymbol())
             );
 

@@ -145,6 +145,7 @@ import DepositModal from '../modal/DepositModal';
 import {WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
+const TOK_SYMBOL = 'TOK';
 
 export default {
     name: 'Wallet',
@@ -158,8 +159,6 @@ export default {
         createTokenUrl: String,
         tradingUrl: String,
         twofa: String,
-        TokenDepositFee: Number,
-        TokenWithdrawFee: Number,
     },
     data() {
         return {
@@ -168,6 +167,7 @@ export default {
             depositAddresses: {},
             showModal: false,
             selectedCurrency: null,
+            isTokenModal: false,
             depositAddress: null,
             depositDescription: null,
             showDepositModal: null,
@@ -201,8 +201,9 @@ export default {
     },
     computed: {
         addressLength: function() {
-            return this.depositAddresses[this.selectedCurrency] && this.depositAddresses[this.selectedCurrency].length
-                ? this.depositAddresses[this.selectedCurrency].length
+            let currency = this.isTokenModal ? TOK_SYMBOL : this.selectedCurrency;
+            return this.depositAddresses[currency] && this.depositAddresses[currency].length
+                ? this.depositAddresses[currency].length
                 : 1;
         },
         hasTokens: function() {
@@ -273,7 +274,8 @@ export default {
             }
             this.showModal = true;
             this.selectedCurrency = currency;
-            this.withdraw.fee = toMoney(isToken ? this.TokenWithdrawFee: fee, subunit);
+            this.isTokenModal = isToken;
+            this.withdraw.fee = toMoney(isToken ? '0': fee, subunit);
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
@@ -281,13 +283,15 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency, subunit, isToken = false) {
-            this.depositAddress = this.depositAddresses[currency] || 'Loading..';
+            this.depositAddress = (isToken ? this.depositAddresses[TOK_SYMBOL] : this.depositAddresses[currency])
+                || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
+            this.selectedCurrency = isToken;
 
             if (isToken) {
-                this.deposit.fee = this.TokendepositFee;
+                this.deposit.fee = '0';
                 this.showDepositModal = true;
                 return;
             }

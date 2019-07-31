@@ -11,7 +11,6 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\PendingManagerInterface;
-use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
@@ -20,10 +19,10 @@ use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Money\MoneyWrapper;
-use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -48,14 +47,8 @@ class Wallet implements WalletInterface
     /** @var ContractHandlerInterface */
     private $contractHandler;
 
-    /** @var Config */
-    private $contractConfig;
-
     /** @var LoggerInterface */
     private $logger;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
 
     public function __construct(
         WithdrawGatewayInterface $withdrawGateway,
@@ -64,9 +57,7 @@ class Wallet implements WalletInterface
         PendingManagerInterface $pendingManager,
         EntityManagerInterface $em,
         ContractHandlerInterface $contractHandler,
-        Config $contractConfig,
-        LoggerInterface $logger,
-        MoneyWrapperInterface $moneyWrapper
+        LoggerInterface $logger
     ) {
         $this->withdrawGateway = $withdrawGateway;
         $this->balanceHandler = $balanceHandler;
@@ -74,9 +65,7 @@ class Wallet implements WalletInterface
         $this->pendingManager = $pendingManager;
         $this->em = $em;
         $this->contractHandler = $contractHandler;
-        $this->contractConfig = $contractConfig;
         $this->logger = $logger;
-        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
@@ -110,7 +99,7 @@ class Wallet implements WalletInterface
     ): PendingWithdrawInterface {
         $fee = $tradable instanceof Crypto
             ? $tradable->getFee()
-            : $this->moneyWrapper->parse((string)$this->contractConfig->getWithdrawFee(), MoneyWrapper::TOK_SYMBOL);
+            : new Money('0', new Currency(MoneyWrapper::TOK_SYMBOL));
 
         if ($tradable instanceof Crypto) {
             $crypto = $tradable;
@@ -198,9 +187,9 @@ class Wallet implements WalletInterface
     /** {@inheritDoc} */
     public function getTokenDepositCredentials(User $user): array
     {
-        return array_map(function (string $address) {
-            return new Address($address);
-        }, $this->contractHandler->getDepositCredentials($user)->toArray());
+        return [
+            MoneyWrapper::TOK_SYMBOL => new Address($this->contractHandler->getDepositCredentials($user)),
+        ];
     }
 
     /** {@inheritDoc} */

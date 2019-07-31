@@ -8,22 +8,13 @@ class Config
     /** @var int $offset */
     private $offset;
 
-    /** @var float $tokenWithdrawFee */
-    private $tokenWithdrawFee;
-
-    public function __construct(int $offset, float $tokenWithdrawFee)
+    public function __construct(int $offset)
     {
         $this->offset = $offset;
-        $this->tokenWithdrawFee = $tokenWithdrawFee;
     }
 
     public function getOffset(): int
     {
         return $this->offset;
-    }
-
-    public function getTokenWithdrawFee(): float
-    {
-        return $this->tokenWithdrawFee;
     }
 }

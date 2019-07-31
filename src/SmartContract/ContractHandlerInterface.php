@@ -2,12 +2,9 @@
 
 namespace App\SmartContract;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\SmartContract\Model\TokenDeployResult;
-use App\Wallet\Deposit\Model\DepositCredentials;
-use App\Wallet\Model\Address;
 use Exception;
 use Money\Money;
 
@@ -22,7 +19,7 @@ interface ContractHandlerInterface
 
     public function updateMinDestination(Token $token, string $address, bool $lock): void;
 
-    public function getDepositCredentials(User $user): DepositCredentials;
+    public function getDepositCredentials(User $user): string;
 
     public function withdraw(User $user, Money $balance, string $address, Token $token): void;
 

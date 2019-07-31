@@ -11,18 +11,10 @@ class Config
     /** @var string */
     private $tokenQuantity;
 
-    /** @var float */
-    private $depositFee;
-
-    /** @var float */
-    private $withdrawFee;
-
-    public function __construct(string $mintmeAddress, string $tokenQuantity, float $depositFee, float $withdrawFee)
+    public function __construct(string $mintmeAddress, string $tokenQuantity)
     {
         $this->mintmeAddress = $mintmeAddress;
         $this->tokenQuantity = $tokenQuantity;
-        $this->depositFee = $depositFee;
-        $this->withdrawFee = $withdrawFee;
     }
 
     public function getMintmeAddress(): string
@@ -33,15 +25,5 @@ class Config
     public function getTokenQuantity(): string
     {
         return $this->tokenQuantity;
-    }
-
-    public function getWithdrawFee(): float
-    {
-        return $this->withdrawFee;
-    }
-
-    public function getDepositFee(): float
-    {
-        return $this->depositFee;
     }
 }
