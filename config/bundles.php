@@ -37,4 +37,5 @@ return [
     Sonata\ClassificationBundle\SonataClassificationBundle::class => ['all' => true],
     Sonata\NewsBundle\SonataNewsBundle::class => ['all' => true],
     FOS\JsRoutingBundle\FOSJsRoutingBundle::class => ['all' => true],
+    Presta\SitemapBundle\PrestaSitemapBundle::class => ['all' => true],
 ];
