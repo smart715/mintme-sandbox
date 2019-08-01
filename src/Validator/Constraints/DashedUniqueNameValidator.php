@@ -2,18 +2,18 @@
 
 namespace App\Validator\Constraints;
 
-use App\Manager\TokenManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class DashedUniqueNameValidator extends ConstraintValidator
 {
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    /** @var EntityManagerInterface */
+    private $entityManager;
 
-    public function __construct(TokenManagerInterface $tokenManager)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->tokenManager = $tokenManager;
+        $this->entityManager = $entityManager;
     }
 
     /** {@inheritdoc} */
@@ -26,6 +26,6 @@ class DashedUniqueNameValidator extends ConstraintValidator
 
     private function isExisted(string $tokenName): bool
     {
-        return $this->tokenManager->isExisted($tokenName);
+        return $this->entityManager->isExisted($tokenName);
     }
 }
