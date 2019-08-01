@@ -10,7 +10,7 @@
                     :items="traders"
                     :fields="fields">
                     <template slot="trader" slot-scope="row">
-                        {{ row.value }}
+                        <a :href="row.item.url">{{ row.value }}</a>
                         <img
                             src="../../../img/avatar.png"
                             class="float-right"
@@ -87,6 +87,7 @@ export default {
             .then(({data}) => this.traders = data.map((row) => {
                 return {
                     trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
+                    url: this.$routing.generate('profile-view', {pageUrl: row.user.profile.page_url}),
                     date: moment.unix(row.timestamp).format(GENERAL.dateFormat),
                     amount: Math.round(row.balance),
                 };
