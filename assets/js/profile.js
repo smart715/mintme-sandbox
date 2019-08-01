@@ -1,7 +1,7 @@
 import LimitedTextarea from './components/LimitedTextarea.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
-import {useMarkitup} from './utils/markitup.js';
+import {useMarkitup} from './utils';
 import {minLength, helpers} from 'vuelidate/lib/validators';
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));

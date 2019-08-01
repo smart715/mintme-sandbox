@@ -78,7 +78,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import BbcodeView from '../../bbcode/BbcodeView';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
-import {useMarkitup} from '../../../utils/markitup.js';
+import {useMarkitup} from '../../../utils';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';

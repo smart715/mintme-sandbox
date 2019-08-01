@@ -2,6 +2,7 @@ import Decimal from 'decimal.js/decimal.js';
 import * as Constants from './constants';
 import Interval from './interval';
 import EchartTheme from './echart-theme';
+import {useMarkitup} from './markitup.js';
 
 /**
  * Checks that given url is valid
@@ -128,4 +129,5 @@ export {
     EchartTheme,
     Interval,
     getUserOffset,
+    useMarkitup,
 };
