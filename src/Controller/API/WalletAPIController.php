@@ -122,13 +122,12 @@ class WalletAPIController extends AbstractFOSRestController
                 $tradable
             );
         } catch (Throwable $exception) {
-            var_dump($exception->getMessage());
             return $this->view([
                 'error' => 'Withdrawal failed',
             ], Response::HTTP_BAD_GATEWAY);
         }
 
-//        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
         $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
@@ -147,17 +146,14 @@ class WalletAPIController extends AbstractFOSRestController
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
-//         $depositAddresses = $depositCommunicator->getDepositCredentials(
-//             $this->getUser(),
-//             $cryptoManager->findAll()
-//         );
-//
+         $depositAddresses = $depositCommunicator->getDepositCredentials(
+             $this->getUser(),
+             $cryptoManager->findAll()
+         );
+
         $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($this->getUser());
 
-//         return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
-
-
-         return $this->view(array_merge([], $tokenDepositAddress));
+         return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
     }
 
     /**

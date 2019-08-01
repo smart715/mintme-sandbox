@@ -12,6 +12,7 @@ use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use App\Wallet\WalletInterface;
 use Money\Currency;
 use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
@@ -41,6 +42,9 @@ class DepositConsumer implements ConsumerInterface
     /** @var ClockInterface */
     private $clock;
 
+    /** @var WalletInterface */
+    private $depositCommunicator;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -48,7 +52,8 @@ class DepositConsumer implements ConsumerInterface
         TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
-        ClockInterface $clock
+        ClockInterface $clock,
+        WalletInterface $depositCommunicator
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -57,6 +62,7 @@ class DepositConsumer implements ConsumerInterface
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->clock = $clock;
+        $this->depositCommunicator = $depositCommunicator;
     }
 
     /** {@inheritdoc} */
@@ -102,9 +108,17 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
+            if ($tradable instanceof Token) {
+                $this->balanceHandler->withdraw(
+                    $user,
+                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    $this->depositCommunicator->getFee($tradable)
+                );
+            }
+
             $this->balanceHandler->deposit(
                 $user,
-                $tradable instanceof Token? $tradable: Token::getFromCrypto($tradable),
+                $tradable instanceof Token ? $tradable: Token::getFromCrypto($tradable),
                 $tradable instanceof Token
                     ? (new Money($clbResult->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL)))
                     : $this->moneyWrapper->parse($clbResult->getAmount(), $tradable->getSymbol())

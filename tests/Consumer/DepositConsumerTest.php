@@ -12,6 +12,7 @@ use App\Manager\UserManagerInterface;
 use App\SmartContract\Config\Config;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use App\Wallet\WalletInterface;
 use Money\Currency;
 use Money\Money;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -31,8 +32,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(Config::class),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->createMock(WalletInterface::class)
         );
 
         $this->assertTrue(
@@ -54,8 +55,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(Config::class),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->createMock(WalletInterface::class)
         );
 
         $this->assertTrue(
@@ -77,8 +78,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(Config::class),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->createMock(WalletInterface::class)
         );
 
         $this->assertTrue(
@@ -100,8 +101,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(Config::class),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->createMock(WalletInterface::class)
         );
 
         $this->assertTrue(
@@ -128,8 +129,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(Config::class),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->createMock(WalletInterface::class)
         );
 
         $this->assertFalse(

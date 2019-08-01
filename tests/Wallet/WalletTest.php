@@ -5,6 +5,7 @@ namespace App\Tests\Wallet;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandlerInterface;
@@ -39,10 +40,9 @@ class WalletTest extends TestCase
             $this->mockDepositCommunicator($depositTransactions),
             $this->createMock(PendingManagerInterface::class),
             $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class),
             $this->createMock(ContractHandlerInterface::class),
-            $this->createMock(Config::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(MoneyWrapperInterface::class)
+            $this->createMock(LoggerInterface::class)
         );
 
         $history = $wallet->getWithdrawDepositHistory($this->mockUser(), 0, 10);

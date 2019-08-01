@@ -9,12 +9,12 @@ use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\Model\TokenDeployResult;
-use App\Wallet\Deposit\Model\DepositCredentials;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use App\Wallet\WalletInterface;
 use Exception;
 use Money\Currency;
 use Money\Money;
@@ -160,7 +160,7 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function getTransactions(User $user, int $offset, int $limit): array
+    public function getTransactions(WalletInterface $wallet, User $user, int $offset, int $limit): array
     {
         $response = $this->rpc->send(
             self::TRANSACTIONS,
@@ -175,12 +175,18 @@ class ContractHandler implements ContractHandlerInterface
             throw new FetchException((string)json_encode($response->getError()));
         }
 
-        return $this->parseTransactions($response->getResult());
+        return $this->parseTransactions($wallet, $response->getResult());
     }
 
-    private function parseTransactions(array $transactions): array
+    private function parseTransactions(WalletInterface $wallet, array $transactions): array
     {
-        return array_map(function (array $transaction) {
+        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $depositFee = $wallet->getFee($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))->getAmount();
+        $withdrawFee = $crypto
+            ? $crypto->getFee()->getAmount()
+            : '0';
+
+        return array_map(function (array $transaction) use ($withdrawFee, $depositFee) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 $transaction['hash'],
@@ -192,8 +198,8 @@ class ContractHandler implements ContractHandlerInterface
                 ),
                 $this->moneyWrapper->parse(
                     'withdraw' == $transaction['type']
-                            ? (string)$this->config->getWithdrawFee()
-                            : (string)$this->config->getDepositFee(),
+                            ? $withdrawFee
+                            : $depositFee,
                     MoneyWrapper::TOK_SYMBOL
                 ),
                 $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL),

@@ -41,5 +41,5 @@ interface WalletInterface
 
     public function getDepositCredential(User $user, Crypto $crypto): Address;
 
-    public function getFee(Crypto $crypto): Money;
+    public function getFee(TradebleInterface $tradable): Money;
 }

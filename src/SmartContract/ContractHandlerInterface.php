@@ -5,6 +5,7 @@ namespace App\SmartContract;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\SmartContract\Model\TokenDeployResult;
+use App\Wallet\WalletInterface;
 use Exception;
 use Money\Money;
 
@@ -23,5 +24,5 @@ interface ContractHandlerInterface
 
     public function withdraw(User $user, Money $balance, string $address, Token $token): void;
 
-    public function getTransactions(User $user, int $offset, int $limit): array;
+    public function getTransactions(WalletInterface $wallet, User $user, int $offset, int $limit): array;
 }
