@@ -92,7 +92,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $repo = $this->createMock(PendingWithdrawRepository::class);
-        $repo->expects($this->once())
+        $repo->expects($this->exactly(2))
             ->method('findAll')
             ->willReturn(array_map(function () {
                 return $this->mockPending();
