@@ -2,9 +2,11 @@
 
 namespace App\Command;
 
+use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use DateInterval;
@@ -30,16 +32,21 @@ class UpdatePendingWithdrawals extends Command
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
     public function __construct(
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         DateTime $dateTime,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
         $this->date = $dateTime;
         $this->balanceHandler = $balanceHandler;
+        $this->cryptoManager = $cryptoManager;
 
         parent::__construct();
     }
@@ -71,6 +78,41 @@ class UpdatePendingWithdrawals extends Command
                         $item->getUser(),
                         Token::getFromCrypto($item->getCrypto()),
                         $item->getAmount()->getAmount()->add($item->getCrypto()->getFee())
+                    );
+                } catch (Throwable $exception) {
+                    $this->em->rollback();
+                }
+
+                $this->em->commit();
+            }
+        }
+
+        /** @var PendingWithdrawRepository $repo */
+        $repo = $this->em->getRepository(PendingTokenWithdraw::class);
+
+        /** @var PendingTokenWithdraw $item */
+        foreach ($repo->findAll() as $item) {
+            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+
+            if (!$crypto) {
+                return;
+            }
+
+            if ($item->getDate()->add($expires) < $this->date->now()) {
+                $this->em->beginTransaction();
+
+                try {
+                    $this->em->remove($item);
+                    $this->em->flush();
+                    $this->balanceHandler->deposit(
+                        $item->getUser(),
+                        $item->getToken(),
+                        $item->getAmount()->getAmount()
+                    );
+                    $this->balanceHandler->deposit(
+                        $item->getUser(),
+                        Token::getFromCrypto($crypto),
+                        $crypto->getFee()
                     );
                 } catch (Throwable $exception) {
                     $this->em->rollback();
