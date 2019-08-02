@@ -43,13 +43,14 @@
                                 </div>
                                 <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
-                                <textarea
-                                    class="form-control"
-                                    v-model.lazy="$v.newDescription.$model"
-                                    :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
+                                <bbcode-editor
+                                    maxlength="500"
                                     rows="5"
-                                >
-                                </textarea>
+                                    class="form-control"
+                                    :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
+                                    :value="newDescription"
+                                    @change="onDescriptionChange"
+                                ></bbcode-editor>
                                 <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
                                      class="text-sm text-danger">
                                     Token Description must be more than one character
@@ -76,9 +77,9 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
-import BbcodeView from '../../bbcode/BbcodeView';
+import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
-import {useMarkitup} from '../../../utils';
+import BbcodeView from '../../bbcode/BbcodeView';
 import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
@@ -101,8 +102,9 @@ export default {
         FontAwesomeIcon,
         Guide,
         LimitedTextarea,
-        BbcodeView,
+        BbcodeEditor,
         BbcodeHelp,
+        BbcodeView,
     },
     data() {
         return {
@@ -117,6 +119,9 @@ export default {
         },
     },
     methods: {
+        onDescriptionChange: function(val) {
+            this.newDescription = val;
+        },
         editDescription: function() {
             this.$v.$touch();
             if (this.$v.$invalid) {
@@ -161,9 +166,6 @@ export default {
         description: function(val) {
             this.newDescription = val;
         },
-    },
-    mounted: function() {
-        useMarkitup('textarea');
     },
 };
 </script>

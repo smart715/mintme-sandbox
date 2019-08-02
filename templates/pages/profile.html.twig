@@ -105,10 +105,23 @@
                                         {{ form_row(form.country) }}
                                     </div>
                                 </div>
-                                <div class="col-12 pt-3  ">
+                                <div class="col-12 pt-3">
                                     <div>
+                                        <!-- {{ form_row(form.description) }} -->
                                         <bbcode-help class="float-right"></bbcode-help>
-                                        {{ form_row(form.description) }}
+                                        <div class="form-group">
+                                            <label for="profile_description">Description</label>
+                                            <bbcode-editor
+                                                id="profile_description"
+                                                class="form-control form-control-md"
+                                                name="profile[description]"
+                                                maxlength="500"
+                                                rows="5"
+                                                cols="30"
+                                                ref="description"
+                                                value="{{ profile.description }}"
+                                            ></bbcode-editor>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-12 pt-3">
