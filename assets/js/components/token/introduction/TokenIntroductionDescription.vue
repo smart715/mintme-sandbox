@@ -25,7 +25,7 @@
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"/>
                         </span>
-                        <bbcode-view v-if="!editingDescription" :description="description"></bbcode-view>
+                        <bbcode-view v-if="!editingDescription" :value="description"></bbcode-view>
                         <template v-if="editable">
                             <div  v-show="editingDescription">
                                 <div class="pb-1">

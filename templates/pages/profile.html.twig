@@ -48,7 +48,7 @@
                                 {% endif %}
                             </div>
                             <div class="col-12 pt-3">
-                                <bbcode-view description="{{ profile.description }}"></bbcode-view>
+                                <bbcode-view value="{{ profile.description }}"></bbcode-view>
                             </div>
                         </div>
 
@@ -110,7 +110,7 @@
                                         <!-- {{ form_row(form.description) }} -->
                                         <bbcode-help class="float-right"></bbcode-help>
                                         <div class="form-group">
-                                            <label for="profile_description">Description</label>
+                                            <label for="profile_description">Description:</label>
                                             <bbcode-editor
                                                 id="profile_description"
                                                 class="form-control form-control-md"

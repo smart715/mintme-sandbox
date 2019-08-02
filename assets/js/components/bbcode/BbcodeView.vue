@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p v-html="parsedDescription"></p>
+        <p v-html="parsedValue"></p>
     </div>
 </template>
 
@@ -12,14 +12,14 @@ import presetHTML5 from '@bbob/preset-html5';
 export default {
     name: 'BbcodeView',
     props: {
-        description: String,
+        value: String,
     },
     computed: {
-        parsedDescription: function() {
-            if (null === this.description) return '';
+        parsedValue: function() {
+            if (null === this.value) return '';
 
             return bbob(presetHTML5())
-                .process(this.description, {render})
+                .process(this.value, {render})
                 .html
                 .replace(/<img src="/g, '<img style="max-width: 100%;" src="')
                 .replace(/<a href="(http(s)?:\/\/)?/g, '<a rel="nofollow" target="_blank" href="https://');
