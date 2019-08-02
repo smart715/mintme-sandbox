@@ -106,6 +106,16 @@ class TokenController extends Controller
             throw new NotFoundTokenException();
         }
 
+        if ($this->tokenManager->isPredefined($token)) {
+            return $this->redirectToRoute(
+                'coin',
+                [
+                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
+                    'quote'=> Token::WEB_SYMBOL,
+                ]
+            );
+        }
+
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
