@@ -67,6 +67,7 @@
                         </b-tab>
                     {% endif %}
                     <template slot="tabs">
+                        {% if token is defined %}
                         <li class="nav-item">
                             <div class="nav-link pr-md-0">
                                 <token-deploy
@@ -80,6 +81,7 @@
                                 />
                             </div>
                         </li>
+                        {% endif %}
                         <li class="nav-item float-sm-right">
                             <div class="nav-link">
                                 <token-name
