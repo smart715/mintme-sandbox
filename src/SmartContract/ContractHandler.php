@@ -181,9 +181,11 @@ class ContractHandler implements ContractHandlerInterface
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
     {
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $depositFee = $wallet->getFee($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))->getAmount();
+        $depositFee = $this->moneyWrapper->format(
+            $wallet->getFee($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))
+        );
         $withdrawFee = $crypto
-            ? $crypto->getFee()->getAmount()
+            ? $this->moneyWrapper->format($crypto->getFee())
             : '0';
 
         return array_map(function (array $transaction) use ($withdrawFee, $depositFee) {
