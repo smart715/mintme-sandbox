@@ -1,0 +1,44 @@
+cryptos:
+  network: mainnet #can be testnet
+
+  webchain:
+    # webchaind rpc server url
+    daemon_host: 'http://webchaind:39573'
+
+    # webchain-cli rpc server url
+    vault_cli_host: 'http://webchain-cli:1920'
+
+    # Address which will receive investment funds:
+    target_address: '0x8f06fe5c631d2ea3ff22673fa15b2e0c829c386b'
+
+    # Gas limit to pay for transactions
+    gas_limit_wei: 21000
+
+    fee: auto
+
+    min_deposit_val: 1
+
+    confirmations: 6
+
+  bitcoin:
+    electrum_daemon_rpc: 'http://electrum:7777'
+
+    electrum_auth:
+      user: electrum
+      password: changeme
+
+    network: testnet
+
+    fee: 0
+
+    confirmations: 5
+
+rabbitmq_url: 'amqp://guest:guest@rabbitmq:5672'
+
+app_server_port: 3000
+
+app_server_hostname: '0.0.0.0'
+
+enabled_cryptos:
+  - 'web'
+  - 'btc'
