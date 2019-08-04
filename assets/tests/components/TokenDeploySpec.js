@@ -198,8 +198,8 @@ describe('TokenDeploy', () => {
 
             let wrapper = mockTokenDeploy(false, true, true);
             moxios.wait(() => {
-                expect(wrapper.vm.balance).to.deep.equal(null);
-                expect(wrapper.vm.webCost).to.deep.equal(null);
+                expect(wrapper.vm.balance).to.deep.equal(0);
+                expect(wrapper.vm.webCost).to.deep.equal(0);
                 done();
             });
         });
@@ -212,8 +212,8 @@ describe('TokenDeploy', () => {
 
             let wrapper = mockTokenDeploy(false, false, false);
             moxios.wait(() => {
-                expect(wrapper.vm.balance).to.deep.equal(null);
-                expect(wrapper.vm.webCost).to.deep.equal(null);
+                expect(wrapper.vm.balance).to.deep.equal(0);
+                expect(wrapper.vm.webCost).to.deep.equal(0);
                 done();
             });
         });

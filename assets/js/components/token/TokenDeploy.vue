@@ -136,6 +136,9 @@ export default {
                     this.balance = response.params[0][WEB].available;
                 }
             }, 'trade-buy-order-asset');
+        } else {
+            this.webCost = 0;
+            this.balance = 0;
         }
     },
     components: {
