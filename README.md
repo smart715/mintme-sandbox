@@ -52,6 +52,42 @@ php bin/console rabbitmq:consumer market &
 ```
 to listen for new data in markets
 
+Development
+-----------
+
+### Requirements:
+
+* [Docker](https://docs.docker.com/install/#backporting) 
+* [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
+
+### Installation:
+
+1. Clone this repository and checkout needed branch;
+2. Pull submodule repositories with `git submodule update --init --recursive`;
+
+You may need to replace `localhost` DNS with your docker-machine 
+ip address in case of using `docker-toolbox`.  
+Also you should check your config files in nested projects. It should contains references to 
+services running by itself. \
+If you'd like to change deposit/withdraw address you need optionaly change .docker configs. 
+
+### Example:
+
+```yaml
+database_host: http://db:3306 # We are replacing actual ip with a service alias `db`
+```
+
+### Usage:
+
+1. Run `docker-compose up -d` to setup a services cluster.  
+2. Wait untill all services aren't started
+3. Check panel with `localhost` or docker-machine ip
+
+### PS:
+
+I really don't recommend to use it on Windows. I warned you ;)
+
+
 Contribution
 ------------
 1. Take an issue from the [Redmine](https://redmine.abchosting.org/projects/mintme/issues);
