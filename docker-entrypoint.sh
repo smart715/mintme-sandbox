@@ -12,6 +12,16 @@ do
     sleep 5
 done
 
+until nc -z -v -w30 btc 8080
+do
+    echo "Waiting for viabtc connection..."
+    sleep 5
+done
+
+if test ! -f ".env"; then
+    cp .env.dist .env
+fi
+
 # Install npm deps
 npm i
 npm run dev
