@@ -1,0 +1,51 @@
+doctrine:
+  host: db
+  port: 3306
+  user: root
+  password: root
+  dbname: withdraw
+  driver: pdo_mysql
+  charset: utf8
+  default_table_options:
+    charset: utf8mb4
+    collate: utf8mb4_unicode_ci
+
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  user: guest
+  password: guest
+  vhost: /
+
+wallets:
+  monero:
+    wallet_address: notNecessaryForMonero
+    rpc_url: http://localhost:18081/json_rpc
+    auth:
+      type: digest
+      username: user
+      password: ~
+    # For connection without authentication use
+    # auth: ~
+    transfer_options:
+      mixin: 2
+      priority: 1
+  webchain:
+    wallet_address: '0x8f06fe5c631d2ea3ff22673fa15b2e0c829c386b'
+    rpc_url: http://webchaind:39573
+    auth:
+      type: digest
+      username: user
+      password: ~
+    transfer_options: []
+  bitcoin:
+    wallet_address: notNecessaryForBitcoin
+    rpc_url: http://electrum:7777
+    auth:
+      type: basic
+      username: electrum
+      password: changeme
+    transfer_options: []
+
+payment:
+  retry_delay_minutes: 2
