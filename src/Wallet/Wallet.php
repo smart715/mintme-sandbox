@@ -145,7 +145,7 @@ class Wallet implements WalletInterface
         $this->balanceHandler->withdraw($user, $token, $amount->getAmount()->add($fee));
 
         if ($tradable instanceof Token) {
-            $this->balanceHandler->withdraw($user, Token::getFromCrypto($crypto), $crypto->getFee());
+            $this->balanceHandler->withdraw($user, $tradable, $crypto->getFee());
         }
 
         return $this->pendingManager->create($user, $address, $amount, $tradable);
@@ -166,10 +166,6 @@ class Wallet implements WalletInterface
         $address = $pendingWithdraw->getAddress();
 
         if ($tradable instanceof Crypto && !$this->validateAmount($tradable, $amount, $user)) {
-            throw new NotEnoughAmountException();
-        }
-
-        if ($tradable instanceof Token && !$this->validateTokenFee($user)) {
             throw new NotEnoughAmountException();
         }
 
