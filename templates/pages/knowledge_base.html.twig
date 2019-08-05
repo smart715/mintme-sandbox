@@ -4,6 +4,15 @@
 
 {% block content %}
     <div id="kb" class="container">
+        {% if knowledgeBases is empty %}
+        <div class="h-100 pt-5">
+            <div class="row">
+                <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
+                    <h1>No articles found</h1>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="row">
             <div class="col-12">
                 {% for category in knowledgeBases %}
