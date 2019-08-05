@@ -54,7 +54,6 @@ export default {
         isOwner: Boolean,
         precision: Number,
         deployedProp: Boolean,
-        usdCost: Number,
     },
     data() {
         return {

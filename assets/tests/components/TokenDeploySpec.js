@@ -43,7 +43,6 @@ function mockTokenDeploy(balanceFetched, isOwner = true, deployed = false) {
             isOwner: isOwner,
             precision: 4,
             deployedProp: deployed,
-            usdCost: 49,
         },
     });
 
