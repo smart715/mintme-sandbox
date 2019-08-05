@@ -32,7 +32,7 @@ class TraderBalanceViewFactoryTest extends TestCase
 
         $token = $this->mockToken();
         $balanceHandler = $this->mockBalanceHandler();
-        $balanceHandler->expects($this->never())->method('topTraders');
+        $balanceHandler->expects($this->never())->method('topHolders');
 
         /** @var TraderBalanceView[] $result */
         $result = $factory->create(
@@ -68,7 +68,7 @@ class TraderBalanceViewFactoryTest extends TestCase
 
         $token = $this->mockToken();
         $balanceHandler = $this->mockBalanceHandler();
-        $balanceHandler->expects($this->never())->method('topTraders');
+        $balanceHandler->expects($this->never())->method('topHolders');
 
         /** @var TraderBalanceView[] $result */
         $result = $factory->create(
@@ -100,7 +100,7 @@ class TraderBalanceViewFactoryTest extends TestCase
 
         $token = $this->mockToken();
         $balanceHandler = $this->mockBalanceHandler();
-        $balanceHandler->expects($this->never())->method('topTraders');
+        $balanceHandler->expects($this->never())->method('topHolders');
 
         /** @var TraderBalanceView[] $result */
         $result = $factory->create(
@@ -146,7 +146,7 @@ class TraderBalanceViewFactoryTest extends TestCase
 
         $token = $this->mockToken(false);
         $balanceHandler = $this->mockBalanceHandler();
-        $balanceHandler->expects($this->never())->method('topTraders');
+        $balanceHandler->expects($this->never())->method('topHolders');
 
         /** @var TraderBalanceView[] $result */
         $result = $factory->create(
@@ -176,7 +176,7 @@ class TraderBalanceViewFactoryTest extends TestCase
 
         $token = $this->mockToken();
         $balanceHandler = $this->mockBalanceHandler();
-        $balanceHandler->expects($this->once())->method('topTraders')->with($token, 2, 4, 1);
+        $balanceHandler->expects($this->once())->method('topHolders')->with($token, 2, 4, 1);
 
         /** @var TraderBalanceView[] $result */
         $factory->create(
@@ -203,7 +203,7 @@ class TraderBalanceViewFactoryTest extends TestCase
 
         $token = $this->mockToken();
         $balanceHandler = $this->mockBalanceHandler();
-        $balanceHandler->expects($this->never())->method('topTraders');
+        $balanceHandler->expects($this->never())->method('topHolders');
 
         /** @var TraderBalanceView[] $result */
         $result = $factory->create(
@@ -239,7 +239,7 @@ class TraderBalanceViewFactoryTest extends TestCase
 
         $token = $this->mockToken();
         $balanceHandler = $this->mockBalanceHandler();
-        $balanceHandler->expects($this->never())->method('topTraders');
+        $balanceHandler->expects($this->never())->method('topHolders');
 
         /** @var TraderBalanceView[] $result */
         $result = $factory->create(

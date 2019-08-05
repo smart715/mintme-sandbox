@@ -47,7 +47,7 @@ describe('TopHolders', () => {
         expect(wrapper.find('b-table').exists()).to.be.false;
         expect(wrapper.vm.traders).to.deep.equal(null);
 
-        moxios.stubRequest('top_traders', {status: 200, response: [
+        moxios.stubRequest('top_holders', {status: 200, response: [
             {
                 user: {profile: {firstName: 'foo', lastName: 'bar'}},
                 timestamp: 1563550710,

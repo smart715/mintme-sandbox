@@ -98,7 +98,7 @@ class BalanceHandlerTest extends TestCase
         );
     }
 
-    public function testTopTraders(): void
+    public function testTopHolders(): void
     {
         $converter = $this->mockTokenNameConverter();
         $converter->expects($this->once())->method('convert');
@@ -115,7 +115,7 @@ class BalanceHandlerTest extends TestCase
             $this->mockLogger()
         );
 
-        $handler->topTraders(
+        $handler->topHolders(
             $this->mockToken('foo'),
             3,
             4,
