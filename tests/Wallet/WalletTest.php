@@ -7,13 +7,11 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
-use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
-use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Wallet;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use DateTime;
@@ -34,6 +32,11 @@ class WalletTest extends TestCase
             $this->mockTransaction(9876547, 'XMR', 'withdraw'),
         ];
 
+        $tokenransactions = [
+            $this->mockTransaction(9876546, 'foo', 'withdraw'),
+            $this->mockTransaction(9876542, 'bar', 'deposit'),
+        ];
+
         $wallet = new Wallet(
             $this->mockWithdrawGatewayInterface($withdrawTransactions),
             $this->mockBalanceHandler(),
@@ -41,7 +44,7 @@ class WalletTest extends TestCase
             $this->createMock(PendingManagerInterface::class),
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(CryptoManagerInterface::class),
-            $this->createMock(ContractHandlerInterface::class),
+            $this->mockContractHandler($tokenransactions),
             $this->createMock(LoggerInterface::class)
         );
 
@@ -55,6 +58,11 @@ class WalletTest extends TestCase
                     'withdraw',
                 ],
                 [
+                    9876546,
+                    'foo',
+                    'withdraw',
+                ],
+                [
                     9876545,
                     'BTC',
                     'deposit',
@@ -63,6 +71,11 @@ class WalletTest extends TestCase
                     9876543,
                     'ETH',
                     'withdraw',
+                ],
+                [
+                    9876542,
+                    'bar',
+                    'deposit',
                 ],
                 [
                     9876541,
@@ -91,6 +104,16 @@ class WalletTest extends TestCase
                     $history[3]->getCrypto()->getSymbol(),
                     $history[3]->getType()->getTypeCode(),
                 ],
+                [
+                    $history[4]->getDate()->getTimestamp(),
+                    $history[4]->getCrypto()->getSymbol(),
+                    $history[4]->getType()->getTypeCode(),
+                ],
+                [
+                    $history[5]->getDate()->getTimestamp(),
+                    $history[5]->getCrypto()->getSymbol(),
+                    $history[5]->getType()->getTypeCode(),
+                ],
             ]
         );
     }
@@ -104,6 +127,16 @@ class WalletTest extends TestCase
         ;
 
         return $depositCommunicatorMock;
+    }
+
+    private function mockContractHandler(array $transactions): ContractHandlerInterface
+    {
+        $contractHandler = $this->createMock(ContractHandlerInterface::class);
+        $contractHandler
+            ->method('getTransactions')
+            ->willReturn($transactions);
+
+        return $contractHandler;
     }
 
     private function mockWithdrawGatewayInterface(array $history): WithdrawGatewayInterface
