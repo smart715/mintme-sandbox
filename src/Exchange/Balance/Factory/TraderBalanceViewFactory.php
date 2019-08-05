@@ -51,7 +51,7 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
             return $this->getTraderBalancesView(array_slice($usersTradables, 0, $limit), $balances);
         }
 
-        return $balanceHandler->topTraders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
+        return $balanceHandler->topHolders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
     }
 
     /**

@@ -91,7 +91,7 @@ class BalanceHandler implements BalanceHandlerInterface
     }
 
     /** @inheritDoc */
-    public function topTraders(
+    public function topHolders(
         TradebleInterface $tradable,
         int $limit,
         int $extend = 15,

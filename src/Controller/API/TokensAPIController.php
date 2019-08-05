@@ -367,9 +367,9 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{name}/top-traders", name="top_traders", options={"expose"=true})
+     * @Rest\Get("/{name}/top-holders", name="top_holders", options={"expose"=true})
      */
-    public function getTopTraders(
+    public function getTopHolders(
         string $name,
         BalanceHandlerInterface $balanceHandler
     ): View {
@@ -380,7 +380,7 @@ class TokensAPIController extends AbstractFOSRestController
             throw $this->createNotFoundException('Not Found');
         }
 
-        $topTraders = $balanceHandler->topTraders($tradable, 10);
+        $topTraders = $balanceHandler->topHolders($tradable, 10);
 
         return $this->view($topTraders, Response::HTTP_ACCEPTED);
     }

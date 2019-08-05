@@ -4,13 +4,18 @@
             Top Holders
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive fix-height" ref="traders">
+            <div class="table-responsive fixed-head-table">
                 <template v-if="loaded">
                     <b-table v-if="hasTraders"
+                     ref="table"
                     :items="traders"
                     :fields="fields">
                     <template slot="trader" slot-scope="row">
-                        <a :href="row.item.url">{{ row.value }}</a>
+                        <a :href="row.item.url">
+                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                {{ row.value | truncate(9) }}
+                            </span>
+                        </a>
                         <img
                             src="../../../img/avatar.png"
                             class="float-right"
@@ -42,8 +47,11 @@
 import moment from 'moment';
 import {formatMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
+import {FiltersMixin} from '../../mixins';
+
 export default {
     name: 'TopHolders',
+    mixins: [FiltersMixin],
     props: {
       tokenName: String,
     },
@@ -77,11 +85,11 @@ export default {
     },
     methods: {
         scrollDown: function() {
-            let parentDiv = this.$refs.traders;
+            let parentDiv = this.$refs.table.$el.tBodies[0];
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
         getTraders: function() {
-            this.$axios.single.get(this.$routing.generate('top_traders', {
+            this.$axios.single.get(this.$routing.generate('top_holders', {
                 name: this.tokenName,
             }))
             .then(({data}) => this.traders = data.map((row) => {

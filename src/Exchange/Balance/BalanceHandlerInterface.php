@@ -40,7 +40,7 @@ interface BalanceHandlerInterface
      * @param  int $max
      * @return TraderBalanceView[]
      */
-    public function topTraders(
+    public function topHolders(
         TradebleInterface $tradable,
         int $limit,
         int $extend = 15,
