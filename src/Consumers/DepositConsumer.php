@@ -99,8 +99,8 @@ class DepositConsumer implements ConsumerInterface
         }
 
         try {
-            $tradable = $this->tokenManager->findByName($clbResult->getCrypto())
-                ?? $this->cryptoManager->findBySymbol($clbResult->getCrypto());
+            $tradable =$this->cryptoManager->findBySymbol($clbResult->getCrypto())
+                ?? $this->tokenManager->findByName($clbResult->getCrypto());
 
             if (!$tradable) {
                 $this->logger->info('[deposit-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
