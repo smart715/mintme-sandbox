@@ -2,7 +2,7 @@
     <div>
         <modal
             :visible="visible"
-            no-close-on-backdrop
+            :no-close="noClose"
             @close="closeModal">
             <template slot="header">
                 <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName }}</span>
@@ -66,6 +66,7 @@ export default {
     },
     props: {
         currentName: String,
+        noClose: Boolean,
         twofa: Boolean,
         visible: Boolean,
     },

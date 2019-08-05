@@ -13,6 +13,7 @@
         </span>
         <token-edit-modal
             v-if="editable"
+            :no-close="true"
             :twofa="twofa"
             :visible="showTokenEditModal"
             :current-name="currentName"
