@@ -5,7 +5,6 @@ namespace App\Tests\Wallet;
 use App\Entity\Crypto;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
-use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -295,7 +294,7 @@ class WalletTest extends TestCase
             $this->createMock(LoggerInterface::class)
         );
 
-        $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000', Token::WEB_SYMBOL, false));
+        $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000'));
     }
 
     public function testWithdrawCommitCryptoWithLowBalance(): void
@@ -313,7 +312,7 @@ class WalletTest extends TestCase
 
         $this->expectException(NotEnoughAmountException::class);
 
-        $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000', Token::WEB_SYMBOL, false));
+        $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000'));
     }
 
     public function testWithdrawCommitToken(): void
@@ -329,24 +328,32 @@ class WalletTest extends TestCase
             $this->createMock(LoggerInterface::class)
         );
 
-        $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000', MoneyWrapper::TOK_SYMBOL, true));
+        $wallet->withdrawCommit($this->mockPendingTokenWithdraw('1000000000000'));
     }
 
-    private function mockPendingWithdraw(string $amount, string $symbol, bool $isToken = false): PendingWithdrawInterface
+    private function mockPendingWithdraw(string $amount): PendingWithdraw
     {
-        if ($isToken) {
-            $pending = $this->createMock(PendingTokenWithdraw::class);
-            $pending->method('getToken')->willReturn($this->mockToken());
-        } else {
-            $pending = $this->createMock(PendingWithdraw::class);
-            $pending->method('getCrypto')->willReturn($this->mockCrypto(Token::WEB_SYMBOL));
-        }
-
         $amountMock = $this->createMock(Amount::class);
         $amountMock->method('getAmount')->willReturn(
-            new Money($amount, new Currency($symbol))
+            new Money($amount, new Currency(Token::WEB_SYMBOL))
         );
 
+        $pending = $this->createMock(PendingWithdraw::class);
+        $pending->method('getCrypto')->willReturn($this->mockCrypto(Token::WEB_SYMBOL));
+        $pending->method('getAmount')->willReturn($amountMock);
+
+        return $pending;
+    }
+
+    private function mockPendingTokenWithdraw(string $amount): PendingTokenWithdraw
+    {
+        $amountMock = $this->createMock(Amount::class);
+        $amountMock->method('getAmount')->willReturn(
+            new Money($amount, new Currency(MoneyWrapper::TOK_SYMBOL))
+        );
+
+        $pending = $this->createMock(PendingTokenWithdraw::class);
+        $pending->method('getToken')->willReturn($this->mockToken());
         $pending->method('getAmount')->willReturn($amountMock);
 
         return $pending;
