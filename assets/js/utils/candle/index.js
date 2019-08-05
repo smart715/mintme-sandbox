@@ -640,7 +640,7 @@ data = data.map(function(v) {
       },
     };
     let lineStyle = {normal: {opacity: 0.5}};
-    let rightAxis = window.innerWidth >= 992
+    let rightAxis = args.rightLabel
         ? [{
             name: 'extraAxis',
             type: 'candlestick',
@@ -700,7 +700,7 @@ data = data.map(function(v) {
     return result;
   }
 
-  let candle = function candle(columns, rows, settings, status) {
+  let candle = function candle(columns, rows, settings, status, rightLabel) {
     let _settings$dimension = settings.dimension;
         let dimension = _settings$dimension === undefined ? columns[0] : _settings$dimension;
         let _settings$metrics = settings.metrics;
@@ -775,6 +775,7 @@ volumes.push(row[columns.indexOf(volumeMetrics)]);
     let xAxis = getCandleXAxis({dims: dims});
     let yAxis = getCandleYAxis({dataType: dataType, digit: digit});
     let series = getCandleSeries({
+      rightLabel: rightLabel,
       values: values,
       volumes: volumes,
       upColor: upColor,
@@ -908,6 +909,7 @@ seriesItem[key] = marks[key];
       loading: Boolean,
       dataEmpty: Boolean,
       extend: Object,
+      rightLabel: Boolean,
       judgeWidth: {type: Boolean, default: false},
       widthChangeDelay: {type: Number, default: 300},
       tooltipFormatter: {type: Function},
@@ -995,7 +997,7 @@ return;
 data = this.beforeConfig(data);
 }
 
-        let options = this.chartHandler(columns, rows, this.settings, extra);
+        let options = this.chartHandler(columns, rows, this.settings, extra, this.rightLabel);
         if (options) {
           if (typeof options.then === 'function') {
             options.then(this.optionsHandler);

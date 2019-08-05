@@ -52,6 +52,7 @@
                     <ve-candle
                         class="m-2"
                         :extend="additionalAttributes"
+                        :right-label="rightLabel"
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(market.base.subunit)"
@@ -83,6 +84,7 @@ export default {
     },
     data() {
         return {
+            rightLabel: true,
             chartTheme: VeLineTheme,
             chartSettings: {
                 labelMap: {
@@ -153,6 +155,9 @@ export default {
         },
     },
     mounted() {
+        window.addEventListener('resize', this.handleRightLabel);
+        this.handleRightLabel();
+
         this.$axios.retry.get(this.$routing.generate('market_kline', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
@@ -226,6 +231,9 @@ export default {
             }
 
             return 0;
+        },
+        handleRightLabel() {
+            this.rightLabel = window.innerWidth >= 992 ? true : false;
         },
     },
     components: {
