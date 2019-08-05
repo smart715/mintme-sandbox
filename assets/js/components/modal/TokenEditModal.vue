@@ -42,6 +42,7 @@
         <two-factor-modal
             :visible="showTwoFactorModal"
             :twofa="twofa"
+            :no-close="noClose"
             @verify="doEditToken"
             @close="closeTwoFactorModal">
         </two-factor-modal>

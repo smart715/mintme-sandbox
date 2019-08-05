@@ -1,7 +1,7 @@
 <template>
     <modal
         :visible="visible"
-        no-close-on-backdrop
+        :no-close="noClose"
         @close="closeModal">
         <template slot="close"> &nbsp; </template>
         <template slot="body">
@@ -43,6 +43,7 @@ export default {
         Modal,
     },
     props: {
+        noClose: Boolean,
         visible: Boolean,
     },
     data() {
