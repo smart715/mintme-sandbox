@@ -41,7 +41,9 @@ class ProfileController extends Controller
         }
 
         $profileClone = clone $profile;
-        $form = $this->createForm(ProfileType::class, $profile);
+        $form = $this->createForm(ProfileType::class, $profile, [
+            'allow_extra_fields' => true,
+        ]);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -55,11 +57,12 @@ class ProfileController extends Controller
         }
 
         $profile->setPageUrl($profileManager->generatePageUrl($profile));
+        $profile->setDescription($form->getExtraData()['description']);
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->merge($profile);
         $entityManager->flush();
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $this->get("security.csrf.token_manager")->refreshToken("form_intention");
         }

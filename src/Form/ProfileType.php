@@ -53,13 +53,6 @@ class ProfileType extends AbstractType
                 'required' => false,
                 'placeholder' => 'Select the country',
             ])
-            ->add('description', TextareaType::class, [
-                'label' => 'Description:',
-                'required' => false,
-                'attr' => [
-                    'maxlength' => 500,
-                ],
-            ])
             ->add('anonymous', CheckboxType::class, [
                 'label' => 'Trade anonymously',
                 'required' => false,
