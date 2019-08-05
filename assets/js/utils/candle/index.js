@@ -640,20 +640,23 @@ data = data.map(function(v) {
       },
     };
     let lineStyle = {normal: {opacity: 0.5}};
-      let series = [
+    let rightAxis = window.innerWidth >= 992
+        ? [{
+            name: 'extraAxis',
+            type: 'candlestick',
+            yAxisIndex: 1,
+            data: values,
+            itemStyle: style,
+            }]
+        : [];
+    let series = [
         {
         name: labelMap[DEFAULT_K_NAME] == null ? DEFAULT_K_NAME : labelMap[DEFAULT_K_NAME],
         type: 'candlestick',
         data: values,
         itemStyle: style,
       },
-      {
-        name: 'extraAxis',
-        type: 'candlestick',
-        yAxisIndex: 1,
-        data: values,
-        itemStyle: style,
-      },
+        ...rightAxis,
     ];
 
     if (showMA) {
