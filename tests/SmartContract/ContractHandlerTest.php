@@ -2,6 +2,7 @@
 
 namespace App\Tests\SmartContract;
 
+use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Entity\Crypto;
@@ -353,6 +354,38 @@ class ContractHandlerTest extends TestCase
             'paid',
             'withdraw',
         ]);
+    }
+
+    public function testGetTransactionsWithResponseError(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'get_transactions',
+                [
+                    'userId' => 1,
+                    "offset" => 0,
+                    "limit" => 50,
+                ]
+            )
+            ->willReturn($this->mockResponse(true, []));
+
+        $handler = new ContractHandler(
+            $rpc,
+            $this->mockConfig(),
+            $this->mockLoggerInterface(),
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoManager()
+        );
+
+        $this->expectException(FetchException::class);
+
+        $handler->getTransactions(
+            $this->mockWallet(),
+            $this->mockUser(1),
+            0,
+            50
+        );
     }
 
     public function getDepositCredentials(): void

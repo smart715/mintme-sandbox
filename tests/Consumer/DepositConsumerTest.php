@@ -4,13 +4,14 @@ namespace App\Tests\Consumer;
 
 use App\Consumers\DepositConsumer;
 use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\SmartContract\Config\Config;
 use App\Utils\ClockInterface;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Money\Currency;
@@ -29,11 +30,11 @@ class DepositConsumerTest extends TestCase
             $this->mockBalanceHandler($this->once()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
-            $this->createMock(WalletInterface::class)
+            $this->mockWallet()
         );
 
         $this->assertTrue(
@@ -52,11 +53,11 @@ class DepositConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager(null),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
-            $this->createMock(WalletInterface::class)
+            $this->mockWallet()
         );
 
         $this->assertTrue(
@@ -75,11 +76,11 @@ class DepositConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager(null),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
-            $this->createMock(WalletInterface::class)
+            $this->mockWallet()
         );
 
         $this->assertTrue(
@@ -98,17 +99,40 @@ class DepositConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
-            $this->createMock(WalletInterface::class)
+            $this->mockWallet()
         );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
                 'userId' => 1,
                 'crypto' => $cryptoSymbol,
+            ])))
+        );
+    }
+
+    public function testExecuteWithToken(): void
+    {
+        $tokenName = 'TOK1';
+        $dc = new DepositConsumer(
+            $this->mockBalanceHandler($this->once(), $this->once()),
+            $this->mockUserManager($this->createMock(User::class)),
+            $this->mockCryptoManager(null),
+            $this->mockTokenManager($this->mockToken($tokenName)),
+            $this->mockLogger(),
+            $this->mockMoneyWrapper(),
+            $this->createMock(ClockInterface::class),
+            $this->mockWallet()
+        );
+
+        $this->assertTrue(
+            $dc->execute($this->mockMessage((string)json_encode([
+                'userId' => 1,
+                'crypto' => $tokenName,
+                'amount' => '10000',
             ])))
         );
     }
@@ -126,11 +150,11 @@ class DepositConsumerTest extends TestCase
             $bh,
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
-            $this->createMock(WalletInterface::class)
+            $this->mockWallet()
         );
 
         $this->assertFalse(
@@ -142,12 +166,30 @@ class DepositConsumerTest extends TestCase
         );
     }
 
+    private function mockWallet(): WalletInterface
+    {
+        $wallet = $this->createMock(WalletInterface::class);
+        $wallet->method('getFee')->willReturn(
+            new Money('10000000000', new Currency(MoneyWrapper::TOK_SYMBOL))
+        );
+
+        return $wallet;
+    }
+
     private function mockCrypto(string $symbol): Crypto
     {
         $crypto = $this->createMock(Crypto::class);
         $crypto->method('getSymbol')->willReturn($symbol);
 
         return $crypto;
+    }
+
+    private function mockToken(string $name): Token
+    {
+        $token = $this->createMock(Token::class);
+        $token->method('getSymbol')->willReturn($name);
+
+        return $token;
     }
 
     private function mockMessage(string $message): AMQPMessage
@@ -158,10 +200,11 @@ class DepositConsumerTest extends TestCase
         return $msg;
     }
 
-    private function mockBalanceHandler(Invocation $im): BalanceHandlerInterface
+    private function mockBalanceHandler(Invocation $imDeposit, ?Invocation $imWithdraw = null): BalanceHandlerInterface
     {
         $bh = $this->createMock(BalanceHandlerInterface::class);
-        $bh->expects($im)->method('deposit');
+        $bh->expects($imDeposit)->method('deposit');
+        $bh->expects($imWithdraw ?? $this->never())->method('withdraw');
 
         return $bh;
     }
@@ -180,6 +223,14 @@ class DepositConsumerTest extends TestCase
         $cm->method('findBySymbol')->willReturn($crypto);
 
         return $cm;
+    }
+
+    private function mockTokenManager(?Token $token): TokenManagerInterface
+    {
+        $tm = $this->createMock(TokenManagerInterface::class);
+        $tm->method('findByName')->willReturn($token);
+
+        return $tm;
     }
 
     private function mockLogger(): LoggerInterface
