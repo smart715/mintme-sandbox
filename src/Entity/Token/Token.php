@@ -209,7 +209,7 @@ class Token implements TradebleInterface
 
     public function lockMinDestination(): self
     {
-        $this->minDestinationLocked= true;
+        $this->minDestinationLocked = true;
 
         return $this;
     }
