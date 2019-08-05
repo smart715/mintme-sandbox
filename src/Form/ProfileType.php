@@ -4,10 +4,10 @@ namespace App\Form;
 
 use App\Entity\Profile;
 use App\Form\DataTransformer\NameTransformer;
+use App\Form\Type\BbcodeEditorType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -52,6 +52,13 @@ class ProfileType extends AbstractType
                 'label' => 'Country:',
                 'required' => false,
                 'placeholder' => 'Select the country',
+            ])
+            ->add('description', BbcodeEditorType::class, [
+                'label' => 'Description:',
+                'required' => false,
+                'attr' => [
+                    'maxlength' => 500,
+                ],
             ])
             ->add('anonymous', CheckboxType::class, [
                 'label' => 'Trade anonymously',

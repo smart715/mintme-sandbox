@@ -108,3 +108,20 @@
     <textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
 {%- endif -%}
 {%- endblock textarea_widget -%}
+
+{%- block bbcode_editor_row -%}
+    {% spaceless %}
+        <div class="form-group">
+            {{ form_label(form) }}
+            <bbcode-help class="float-right"></bbcode-help>
+            {{ form_errors(form) }}
+            <bbcode-editor
+                    value="{{ value }}"
+                    rows="5"
+                    cols="30"
+                    {{ block('widget_attributes') }}
+            ></bbcode-editor>
+        </div>
+    {% endspaceless %}
+{%- endblock bbcode_editor_row -%}
+
