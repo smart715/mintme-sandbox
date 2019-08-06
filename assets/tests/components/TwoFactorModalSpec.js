@@ -12,7 +12,7 @@ describe('TwoFactorModal', () => {
          data: {code: ''},
     });
 
-   const textInput = wrapper.find('input');
+    const textInput = wrapper.find('input');
 
     it('renders correctly with assigned props', () => {
         expect(wrapper.vm.visible).to.equal(true);
@@ -31,5 +31,12 @@ describe('TwoFactorModal', () => {
         textInput.setValue('123');
         wrapper.vm.onVerify();
         expect(wrapper.emitted().verify[0]).to.deep.equal(['123']);
+    });
+
+    it('clear code when close', () => {
+        textInput.setValue('123');
+        wrapper.vm.closeModal();
+        wrapper.vm.visible = true;
+        expect(textInput.element.value).to.equal('');
     });
 });

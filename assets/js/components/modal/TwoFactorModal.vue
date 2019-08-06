@@ -53,6 +53,7 @@ export default {
     },
     methods: {
         closeModal: function() {
+            this.code = '';
             this.$emit('close');
         },
         onVerify: function() {
