@@ -14,6 +14,7 @@ security:
             pattern: ^/
             logout:
                 handlers: [logout_listner]
+                target: /logout_success
             anonymous: true
             form_login:
                 provider: fos_userbundle
@@ -42,7 +43,6 @@ security:
         - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/trading$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/news, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/token, role: ROLE_USER }
         - { path: ^/api, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
@@ -57,3 +57,4 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+, role: ROLE_USER }
         - { path: ^/referral-program, role: ROLE_USER }
+        - { path: ^/logout$, role: ROLE_USER }
