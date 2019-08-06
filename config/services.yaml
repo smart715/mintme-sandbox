@@ -44,20 +44,20 @@ services:
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
-            $url: '%viabtc_rpc%'
+            $url: '%env(VIABTC_RPC)%'
             $timeoutSeconds: '%viabtc_response_timeout_seconds%'
 
     deposit.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
-            $url: '%deposit_rpc%'
+            $url: '%env(DEPOSIT_RPC)%'
             $timeoutSeconds: '%deposit_response_timeout_seconds%'
             $auth: '%deposit_auth%'
 
     withdraw.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
-            $url: '%withdraw_rpc%'
+            $url: '%env(WITHDRAW_RPC)%'
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
             $auth: '%withdraw_auth%'
 
