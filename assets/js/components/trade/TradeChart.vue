@@ -233,7 +233,7 @@ export default {
             return 0;
         },
         handleRightLabel() {
-            this.rightLabel = window.innerWidth >= 992 ? true : false;
+            this.rightLabel = window.innerWidth >= 1200;
         },
     },
     components: {
