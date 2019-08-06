@@ -90,8 +90,8 @@ class WalletAPIController extends AbstractFOSRestController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $tradable = $tokenManager->findByName($request->get('crypto'))
-            ?? $cryptoManager->findBySymbol($request->get('crypto'));
+        $tradable = $cryptoManager->findBySymbol($request->get('crypto'))
+            ?? $tokenManager->findByName($request->get('crypto'));
 
         if (!$tradable) {
             return $this->view([
