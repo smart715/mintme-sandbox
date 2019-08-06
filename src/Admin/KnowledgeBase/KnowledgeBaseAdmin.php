@@ -45,7 +45,9 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('subcategory', null)
             ->add('title', TextType::class)
             ->add('shortUrl', TextType::class)
-            ->add('description', TextareaType::class);
+            ->add('description', TextareaType::class, [
+                'attr' => ['rows' => 15],
+            ]);
     }
 
     protected function configureListFields(ListMapper $listMapper): void
