@@ -10,7 +10,7 @@ twig:
         viabtc_offset: '%env(VIABTC_OFFSET)%'
         version: '%version%'
         is_beta_version: '%is_beta_version%'
-        global_websocket_url: '%websocket_url%'
+        global_websocket_url: '%env(WEBSOCKET_URL)%'
         prelaunch: '@App\Exchange\Trade\Config\PrelaunchConfig'
         google_tracking_id: '%google_tracking_id%'
         tawk_api_key: '%tawk_api_key%'
