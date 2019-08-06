@@ -88,11 +88,11 @@ class KnowledgeBase
     }
 
     /**
-     * @return Category|string
+     * @return Category|string|null
      */
     public function getCategory()
     {
-        return $this->category ?? '';
+        return $this->category;
     }
 
     public function setCategory(Category $category): void
@@ -101,11 +101,11 @@ class KnowledgeBase
     }
 
     /**
-     * @return Subcategory|string
+     * @return Subcategory|string|null
      */
     public function getSubcategory()
     {
-        return $this->subcategory ?? '';
+        return $this->subcategory;
     }
 
     public function setSubcategory(?Subcategory $subcategory): void
