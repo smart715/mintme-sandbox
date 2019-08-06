@@ -98,7 +98,7 @@ export default {
         editName: function() {
             this.$v.$touch();
             if (this.currentName === this.newName) {
-                this.cancelEditingMode();
+                this.closeModal();
                 return;
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');
