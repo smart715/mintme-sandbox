@@ -17,18 +17,31 @@
             <div class="col-12">
                 {% for category in knowledgeBases %}
                     <div class="pt-1">
-                        <h2>{{ category[0].category.name }}</h2>
-                        <ul class="list-group">
-                            {% for kb in category %}
-                                    <li class="list-group-item bg-primary">
-                                        <span class="text-danger">
-                                            <a href="{{ path('kb_show', {'url': kb.shortUrl}) }}" class="text-light">
-                                                {{ kb.title}}
-                                            </a>
-                                        </span>
-                                    </li>
+                        <h2>test</h2>
+                            {% for subcategory in category %}
+                                <ul class="list-group">
+                                    {% if subcategory is not iterable %}
+                                        <li class="list-group-item bg-primary">
+                                            <span class="text-danger">
+                                                <a href="{{ path('kb_show', {'url': subcategory.shortUrl}) }}" class="text-light">
+                                                    {{ subcategory.title}}
+                                                </a>
+                                            </span>
+                                        </li>
+                                     {% else %}
+                                         <h2>{{ subcategory[0].category.name }}</h2>
+                                         {% for kb in subcategory  %}
+                                            <li class="list-group-item bg-primary">
+                                                <span class="text-danger">
+                                                    <a href="{{ path('kb_show', {'url': kb.shortUrl}) }}" class="text-light">
+                                                        {{ kb.title}}
+                                                    </a>
+                                                </span>
+                                            </li>
+                                         {% endfor %}
+                                    {% endif %}
+                                </ul>
                             {% endfor %}
-                        </ul>
                     </div>
                 {% endfor %}
             </div>
