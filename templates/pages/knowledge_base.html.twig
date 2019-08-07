@@ -15,19 +15,19 @@
         {% endif %}
         <div class="row pt-3 justify-content-center">
             {% for category in knowledgeBases %}
-                <div class="col-xl-10 card pb-3">
+                <div class="col-xl-12 card pb-3">
                     <div class="card-header">
                         {% if category|first is iterable %}
-                            <h3 class="mb-0">{{ category|first|first.category.name }}</h3>
+                            <h3>{{ category|first|first.category.name }}</h3>
                         {% else %}
-                            <h3 class="mb-0">{{ category|first.category.name }}</h3>
+                            <h3>{{ category|first.category.name }}</h3>
                         {% endif %}
                     </div>
-                    <div class="card-body pt-0">
+                    <div class="card-body">
                         {% for subcategory in category %}
                             <ul class="list-group">
                                 {% if subcategory is not iterable %}
-                                    <li class="list-group-item border-0 pt-0 pb-1">
+                                    <li class="list-group-item border-0">
                                     <span class="text-danger">
                                         <a href="{{ path('kb_show', {'url': subcategory.shortUrl}) }}"
                                            class="text-light">
@@ -36,9 +36,9 @@
                                     </span>
                                     </li>
                                 {% else %}
-                                    <h6 class="pb-0 pt-2 pl-2 text-info">{{ subcategory|first.subcategory.name }}</h6>
+                                    {#<h5 class="pl-1">{{ subcategory|first.subcategory.name }}</h5>#}
                                     {% for kb in subcategory %}
-                                        <li class="list-group-item border-0 pt-0 pb-1">
+                                        <li class="list-group-item">
                                         <span class="text-danger">
                                             <a href="{{ path('kb_show', {'url': kb.shortUrl}) }}" class="text-light">
                                                 {{ kb.title }}
