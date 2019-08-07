@@ -44,7 +44,6 @@
                                 <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
                                 <bbcode-editor
-                                    maxlength="500"
                                     rows="5"
                                     class="form-control"
                                     :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
