@@ -1228,6 +1228,17 @@ this.removeResizeListener();
     },
     mounted: function mounted() {
       this.init();
+      const canvasDiv = this.$refs.canvas.childNodes[0];
+      const mouseOverHandler = function() {
+        const tooltip = canvasDiv.nextElementSibling;
+        canvasDiv.removeEventListener('mouseover', mouseOverHandler);
+        canvasDiv.addEventListener('mouseout', function() {
+          setTimeout(function() {
+            tooltip.style.display = 'none';
+          }, 100);
+        });
+      };
+      canvasDiv.addEventListener('mouseover', mouseOverHandler);
     },
     beforeDestroy: function beforeDestroy() {
       this.clean();
