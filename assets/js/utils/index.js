@@ -123,8 +123,8 @@ function getUserOffset() {
  * @return {string}
  */
 function getBreakPoint() {
-    let body = document.body;
-    return window.getComputedStyle(body).getPropertyValue('content').replace(/"/g, '');
+    return window.getComputedStyle(document.body)
+        .getPropertyValue('content').replace(/"/g, '');
 }
 
 export {
