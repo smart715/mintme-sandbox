@@ -3,19 +3,15 @@
 {% block title %}Knowledge Base | mintMe{% endblock %}
 
 {% block content %}
-    <div id="kb_show" class="container mt-5">
+    <div id="kb_show" class="container bg-primary mt-5">
         <div class="row">
-            <div class="col-12 p-4">
-                <header>
-                    <h2 class="word-break">
-                        {{ article.title }}
-                    </h2>
-                </header>
-                <div class="pt-2 pb-4">
+            <div class="col-12 pt-4">
+                <a href="{{ path('kb') }}" role="button">&laquo;Back to Help</a>
+                <h1 class="pt-3">{{ article.title }}</h1>
+                <hr>
+                <div class="py-5">
                     {{ article.description | raw }}
                 </div>
-                <a href="{{ path('kb') }}">&lt; Back to news</a>
-
             </div>
         </div>
     </div>
