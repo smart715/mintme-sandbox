@@ -9,16 +9,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /** @codeCoverageIgnore */
 class TraderBalanceView
 {
-    /**
-     * @var User
-     * @Groups({"API"})
-     */
+    /** @var User */
     private $user;
 
-    /**
-     * @var string
-     * @Groups({"API"})
-     */
+    /** @var string */
     private $balance;
 
     /** @var DateTimeImmutable */
@@ -45,11 +39,19 @@ class TraderBalanceView
         return $this->date->getTimestamp();
     }
 
+    /**
+     * @Groups({"API"})
+     * @return User
+     */
     public function getUser(): User
     {
         return $this->user;
     }
 
+    /**
+     * @Groups({"API"})
+     * @return string
+     */
     public function getBalance(): string
     {
         return $this->balance;

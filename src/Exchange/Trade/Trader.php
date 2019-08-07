@@ -196,8 +196,7 @@ class Trader implements TraderInterface
     private function updateUserCrypto(User $user, Crypto $crypto): void
     {
         if (!in_array($user, $crypto->getUsers(), true)) {
-            $userCrypto = (new UserCrypto())->setCrypto($crypto)->setUser($user);
-            $this->entityManager->persist($userCrypto);
+            $userCrypto = new UserCrypto($user, $crypto);
             $user->addCrypto($userCrypto);
             $this->entityManager->persist($user);
             $this->entityManager->flush();

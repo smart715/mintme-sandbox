@@ -12,6 +12,12 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class UserCrypto implements UserTradebleInterface
 {
+    public function __construct(User $user, Crypto $crypto)
+    {
+        $this->user = $user;
+        $this->crypto = $crypto;
+    }
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -50,23 +56,9 @@ class UserCrypto implements UserTradebleInterface
         return $this->user;
     }
 
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getCrypto(): Crypto
     {
         return $this->crypto;
-    }
-
-    public function setCrypto(Crypto $crypto): self
-    {
-        $this->crypto = $crypto;
-
-        return $this;
     }
 
     public function getCreated(): DateTimeImmutable

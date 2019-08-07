@@ -112,7 +112,7 @@ class User extends BaseUser implements
     protected $cryptos;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="referencer", cascade={"persist", "remove"})
      * @var ArrayCollection
      */
     protected $referrals;

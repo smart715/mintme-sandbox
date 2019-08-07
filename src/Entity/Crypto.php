@@ -68,7 +68,7 @@ class Crypto implements TradebleInterface
     protected $exchangeble;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="crypto")
+     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="crypto", cascade={"persist", "remove"})
      * @var ArrayCollection
      */
     protected $users;
