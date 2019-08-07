@@ -158,23 +158,7 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.$routing.generate('token_send_code', {
-                    name: this.currentName,
-                }))
-                .then((response) => {
-                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
-                        this.$toasted.success(response.data.message);
-                        this.needToSendCode = false;
-                    }
-                }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
-                });
+            this.sendConfirmCode();
         },
         doDeleteToken: function(code = '') {
             this.$axios.single.post(this.$routing.generate('token_delete', {
@@ -193,6 +177,9 @@ export default {
                         this.$toasted.error('Network error');
                     } else if (error.response.data.message) {
                         this.$toasted.error(error.response.data.message);
+                        if ('2fa code is expired' === error.response.data.message) {
+                            this.sendConfirmCode();
+                        }
                     } else {
                         this.$toasted.error('An error has occurred, please try again later');
                     }
@@ -204,6 +191,25 @@ export default {
             } else if ('edit' === this.mode) {
                 this.doEditName(code);
             }
+        },
+        sendConfirmCode: function() {
+            this.$axios.single.post(this.$routing.generate('token_send_code', {
+                    name: this.currentName,
+                }))
+                .then((response) => {
+                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
+                        this.$toasted.success(response.data.message);
+                        this.needToSendCode = false;
+                    }
+                }, (error) => {
+                    if (!error.response) {
+                        this.$toasted.error('Network error');
+                    } else if (error.response.data.message) {
+                        this.$toasted.error(error.response.data.message);
+                    } else {
+                        this.$toasted.error('An error has occurred, please try again later');
+                    }
+                });
         },
     },
     validations() {

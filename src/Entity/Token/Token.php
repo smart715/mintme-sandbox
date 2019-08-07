@@ -122,6 +122,12 @@ class Token implements TradebleInterface
      */
     protected $confirmCode;
 
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable
+     */
+    protected $confirmCodeExpirationTime;
+
     /** @return User[] */
     public function getRelatedUsers(): array
     {
@@ -274,17 +280,32 @@ class Token implements TradebleInterface
 
     /**
      * @param int|null $confirmCode
+     * @param int $expirationTime
      * @return Token
+     * @throws \Exception
      */
-    public function setConfirmCode(?int $confirmCode): self
+    public function setConfirmCode(?int $confirmCode, int $expirationTime): self
     {
         $this->confirmCode = $confirmCode;
+        $tokenDeletionExpirationTime = time() + $expirationTime*60;
+        $this->confirmCodeExpirationTime = (new \DateTimeImmutable())->setTimestamp($tokenDeletionExpirationTime);
 
         return $this;
     }
 
-    public function checkConfirmCode(?int $confirmCode): bool
+    public function checkConfirmCode(?int $confirmCode, int $expirationTime): array
     {
-        return $confirmCode === $this->confirmCode;
+        $message = null;
+
+        if ($confirmCode !== $this->confirmCode) {
+            $message = 'Invalid 2fa code';
+        } elseif (date_timestamp_get($this->confirmCodeExpirationTime) - time() < 0) {
+            $message = '2fa code is expired';
+        }
+
+        return [
+            'result' => null === $message,
+            'message' => $message,
+        ];
     }
 }

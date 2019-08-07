@@ -51,16 +51,21 @@ class TokensAPIController extends AbstractFOSRestController
     /** @var UserActionLogger */
     private $userActionLogger;
 
+    /** @var int */
+    private $expirationTime;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        int $expirationTime = 10
     ) {
         $this->em = $entityManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->userActionLogger = $userActionLogger;
+        $this->expirationTime = $expirationTime;
     }
 
 
@@ -376,8 +381,12 @@ class TokensAPIController extends AbstractFOSRestController
 
         if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
             throw new ApiUnauthorizedException('Invalid 2fa code');
-        } elseif (!$user->isGoogleAuthenticatorEnabled() && !$token->checkConfirmCode((int) $request->get('code'))) {
-            throw new ApiUnauthorizedException('Invalid 2fa code');
+        } elseif (!$user->isGoogleAuthenticatorEnabled()) {
+            $response = $token->checkConfirmCode((int) $request->get('code'), $this->expirationTime);
+
+            if (!$response['result']) {
+                throw new ApiUnauthorizedException($response['message']);
+            }
         }
 
         if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
@@ -417,7 +426,7 @@ class TokensAPIController extends AbstractFOSRestController
         $message = null;
 
         if (!$user->isGoogleAuthenticatorEnabled()) {
-            $token->setConfirmCode(rand(100000, 999999));
+            $token->setConfirmCode(rand(100000, 999999), $this->expirationTime);
             $em = $this->getDoctrine()->getManager();
             $em->persist($token);
             $em->flush();
