@@ -106,13 +106,13 @@ class User extends BaseUser implements
     protected $tokens;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="user", cascade={"persist", "remove"})
      * @var ArrayCollection
      */
     protected $cryptos;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="referencer", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
      * @var ArrayCollection
      */
     protected $referrals;
