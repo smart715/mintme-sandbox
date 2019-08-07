@@ -72,7 +72,7 @@
 import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
 import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
-import {toMoney, EchartTheme as VeLineTheme} from '../../utils';
+import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 
 export default {
@@ -103,7 +103,7 @@ export default {
                     top: 20,
                     bottom: 60,
                     left: 75,
-                    right: '8%',
+                    right: '10%',
                 },
                 xAxis: {
                     boundaryGap: true,
@@ -233,7 +233,7 @@ export default {
             return 0;
         },
         handleRightLabel() {
-            this.rightLabel = window.innerWidth >= 1200;
+            this.rightLabel = ['lg', 'xl'].includes(getBreakPoint());
         },
     },
     components: {
