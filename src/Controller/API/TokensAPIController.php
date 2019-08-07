@@ -29,7 +29,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 
@@ -59,7 +58,7 @@ class TokensAPIController extends AbstractFOSRestController
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         UserActionLogger $userActionLogger,
-        int $expirationTime = 10
+        int $expirationTime = 60
     ) {
         $this->em = $entityManager;
         $this->tokenManager = $tokenManager;
