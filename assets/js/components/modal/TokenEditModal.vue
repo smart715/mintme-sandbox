@@ -5,7 +5,7 @@
             :no-close="noClose"
             @close="closeModal">
             <template slot="header">
-                <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName }}</span>
+                <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
             </template>
             <template slot="body">
                 <div class="col-12 pb-3">
@@ -54,6 +54,7 @@ import TwoFactorModal from './TwoFactorModal';
 import Modal from './Modal';
 import Guide from '../Guide';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+import {FiltersMixin} from '../../mixins';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
@@ -71,6 +72,7 @@ export default {
         twofa: Boolean,
         visible: Boolean,
     },
+    mixins: [FiltersMixin],
     data() {
         return {
             minLength: 4,
