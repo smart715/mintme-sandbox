@@ -75,14 +75,14 @@ describe('TokenDeploy', () => {
         const wrapper = mockTokenDeploy(true);
         wrapper.vm.webCost = 999;
         wrapper.vm.isOwner = false;
-        wrapper.vm.deployed = false;
+        wrapper.vm.status = 'not-deployed';
         expect(wrapper.find('button').exists()).to.be.false;
         expect(wrapper.find('.deployed-icon').exists()).to.be.false;
     });
 
-    it('should has deployed icon if deployed', () => {
+    it('should has deployed-icon if deployed', () => {
         const wrapper = mockTokenDeploy(true);
-        wrapper.vm.deployed = true;
+        wrapper.vm.status = 'deployed';
         wrapper.vm.isOwner = true;
         expect(wrapper.find('button').exists()).to.be.false;
         expect(wrapper.find('.deployed-icon').exists()).to.be.true;
@@ -95,7 +95,7 @@ describe('TokenDeploy', () => {
         it('should be visible if not deployed & isOwner', () => {
             const wrapper = mockTokenDeploy(true);
             wrapper.vm.isOwner = true;
-            wrapper.vm.deployed = false;
+            wrapper.vm.status = 'not-deployed';
             expect(wrapper.find('button').exists()).to.be.true;
         });
 
@@ -146,12 +146,12 @@ describe('TokenDeploy', () => {
             const wrapper = mockTokenDeploy(true, true, 'not-deployed');
             wrapper.vm.modalVisible = true;
             wrapper.vm.deploy();
-            expect(wrapper.vm.deployed).to.be.false;
+            expect(wrapper.vm.status).to.deep.equal('not-deployed');
 
             moxios.stubRequest('token_deploy', {status: 200, response: true});
 
             moxios.wait(() => {
-                expect(wrapper.vm.deployed).to.be.true;
+                expect(wrapper.vm.status).to.deep.equal('pending');
                 done();
             });
         });
