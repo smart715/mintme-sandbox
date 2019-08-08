@@ -7,6 +7,7 @@ use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -26,6 +27,7 @@ class PaymentConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
+            $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -50,6 +52,7 @@ class PaymentConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager(null),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
+            $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -74,6 +77,7 @@ class PaymentConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager(null, $this->once()),
+            $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -98,6 +102,7 @@ class PaymentConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
+            $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -126,6 +131,7 @@ class PaymentConsumerTest extends TestCase
             $bh,
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
+            $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -154,6 +160,7 @@ class PaymentConsumerTest extends TestCase
             $bh,
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
+            $this->createMock(TokenManagerInterface::class),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)

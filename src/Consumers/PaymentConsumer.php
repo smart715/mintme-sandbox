@@ -99,7 +99,7 @@ class PaymentConsumer implements ConsumerInterface
                 }
 
                 if ($tradable instanceof Token
-                    && null !== ($crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL))) {
+                    && null != ($crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL))) {
                     $this->balanceHandler->deposit(
                         $user,
                         Token::getFromCrypto($crypto),
