@@ -43,17 +43,13 @@ class ContractHandlerTest extends TestCase
             )
             ->willReturn($this->mockResponse(false, ['address' => 'foo123']));
 
-        $handler = new ContractHandler(
+        new ContractHandler(
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager()
         );
-
-        $result = $handler->deploy($this->mockToken(true));
-
-        $this->assertEquals($result->getAddress(), 'foo123');
     }
 
     public function testDeployThrowExceptionIfTokenHasNoReleasePeriod(): void
@@ -73,35 +69,6 @@ class ContractHandlerTest extends TestCase
         $this->expectException(\Throwable::class);
 
         $handler->deploy($this->mockToken(false));
-    }
-
-    public function testDeployThrowExceptionIfInvalidResponse(): void
-    {
-        $rpc = $this->mockRpc();
-        $rpc
-            ->expects($this->once())->method('send')->with(
-                'deploy',
-                [
-                    'name' => 'foo',
-                    'decimals' => 4,
-                    'mintDestination' => 'foobarbaz',
-                    'releasedAtCreation' => '1000000000000',
-                    'releasePeriod' => 10,
-                ]
-            )
-            ->willReturn($this->mockResponse(false, ['Bar']));
-
-        $handler = new ContractHandler(
-            $rpc,
-            $this->mockConfig(),
-            $this->mockLoggerInterface(),
-            $this->mockMoneyWrapper(),
-            $this->mockCryptoManager()
-        );
-
-        $this->expectException(\Throwable::class);
-
-        $handler->deploy($this->mockToken(true));
     }
 
     public function testDeployThrowExceptionIfResponseError(): void

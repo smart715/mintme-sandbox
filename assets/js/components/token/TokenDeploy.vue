@@ -33,7 +33,12 @@
                 </template>
             </modal>
         </div>
-        <div v-else-if="deployed" class="deployed-icon"><img class="h-100" src="../../../img/webchain_W.svg" alt="deployed"></div>
+        <div v-else-if="deployed" class="deployed-icon">
+            <img class="h-100" src="../../../img/webchain_W.svg" alt="deployed">
+        </div>
+        <div v-else-if="showPending">
+            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </div>
     </div>
 </template>
 
@@ -44,6 +49,7 @@ import {WebSocketMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 
 const WEB = 'web';
+const STATUS = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
 
 export default {
     name: 'TokenDeploy',
@@ -53,11 +59,11 @@ export default {
         hasReleasePeriod: Boolean,
         isOwner: Boolean,
         precision: Number,
-        deployedProp: Boolean,
+        statusProp: String,
     },
     data() {
         return {
-            deployed: this.deployedProp,
+            status: this.statusProp,
             deploying: false,
             modalVisible: false,
             balance: null,
@@ -65,8 +71,20 @@ export default {
         };
     },
     computed: {
+        notDeployed: function() {
+            return STATUS.notDeployed === this.status;
+        },
+        pending: function() {
+            return STATUS.pending === this.status;
+        },
+        deployed: function() {
+            return STATUS.deployed === this.status;
+        },
+        showPending: function(){
+            return this.isOwner && this.pending;
+        },
         btnEnabled: function() {
-            return this.isOwner && !this.deployed;
+            return this.isOwner && this.notDeployed;
         },
         btnModalDisabled: function() {
             return this.costExceed || this.deploying;
@@ -94,9 +112,9 @@ export default {
                 name: this.name,
             }))
             .then(() => {
-                this.deployed = true;
+                this.status = STATUS.pending;
                 this.setModalVisible(false);
-                this.$toasted.success('Deployed successfully');
+                this.$toasted.success('Process in pending status and it will take some minutes to be done.');
             })
             .catch(({response}) => {
                 if (!response) {
@@ -125,7 +143,7 @@ export default {
         },
     },
     mounted() {
-        if (!this.deployed && this.isOwner) {
+        if (this.notDeployed && this.isOwner) {
             this.fetchBalances();
             this.addMessageHandler((response) => {
                 if (

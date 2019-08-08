@@ -188,6 +188,13 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
+    deploy_consumer:
+        class: 'App\Consumers\DeployConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
     wallet:
         class: 'App\Wallet\Wallet'
         arguments:

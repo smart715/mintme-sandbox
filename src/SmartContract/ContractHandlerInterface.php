@@ -14,9 +14,8 @@ interface ContractHandlerInterface
     /**
      * @throws Exception
      * @param Token $token
-     * @return TokenDeployResult
      */
-    public function deploy(Token $token): TokenDeployResult;
+    public function deploy(Token $token): void;
 
     public function updateMinDestination(Token $token, string $address, bool $lock): void;
 

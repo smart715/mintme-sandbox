@@ -57,7 +57,7 @@ class ContractHandler implements ContractHandlerInterface
         $this->cryptoManager = $cryptoManager;
     }
 
-    public function deploy(Token $token): TokenDeployResult
+    public function deploy(Token $token): void
     {
         if (!$token->getLockIn()) {
             $this->logger->error("Failed to deploy token '{$token->getName()}' because It has not a release period");
@@ -85,16 +85,6 @@ class ContractHandler implements ContractHandlerInterface
 
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
-
-        $result = $response->getResult();
-
-        if (!isset($result['address'])) {
-            $this->logger->error("Failed to deploy token '{$token->getName()}'");
-
-            throw new Exception('get error response');
-        }
-
-        return new TokenDeployResult($result['address']);
     }
 
     public function updateMinDestination(Token $token, string $address, bool $lock): void

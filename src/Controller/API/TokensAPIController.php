@@ -445,7 +445,7 @@ class TokensAPIController extends AbstractFOSRestController
                 throw new ApiBadRequestException('Low balance');
             }
 
-            $deployResult = $contractHandler->deploy($token);
+//            $contractHandler->deploy($token);
 
             $balanceHandler->withdraw(
                 $this->getUser(),
@@ -453,7 +453,8 @@ class TokensAPIController extends AbstractFOSRestController
                 $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
             );
 
-            $token->setAddress($deployResult->getAddress());
+            $token->setPendingDeployment();
+            $token->setDeployCost($cost);
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {

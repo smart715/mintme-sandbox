@@ -76,7 +76,7 @@
                                         name="{{ market.quote.name }}"
                                         :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
                                         :precision="{{ precision }}"
-                                        :deployed-prop="{{ token.isDeployed | json_encode }}"
+                                        :status-prop="{{ token.deploymentStatus | json_encode }}"
                                 />
                             </div>
                         </li>
