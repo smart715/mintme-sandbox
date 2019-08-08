@@ -99,6 +99,11 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
+    public function isPredefined(Token $token): bool
+    {
+        return in_array($token, $this->findAllPredefined());
+    }
+
     /**
      * {@inheritdoc}
      *

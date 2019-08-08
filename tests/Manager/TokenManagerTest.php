@@ -236,6 +236,32 @@ class TokenManagerTest extends TestCase
         ]);
     }
 
+    public function testIsPredefined(): void
+    {
+        $tokenManager = new TokenManager(
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(ProfileFetcherInterface::class),
+            $this->createMock(TokenStorageInterface::class),
+            $this->mockCryptoManager([
+                $this->mockCrypto('foo'),
+                $this->mockCrypto('bar'),
+            ]),
+            $this->mockConfig(0)
+        );
+
+        $fooTok = $this->mockToken('foo');
+        $blahTok = $this->mockToken('blah');
+
+        $toks = array_map(function ($item) {
+            return $item->getName();
+        }, $tokenManager->findAllPredefined());
+
+        $this->assertContains($fooTok->getName(), $toks);
+        $this->assertNotContains($blahTok, $toks);
+    }
+
+
+
     private function mockToken(string $name, ?LockIn $lockIn = null, ?User $user = null): Token
     {
         $profile = $this->createMock(Profile::class);
