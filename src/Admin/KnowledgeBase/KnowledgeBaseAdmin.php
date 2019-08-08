@@ -8,6 +8,7 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelListType;
+use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -63,5 +64,16 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->addIdentifier('title', TextType::class)
             ->add('url', TextType::class)
             ->add('description', TextareaType::class);
+    }
+
+    protected function configureShowFields(ShowMapper $showMapper): void
+    {
+        $showMapper
+            ->add('category')
+            ->add('subcategory')
+            ->add('title')
+            ->add('url')
+            ->add('description', null, ['safe' => true])
+        ;
     }
 }
