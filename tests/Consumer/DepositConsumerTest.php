@@ -36,7 +36,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->createMock(EntityManagerInterface::class)
+            $this->mockEntityManager()
         );
 
         $this->assertTrue(
@@ -60,7 +60,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->createMock(EntityManagerInterface::class)
+            $this->mockEntityManager()
         );
 
         $this->assertTrue(
@@ -84,7 +84,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->createMock(EntityManagerInterface::class)
+            $this->mockEntityManager()
         );
 
         $this->assertTrue(
@@ -108,7 +108,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->createMock(EntityManagerInterface::class)
+            $this->mockEntityManager()
         );
 
         $this->assertTrue(
@@ -131,7 +131,32 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->createMock(EntityManagerInterface::class)
+            $this->mockEntityManager($this->once())
+        );
+
+        $this->assertTrue(
+            $dc->execute($this->mockMessage((string)json_encode([
+                'userId' => 1,
+                'crypto' => $tokenName,
+                'amount' => '10000',
+            ])))
+        );
+    }
+
+    public function testExecuteWithTokenAndRelatedUser(): void
+    {
+        $tokenName = 'TOK1';
+        $user = $this->createMock(User::class);
+        $dc = new DepositConsumer(
+            $this->mockBalanceHandler($this->once(), $this->once()),
+            $this->mockUserManager($user),
+            $this->mockCryptoManager(null),
+            $this->mockTokenManager($this->mockToken($tokenName, [$user])),
+            $this->mockLogger(),
+            $this->mockMoneyWrapper(),
+            $this->createMock(ClockInterface::class),
+            $this->mockWallet(),
+            $this->mockEntityManager($this->never())
         );
 
         $this->assertTrue(
@@ -161,7 +186,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->createMock(EntityManagerInterface::class)
+            $this->mockEntityManager()
         );
 
         $this->assertFalse(
@@ -171,6 +196,14 @@ class DepositConsumerTest extends TestCase
                 'amount' => '10000',
             ])))
         );
+    }
+
+    private function mockEntityManager(?Invocation $invocation = null): EntityManagerInterface
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($invocation ?? $this->never())->method('flush');
+
+        return $em;
     }
 
     private function mockWallet(): WalletInterface
@@ -191,10 +224,11 @@ class DepositConsumerTest extends TestCase
         return $crypto;
     }
 
-    private function mockToken(string $name): Token
+    private function mockToken(string $name, array $users = []): Token
     {
         $token = $this->createMock(Token::class);
         $token->method('getSymbol')->willReturn($name);
+        $token->method('getRelatedUsers')->willReturn($users);
 
         return $token;
     }

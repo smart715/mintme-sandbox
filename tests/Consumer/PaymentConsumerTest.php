@@ -4,6 +4,7 @@ namespace App\Tests\Consumer;
 
 use App\Consumers\PaymentConsumer;
 use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
@@ -22,12 +23,12 @@ class PaymentConsumerTest extends TestCase
 {
     public function testExecute(): void
     {
-        $cryptoSymbol = 'WEB';
+        $cryptoSymbol = 'FOO';
         $dc = new PaymentConsumer(
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -52,7 +53,7 @@ class PaymentConsumerTest extends TestCase
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager(null),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -72,12 +73,12 @@ class PaymentConsumerTest extends TestCase
 
     public function testExecuteWithoutCrypto(): void
     {
-        $cryptoSymbol = 'WEB';
+        $cryptoSymbol = 'FOO';
         $dc = new PaymentConsumer(
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager(null, $this->once()),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(null, $this->once()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -97,12 +98,12 @@ class PaymentConsumerTest extends TestCase
 
     public function testExecuteFailedParse(): void
     {
-        $cryptoSymbol = 'WEB';
+        $cryptoSymbol = 'FOO';
         $dc = new PaymentConsumer(
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -121,7 +122,7 @@ class PaymentConsumerTest extends TestCase
 
     public function testExecuteWithException(): void
     {
-        $cryptoSymbol = 'WEB';
+        $cryptoSymbol = 'FOO';
 
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->method('deposit')
@@ -131,7 +132,7 @@ class PaymentConsumerTest extends TestCase
             $bh,
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -151,7 +152,7 @@ class PaymentConsumerTest extends TestCase
 
     public function testExecuteFailedToDeposit(): void
     {
-        $cryptoSymbol = 'WEB';
+        $cryptoSymbol = 'FOO';
 
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->expects($this->once())->method('deposit');
@@ -160,7 +161,7 @@ class PaymentConsumerTest extends TestCase
             $bh,
             $this->mockUserManager($this->createMock(User::class)),
             $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
-            $this->createMock(TokenManagerInterface::class),
+            $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class)
@@ -173,6 +174,35 @@ class PaymentConsumerTest extends TestCase
                 'tx_hash' => 'x01234123',
                 'retries' => 0,
                 'crypto' => $cryptoSymbol,
+                'amount' => '10000',
+            ])))
+        );
+    }
+
+    public function testExecuteFailedToDepositWithToken(): void
+    {
+        $tokenName = 'tok1';
+
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+        $bh->expects($this->exactly(2))->method('deposit');
+
+        $dc = new PaymentConsumer(
+            $bh,
+            $this->mockUserManager($this->createMock(User::class)),
+            $this->mockCryptoManager(null, $this->exactly(2)),
+            $this->mockTokenManager($this->mockToken($tokenName), $this->once()),
+            $this->mockLogger(),
+            $this->mockMoneyWrapper(),
+            $this->createMock(ClockInterface::class)
+        );
+
+        $this->assertTrue(
+            $dc->execute($this->mockMessage((string)json_encode([
+                'id' => 1,
+                'status' => 'fail',
+                'tx_hash' => 'x01234123',
+                'retries' => 0,
+                'crypto' => $tokenName,
                 'amount' => '10000',
             ])))
         );
@@ -214,9 +244,32 @@ class PaymentConsumerTest extends TestCase
     private function mockCryptoManager(?Crypto $crypto, Invocation $invocation): CryptoManagerInterface
     {
         $cm = $this->createMock(CryptoManagerInterface::class);
-        $cm->expects($invocation)->method('findBySymbol')->willReturn($crypto);
+        $cm->expects($invocation)->method('findBySymbol')->will($this->returnCallback(
+            function ($symbol) use ($crypto) {
+                return !$crypto && 'WEB' === $symbol
+                    ? $this->mockCrypto('WEB')
+                    : $crypto;
+            }
+        ));
 
         return $cm;
+    }
+
+    private function mockTokenManager(?Token $token = null, ?Invocation $invocation = null): TokenManagerInterface
+    {
+        $tm = $this->createMock(TokenManagerInterface::class);
+        $tm->expects($invocation ?? $this->never())
+            ->method('findByName')->willReturn($token);
+
+        return $tm;
+    }
+
+    private function mockToken(string $name): Token
+    {
+        $token = $this->createMock(Token::class);
+        $token->method('getSymbol')->willReturn($name);
+
+        return $token;
     }
 
     private function mockLogger(): LoggerInterface
