@@ -220,7 +220,6 @@ class Wallet implements WalletInterface
 
     public function getFee(TradebleInterface $tradable): Money
     {
-        return new Money('1000000000000000000', new Currency(Token::WEB_SYMBOL));
         return $this->depositCommunicator->getFee($tradable->getSymbol());
     }
 
