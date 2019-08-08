@@ -153,7 +153,7 @@ class WalletAPIController extends AbstractFOSRestController
 
         $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($this->getUser());
 
-         return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
+        return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
     }
 
     /**
