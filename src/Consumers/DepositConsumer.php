@@ -120,7 +120,7 @@ class DepositConsumer implements ConsumerInterface
                 $user,
                 $tradable instanceof Token ? $tradable: Token::getFromCrypto($tradable),
                 $tradable instanceof Token
-                    ? (new Money($clbResult->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL)))
+                    ? new Money($clbResult->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL))
                     : $this->moneyWrapper->parse($clbResult->getAmount(), $tradable->getSymbol())
             );
 
