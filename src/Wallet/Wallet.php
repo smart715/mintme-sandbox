@@ -145,7 +145,7 @@ class Wallet implements WalletInterface
         $this->balanceHandler->withdraw($user, $token, $amount->getAmount()->add($fee));
 
         if ($tradable instanceof Token) {
-            $this->balanceHandler->withdraw($user, $tradable, $crypto->getFee());
+            $this->balanceHandler->withdraw($user, Token::getFromCrypto($crypto), $crypto->getFee());
         }
 
         return $this->pendingManager->create($user, $address, $amount, $tradable);
@@ -220,6 +220,7 @@ class Wallet implements WalletInterface
 
     public function getFee(TradebleInterface $tradable): Money
     {
+        return new Money('1000000000000000000', new Currency(Token::WEB_SYMBOL));
         return $this->depositCommunicator->getFee($tradable->getSymbol());
     }
 

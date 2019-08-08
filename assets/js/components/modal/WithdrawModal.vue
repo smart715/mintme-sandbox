@@ -134,7 +134,10 @@ export default {
                 new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
             );
 
-            return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(), this.subunit);
+            return toMoney(
+                amount.add(!this.isToken && amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
+                this.subunit
+            );
         },
         feeCurrency: function() {
             return this.isToken ? WEB_SYMBOL : this.currency;
