@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Balance\Factory;
 
+use App\Entity\Token\Token;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -62,7 +63,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $subunit,
                 $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
                 $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
-                $token->isDeployed()
+                Token::DEPLOYED === $token->deploymentStatus()
             );
         }
 

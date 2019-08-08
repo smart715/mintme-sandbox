@@ -127,7 +127,7 @@ class ContractHandler implements ContractHandlerInterface
 
     public function withdraw(User $user, Money $balance, string $address, Token $token): void
     {
-        if (!$token->isDeployed()) {
+        if (Token::DEPLOYED !== $token->deploymentStatus()) {
             $this->logger->error("Failed to Update minDestination for '{$token->getName()}' because It is locked");
 
             throw new Exception('Token not deployed yet');

@@ -80,7 +80,7 @@ export default {
         deployed: function() {
             return STATUS.deployed === this.status;
         },
-        showPending: function(){
+        showPending: function() {
             return this.isOwner && this.pending;
         },
         btnEnabled: function() {

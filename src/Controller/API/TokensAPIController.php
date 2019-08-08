@@ -445,7 +445,7 @@ class TokensAPIController extends AbstractFOSRestController
                 throw new ApiBadRequestException('Low balance');
             }
 
-//            $contractHandler->deploy($token);
+            $contractHandler->deploy($token);
 
             $balanceHandler->withdraw(
                 $this->getUser(),

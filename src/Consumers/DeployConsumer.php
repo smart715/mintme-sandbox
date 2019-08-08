@@ -57,7 +57,6 @@ class DeployConsumer implements ConsumerInterface
             $clbResult = DeployCallbackMessage::parse(
                 json_decode((string)$body, true)
             );
-
         } catch (\Throwable $exception) {
             $this->logger->warning(
                 '[deploy-consumer] Failed to parse incoming message',
@@ -77,7 +76,7 @@ class DeployConsumer implements ConsumerInterface
             }
 
             if (!$clbResult->getAddress()) {
-                if ($token->getDeployCost()) {
+                if (null !== $token->getDeployCost()) {
                     $this->balanceHandler->deposit(
                         $token->getProfile()->getUser(),
                         Token::getFromSymbol(Token::WEB_SYMBOL),

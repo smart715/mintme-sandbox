@@ -27,10 +27,10 @@ function mockVue() {
 /**
  * @param {Boolean} balanceFetched
  * @param {Boolean} isOwner
- * @param {Boolean} deployed
+ * @param {String} status
  * @return {Wrapper<Vue>}
  */
-function mockTokenDeploy(balanceFetched, isOwner = true, deployed = false) {
+function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed') {
     const store = new Vuex.Store({
         modules: {makeOrder},
     });
@@ -42,7 +42,7 @@ function mockTokenDeploy(balanceFetched, isOwner = true, deployed = false) {
             hasReleasePeriod: false,
             isOwner: isOwner,
             precision: 4,
-            deployedProp: deployed,
+            statusProp: status,
         },
     });
 
@@ -143,7 +143,7 @@ describe('TokenDeploy', () => {
 
     describe('deploy() function', () => {
         it('should work correctly', (done) => {
-            const wrapper = mockTokenDeploy(true, true, false);
+            const wrapper = mockTokenDeploy(true, true, 'not-deployed');
             wrapper.vm.modalVisible = true;
             wrapper.vm.deploy();
             expect(wrapper.vm.deployed).to.be.false;
@@ -181,7 +181,7 @@ describe('TokenDeploy', () => {
                     webCost: 99,
                 }});
 
-            let wrapper = mockTokenDeploy(false, true, false);
+            let wrapper = mockTokenDeploy(false, true, 'not-deployed');
             moxios.wait(() => {
                 expect(wrapper.vm.balance).to.deep.equal(999);
                 expect(wrapper.vm.webCost).to.deep.equal(99);
@@ -195,7 +195,7 @@ describe('TokenDeploy', () => {
                     webCost: 99,
                 }});
 
-            let wrapper = mockTokenDeploy(false, true, true);
+            let wrapper = mockTokenDeploy(false, true, 'deployed');
             moxios.wait(() => {
                 expect(wrapper.vm.balance).to.deep.equal(0);
                 expect(wrapper.vm.webCost).to.deep.equal(0);
@@ -209,7 +209,7 @@ describe('TokenDeploy', () => {
                     webCost: 99,
                 }});
 
-            let wrapper = mockTokenDeploy(false, false, false);
+            let wrapper = mockTokenDeploy(false, false, 'not-deployed');
             moxios.wait(() => {
                 expect(wrapper.vm.balance).to.deep.equal(0);
                 expect(wrapper.vm.webCost).to.deep.equal(0);

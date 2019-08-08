@@ -12,9 +12,6 @@ use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandler;
-use App\Wallet\Model\Status;
-use App\Wallet\Model\Transaction;
-use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -41,15 +38,17 @@ class ContractHandlerTest extends TestCase
                     'releasePeriod' => 10,
                 ]
             )
-            ->willReturn($this->mockResponse(false, ['address' => 'foo123']));
+            ->willReturn($this->mockResponse(false, []));
 
-        new ContractHandler(
+        $handler = new ContractHandler(
             $rpc,
             $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager()
         );
+
+        $handler->deploy($this->mockToken(true));
     }
 
     public function testDeployThrowExceptionIfTokenHasNoReleasePeriod(): void
@@ -85,7 +84,7 @@ class ContractHandlerTest extends TestCase
                     'releasePeriod' => 10,
                 ]
             )
-            ->willReturn($this->mockResponse(true, ['address' => 'foo123']));
+            ->willReturn($this->mockResponse(true, []));
 
         $handler = new ContractHandler(
             $rpc,
@@ -196,7 +195,7 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Token::WEB_SYMBOL)),
             '0x123',
-            $this->mockToken(true, '0x123', false, true)
+            $this->mockToken(true, '0x123', false, 'deployed')
         );
     }
 
@@ -220,7 +219,7 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Token::WEB_SYMBOL)),
             '0x123',
-            $this->mockToken(true, '0x123', false, false)
+            $this->mockToken(true, '0x123', false, 'not-deployed')
         );
     }
 
@@ -252,7 +251,7 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Token::WEB_SYMBOL)),
             '0x123',
-            $this->mockToken(true, '0x123', false, true)
+            $this->mockToken(true, '0x123', false, 'deployed')
         );
     }
 
@@ -423,13 +422,17 @@ class ContractHandlerTest extends TestCase
     }
 
     /** @return Token|MockObject */
-    private function mockToken(bool $hasReleasePeriod, string $address = '0x123', bool $minLocked = false, bool $isDeployed = false): Token
-    {
+    private function mockToken(
+        bool $hasReleasePeriod,
+        string $address = '0x123',
+        bool $minLocked = false,
+        string $status = 'not-deployed'
+    ): Token {
         $token = $this->createMock(Token::class);
         $token->method('getName')->willReturn('foo');
         $token->method('getAddress')->willReturn($address);
         $token->method('isMinDestinationLocked')->willReturn($minLocked);
-        $token->method('isDeployed')->willReturn($isDeployed);
+        $token->method('deploymentStatus')->willReturn($status);
 
         if (!$hasReleasePeriod) {
             $token->method('getLockIn')->willReturn(null);
