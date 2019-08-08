@@ -107,7 +107,7 @@ class Wallet implements WalletInterface
         if ($tradable instanceof Crypto) {
             $fee = $tradable->getFee();
             $crypto = $tradable;
-            $token = Token::getFromSymbol($tradable->getSymbol());
+            $token = Token::getFromCrypto($tradable);
         } else {
             $fee = new Money('0', new Currency(MoneyWrapper::TOK_SYMBOL));
             $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
