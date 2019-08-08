@@ -31,7 +31,7 @@
                                 {% if subcategory is not iterable %}
                                     <li class="list-group-item border-0 pt-0 pb-1">
                                     <span class="text-danger">
-                                        <a href="{{ path('kb_show', {'url': subcategory.shortUrl}) }}"
+                                        <a href="{{ path('kb_show', {'url': subcategory.url}) }}"
                                            class="text-light">
                                             {{ subcategory.title }}
                                         </a>
@@ -42,7 +42,7 @@
                                     {% for kb in subcategory %}
                                         <li class="list-group-item border-0 pt-0 pb-1">
                                         <span class="text-danger">
-                                            <a href="{{ path('kb_show', {'url': kb.shortUrl}) }}" class="text-light">
+                                            <a href="{{ path('kb_show', {'url': kb.url}) }}" class="text-light">
                                                 {{ kb.title }}
                                             </a>
                                         </span>

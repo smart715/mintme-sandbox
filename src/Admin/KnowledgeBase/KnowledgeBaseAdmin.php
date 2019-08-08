@@ -2,10 +2,12 @@
 
 namespace App\Admin\KnowledgeBase;
 
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Form\Type\ModelListType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -41,12 +43,15 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $form): void
     {
         $form
-            ->add('category', null)
-            ->add('subcategory', null)
+            ->add('category', ModelListType::class)
+            ->add('subcategory', ModelListType::class, [
+                'required' => false,
+            ])
             ->add('title', TextType::class)
             ->add('url', TextType::class)
-            ->add('description', TextareaType::class, [
-                'attr' => ['rows' => 15],
+            ->add('description', CKEditorType::class, [
+                'label' => 'Description (allow HTML tags)',
+                'attr' => ['rows' => 35],
             ]);
     }
 
