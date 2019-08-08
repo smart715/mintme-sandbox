@@ -13,6 +13,7 @@ use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
@@ -45,6 +46,9 @@ class DepositConsumer implements ConsumerInterface
     /** @var WalletInterface */
     private $depositCommunicator;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -53,7 +57,8 @@ class DepositConsumer implements ConsumerInterface
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
         ClockInterface $clock,
-        WalletInterface $depositCommunicator
+        WalletInterface $depositCommunicator,
+        EntityManagerInterface $em
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -63,6 +68,7 @@ class DepositConsumer implements ConsumerInterface
         $this->moneyWrapper = $moneyWrapper;
         $this->clock = $clock;
         $this->depositCommunicator = $depositCommunicator;
+        $this->em = $em;
     }
 
     /** {@inheritdoc} */
@@ -111,9 +117,15 @@ class DepositConsumer implements ConsumerInterface
             if ($tradable instanceof Token) {
                 $this->balanceHandler->withdraw(
                     $user,
-                    $tradable,
+                    Token::getFromSymbol(Token::WEB_SYMBOL),
                     $this->depositCommunicator->getFee($tradable)
                 );
+
+                if (!in_array($user, $tradable->getRelatedUsers(), true)) {
+                    $user->addRelatedToken($tradable);
+                    $this->em->persist($user);
+                    $this->em->flush();
+                }
             }
 
             $this->balanceHandler->deposit(
