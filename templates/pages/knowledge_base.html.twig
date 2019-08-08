@@ -15,13 +15,15 @@
         {% endif %}
         <div class="row pt-3 justify-content-center">
             {% for category in knowledgeBases %}
-                <div class="col-xl-10 card pb-3">
+                <div class="col-xl-12 card pb-3">
                     <div class="card-header">
-                        {% if category|first is iterable %}
-                            <h3 class="mb-0">{{ category|first|first.category.name }}</h3>
-                        {% else %}
-                            <h3 class="mb-0">{{ category|first.category.name }}</h3>
-                        {% endif %}
+                        <h3 class="mb-0">
+                            {% if category|first is iterable %}
+                                {{ category|first|first.category.name }}
+                            {% else %}
+                                {{ category|first.category.name }}
+                            {% endif %}
+                        </h3>
                     </div>
                     <div class="card-body pt-0">
                         {% for subcategory in category %}

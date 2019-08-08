@@ -22,10 +22,10 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
         return $this->parseKnowledgeBases($this->kbRepository->findAll());
     }
 
-    public function getByUrl(string $shortUrl): ?KnowledgeBase
+    public function getByUrl(string $url): ?KnowledgeBase
     {
         return $this->kbRepository->findOneBy([
-            'shortUrl' => $shortUrl,
+            'url' => $url,
         ]);
     }
 

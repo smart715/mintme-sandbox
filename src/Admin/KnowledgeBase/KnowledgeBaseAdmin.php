@@ -34,7 +34,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('category', null)
             ->add('subcategory', null)
             ->add('title')
-            ->add('shortUrl')
+            ->add('url')
             ->add('description');
     }
 
@@ -44,7 +44,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('category', null)
             ->add('subcategory', null)
             ->add('title', TextType::class)
-            ->add('shortUrl', TextType::class)
+            ->add('url', TextType::class)
             ->add('description', TextareaType::class, [
                 'attr' => ['rows' => 15],
             ]);
@@ -55,8 +55,8 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
         $listMapper->addIdentifier('id', IntegerType::class)
             ->add('category', null)
             ->add('subcategory', null)
-            ->add('title', TextType::class)
-            ->add('shortUrl', TextType::class)
+            ->addIdentifier('title', TextType::class)
+            ->add('url', TextType::class)
             ->add('description', TextareaType::class);
     }
 }

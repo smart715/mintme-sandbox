@@ -44,7 +44,7 @@ class KnowledgeBase
      * @ORM\Column(type="string")
      * @var string
      */
-    protected $shortUrl;
+    protected $url;
 
     /**
      * @ORM\Column(type="text")
@@ -67,14 +67,14 @@ class KnowledgeBase
         $this->title = $title;
     }
 
-    public function getShortUrl(): string
+    public function getUrl(): string
     {
-        return $this->shortUrl ?? '';
+        return $this->url ?? '';
     }
 
-    public function setShortUrl(string $shortUrl): void
+    public function setUrl(string $url): void
     {
-        $this->shortUrl = $shortUrl;
+        $this->url = $url;
     }
 
     public function getDescription(): string
