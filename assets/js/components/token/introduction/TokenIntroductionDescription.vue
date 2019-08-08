@@ -49,6 +49,7 @@
                                     :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
                                     :value="newDescription"
                                     @change="onDescriptionChange"
+                                    @input="onDescriptionChange"
                                 ></bbcode-editor>
                                 <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
                                      class="text-sm text-danger">
@@ -59,7 +60,7 @@
                                 </div>
                                 <div class="text-left pt-3">
                                     <button class="btn btn-primary" @click="editDescription"
-                                            :disabled="$v.$invalid">Save</button>
+                                            :disabled="$v.$invalid || !readyToSave">Save</button>
                                     <span class="btn-cancel pl-3 c-pointer" @click="editingDescription = false">Cancel</span>
                                 </div>
                             </div>
@@ -110,6 +111,7 @@ export default {
             editingDescription: false,
             newDescription: this.description || '',
             maxDescriptionLength: 10000,
+            readyToSave: false,
         };
     },
     computed: {
@@ -120,9 +122,11 @@ export default {
     methods: {
         onDescriptionChange: function(val) {
             this.newDescription = val;
+            this.readyToSave = true;
         },
         editDescription: function() {
             this.$v.$touch();
+            this.readyToSave = false;
             if (this.$v.$invalid) {
                 if (!this.$v.newDescription.minLength || !this.$v.newDescription.required) {
                     this.$toasted.error('Token Description must be more than one character');
@@ -138,6 +142,7 @@ export default {
                 .then((response) => {
                     this.$emit('updated', this.newDescription);
                 }, (error) => {
+                    this.readyToSave = true;
                     if (!error.response) {
                         this.$toasted.error('Network error');
                     } else if (error.response.data.message) {
