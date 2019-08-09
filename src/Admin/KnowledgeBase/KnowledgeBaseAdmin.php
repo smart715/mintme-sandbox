@@ -52,7 +52,6 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('url', TextType::class)
             ->add('description', CKEditorType::class, [
                 'label' => 'Description (allow HTML tags)',
-                'attr' => ['rows' => 35],
             ]);
     }
 

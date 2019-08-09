@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Exception\NotFoundKnowledgeBaseException;
 use App\Manager\KnowledgeBaseManagerInterface;
 use FOS\RestBundle\Controller\Annotations\Route;
-use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 
 class KnowledgeBaseController extends Controller
@@ -27,7 +27,7 @@ class KnowledgeBaseController extends Controller
         $article = $kbManager->getByUrl($url);
 
         if (!$article) {
-            throw new InvalidArgumentException();
+            throw new NotFoundKnowledgeBaseException();
         }
 
         return $this->render('pages/knowledge_base_show.html.twig', [

@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Exception\ApiExceptionInterface;
+use App\Exception\NotFoundKnowledgeBaseException;
 use App\Exception\NotFoundPairException;
 use App\Exception\NotFoundProfileException;
 use App\Exception\NotFoundTokenException;
@@ -57,6 +58,15 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
                     'error_message' => 'PROFILE DOES NOT EXIST',
+                ]),
+                404
+            ));
+        }
+
+        if ($exception instanceof NotFoundKnowledgeBaseException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => 'ARTICLE NOT FOUND',
                 ]),
                 404
             ));
