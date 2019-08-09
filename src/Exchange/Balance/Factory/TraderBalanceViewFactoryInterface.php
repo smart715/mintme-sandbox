@@ -3,27 +3,15 @@
 namespace App\Exchange\Balance\Factory;
 
 use App\Entity\TradebleInterface;
+use App\Entity\UserTradebleInterface;
 use App\Exchange\Balance\BalanceHandlerInterface;
 
 interface TraderBalanceViewFactoryInterface
 {
     /**
-     * @param BalanceHandlerInterface $balanceHandler
-     * @param array $traderBalances
-     * @param TradebleInterface $tradable
-     * @param int $limit
-     * @param int $extend
-     * @param int $incrementer
-     * @param int $max
+     * @param UserTradebleInterface[] $usersTokens
+     * @param string[] $balances
      * @return TraderBalanceView[]
      */
-    public function create(
-        BalanceHandlerInterface $balanceHandler,
-        array $traderBalances,
-        TradebleInterface $tradable,
-        int $limit,
-        int $extend,
-        int $incrementer,
-        int $max
-    ): array;
+    public function create(array $usersTokens, array $balances): array;
 }

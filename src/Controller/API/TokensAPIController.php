@@ -37,6 +37,8 @@ use Symfony\Component\Validator\Validation;
  */
 class TokensAPIController extends AbstractFOSRestController
 {
+    private const TOP_HOLDERS_COUNT = 10;
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -380,8 +382,8 @@ class TokensAPIController extends AbstractFOSRestController
             throw $this->createNotFoundException('Not Found');
         }
 
-        $topTraders = $balanceHandler->topHolders($tradable, 10);
+        $topTraders = $balanceHandler->topHolders($tradable, self::TOP_HOLDERS_COUNT);
 
-        return $this->view($topTraders, Response::HTTP_ACCEPTED);
+        return $this->view($topTraders, Response::HTTP_OK);
     }
 }

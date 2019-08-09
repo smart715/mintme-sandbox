@@ -3,17 +3,18 @@
 namespace App\Exchange\Balance;
 
 use App\Communications\Exception\FetchException;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Exchange\Balance\Exception\BalanceException;
-use App\Exchange\Balance\Factory\TraderBalanceView;
 use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
-use App\Manager\UserManager;
+use App\Exchange\Config\Config;
+use App\Manager\UserManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,6 +32,12 @@ class BalanceHandler implements BalanceHandlerInterface
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var UserManagerInterface */
+    private $userManager;
+
+    /** @var Config */
+    private $config;
+
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
@@ -44,6 +51,8 @@ class BalanceHandler implements BalanceHandlerInterface
         TokenNameConverterInterface $converter,
         BalanceFetcherInterface $balanceFetcher,
         EntityManagerInterface $entityManager,
+        UserManagerInterface $userManager,
+        Config $config,
         MoneyWrapperInterface $moneyWrapper,
         TraderBalanceViewFactoryInterface $traderBalanceViewFactory,
         LoggerInterface $logger
@@ -51,6 +60,8 @@ class BalanceHandler implements BalanceHandlerInterface
         $this->converter = $converter;
         $this->balanceFetcher = $balanceFetcher;
         $this->entityManager = $entityManager;
+        $this->userManager = $userManager;
+        $this->config = $config;
         $this->moneyWrapper = $moneyWrapper;
         $this->traderBalanceViewFactory = $traderBalanceViewFactory;
         $this->logger = $logger;
@@ -102,9 +113,9 @@ class BalanceHandler implements BalanceHandlerInterface
             ? $this->converter->convert($tradable)
             : $tradable->getSymbol();
 
-        $result = $this->balanceFetcher->topBalances($tradableName, $extend);
+        $balances = $this->balanceFetcher->topBalances($tradableName, $extend);
 
-        return $this->traderBalanceViewFactory->create($this, $result, $tradable, $limit, $extend, $incrementer, $max);
+        return $this->refactor($balances, $tradable, $limit, $extend, $incrementer, $max);
     }
 
     public function isNotExchanged(Token $token, int $amount): bool
@@ -144,5 +155,56 @@ class BalanceHandler implements BalanceHandlerInterface
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         }
+    }
+
+    private function refactor(
+        array $balances,
+        TradebleInterface $tradable,
+        int $limit,
+        int $extend,
+        int $incrementer,
+        int $max
+    ): array {
+        if (0 === count($balances) || $tradable instanceof Token && null === $tradable->getId()) {
+            return [];
+        }
+
+        $isMax = $max <= $extend || count($balances) < $extend;
+        $balances = $this->refactorTraderBalances($balances);
+
+        $usersTradables = count($balances) > 0 ? $this->getUserTradables($tradable, array_keys($balances)) : [];
+
+        if ($isMax || count($usersTradables) >= $limit) {
+            return $this->traderBalanceViewFactory->create(array_slice($usersTradables, 0, $limit), $balances);
+        }
+
+        return $this->topHolders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
+    }
+
+    private function getUserTradables(TradebleInterface $tradeble, array $userIds): array
+    {
+        if ($tradeble instanceof Token) {
+            return $this->userManager->getUserToken($tradeble, $userIds);
+        }
+
+        if ($tradeble instanceof Crypto) {
+            return $this->userManager->getUserCrypto($tradeble, $userIds);
+        }
+
+        return [];
+    }
+
+    private function refactorTraderBalances(array $balances): array
+    {
+        $refactoredBalances = [];
+
+        foreach ($balances as $balance) {
+            if (isset($balance[0]) && isset($balance[1])
+                && 0 < ($userId = (int)$balance[0] - $this->config->getOffset())) {
+                $refactoredBalances[$userId] = $balance[1];
+            }
+        }
+
+        return $refactoredBalances;
     }
 }
