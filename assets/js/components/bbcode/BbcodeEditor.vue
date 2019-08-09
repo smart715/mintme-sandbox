@@ -1,8 +1,8 @@
 <template>
     <textarea
         v-model="newValue"
-        @change="onEvent('change', $event)"
-        @input="onEvent('input', $event)"
+        @change="onChange($event)"
+        @input="onInput($event)"
     ></textarea>
 </template>
 
@@ -28,9 +28,13 @@ export default {
         },
     },
     methods: {
-        onEvent: function(type, event) {
+        onChange: function(event) {
             this.newValue = event.target.value;
-            this.$emit(type, this.newValue);
+            this.$emit('change', this.newValue);
+        },
+        onInput: function(event) {
+            this.newValue = event.target.value;
+            this.$emit('input', this.newValue);
         },
     },
 };
