@@ -120,6 +120,14 @@ function getUserOffset() {
     return parseInt(offset.getAttribute('content'));
 }
 
+/**
+ * @return {string}
+ */
+function getBreakPoint() {
+    return window.getComputedStyle(document.body)
+        .getPropertyValue('content').replace(/"/g, '');
+}
+
 export {
     isValidUrl,
     deepFlatten,
@@ -130,4 +138,5 @@ export {
     Interval,
     getUserOffset,
     useMarkitup,
+    getBreakPoint,
 };

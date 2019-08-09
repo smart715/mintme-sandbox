@@ -52,6 +52,7 @@
                     <ve-candle
                         class="m-2"
                         :extend="additionalAttributes"
+                        :right-label="rightLabel"
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(market.base.subunit)"
@@ -71,7 +72,7 @@
 import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
 import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
-import {toMoney, EchartTheme as VeLineTheme} from '../../utils';
+import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 
 export default {
@@ -83,6 +84,7 @@ export default {
     },
     data() {
         return {
+            rightLabel: true,
             chartTheme: VeLineTheme,
             chartSettings: {
                 labelMap: {
@@ -101,7 +103,7 @@ export default {
                     top: 20,
                     bottom: 60,
                     left: 75,
-                    right: '8%',
+                    right: '10%',
                 },
                 xAxis: {
                     boundaryGap: true,
@@ -153,6 +155,9 @@ export default {
         },
     },
     mounted() {
+        window.addEventListener('resize', this.handleRightLabel);
+        this.handleRightLabel();
+
         this.$axios.retry.get(this.$routing.generate('market_kline', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
@@ -226,6 +231,9 @@ export default {
             }
 
             return 0;
+        },
+        handleRightLabel() {
+            this.rightLabel = ['lg', 'xl'].includes(getBreakPoint());
         },
     },
     components: {
