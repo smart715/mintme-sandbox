@@ -26,9 +26,6 @@
             @verify="doEditName"
             @close="closeTwoFactorModal"
             />
-        <span v-if="!editingName" class="token-name-font" v-b-tooltip="{title: currentName, boundary:'viewport'}">
-            {{ currentName | truncate(7) }}
-        </span>
     </div>
 </template>
 
