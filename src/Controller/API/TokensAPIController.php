@@ -3,7 +3,6 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
-use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -27,7 +26,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 

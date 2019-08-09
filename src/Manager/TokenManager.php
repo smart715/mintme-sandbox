@@ -139,14 +139,18 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
-    public function isExisted(Token $token): bool
+    public function isExisted(string $tokenName): bool
     {
-        $name = strtoupper(
-            str_replace(' ', '-', $token->getName())
-        );
-        $otherToken = $this->findByName($name);
+        $tokenName = strtoupper($tokenName);
 
-        return null !== $otherToken && $token !== $otherToken;
+        $toDashedTokenName = str_replace(' ', '-', $tokenName);
+        $toDashedToken = $this->findByName($toDashedTokenName);
+
+        $toSpaceTokenName = str_replace('-', ' ', $tokenName);
+        $toSpaceToken = $this->findByName($toSpaceTokenName);
+
+        return (null !== $toDashedToken && $tokenName !== $toDashedTokenName)
+            || (null !== $toSpaceToken && $tokenName !== $toSpaceTokenName);
     }
 
     private function getProfile(): ?Profile

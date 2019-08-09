@@ -58,7 +58,6 @@ class TokenController extends Controller
     /** @var UserActionLogger  */
     private $userActionLogger;
 
-
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -155,16 +154,6 @@ class TokenController extends Controller
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-
-            if ($this->tokenManager->isExisted($token)) {
-                $form->addError(new FormError('Token name is already exists.'));
-
-                return $this->render('pages/token_creation.html.twig', [
-                    'formHeader' => 'Create your own token',
-                    'form' => $form->createView(),
-                    'profileCreated' => true,
-                ]);
-            }
 
             $this->em->beginTransaction();
 
