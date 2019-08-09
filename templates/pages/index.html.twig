@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe{% endblock %}
+{% block title %}mintMe | create your own token, monetize yourself!{% endblock %}
 
 {% block bodyclass %}homepage{% endblock %}
 
@@ -22,9 +22,15 @@
                                     MintMe revolutionizes crowdfunding<br/> by allowing both sides to earn.
                                 </div>
                                 <div class="py-sm-4">
+                                {% if not app.user %}
                                     <a class="btn btn-register btn-register-hover-light bg-white" href="{{ path('fos_user_registration_register') }}">
                                         Register Now
                                     </a>
+                                {% else %}
+                                    <a class="btn btn-register btn-register-hover-light bg-white" href="{{ path('trading') }}">
+                                        TRADE NOW
+                                    </a>
+                                {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -132,7 +138,11 @@
         </div>
         <div class="container mb-4">
             <div class="text-center text-responsive">
+            {% if not app.user %}
                 <a href="{{ path('fos_user_registration_register') }}" class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white">REGISTER NOW</a>
+            {% else %}
+                <a class="btn btn-register btn-register-hover-light bg-white" href="{{ path('trading') }}">TRADE NOW</a>
+            {% endif %}
             </div>
         </div>
         <div class="container mb-3">

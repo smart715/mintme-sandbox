@@ -1,0 +1,231 @@
+version: "3.3"
+services:
+  # APP
+  panel:
+    build: .
+    depends_on:
+      - db
+      - rabbitmq
+      - withdraw
+      - deposit
+      - btc
+    networks:
+      - middleend
+      - backward
+    volumes:
+      - .:/var/www/html/panel
+
+  withdraw:
+    build: .docker/withdraw
+    depends_on:
+      - db
+      - rabbitmq
+      - electrum
+      - webchaind
+    networks:
+      - middleend
+    volumes:
+      - .docker/withdraw:/var/www/html/withdraw
+      - .docker/withdraw.conf.yaml:/var/www/html/withdraw/config/config.yaml
+
+  deposit:
+    build: .docker/deposit
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+      - webchaind
+      - electrum
+      - rabbitmq
+      - webchain-cli
+    volumes:
+      - .docker/deposit.conf.yaml:/src/config/default.yaml
+      - .docker/deposit.env:/src/.env
+    networks:
+      - middleend
+
+  webchain-cli:
+    image: 22116/webchain-cli
+    networks:
+      - middleend
+    ports:
+      - 1920:1920
+    volumes:
+      # Replace next paths with actuals on your system
+      - .docker/default/WEB:/data
+
+  webchaind:
+    image: 22116/webchaind
+    ports:
+      - 39573:39573 # debug
+    networks:
+      - middleend
+    volumes:
+      # Replace next paths with actuals on your system
+      - .docker/default/WEB/password.txt:/data/password
+      - .docker/default/WEB/private.txt:/data/private
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 16614:16614
+      - 8000:8000 # php-withdraw debug
+      - 8008:8008
+    depends_on:
+      - panel
+      - withdraw
+      - btc
+    networks:
+      - middleend
+      - backward
+    volumes:
+      - .docker/nginx:/etc/nginx/conf.d
+      - .:/var/www/html/panel
+      - .docker/withdraw:/var/www/html/withdraw
+    command: [nginx-debug, '-g', 'daemon off;']
+
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: withdraw
+    ports:
+      - 3306:3306
+    networks:
+      - middleend
+    volumes:
+      - .docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - middleend
+    volumes:
+      - .docker/rabbitmq-guest.conf:/etc/rabbitmq/rabbitmq.config
+
+  electrum:
+    build:
+      context: https://github.com/22116/docker-electrum-daemon.git
+      args:
+        ELECTRUM_VERSION: 3.3.6
+        ELECTRUM_USER: electrum
+        ELECTRUM_PASSWORD: changeme
+    environment:
+      TESTNET: 1
+    ports:
+      - 7777:7777 # debug
+    networks:
+      - middleend
+    volumes:
+      # Replace the next path with actual on your system
+      - .docker/default/BTC/wallet_btc_testnet:/data/default_wallet
+
+  # VIABTC
+  btc:
+    privileged: true
+    container_name: btc-service
+    build: .docker/viabtc/btc/
+    ports:
+      - 127.0.0.1:17416:7416
+      - 127.0.0.1:17316:7316
+      - 127.0.0.1:17317:7317
+      - 127.0.0.1:17424:7424
+      - 127.0.0.1:14444:4444
+      - 127.0.0.1:18080:8080
+      - 127.0.0.1:18081:8081
+      - 127.0.0.1:18091:8091
+      - 127.0.0.1:18364:8364
+    volumes:
+      - .docker/viabtc/btc/btc/matchengine/config.json:/btc/matchengine/config.json
+      - .docker/viabtc/btc/btc/accesshttp/config.json:/btc/accesshttp/config.json
+      - .docker/viabtc/btc/btc/marketprice/config.json:/btc/marketprice/config.json
+      - .docker/viabtc/btc/btc/accessws/config.json:/btc/accessws/config.json
+      - .docker/viabtc/btc/btc/alertcenter/config.json:/btc/alertcenter/config.json
+      - .docker/viabtc/btc/btc/readhistory/config.json:/btc/readhistory/config.json
+    depends_on:
+      - mysql
+      - mq
+      - redis_sentinel
+      - redis_slave
+      - redis_master
+    links:
+      - mysql:db
+    networks:
+      - backend
+      - backward
+
+  redis_master:
+    container_name: btc-redis-master
+    image: redis:4.0.2-alpine
+    ports:
+      - 16379:6379
+    networks:
+      - backend
+
+  redis_slave:
+    container_name: btc-redis-slave
+    image: redis:4.0.2-alpine
+    ports:
+      - 16380:6379
+    networks:
+      - backend
+
+  redis_sentinel:
+    container_name: btc-redis-sentinel
+    build: .docker/viabtc/redis
+    image: redis-sentinel
+    environment:
+      - MASTER_NAME=mymaster
+      - QUORUM=1
+      - MASTER=redis_master
+      - SLAVES=redis_slave
+    depends_on:
+      - redis_master
+    networks:
+      - backend
+    ports:
+      - 26379:26379
+
+  mysql:
+    container_name: btc-mysql
+    build: .docker/viabtc/db/
+    ports:
+      - 13306:3306
+    networks:
+      - backend
+
+  zookeeper:
+    container_name: btc-zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - 12181:2181
+    networks:
+      - backend
+
+  mq:
+    container_name: btc-kafka
+    image: wurstmeister/kafka
+    restart: on-failure:5
+    ports:
+      - 19092:9092
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: mq
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    # Remove on Windows
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - backend
+
+networks:
+  backward:
+    driver: bridge
+  middleend:
+    driver: bridge
+  backend:
+    driver: bridge

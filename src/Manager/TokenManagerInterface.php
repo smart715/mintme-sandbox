@@ -20,6 +20,8 @@ interface TokenManagerInterface
     /** @return Token[] */
     public function findAllPredefined(): array;
 
+    public function isPredefined(Token $token): bool;
+
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult;
 
     /** @return Token[] */

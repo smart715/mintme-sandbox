@@ -5,24 +5,24 @@ parameters:
     version: 'V1.0.0'
     is_beta_version: true
 
-    viabtc_rpc: 'http://localhost:8080'
+    viabtc_rpc: 'http://btc:8080'
     viabtc_response_timeout_seconds: 10
     withdraw_auth:
         - 'user'
         - 'pass'
         - 'basic'
 
-    withdraw_rpc: 'http://localhost:8081'
+    withdraw_rpc: 'http://nginx:8000'
     withdraw_response_timeout_seconds: 10
     deposit_auth:
         - 'user'
         - 'pass'
         - 'basic'
 
-    deposit_rpc: 'http://localhost:3000'
+    deposit_rpc: 'http://deposit:3000'
     deposit_response_timeout_seconds: 10
 
-    websocket_url: 'ws://10.81.142.6:8364'
+    websocket_url: 'ws://localhost:18364'
 
     # 0.2%
     taker_fee_rate: 0.002
