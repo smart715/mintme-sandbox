@@ -119,6 +119,14 @@ function getUserOffset() {
     return parseInt(offset.getAttribute('content'));
 }
 
+/**
+ * @return {string}
+ */
+function getBreakPoint() {
+    return window.getComputedStyle(document.body)
+        .getPropertyValue('content').replace(/"/g, '');
+}
+
 export {
     isValidUrl,
     deepFlatten,
@@ -128,4 +136,5 @@ export {
     EchartTheme,
     Interval,
     getUserOffset,
+    getBreakPoint,
 };
