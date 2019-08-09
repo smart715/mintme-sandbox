@@ -19,7 +19,6 @@ class DashedUniqueNameValidator extends ConstraintValidator
     /** {@inheritdoc} */
     public function validate($value, Constraint $constraint): void
     {
-
         if ($this->tokenManager->isExisted((string)$value)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
