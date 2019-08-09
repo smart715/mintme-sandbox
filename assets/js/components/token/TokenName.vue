@@ -1,20 +1,31 @@
 <template>
-    <div v-on-clickaway="cancelEditingMode">
-        <template v-if="editable">
-            <input
-                type="text"
-                v-model.trim="$v.newName.$model"
-                v-if="editingName"
-                ref="tokenNameInput"
-                class="token-name-input token-name-font"
-                :class="{ 'is-invalid': $v.$invalid }">
-            <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
-                :icon="icon"
-                transform="shrink-4 up-1.5"
-                @click="editName"
+    <div>
+        <div v-on-clickaway="cancelEditingMode">
+            <template v-if="editable">
+                <input
+                    type="text"
+                    v-model.trim="$v.newName.$model"
+                    v-if="editingName"
+                    ref="tokenNameInput"
+                    class="token-name-input token-name-font"
+                    :class="{ 'is-invalid': $v.$invalid }">
+                <font-awesome-icon
+                    class="icon-edit c-pointer align-middle"
+                    :icon="icon"
+                    transform="shrink-4 up-1.5"
+                    @click="editName"
+                />
+            </template>
+            <span v-if="!editingName" class="token-name-font" v-b-tooltip="{title: currentName, boundary:'viewport'}">
+                {{ currentName | truncate(7) }}
+            </span>
+        </div>
+        <two-factor-modal
+            :visible="showTwoFactorModal"
+            :twofa="twofa"
+            @verify="doEditName"
+            @close="closeTwoFactorModal"
             />
-        </template>
         <span v-if="!editingName" class="token-name-font" v-b-tooltip="{title: currentName, boundary:'viewport'}">
             {{ currentName | truncate(7) }}
         </span>
@@ -40,6 +51,7 @@ Vue.use(Toasted, {
 });
 
 const HTTP_ACCEPTED = 202;
+const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenName',
@@ -63,6 +75,7 @@ export default {
             newName: this.name,
             isTokenExchanged: true,
             minLength: 4,
+            maxLength: 60,
             showTwoFactorModal: false,
         };
     },
@@ -149,9 +162,7 @@ export default {
                     this.cancelEditingMode();
                 }
             }, (error) => {
-                if (!error.response) {
-                    this.$toasted.error('Network error');
-                } else if (error.response.data.message) {
+                if (error.response.status === HTTP_BAD_REQUEST) {
                     this.$toasted.error(error.response.data.message);
                 } else {
                     this.$toasted.error('An error has occurred, please try again later');
@@ -173,7 +184,7 @@ export default {
                 required,
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
-                maxLength: maxLength(60),
+                maxLength: maxLength(this.maxLength),
             },
         };
     },
