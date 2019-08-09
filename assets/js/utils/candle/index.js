@@ -1302,6 +1302,19 @@
         },
         mounted: function mounted() {
             this.init();
+            setTimeout(() => {
+                const canvasDiv = this.$refs.canvas.childNodes[0];
+                const mouseOverHandler = function() {
+                    const tooltip = canvasDiv.nextElementSibling;
+                    canvasDiv.removeEventListener('mouseover', mouseOverHandler);
+                    canvasDiv.addEventListener('mouseout', function() {
+                        setTimeout(function() {
+                            tooltip.style.display = 'none';
+                        }, 300);
+                    });
+                };
+            canvasDiv.addEventListener('mouseover', mouseOverHandler);
+            }, 3000);
         },
         beforeDestroy: function beforeDestroy() {
             this.clean();
@@ -1319,149 +1332,5 @@
         },
     });
 
-        if (this.$el.clientWidth || this.$el.clientHeight) {
-          resize();
-        } else {
-          this.$nextTick(function(_) {
-            if (_this2.$el.clientWidth || _this2.$el.clientHeight) {
-              resize();
-            } else {
-              setTimeout(function(_) {
-                resize();
-                if (!_this2.$el.clientWidth || !_this2.$el.clientHeight) {
-                  console.warn(' Can\'t get dom width or height ');
-                }
-              }, widthChangeDelay);
-            }
-          });
-        }
-      },
-      resizeableHandler: function resizeableHandler(resizeable) {
-        if (resizeable && !this._once.onresize) {
-this.addResizeListener();
-}
-        if (!resizeable && this._once.onresize) {
-this.removeResizeListener();
-}
-      },
-      init: function init() {
-        if (this.echarts) {
-return;
-}
-        let themeName = this.themeName || this.theme || DEFAULT_THEME;
-        this.echarts = echartsLib.init(this.$refs.canvas, themeName, this.initOptions);
-        if (this.data) {
-this.changeHandler();
-}
-        this.createEventProxy();
-        if (this.resizeable) {
-this.addResizeListener();
-}
-      },
-      addResizeListener: function addResizeListener() {
-        window.addEventListener('resize', this.resizeHandler);
-        this._once.onresize = true;
-      },
-      removeResizeListener: function removeResizeListener() {
-        window.removeEventListener('resize', this.resizeHandler);
-        this._once.onresize = false;
-      },
-      addWatchToProps: function addWatchToProps() {
-        let _this3 = this;
-
-        let watchedVariable = this._watchers.map(function(watcher) {
-          return watcher.expression;
-        });
-        Object.keys(this.$props).forEach(function(prop) {
-          if (!~watchedVariable.indexOf(prop) && !~STATIC_PROPS.indexOf(prop)) {
-            let opts = {};
-            if (~['[object Object]', '[object Array]'].indexOf(getType(_this3.$props[prop]))) {
-              opts.deep = true;
-            }
-            _this3.$watch(prop, function() {
-              _this3.changeHandler();
-            }, opts);
-          }
-        });
-      },
-      createEventProxy: function createEventProxy() {
-        let _this4 = this;
-
-        // 只要用户使用 on 方法绑定的事件都做一层代理，
-        // 是否真正执行相应的事件方法取决于该方法是否仍然存在 events 中
-        // 实现 events 的动态响应
-        let self = this;
-        let keys = Object.keys(this.events || {});
-        keys.length && keys.forEach(function(ev) {
-          if (_this4.registeredEvents.indexOf(ev) === -1) {
-            _this4.registeredEvents.push(ev);
-            _this4.echarts.on(ev, function(ev) {
-              return function() {
-                if (ev in self.events) {
-                  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-                    args[_key] = arguments[_key];
-                  }
-
-                  self.events[ev].apply(null, args);
-                }
-              };
-            }(ev));
-          }
-        });
-      },
-      themeChange: function themeChange(theme) {
-        this.clean();
-        this.echarts = null;
-        this.init();
-      },
-      clean: function clean() {
-        if (this.resizeable) {
-this.removeResizeListener();
-}
-        this.echarts.dispose();
-      },
-    },
-
-    created: function created() {
-      this.echarts = null;
-      this.registeredEvents = [];
-      this._once = {};
-      this._store = {};
-      this.resizeHandler = debounce(this.resize, this.resizeDelay);
-      this.changeHandler = debounce(this.dataHandler, this.changeDelay);
-      this.addWatchToProps();
-    },
-    mounted: function mounted() {
-      this.init();
-      setTimeout(() => {
-        const canvasDiv = this.$refs.canvas.childNodes[0];
-        const mouseOverHandler = function() {
-          const tooltip = canvasDiv.nextElementSibling;
-          canvasDiv.removeEventListener('mouseover', mouseOverHandler);
-          canvasDiv.addEventListener('mouseout', function() {
-            setTimeout(function() {
-              tooltip.style.display = 'none';
-            }, 300);
-          });
-        };
-        canvasDiv.addEventListener('mouseover', mouseOverHandler);
-      }, 3000);
-    },
-    beforeDestroy: function beforeDestroy() {
-      this.clean();
-    },
-
-
-    _numerify: numerify,
-  };
-
-  let index = _extends({}, Core, {
-    name: 'VeCandle',
-    data: function data() {
-      this.chartHandler = candle;
-      return {};
-    },
-  });
-
-  return index;
+    return index;
 })));
