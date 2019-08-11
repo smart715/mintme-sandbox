@@ -1,13 +1,15 @@
 <?php declare(strict_types = 1);
 
 namespace App\Tests\EventListener;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use App\EventListener\LogoutListener;
+use App\Logger\UserActionLogger;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;Bag;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 class LogoutListenerTest extends TestCase
