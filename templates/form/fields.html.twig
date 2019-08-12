@@ -108,3 +108,12 @@
     <textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
 {%- endif -%}
 {%- endblock textarea_widget -%}
+
+{% block trusted_device %}
+    {% if trusted_device_enabled %}
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" id="trusted_device" name="_trusted" class="custom-control-input" value="1">
+            <label for="trusted_device" class="custom-control-label">Save device as trusted</label>
+        </div>
+    {% endif %}
+{% endblock %}
