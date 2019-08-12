@@ -52,8 +52,12 @@
                 <div class="row">
                     <div class="col-12  text-left"></div>
                     <div class="col">
-                        {% if form_errors(form)|length > 0 %}
-                            <div class="bg-danger text-white">{{ form_errors(form) }}</div>
+                        {% if not form.vars.valid %}
+                            {% for error in form.vars.errors %}
+                                {% if not (error.cause.id is defined and 'captcha_login' is same as(error.cause.id)) %}
+                                    <div class="py-2 mb-2 bg-danger text-white text-center">{{ error.message }}</div>
+                                {% endif %}
+                            {% endfor %}
                         {% endif %}
                         {{ form_widget(form) }}
                     </div>
