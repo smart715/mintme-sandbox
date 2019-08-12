@@ -15,7 +15,7 @@
 
             </div>
             <div class="card-body">
-                <div class="row fix-height">
+                <div class="row fix-height custom-scrollbar">
                     <div class="col-12">
                         <span class="card-header-icon">
                             <font-awesome-icon

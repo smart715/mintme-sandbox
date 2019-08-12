@@ -211,6 +211,23 @@ a
       display: table-cell
       width: 120px
 
+.custom-scrollbar
+  scrollbar-color: $primary-light $white
+
+  &::-webkit-scrollbar
+    width: 10px
+    height: 10px
+
+  &::-webkit-scrollbar-track-piece
+    background-color: $white
+
+  &::-webkit-scrollbar-thumb:horizontal
+    background-color: $primary-light
+
+  &::-webkit-scrollbar-thumb:vertical
+    height: 30px
+    background-color: $primary-light
+
 .table, .table-responsive
   color: inherit
 
@@ -232,21 +249,7 @@ a
         border: none
 
   &, tbody
-    scrollbar-color: $primary-light $white
-
-    &::-webkit-scrollbar
-      width: 10px
-      height: 10px
-
-    &::-webkit-scrollbar-track-piece
-      background-color: $white
-
-    &::-webkit-scrollbar-thumb:horizontal
-      background-color: $primary-light
-
-    &::-webkit-scrollbar-thumb:vertical
-      height: 30px
-      background-color: $primary-light
+    @extend .custom-scrollbar
 
   td
     border: none

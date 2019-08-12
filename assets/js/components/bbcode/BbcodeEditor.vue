@@ -1,5 +1,6 @@
 <template>
     <textarea
+        class="custom-scrollbar"
         v-model="newValue"
         @change="onChange($event)"
         @input="onInput($event)"
