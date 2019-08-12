@@ -12,7 +12,13 @@
                     </div>
                     <div class="card-body py-2">
                         {{ form_start(form) }}
-                        {{ form_errors(form) }}
+                        {% if not form.vars.valid %}
+                            {% for error in form.vars.errors %}
+                                {% if not (error.cause.id is defined and 'token_create' is same as(error.cause.id)) %}
+                                    <div class="py-2 mb-2 bg-danger text-white text-center">{{ error.message }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                         {{ form_row(form.name, {'attr': {
                             'v-model': '$v.tokenName.$model',
                             'class' : 'form-control',
