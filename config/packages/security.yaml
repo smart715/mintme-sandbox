@@ -26,6 +26,7 @@ security:
                 default_target_path: /login_success
                 always_use_default_target_path: false
                 multi_factor: true
+                csrf_token_generator: security.csrf.token_manager
 
     role_hierarchy:
         ROLE_ADMIN_NEWS_ADMIN:
