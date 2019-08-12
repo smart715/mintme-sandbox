@@ -287,6 +287,9 @@
     "pragmarx/random": {
         "version": "v0.2.2"
     },
+    "presta/sitemap-bundle": {
+        "version": "v1.7.0"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },
