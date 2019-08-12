@@ -1043,6 +1043,19 @@
         },
 
         methods: {
+            mouseOutHandler: function mouseOutHandler() {
+                const canvasDiv = this.$refs.canvas.childNodes[0];
+                const mouseOverHandler = function() {
+                    const tooltip = canvasDiv.nextElementSibling;
+                    canvasDiv.removeEventListener('mouseover', mouseOverHandler);
+                    canvasDiv.addEventListener('mouseout', function() {
+                        setTimeout(function() {
+                            tooltip.style.display = 'none';
+                        }, 300);
+                    });
+                };
+                canvasDiv.addEventListener('mouseover', mouseOverHandler);
+            },
             dataHandler: function dataHandler() {
                 if (!this.chartHandler) {
                     return;
@@ -1074,6 +1087,7 @@
                         this.optionsHandler(options);
                     }
                 }
+                this.mouseOutHandler();
             },
             nextTickResize: function nextTickResize() {
                 this.$nextTick(this.resize);
