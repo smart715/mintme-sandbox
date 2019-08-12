@@ -50,7 +50,7 @@ export default {
     data() {
         return {
             code: '',
-            label: this.twofa ? 'Two Factor Authentication Code:' : 'Email Verification Code:'
+            label: this.twofa ? 'Two Factor Authentication Code:' : 'Email Verification Code:',
         };
     },
     methods: {
