@@ -8,7 +8,7 @@
             <div class="text-center">
                 <div class="col-12 pb-3">
                     <label for="twofactor" class="d-block text-left">
-                        Two Factor Authentication Code:
+                        {{ label }}
                     </label>
                     <input
                         v-model="code"
@@ -44,11 +44,13 @@ export default {
     },
     props: {
         noClose: Boolean,
+        twofa: Boolean,
         visible: Boolean,
     },
     data() {
         return {
             code: '',
+            label: this.twofa ? 'Two Factor Authentication Code:' : 'Email Verification Code:'
         };
     },
     methods: {
