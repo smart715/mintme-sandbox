@@ -15,6 +15,7 @@ use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
@@ -364,6 +365,7 @@ class TokensAPIController extends AbstractFOSRestController
     public function delete(
         ParamFetcherInterface $request,
         TwoFactorManagerInterface $twoFactorManager,
+        EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
         string $name
     ): View {
@@ -381,7 +383,7 @@ class TokensAPIController extends AbstractFOSRestController
         if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
             throw new ApiUnauthorizedException('Invalid 2fa code');
         } elseif (!$user->isGoogleAuthenticatorEnabled()) {
-            $response = $token->checkConfirmCode((int) $request->get('code'), $this->expirationTime);
+            $response = $emailAuthManager->checkCode($user, $request->get('code'));
 
             if (!$response['result']) {
                 throw new ApiUnauthorizedException($response['message']);
@@ -406,6 +408,7 @@ class TokensAPIController extends AbstractFOSRestController
      */
     public function sendCode(
         MailerInterface $mailer,
+        EmailAuthManagerInterface $emailAuthManager,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -425,15 +428,11 @@ class TokensAPIController extends AbstractFOSRestController
         $message = null;
 
         if (!$user->isGoogleAuthenticatorEnabled()) {
-            $token->setConfirmCode(rand(100000, 999999), $this->expirationTime);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($token);
-            $em->flush();
+            $emailAuthManager->generateCode($user, $this->expirationTime);
             $mailer->sendAuthCodeToMail(
                 'Confirm token deletion',
                 'Your code to confirm token deletion:',
-                $user,
-                (string) $token->getConfirmCode()
+                $user
             );
             $message = "Code for confirmation of token deletion was send to email.";
         }

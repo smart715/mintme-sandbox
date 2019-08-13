@@ -100,6 +100,12 @@ class User extends BaseUser implements
     private $authCode;
 
     /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable
+     */
+    protected $authCodeExpirationTime;
+
+    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token", inversedBy="relatedUsers")
      * @ORM\JoinTable(name="user_tokens",
      *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
@@ -329,6 +335,16 @@ class User extends BaseUser implements
     public function setEmailAuthCode(string $authCode): void
     {
         $this->authCode = $authCode;
+    }
+
+    public function getEmailAuthCodeExpirationTime(): \DateTimeImmutable
+    {
+        return $this->authCodeExpirationTime;
+    }
+
+    public function setEmailAuthCodeExpirationTime(\DateTimeImmutable $authCodeExpirationTime): void
+    {
+        $this->authCodeExpirationTime = $authCodeExpirationTime;
     }
 
     private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry

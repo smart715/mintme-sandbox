@@ -3,7 +3,6 @@
 namespace App\Mailer;
 
 use App\Entity\PendingWithdraw;
-use App\Entity\Token\Token;
 use App\Entity\User;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
@@ -66,21 +65,19 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->sendAuthCodeToMail(
             'Confirm authentication',
             'You verification code:',
-            $user,
-            $user->getEmailAuthCode()
+            $user
         );
     }
 
     public function sendAuthCodeToMail(
         string $subject,
         string $label,
-        TwoFactorInterface $user,
-        string $code
+        TwoFactorInterface $user
     ): void {
         $body = $this->twigEngine->render('mail/auth_verification_code.html.twig', [
             'label' => $label,
             'email' => $user->getEmailAuthRecipient(),
-            'code' => $code,
+            'code' => $user->getEmailAuthCode(),
         ]);
 
         $msg = (new Swift_Message($subject))
