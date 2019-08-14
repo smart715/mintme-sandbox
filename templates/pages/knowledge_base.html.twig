@@ -29,23 +29,23 @@
                         {% for subcategory in category %}
                             <ul class="list-group">
                                 {% if subcategory is not iterable %}
-                                    <li class="list-group-item border-0 pt-2 pb-0">
-                                    <span class="text-danger">
-                                        <a href="{{ path('kb_show', {'url': subcategory.url}) }}"
-                                           class="text-light">
-                                            {{ subcategory.title }}
-                                        </a>
-                                    </span>
+                                    <li class="img-fluid list-group-item border-0 pt-2 pb-0">
+                                        <span class="text-danger">
+                                            <a href="{{ path('kb_show', {'url': subcategory.url}) }}"
+                                               class="text-light">
+                                                {{ subcategory.title }}
+                                            </a>
+                                        </span>
                                     </li>
                                 {% else %}
                                     <h6 class="pb-0 pt-2 pl-2 text-info">{{ subcategory|first.subcategory.name }}</h6>
                                     {% for kb in subcategory %}
                                         <li class="list-group-item border-0 pt-0 pb-1">
-                                        <span class="text-danger">
-                                            <a href="{{ path('kb_show', {'url': kb.url}) }}" class="text-light">
-                                                {{ kb.title }}
-                                            </a>
-                                        </span>
+                                            <span class="text-danger">
+                                                <a href="{{ path('kb_show', {'url': kb.url}) }}" class="text-light">
+                                                    {{ kb.title }}
+                                                </a>
+                                            </span>
                                         </li>
                                     {% endfor %}
                                 {% endif %}
