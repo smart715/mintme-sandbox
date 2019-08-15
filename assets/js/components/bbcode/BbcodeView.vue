@@ -18,8 +18,13 @@ export default {
         parsedValue: function() {
             if (null === this.value) return '';
 
+            let value = this.value
+                // xss protection
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
             return bbob(presetHTML5())
-                .process(this.value, {render})
+                .process(value, {render})
                 .html
                 .replace(/<img src="/g, '<img style="max-width: 100%;" src="')
                 .replace(/<a href="(http(s)?:\/\/)?/g, '<a rel="nofollow" target="_blank" href="https://');
