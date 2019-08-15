@@ -68,6 +68,8 @@ class TokensAPIController extends AbstractFOSRestController
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
+     * @Rest\RequestParam(name="telegramUrl", nullable=true)
+     * @Rest\RequestParam(name="discordUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
       *@Rest\RequestParam(name="code", nullable=true)
      */
@@ -84,7 +86,7 @@ class TokensAPIController extends AbstractFOSRestController
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
         }
-        
+
         if ($request->get('name')
             && ($errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager))) {
                 throw new ApiNotFoundException($errorMessage);
@@ -129,7 +131,7 @@ class TokensAPIController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/website-confirmation", name="token_website_confirm")
-     * @Rest\RequestParam(name="url", allowBlank=false)
+     * @Rest\RequestParam(name="url", nullable=true)
      */
     public function confirmWebsite(
         ParamFetcherInterface $request,
@@ -153,25 +155,32 @@ class TokensAPIController extends AbstractFOSRestController
 
         $url = $request->get('url');
 
-        $validator = Validation::createValidator();
-        $urlViolations = $validator->validate($url, new Url());
+        $isVerified = true;
 
-        if (0 < count($urlViolations)) {
-            return $this->view([
-                'verified' => false,
-                'errors' => array_map(static function ($violation) {
-                    return $violation->getMessage();
-                }, iterator_to_array($urlViolations)),
-            ], Response::HTTP_ACCEPTED);
+        if (null != $url) {
+            $validator = Validation::createValidator();
+            $urlViolations = $validator->validate($url, new Url());
+
+            if (0 < count($urlViolations)) {
+                return $this->view([
+                    'verified' => false,
+                    'errors' => array_map(static function ($violation) {
+                        return $violation->getMessage();
+                    }, iterator_to_array($urlViolations)),
+                ], Response::HTTP_ACCEPTED);
+            }
+
+            $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
+            $message = 'Website confirmed';
+        } else {
+            $message = 'Website deleted';
         }
-
-        $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
 
         if ($isVerified) {
             $token->setWebsiteUrl($url);
             $this->em->flush();
 
-            $this->userActionLogger->info('Website confirmed', [
+            $this->userActionLogger->info($message, [
                 'token' => $token->getName(),
                 'website' => $url,
             ]);
@@ -180,6 +189,7 @@ class TokensAPIController extends AbstractFOSRestController
         return $this->view([
             'verified' => $isVerified,
             'errors' => ['fileError' => $websiteVerifier->getError()],
+            'message' => $message.' successfully',
         ], Response::HTTP_ACCEPTED);
     }
 

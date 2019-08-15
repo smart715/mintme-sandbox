@@ -42,6 +42,8 @@
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
                                     token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
+                                    telegram-url="{{ token.telegramUrl }}"
+                                    discord-url="{{ token.discordUrl }}"
                                 >
                                 </token-introduction-profile>
 

@@ -34,9 +34,17 @@
         </div>
         <div v-show="editing">
             <div class=" d-block mx-0 my-1 p-0">
-                <a class="c-pointer" @click="addPage">
-                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
-                    Add Facebook address
+                <a class="c-pointer" @click="addPage" id="address-link">
+                    <span class="token-introduction-profile-icon text-center d-inline-block">
+                        <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
+                    </span>
+                    {{ computedAddress | truncate(35) }}
+                </a>
+                <b-tooltip v-if="currentAddress" target="address-link">
+                    {{ computedAddress }}
+                </b-tooltip>
+                <a v-if="currentAddress" @click.prevent="deleteAddress">
+                    <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
                 </a>
             </div>
         </div>
@@ -74,17 +82,20 @@
 <script>
 import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
+import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {FiltersMixin} from '../../mixins';
 import Guide from '../Guide';
 import Modal from '../modal/Modal';
-library.add(faFacebookSquare);
+
+library.add(faFacebookSquare, faTimes);
 Vue.use(Toasted, {
     position: 'top-center',
     duration: 5000,
 });
 
-const HTTP_NO_CONTENT = 204;
+const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenFacebookAddress',
@@ -99,6 +110,7 @@ export default {
         Guide,
         Modal,
     },
+    mixins: [FiltersMixin],
     created: function() {
         this.loadFacebookSdk();
     },
@@ -108,11 +120,15 @@ export default {
             currentAddress: this.address,
             showConfirmModal: false,
             selectedUrl: '',
+            submitting: false,
         };
     },
     computed: {
         currentAddressEncoded: function() {
             return encodeURIComponent(this.currentAddress);
+        },
+        computedAddress: function() {
+            return this.currentAddress || 'Add Facebook address';
         },
     },
     mounted() {
@@ -154,15 +170,29 @@ export default {
             }, {scope: 'pages_show_list'});
         },
         savePage: function() {
+            this.requestForAddress();
+        },
+        deleteAddress: function() {
+            this.selectedUrl = '';
+            this.requestForAddress();
+        },
+        requestForAddress: function() {
+            if (this.submitting) {
+                return;
+            }
+
+            this.submitting = true;
             this.$axios.single.patch(this.updateUrl, {
                 facebookUrl: this.selectedUrl,
             })
             .then((response) => {
-                if (response.status === HTTP_NO_CONTENT) {
+                if (response.status === HTTP_ACCEPTED) {
+                    let state = this.selectedUrl ? `saved as ${this.currentAddress}` : 'deleted';
                     this.showConfirmModal = false;
                     this.currentAddress = this.selectedUrl;
-                    this.$toasted.success(`Facebook paged saved as ${this.currentAddress}`);
+                    this.$toasted.success(`Facebook page ${state}`);
                 }
+                this.submitting = false;
             }, (error) => {
                 if (!error.response) {
                     this.$toasted.error('Network error');
@@ -171,6 +201,7 @@ export default {
                 } else {
                     this.$toasted.error('An error has occurred, please try again later');
                 }
+                this.submitting = false;
             })
             .then(() => {
                 this.showConfirmModal = false;
