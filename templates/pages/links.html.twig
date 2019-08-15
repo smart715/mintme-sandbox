@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Links | mintMe{% endblock %}
+
+{% block pagestyles %}
+    <style>
+        #links a, #links a:hover {
+            color: #fff;
+            display:block;
+        }
+    </style>
+{% endblock %}
+
+{% block bodyclass %}document{% endblock %}
+
+{% block content %}
+    <div id="links" class="container">
+        <div class="row pt-5 justify-content-center text-white">
+            <div class="col-md-8 text-white bg-primary p-4">
+                <div class="text-center">
+                    <h2 class="page-title">Links</h2>
+                </div>
+                <!-- LINKS START -->
+                <a href="http://trafficsimulator.net/" rel=”nofollow”>Traffic Simulator</a>
+                <a href="http://www.bocaiw.net/" rel=”nofollow”>Bocaiw Directory</a>
+                <a href="http://www.seodirectoryonline.org/" rel=”nofollow”>SEO Directory Online</a>
+                <a href="https://www.reddit.com/" rel=”nofollow”>Reddit</a>
+                <a href="https://www.yahoo.com/" rel=”nofollow”>Yahoo</a>
+                <a href="https://en.wikipedia.org/" rel=”nofollow”>Wikipedia</a>
+                <!-- LINKS END-->
+            </div>
+        </div>
+    </div>
+{% endblock %}
