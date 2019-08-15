@@ -3,11 +3,16 @@
 namespace App\Entity\KnowledgeBase;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="knowledge_base")
  * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
+ * @UniqueEntity(
+ *     fields={"url"},
+ *     message="This url is already use."
+ * )
  */
 class KnowledgeBase
 {
