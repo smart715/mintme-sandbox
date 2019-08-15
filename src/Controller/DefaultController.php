@@ -57,4 +57,15 @@ class DefaultController extends Controller
     {
         return $this->render('pages/terms_of_service.html.twig');
     }
+
+    /**
+     * @Route("/links",
+     *      name="links",
+     *      options={"sitemap" = false}
+     * )
+     */
+    public function links(): Response
+    {
+        return $this->render('pages/links.html.twig');
+    }
 }
