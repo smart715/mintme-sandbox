@@ -283,6 +283,7 @@ class Token implements TradebleInterface
     public function setTelegramUrl(?string $url): self
     {
         $this->telegramUrl = $url;
+
         return $this;
     }
 
@@ -294,6 +295,7 @@ class Token implements TradebleInterface
     public function setDiscordUrl(?string $url): self
     {
         $this->discordUrl = $url;
+
         return $this;
     }
 }
