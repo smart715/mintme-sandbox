@@ -34,10 +34,10 @@ interface BalanceHandlerInterface
 
     /**
      * @param  TradebleInterface $tradable
-     * @param  int $limit
-     * @param  int $extend
-     * @param  int $incrementer
-     * @param  int $max
+     * @param  int $limit number to limit the return count.
+     * @param  int $extend number of rows that we need from viabtc (offset param for viabtc).
+     * @param  int $incrementer number to increment extend if number of rows became lower than limit after filtering.
+     * @param  int $max number to limit the recursion calls.
      * @return TraderBalanceView[]
      */
     public function topHolders(

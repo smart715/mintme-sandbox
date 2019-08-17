@@ -5,11 +5,15 @@ namespace App\Entity;
 use App\Entity\Token\Token;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
- * @ORM\Table(name="user_token")
+ * @ORM\Table(
+ *     name="user_token",
+ *     uniqueConstraints={@UniqueConstraint(name="user_token_index", columns={"user_id", "token_id"})}
+ *     )
  */
 class UserToken implements UserTradebleInterface
 {

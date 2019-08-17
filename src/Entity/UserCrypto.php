@@ -4,11 +4,15 @@ namespace App\Entity;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
- * @ORM\Table(name="user_crypto")
+ * @ORM\Table(
+ *     name="user_crypto",
+ *     uniqueConstraints={@UniqueConstraint(name="user_crypto_index", columns={"user_id", "crypto_id"})}
+ * )
  */
 class UserCrypto implements UserTradebleInterface
 {

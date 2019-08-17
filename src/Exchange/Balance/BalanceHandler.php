@@ -9,6 +9,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\TraderBalanceView;
 use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
@@ -157,6 +158,10 @@ class BalanceHandler implements BalanceHandlerInterface
         }
     }
 
+    /**
+     * @param string[] $balances
+     * @return TraderBalanceView[]
+     */
     private function refactor(
         array $balances,
         TradebleInterface $tradable,
