@@ -99,32 +99,32 @@ class WalletTest extends TestCase
             [
                 [
                     $history[0]->getDate()->getTimestamp(),
-                    $history[0]->getCrypto()->getSymbol(),
+                    $history[0]->getTradable()->getSymbol(),
                     $history[0]->getType()->getTypeCode(),
                 ],
                 [
                     $history[1]->getDate()->getTimestamp(),
-                    $history[1]->getCrypto()->getSymbol(),
+                    $history[1]->getTradable()->getSymbol(),
                     $history[1]->getType()->getTypeCode(),
                 ],
                 [
                     $history[2]->getDate()->getTimestamp(),
-                    $history[2]->getCrypto()->getSymbol(),
+                    $history[2]->getTradable()->getSymbol(),
                     $history[2]->getType()->getTypeCode(),
                 ],
                 [
                     $history[3]->getDate()->getTimestamp(),
-                    $history[3]->getCrypto()->getSymbol(),
+                    $history[3]->getTradable()->getSymbol(),
                     $history[3]->getType()->getTypeCode(),
                 ],
                 [
                     $history[4]->getDate()->getTimestamp(),
-                    $history[4]->getCrypto()->getSymbol(),
+                    $history[4]->getTradable()->getSymbol(),
                     $history[4]->getType()->getTypeCode(),
                 ],
                 [
                     $history[5]->getDate()->getTimestamp(),
-                    $history[5]->getCrypto()->getSymbol(),
+                    $history[5]->getTradable()->getSymbol(),
                     $history[5]->getType()->getTypeCode(),
                 ],
             ]
@@ -454,7 +454,7 @@ class WalletTest extends TestCase
             ->willReturn($this->mockDateTime($timestamp))
         ;
         $transactionMock
-            ->method('getCrypto')
+            ->method('getTradable')
             ->willReturn($this->mockCrypto($crypto))
         ;
         $transactionMock

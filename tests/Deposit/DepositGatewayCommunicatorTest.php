@@ -61,7 +61,7 @@ class DepositGatewayCommunicatorTest extends TestCase
                 $transaction->getAmount()->getAmount(),
                 $transaction->getFee()->getAmount(),
                 $transaction->getDate()->getTimestamp(),
-                $transaction->getCrypto()->getSymbol(),
+                $transaction->getTradable()->getSymbol(),
                 $transaction->getStatus()->getStatusCode(),
             ]
         );
