@@ -7,6 +7,7 @@ use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\Model\TokenDeployResult;
 use App\Wallet\Model\Status;
@@ -43,18 +44,23 @@ class ContractHandler implements ContractHandlerInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     public function __construct(
         JsonRpcInterface $rpc,
         Config $config,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ) {
         $this->rpc = $rpc;
         $this->config = $config;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
     }
 
     public function deploy(Token $token): void
@@ -194,7 +200,7 @@ class ContractHandler implements ContractHandlerInterface
                             : $depositFee,
                     MoneyWrapper::TOK_SYMBOL
                 ),
-                $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL),
+                $this->tokenManager->findByName($transaction['token']),
                 Status::fromString('paid'),
                 Type::fromString($transaction['type'])
             );
