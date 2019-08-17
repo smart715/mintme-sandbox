@@ -21,7 +21,7 @@ class EmailAuthManager implements EmailAuthManagerInterface
 
         if ($code !== $user->getEmailAuthCode()) {
             $message = 'Invalid 2fa code';
-        } elseif (date_timestamp_get($user->getEmailAuthCodeExpirationTime()) - time() < 0) {
+        } elseif ($user->getEmailAuthCodeExpirationTime()->getTimestamp() < time()) {
             $message = '2fa code is expired';
         }
 
@@ -36,7 +36,7 @@ class EmailAuthManager implements EmailAuthManagerInterface
         $confirmCode = (string) rand(1000000, 9999999);
         $user->setEmailAuthCode($confirmCode);
         
-        $codeExpirationTime = (new \DateTimeImmutable())->setTimestamp(time() + $expirationTime*60);
+        $codeExpirationTime = (new \DateTimeImmutable())->setTimestamp(time() + $expirationTime * 60);
         $user->setEmailAuthCodeExpirationTime($codeExpirationTime);
         
         $this->entityManager->persist($user);
