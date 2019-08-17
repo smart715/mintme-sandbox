@@ -15,8 +15,8 @@ scheb_two_factor:
         template: security/email_login.html.twig
         mailer: app.mailer
 
-    # ip_whitelist:
-    #     - 127.0.0.1
+    ip_whitelist:
+        - 127.0.0.1
 
     trusted_device:
         enabled: '%trusted_device_enabled%'
