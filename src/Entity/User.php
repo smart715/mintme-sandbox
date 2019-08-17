@@ -132,9 +132,9 @@ class User extends BaseUser implements
 
     /**
      * @ORM\Column(type="integer", nullable=true, options={"default": 0})
-     * @var int|null
+     * @var int
      */
-    private $trustedTokenVersion;
+    private $trustedTokenVersion = 0;
 
     /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
@@ -354,7 +354,7 @@ class User extends BaseUser implements
 
     public function getTrustedTokenVersion(): int
     {
-        return (int) $this->trustedTokenVersion;
+        return $this->trustedTokenVersion;
     }
 
     public function setTrustedTokenVersion(int $trustedTokenVersion): self
