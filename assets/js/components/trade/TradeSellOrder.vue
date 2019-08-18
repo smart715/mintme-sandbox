@@ -36,7 +36,7 @@
                             </span>
                         </span>
                     </div>
-                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-sm-right text-md-left text-xl-right">
+                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-md-left" :class="marketPricePositionClass">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"
@@ -144,7 +144,7 @@
 <script>
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
-import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin, PricePositionMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
@@ -155,7 +155,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
