@@ -110,7 +110,7 @@ export default {
                 },
                 yAxis: {
                     axisLabel: {
-                        formatter: (val) => toMoney(val, this.market.base.subunit),
+                        formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit)).toString(),
                     },
                 },
             },
