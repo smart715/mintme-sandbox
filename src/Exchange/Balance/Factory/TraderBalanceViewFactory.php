@@ -3,7 +3,6 @@
 namespace App\Exchange\Balance\Factory;
 
 use App\Entity\UserToken;
-use App\Entity\UserTradebleInterface;
 
 class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
 {

@@ -9,12 +9,12 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\BalancesArrayFactoryInterface;
 use App\Exchange\Balance\Factory\TraderBalanceView;
 use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
-use App\Exchange\Config\Config;
 use App\Manager\UserManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -36,8 +36,8 @@ class BalanceHandler implements BalanceHandlerInterface
     /** @var UserManagerInterface */
     private $userManager;
 
-    /** @var Config */
-    private $config;
+    /** @var BalancesArrayFactoryInterface */
+    private $balanceArrayFactory;
 
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
@@ -53,7 +53,7 @@ class BalanceHandler implements BalanceHandlerInterface
         BalanceFetcherInterface $balanceFetcher,
         EntityManagerInterface $entityManager,
         UserManagerInterface $userManager,
-        Config $config,
+        BalancesArrayFactoryInterface $balanceArrayFactory,
         MoneyWrapperInterface $moneyWrapper,
         TraderBalanceViewFactoryInterface $traderBalanceViewFactory,
         LoggerInterface $logger
@@ -62,7 +62,7 @@ class BalanceHandler implements BalanceHandlerInterface
         $this->balanceFetcher = $balanceFetcher;
         $this->entityManager = $entityManager;
         $this->userManager = $userManager;
-        $this->config = $config;
+        $this->balanceArrayFactory = $balanceArrayFactory;
         $this->moneyWrapper = $moneyWrapper;
         $this->traderBalanceViewFactory = $traderBalanceViewFactory;
         $this->logger = $logger;
@@ -159,7 +159,7 @@ class BalanceHandler implements BalanceHandlerInterface
     }
 
     /**
-     * @param string[] $balances
+     * @param array[] $balances
      * @return TraderBalanceView[]
      */
     private function refactor(
@@ -175,7 +175,7 @@ class BalanceHandler implements BalanceHandlerInterface
         }
 
         $isMax = $max <= $extend || count($balances) < $extend;
-        $balances = $this->refactorTraderBalances($balances);
+        $balances = $this->balanceArrayFactory->create($balances);
 
         $usersTradables = count($balances) > 0 ? $this->getUserTradables($tradable, array_keys($balances)) : [];
 
@@ -197,19 +197,5 @@ class BalanceHandler implements BalanceHandlerInterface
         }
 
         return [];
-    }
-
-    private function refactorTraderBalances(array $balances): array
-    {
-        $refactoredBalances = [];
-
-        foreach ($balances as $balance) {
-            if (isset($balance[0]) && isset($balance[1])
-                && 0 < ($userId = (int)$balance[0] - $this->config->getOffset())) {
-                $refactoredBalances[$userId] = $balance[1];
-            }
-        }
-
-        return $refactoredBalances;
     }
 }
