@@ -116,7 +116,7 @@ class BalanceHandler implements BalanceHandlerInterface
 
         $balances = $this->balanceFetcher->topBalances($tradableName, $extend);
 
-        return $this->refactor($balances, $tradable, $limit, $extend, $incrementer, $max);
+        return $this->createBalanceViewWithExtension($balances, $tradable, $limit, $extend, $incrementer, $max);
     }
 
     public function isNotExchanged(Token $token, int $amount): bool
@@ -162,7 +162,7 @@ class BalanceHandler implements BalanceHandlerInterface
      * @param array[] $balances
      * @return TraderBalanceView[]
      */
-    private function refactor(
+    private function createBalanceViewWithExtension(
         array $balances,
         TradebleInterface $tradable,
         int $limit,
