@@ -13,7 +13,7 @@
                     <template slot="trader" slot-scope="row">
                         <a :href="row.item.url">
                             <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                {{ row.value | truncate(9) }}
+                                {{ row.value | truncate(15) }}
                             </span>
                         </a>
                         <img
