@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Profile;
 use App\Form\DataTransformer\NameTransformer;
+use App\Form\DataTransformer\XSSProtectionTransformer;
 use App\Form\Type\BbcodeEditorType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -18,9 +19,16 @@ class ProfileType extends AbstractType
     /** @var NameTransformer  */
     private $nameTransformer;
 
-    public function __construct(NameTransformer $nameTransformer)
+    /** @var XSSProtectionTransformer */
+    private $xssProtectionTransformer;
+
+    public function __construct(
+        NameTransformer $nameTransformer,
+        XSSProtectionTransformer $xssProtectionTransformer
+    )
     {
         $this->nameTransformer = $nameTransformer;
+        $this->xssProtectionTransformer = $xssProtectionTransformer;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -77,6 +85,9 @@ class ProfileType extends AbstractType
 
         $builder->get('city')
             ->addModelTransformer($this->nameTransformer);
+
+        $builder->get('description')
+            ->addModelTransformer($this->xssProtectionTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
