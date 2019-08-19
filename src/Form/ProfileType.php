@@ -25,8 +25,7 @@ class ProfileType extends AbstractType
     public function __construct(
         NameTransformer $nameTransformer,
         XSSProtectionTransformer $xssProtectionTransformer
-    )
-    {
+    ) {
         $this->nameTransformer = $nameTransformer;
         $this->xssProtectionTransformer = $xssProtectionTransformer;
     }
