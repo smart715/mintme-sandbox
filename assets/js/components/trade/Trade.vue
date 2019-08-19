@@ -222,6 +222,11 @@ export default {
             });
         },
         updateAssets: function() {
+            if (!this.isLoggedIn) {
+                this.balances = false;
+                return;
+            }
+
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
                     this.balances = {...res.data.common, ...res.data.predefined};
