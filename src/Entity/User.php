@@ -94,7 +94,7 @@ class User extends BaseUser implements
     protected $googleAuthenticatorEntry;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      * @var string|null
      */
     private $authCode;
@@ -328,7 +328,7 @@ class User extends BaseUser implements
     /** @codeCoverageIgnore */
     public function getEmailAuthCode(): string
     {
-        return (string)$this->authCode;
+        return $this->authCode ?? '';
     }
 
     /** @codeCoverageIgnore */

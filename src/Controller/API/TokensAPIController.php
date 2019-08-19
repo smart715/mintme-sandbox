@@ -16,6 +16,7 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
+use App\Manager\Model\EmailAuthResultModel;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
@@ -385,8 +386,8 @@ class TokensAPIController extends AbstractFOSRestController
         } elseif (!$user->isGoogleAuthenticatorEnabled()) {
             $response = $emailAuthManager->checkCode($user, $request->get('code'));
 
-            if (!$response['result']) {
-                throw new ApiUnauthorizedException($response['message']);
+            if (!$response->getResult()) {
+                throw new ApiUnauthorizedException($response->getMessage());
             }
         }
 
@@ -420,11 +421,6 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         $user = $this->getUser();
-
-        if (!$user) {
-            throw new ApiUnauthorizedException('Invalid user');
-        }
-
         $message = null;
 
         if (!$user->isGoogleAuthenticatorEnabled()) {

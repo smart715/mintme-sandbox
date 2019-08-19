@@ -3,40 +3,49 @@
 namespace App\Manager;
 
 use App\Entity\User;
+use App\Manager\Model\EmailAuthResultModel;
+use App\Utils\DateTime;
+use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\Uuid;
 
 class EmailAuthManager implements EmailAuthManagerInterface
 {
+    public const INVALID_CODE = 'Invalid email verification code';
+    public const EXPIRED_CODE = 'Email verification code is expired';
+    public const HASH_ALGORITHM = 'sha256';
+
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var DateTime */
+    private $time;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
+        $this->time = new DateTime();
         $this->entityManager = $entityManager;
     }
 
-    public function checkCode(User $user, string $code): array
+    public function checkCode(User $user, string $code): EmailAuthResultModel
     {
         $message = null;
 
         if ($code !== $user->getEmailAuthCode()) {
-            $message = 'Invalid 2fa code';
-        } elseif ($user->getEmailAuthCodeExpirationTime()->getTimestamp() < time()) {
-            $message = '2fa code is expired';
+            $message = self::INVALID_CODE;
+        } elseif ($user->getEmailAuthCodeExpirationTime() < $this->time->now()) {
+            $message = self::EXPIRED_CODE;
         }
 
-        return [
-            'result' => null === $message,
-            'message' => $message,
-        ];
+        return new EmailAuthResultModel($message);
     }
 
     public function generateCode(User $user, int $expirationTime): string
     {
-        $confirmCode = (string) rand(1000000, 9999999);
+        $confirmCode = hash(self::HASH_ALGORITHM, Uuid::uuid4()->toString());
         $user->setEmailAuthCode($confirmCode);
         
-        $codeExpirationTime = (new \DateTimeImmutable())->setTimestamp(time() + $expirationTime * 60);
+        $codeExpirationTime = $this->time->now()->add(new DateInterval("PT{$expirationTime}M"));
         $user->setEmailAuthCodeExpirationTime($codeExpirationTime);
         
         $this->entityManager->persist($user);
