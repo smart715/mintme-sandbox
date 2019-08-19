@@ -39,7 +39,7 @@ class WalletController extends Controller
         ]);
     }
 
-    /** 
+    /**
      * @Route("/withdraw/{hash}",
      *     name="withdraw-confirm",
      *     options={"expose"=true},
