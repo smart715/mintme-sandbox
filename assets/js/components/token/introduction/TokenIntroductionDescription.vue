@@ -47,7 +47,7 @@
                                     rows="5"
                                     class="form-control"
                                     :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
-                                    :value="newDescription"
+                                    :value="newDescriptionHtmlDecode"
                                     @change="onDescriptionChange"
                                     @input="onDescriptionChange"
                                 ></bbcode-editor>
@@ -117,6 +117,11 @@ export default {
     computed: {
         showEditIcon: function() {
             return !this.editingDescription && this.editable;
+        },
+        newDescriptionHtmlDecode: function() {
+            return this.newDescription
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>');
         },
     },
     methods: {
