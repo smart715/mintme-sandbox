@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -125,15 +126,17 @@ class Token implements TradebleInterface
     protected $created;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="relatedTokens")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserToken", mappedBy="token")
      * @var ArrayCollection
      */
-    protected $relatedUsers;
+    protected $users;
 
     /** @return User[] */
-    public function getRelatedUsers(): array
+    public function getUsers(): array
     {
-        return $this->relatedUsers->toArray();
+        return array_map(function (UserToken $userToken) {
+            return $userToken->getUser();
+        }, $this->users->toArray());
     }
 
     /** {@inheritdoc} */

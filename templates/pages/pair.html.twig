@@ -46,7 +46,6 @@
                                     discord-url="{{ token.discordUrl }}"
                                 >
                                 </token-introduction-profile>
-
                                 <token-introduction-statistics
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
@@ -56,6 +55,10 @@
                                     token-created="{{ token.getCreated().format('d M Y') }}"
                                     :precision="{{ precision }}">
                                 </token-introduction-statistics>
+                                <top-holders
+                                        class="col-12 mt-3"
+                                        :token-name="{{ market.quote.symbol | json_encode }}">
+                                </top-holders>
                                 <token-introduction-description
                                     class="col-12 pt-3"
                                     @updated="descriptionUpdated"
