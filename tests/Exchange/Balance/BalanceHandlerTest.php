@@ -5,13 +5,18 @@ namespace App\Tests\Exchange\Balance;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Exchange\Balance\BalanceFetcherInterface;
 use App\Exchange\Balance\BalanceHandler;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\BalancesArrayFactoryInterface;
+use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\UserManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -35,7 +40,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -61,7 +69,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -84,13 +95,112 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
         $handler->balance(
             $this->mockUser(1),
             $this->mockToken('foo')
+        );
+    }
+
+    public function testTopHolders(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+        $converter->expects($this->once())->method('convert');
+
+        $fetcher = $this->mockBalanceFetcher();
+        $fetcher->expects($this->once())->method('topBalances')->with('fooFOO', 4);
+
+        $handler = new BalanceHandler(
+            $converter,
+            $fetcher,
+            $this->mockEm(),
+            $this->mockUserManager([$this->mockUserToken($this->mockUser(1), $this->mockDate())]),
+            $this->mockBalancesArrayFactory(),
+            $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
+            $this->mockLogger()
+        );
+
+        $handler->topHolders(
+            $this->mockToken('foo'),
+            3,
+            4,
+            1,
+            5
+        );
+    }
+
+    public function testTopHoldersWithManyFetchs(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+        $converter->expects($this->exactly(2))->method('convert');
+
+        $fetcher = $this->mockBalanceFetcher();
+        $fetcher->expects($this->exactly(2))
+            ->method('topBalances')
+            ->willReturn([
+                [1, '999'],
+                [2, '99'],
+                [3, '9'],
+            ]);
+
+        $handler = new BalanceHandler(
+            $converter,
+            $fetcher,
+            $this->mockEm(),
+            $this->mockUserManager([$this->mockUserToken($this->mockUser(1), $this->mockDate())]),
+            $this->mockBalancesArrayFactory(),
+            $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
+            $this->mockLogger()
+        );
+
+        $handler->topHolders(
+            $this->mockToken('foo'),
+            2,
+            3,
+            1,
+            5
+        );
+    }
+
+    public function testTopHoldersForMaxArgument(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+        $converter->expects($this->once())->method('convert');
+
+        $fetcher = $this->mockBalanceFetcher();
+        $fetcher->expects($this->once())
+            ->method('topBalances')
+            ->willReturn([
+                [1, '999'],
+                [2, '99'],
+                [3, '9'],
+            ]);
+
+        $handler = new BalanceHandler(
+            $converter,
+            $fetcher,
+            $this->mockEm(),
+            $this->mockUserManager([$this->mockUserToken($this->mockUser(1), $this->mockDate())]),
+            $this->mockBalancesArrayFactory(),
+            $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
+            $this->mockLogger()
+        );
+
+        $handler->topHolders(
+            $this->mockToken('foo'),
+            2,
+            3,
+            1,
+            3
         );
     }
 
@@ -114,7 +224,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -146,7 +259,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -175,7 +291,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $em,
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -204,7 +323,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $em,
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -230,7 +352,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -256,7 +381,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -283,7 +411,10 @@ class BalanceHandlerTest extends TestCase
             $converter,
             $fetcher,
             $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
             $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
             $this->mockLogger()
         );
 
@@ -315,7 +446,7 @@ class BalanceHandlerTest extends TestCase
     {
         $user = $this->createMock(User::class);
         $user->method('getId')->willReturn($id);
-        $user->method('getRelatedTokens')->willReturn($toks);
+        $user->method('getTokens')->willReturn($toks);
 
         return $user;
     }
@@ -323,6 +454,12 @@ class BalanceHandlerTest extends TestCase
     private function mockLogger(): LoggerInterface
     {
         return $this->createMock(LoggerInterface::class);
+    }
+
+    /** @return MockObject|TraderBalanceViewFactoryInterface */
+    private function mockTraderBalanceViewFactory(): TraderBalanceViewFactoryInterface
+    {
+        return $this->createMock(TraderBalanceViewFactoryInterface::class);
     }
 
     private function mockMoneyWrapper(): MoneyWrapperInterface
@@ -373,5 +510,46 @@ class BalanceHandlerTest extends TestCase
     private function mockBalanceResult(): BalanceResult
     {
         return $this->createMock(BalanceResult::class);
+    }
+
+    /**
+     * @return UserManagerInterface|MockObject
+     */
+    private function mockUserManager(array $UsersTokens): UserManagerInterface
+    {
+        $manager = $this->createMock(UserManagerInterface::class);
+        $manager->method('getUserToken')->willReturn($UsersTokens);
+
+        return $manager;
+    }
+
+    /**
+     * @return UserToken|MockObject
+     */
+    private function mockUserToken(User $user, DateTimeImmutable $date): UserToken
+    {
+        $userToken = $this->createMock(UserToken::class);
+        $userToken->method('getUser')->willReturn($user);
+        $userToken->method('getCreated')->willReturn($date);
+
+        return $userToken;
+    }
+
+    /**
+     * @return BalancesArrayFactoryInterface|MockObject
+     */
+    private function mockBalancesArrayFactory(): BalancesArrayFactoryInterface
+    {
+        $factory = $this->createMock(BalancesArrayFactoryInterface::class);
+        $factory->method('create')->will(self::returnCallback(function (array $balances) {
+            return $balances;
+        }));
+
+        return $factory;
+    }
+
+    private function mockDate(): DateTimeImmutable
+    {
+        return $this->createMock(DateTimeImmutable::class);
     }
 }
