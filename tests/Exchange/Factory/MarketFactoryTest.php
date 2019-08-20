@@ -86,7 +86,7 @@ class MarketFactoryTest extends TestCase
     private function mockUser(array $toks): User
     {
         $user = $this->createMock(User::class);
-        $user->method('getRelatedTokens')->willReturn($toks);
+        $user->method('getTokens')->willReturn($toks);
 
         return $user;
     }
