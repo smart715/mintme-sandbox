@@ -9,7 +9,7 @@
                     <div class="col-12">
                         <font-awesome-icon
                             class="icon-edit float-right c-pointer"
-                            :icon="editingUrls ? 'times' : 'edit'"
+                            :icon="editingUrlsIcon"
                             transform="shrink-4 up-1.5"
                             @click="editingUrls = !editingUrls"/>
                         <a :href="profileUrl">
@@ -229,6 +229,9 @@ export default {
     computed: {
         description: function() {
            return this.twitterDescription + this.tokenUrl;
+        },
+        editingUrlsIcon: function() {
+            return this.editingUrls ? 'times' : 'edit';
         },
         showEditIcon: function() {
             return !this.editingUrls && this.editable;

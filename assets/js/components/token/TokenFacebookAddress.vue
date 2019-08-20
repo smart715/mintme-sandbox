@@ -170,13 +170,13 @@ export default {
             }, {scope: 'pages_show_list'});
         },
         savePage: function() {
-            this.requestForAddress();
+            this.saveFacebookAddress();
         },
         deleteAddress: function() {
             this.selectedUrl = '';
-            this.requestForAddress();
+            this.saveFacebookAddress();
         },
-        requestForAddress: function() {
+        saveFacebookAddress: function() {
             if (this.submitting) {
                 return;
             }
@@ -192,7 +192,6 @@ export default {
                     this.currentAddress = this.selectedUrl;
                     this.$toasted.success(`Facebook page ${state}`);
                 }
-                this.submitting = false;
             }, (error) => {
                 if (!error.response) {
                     this.$toasted.error('Network error');
@@ -201,10 +200,10 @@ export default {
                 } else {
                     this.$toasted.error('An error has occurred, please try again later');
                 }
-                this.submitting = false;
             })
             .then(() => {
                 this.showConfirmModal = false;
+                this.submitting = false;
             });
         },
     },

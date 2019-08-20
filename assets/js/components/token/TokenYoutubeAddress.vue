@@ -79,6 +79,7 @@ export default {
     data() {
         return {
             currentChannelId: this.channelId,
+            submitting: false,
         };
     },
     computed: {
@@ -117,18 +118,24 @@ export default {
         addChannel: function() {
             this.signInYoutube()
                 .then(() => this.getChannelId().then((channelId) => {
-                    this.requestForYoutubeChannel(channelId);
+                    this.saveYoutubeChannel(channelId);
                 }), (error) => {
                     this.$toasted.info('Operation canceled');
                 });
         },
         deleteChannel: function() {
-            this.requestForYoutubeChannel('');
+            this.saveYoutubeChannel('');
         },
-        requestForYoutubeChannel: function(channelId) {
+        saveYoutubeChannel: function(channelId) {
+            if (this.submitting) {
+                return;
+            }
+
+            this.submitting = true;
             this.$axios.single.patch(this.updateUrl, {
-                    youtubeChannelId: channelId,
-                }).then((response) => {
+                youtubeChannelId: channelId,
+            })
+                .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
                         let state = channelId ? `saved as ${this.buildYoutubeUrl(channelId)}` : 'deleted';
                         this.currentChannelId = channelId;
@@ -143,6 +150,9 @@ export default {
                     } else {
                         this.$toasted.error('An error has occurred, please try again later');
                     }
+                })
+                .then(() => {
+                    this.submitting = false;
                 });
         },
         signInYoutube: function() {
