@@ -228,7 +228,7 @@ class DepositConsumerTest extends TestCase
     {
         $token = $this->createMock(Token::class);
         $token->method('getSymbol')->willReturn($name);
-        $token->method('getRelatedUsers')->willReturn($users);
+        $token->method('getUsers')->willReturn($users);
 
         return $token;
     }
