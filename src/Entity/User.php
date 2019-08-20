@@ -356,11 +356,13 @@ class User extends BaseUser implements
         return $this->googleAuthenticatorEntry;
     }
 
+    /** @codeCoverageIgnore */
     public function getTrustedTokenVersion(): int
     {
         return $this->trustedTokenVersion;
     }
 
+    /** @codeCoverageIgnore */
     public function setTrustedTokenVersion(int $trustedTokenVersion): self
     {
         $this->trustedTokenVersion = $trustedTokenVersion;
