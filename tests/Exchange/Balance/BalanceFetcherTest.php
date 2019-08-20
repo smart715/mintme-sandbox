@@ -104,6 +104,68 @@ class BalanceFetcherTest extends TestCase
         $handler->balance(1, ['TOK999']);
     }
 
+    public function testTopBalances(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'balance.top',
+                [ 'TOK999', 3 ]
+            )
+            ->willReturn($this->mockResponse(false, [
+                [1, 999],
+                [2, 99],
+                [3, 9],
+            ]));
+
+        $handler = new BalanceFetcher(
+            $rpc,
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
+        );
+
+        $result = $handler->topBalances(
+            'TOK999',
+            3
+        );
+
+        $this->assertEquals($result, [
+            [1, 999],
+            [2, 99],
+            [3, 9],
+        ]);
+    }
+
+    public function testTopBalancesWithErrors(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'balance.top',
+                [ 'TOK999', 3 ]
+            )
+            ->willReturn($this->mockResponse(true, [
+                [1, 999],
+                [2, 99],
+                [3, 9],
+            ]));
+
+        $handler = new BalanceFetcher(
+            $rpc,
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
+        );
+
+        $this->expectException(BalanceException::class);
+
+        $handler->topBalances(
+            'TOK999',
+            3
+        );
+    }
+
     public function testSummary(): void
     {
         $rpc = $this->mockRpc();
