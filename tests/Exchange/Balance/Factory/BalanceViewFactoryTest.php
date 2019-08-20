@@ -5,7 +5,6 @@ namespace App\Tests\Exchange\Balance\Factory;
 use App\Entity\Crypto;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
-use App\Entity\User;
 use App\Exchange\Balance\Factory\BalanceView;
 use App\Exchange\Balance\Factory\BalanceViewFactory;
 use App\Exchange\Balance\Model\BalanceResult;
@@ -15,8 +14,6 @@ use App\Utils\Converter\TokenNameConverterInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class BalanceViewFactoryTest extends TestCase
 {
