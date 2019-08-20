@@ -50,7 +50,7 @@ class MarketFactory implements MarketFactoryInterface
             $this->getCoinMarkets(),
             $this->getMarkets(
                 $this->getExchangableCryptos(),
-                $user->getRelatedTokens()
+                $user->getTokens()
             )
         );
     }
