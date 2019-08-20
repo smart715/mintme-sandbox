@@ -2,7 +2,11 @@
 
 namespace App\Manager;
 
+use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserCrypto;
+use App\Entity\UserToken;
 use App\Repository\UserRepository;
 
 class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserManagerInterface
@@ -23,5 +27,41 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         return $this->getRepository()->findOneBy([
             'referralCode' => $code,
         ]);
+    }
+
+    /** @inheritDoc */
+    public function getUserToken(Token $token, array $userIds): array
+    {
+        $qb = $this->getRepository()->createQueryBuilder('q');
+
+        return $qb->select('ut')
+                ->from(UserToken::class, 'ut')
+                ->innerJoin('ut.user', 'u')
+                ->innerJoin('u.profile', 'p')
+                ->add('where', $qb->expr()->in('ut.user', $userIds))
+                ->andWhere('ut.token = ?1')
+                ->andWhere('ut.user != ?2')
+                ->andWhere('p.anonymous = 0')
+                ->setParameter(1, $token->getId())
+                ->setParameter(2, $token->getProfile()->getUser()->getId())
+                ->getQuery()
+                ->execute();
+    }
+
+    /** @inheritDoc */
+    public function getUserCrypto(Crypto $crypto, array $userIds): array
+    {
+        $qb = $this->getRepository()->createQueryBuilder('q');
+
+        return $qb->select('uc')
+            ->from(UserCrypto::class, 'uc')
+            ->innerJoin('uc.user', 'u')
+            ->innerJoin('u.profile', 'p')
+            ->add('where', $qb->expr()->in('uc.user', $userIds))
+            ->andWhere('uc.crypto = ?1')
+            ->andWhere('p.anonymous = 0')
+            ->setParameter(1, $crypto->getId())
+            ->getQuery()
+            ->execute();
     }
 }
