@@ -73,7 +73,6 @@ import TradeBuyOrder from './TradeBuyOrder';
 import TradeSellOrder from './TradeSellOrder';
 import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
-import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
@@ -91,7 +90,6 @@ export default {
         TradeChart,
         TradeOrders,
         TradeTradeHistory,
-        TopTraders,
         OrderModal,
     },
     props: {
@@ -224,6 +222,11 @@ export default {
             });
         },
         updateAssets: function() {
+            if (!this.isLoggedIn) {
+                this.balances = false;
+                return;
+            }
+
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
                     this.balances = {...res.data.common, ...res.data.predefined};

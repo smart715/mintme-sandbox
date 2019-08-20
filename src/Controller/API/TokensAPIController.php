@@ -42,6 +42,8 @@ use Throwable;
  */
 class TokensAPIController extends AbstractFOSRestController
 {
+    private const TOP_HOLDERS_COUNT = 10;
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -292,7 +294,7 @@ class TokensAPIController extends AbstractFOSRestController
         try {
             $common = $balanceHandler->balances(
                 $this->getUser(),
-                $this->getUser()->getRelatedTokens()
+                $this->getUser()->getTokens()
             );
         } catch (BalanceException $exception) {
             if (BalanceException::EMPTY == $exception->getCode()) {
@@ -372,6 +374,26 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
+     * @Rest\Get("/{name}/top-holders", name="top_holders", options={"expose"=true})
+     */
+    public function getTopHolders(
+        string $name,
+        BalanceHandlerInterface $balanceHandler
+    ): View {
+        $tradable = $this->cryptoManager->findBySymbol($name) ??
+            $this->tokenManager->findByName($name);
+
+        if (null == $tradable) {
+            throw $this->createNotFoundException('Not Found');
+        }
+
+        $topTraders = $balanceHandler->topHolders($tradable, self::TOP_HOLDERS_COUNT);
+
+        return $this->view($topTraders, Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
      * @Rest\Get("/{name}/deploy", name="token_deploy_balances", options={"expose"=true})
      */
     public function tokenDeployBalances(
@@ -394,10 +416,10 @@ class TokensAPIController extends AbstractFOSRestController
 
         try {
             $balances = [
-              'balance' => $moneyWrapper->format(
-                  $balanceHandler->balance($this->getUser(), Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable()
-              ),
-              'webCost' => $costFetcher->getDeployWebCost(),
+                'balance' => $moneyWrapper->format(
+                    $balanceHandler->balance($this->getUser(), Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable()
+                ),
+                'webCost' => $costFetcher->getDeployWebCost(),
             ];
         } catch (Throwable $ex) {
             return $this->view(null, Response::HTTP_BAD_REQUEST);

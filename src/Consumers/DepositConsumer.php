@@ -4,6 +4,7 @@ namespace App\Consumers;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -121,8 +122,10 @@ class DepositConsumer implements ConsumerInterface
                     $this->depositCommunicator->getFee($tradable)
                 );
 
-                if (!in_array($user, $tradable->getRelatedUsers(), true)) {
-                    $user->addRelatedToken($tradable);
+                if (!in_array($user, $tradable->getUsers(), true)) {
+                    $userToken = (new UserToken())->setToken($tradable)->setUser($user);
+                    $this->em->persist($userToken);
+                    $user->addToken($userToken);
                     $this->em->persist($user);
                     $this->em->flush();
                 }
