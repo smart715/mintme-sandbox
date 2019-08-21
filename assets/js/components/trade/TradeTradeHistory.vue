@@ -60,6 +60,11 @@
                                 </a>
                                 <span v-else>{{ row.value }}</span>
                             </template>
+                            <template slot="dateTime" slot-scope="row">
+                                 <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                        {{ row.value | truncate(13) }}
+                                </span>
+                            </template>
                         </b-table>
                         <div v-if="!hasOrders">
                             <p class="text-center p-5">No deal was made yet</p>
