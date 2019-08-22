@@ -1,33 +1,69 @@
 <template>
     <div>
-        <div class="form-group my-3" v-if="editingDiscord">
+        <div
+            v-if="editingDiscord"
+            class="form-group my-3"
+        >
             <label for="discord-err">Discord address:</label>
-            <input id="discord-err"
-                type="text"
+            <input
+                id="discord-err"
                 v-model="newDiscord"
+                type="text"
                 class="form-control"
                 :class="{ 'is-invalid': showDiscordError }"
-                @keyup.enter="checkDiscordUrl">
-            <div class="invalid-feedback" v-if="showDiscordError">
+                @keyup.enter="checkDiscordUrl"
+            >
+            <div
+                v-if="showDiscordError"
+                class="invalid-feedback"
+            >
                 Please provide a valid URL.
             </div>
             <div class="col-12 text-left mt-3">
-                <button class="btn btn-primary" @click="editDiscord">Save</button>
-                <span class="btn-cancel pl-3 c-pointer" @click="$emit('toggleEdit', null)">
+                <button
+                    class="btn btn-primary"
+                    @click="editDiscord"
+                >
+                    Save
+                </button>
+                <span
+                    class="btn-cancel pl-3 c-pointer"
+                    @click="$emit('toggleEdit', null)"
+                >
                     Cancel
                 </span>
             </div>
         </div>
-        <div class="d-block mx-0 my-1 p-0" v-else>
-            <a id="discord-link" class="c-pointer" @click.prevent="$emit('toggleEdit', 'discord')">
+        <div
+            v-else
+            class="d-block mx-0 my-1 p-0"
+        >
+            <a
+                id="discord-link"
+                class="c-pointer"
+                @click.prevent="$emit('toggleEdit', 'discord')"
+            >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
-                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'discord'}" size="lg" />
+                    <font-awesome-icon
+                        :icon="{prefix: 'fab', iconName: 'discord'}"
+                        size="lg"
+                    />
                 </span>
                 {{ computedDiscordUrl | truncate(35) }}
             </a>
-            <b-tooltip v-if="currentDiscord" target="discord-link" :title="computedDiscordUrl" />
-            <a v-if="currentDiscord" @click.prevent="deleteDiscord">
-                <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+            <b-tooltip
+                v-if="currentDiscord"
+                target="discord-link"
+                :title="computedDiscordUrl"
+            />
+            <a
+                v-if="currentDiscord"
+                @click.prevent="deleteDiscord"
+            >
+                <font-awesome-icon
+                    icon="times"
+                    class="text-danger c-pointer ml-2"
+                />
             </a>
         </div>
     </div>

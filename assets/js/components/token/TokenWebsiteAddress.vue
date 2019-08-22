@@ -1,53 +1,94 @@
 <template>
     <div>
-        <div class="form-group my-3" v-if="editingWebsite">
+        <div
+            v-if="editingWebsite"
+            class="form-group my-3"
+        >
             <label for="website-err">Website address:</label>
-            <input id="website-err"
-                type="text"
+            <input
+                id="website-err"
                 v-model="newWebsite"
+                type="text"
                 class="form-control"
                 :class="{ 'is-invalid': showWebsiteError }"
-                @keyup.enter="checkWebsiteUrl">
-            <div class="invalid-feedback" v-if="showWebsiteError">
+                @keyup.enter="checkWebsiteUrl"
+            >
+            <div
+                v-if="showWebsiteError"
+                class="invalid-feedback"
+            >
                 Please provide a valid URL.
             </div>
             <div class="col-12 text-left mt-3">
-                <button class="btn btn-primary" @click="editWebsite">Save</button>
-                <span class="btn-cancel pl-3 c-pointer" @click="$emit('toggleEdit')">
+                <button
+                    class="btn btn-primary"
+                    @click="editWebsite"
+                >
+                    Save
+                </button>
+                <span
+                    class="btn-cancel pl-3 c-pointer"
+                    @click="$emit('toggleEdit')"
+                >
                     Cancel
                 </span>
             </div>
         </div>
-        <div class="d-block mx-0 my-1 p-0" v-else>
-            <a id="website-link" class="c-pointer" @click.prevent="$emit('toggleEdit', 'website')">
+        <div
+            v-else
+            class="d-block mx-0 my-1 p-0"
+        >
+            <a
+                id="website-link"
+                class="c-pointer"
+                @click.prevent="$emit('toggleEdit', 'website')"
+            >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
-                    <font-awesome-icon icon="globe" size="lg"/>
+                    <font-awesome-icon
+                        icon="globe"
+                        size="lg"
+                    />
                 </span>
                 {{ computedWebsiteUrl | truncate(35) }}
             </a>
-            <b-tooltip v-if="currentWebsite" target="website-link" :title="computedWebsiteUrl" />
-            <a v-if="currentWebsite" @click.prevent="deleteWebsite">
-                <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+            <b-tooltip
+                v-if="currentWebsite"
+                target="website-link"
+                :title="computedWebsiteUrl"
+            />
+            <a
+                v-if="currentWebsite"
+                @click.prevent="deleteWebsite"
+            >
+                <font-awesome-icon
+                    icon="times"
+                    class="text-danger c-pointer ml-2"
+                />
             </a>
         </div>
         <modal
             @close="closeFileErrorModal"
-            :visible="!!fileErrorVisible">
+            :visible="!!fileErrorVisible"
+        >
             <template slot="body">
                 <h3 class="modal-title text-center text-danger">{{ fileError.title }}</h3>
                 <div class="text-white">
                     <p>
                         {{ fileError.details }}
                         <a
-                            href="https://www.restapitutorial.com/httpstatuscodes.html"
                             v-if="fileErrorHttpUrl"
+                            href="https://www.restapitutorial.com/httpstatuscodes.html"
                             target="_blank"
-                            rel="nofollow">
+                            rel="nofollow"
+                        >
                             More information about HTTP status codes.
                         </a>
                     </p>
                     <div class="pt-2 text-center">
-                        <button class="btn btn-primary" @click="closeFileErrorModal">
+                        <button
+                            class="btn btn-primary"
+                            @click="closeFileErrorModal"
+                        >
                             OK
                         </button>
                     </div>
@@ -66,7 +107,12 @@
                         <ol class="pl-3">
                             <li>
                                 Download
-                                <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
+                                <a
+                                    :href="confirmWebsiteFileUrl"
+                                    target="_blank"
+                                >
+                                    this html verification file
+                                </a>
                             </li>
                             <li>Upload the file to {{ parsedWebsite }}</li>
                             <li>
@@ -74,7 +120,8 @@
                                 <a
                                     :href="siteRequestUrl"
                                     target="_blank"
-                                    rel="nofollow">
+                                    rel="nofollow"
+                                >
                                     {{ siteRequestUrl }}
                                 </a>
                             </li>
@@ -82,14 +129,25 @@
                         </ol>
                     </div>
                     <div class="col-12 text-left">
-                        <button class="btn btn-primary" @click="confirmWebsite">
+                        <button
+                            class="btn btn-primary"
+                            @click="confirmWebsite"
+                        >
                             <font-awesome-icon
-                                    v-if="submitting"
-                                    icon="circle-notch" spin
-                                    class="loading-spinner" fixed-width />
+                                v-if="submitting"
+                                icon="circle-notch"
+                                spin
+                                class="loading-spinner"
+                                fixed-width
+                            />
                             Confirm
                         </button>
-                        <span class="btn-cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</span>
+                        <span
+                            class="btn-cancel pl-3 c-pointer"
+                            @click="showConfirmWebsiteModal = false"
+                        >
+                            Cancel
+                        </span>
                     </div>
                 </div>
             </template>

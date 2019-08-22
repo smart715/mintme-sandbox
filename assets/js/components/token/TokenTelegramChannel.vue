@@ -1,33 +1,69 @@
 <template>
     <div>
-        <div class="form-group my-3" v-if="editingTelegram">
+        <div
+            v-if="editingTelegram"
+            class="form-group my-3"
+        >
             <label for="telegram-err">Telegram address:</label>
-            <input id="telegram-err"
-                type="text"
+            <input
+                id="telegram-err"
                 v-model="newTelegram"
+                type="text"
                 class="form-control"
                 :class="{ 'is-invalid': showTelegramError }"
-                @keyup.enter="checkTelegramUrl">
-            <div class="invalid-feedback" v-if="showTelegramError">
+                @keyup.enter="checkTelegramUrl"
+            >
+            <div
+                v-if="showTelegramError"
+                class="invalid-feedback"
+            >
                 Please provide a valid URL.
             </div>
             <div class="col-12 text-left mt-3">
-                <button class="btn btn-primary" @click="editTelegram">Save</button>
-                <span class="btn-cancel pl-3 c-pointer" @click="$emit('toggleEdit', null)">
+                <button
+                    class="btn btn-primary"
+                    @click="editTelegram"
+                >
+                    Save
+                </button>
+                <span
+                    class="btn-cancel pl-3 c-pointer"
+                    @click="$emit('toggleEdit', null)"
+                >
                     Cancel
                 </span>
             </div>
         </div>
-        <div class="d-block mx-0 my-1 p-0" v-else>
-            <a id="telegram-link" class="c-pointer" @click.prevent="$emit('toggleEdit', 'telegram')">
+        <div
+            v-else
+            class="d-block mx-0 my-1 p-0"
+        >
+            <a
+                id="telegram-link"
+                class="c-pointer"
+                @click.prevent="$emit('toggleEdit', 'telegram')"
+            >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
-                    <font-awesome-icon :icon="{prefix: 'fab', iconName: 'telegram'}" size="lg" />
+                    <font-awesome-icon
+                        :icon="{prefix: 'fab', iconName: 'telegram'}"
+                        size="lg"
+                    />
                 </span>
                 {{ computedTelegramUrl | truncate(35) }}
             </a>
-            <b-tooltip v-if="currentTelegram" target="telegram-link" :title="computedTelegramUrl" />
-            <a v-if="currentTelegram" @click.prevent="deleteTelegram">
-                <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+            <b-tooltip
+                v-if="currentTelegram"
+                target="telegram-link"
+                :title="computedTelegramUrl"
+            />
+            <a
+                v-if="currentTelegram"
+                @click.prevent="deleteTelegram"
+            >
+                <font-awesome-icon
+                    icon="times"
+                    class="text-danger c-pointer ml-2"
+                />
             </a>
         </div>
     </div>
