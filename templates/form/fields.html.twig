@@ -108,3 +108,13 @@
     <textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
 {%- endif -%}
 {%- endblock textarea_widget -%}
+
+{% block trusted_device %}
+    {% if trusted_device_enabled %}
+        <div class="custom-control custom-checkbox my-1">
+            <input type="checkbox" id="trusted_device" name="_trusted" class="custom-control-input" value="1" checked>
+            {% set lifetime_days = trusted_device_cookie_lifetime/(24*60*60) %}
+            <label for="trusted_device" class="custom-control-label">Save device as trusted for {{ lifetime_days }} days</label>
+        </div>
+    {% endif %}
+{% endblock %}
