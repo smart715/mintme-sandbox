@@ -27,6 +27,7 @@ security:
                 always_use_default_target_path: false
                 multi_factor: true
                 csrf_token_generator: security.csrf.token_manager
+                authentication_required_handler: two_factor.auth_require_handler
 
     role_hierarchy:
         ROLE_ADMIN_NEWS_ADMIN:
@@ -42,15 +43,9 @@ security:
     access_control:
         - { path: ^/api/tokens/[a-zA-Z0-9]+/send-code$, role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/delete$, role: ROLE_USER }
-        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/trading$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/news, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/token, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/token/[a-zA-Z0-9]+, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/token$, role: ROLE_USER }
         - { path: ^/profile$, role: ROLE_USER }
         - { path: ^/settings, role: ROLE_USER }

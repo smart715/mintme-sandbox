@@ -310,3 +310,7 @@ services:
     App\Controller\API\TokensAPIController:
         arguments:
             $expirationTime: "%token_deletion_confirm_code_expiration_time%"
+
+    two_factor.auth_require_handler:
+        class: App\Security\TwoFactorRequireHandler
+        public: true

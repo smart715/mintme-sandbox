@@ -222,7 +222,7 @@ export default {
             });
         },
         updateAssets: function() {
-            if (!this.isLoggedIn) {
+            if (!this.loggedIn) {
                 this.balances = false;
                 return;
             }

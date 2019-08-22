@@ -12,7 +12,7 @@ class DefaultController extends Controller
     /**
      * @Route("/",
      *     name="homepage",
-     *     options={"expose"=true, "sitemap"=true}
+     *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
      * )
      */
     public function index(): Response
