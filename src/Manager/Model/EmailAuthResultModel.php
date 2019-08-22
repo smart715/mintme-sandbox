@@ -30,7 +30,7 @@ class EmailAuthResultModel
 
     public function getResult(): bool
     {
-        return (bool) $this->result;
+        return $this->result;
     }
 
     public function setResult(bool $result): self
