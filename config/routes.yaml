@@ -46,6 +46,8 @@ api_controllers:
 news:
     resource: '@SonataNewsBundle/Resources/config/routing/news.xml'
     prefix: /news
+    options:
+        2fa_progress: false
 
 admin:
     resource: '@SonataAdminBundle/Resources/config/routing/sonata_admin.xml'
