@@ -12,6 +12,7 @@ use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
+use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -26,7 +27,8 @@ class User extends BaseUser implements
     TwoFactorInterface,
     EmailTwoFactorInterface,
     BackupCodeInterface,
-    PreferredProviderInterface
+    PreferredProviderInterface,
+    TrustedDeviceInterface
 {
     /**
      * @ORM\Id
@@ -135,6 +137,12 @@ class User extends BaseUser implements
      * @var ArrayCollection
      */
     protected $pendingWithdrawals;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true, options={"default": 0})
+     * @var int
+     */
+    private $trustedTokenVersion = 0;
 
     /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
@@ -362,5 +370,19 @@ class User extends BaseUser implements
         }
 
         return $this->googleAuthenticatorEntry;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getTrustedTokenVersion(): int
+    {
+        return $this->trustedTokenVersion;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setTrustedTokenVersion(int $trustedTokenVersion): self
+    {
+        $this->trustedTokenVersion = $trustedTokenVersion;
+
+        return $this;
     }
 }
