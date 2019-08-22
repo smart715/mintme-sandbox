@@ -15,3 +15,5 @@ twig:
         google_tracking_id: '%google_tracking_id%'
         tawk_api_key: '%tawk_api_key%'
         is_hacker_allowed: '%is_hacker_allowed%'
+        trusted_device_enabled: '%trusted_device_enabled%'
+        trusted_device_cookie_lifetime: '%trusted_device_cookie_lifetime%'

@@ -29,13 +29,14 @@
                                         class="form-control form-control-md" id="code" autofocus
                                         >
                                 </div>
-                                <div class="form-group">
-                                    <p>An email has been sent to your address</p>
-                                    <p class="pb-0 mb-0">
+                                <div class="form-group mb-0" style="line-height: 0.8em;">
+                                    <small>
+                                        An email has been sent to your address<br>
                                         it contains verification code you must fill to log in into your account <br/>
                                         Do not forget to check your spam folder
-                                    </p>
+                                    </small>
                                 </div>
+                                {{ block('trusted_device', 'form/fields.html.twig') }}
                                 <div class="form-group">
                                     <input
                                         type="submit" id="_submit" name="_submit"
