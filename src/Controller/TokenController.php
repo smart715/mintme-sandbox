@@ -85,7 +85,7 @@ class TokenController extends Controller
      *     defaults={"tab" = "trade"},
      *     methods={"GET"},
      *     requirements={"tab" = "trade|intro"},
-     *     options={"expose"=true}
+     *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
     public function show(
