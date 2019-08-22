@@ -252,15 +252,12 @@ export default {
         },
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
-            this.toggleEdit(null);
         },
         saveTelegram: function(newTelegram) {
             this.currentTelegram = newTelegram;
-            this.toggleEdit(null);
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;
-            this.toggleEdit(null);
         },
     },
 };

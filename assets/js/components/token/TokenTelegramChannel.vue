@@ -1,7 +1,7 @@
 <template>
     <div>
         <div
-            v-if="editingTelegram"
+            v-if="editing"
             class="form-group my-3"
         >
             <label for="telegram-err">Telegram address:</label>
@@ -28,7 +28,7 @@
                 </button>
                 <span
                     class="btn-cancel pl-3 c-pointer"
-                    @click="$emit('toggleEdit', null)"
+                    @click="editing = false"
                 >
                     Cancel
                 </span>
@@ -41,7 +41,7 @@
             <a
                 id="telegram-link"
                 class="c-pointer"
-                @click.prevent="$emit('toggleEdit', 'telegram')"
+                @click.prevent="toggleEdit"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
                     <font-awesome-icon
@@ -99,6 +99,7 @@ export default {
     mixins: [FiltersMixin],
     data() {
         return {
+            editing: this.editingTelegram,
             newTelegram: this.currentTelegram || 'https://t.me/joinchat/',
             showTelegramError: false,
             submitting: false,
@@ -110,6 +111,7 @@ export default {
     watch: {
         editingTelegram: function() {
             this.submitting = false;
+            this.editing = this.editingTelegram;
         },
     },
     computed: {
@@ -151,11 +153,18 @@ export default {
                         this.$emit('saveTelegram', this.newTelegram);
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
                         this.$toasted.success(`Telegram invitation link ${state} successfully`);
+                        this.editing = false;
                     } else {
                         this.$toasted.error(response.data.message || 'Network error');
                     }
                     this.submitting = false;
                 });
+        },
+        toggleEdit: function() {
+            this.editing = !this.editing;
+            if (this.editing) {
+                this.$emit('toggleEdit', 'telegram');
+            }
         },
     },
 };

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div
-            v-if="editingWebsite"
+            v-if="editing"
             class="form-group my-3"
         >
             <label for="website-err">Website address:</label>
@@ -28,7 +28,7 @@
                 </button>
                 <span
                     class="btn-cancel pl-3 c-pointer"
-                    @click="$emit('toggleEdit')"
+                    @click="editing = false"
                 >
                     Cancel
                 </span>
@@ -41,7 +41,7 @@
             <a
                 id="website-link"
                 class="c-pointer"
-                @click.prevent="$emit('toggleEdit', 'website')"
+                @click.prevent="toggleEdit"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
                     <font-awesome-icon
@@ -190,6 +190,7 @@ export default {
             confirmWebsiteUrl: this.$routing.generate('token_website_confirm', {
                 name: this.tokenName,
             }),
+            editing: this.editingWebsite,
             fileError: {},
             newWebsite: this.currentWebsite || 'https://',
             parsedWebsite: '',
@@ -201,6 +202,7 @@ export default {
     watch: {
         editingWebsite: function() {
             this.submitting = false;
+            this.editing = this.editingWebsite;
         },
         newWebsite: function() {
             this.fileError = {};
@@ -263,6 +265,7 @@ export default {
                         this.newWebsite = this.newWebsite || 'https://';
                         this.$toasted.success(response.data.message);
                         this.showConfirmWebsiteModal = false;
+                        this.editing = false;
                         this.clearFileError();
                     } else if (response.data.errors.fileError) {
                         this.fileError = response.data.errors.fileError;
@@ -283,6 +286,12 @@ export default {
         },
         clearFileError: function() {
             this.fileError = {};
+        },
+        toggleEdit: function() {
+            this.editing = !this.editing;
+            if (this.editing) {
+                this.$emit('toggleEdit', 'website');
+            }
         },
     },
 };

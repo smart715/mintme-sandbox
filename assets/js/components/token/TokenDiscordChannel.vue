@@ -1,7 +1,7 @@
 <template>
     <div>
         <div
-            v-if="editingDiscord"
+            v-if="editing"
             class="form-group my-3"
         >
             <label for="discord-err">Discord address:</label>
@@ -28,7 +28,7 @@
                 </button>
                 <span
                     class="btn-cancel pl-3 c-pointer"
-                    @click="$emit('toggleEdit', null)"
+                    @click="toggleEdit"
                 >
                     Cancel
                 </span>
@@ -41,7 +41,7 @@
             <a
                 id="discord-link"
                 class="c-pointer"
-                @click.prevent="$emit('toggleEdit', 'discord')"
+                @click.prevent="toggleEdit"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
                     <font-awesome-icon
@@ -99,6 +99,7 @@ export default {
     mixins: [FiltersMixin],
     data() {
         return {
+            editing: this.editingDiscord,
             newDiscord: this.currentDiscord || 'https://discord.gg/',
             showDiscordError: false,
             submitting: false,
@@ -110,6 +111,7 @@ export default {
     watch: {
         editingDiscord: function() {
             this.submitting = false;
+            this.editing = this.editingDiscord;
         },
     },
     computed: {
@@ -151,11 +153,18 @@ export default {
                         this.$emit('saveDiscord', this.newDiscord);
                         this.newDiscord = this.newDiscord || 'https://discord.gg/';
                         this.$toasted.success(`Discord invitation link ${state} successfully`);
+                        this.editing = false;
                     } else {
                         this.$toasted.error(response.data.message || 'Network error');
                     }
                     this.submitting = false;
                 });
+        },
+        toggleEdit: function() {
+            this.editing = !this.editing;
+            if (this.editing) {
+                this.$emit('toggleEdit', 'discord');
+            }
         },
     },
 };
