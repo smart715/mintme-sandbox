@@ -91,7 +91,7 @@ export default {
     props: {
         currentDiscord: String,
         editingDiscord: Boolean,
-        updateUrl: String,
+        tokenName: String,
     },
     components: {
         FontAwesomeIcon,
@@ -102,6 +102,9 @@ export default {
             newDiscord: this.currentDiscord || 'https://discord.gg/',
             showDiscordError: false,
             submitting: false,
+            updateUrl: this.$routing.generate('token_update', {
+                name: this.tokenName,
+            }),
         };
     },
     watch: {
@@ -120,17 +123,14 @@ export default {
                 this.checkDiscordUrl();
             }
 
-            if (this.showDiscordError && !this.newDiscord.length) {
-                this.showDiscordError = false;
-            }
-        },
-        checkDiscordUrl: function() {
-            this.showDiscordError = false;
-            if (!isValidDiscordUrl(this.newDiscord)) {
-                this.showDiscordError = true;
+            if (this.showDiscordError) {
                 return;
             }
+
             this.saveDiscord();
+        },
+        checkDiscordUrl: function() {
+            this.showDiscordError = !isValidDiscordUrl(this.newDiscord);
         },
         deleteDiscord: function() {
             this.newDiscord = '';

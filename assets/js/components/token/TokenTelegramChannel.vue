@@ -91,7 +91,7 @@ export default {
     props: {
         currentTelegram: String,
         editingTelegram: Boolean,
-        updateUrl: String,
+        tokenName: String,
     },
     components: {
         FontAwesomeIcon,
@@ -102,6 +102,9 @@ export default {
             newTelegram: this.currentTelegram || 'https://t.me/joinchat/',
             showTelegramError: false,
             submitting: false,
+            updateUrl: this.$routing.generate('token_update', {
+                name: this.tokenName,
+            }),
         };
     },
     watch: {
@@ -120,17 +123,14 @@ export default {
                 this.checkTelegramUrl();
             }
 
-            if (this.showTelegramError && !this.newTelegram.length) {
-                this.showTelegramError = false;
-            }
-        },
-        checkTelegramUrl: function() {
-            this.showTelegramError = false;
-            if (!isValidTelegramUrl(this.newTelegram)) {
-                this.showTelegramError = true;
+            if (this.showTelegramError) {
                 return;
             }
+
             this.saveTelegram();
+        },
+        checkTelegramUrl: function() {
+            this.showTelegramError = !isValidTelegramUrl(this.newTelegram);
         },
         deleteTelegram: function() {
             this.newTelegram = '';

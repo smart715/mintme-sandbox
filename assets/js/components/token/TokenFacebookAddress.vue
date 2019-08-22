@@ -100,10 +100,10 @@ const HTTP_ACCEPTED = 202;
 export default {
     name: 'TokenFacebookAddress',
     props: {
+        address: String,
         appId: String,
         editing: Boolean,
-        address: String,
-        updateUrl: String,
+        tokenName: String,
     },
     components: {
         FontAwesomeIcon,
@@ -121,6 +121,9 @@ export default {
             showConfirmModal: false,
             selectedUrl: '',
             submitting: false,
+            updateUrl: this.$routing.generate('token_update', {
+                name: this.tokenName,
+            }),
         };
     },
     computed: {

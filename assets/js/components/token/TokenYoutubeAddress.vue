@@ -60,11 +60,11 @@ const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
 export default {
     name: 'TokenYoutubeAddress',
     props: {
-        clientId: String,
         editable: Boolean,
         editing: Boolean,
         channelId: String,
-        updateUrl: String,
+        clientId: String,
+        tokenName: String,
     },
     components: {
         FontAwesomeIcon,
@@ -80,6 +80,9 @@ export default {
         return {
             currentChannelId: this.channelId,
             submitting: false,
+            updateUrl: this.$routing.generate('token_update', {
+                name: this.tokenName,
+            }),
         };
     },
     computed: {

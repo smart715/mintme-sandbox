@@ -131,7 +131,7 @@
                     <div class="col-12 text-left">
                         <button
                             class="btn btn-primary"
-                            @click="confirmWebsite"
+                            @click="saveWebsite"
                         >
                             <font-awesome-icon
                                 v-if="submitting"
@@ -173,11 +173,9 @@ Vue.use(Toasted, {
 export default {
     name: 'TokenWebsiteAddress',
     props: {
-        confirmWebsiteFileUrl: String,
-        confirmWebsiteUrl: String,
         currentWebsite: String,
         editingWebsite: Boolean,
-        updateUrl: String,
+        tokenName: String,
     },
     components: {
         FontAwesomeIcon,
@@ -186,6 +184,12 @@ export default {
     mixins: [FiltersMixin],
     data() {
         return {
+            confirmWebsiteFileUrl: this.$routing.generate('token_website_confirmation', {
+                name: this.tokenName,
+            }),
+            confirmWebsiteUrl: this.$routing.generate('token_website_confirm', {
+                name: this.tokenName,
+            }),
             fileError: {},
             newWebsite: this.currentWebsite || 'https://',
             parsedWebsite: '',
@@ -239,9 +243,6 @@ export default {
 
             this.parsedWebsite = this.newWebsite.replace(/\/+$/, '');
             this.showConfirmWebsiteModal = true;
-        },
-        confirmWebsite: function() {
-            this.saveWebsite();
         },
         deleteWebsite: function() {
             this.newWebsite = null;

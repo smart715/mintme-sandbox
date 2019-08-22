@@ -66,7 +66,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}", name="token_update")
+     * @Rest\Patch("/{name}", name="token_update", options={"expose"=true})
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
@@ -132,7 +132,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/website-confirmation", name="token_website_confirm")
+     * @Rest\Post("/{name}/website-confirmation", name="token_website_confirm", options={"expose"=true})
      * @Rest\RequestParam(name="url", nullable=true)
      */
     public function confirmWebsite(

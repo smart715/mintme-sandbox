@@ -11,7 +11,8 @@
                             class="icon-edit float-right c-pointer"
                             :icon="editingUrlsIcon"
                             transform="shrink-4 up-1.5"
-                            @click="editingUrls = !editingUrls"/>
+                            @click="editingUrls = !editingUrls"
+                        />
                         <a :href="profileUrl">
                             Visit token's creator profile
                         </a>
@@ -19,43 +20,43 @@
                             <div class="pb-1">
                                 <template v-if="editingUrls">
                                     <token-website-address
-                                        :confirmWebsiteFileUrl="confirmWebsiteFileUrl"
-                                        :confirmWebsiteUrl="confirmWebsiteUrl"
                                         :currentWebsite="currentWebsite"
                                         :editingWebsite="editingWebsite"
-                                        :updateUrl="updateUrl"
+                                        :tokenName="tokenName"
                                         @saveWebsite="saveWebsite"
                                         @toggleEdit="toggleEdit"
-                                    ></token-website-address>
+                                    />
                                 </template>
                                 <token-facebook-address
+                                    :address="facebookUrl"
                                     :app-id="facebookAppId"
                                     :editing="editingUrls"
-                                    :address="facebookUrl"
-                                    :update-url="updateUrl"/>
+                                    :tokenName="tokenName"
+                                />
                                 <token-youtube-address
-                                    :client-id="youtubeClientId"
                                     :editable="editable"
                                     :editing="editingUrls"
                                     :channel-id="youtubeChannelId"
-                                    :update-url="updateUrl"/>
+                                    :client-id="youtubeClientId"
+                                    :tokenName="tokenName"
+                                />
                                 <template v-if="editingUrls">
                                     <token-telegram-channel
                                         :currentTelegram="currentTelegram"
                                         :editingTelegram="editingTelegram"
-                                        :updateUrl="updateUrl"
+                                        :tokenName="tokenName"
                                         @saveTelegram="saveTelegram"
                                         @toggleEdit="toggleEdit"
                                     ></token-telegram-channel>
                                     <token-discord-channel
                                         :currentDiscord="currentDiscord"
                                         :editingDiscord="editingDiscord"
-                                        :updateUrl="updateUrl"
+                                        :tokenName="tokenName"
                                         @saveDiscord="saveDiscord"
                                         @toggleEdit="toggleEdit"
                                     ></token-discord-channel>
                                 </template>
-                                <template v-if="!editingUrls">
+                                <template v-else>
                                     <div v-if="currentWebsite">
                                         Web:
                                         <a :href="currentWebsite" target="_blank" rel="nofollow">
@@ -187,18 +188,15 @@ export default {
     props: {
         facebookAppId: String,
         youtubeClientId: String,
-        confirmWebsiteFileUrl: String,
-        confirmWebsiteUrl: String,
         profileName: String,
         websiteUrl: String,
         facebookUrl: String,
         youtubeChannelId: String,
-        updateUrl: String,
         editable: Boolean,
         profileUrl: String,
-        tokenUrl: String,
         telegramUrl: String,
         discordUrl: String,
+        tokenName: String,
     },
     components: {
         bDropdown,
@@ -224,6 +222,10 @@ export default {
             currentDiscord: this.discordUrl,
             showWebsiteError: false,
             twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
+            tokenUrl: this.$routing.generate('token_show', {
+                name: this.tokenName,
+                tab: 'intro',
+            }),
         };
     },
     computed: {
