@@ -17,3 +17,8 @@ scheb_two_factor:
 
     ip_whitelist:
         - 127.0.0.1
+
+    trusted_device:
+        enabled: '%trusted_device_enabled%'
+        lifetime: '%trusted_device_cookie_lifetime%'
+        extend_lifetime: '%trusted_device_extend_lifetime%'
