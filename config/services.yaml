@@ -333,3 +333,6 @@ services:
         tags:
             - { name: "kernel.event_subscriber", priority: 100 }
 
+    two_factor.auth_require_handler:
+        class: App\Security\TwoFactorRequireHandler
+        public: true

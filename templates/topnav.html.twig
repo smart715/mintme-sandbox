@@ -1,3 +1,4 @@
+{% set show_links = app.user and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %}
 <b-navbar id="navbar" toggleable="lg" type="" class="top-navbar pt-3" v-cloak>
     <div class="container-fluid">
         <b-navbar-brand href="{{ path('homepage') }}">
@@ -13,7 +14,7 @@
                     <li class="search nav-item align-self-center py-3 py-lg-0 pr-0 pr-lg-3">
                         <token-searcher class="justify-content-center pr-0" search-url="{{ path('token_search') }}"></token-searcher>
                     </li>
-                    {% if app.user %}
+                    {% if show_links %}
                         <b-nav-item class="menu-token align-self-center {{ app.request.get('_route') == 'token' ? 'active' : '' }}" href="{{ path('token_create') }}">
                             <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline"></span>
                             <span>My Token</span>
@@ -22,7 +23,7 @@
                     <b-nav-item class="align-self-center {{ app.request.get('_route') == 'trading' ? 'active' : '' }}" href="{{ path('trading') }}">
                         Trading
                     </b-nav-item>
-                    {% if app.user %}
+                    {% if show_links %}
                         <b-nav-item class="align-self-center {{ app.request.get('_route') == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                             Wallet
                         </b-nav-item>
@@ -31,7 +32,7 @@
                         News
                     </b-nav-item>
                 {% endif %}
-                {% if app.user %}
+                {% if show_links %}
                     <b-nav-item class="align-self-center {{ app.request.get('_route') == 'referral' ? 'active' : '' }}" href="{{ path('referral-program') }}">
                         Referrals
                     </b-nav-item>
@@ -44,38 +45,44 @@
                         <span>Sign Up</span>
                     </b-nav-item>
                 {% else %}
-                    <div class="d-lg-none align-self-center ">
-                        {% if prelaunch.isFinished() %}
-                            <b-nav-item class="text-center {{ app.request.get('_route') == 'profile' ? 'active' : '' }}" href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
-                                <span>Profile</span>
+                    {% if show_links %}
+                        <div class="d-lg-none align-self-center ">
+                            {% if prelaunch.isFinished() %}
+                                <b-nav-item class="text-center {{ app.request.get('_route') == 'profile' ? 'active' : '' }}" href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
+                                    <span>Profile</span>
+                                </b-nav-item>
+                            {% endif %}
+                            <b-nav-item class="text-center {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
+                                <span>Settings</span>
                             </b-nav-item>
-                        {% endif %}
-                        <b-nav-item class="text-center {{ app.request.get('_route') == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
-                            <span>Settings</span>
-                        </b-nav-item>
-                        <b-nav-item class="text-center {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
+                            <b-nav-item class="text-center {{ app.request.get('_route') == 'fos_user_security_logout' ? 'active' : '' }}" href="{{ path('fos_user_security_logout') }}">
+                                <span>Log Out</span>
+                            </b-nav-item>
+                        </div>
+                        <b-nav-item-dropdown class="d-none d-lg-block align-self-end align-self-lg-center" right="right">
+                            <template slot="button-content">
+                                <i class="icon-user-avatar d-none d-lg-block"></i>
+                            </template>
+                            {% if prelaunch.isFinished() %}
+                                <b-dropdown-item href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
+                                    <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                    Profile
+                                </b-dropdown-item>
+                            {% endif %}
+                            <b-dropdown-item href="{{ path('settings') }}">
+                                <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                Settings
+                            </b-dropdown-item>
+                            <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
+                                <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                Log Out
+                            </b-dropdown-item>
+                        </b-nav-item-dropdown>
+                    {% else %}
+                        <b-nav-item class="align-self-center" href="{{ path('fos_user_security_logout') }}">
                             <span>Log Out</span>
                         </b-nav-item>
-                    </div>
-                    <b-nav-item-dropdown class="d-none d-lg-block align-self-end align-self-lg-center" right="right">
-                        <template slot="button-content">
-                            <i class="icon-user-avatar d-none d-lg-block"></i>
-                        </template>
-                        {% if prelaunch.isFinished() %}
-                            <b-dropdown-item href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}">
-                                <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                Profile
-                            </b-dropdown-item>
-                        {% endif %}
-                        <b-dropdown-item href="{{ path('settings') }}">
-                            <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                            Settings
-                        </b-dropdown-item>
-                        <b-dropdown-item href="{{ path('fos_user_security_logout') }}">
-                            <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                            Log Out
-                        </b-dropdown-item>
-                    </b-nav-item-dropdown>
+                    {% endif %}
                 {% endif %}
             </b-navbar-nav>
         </b-collapse>

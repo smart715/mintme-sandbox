@@ -23,7 +23,8 @@ class TradingController extends Controller
      *     requirements={"page"="\d+"},
      *     name="trading",
      *     options={"expose"=true,
-     *          "sitemap" = true
+     *          "sitemap" = true,
+     *          "2fa_progress"=false
      *     }
      * )
      */
