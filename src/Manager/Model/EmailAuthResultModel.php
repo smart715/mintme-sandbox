@@ -10,9 +10,10 @@ class EmailAuthResultModel
     /** @var bool */
     private $result;
 
-    public function __construct(?string $message)
+    public function __construct(bool $result, ?string $message)
     {
         $this->setMessage($message);
+        $this->setResult($result);
     }
 
     public function getMessage(): string
@@ -22,7 +23,6 @@ class EmailAuthResultModel
 
     public function setMessage(?string $message): self
     {
-        $this->result = null === $message;
         $this->message = $message;
 
         return $this;
@@ -30,6 +30,13 @@ class EmailAuthResultModel
 
     public function getResult(): bool
     {
-        return $this->result;
+        return (bool) $this->result;
+    }
+
+    public function setResult(bool $result): self
+    {
+        $this->result = $result;
+
+        return $this;
     }
 }

@@ -37,7 +37,7 @@ class EmailAuthManager implements EmailAuthManagerInterface
             $message = self::EXPIRED_CODE;
         }
 
-        return new EmailAuthResultModel($message);
+        return new EmailAuthResultModel(null === $message, $message);
     }
 
     public function generateCode(User $user, int $expirationTime): string
