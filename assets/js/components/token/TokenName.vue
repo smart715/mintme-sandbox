@@ -167,8 +167,8 @@ export default {
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
-                isDashes: this.replace(/-/g, '').length === 0 ? true : false,
-                isSpaces: this.match(/^\s+$/) !== null ? true : false,
+                isDashes: this.newName.replace(/-/g, '').length === 0 ? false : true,
+                isSpaces: this.newName.match(/^\s+$/) === null ? false : true,
             },
         };
     },

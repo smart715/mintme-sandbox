@@ -29,10 +29,10 @@
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
                             Token name can't be longer than 255 characters
                         </div>
-                        <div v-cloak="$v.tokenName" v-if="$v.tokenName.isDashes" class="text-danger text-center">
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.isDashes" class="text-danger text-center">
                             Token name cannot contain only dashes
                         </div>
-                        <div v-cloak="$v.tokenName" v-if="$v.tokenName.isSpaces" class="text-danger text-center">
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.isSpaces" class="text-danger text-center">
                             Token name cannot contain only spaces
                         </div>
                         <div class="form-group row">
