@@ -72,7 +72,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Route("/invite/{code}", name="register-referral")
+     * @Rest\Route("/invite/{code}", name="register-referral", schemes={"https"})
      */
     public function registerReferral(string $code, AuthorizationCheckerInterface $authorizationChecker): Response
     {
