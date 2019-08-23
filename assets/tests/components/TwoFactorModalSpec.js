@@ -39,4 +39,18 @@ describe('TwoFactorModal', () => {
         wrapper.vm.visible = true;
         expect(textInput.element.value).to.equal('');
     });
+
+    it('2fa label when 2fa activated', () => {
+        const wrapper = mount(TwoFactorModal, {
+             propsData: {twofa: true},
+        });
+        expect(wrapper.find('label').text()).to.equal('Two Factor Authentication Code:');
+    });
+
+    it('email label when 2fa not activated', () => {
+        const wrapper = mount(TwoFactorModal, {
+             propsData: {twofa: false},
+        });
+        expect(wrapper.find('label').text()).to.equal('Email Verification Code:');
+    });
 });

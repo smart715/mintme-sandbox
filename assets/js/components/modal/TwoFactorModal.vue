@@ -43,7 +43,7 @@ export default {
         Modal,
     },
     props: {
-        noClose: Boolean,
+        noClose: {type: Boolean, defalut: true},
         twofa: Boolean,
         visible: Boolean,
     },
