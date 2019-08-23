@@ -1,14 +1,14 @@
 <template>
     <modal
         :visible="visible"
-        no-close-on-backdrop
+        :no-close="noClose"
         @close="closeModal">
         <template slot="close"> &nbsp; </template>
         <template slot="body">
             <div class="text-center">
                 <div class="col-12 pb-3">
                     <label for="twofactor" class="d-block text-left">
-                        Two Factor Authentication Code:
+                        {{ label }}
                     </label>
                     <input
                         v-model="code"
@@ -43,15 +43,19 @@ export default {
         Modal,
     },
     props: {
+        noClose: {type: Boolean, defalut: true},
+        twofa: Boolean,
         visible: Boolean,
     },
     data() {
         return {
             code: '',
+            label: this.twofa ? 'Two Factor Authentication Code:' : 'Email Verification Code:',
         };
     },
     methods: {
         closeModal: function() {
+            this.code = '';
             this.$emit('close');
         },
         onVerify: function() {
