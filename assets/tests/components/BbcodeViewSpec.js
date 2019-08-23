@@ -25,4 +25,11 @@ describe('BbcodeView', () => {
 
         expect(wrapper.vm.parsedValue).to.equal('<a rel="nofollow" target="_blank" href="https://foo">bar</a>');
     });
+    it('parse bbcode xss protection', () => {
+        const wrapper = mount(BbcodeView, {
+             propsData: {value: '<script>alert("XSS");</script>'},
+        });
+
+        expect(wrapper.vm.parsedValue).to.equal('&lt;script&gt;alert("XSS");&lt;/script&gt;');
+    });
 });
