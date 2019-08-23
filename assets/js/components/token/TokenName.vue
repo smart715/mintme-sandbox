@@ -29,8 +29,8 @@ import WebSocketMixin from '../../mixins/websocket';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
-const isSpaces = helpers.regex('names', /^ *$/u);
-const isDashes = helpers.regex('names', /^-*$/u);
+const isSpaces = helpers.regex('names', /^\\ *$/u);
+const isDashes = helpers.regex('names', /^\\-*$/u);
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
