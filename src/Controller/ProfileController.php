@@ -59,7 +59,7 @@ class ProfileController extends Controller
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->merge($profile);
         $entityManager->flush();
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $this->get("security.csrf.token_manager")->refreshToken("form_intention");
         }
