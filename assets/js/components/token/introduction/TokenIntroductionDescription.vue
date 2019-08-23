@@ -39,7 +39,7 @@
                                             identity and everything that may interest buyers.
                                         </template>
                                     </guide>
-                                    <bbcode-help class="d-inline"></bbcode-help>
+                                    <bbcode-help class="d-inline" placement="right"></bbcode-help>
                                 </div>
                                 <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
 
