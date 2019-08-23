@@ -169,6 +169,8 @@ export default {
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
+                isDashes: this.newName.replace(/-/g, '').length === 0 ? true : false,
+                isSpaces: this.newName.trim() ? false : true,
             },
         };
     },
