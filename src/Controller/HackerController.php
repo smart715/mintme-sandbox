@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/hacker")
  * @Security(expression="is_granted('hacker')")
+ * @codeCoverageIgnore
  */
 class HackerController extends AbstractController
 {

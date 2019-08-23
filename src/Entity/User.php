@@ -12,6 +12,7 @@ use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
+use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -26,7 +27,8 @@ class User extends BaseUser implements
     TwoFactorInterface,
     EmailTwoFactorInterface,
     BackupCodeInterface,
-    PreferredProviderInterface
+    PreferredProviderInterface,
+    TrustedDeviceInterface
 {
     /**
      * @ORM\Id
@@ -100,14 +102,16 @@ class User extends BaseUser implements
     private $authCode;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token", inversedBy="relatedUsers")
-     * @ORM\JoinTable(name="user_tokens",
-     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="token_id", referencedColumnName="id")}
-     * )
+     * @ORM\OneToMany(targetEntity="UserToken", mappedBy="user")
      * @var ArrayCollection
      */
-    protected $relatedTokens;
+    protected $tokens;
+
+    /**
+     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="user", cascade={"persist", "remove"})
+     * @var ArrayCollection
+     */
+    protected $cryptos;
 
     /**
      * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
@@ -128,6 +132,12 @@ class User extends BaseUser implements
      */
     protected $pendingWithdrawals;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true, options={"default": 0})
+     * @var int
+     */
+    private $trustedTokenVersion = 0;
+
     /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
     {
@@ -138,23 +148,25 @@ class User extends BaseUser implements
      * @codeCoverageIgnore
      * @return Token[]
      */
-    public function getRelatedTokens(): array
+    public function getTokens(): array
     {
-        return $this->relatedTokens->toArray();
+        return array_map(function (UserToken $userToken) {
+            return $userToken->getToken();
+        }, $this->tokens->toArray());
     }
 
     /** @codeCoverageIgnore */
-    public function addRelatedToken(Token $token): self
+    public function addToken(UserToken $userToken): self
     {
-        $this->relatedTokens->add($token);
+        $this->tokens->add($userToken);
 
         return $this;
     }
 
     /** @codeCoverageIgnore */
-    public function removeRelatedToken(Token $token): self
+    public function addCrypto(UserCrypto $userCrypto): self
     {
-        $this->relatedTokens->removeElement($token);
+        $this->cryptos->add($userCrypto);
 
         return $this;
     }
@@ -342,5 +354,19 @@ class User extends BaseUser implements
         }
 
         return $this->googleAuthenticatorEntry;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getTrustedTokenVersion(): int
+    {
+        return $this->trustedTokenVersion;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setTrustedTokenVersion(int $trustedTokenVersion): self
+    {
+        $this->trustedTokenVersion = $trustedTokenVersion;
+
+        return $this;
     }
 }

@@ -35,6 +35,8 @@ use Symfony\Component\Validator\Validation;
  */
 class TokensAPIController extends AbstractFOSRestController
 {
+    private const TOP_HOLDERS_COUNT = 10;
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -285,7 +287,7 @@ class TokensAPIController extends AbstractFOSRestController
         try {
             $common = $balanceHandler->balances(
                 $this->getUser(),
-                $this->getUser()->getRelatedTokens()
+                $this->getUser()->getTokens()
             );
         } catch (BalanceException $exception) {
             if (BalanceException::EMPTY == $exception->getCode()) {
@@ -361,5 +363,25 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         return null;
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/top-holders", name="top_holders", options={"expose"=true})
+     */
+    public function getTopHolders(
+        string $name,
+        BalanceHandlerInterface $balanceHandler
+    ): View {
+        $tradable = $this->cryptoManager->findBySymbol($name) ??
+            $this->tokenManager->findByName($name);
+
+        if (null == $tradable) {
+            throw $this->createNotFoundException('Not Found');
+        }
+
+        $topTraders = $balanceHandler->topHolders($tradable, self::TOP_HOLDERS_COUNT);
+
+        return $this->view($topTraders, Response::HTTP_OK);
     }
 }

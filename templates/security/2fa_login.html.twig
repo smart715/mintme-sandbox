@@ -15,7 +15,7 @@
                         {{ formHeader }}
                     </div>
                     <div class="card-body">
-                        {% if authenticationError %}
+                        {% if authenticationError  and 'Invalid CSRF token.' != authenticationError  %}
                             <div class="p-2 mb-2 bg-danger text-center text-white">
                                 {{ authenticationError|trans(authenticationErrorData) }}
                             </div>
@@ -29,18 +29,22 @@
                                         class="form-control form-control-md" id="code" autofocus
                                         >
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group mb-0" style="line-height: 0.8em;">
                                     <small>
                                         Enter the code from the two-factor app on your mobile device.
                                         If you've lost your device, you may enter one of your recovery codes.
                                     </small>
                                 </div>
+                                {{ block('trusted_device', 'form/fields.html.twig') }}
                                 <div class="form-group">
                                     <input
                                         type="submit" id="_submit" name="_submit"
                                         class="btn btn-primary" value="Verify Code"
                                         >
                                 </div>
+                                {% if isCsrfProtectionEnabled %}
+                                    <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+                                {% endif %}
                             </form>
                         {% endblock %}
                     </div>

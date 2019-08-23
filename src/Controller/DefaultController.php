@@ -11,7 +11,7 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/", name="homepage",
-     *      options={"sitemap" = true}
+     *      options={"sitemap" = true, "2fa_progress" = false}
      * )
      */
     public function index(): Response
@@ -55,5 +55,16 @@ class DefaultController extends Controller
     public function termsOfService(): Response
     {
         return $this->render('pages/terms_of_service.html.twig');
+    }
+
+    /**
+     * @Route("/links",
+     *      name="links",
+     *      options={"sitemap" = false}
+     * )
+     */
+    public function links(): Response
+    {
+        return $this->render('pages/links.html.twig');
     }
 }
