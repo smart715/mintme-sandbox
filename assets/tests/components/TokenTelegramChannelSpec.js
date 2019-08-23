@@ -41,7 +41,7 @@ describe('TokenTelegramChannel', () => {
         });
 
         wrapper.find('input').setValue('https://t.me/joinchat/newtelegram');
-        wrapper.vm.checkTelegramUrl();
+        wrapper.vm.editTelegram();
 
         moxios.stubRequest('token_update', {
             status: 202,
@@ -67,7 +67,7 @@ describe('TokenTelegramChannel', () => {
         });
 
         wrapper.find('input').setValue('incorrect_link');
-        wrapper.vm.checkTelegramUrl();
+        wrapper.vm.editTelegram();
 
         expect(wrapper.vm.showTelegramError).to.equal(true);
     });

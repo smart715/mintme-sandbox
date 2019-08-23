@@ -41,7 +41,7 @@ describe('TokenDiscordChannel', () => {
         });
 
         wrapper.find('input').setValue('https://discord.gg/newdiscord');
-        wrapper.vm.checkDiscordUrl();
+        wrapper.vm.editDiscord();
 
         moxios.stubRequest('token_update', {
             status: 202,
@@ -67,7 +67,7 @@ describe('TokenDiscordChannel', () => {
         });
 
         wrapper.find('input').setValue('incorrect_link');
-        wrapper.vm.checkDiscordUrl();
+        wrapper.vm.editDiscord();
 
         expect(wrapper.vm.showDiscordError).to.equal(true);
     });

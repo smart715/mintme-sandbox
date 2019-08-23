@@ -27,7 +27,7 @@ describe('TokenWebsiteAddress', () => {
         moxios.uninstall();
     });
 
-    it('save correct link', (done) => {
+    it('open confirm dialog', () => {
         const localVue = mockVue();
         const wrapper = mount(TokenWebsiteAddress, {
             localVue,
@@ -35,26 +35,13 @@ describe('TokenWebsiteAddress', () => {
                 showWebsiteError: false,
                 showConfirmWebsiteModal: false,
             },
-            propsData: {
-                editingWebsite: true,
-                confirmWebsiteUrl: 'confirm_website',
-            },
+            propsData: {editingWebsite: true},
         });
 
         wrapper.find('input').setValue('https://example.com');
         wrapper.vm.checkWebsiteUrl();
         expect(wrapper.vm.showWebsiteError).to.equal(false);
         expect(wrapper.vm.showConfirmWebsiteModal).to.equal(true);
-        wrapper.vm.confirmWebsite();
-
-        moxios.stubRequest('confirm_website', {
-            response: {verified: true},
-        });
-
-        moxios.wait(() => {
-            expect(wrapper.emitted().saveWebsite[0]).to.deep.equal(['https://example.com']);
-            done();
-        });
     });
 
     it('do not save incorrect link', () => {
