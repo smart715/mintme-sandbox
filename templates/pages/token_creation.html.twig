@@ -33,8 +33,7 @@
                             <div class="col-md-12 text-left">
                                 <input type="submit"
                                        :disabled="$v.$anyError || !tokenName ||
-                                       tokenName.replace(/-/g, '').length === 0 ||
-                                       tokenName.replace(' ','').length === 0"
+                                       tokenName.replace(/-/g, '').length === 0 || !tokenName.trim()"
                                        class="btn btn-primary" value="Create token"
                                 />
                                 <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
