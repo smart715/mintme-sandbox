@@ -120,6 +120,12 @@ export default {
             } else if (!this.$v.newName.maxLength) {
                 this.$toasted.error('Token name can not be longer than 60 characters');
                 return;
+            } else if (!this.$v.newName.trim()) {
+                this.$toasted.error('Token name cannot contain only spaces');
+                return;
+            } else if (this.$v.newName.replace(/-/g, '').length === 0) {
+                this.$toasted.error('Token name cannot contain only dashes');
+                return;
             }
 
             this.$axios.single.patch(this.updateUrl, {
