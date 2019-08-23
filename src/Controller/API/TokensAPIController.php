@@ -394,7 +394,7 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to change token\'s name');
+            throw new ApiBadRequestException('You need all your tokens to delete token');
         }
 
         $this->em->remove($token);
