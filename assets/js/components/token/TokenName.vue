@@ -29,6 +29,8 @@ import WebSocketMixin from '../../mixins/websocket';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
+const isSpaces = helpers.regex('names', /^ *$/u);
+const isDashes = helpers.regex('names', /^-*$/u);
 
 library.add(faEdit, faCheck);
 Vue.use(Toasted, {
@@ -120,7 +122,7 @@ export default {
             } else if (!this.$v.newName.maxLength) {
                 this.$toasted.error('Token name can not be longer than 60 characters');
                 return;
-            } else if (!this.$v.newName.isSpaces) {
+            } else if (this.$v.newName.isSpaces) {
                 this.$toasted.error('Token name cannot contain only spaces');
                 return;
             } else if (this.$v.newName.isDashes) {
@@ -167,8 +169,8 @@ export default {
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
-                isDashes: this.newName.replace(/-/g, '').length === 0 ? true : false,
-                isSpaces: !this.newName.trim() ? true : false,
+                isDashes: isDashes,
+                isSpaces: isSpaces,
             },
         };
     },
