@@ -1,5 +1,5 @@
 import {mount, createLocalVue} from '@vue/test-utils';
-import TokenWebsiteAddress from '../../js/components/token/TokenWebsiteAddress';
+import TokenWebsiteAddress from '../../js/components/token/website/TokenWebsiteAddress';
 import moxios from 'moxios';
 import axios from 'axios';
 
