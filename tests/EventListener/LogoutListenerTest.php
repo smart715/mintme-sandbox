@@ -32,10 +32,13 @@ class LogoutListenerTest extends TestCase
         $event = $this->createMock(FilterUserResponseEvent::class);
 
         $request = $this->createMock(Request::class);
+        $response = $this->createMock(Response::class);
+        $token = $this->createMock(TokenInterface::class);
         $request->cookies = $this->createMock(ParameterBag::class);
 
-        $event->method('getUser')->willReturn($this->createMock(TokenInterface::class));
+        $event->method('getUser')->willReturn($token);
         $event->method('getRequest')->willReturn($request);
-        $listener->logout($event);
+
+        $listener->logout($request, $response, $token);
     }
 }
