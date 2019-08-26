@@ -34,7 +34,7 @@ class UserEmailValidator extends ConstraintValidator
         }
     }
 
-    protected function checkDisposable(string $email): bool
+    protected function checkDisposable($email): bool
     {
         $email = substr($email, strrpos($email, '@')+1);
         $client = HttpClient::create();
