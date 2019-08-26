@@ -12,7 +12,7 @@ describe('TwoFactorModal', () => {
          data: {code: ''},
     });
 
-   const textInput = wrapper.find('input');
+    const textInput = wrapper.find('input');
 
     it('renders correctly with assigned props', () => {
         expect(wrapper.vm.visible).to.equal(true);
@@ -31,5 +31,19 @@ describe('TwoFactorModal', () => {
         textInput.setValue('123');
         wrapper.vm.onVerify();
         expect(wrapper.emitted().verify[0]).to.deep.equal(['123']);
+    });
+
+    it('2fa label when 2fa activated', () => {
+        const wrapper = mount(TwoFactorModal, {
+             propsData: {twofa: true},
+        });
+        expect(wrapper.find('label').text()).to.equal('Two Factor Authentication Code:');
+    });
+
+    it('email label when 2fa not activated', () => {
+        const wrapper = mount(TwoFactorModal, {
+             propsData: {twofa: false},
+        });
+        expect(wrapper.find('label').text()).to.equal('Email Verification Code:');
     });
 });

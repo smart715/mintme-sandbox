@@ -16,6 +16,8 @@
 @import 'wallet'
 @import 'news'
 @import 'trading'
+@import 'markitup'
+@import 'bbcode-help'
 @import 'knowledge-base'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
@@ -157,6 +159,7 @@ a
     height: auto
     border: none
     cursor: url('../img/input-cursor.png'), auto
+    -webkit-text-fill-color: white
 
   .custom-select, .form-control
     border: none
@@ -210,6 +213,24 @@ a
       display: table-cell
       width: 120px
 
+.custom-scrollbar
+  scrollbar-color: $primary-light $white
+  cursor: default
+
+  &::-webkit-scrollbar
+    width: 10px
+    height: 10px
+
+  &::-webkit-scrollbar-track-piece
+    background-color: $white
+
+  &::-webkit-scrollbar-thumb:horizontal
+    background-color: $primary-light
+
+  &::-webkit-scrollbar-thumb:vertical
+    height: 30px
+    background-color: $primary-light
+
 .table, .table-responsive
   color: inherit
 
@@ -231,21 +252,7 @@ a
         border: none
 
   &, tbody
-    scrollbar-color: $primary-light $white
-
-    &::-webkit-scrollbar
-      width: 10px
-      height: 10px
-
-    &::-webkit-scrollbar-track-piece
-      background-color: $white
-
-    &::-webkit-scrollbar-thumb:horizontal
-      background-color: $primary-light
-
-    &::-webkit-scrollbar-thumb:vertical
-      height: 30px
-      background-color: $primary-light
+    @extend .custom-scrollbar
 
   td
     border: none

@@ -5,6 +5,9 @@
   "main": "main.js",
   "directories": {},
   "dependencies": {
+    "@bbob/core": "^2.5.1",
+    "@bbob/html": "^2.5.1",
+    "@bbob/preset-html5": "^2.5.1",
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/fontawesome-free-brands": "^5.0.13",
     "@fortawesome/fontawesome-free-regular": "^5.0.13",
@@ -29,6 +32,7 @@
     "karma-es5-shim": "0.0.4",
     "karma-es6-shim": "^1.0.0",
     "locutus": "^2.0.10",
+    "markitup": "^3.0.0-0",
     "moment": "^2.22.2",
     "url-parse": "^1.4.4",
     "v-autocomplete": "^1.8.2",
