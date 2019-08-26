@@ -1,25 +1,23 @@
 <template>
-    <div>
-        <div class="d-flex-inline" v-if="channelId">
-            <div class="display-text">
-                Youtube:
-                <a
-                    :href="youTubeUrl"
-                    target="_blank"
-                    rel="nofollow"
-                >
-                    {{ youTubeUrl }}
-                </a>
-                <div ref="ytButtonContainer" class="d-block-inline"></div>
-                <guide>
-                    <template slot="header">
-                        Youtube
-                    </template>
-                    <template slot="body">
-                        Link to token creator’s YouTube. Before adding it, we confirmed ownership.
-                    </template>
-                </guide>
-            </div>
+    <div class="d-flex-inline">
+        <div class="display-text">
+            Youtube:
+            <a
+                :href="youTubeUrl"
+                target="_blank"
+                rel="nofollow"
+            >
+                {{ youTubeUrl }}
+            </a>
+            <div ref="ytButtonContainer" class="d-block-inline"></div>
+            <guide>
+                <template slot="header">
+                    Youtube
+                </template>
+                <template slot="body">
+                    Link to token creator’s YouTube. Before adding it, we confirmed ownership.
+                </template>
+            </guide>
         </div>
     </div>
 </template>
