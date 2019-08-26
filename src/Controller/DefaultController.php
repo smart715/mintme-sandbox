@@ -11,7 +11,7 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/", name="homepage",
-     *      options={"sitemap" = true}
+     *      options={"sitemap" = true, "2fa_progress" = false}
      * )
      */
     public function index(): Response

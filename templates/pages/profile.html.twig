@@ -48,7 +48,7 @@
                                 {% endif %}
                             </div>
                             <div class="col-12 pt-3">
-                                <div>{{ profile.description }}</div>
+                                <bbcode-view value="{{ profile.description }}"></bbcode-view>
                             </div>
                         </div>
 
@@ -105,9 +105,14 @@
                                         {{ form_row(form.country) }}
                                     </div>
                                 </div>
-                                <div class="col-12 pt-3  ">
+                                <div class="col-12 pt-3">
                                     <div>
-                                        {{ form_row(form.description) }}
+                                        {{ form_row(form.description, {'attr':
+                                            {
+                                                'class' : 'form-control form-control-md',
+                                                'ref' : 'description'
+                                            }
+                                        }) }}
                                     </div>
                                 </div>
                                 <div class="col-12 pt-3">
