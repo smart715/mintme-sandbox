@@ -79,6 +79,7 @@ import {FiltersMixin} from '../../mixins/';
 import {isValidDiscordUrl} from '../../utils';
 
 library.add(faDiscord, faTimes);
+
 Vue.use(Toasted, {
     duration: 5000,
     position: 'top-center',

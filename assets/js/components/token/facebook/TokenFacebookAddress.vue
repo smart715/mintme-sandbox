@@ -1,52 +1,33 @@
 <template>
     <div>
-        <div v-show="!editing">
-            <div class="d-flex-inline" v-if="currentAddress">
-                <div class="display-text">
-                    Facebook:
-                    <a :href="currentAddress" target="_blank" rel="nofollow">
-                        {{ currentAddress }}
-                    </a>
-                    <div
-                        class="fb-share-button"
-                        :data-href="currentAddress"
-                        data-layout="button_count"
-                        data-size="small"
-                        data-mobile-iframe="true">
-                        <a
-                            target="_blank"
-                            :href="'https://www.facebook.com/sharer/sharer.php?u='
-                            +currentAddressEncoded+'&amp;src=sdkpreparse'"
-                            class="fb-xfbml-parse-ignore">
-                        </a>
-                    </div>
-                    <guide>
-                        <template slot="header">
-                            Facebook
-                        </template>
-                        <template slot="body">
-                            Link to token creator’s Facebook.
-                            Before adding it, we confirmed ownership.
-                        </template>
-                    </guide>
-                </div>
-            </div>
-        </div>
-        <div v-show="editing">
-            <div class=" d-block mx-0 my-1 p-0">
-                <a class="c-pointer" @click="addPage" id="address-link">
-                    <span class="token-introduction-profile-icon text-center d-inline-block">
-                        <font-awesome-icon :icon="{prefix: 'fab', iconName: 'facebook-square'}" size="lg"/>
-                    </span>
-                    {{ computedAddress | truncate(35) }}
-                </a>
-                <b-tooltip v-if="currentAddress" target="address-link">
-                    {{ computedAddress }}
-                </b-tooltip>
-                <a v-if="currentAddress" @click.prevent="deleteAddress">
-                    <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                </a>
-            </div>
+        <div class="d-block mx-0 my-1 p-0">
+            <a
+                id="address-link"
+                class="c-pointer"
+                @click="addPage"
+            >
+                <span class="token-introduction-profile-icon text-center d-inline-block">
+                    <font-awesome-icon
+                        :icon="{prefix: 'fab', iconName: 'facebook-square'}"
+                        size="lg"
+                    />
+                </span>
+                {{ computedAddress | truncate(35) }}
+            </a>
+            <b-tooltip
+                v-if="currentAddress"
+                target="address-link"
+                title="computedAddress"
+            />
+            <a
+                v-if="currentAddress"
+                @click.prevent="deleteAddress"
+            >
+                <font-awesome-icon
+                    icon="times"
+                    class="text-danger c-pointer ml-2"
+                />
+            </a>
         </div>
         <modal
             :visible="showConfirmModal"
@@ -58,20 +39,35 @@
                         <h3 class="modal-title text-center pb-2">Facebook page Confirmation</h3>
                         <div class="form-group">
                             <label for="select-fb-pages">Select Facebook page to show:</label>
-                            <select v-model="selectedUrl" class="form-control" id="select-fb-pages">
+                            <select
+                                id="select-fb-pages"
+                                v-model="selectedUrl"
+                                class="form-control"
+                            >
                                 <option
                                     v-for="(page, index) in pages"
                                     :selected="index === 0 ? 'selected' : ''"
                                     :key="page.id"
-                                    :value="page.link">
+                                    :value="page.link"
+                                >
                                     {{ page.name }}
                                 </option>
                             </select>
                         </div>
                     </div>
                     <div class="col-12 text-center pt-2">
-                        <button class="btn btn-primary" @click="savePage">Confirm</button>
-                        <span class="btn-cancel c-pointer pl-3" @click="showConfirmModal = false">Cancel</span>
+                        <button
+                            class="btn btn-primary"
+                            @click="savePage"
+                        >
+                            Confirm
+                        </button>
+                        <span
+                            class="btn-cancel c-pointer pl-3"
+                            @click="showConfirmModal = false"
+                        >
+                            Cancel
+                        </span>
                     </div>
                 </div>
             </template>
@@ -85,11 +81,12 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin} from '../../mixins';
-import Guide from '../Guide';
-import Modal from '../modal/Modal';
+import {FiltersMixin} from '../../../mixins';
+import Guide from '../../Guide';
+import Modal from '../../modal/Modal';
 
 library.add(faFacebookSquare, faTimes);
+
 Vue.use(Toasted, {
     position: 'top-center',
     duration: 5000,
@@ -102,7 +99,6 @@ export default {
     props: {
         address: String,
         appId: String,
-        editing: Boolean,
         tokenName: String,
     },
     components: {
@@ -116,10 +112,10 @@ export default {
     },
     data() {
         return {
-            pages: [],
             currentAddress: this.address,
-            showConfirmModal: false,
+            pages: [],
             selectedUrl: '',
+            showConfirmModal: false,
             submitting: false,
             updateUrl: this.$routing.generate('token_update', {
                 name: this.tokenName,
@@ -188,34 +184,28 @@ export default {
             this.$axios.single.patch(this.updateUrl, {
                 facebookUrl: this.selectedUrl,
             })
-            .then((response) => {
-                if (response.status === HTTP_ACCEPTED) {
-                    let state = this.selectedUrl ? `saved as ${this.currentAddress}` : 'deleted';
+                .then((response) => {
+                    if (response.status === HTTP_ACCEPTED) {
+                        let state = this.selectedUrl ? `saved as ${this.currentAddress}` : 'deleted';
+                        this.showConfirmModal = false;
+                        this.currentAddress = this.selectedUrl;
+                        this.$toasted.success(`Facebook page ${state}`);
+                        this.$emit('saveFacebook', this.currentAddress);
+                    }
+                }, (error) => {
+                    if (!error.response) {
+                        this.$toasted.error('Network error');
+                    } else if (error.response.data.message) {
+                        this.$toasted.error(error.response.data.message);
+                    } else {
+                        this.$toasted.error('An error has occurred, please try again later');
+                    }
+                })
+                .then(() => {
                     this.showConfirmModal = false;
-                    this.currentAddress = this.selectedUrl;
-                    this.$toasted.success(`Facebook page ${state}`);
-                }
-            }, (error) => {
-                if (!error.response) {
-                    this.$toasted.error('Network error');
-                } else if (error.response.data.message) {
-                    this.$toasted.error(error.response.data.message);
-                } else {
-                    this.$toasted.error('An error has occurred, please try again later');
-                }
-            })
-            .then(() => {
-                this.showConfirmModal = false;
-                this.submitting = false;
-            });
+                    this.submitting = false;
+                });
         },
     },
 };
 </script>
-
-<style lang="sass" scoped>
-    .display-text
-        display: inline-block
-        width: 100%
-        text-overflow: ellipsis
-</style>

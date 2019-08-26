@@ -26,21 +26,20 @@
                                         @saveWebsite="saveWebsite"
                                         @toggleEdit="toggleEdit"
                                     />
-                                </template>
-                                <token-facebook-address
-                                    :address="facebookUrl"
-                                    :app-id="facebookAppId"
-                                    :editing="editingUrls"
-                                    :tokenName="tokenName"
-                                />
-                                <token-youtube-address
-                                    :editable="editable"
-                                    :editing="editingUrls"
-                                    :channel-id="youtubeChannelId"
-                                    :client-id="youtubeClientId"
-                                    :tokenName="tokenName"
-                                />
-                                <template v-if="editingUrls">
+                                    <token-youtube-address
+                                        :editable="editable"
+                                        :channel-id="currentYoutube"
+                                        :client-id="youtubeClientId"
+                                        :tokenName="tokenName"
+                                        @saveYoutube="saveYoutube"
+                                    />
+                                    <token-facebook-address
+                                        :address="currentFacebook"
+                                        :app-id="facebookAppId"
+                                        :editing="editingUrls"
+                                        :tokenName="tokenName"
+                                        @saveFacebook="saveFacebook"
+                                    />
                                     <token-telegram-channel
                                         :currentTelegram="currentTelegram"
                                         :editingTelegram="editingTelegram"
@@ -57,56 +56,65 @@
                                     ></token-discord-channel>
                                 </template>
                                 <template v-else>
-                                    <div v-if="currentWebsite">
-                                        Web:
-                                        <a :href="currentWebsite" target="_blank" rel="nofollow">
-                                            {{ currentWebsite }}
-                                        </a>
-                                        <guide>
-                                            <template  slot="header">
-                                                Web
-                                            </template>
-                                            <template slot="body">
-                                                Link to token creator’s website.
-                                                Before adding it, we confirmed ownership.
-                                            </template>
-                                        </guide>
-                                    </div>
+                                    <token-website-address-view
+                                        v-if="currentWebsite"
+                                        :currentWebsite="currentWebsite"
+                                    />
+                                    <token-youtube-address-view
+                                        v-if="currentYoutube"
+                                        :channel-id="currentYoutube"
+                                        :client-id="youtubeClientId"
+                                    />
+                                    <token-facebook-address-view
+                                        v-if="currentFacebook"
+                                        :address="currentFacebook"
+                                        :app-id="facebookAppId"
+                                    />
                                     <div class="col-12 my-3 text-left d-flex align-items-center">
-                                        <b-dropdown id="share" text="Share" variant="primary" class="mt-3">
+                                        <b-dropdown
+                                            id="share"
+                                            text="Share"
+                                            variant="primary"
+                                            class="mt-3"
+                                        >
                                             <social-sharing
-                                                    url=""
-                                                    title="MintMe"
-                                                    :description="description"
-                                                    inline-template>
+                                                url=""
+                                                title="MintMe"
+                                                :description="description"
+                                                inline-template
+                                            >
                                                 <div class="px-2">
-                                                    <network class="d-block c-pointer" network="email">
-                                                        <font-awesome-icon icon="envelope"></font-awesome-icon> Email
+                                                    <network
+                                                        class="d-block c-pointer"
+                                                        network="email"
+                                                    >
+                                                        <font-awesome-icon icon="envelope" /> Email
                                                     </network>
                                                 </div>
                                             </social-sharing>
                                             <social-sharing
-                                                    :title="twitterDescription"
-                                                    :description="description"
-                                                    :quote="description"
-                                                    hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,
-                                                        Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
-                                                    inline-template>
+                                                :title="twitterDescription"
+                                                :description="description"
+                                                :quote="description"
+                                                hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,
+                                                    Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
+                                                inline-template
+                                            >
                                                 <div class="px-2">
                                                     <network class="d-block c-pointer" network="facebook">
-                                                        <font-awesome-icon :icon="['fab', 'facebook']"></font-awesome-icon> Facebook
+                                                        <font-awesome-icon :icon="['fab', 'facebook']" /> Facebook
                                                     </network>
                                                     <network class="d-block c-pointer" network="linkedin">
-                                                        <font-awesome-icon :icon="['fab', 'linkedin']"></font-awesome-icon> LinkedIn
+                                                        <font-awesome-icon :icon="['fab', 'linkedin']" /> LinkedIn
                                                     </network>
                                                     <network class="d-block c-pointer" network="reddit">
-                                                        <font-awesome-icon :icon="['fab', 'reddit']"></font-awesome-icon> Reddit
+                                                        <font-awesome-icon :icon="['fab', 'reddit']" /> Reddit
                                                     </network>
                                                     <network class="d-block c-pointer" network="telegram">
-                                                        <font-awesome-icon :icon="['fab', 'telegram']"></font-awesome-icon> Telegram
+                                                        <font-awesome-icon :icon="['fab', 'telegram']" /> Telegram
                                                     </network>
                                                     <network class="d-block c-pointer" network="twitter">
-                                                        <font-awesome-icon :icon="['fab', 'twitter']"></font-awesome-icon> Twitter
+                                                        <font-awesome-icon :icon="['fab', 'twitter']" /> Twitter
                                                     </network>
                                                 </div>
                                             </social-sharing>
@@ -118,29 +126,33 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <span
-                                                class="d-inline-block mx-2 mb-1"
                                                 v-if="currentTelegram || currentDiscord"
+                                                class="d-inline-block mx-2 mb-1"
                                             >
                                                 Join us on:
                                             </span>
                                             <div class="row justify-content-start pl-4">
-                                                <a  :href="currentDiscord"
+                                                <a
                                                     v-if="currentDiscord"
+                                                    :href="currentDiscord"
                                                     class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
                                                     target="_blank"
                                                 >
-                                                    <img src="../../../../img/icon-discord.png"
+                                                    <img
+                                                        src="../../../../img/icon-discord.png"
                                                         class="align-self-center text-center"
                                                         width="45"
                                                         alt="discord icon"
                                                     />
                                                 </a>
-                                                <a  :href="currentTelegram"
+                                                <a
                                                     v-if="currentTelegram"
+                                                    :href="currentTelegram"
                                                     class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
                                                     target="_blank"
                                                 >
-                                                    <img src="../../../../img/icon-telegram-group.png"
+                                                    <img
+                                                        src="../../../../img/icon-telegram-group.png"
                                                         class="align-self-center text-center"
                                                         width="45"
                                                         alt="telegram group"
@@ -161,10 +173,13 @@
 
 <script>
 import TokenDiscordChannel from '../TokenDiscordChannel';
-import TokenFacebookAddress from '../TokenFacebookAddress';
+import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
+import TokenFacebookAddressView from '../facebook/TokenFacebookAddressView';
 import TokenTelegramChannel from '../TokenTelegramChannel';
-import TokenWebsiteAddress from '../TokenWebsiteAddress';
-import TokenYoutubeAddress from '../TokenYoutubeAddress';
+import TokenWebsiteAddress from '../website/TokenWebsiteAddress';
+import TokenWebsiteAddressView from '../website/TokenWebsiteAddressView';
+import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
+import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown';
 import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';
@@ -173,6 +188,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
+
 let SocialSharing = require('vue-social-sharing');
 
 Vue.use(SocialSharing);
@@ -186,46 +202,51 @@ Vue.use(Toasted, {
 export default {
     name: 'TokenIntroductionProfile',
     props: {
-        facebookAppId: String,
-        youtubeClientId: String,
-        profileName: String,
-        websiteUrl: String,
-        facebookUrl: String,
-        youtubeChannelId: String,
+        discordUrl: String,
         editable: Boolean,
+        facebookUrl: String,
+        facebookAppId: String,
+        profileName: String,
         profileUrl: String,
         telegramUrl: String,
-        discordUrl: String,
         tokenName: String,
+        websiteUrl: String,
+        youtubeClientId: String,
+        youtubeChannelId: String,
     },
     components: {
         bDropdown,
         bDropdownItem,
         FontAwesomeIcon,
-        TokenDiscordChannel,
-        TokenFacebookAddress,
-        TokenTelegramChannel,
-        TokenYoutubeAddress,
-        TokenWebsiteAddress,
         Guide,
         Modal,
+        TokenDiscordChannel,
+        TokenFacebookAddress,
+        TokenFacebookAddressView,
+        TokenTelegramChannel,
+        TokenYoutubeAddress,
+        TokenYoutubeAddressView,
+        TokenWebsiteAddress,
+        TokenWebsiteAddressView,
     },
     data() {
         return {
-            submitting: false,
+            currentDiscord: this.discordUrl,
+            currentFacebook: this.facebookUrl,
+            currentTelegram: this.telegramUrl,
+            currentWebsite: this.websiteUrl,
+            currentYoutube: this.youtubeChannelId,
+            editingDiscord: false,
+            editingTelegram: false,
             editingUrls: false,
             editingWebsite: false,
-            currentWebsite: this.websiteUrl,
-            editingTelegram: false,
-            currentTelegram: this.telegramUrl,
-            editingDiscord: false,
-            currentDiscord: this.discordUrl,
             showWebsiteError: false,
-            twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
+            submitting: false,
             tokenUrl: this.$routing.generate('token_show', {
                 name: this.tokenName,
                 tab: 'intro',
             }),
+            twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
         };
     },
     computed: {
@@ -245,19 +266,25 @@ export default {
         },
     },
     methods: {
-        toggleEdit: function(url = null) {
-            this.editingDiscord = 'discord' === url;
-            this.editingTelegram = 'telegram' === url;
-            this.editingWebsite = 'website' === url;
-        },
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
+        },
+        saveDiscord: function(newDiscord) {
+            this.currentDiscord = newDiscord;
+        },
+        saveFacebook: function(newFacebook) {
+            this.currentFacebook = newFacebook;
         },
         saveTelegram: function(newTelegram) {
             this.currentTelegram = newTelegram;
         },
-        saveDiscord: function(newDiscord) {
-            this.currentDiscord = newDiscord;
+        saveYoutube: function(newChannelId) {
+            this.currentYoutube = newChannelId;
+        },
+        toggleEdit: function(url = null) {
+            this.editingDiscord = 'discord' === url;
+            this.editingTelegram = 'telegram' === url;
+            this.editingWebsite = 'website' === url;
         },
     },
 };

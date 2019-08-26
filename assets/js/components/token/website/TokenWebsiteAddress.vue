@@ -99,7 +99,8 @@
             class="text-white"
             :visible="showConfirmWebsiteModal"
             :no-close="false"
-            @close="showConfirmWebsiteModal = false">
+            @close="showConfirmWebsiteModal = false"
+        >
             <template slot="body">
                 <h5 class="modal-title text-center mb-2">Website Confirmation</h5>
                 <div class="row">
@@ -160,11 +161,12 @@ import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faGlobe, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin} from '../../mixins/';
-import {isValidUrl} from '../../utils';
-import Modal from '../modal/Modal';
+import {FiltersMixin} from '../../../mixins/';
+import {isValidUrl} from '../../../utils';
+import Modal from '../../modal/Modal';
 
 library.add(faGlobe, faTimes);
+
 Vue.use(Toasted, {
     position: 'top-center',
     duration: 5000,
@@ -194,9 +196,9 @@ export default {
             fileError: {},
             newWebsite: this.currentWebsite || 'https://',
             parsedWebsite: '',
+            showConfirmWebsiteModal: false,
             showWebsiteError: false,
             submitting: false,
-            showConfirmWebsiteModal: false,
         };
     },
     watch: {
