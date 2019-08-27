@@ -26,9 +26,9 @@ new Vue({
     validations: {
         tokenName: {
             required,
-                tokenContain: tokenContain,
-                minLength: minLength(4),
-                maxLength: maxLength(255),
+            tokenContain: tokenContain,
+            minLength: minLength(4),
+            maxLength: maxLength(255),
         },
     },
 });
