@@ -14,19 +14,6 @@ final class KnowledgeBaseCategoryAdmin extends AbstractAdmin
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
 
-    /** @var mixed[] overriding $datagridValues */
-    protected $datagridValues = [
-
-        // display the first page (default = 1)
-        '_page' => 1,
-
-        // show posts list in DESC order (default = 'ASC')
-        '_sort_order' => 'ASC',
-
-        // name of the ordered field (default = the model's id field, if any)
-        '_sort_by' => 'id',
-    ];
-
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper->add('name');

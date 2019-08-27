@@ -2,7 +2,6 @@
 
 namespace App\Manager;
 
-use App\Entity\KnowledgeBase\Category;
 use App\Entity\KnowledgeBase\KnowledgeBase;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
