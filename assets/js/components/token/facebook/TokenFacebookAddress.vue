@@ -15,12 +15,12 @@
                 {{ computedAddress | truncate(35) }}
             </a>
             <b-tooltip
-                v-if="currentAddress"
+                v-if="address"
                 target="address-link"
-                title="computedAddress"
+                :title="computedAddress"
             />
             <a
-                v-if="currentAddress"
+                v-if="address"
                 @click.prevent="deleteAddress"
             >
                 <font-awesome-icon
@@ -112,7 +112,6 @@ export default {
     },
     data() {
         return {
-            currentAddress: this.address,
             pages: [],
             selectedUrl: '',
             showConfirmModal: false,
@@ -123,11 +122,8 @@ export default {
         };
     },
     computed: {
-        currentAddressEncoded: function() {
-            return encodeURIComponent(this.currentAddress);
-        },
         computedAddress: function() {
-            return this.currentAddress || 'Add Facebook address';
+            return this.address || 'Add Facebook address';
         },
     },
     mounted() {
@@ -186,11 +182,9 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        let state = this.selectedUrl ? `saved as ${this.currentAddress}` : 'deleted';
-                        this.showConfirmModal = false;
-                        this.currentAddress = this.selectedUrl;
+                        let state = this.selectedUrl ? `saved as ${this.selectedUrl}` : 'deleted';
                         this.$toasted.success(`Facebook page ${state}`);
-                        this.$emit('saveFacebook', this.currentAddress);
+                        this.$emit('saveFacebook', this.selectedUrl);
                     }
                 }, (error) => {
                     if (!error.response) {

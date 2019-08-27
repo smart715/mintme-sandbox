@@ -17,7 +17,7 @@
             <b-tooltip
                 v-if="currentChannelId"
                 target="channel-link"
-                title="computedChannel"
+                :title="computedChannel"
             />
             <a
                 v-if="currentChannelId"
@@ -69,6 +69,7 @@ export default {
     data() {
         return {
             currentChannelId: this.channelId,
+            submitting: false,
             updateUrl: this.$routing.generate('token_update', {
                 name: this.tokenName,
             }),
