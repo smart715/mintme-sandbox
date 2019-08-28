@@ -18,7 +18,7 @@ new Vue({
             if (this.tokenName.replace(/-|\s/g, '').length === 0) {
                 this.tokenName = '';
             }
-        }
+        },
     },
     methods: {
         redirectToProfile: function() {
