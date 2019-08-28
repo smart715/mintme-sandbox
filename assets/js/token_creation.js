@@ -15,7 +15,7 @@ new Vue({
     },
     watch: {
         tokenName: function() {
-            if (this.tokenName.replace(/-/g, '').length === 0 || this.tokenName.replace(/\s/g, '').length === 0) {
+            if (this.tokenName.replace(/-|\s/g, '').length === 0) {
                 this.tokenName = '';
             }
         },
