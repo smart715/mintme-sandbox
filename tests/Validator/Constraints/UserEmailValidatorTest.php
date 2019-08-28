@@ -5,7 +5,6 @@ namespace App\Tests\Validator\Constraints;
 use App\Entity\User;
 use App\Manager\UserManagerInterface;
 use App\Validator\Constraints\IsNotBlacklisted;
-use App\Validator\Constraints\IsNotBlacklistedValidator;
 use App\Validator\Constraints\UserEmailValidator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
