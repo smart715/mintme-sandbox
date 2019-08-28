@@ -28,7 +28,7 @@ class TokenCreateType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Token name',
+                'label' => 'Token name:',
                 'attr' => [
                     'minlength' => Token::NAME_MIN_LENGTH,
                     'maxlength' => Token::NAME_MAX_LENGTH,

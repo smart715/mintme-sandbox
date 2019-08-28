@@ -10,7 +10,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="homepage",
+     *      options={"sitemap" = true, "2fa_progress" = false}
+     * )
      */
     public function index(): Response
     {
@@ -34,7 +36,10 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/privacy-policy", name="privacy_policy")
+     * @Route("/privacy-policy",
+     *      name="privacy_policy",
+     *      options={"sitemap" = true}
+     * )
      */
     public function privacyPolicy(): Response
     {
@@ -42,10 +47,24 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/terms-of-service", name="terms_of_service")
+     * @Route("/terms-of-service",
+     *      name="terms_of_service",
+     *      options={"sitemap" = true}
+     * )
      */
     public function termsOfService(): Response
     {
         return $this->render('pages/terms_of_service.html.twig');
+    }
+
+    /**
+     * @Route("/links",
+     *      name="links",
+     *      options={"sitemap" = false}
+     * )
+     */
+    public function links(): Response
+    {
+        return $this->render('pages/links.html.twig');
     }
 }

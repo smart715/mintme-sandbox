@@ -78,7 +78,11 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
+     */
     public function getTokensByPattern(string $pattern): array
     {
         return $this->repository->findTokensByPattern($pattern);
@@ -95,7 +99,16 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
-    /** {@inheritdoc} */
+    public function isPredefined(Token $token): bool
+    {
+        return in_array($token, $this->findAllPredefined());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
+     */
     public function findAll(): array
     {
         return $this->repository->findAll();
@@ -126,6 +139,16 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
+    public function isExisted(Token $token): bool
+    {
+        $name = strtoupper(
+            str_replace(' ', '-', $token->getName())
+        );
+        $otherToken = $this->findByName($name);
+
+        return null !== $otherToken && $token !== $otherToken;
+    }
+
     private function getProfile(): ?Profile
     {
         return $this->profileFetcher->fetchProfile();
@@ -139,15 +162,5 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
-    }
-
-    public function isExisted(Token $token): bool
-    {
-        $name = strtoupper(
-            str_replace(' ', '-', $token->getName())
-        );
-        $otherToken = $this->findByName($name);
-
-        return null !== $otherToken && $token !== $otherToken;
     }
 }

@@ -3,6 +3,9 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
+use App\Entity\User;
+use App\Exception\ApiBadRequestException;
+use App\Exception\ApiNotFoundException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
@@ -11,6 +14,7 @@ use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\TwoFactorManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
@@ -33,6 +37,8 @@ use Symfony\Component\Validator\Validation;
  */
 class TokensAPIController extends AbstractFOSRestController
 {
+    private const TOP_HOLDERS_COUNT = 10;
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -65,10 +71,12 @@ class TokensAPIController extends AbstractFOSRestController
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
+      *@Rest\RequestParam(name="code", nullable=true)
      */
     public function update(
         ParamFetcherInterface $request,
         BalanceHandlerInterface $balanceHandler,
+        TwoFactorManagerInterface $twoFactorManager,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -76,13 +84,18 @@ class TokensAPIController extends AbstractFOSRestController
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw new ApiNotFoundException('Token does not exist');
+        }
+        
+        if ($request->get('name')
+            && ($errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager))) {
+                throw new ApiNotFoundException($errorMessage);
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
 
         if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new BadRequestHttpException("You need all your tokens to change token's name");
+            throw new ApiBadRequestException('You need all your tokens to change token\'s name');
         }
 
         $form = $this->createForm(TokenType::class, $token, [
@@ -95,16 +108,16 @@ class TokensAPIController extends AbstractFOSRestController
         }), false);
 
         if (!$form->isValid()) {
-            /** @var FormError[] $nameErrors */
-            $nameErrors = $form->get('name')->getErrors();
-            $message = count($nameErrors) > 0
-                ? $nameErrors[0]->getMessage()
-                : 'Invalid name';
+            foreach ($form->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $form->get($childForm->getName())->getErrors();
 
-            return $this->view(
-                $message,
-                Response::HTTP_ALREADY_REPORTED
-            );
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException('Invalid argument');
         }
 
         $this->em->persist($token);
@@ -175,18 +188,26 @@ class TokensAPIController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in")
+     * @Rest\RequestParam(name="code", nullable=true)
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
         string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        TwoFactorManagerInterface $twoFactorManager
     ): View {
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             throw $this->createNotFoundException('Token does not exist');
+        }
+
+        $errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager);
+
+        if ($errorMessage) {
+            return $this->view($errorMessage, Response::HTTP_UNAUTHORIZED);
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
@@ -268,7 +289,7 @@ class TokensAPIController extends AbstractFOSRestController
         try {
             $common = $balanceHandler->balances(
                 $this->getUser(),
-                $this->getUser()->getRelatedTokens()
+                $this->getUser()->getTokens()
             );
         } catch (BalanceException $exception) {
             if (BalanceException::EMPTY == $exception->getCode()) {
@@ -328,5 +349,41 @@ class TokensAPIController extends AbstractFOSRestController
         return $this->view(
             !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
         );
+    }
+
+    private function getGoogleAuthenticatorErrorMessage(string $code, TwoFactorManagerInterface $twoFactorManager): ?string
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return 'Invalid user';
+        }
+
+        if ($user->isGoogleAuthenticatorEnabled()
+            && !$twoFactorManager->checkCode($user, $code)) {
+            return 'Invalid 2fa code';
+        }
+
+        return null;
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/top-holders", name="top_holders", options={"expose"=true})
+     */
+    public function getTopHolders(
+        string $name,
+        BalanceHandlerInterface $balanceHandler
+    ): View {
+        $tradable = $this->cryptoManager->findBySymbol($name) ??
+            $this->tokenManager->findByName($name);
+
+        if (null == $tradable) {
+            throw $this->createNotFoundException('Not Found');
+        }
+
+        $topTraders = $balanceHandler->topHolders($tradable, self::TOP_HOLDERS_COUNT);
+
+        return $this->view($topTraders, Response::HTTP_OK);
     }
 }

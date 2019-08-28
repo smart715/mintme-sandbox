@@ -4,13 +4,13 @@
             <div class="table-responsive table-restricted" ref="table">
                 <b-table
                     v-if="hasHistory"
-                    :items="tableData"
+                    :items="history"
                     :fields="fields">
-                    <template slot="market" slot-scope="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                    <template slot="name" slot-scope="row">
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
+                        </div>
                     </template>
-                     <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
-                     <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
                 </b-table>
                 <div v-if="!hasHistory">
                     <p class="text-center p-5">No deal was made yet</p>
@@ -29,9 +29,10 @@
 </template>
 
 <script>
+import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI} from '../../utils/constants';
 import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
 export default {
@@ -42,13 +43,12 @@ export default {
             tableData: null,
             currentPage: 1,
             fields: {
-                timestamp: {label: 'Date', sortable: true},
+                date: {label: 'Date', sortable: true},
                 side: {label: 'Type', sortable: true},
-                market: {
+                name: {
                     label: 'Name',
                     sortable: true,
-                    formatter: (market) => {
-                        let name = market.base.symbol + '/' + market.quote.symbol;
+                    formatter: (name) => {
                         return {
                             full: name,
                             truncate: this.truncateFunc(name, 15),
@@ -58,26 +58,22 @@ export default {
                 amount: {
                     label: 'Amount',
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.quote.subunit)),
+                    formatter: formatMoney,
                 },
                 price: {
                     label: 'Price',
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
+                    formatter: formatMoney,
                 },
                 total: {
                     label: 'Total cost',
                     sortable: true,
-                    formatter: (value, key, item) => {
-                        let tWF = new Decimal(item.amount).times(item.price);
-                        let f = new Decimal(item.fee);
-                        return formatMoney(toMoney(tWF.add(f).toString(), item.market.base.subunit));
-                    },
+                    formatter: formatMoney,
                 },
                 fee: {
                     label: 'Fee',
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
+                    formatter: formatMoney,
                 },
             },
         };
@@ -89,6 +85,20 @@ export default {
         hasHistory: function() {
             return !!(Array.isArray(this.tableData) && this.tableData.length);
         },
+        history: function() {
+            return this.tableData.map((history) => {
+                return {
+                    date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
+                    side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
+                    name: history.market.base.symbol + '/' + history.market.quote.symbol,
+                    amount: toMoney(history.amount, history.market.base.subunit),
+                    price: toMoney(history.price, history.market.base.subunit),
+                    total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
+                    fee: toMoney(history.fee, history.market.base.subunit),
+                    pairUrl: this.generatePairUrl(history.market),
+                };
+            });
+        },
     },
     mounted: function() {
         this.updateTableData();
@@ -99,7 +109,6 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
                     .then((res) => {
                         res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
-
                         if (this.tableData === null) {
                             this.tableData = res.data;
                             this.currentPage++;
@@ -116,11 +125,12 @@ export default {
                     });
             });
         },
-        getDate: function(timestamp) {
-           return new Date(timestamp * 1000).toDateString();
-        },
-        getType: function(type) {
-           return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';
+        generatePairUrl: function(market) {
+            if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
+                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+            }
+
+            return this.$routing.generate('token_show', {name: market.quote.name});
         },
     },
 };

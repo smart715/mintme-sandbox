@@ -8,6 +8,9 @@
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
             >
+                <template slot="crypto" slot-scope="data">
+                    <a :href="data.item.url" class="text-white">{{ data.item.crypto }}</a>
+                </template>
                 <template slot="toAddress" slot-scope="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
                         <copy-link :content-to-copy="row.value" class="c-pointer">
@@ -39,6 +42,8 @@ import moment from 'moment';
 import {toMoney, formatMoney} from '../../utils';
 import {LazyScrollTableMixin} from '../../mixins';
 import CopyLink from '../CopyLink';
+import {GENERAL} from '../../utils/constants';
+
 
 export default {
     name: 'DepositWithdrawHistory',
@@ -77,9 +82,6 @@ export default {
                     sortable: true,
                     formatter: formatMoney,
                 },
-            },
-            history: {
-                dateFormat: 'MM-DD-YYYY',
             },
             tableData: null,
             currentPage: 1,
@@ -129,7 +131,7 @@ export default {
         sanitizeHistory: function(historyData) {
             historyData.forEach((item) => {
                 item['date'] = item.date
-                    ? moment(item.date).format(this.history.dateFormat)
+                    ? moment(item.date).format(GENERAL.dateFormat)
                     : null;
                 item['fee'] = item.fee
                     ? toMoney(item.fee, item.crypto.subunit)
@@ -146,9 +148,18 @@ export default {
                 item['type'] = item.type.typeCode
                     ? item.type.typeCode
                     : null;
+                item['url'] = this.generateCoinUrl(item.crypto);
             });
 
             return historyData;
+        },
+        generateCoinUrl: function(crypto) {
+            /** @TODO In future we need to use another solution and remove hardcoded BTC & WEB symbols **/
+            let params = {
+                base: !crypto.exchangeble ? crypto.symbol : 'BTC',
+                quote: crypto.exchangeble && crypto.tradable ? crypto.symbol : 'WEB',
+            };
+            return this.$routing.generate('coin', params);
         },
     },
 };

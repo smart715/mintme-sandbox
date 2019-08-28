@@ -30,7 +30,7 @@
                         <label for="inputEmail" class="d-block label-featured">Email:</label>
                     </div>
                     <div class="col">
-                        <input type="email" name="_username"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
+                        <input type="email" name="_username"  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" value ="{{ last_username }}" required="required" id="inputEmail" class="form-control" autofocus>
                     </div>
                 </div>
             </div>
@@ -52,8 +52,12 @@
                 <div class="row">
                     <div class="col-12  text-left"></div>
                     <div class="col">
-                        {% if form_errors(form)|length > 0 %}
-                            <div class="bg-danger text-white">{{ form_errors(form) }}</div>
+                        {% if not form.vars.valid %}
+                            {% for error in form.vars.errors %}
+                                {% if not (error.cause.id is defined and 'captcha_login' is same as(error.cause.id)) %}
+                                    <div class="py-2 mb-2 bg-danger text-white text-center">{{ error.message }}</div>
+                                {% endif %}
+                            {% endfor %}
                         {% endif %}
                         {{ form_widget(form) }}
                     </div>

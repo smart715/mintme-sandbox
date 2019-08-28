@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use Money\Currency;
@@ -32,34 +33,54 @@ class PaymentConsumer implements ConsumerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var ClockInterface */
+    private $clock;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
         CryptoManagerInterface $cryptoManager,
         LoggerInterface $logger,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        ClockInterface $clock
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
         $this->cryptoManager = $cryptoManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
+        $this->clock = $clock;
     }
 
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg): bool
     {
-        $clbResult = WithdrawCallbackMessage::parse(
-            json_decode($msg->body, true)
-        );
+        $this->logger->info('[payment-consumer] Received new message: '.json_encode($msg->body));
 
-        /** @var User $user */
+        try {
+            $clbResult = WithdrawCallbackMessage::parse(
+                json_decode($msg->body, true)
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->warning(
+                '[payment-consumer] Failed to parse incoming message',
+                [$msg->body]
+            );
+
+            return true;
+        }
+
+        /** @var ?User $user */
         $user = $this->userManager->find($clbResult->getUserId());
+
+        if (!$user) {
+            $this->logger->warning('[payment-consumer] User not found', $clbResult->toArray());
+
+            return true;
+        }
 
         if ('fail' === $clbResult->getStatus()) {
             try {
-                $this->logger->info('[payment-consumer] Received new message: '.json_encode($clbResult->toArray()));
-
                 $crypto = $this->cryptoManager->findBySymbol($clbResult->getCrypto());
 
                 if (!$crypto) {
@@ -83,7 +104,7 @@ class PaymentConsumer implements ConsumerInterface
                 $this->logger->error(
                     '[payment-consumer] Failed to resume payment. Retry operation. Reason:'. $exception->getMessage()
                 );
-                sleep(10);
+                $this->clock->sleep(10);
 
                 return false;
             }

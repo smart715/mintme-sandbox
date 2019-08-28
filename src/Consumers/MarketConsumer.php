@@ -39,11 +39,15 @@ class MarketConsumer implements ConsumerInterface
 
     public function execute(AMQPMessage $msg): bool
     {
-        /** @var ?Market $market */
-        $market = unserialize($msg->body);
+        try {
+            /** @var ?Market $market */
+            $market = unserialize($msg->body);
+        } catch (Throwable $exception) {
+            $market = null;
+        }
 
         if (!$market || !($market instanceof Market)) {
-            $this->logger->info('[market-consumer] Can not parse a message: '.$msg->getBody());
+            $this->logger->warning('[market-consumer] Can not parse a message: '.$msg->getBody());
 
             return true;
         }

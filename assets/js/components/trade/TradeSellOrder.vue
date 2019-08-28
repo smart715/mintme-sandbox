@@ -20,7 +20,9 @@
                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
                         >
                         Your
-                        <span class="c-pointer" @click="balanceClicked">{{ market.quote.symbol }}:
+                        <span class="c-pointer" @click="balanceClicked"
+                              v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
+                            {{ market.quote.symbol | truncate(7) }}:
                             <span class="text-white  word-break">
                                 {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                 <guide>
@@ -34,7 +36,7 @@
                             </span>
                         </span>
                     </div>
-                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-sm-right text-md-left text-xl-right">
+                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-md-left" :class="marketPricePositionClass">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model.number="useMarketPrice"
@@ -79,7 +81,7 @@
                             type="text"
                             id="sell-price-input"
                             class="form-control"
-                            :disabled="useMarketPrice"
+                            :disabled="useMarketPrice || !loggedIn"
                             @keypress="$emit('check-input', market.base.subunit)"
                             @paste="$emit('check-input', market.base.subunit)"
                         >
@@ -97,10 +99,12 @@
                             class="form-control"
                             @keypress="$emit('check-input', market.quote.subunit)"
                             @paste="$emit('check-input', market.quote.subunit)"
+                            :disabled="!loggedIn"
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        Total Price:
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -140,7 +144,7 @@
 <script>
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
-import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin, PricePositionMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
@@ -151,7 +155,7 @@ export default {
         Guide,
         OrderModal,
     },
-    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
@@ -214,9 +218,7 @@ export default {
         },
         balanceClicked: function() {
             this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
-            if (parseFloat(this.price || 0) > 0) {
-                this.sellPrice = this.price;
-            }
+            this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
         },
         ...mapMutations('makeOrder', [
             'setSellPriceInput',
@@ -227,8 +229,8 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(!isNaN(this.sellPrice) ? this.sellPrice : 0)
-                .times(!isNaN(this.sellAmount) ? this.sellAmount : 0)
+            return new Decimal(this.sellPrice && !isNaN(this.sellPrice) ? this.sellPrice : 0)
+                .times(this.sellAmount && !isNaN(this.sellAmount) ? this.sellAmount : 0)
                 .toString();
         },
         price: function() {
@@ -244,7 +246,7 @@ export default {
             return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
-            return !this.marketPrice > 0;
+            return !this.marketPrice > 0 || !this.loggedIn;
         },
         ...mapGetters('makeOrder', [
             'getSellPriceInput',

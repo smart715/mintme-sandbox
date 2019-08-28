@@ -22,13 +22,16 @@ class TradingController extends Controller
      *     defaults={"page"="1"},
      *     requirements={"page"="\d+"},
      *     name="trading",
-     *     options={"expose"=true}
+     *     options={"expose"=true,
+     *          "sitemap" = true,
+     *          "2fa_progress"=false
+     *     }
      * )
      */
     public function trading(string $page, MarketFactoryInterface $marketManager): Response
     {
         return $this->render('pages/trading.html.twig', [
-            'markets' => $marketManager->createAll(),
+            'marketsLength' => count($marketManager->createAll()),
             'page' => $page,
         ]);
     }

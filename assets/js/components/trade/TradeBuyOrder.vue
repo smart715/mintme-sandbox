@@ -35,8 +35,8 @@
                         </span>
                     </div>
                     <div
-                        class="col-12 col-sm-4 col-md-12 col-xl-4
-                        text-sm-right text-md-left text-xl-right">
+                    class="col-12 col-sm-4 col-md-12 col-xl-4
+                    text-md-left" :class="marketPricePositionClass">
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model="useMarketPrice"
@@ -83,7 +83,7 @@
                             class="form-control"
                             @keypress="$emit('check-input', market.base.subunit)"
                             @paste="$emit('check-input', market.base.subunit)"
-                            :disabled="useMarketPrice"
+                            :disabled="useMarketPrice || !loggedIn"
                         >
                     </div>
                     <div class="col-12 pt-2">
@@ -99,10 +99,12 @@
                             @keypress="$emit('check-input', market.quote.subunit)"
                             @paste="$emit('check-input', market.quote.subunit)"
                             class="form-control"
+                            :disabled="!loggedIn"
                         >
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        Total Price:
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -140,14 +142,14 @@
 <script>
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
-import {WebSocketMixin, PlaceOrder, MoneyFilterMixin} from '../../mixins';
+import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin],
     components: {
         Guide,
         OrderModal,
@@ -218,7 +220,7 @@ export default {
                 new Decimal(this.immutableBalance).div(parseFloat(this.price)|| 1).toString(),
                 this.market.quote.subunit
             );
-            this.buyPrice = this.price || 0;
+            this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
         },
         ...mapMutations('makeOrder', [
             'setBuyPriceInput',
@@ -229,8 +231,8 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(!isNaN(this.buyPrice) ? this.buyPrice : 0)
-                .times(!isNaN(this.buyAmount) ? this.buyAmount : 0)
+            return new Decimal(this.buyPrice && !isNaN(this.buyPrice) ? this.buyPrice : 0)
+                .times(this.buyAmount && !isNaN(this.buyAmount) ? this.buyAmount : 0)
                 .toString();
         },
         price: function() {
@@ -246,7 +248,7 @@ export default {
             return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
-            return !this.marketPrice > 0;
+            return !this.marketPrice > 0 || !this.loggedIn;
         },
         ...mapGetters('makeOrder', [
             'getBuyPriceInput',

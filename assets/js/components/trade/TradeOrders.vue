@@ -1,7 +1,7 @@
 <template>
-    <div class="container">
-        <div class="row px-lg-0 mx-lg-0">
-            <div class="col-12 col-xl-6 col-lg-12 pr-lg-2 pl-lg-0 mt-3">
+    <div class="container p-0 m-0">
+        <div class="row p-0 m-0">
+            <div class="col-12 col-xl-6 pr-xl-2 mt-3">
                 <trade-buy-orders
                         v-if="ordersLoaded"
                         @update-data="updateBuyOrders"
@@ -12,6 +12,7 @@
                         :sort-desc="true"
                         :basePrecision="market.base.subunit"
                         :quotePrecision="market.quote.subunit"
+                        :logged-in="loggedIn"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -19,7 +20,7 @@
                     </div>
                 </template>
             </div>
-            <div class="col-12 col-xl-6 col-lg-12 pr-lg-0 pl-lg-2 mt-3">
+            <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
                         v-if="ordersLoaded"
                         @update-data="updateSellOrders"
@@ -30,6 +31,7 @@
                         :sort-desc="false"
                         :basePrecision="market.base.subunit"
                         :quotePrecision="market.quote.subunit"
+                        :logged-in="loggedIn"
                         @modal="removeOrderModal"/>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -40,6 +42,7 @@
         </div>
         <confirm-modal
                 :visible="confirmModal"
+                :no-close="false"
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
         >
@@ -74,6 +77,7 @@ export default {
         sellOrders: [Array, Object],
         market: Object,
         userId: Number,
+        loggedIn: Boolean,
     },
     data() {
         return {
@@ -134,6 +138,7 @@ export default {
                         '#',
                     side: order.side,
                     owner: order.owner,
+                    isAnonymous: !order.maker.profile || order.maker.profile.anonymous,
                 };
             });
         },

@@ -1,23 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Trading{% endblock %}
+{% block title %}Trading | mintMe{% endblock %}
 
 {% block bodyclass %}trading{% endblock %}
 
 {% block content %}
     <div id="trading" class="container">
         <div class="row pt-5 justify-content-center">
-            <div class="col-md-8">
+            <div class="col-xl-8">
                 <div class="card">
                     <div class="card-header">
                         Trading
                     </div>
                     <div class="card-body p-0">
-                        <trading websocket-url="{{ global_websocket_url }}" v-cloak :page="{{ page }}">
+                        <trading
+                            websocket-url="{{ global_websocket_url }}" v-cloak
+                            :page="{{ page }}"
+                            :markets-count="{{ marketsLength }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}">
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                            <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-                                Top {{ markets | length }} tokens
-                            </div>
                         </trading>
                     </div>
                 </div>

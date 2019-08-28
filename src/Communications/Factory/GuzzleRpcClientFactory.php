@@ -5,6 +5,7 @@ namespace App\Communications\Factory;
 use Graze\GuzzleHttp\JsonRpc\Client;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 
+/** @codeCoverageIgnore */
 class GuzzleRpcClientFactory implements RpcClientFactoryInterface
 {
     public function createClient(string $url, array $parameters): ClientInterface

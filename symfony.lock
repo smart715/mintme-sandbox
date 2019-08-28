@@ -197,6 +197,9 @@
     "lcobucci/jwt": {
         "version": "3.2.4"
     },
+    "liuggio/fastest": {
+        "version": "v1.6.1"
+    },
     "michelf/php-markdown": {
         "version": "1.8.0"
     },
@@ -283,6 +286,9 @@
     },
     "pragmarx/random": {
         "version": "v0.2.2"
+    },
+    "presta/sitemap-bundle": {
+        "version": "v1.7.0"
     },
     "psr/cache": {
         "version": "1.0.1"

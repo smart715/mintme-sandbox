@@ -50,18 +50,7 @@ class MarketFactory implements MarketFactoryInterface
             $this->getCoinMarkets(),
             $this->getMarkets(
                 $this->getExchangableCryptos(),
-                $user->getRelatedTokens()
-            )
-        );
-    }
-
-    public function createPredefined(): array
-    {
-        return array_merge(
-            $this->getCoinMarkets(),
-            $this->getMarkets(
-                $this->getExchangableCryptos(),
-                $this->getExchangableCryptos()
+                $user->getTokens()
             )
         );
     }
@@ -81,8 +70,8 @@ class MarketFactory implements MarketFactoryInterface
         });
     }
 
-    /** @return Market[] */
-    private function getCoinMarkets(): array
+    /** {@inheritdoc} */
+    public function getCoinMarkets(): array
     {
         return $this->getMarkets(
             $this->getTradableCryptos(),

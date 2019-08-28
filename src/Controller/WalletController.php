@@ -57,16 +57,8 @@ class WalletController extends Controller
             );
         }
 
-        $entityManager->remove($pendingWithdraw);
-        $entityManager->flush();
-
         try {
-            $wallet->withdraw(
-                $pendingWithdraw->getUser(),
-                $pendingWithdraw->getAddress(),
-                $pendingWithdraw->getAmount(),
-                $pendingWithdraw->getCrypto()
-            );
+            $wallet->withdrawCommit($pendingWithdraw);
         } catch (Throwable $exception) {
             return $this->createWalletRedirection(
                 'danger',

@@ -4,7 +4,10 @@
             <div class="card-header">
                 Sell Orders
                 <span class="card-header-icon">
-                    Total: {{ total | formatMoney }} <span v-b-tooltip:title="tokenName">{{ tokenName | truncate(7) }}</span>
+                    Total: {{ total | formatMoney }}
+                    <span v-b-tooltip="{title: tokenName, boundary:'viewport'}">
+                    {{ tokenName | truncate(7) }}
+                </span>
                     <guide>
                         <template slot="header">
                             Sell Orders
@@ -25,7 +28,7 @@
                          :items="tableData"
                          :fields="fields">
                         <template slot="trader" slot-scope="row">
-                        <a :href="row.item.traderUrl">
+                        <a v-if="!row.item.isAnonymous" :href="row.item.traderUrl">
                             <span v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
                                 {{ row.value }}
                             </span>
@@ -34,6 +37,8 @@
                                 class="float-right"
                                 alt="avatar">
                         </a>
+                        <span v-else>{{ row.value }}</span>
+
                         <a @click="removeOrderModal(row.item)"
                            v-if="row.item.owner">
                             <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
@@ -43,16 +48,16 @@
                     <div v-if="!hasOrders">
                         <p class="text-center p-5">No order was added yet</p>
                     </div>
-                    <div v-if="loading" class="p-1 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
                 </div>
-                <div class="text-center pb-2" v-if="showDownArrow">
+                <div class="text-center pb-2" v-if="showDownArrow && !loading">
                     <img
                         src="../../../img/down-arrows.png"
                         class="icon-arrows-down c-pointer"
                         alt="arrow down"
                         @click="scrollDown">
+                </div>
+                <div v-if="loading" class="p-1 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                 </div>
             </div>
         </div>
@@ -75,6 +80,7 @@ export default {
         sortBy: String,
         sortDesc: Boolean,
         basePrecision: Number,
+        loggedIn: Boolean,
     },
     data() {
         return {
@@ -90,7 +96,7 @@ export default {
     computed: {
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
-                new Decimal(order.amount).add(sum), 0), this.basePrecision
+                new Decimal(order.amount).add(sum), 0), this.quotePrecision
             );
         },
         hasOrders: function() {

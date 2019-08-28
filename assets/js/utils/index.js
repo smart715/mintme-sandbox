@@ -2,6 +2,7 @@ import Decimal from 'decimal.js/decimal.js';
 import * as Constants from './constants';
 import Interval from './interval';
 import EchartTheme from './echart-theme';
+import {useMarkitup} from './markitup.js';
 
 /**
  * Checks that given url is valid
@@ -74,12 +75,15 @@ function deepFlatten(object) {
 /**
  * @param {string|int|float} val
  * @param {int} precision
+ * @param {boolean} fixedPoint
  * @return {string}
  */
-function toMoney(val, precision = Constants.GENERAL.precision) {
+function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true) {
     Decimal.set({rounding: Decimal.ROUND_DOWN});
 
-    return new Decimal(val).toFixed(precision);
+    return fixedPoint
+        ? new Decimal(val).toFixed(precision)
+        : new Decimal(val).toDP(precision);
 }
 
 /**
@@ -116,6 +120,14 @@ function getUserOffset() {
     return parseInt(offset.getAttribute('content'));
 }
 
+/**
+ * @return {string}
+ */
+function getBreakPoint() {
+    return window.getComputedStyle(document.body)
+        .getPropertyValue('content').replace(/"/g, '');
+}
+
 export {
     isValidUrl,
     deepFlatten,
@@ -125,4 +137,6 @@ export {
     EchartTheme,
     Interval,
     getUserOffset,
+    useMarkitup,
+    getBreakPoint,
 };

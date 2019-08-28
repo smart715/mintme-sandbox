@@ -1,11 +1,26 @@
 <template>
     <div class="trading">
-        <slot name="title"></slot>
+        <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
+            <span class="float-left">Top {{ marketsCount }} tokens</span>
+            <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
+                <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="checkbox"
+                    v-model="userTokensEnabled"
+                    @change="updateData(1)"
+                    :disabled="loading">
+                <label for="checkbox" class="custom-control-label">Tokens I own</label>
+            </label>
+
+        </div>
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
                     :fields="fields"
+                    :sort-by="fields.lastPrice.key"
+                    :sort-desc="true"
                     :sort-compare="sortCompare">
                     <template slot="HEAD_volume" slot-scope="data">
                         {{ data.label }}
@@ -54,6 +69,8 @@ export default {
     mixins: [WebSocketMixin, FiltersMixin],
     props: {
         page: Number,
+        marketsCount: Number,
+        userId: Number,
     },
     components: {
         Guide,
@@ -65,6 +82,7 @@ export default {
             perPage: 25,
             totalRows: 25,
             loading: false,
+            userTokensEnabled: false,
             fields: {
                 pair: {
                     label: 'Pair',
@@ -76,6 +94,7 @@ export default {
                 },
                 lastPrice: {
                     label: 'Last Price',
+                    key: 'lastPrice',
                     sortable: true,
                     formatter: formatMoney,
                 },
@@ -94,6 +113,10 @@ export default {
     },
     computed: {
         marketsHiddenNames: function() {
+            if (undefined === typeof this.markets) {
+                return {};
+            }
+
             return Object.keys(this.markets);
         },
         tokens: function() {
@@ -139,9 +162,25 @@ export default {
         },
         updateData: function(page) {
             return new Promise((resolve, reject) => {
+                let params = {page};
+
+                if (this.userTokensEnabled) {
+                    params.user = this.userTokensEnabled | 0;
+                }
+
                 this.loading = true;
-                this.$axios.retry.get(this.$routing.generate('markets_info', {page}))
+                this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
+                        if (null !== this.markets) {
+                            this.addOnOpenHandler(() => {
+                                const request = JSON.stringify({
+                                    method: 'state.unsubscribe',
+                                    params: [],
+                                    id: parseInt(Math.random().toString().replace('0.', '')),
+                                });
+                                this.sendMessage(request);
+                            });
+                        }
                         this.currentPage = page;
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;

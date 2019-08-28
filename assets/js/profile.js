@@ -1,7 +1,10 @@
 import LimitedTextarea from './components/LimitedTextarea.vue';
+import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
+import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
+import BbcodeView from './components/bbcode/BbcodeView.vue';
 import {minLength, helpers} from 'vuelidate/lib/validators';
-const names = helpers.regex('names', /^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u);
-const city = helpers.regex('city', /^[A-Za-z\s-]+$/u);
+const xRegExp = require('xregexp');
+const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
 new Vue({
     el: '#profile',
@@ -18,6 +21,9 @@ new Vue({
         this.showEditForm = this.$refs.editFormShowFirst.value;
     },
     components: {
+        BbcodeEditor,
+        BbcodeHelp,
+        BbcodeView,
         LimitedTextarea,
     },
     validations: {
@@ -30,9 +36,8 @@ new Vue({
             minLength: minLength(2),
         },
         city: {
-            helpers: city,
+            helpers: names,
             minLength: minLength(2),
         },
     },
 });
-

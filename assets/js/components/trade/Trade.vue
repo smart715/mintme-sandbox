@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid px-0">
-        <div class="row px-0">
+        <div class="row">
             <trade-chart
                     class="col"
                     :websocket-url="websocketUrl"
@@ -8,7 +8,7 @@
             />
         </div>
         <div class="row">
-            <div class="col-12 col-lg-6 mt-3 pr-lg-2">
+            <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
                         v-if="balanceLoaded"
                         :websocket-url="websocketUrl"
@@ -27,7 +27,7 @@
                     </div>
                 </template>
             </div>
-            <div class="col-12 col-lg-6 mt-3 pl-lg-2">
+            <div class="col-12 col-lg-6 pl-lg-2 mt-3">
                 <trade-sell-order
                         v-if="balanceLoaded"
                         :websocket-url="websocketUrl"
@@ -55,9 +55,10 @@
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
                 :market="market"
-                :user-id="userId" />
+                :user-id="userId"
+                :logged-in="loggedIn"/>
         </div>
-        <div class="row px-0 mt-3">
+        <div class="row mt-3">
             <trade-trade-history
                 class="col"
                 :hash="hash"
@@ -72,7 +73,6 @@ import TradeBuyOrder from './TradeBuyOrder';
 import TradeSellOrder from './TradeSellOrder';
 import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
-import TopTraders from './TopTraders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
@@ -90,7 +90,6 @@ export default {
         TradeChart,
         TradeOrders,
         TradeTradeHistory,
-        TopTraders,
         OrderModal,
     },
     props: {
@@ -163,21 +162,20 @@ export default {
     },
     methods: {
         checkInput: function(precision) {
-            let inputPos = event.target.selectionStart;
+            let selectionStart = event.target.selectionStart;
+            let selectionEnd = event.target.selectionEnd;
             let amount = event.srcElement.value;
-            let selected = getSelection().toString();
-            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${precision}})?$`);
+            let regex = new RegExp(`^[0-9]{0,8}(\\.[0-9]{0,${precision}})?$`);
             let input = event instanceof ClipboardEvent
                 ? event.clipboardData.getData('text')
                 : String.fromCharCode(!event.charCode ? event.which : event.charCode);
 
-            if (selected && regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos + selected.length))) {
-                return true;
-            }
-            if (!regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos))) {
+            if (!regex.test(amount.slice(0, selectionStart) + input + amount.slice(selectionEnd))) {
                 event.preventDefault();
                 return false;
             }
+
+            return true;
         },
         /**
          * @param {undefined|{type, isAssigned, resolve}} context
@@ -224,6 +222,11 @@ export default {
             });
         },
         updateAssets: function() {
+            if (!this.loggedIn) {
+                this.balances = false;
+                return;
+            }
+
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
                     this.balances = {...res.data.common, ...res.data.predefined};

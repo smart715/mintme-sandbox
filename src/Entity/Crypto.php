@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -66,6 +67,25 @@ class Crypto implements TradebleInterface
      */
     protected $exchangeble;
 
+    /**
+     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="crypto", cascade={"persist", "remove"})
+     * @var ArrayCollection
+     */
+    protected $users;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /** @return User[] */
+    public function getUsers(): array
+    {
+        return array_map(function (UserCrypto $userCrypto) {
+            return $userCrypto->getUser();
+        }, $this->users->toArray());
+    }
+
     /** {@inheritdoc} */
     public function getName(): string
     {
@@ -90,12 +110,14 @@ class Crypto implements TradebleInterface
     }
 
     /** Show if crypto could be used as `base` currency */
+    /** @Groups({"API"}) */
     public function isTradable(): bool
     {
         return $this->tradable;
     }
 
     /** Show if crypto could be used as `quote` currency */
+    /** @Groups({"API"}) */
     public function isExchangeble(): bool
     {
         return $this->exchangeble;

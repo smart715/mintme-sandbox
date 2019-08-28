@@ -1,6 +1,7 @@
 <template>
     <modal
         :visible="visible"
+        :no-close="noClose"
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
@@ -37,13 +38,13 @@
                             @click="setMaxAmount">
                             All
                         </button>
-                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
+                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
                             You don't have enough {{ currency }}
                         </div>
-                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
+                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center">
                             Minimum withdraw amount is {{ minAmount }} {{ currency }}
                         </div>
-                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center mt-4">
+                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center">
                             Invalid amount.
                         </div>
                 </div>
@@ -72,15 +73,15 @@
                 <div class="col-12 pt-2 text-center">
                     <button
                         class="btn btn-primary"
+                        :disabled="withdrawing"
                         @click="onWithdraw">
                         Withdraw
                     </button>
-                    <a
-                        href="#"
-                        class="btn-cancel pl-3"
+                    <span
+                        class="btn-cancel pl-3 c-pointer"
                         @click="onCancel">
                         <slot name="cancel">Cancel</slot>
-                    </a>
+                    </span>
                 </div>
             </div>
         </template>
@@ -93,7 +94,7 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
+const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 
 export default {
     name: 'WithdrawModal',
@@ -109,16 +110,20 @@ export default {
         addressLength: Number,
         subunit: Number,
         twofa: String,
+        noClose: Boolean,
     },
     data() {
         return {
+            withdrawing: false,
             code: '',
             amount: 0,
             address: '',
-            minAmount: toMoney('1e-' + this.subunit),
         };
     },
     computed: {
+        minAmount: function() {
+            return toMoney('1e-' + this.subunit, this.subunit);
+        },
         fullAmount: function() {
             Decimal.set({precision: 36});
 
@@ -160,6 +165,8 @@ export default {
                 return;
             }
 
+            this.withdrawing = true;
+
             this.$axios.single.post(this.withdrawUrl, {
                 'crypto': this.currency,
                 'amount': this.amount,
@@ -172,7 +179,8 @@ export default {
             })
             .catch((error) => {
                 this.$toasted.error(error.response.data.error);
-            });
+            })
+            .then(() => this.withdrawing = false);
 
             this.$emit('withdraw', this.currency, this.amount, this.address);
         },

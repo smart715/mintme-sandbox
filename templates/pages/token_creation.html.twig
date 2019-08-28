@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Token Creation{% endblock %}
+{% block title %}Token Creation | mintMe{% endblock %}
 
 {% block content %}
     <div class="container" id="token">
@@ -12,7 +12,13 @@
                     </div>
                     <div class="card-body py-2">
                         {{ form_start(form) }}
-                        {{ form_errors(form) }}
+                        {% if not form.vars.valid %}
+                            {% for error in form.vars.errors %}
+                                {% if not (error.cause.id is defined and 'token_create' is same as(error.cause.id)) %}
+                                    <div class="py-2 mb-2 bg-danger text-white text-center">{{ error.message }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                         {{ form_row(form.name, {'attr': {
                             'v-model': '$v.tokenName.$model',
                             'class' : 'form-control',
@@ -41,12 +47,13 @@
             </div>
         </div>
         <modal
-            no-close-on-backdrop
+            :no-close="false"
+            @close="redirectToProfile"
             :visible="domLoaded && {{ profileCreated ? 'false' : 'true' }}">
             <template slot="close"> &nbsp; </template>
             <template slot="body">
                 <div class="text-center">
-                    <p class="text-white">You need to create profile, only then you will be able to create token</p>
+                    <p class="text-white">You need to create a profile, only then you'll be able to create a token</p>
                     <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
                 </div>
             </template>

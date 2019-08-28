@@ -28,7 +28,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
+     * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @ProfilePeriodLock()
@@ -40,7 +40,7 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
+     * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @ProfilePeriodLock()
@@ -51,7 +51,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Regex(pattern="/^[A-Za-z\s-]+$/u")
+     * @Assert\Regex(pattern="/^[\p{L}\s-]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @Groups({"Default", "API"})

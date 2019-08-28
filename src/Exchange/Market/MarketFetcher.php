@@ -30,17 +30,13 @@ class MarketFetcher implements MarketFetcherInterface
 
     public function getMarketInfo(string $market, int $period = 86400): array
     {
-        try {
-            $response = $this->jsonRpc->send(self::MARKET_STATUS, [
-                $market,
-                $period,
-            ]);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::MARKET_STATUS, [
+            $market,
+            $period,
+        ]);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException($response->getError()['message'] ?? '');
         }
 
         return $response->getResult();

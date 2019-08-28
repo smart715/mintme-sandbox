@@ -16,6 +16,8 @@
 @import 'wallet'
 @import 'news'
 @import 'trading'
+@import 'markitup'
+@import 'bbcode-help'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
@@ -34,6 +36,21 @@ body
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
   min-height: 100vh
+
+  @include media-breakpoint-up(xs)
+    content: "xs"
+
+  @include media-breakpoint-up(sm)
+    content: "sm"
+
+  @include media-breakpoint-up(md)
+    content: "md"
+
+  @include media-breakpoint-up(lg)
+    content: "lg"
+
+  @include media-breakpoint-up(xl)
+    content: "xl"
 
 .text-bold
   font-weight: 800
@@ -132,7 +149,6 @@ a
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
     background-color: $card-input-color !important
-    cursor: url('../img/input-cursor.png'), auto
     color: $white
     border-radius: 0
     border: none
@@ -141,6 +157,8 @@ a
   textarea
     height: auto
     border: none
+    cursor: url('../img/input-cursor.png'), auto
+    -webkit-text-fill-color: white
 
   .custom-select, .form-control
     border: none
@@ -194,6 +212,24 @@ a
       display: table-cell
       width: 120px
 
+.custom-scrollbar
+  scrollbar-color: $primary-light $white
+  cursor: default
+
+  &::-webkit-scrollbar
+    width: 10px
+    height: 10px
+
+  &::-webkit-scrollbar-track-piece
+    background-color: $white
+
+  &::-webkit-scrollbar-thumb:horizontal
+    background-color: $primary-light
+
+  &::-webkit-scrollbar-thumb:vertical
+    height: 30px
+    background-color: $primary-light
+
 .table, .table-responsive
   color: inherit
 
@@ -215,21 +251,7 @@ a
         border: none
 
   &, tbody
-    scrollbar-color: $primary-light $white
-
-    &::-webkit-scrollbar
-      width: 10px
-      height: 10px
-
-    &::-webkit-scrollbar-track-piece
-      background-color: $white
-
-    &::-webkit-scrollbar-thumb:horizontal
-      background-color: $primary-light
-
-    &::-webkit-scrollbar-thumb:vertical
-      height: 30px
-      background-color: $primary-light
+    @extend .custom-scrollbar
 
   td
     border: none
@@ -264,14 +286,13 @@ a
     .page-link
       background: none
       color: $color-link
-    span
-      font-size: 30px
       line-height: 13px
-
 
   .active
     .page-link
       color: $white
+      cursor: default !important
+      pointer-events: none !important
 
 .tabs
   .nav-tabs
@@ -475,6 +496,13 @@ nav.top-navbar
   -webkit-transform-origin: 0 0
   margin-bottom: -25px
 
+.flex-basis-200
+  flex-basis: 200px
+
+.tooltip
+  transition-duration: .4s !important
+  transition-timing-function: ease-in !important
+
 meter
   width: 100%
   height: .5em
@@ -498,7 +526,7 @@ meter
     bottom: 1.2rem
     right: 1rem
 
-#token, #profile-creation, #profile
+#token, #profile
   [v-cloak]
     display: none
   .text-danger
@@ -518,3 +546,9 @@ meter
 
 .is-invalid
   border: 1px solid $red !important
+
+input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
+  cursor: url('../img/input-cursor.png'), auto
+
+.no-bg-img
+  background-image: none !important

@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Token{% endblock %}
+{% block title %}
+    {% if tab|default == 'intro' %}Information about {% endif %}
+    {% if token|default %} {{ token.name }} {% else %} {{ market.base.symbol }}/{{ market.quote.symbol }} {% endif %} | mintMe
+{% endblock %}
 
 {% block content %}
     <div id="token" class="container">
@@ -41,15 +44,19 @@
                                     token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
                                 >
                                 </token-introduction-profile>
-
                                 <token-introduction-statistics
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                    twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                     token-created="{{ token.getCreated().format('d M Y') }}"
                                     :precision="{{ precision }}">
                                 </token-introduction-statistics>
+                                <top-holders
+                                        class="col-12 mt-3"
+                                        :token-name="{{ market.quote.symbol | json_encode }}">
+                                </top-holders>
                                 <token-introduction-description
                                     class="col-12 pt-3"
                                     @updated="descriptionUpdated"
@@ -69,6 +76,7 @@
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
                                         update-url="{{ path('token_update', {'name': market.quote.name}) }}"
+                                        twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>
                             </div>

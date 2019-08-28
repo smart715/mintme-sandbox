@@ -5,10 +5,12 @@
                 <b-table
                     ref="btable"
                     v-if="hasOrders"
-                    :items="getHistory"
+                    :items="history"
                     :fields="fields">
                     <template slot="name" slot-scope="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
+                        </div>
                     </template>
                     <template slot="action" slot-scope="row">
                         <a @click="removeOrderModal(row.item)">
@@ -42,9 +44,10 @@
     </div>
 </template>
 <script>
+import moment from 'moment';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
 import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
 
@@ -110,6 +113,25 @@ export default {
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
         },
+        history: function() {
+            return this.tableData.map((order) => {
+                return {
+                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
+                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
+                    amount: toMoney(order.amount, order.market.base.subunit),
+                    price: toMoney(order.price, order.market.base.subunit),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
+                    fee: order.fee * 100 + '%',
+                    action: this.$routing.generate('orders_сancel', {
+                        base: order.market.base.symbol,
+                        quote: order.market.quote.symbol,
+                    }),
+                    id: order.id,
+                    pairUrl: this.generatePairUrl(order.market),
+                };
+            });
+        },
     },
     mounted: function() {
         Promise.all([
@@ -166,23 +188,11 @@ export default {
                     });
             });
         },
-        getHistory: function() {
-            return this.tableData.map((order) => {
-                return {
-                    date: new Date(order.timestamp * 1000).toDateString(),
-                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
-                    amount: toMoney(order.amount, order.market.base.subunit),
-                    price: toMoney(order.price, order.market.base.subunit),
-                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
-                    fee: order.fee * 100 + '%',
-                    action: this.$routing.generate('orders_сancel', {
-                        base: order.market.base.symbol,
-                        quote: order.market.quote.symbol,
-                    }),
-                    id: order.id,
-                };
-            });
+        generatePairUrl: function(market) {
+            if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
+                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+            }
+            return this.$routing.generate('token_show', {name: market.quote.name});
         },
         removeOrderModal: function(row) {
             this.currentRow = row;

@@ -1,21 +1,31 @@
 <template>
-    <div v-on-clickaway="cancelEditingMode">
-        <template v-if="editable">
-            <input
-                type="text"
-                v-model.trim="$v.newName.$model"
-                v-if="editingName"
-                ref="tokenNameInput"
-                class="token-name-input"
-                :class="{ 'is-invalid': $v.$invalid }">
-            <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
-                :icon="icon"
-                transform="shrink-4 up-1.5"
-                @click="editName"
+    <div>
+        <div v-on-clickaway="cancelEditingMode">
+            <template v-if="editable">
+                <input
+                    type="text"
+                    v-model.trim="$v.newName.$model"
+                    v-if="editingName"
+                    ref="tokenNameInput"
+                    class="token-name-input"
+                    :class="{ 'is-invalid': $v.$invalid }">
+                <font-awesome-icon
+                    class="icon-edit c-pointer align-middle"
+                    :icon="icon"
+                    transform="shrink-4 up-1.5"
+                    @click="editName"
+                />
+            </template>
+            <span v-if="!editingName" v-b-tooltip="{title: currentName, boundary:'viewport'}">
+                {{ currentName | truncate(7) }}
+            </span>
+        </div>
+        <two-factor-modal
+            :visible="showTwoFactorModal"
+            :twofa="twofa"
+            @verify="doEditName"
+            @close="closeTwoFactorModal"
             />
-        </template>
-        <span v-if="!editingName">{{ currentName }}</span>
     </div>
 </template>
 
@@ -25,8 +35,9 @@ import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import WebSocketMixin from '../../mixins/websocket';
+import {WebSocketMixin, FiltersMixin} from '../../mixins';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+import TwoFactorModal from '../modal/TwoFactorModal';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
@@ -37,7 +48,6 @@ Vue.use(Toasted, {
 });
 
 const HTTP_ACCEPTED = 202;
-const HTTP_ALREADY_REPORTED = 208;
 
 export default {
     name: 'TokenName',
@@ -46,11 +56,13 @@ export default {
         identifier: String,
         updateUrl: String,
         editable: Boolean,
+        twofa: String,
     },
     components: {
         FontAwesomeIcon,
+        TwoFactorModal,
     },
-    mixins: [WebSocketMixin, clickaway],
+    mixins: [WebSocketMixin, FiltersMixin, clickaway],
     data() {
         return {
             editingName: false,
@@ -59,6 +71,7 @@ export default {
             newName: this.name,
             isTokenExchanged: true,
             minLength: 4,
+            showTwoFactorModal: false,
         };
     },
     mounted: function() {
@@ -75,6 +88,9 @@ export default {
         }, 'token-name-asset-update');
     },
     methods: {
+        closeTwoFactorModal: function() {
+            this.showTwoFactorModal = false;
+        },
         checkIfTokenExchanged: function() {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
                 name: this.currentName,
@@ -93,7 +109,29 @@ export default {
             }
 
             if (this.icon === 'check') {
-                return this.doEditName();
+                this.$v.$touch();
+                if (this.currentName === this.newName) {
+                    this.cancelEditingMode();
+                    return;
+                } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
+                    this.$toasted.error('Token name shouldn\'t be blank');
+                    return;
+                } else if (!this.$v.newName.tokenContain) {
+                    this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
+                    return;
+                } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
+                    this.$toasted.error('Token name should have at least 4 symbols');
+                    return;
+                } else if (!this.$v.newName.maxLength) {
+                    this.$toasted.error('Token name can not be longer than 60 characters');
+                    return;
+                }
+
+                if (!this.twofa) {
+                    return this.doEditName();
+                }
+
+                return this.showTwoFactorModal = true;
             }
 
             this.editingName = !this.editingName;
@@ -103,27 +141,10 @@ export default {
                 tokenNameInput.focus();
             });
         },
-        doEditName: function() {
-            this.$v.$touch();
-            if (this.currentName === this.newName) {
-                this.cancelEditingMode();
-                return;
-            } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
-                this.$toasted.error('Token name shouldn\'t be blank');
-                return;
-            } else if (!this.$v.newName.tokenContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
-            } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
-                this.$toasted.error('Token name should have at least 4 symbols');
-                return;
-            } else if (!this.$v.newName.maxLength) {
-                this.$toasted.error('Token name can not be longer than 60 characters');
-                return;
-            }
-
+        doEditName: function(code = '') {
             this.$axios.single.patch(this.updateUrl, {
-                name: this.newName,
+                'name': this.newName,
+                'code': code,
             })
             .then((response) => {
                 if (response.status === HTTP_ACCEPTED) {
@@ -134,8 +155,6 @@ export default {
                         name: this.currentName,
                     });
                     this.cancelEditingMode();
-                } else if (response.status === HTTP_ALREADY_REPORTED) {
-                    this.$toasted.error(response.data);
                 }
             }, (error) => {
                 if (!error.response) {
@@ -148,10 +167,12 @@ export default {
             });
         },
         cancelEditingMode: function() {
-            this.$v.$reset();
-            this.newName = this.currentName;
-            this.editingName = false;
-            this.icon = 'edit';
+            if (!this.showTwoFactorModal) {
+                this.$v.$reset();
+                this.newName = this.currentName;
+                this.editingName = false;
+                this.icon = 'edit';
+            }
         },
     },
     validations() {

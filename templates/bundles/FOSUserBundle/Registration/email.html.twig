@@ -1,9 +1,9 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
 {% block subject %}
-  {%- autoescape false -%}
-  {{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
-  {%- endautoescape -%}
+    {%- autoescape false -%}
+        {{ 'registration.email.subject'|trans({'%username%': user.username, '%confirmationUrl%': confirmationUrl}) }}
+    {%- endautoescape -%}
 {% endblock %}
 
 {% block body_text %}{% endblock %}
@@ -11,7 +11,7 @@
 {% block body_html %}
   {% embed 'mail/layout.html.twig' %}
     {% block content %}
-      <table>
+      <table width="100%">
         <tr>
           <th>
             <h3 style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;color: #fff;" >Hello</h3>

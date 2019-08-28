@@ -4,6 +4,7 @@ import TokenIntroductionProfile from './components/token/introduction/TokenIntro
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenName from './components/token/TokenName';
+import TopHolders from './components/trade/TopHolders';
 import store from './storage';
 
 new Vue({
@@ -22,6 +23,7 @@ new Vue({
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
     TokenName,
+    TopHolders,
     Tabs,
   },
   methods: {
@@ -37,6 +39,7 @@ new Vue({
               tab: i ? 'intro' : 'trade',
             })
         );
+        document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';
       }
     },
   },

@@ -72,13 +72,13 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Route("/invite/{code}", name="register-referral")
+     * @Rest\Route("/invite/{code}", name="register-referral", schemes={"https"})
      */
     public function registerReferral(string $code, AuthorizationCheckerInterface $authorizationChecker): Response
     {
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
-            ? $this->redirectToRoute('homepage')
-            : $this->redirectToRoute('fos_user_registration_register');
+            ? $this->redirectToRoute('homepage', [], 301)
+            : $this->redirectToRoute('fos_user_registration_register', [], 301);
 
         $response->headers->setCookie(
             new Cookie('referral-code', $code)

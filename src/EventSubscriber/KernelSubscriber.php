@@ -40,6 +40,7 @@ class KernelSubscriber implements EventSubscriberInterface
         $this->csrfTokenManager = $csrfTokenManager;
     }
 
+    /** @codeCoverageIgnore */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -48,6 +49,7 @@ class KernelSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /** @codeCoverageIgnore */
     public function onResponse(FilterResponseEvent $event): void
     {
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');

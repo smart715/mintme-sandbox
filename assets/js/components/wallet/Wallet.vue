@@ -13,7 +13,9 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template slot="name" slot-scope="data">
-                    {{ data.item.fullname }} ({{ data.item.name }})
+                    <a :href="generateCoinUrl(data.item)" class="text-white">
+                        {{ data.item.fullname }} ({{ data.item.name }})
+                    </a>
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -30,7 +32,12 @@
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
-                            @click="openWithdraw(data.item.name, data.item.fee, data.item.available, data.item.subunit)">
+                            @click="openWithdraw(
+                                        data.item.name,
+                                        data.item.fee,
+                                        data.item.available,
+                                        data.item.subunit)"
+                        >
                                 <div><i class="icon-withdraw"></i></div>
                                 <div>
                                     <span class="pl-2 text-xs align-middle">Withdraw</span>
@@ -53,7 +60,7 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template slot="name" slot-scope="data">
-                    {{ data.item.name }}
+                    <a :href="generatePairUrl(data.item)" class="text-white">{{ data.item.name }}</a>
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -89,6 +96,7 @@
             :address-length="addressLength"
             :twofa="twofa"
             :subunit="withdraw.subunit"
+            :no-close="true"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -98,6 +106,7 @@
             :currency="selectedCurrency"
             :fee="deposit.fee"
             :min="deposit.min"
+            :no-close="false"
             @close="closeDeposit()"
         />
     </div>
@@ -133,6 +142,7 @@ export default {
             depositAddress: null,
             depositDescription: null,
             showDepositModal: null,
+            noClose: false,
             tooltipOptions: {
                 placement: 'bottom',
                 arrow: true,
@@ -227,6 +237,10 @@ export default {
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit) {
+            if (!this.twofa) {
+                this.$toasted.info('Please enable 2FA before withdrawing');
+                return;
+            }
             this.showModal = true;
             this.selectedCurrency = currency;
             this.withdraw.fee = toMoney(fee, subunit);
@@ -293,6 +307,16 @@ export default {
             });
 
             return Object.values(tokens);
+        },
+        generatePairUrl: function(market) {
+            return this.$routing.generate('token_show', {name: market.name});
+        },
+        generateCoinUrl: function(coin) {
+            let params = {
+                base: !coin.exchangeble ? coin.name : this.predefinedTokens.BTC.name,
+                quote: coin.exchangeble && coin.tradable ? coin.name : this.predefinedTokens.WEB.name,
+            };
+            return this.$routing.generate('coin', params);
         },
     },
 };

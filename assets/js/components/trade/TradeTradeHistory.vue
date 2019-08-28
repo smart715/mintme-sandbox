@@ -23,8 +23,21 @@
                             ref="table"
                             :items="ordersList"
                             :fields="fields">
+
+                            <template slot="HEAD_pricePerQuote" slot-scope="row">
+                                <span v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
+                                    Price per {{ market.quote.symbol | truncate(7) }}
+                                </span>
+                            </template>
+
+                            <template slot="HEAD_quoteAmount" slot-scope="row">
+                                <span v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
+                                    {{ market.quote.symbol | truncate(7) }} amount
+                                </span>
+                            </template>
+
                             <template slot="orderMaker" slot-scope="row">
-                                <a :href="row.item.makerUrl">
+                                <a v-if="!row.item.isMakerAnonymous" :href="row.item.makerUrl">
                                     <span v-b-tooltip="{title: row.item.makerFullName, boundary:'viewport'}">
                                         {{ row.value }}
                                     </span>
@@ -33,9 +46,10 @@
                                         class="pl-3 pl-lg-0 float-lg-right"
                                         alt="avatar">
                                 </a>
+                                <span v-else>{{ row.value }}</span>
                             </template>
                             <template slot="orderTrader" slot-scope="row">
-                                <a :href="row.item.takerUrl">
+                                <a v-if="!row.item.isTakerAnonymous" :href="row.item.takerUrl">
                                     <span v-b-tooltip="{title: row.item.takerFullName, boundary:'viewport'}">
                                         {{ row.value }}
                                     </span>
@@ -44,6 +58,12 @@
                                         class="pl-3 pl-lg-0 float-lg-right"
                                         alt="avatar">
                                 </a>
+                                <span v-else>{{ row.value }}</span>
+                            </template>
+                            <template slot="dateTime" slot-scope="row">
+                                 <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                        {{ row.value | truncate(13) }}
+                                </span>
                             </template>
                         </b-table>
                         <div v-if="!hasOrders">
@@ -72,15 +92,16 @@
 </template>
 
 <script>
+import moment from 'moment';
 import Guide from '../Guide';
 import {formatMoney, toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {WSAPI} from '../../utils/constants';
-import {WebSocketMixin, LazyScrollTableMixin} from '../../mixins';
+import {GENERAL, WSAPI} from '../../utils/constants';
+import {WebSocketMixin, FiltersMixin, LazyScrollTableMixin} from '../../mixins';
 
 export default {
     name: 'TradeTradeHistory',
-    mixins: [WebSocketMixin, LazyScrollTableMixin],
+    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
     props: {
         market: Object,
     },
@@ -100,11 +121,9 @@ export default {
                     label: 'Order taker',
                 },
                 pricePerQuote: {
-                    label: 'Price per ' + this.market.quote.symbol,
                     formatter: formatMoney,
                 },
                 quoteAmount: {
-                    label: this.market.quote.symbol + ' amount',
                     formatter: formatMoney,
                 },
                 baseAmount: {
@@ -124,7 +143,7 @@ export default {
         ordersList: function() {
             return this.tableData !== false ? this.tableData.map((order) => {
                 return {
-                    dateTime: new Date(order.timestamp * 1000).toDateString(),
+                    dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     orderMaker: order.maker && order.maker.profile && !order.maker.profile.anonymous
                         ? this.truncateFullName(order.maker.profile)
                         : 'Anonymous',
@@ -150,6 +169,8 @@ export default {
                         new Decimal(order.price).mul(order.amount).toString(),
                         this.market.base.subunit
                     ),
+                    isMakerAnonymous: !order.maker || !order.maker.profile || order.maker.profile.anonymous,
+                    isTakerAnonymous: !order.taker || !order.taker.profile || order.taker.profile.anonymous,
                 };
             }) : [];
         },

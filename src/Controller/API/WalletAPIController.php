@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
@@ -18,8 +17,10 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 /**
  * @Rest\Route("/api/wallet")
@@ -39,7 +40,7 @@ class WalletAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\GET(
+     * @Rest\Get(
      *     "/history/{page}",
      *     name="payment_history",
      *     requirements={"page"="^[0-9]\d*$"},
@@ -64,14 +65,19 @@ class WalletAPIController extends AbstractFOSRestController
      * @Rest\Post("/withdraw", name="withdraw")
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
-     * @Rest\RequestParam(name="address", allowBlank=false)
-     * @Rest\RequestParam(name="code")
+     * @Rest\RequestParam(
+     *     name="address",
+     *      allowBlank=false,
+     *      requirements="^[a-zA-Z0-9]+$"
+     *     )
+     * @Rest\RequestParam(name="code", allowBlank=false)
      */
     public function withdraw(
         ParamFetcherInterface $request,
         CryptoManagerInterface $cryptoManager,
         TwoFactorManagerInterface $twoFactorManager,
         MoneyWrapperInterface $moneyWrapper,
+        WalletInterface $wallet,
         MailerInterface $mailer
     ): View {
         $user = $this->getUser();
@@ -92,22 +98,30 @@ class WalletAPIController extends AbstractFOSRestController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
+        if (!$user->isGoogleAuthenticatorEnabled()) {
+            return $this->view([
+                'error' => '2FA is not enabled',
+                ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$twoFactorManager->checkCode($user, $request->get('code'))) {
             return $this->view([
                 'error' => 'Invalid 2fa code',
                 ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $pendingWithdraw = new PendingWithdraw(
-            $user,
-            $crypto,
-            new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
-            new Address(trim((string)$request->get('address')))
-        );
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($pendingWithdraw);
-        $entityManager->flush();
+        try {
+            $pendingWithdraw = $wallet->withdrawInit(
+                $user,
+                new Address(trim((string)$request->get('address'))),
+                new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
+                $crypto
+            );
+        } catch (Throwable $exception) {
+            return $this->view([
+                'error' => 'Withdrawal failed',
+            ], Response::HTTP_BAD_GATEWAY);
+        }
 
         $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
@@ -122,7 +136,7 @@ class WalletAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\GET("/addresses", name="deposit_addresses", options={"expose"=true})
+     * @Rest\Get("/addresses", name="deposit_addresses", options={"expose"=true})
      */
     public function getDepositAddresses(
         WalletInterface $depositCommunicator,
@@ -168,7 +182,7 @@ class WalletAPIController extends AbstractFOSRestController
         $webToken = $tokenManager->findByName(Token::WEB_SYMBOL);
 
         if (!$webToken) {
-            throw new \InvalidArgumentException();
+            throw new InvalidArgumentException();
         }
 
         return $this->view([

@@ -52,6 +52,7 @@
                     <ve-candle
                         class="m-2"
                         :extend="additionalAttributes"
+                        :right-label="rightLabel"
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(market.base.subunit)"
@@ -68,13 +69,11 @@
 </template>
 
 <script>
-import VeLine from 'v-charts';
+import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
 import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
-import {toMoney, EchartTheme as VeLineTheme} from '../../utils';
+import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
-
-Vue.use(VeLine);
 
 export default {
     name: 'TradeChart',
@@ -85,6 +84,7 @@ export default {
     },
     data() {
         return {
+            rightLabel: true,
             chartTheme: VeLineTheme,
             chartSettings: {
                 labelMap: {
@@ -92,21 +92,26 @@ export default {
                 },
                 showMA: false,
                 showDataZoom: true,
-                start: 70,
-                end: 100,
                 downColor: '#ff6961',
                 upColor: '#77DD77',
                 showVol: false,
+                start: 0,
+                end: 100,
             },
             additionalAttributes: {
                 grid: {
                     top: 20,
                     bottom: 60,
-                    left: '8%',
-                    right: '8%',
+                    left: 75,
+                    right: '10%',
                 },
                 xAxis: {
                     boundaryGap: true,
+                },
+                yAxis: {
+                    axisLabel: {
+                        formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit)).toString(),
+                    },
                 },
             },
             marketStatus: {
@@ -116,6 +121,7 @@ export default {
                 amount: '0',
             },
             stats: null,
+            maxAvailableDays: 30,
         };
     },
     computed: {
@@ -149,11 +155,15 @@ export default {
         },
     },
     mounted() {
+        window.addEventListener('resize', this.handleRightLabel);
+        this.handleRightLabel();
+
         this.$axios.retry.get(this.$routing.generate('market_kline', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
         })).then((res) => {
             this.stats = res.data;
+            this.chartSettings.start = this.getStartTradingPeriod();
 
             this.addMessageHandler((result) => {
                 if (result.method === 'state.update') {
@@ -215,9 +225,20 @@ export default {
         getDate: function(timestamp) {
             return moment.utc((timestamp + 3600) * 1000).format('YYYY-MM-DD');
         },
+        getStartTradingPeriod: function() {
+            if (this.stats.length > this.maxAvailableDays) {
+                return Math.floor((this.stats.length - this.maxAvailableDays) / this.stats.length * 100);
+            }
+
+            return 0;
+        },
+        handleRightLabel() {
+            this.rightLabel = ['lg', 'xl'].includes(getBreakPoint());
+        },
     },
     components: {
         Guide,
+        VeCandle,
     },
 };
 </script>

@@ -86,7 +86,7 @@ class TokenController extends Controller
      *     defaults={"tab" = "trade"},
      *     methods={"GET"},
      *     requirements={"tab" = "trade|intro"},
-     *     options={"expose"=true}
+     *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
     public function show(
@@ -105,6 +105,16 @@ class TokenController extends Controller
 
         if (null === $token) {
             throw new NotFoundTokenException();
+        }
+
+        if ($this->tokenManager->isPredefined($token)) {
+            return $this->redirectToRoute(
+                'coin',
+                [
+                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
+                    'quote'=> Token::WEB_SYMBOL,
+                ]
+            );
         }
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);

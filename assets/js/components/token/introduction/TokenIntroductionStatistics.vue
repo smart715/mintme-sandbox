@@ -30,8 +30,8 @@
                             Token balance:
                         </div>
                         <div class="pb-1">
-                            Wallet on exchange:
-                            {{ walletBalance | toMoney(precision) | formatMoney }}
+                            Wallet on exchange: <br>
+                            {{ walletBalance | toMoney(precision, false) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Wallet on exchange
@@ -43,8 +43,8 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Active orders:
-                            {{ activeOrdersSum | toMoney(precision) | formatMoney }}
+                            Active orders: <br>
+                            {{ activeOrdersSum | toMoney(precision, false) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Active orders
@@ -55,8 +55,8 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Withdrawn:
-                            {{ withdrawBalance | toMoney(precision) | formatMoney }}
+                            Withdrawn: <br>
+                            {{ withdrawBalance | toMoney(precision, false) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Withdrawn
@@ -67,8 +67,8 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Sold on the market:
-                            {{ soldOrdersSum | toMoney(precision) | formatMoney }}
+                            Sold on the market: <br>
+                            {{ soldOrdersSum | toMoney(precision, false) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Sold on the market
@@ -82,12 +82,7 @@
                     <div class="col px-1">
                         <div class="font-weight-bold pb-4">
                             Token release:
-                            <guide max-width="500px">
-                                <font-awesome-icon
-                                        icon="question"
-                                        slot='icon'
-                                        class="ml-1 mb-1 bg-primary text-white
-                                    rounded-circle square blue-question"/>
+                            <guide>
                                 <template slot="header">
                                     Token Release Period
                                 </template>
@@ -100,7 +95,7 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Release period:
+                            Release period: <br>
                             {{ stats.releasePeriod }}
                             <template v-if="stats.releasePeriod !== defaultValue">years</template>
                             <guide>
@@ -113,8 +108,8 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Hourly installment:
-                            {{ stats.hourlyRate | toMoney(precision) | formatMoney }}
+                            Hourly installment: <br>
+                            {{ stats.hourlyRate | toMoney(precision, false) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Hourly installment
@@ -125,8 +120,8 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Already released:
-                            {{ stats.releasedAmount | toMoney(precision) | formatMoney }}
+                            Already released: <br>
+                            {{ stats.releasedAmount | toMoney(precision, false) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Already released
@@ -138,8 +133,8 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            Not yet released:
-                            {{ stats.frozenAmount | toMoney(precision) | formatMoney }}
+                            Not yet released: <br>
+                            {{ stats.frozenAmount | toMoney(precision, false) | formatMoney }}
                             <guide>
                                 <template slot="header">
                                     Not yet released
@@ -151,7 +146,7 @@
                             </guide>
                         </div>
                         <div class="pb-1">
-                            created on:
+                            created on: <br>
                             {{ tokenCreated }}
                         </div>
                     </div>
@@ -161,6 +156,7 @@
                         :release-period-route="releasePeriodRoute"
                         :period="statsPeriod"
                         :released-disabled="releasedDisabled"
+                        :twofa="twofa"
                         @cancel="switchAction"
                         @onStatsUpdate="statsUpdated">
                     </release-period-component>
@@ -199,6 +195,7 @@ export default {
         releasePeriodRoute: String,
         editable: Boolean,
         precision: Number,
+        twofa: String,
     },
     data() {
         return {
@@ -292,8 +289,8 @@ export default {
         },
     },
     filters: {
-        toMoney: function(val, precision) {
-            return isNaN(val) ? val : toMoney(val, precision);
+        toMoney: function(val, precision, fixedPoint = true) {
+            return isNaN(val) ? val : toMoney(val, precision, fixedPoint);
         },
     },
 };

@@ -107,19 +107,19 @@
                             </social-sharing>
                         </b-dropdown>
                         <div class="tooltip-static tooltip-static-left">
-                            Do you want to help your token grow? Spread the word!
+                            Do you want to help the token creator? Spread the word!
                         </div>
                     </div>
                     <div class="col-md-12 text-left" v-if="editingUrls">
                         <input type="submit" class="btn btn-primary" value="Save"  @click="editUrls"/>
-                        <a class="btn-cancel pl-3 c-pointer" @click="editingUrls = false">Cancel</a>
+                        <span class="btn-cancel pl-3 c-pointer" @click="editingUrls = false">Cancel</span>
                     </div>
                 </div>
             </div>
         </div>
         <modal
             @close="closeFileErrorModal"
-            :visible="fileErrorVisible">
+            :visible="!!fileErrorVisible">
             <template slot="body">
                 <h3 class="modal-title text-center text-danger">{{ fileError.title }}</h3>
                 <div class="text-white">
@@ -146,6 +146,7 @@
         <modal
             class="text-white"
             :visible="showConfirmWebsiteModal"
+            :no-close="false"
             @close="showConfirmWebsiteModal = false">
             <template slot="body">
                 <h5 class="modal-title text-center mb-2">Website Confirmation</h5>
@@ -177,7 +178,7 @@
                                     class="loading-spinner" fixed-width />
                             Confirm
                         </button>
-                        <a class="btn-cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
+                        <span class="btn-cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</span>
                     </div>
                 </div>
             </template>

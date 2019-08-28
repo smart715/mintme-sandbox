@@ -14,6 +14,8 @@ use App\Exchange\Config\Config;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\RandomNumber;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Graze\GuzzleHttp\JsonRpc\Message\Response;
+use Graze\GuzzleHttp\JsonRpc\Message\ResponseInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -69,6 +71,99 @@ class BalanceFetcherTest extends TestCase
         $this->expectException(FetchException::class);
 
         $handler->balance(1, ['TOK999'])->get('TOK999');
+    }
+
+    public function testBalanceWithBalanceException(): void
+    {
+        $handler = new BalanceFetcher(
+            $this->mockRpc(),
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
+        );
+        $this->expectException(BalanceException::class);
+
+        $handler->balance(1, [])->get('TOK999');
+    }
+
+    public function testBalanceWithError(): void
+    {
+        $rpc = $this->mockRpc();
+        $response = $this->createMock(JsonRpcResponse::class);
+        $response->method('hasError')->willReturn(true);
+        $rpc->method('send')->willReturn($response);
+
+        $handler = new BalanceFetcher(
+            $rpc,
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
+        );
+        $this->expectException(BalanceException::class);
+
+        $handler->balance(1, ['TOK999']);
+    }
+
+    public function testTopBalances(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'balance.top',
+                [ 'TOK999', 3 ]
+            )
+            ->willReturn($this->mockResponse(false, [
+                [1, 999],
+                [2, 99],
+                [3, 9],
+            ]));
+
+        $handler = new BalanceFetcher(
+            $rpc,
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
+        );
+
+        $result = $handler->topBalances(
+            'TOK999',
+            3
+        );
+
+        $this->assertEquals($result, [
+            [1, 999],
+            [2, 99],
+            [3, 9],
+        ]);
+    }
+
+    public function testTopBalancesWithErrors(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'balance.top',
+                [ 'TOK999', 3 ]
+            )
+            ->willReturn($this->mockResponse(true, [
+                [1, 999],
+                [2, 99],
+                [3, 9],
+            ]));
+
+        $handler = new BalanceFetcher(
+            $rpc,
+            $this->mockRandom(21),
+            $this->mockMoneyWrapper(),
+            $this->mockConfig(0)
+        );
+
+        $this->expectException(BalanceException::class);
+
+        $handler->topBalances(
+            'TOK999',
+            3
+        );
     }
 
     public function testSummary(): void

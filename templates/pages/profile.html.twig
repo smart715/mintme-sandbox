@@ -1,44 +1,139 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Profile{% endblock %}
+{% block title %}
+    {% if profile.firstName is empty %}
+        Create your profile | mintMe
+    {% else %}
+        {{ profile.firstName }} {{ profile.lastName }}
+        {{ profile.city is empty ? '' : ' (from ' ~ profile.city ~ ')' }} profile | mintMe
+    {% endif %}
+{% endblock %}
 
 {% block bodyclass %}profile-view{% endblock %}
 
 {% block content %}
-    <div id="profile-creation" class="container">
+    <div id="profile" class="container">
         <div class="row  pt-5 justify-content-center">
             <div class="col-12 col-lg-4 col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        Create your profile
+                        {% if profile.firstName is empty %}
+                            Create your profile
+                        {% else %}
+                            <span>{{ profile.firstName }} {{ profile.lastName }} </span>
+                        {% endif %}
                     </div>
                     <div class="card-body">
-                        <div class="row justify-content-center pb-3">
+                        {%- if (canEdit == true) -%}
+                            <a @click="showEditForm = true" class="float-right">
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2  icon-edit" v-if="!showEditForm"></font-awesome-icon>
+                            </a>
+                        {%- endif -%}
+                        <div class="row" v-if="!showEditForm">
                             <div class="col-12">
-                                {{ form_start(form) }}
-                                {{ form_row(form.firstName, {'attr': {'v-model': '$v.firstName.$model','class' : 'form-control'}}) }}
-                                <div v-cloak="$v.firstName" v-if="!$v.firstName.helpers" class="text-danger text-center">
-                                    First name can contain only letters, ` and -
+                                <div class="pb-1">
+                                    {% if profile.city is not empty %}
+                                        City: {{ profile.city }}
+                                    {% endif %}
                                 </div>
-                                <div v-cloak="$v.firstName" v-if="!$v.firstName.minLength" class="text-danger text-center">
-                                    First name must have at least 2 letters
+                                <div class="pb-1">
+                                    {% if profile.country is not empty %}
+                                        Country: {{ profile.getCountryFullName() }}
+                                    {% endif %}
                                 </div>
-                                {{ form_row(form.lastName, {'attr': {'v-model': '$v.lastName.$model','class' : 'form-control'}}) }}
-                                <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
-                                    Last name can contain only letters, ` and -
-                                </div>
-                                <div v-cloak="$v.lastName" v-if="!$v.lastName.minLength" class="text-danger text-center">
-                                    Last name must have at least 2 letters
-                                </div>
-                                <div class="text-left pt-3">
-                                    <input type="submit" :disabled="$v.$anyError || !(firstName && lastName)" class="btn btn-primary px-4" value="Save">
-                                    <a href="{{ path('trading') }}" class="btn-cancel pl-3">Cancel</a>
-                                </div>
-                                {{ form_end(form) }}
+                                {% if token is not empty %}
+                                    <div class="pb-1">
+                                        Token: <a href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
+                                    </div>
+                                {% endif %}
                             </div>
+                            <div class="col-12 pt-3">
+                                <bbcode-view value="{{ profile.description }}"></bbcode-view>
+                            </div>
+                        </div>
 
+                        <div v-show="showEditForm" v-cloak>
+                            {{ form_start(form) }}
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="pb-1">
+                                        {{ form_row(form.firstName, {'attr':
+                                            {
+                                                'v-model': '$v.firstName.$model',
+                                                'class' : 'form-control',
+                                                'ref' : 'firstName'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.firstName" v-if="!$v.firstName.helpers" class="text-danger text-center">
+                                        First name can contain only letters, ` and -
+                                    </div>
+                                    <div v-cloak="$v.firstName" v-if="!$v.firstName.minLength" class="text-danger text-center">
+                                        First name must have at least 2 letters
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.lastName, {'attr':
+                                            {
+                                                'v-model': '$v.lastName.$model',
+                                                'class' : 'form-control',
+                                                'ref': 'lastName'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
+                                        Last name can contain only letters, ` and -
+                                    </div>
+                                    <div v-cloak="$v.lastName" v-if="!$v.lastName.minLength" class="text-danger text-center">
+                                        Last name must have at least 2 letters
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.city, {'attr':
+                                            {
+                                                'v-model': '$v.city.$model',
+                                                'class' : 'form-control',
+                                                'ref' : 'city'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
+                                        City can contain alphabets and -
+                                    </div>
+                                    <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
+                                        City must have at least 2 letters
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.country) }}
+                                    </div>
+                                </div>
+                                <div class="col-12 pt-3">
+                                    <div>
+                                        {{ form_row(form.description, {'attr':
+                                            {
+                                                'class' : 'form-control form-control-md',
+                                                'ref' : 'description'
+                                            }
+                                        }) }}
+                                    </div>
+                                </div>
+                                <div class="col-12 pt-3">
+                                    <div class="custom-control custom-checkbox">
+                                        {{ form_widget(form.anonymous) }}
+                                        {{ form_label(form.anonymous) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-left">
+                                <input
+                                        type="submit"
+                                        :disabled="$v.$anyError || !(firstName && lastName)"
+                                        class="btn btn-primary"
+                                        value="Save">
+                                <a href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}" @click="showEditForm = false" class="btn-cancel pl-3" >Cancel</a>
+                            </div>
+                            {{ form_end(form) }}
                         </div>
                     </div>
+                    <input type="hidden" ref="editFormShowFirst" value="{{ editFormShowFirst }}"/>
                 </div>
             </div>
         </div>
@@ -46,5 +141,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/profile_creation.js') }}"></script>
+    <script src="{{ asset('build/profile.js') }}"></script>
 {% endblock %}
