@@ -302,7 +302,7 @@ services:
             - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
 
     App\EventSubscriber\SitemapSubscriber:
-        arguments: 
+        arguments:
             - "@router"
         tags:
             - { name: "kernel.event_subscriber", priority: 100 }
@@ -310,3 +310,7 @@ services:
     two_factor.auth_require_handler:
         class: App\Security\TwoFactorRequireHandler
         public: true
+
+    App\Validator\Handler\DisposableEmailApiHandler:
+        arguments:
+            $disposableApiLink: '%link_to_api_for_check_disposable_email%'

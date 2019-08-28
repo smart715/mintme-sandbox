@@ -11,4 +11,6 @@ class UserEmail extends Constraint
 {
     /** @var string */
     public $message = "Email already in use";
+    /** @var string */
+    public $domainMessage = 'Invalid email domain';
 }
