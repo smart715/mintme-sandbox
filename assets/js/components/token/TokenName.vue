@@ -38,6 +38,7 @@ import {mixin as clickaway} from 'vue-clickaway';
 import {WebSocketMixin, FiltersMixin} from '../../mixins';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import TwoFactorModal from '../modal/TwoFactorModal';
+import {customTrimmer} from '../../utils';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
@@ -104,6 +105,7 @@ export default {
             if (!this.editable) {
                 return;
             }
+            this.newName = customTrimmer(this.name, ' -');
 
             if (null === this.isTokenExchanged || this.isTokenExchanged) {
                 this.$toasted.error('You need all your tokens to change token\'s name');

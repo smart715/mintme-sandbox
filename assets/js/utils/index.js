@@ -128,6 +128,21 @@ function getBreakPoint() {
         .getPropertyValue('content').replace(/"/g, '');
 }
 
+/**
+ * @param {string} text
+ * @param {string} mask
+ * @return {string}
+ */
+function customTrimmer(text, mask) {
+    while (~mask.indexOf(text[0])) {
+        text = text.slice(1);
+    }
+    while (~mask.indexOf(text[text.length - 1])) {
+        text = text.slice(0, -1);
+    }
+    return text;
+}
+
 export {
     isValidUrl,
     deepFlatten,
@@ -139,4 +154,5 @@ export {
     getUserOffset,
     useMarkitup,
     getBreakPoint,
+    customTrimmer,
 };
