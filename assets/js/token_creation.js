@@ -23,14 +23,12 @@ new Vue({
     mounted: function() {
         window.onload = () => this.domLoaded = true;
     },
-    validations() {
-        return {
-            tokenName: {
-                required,
-                tokenContain: tokenContain,
-                minLength: minLength(4),
-                maxLength: maxLength(255),
-            },
-        };
+    validations: {
+        tokenName: {
+            required,
+            tokenContain: tokenContain,
+            minLength: minLength(4),
+            maxLength: maxLength(255),
+        },
     },
 });
