@@ -12,7 +12,7 @@ class DisposableEmailApiHandler
     /** @var string */
     protected $disposableApiLink;
 
-    public function __construct(HttpClientInterface $client, $disposableApiLink)
+    public function __construct(HttpClientInterface $client, string $disposableApiLink)
     {
         $this->client = $client;
         $this->disposableApiLink = $disposableApiLink;

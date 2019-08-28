@@ -32,4 +32,3 @@ parameters:
     is_hacker_allowed: true
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
-    link_to_api_for_check_disposable_email: 'https://open.kickbox.com/v1/disposable/'
