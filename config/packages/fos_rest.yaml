@@ -8,8 +8,14 @@ fos_rest:
         json: true
 
     exception:
+        enabled: true
+        exception_controller: 'FOS\RestBundle\Controller\ExceptionController::showAction'
         codes:
             'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException': 401
+            'Symfony\Component\HttpKernel\Exception\NotFoundHttpException': 404
+        messages:
+            'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException': true
+            'Symfony\Component\HttpKernel\Exception\NotFoundHttpException': true
 
     view:
         view_response_listener:  true
