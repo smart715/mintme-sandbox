@@ -51,15 +51,18 @@ const HTTP_ACCEPTED = 202;
 const HTTP_BAD_REQUEST = 400;
 
 const customTrimmer = (text) => {
-    let mask = ' -';
+    const mask = ' -';
+    const preText = text;
+
     while (~mask.indexOf(text[0])) {
         text = text.slice(1);
     }
     while (~mask.indexOf(text[text.length - 1])) {
         text = text.slice(0, -1);
     }
-    return text;
-}
+
+    return (preText === text ? text : customTrimmer(text));
+};
 
 export default {
     name: 'TokenName',
