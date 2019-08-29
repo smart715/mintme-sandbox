@@ -34,7 +34,7 @@ class UserToken implements UserTradebleInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="tokens")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      * @var Token
      */
     protected $token;
