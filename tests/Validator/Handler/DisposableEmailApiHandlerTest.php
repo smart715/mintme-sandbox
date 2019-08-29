@@ -5,11 +5,11 @@ namespace App\Tests\Validator\Handler;
 use App\Validator\Handler\DisposableEmailApiHandler;
 use PHPUnit\Framework\TestCase;
 
-class testDisposableEmailApiHandler extends TestCase
+class DisposableEmailApiHandlerTest extends TestCase
 {
     public function testDisposableEmail(): void
     {
-        $inavalitEmail = 'foo@0x01.gq';
+        $inavalitEmail = 'foobar@0x01.gq';
         $noramlEmail = 'test@gmail.com';
         $disposableApiLink = 'https://open.kickbox.com/v1/disposable/';
         $disposableEmail = new DisposableEmailApiHandler($disposableApiLink);
