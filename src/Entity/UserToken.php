@@ -74,7 +74,7 @@ class UserToken implements UserTradebleInterface
         return $this;
     }
 
-    public function getCreated(): DateTimeImmutable
+    public function getCreated(): ?DateTimeImmutable
     {
         return $this->created;
     }
