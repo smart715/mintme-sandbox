@@ -4,7 +4,7 @@
             <template v-if="editable">
                 <input
                     type="text"
-                    v-model.trim="$v.newName.$model"
+                    v-model="$v.newName.$model"
                     v-if="editingName"
                     ref="tokenNameInput"
                     class="token-name-input token-name-font"
@@ -38,7 +38,6 @@ import {mixin as clickaway} from 'vue-clickaway';
 import {WebSocketMixin, FiltersMixin} from '../../mixins';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import TwoFactorModal from '../modal/TwoFactorModal';
-import {customTrimmer} from '../../utils';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
@@ -50,6 +49,17 @@ Vue.use(Toasted, {
 
 const HTTP_ACCEPTED = 202;
 const HTTP_BAD_REQUEST = 400;
+
+const customTrimmer = (text) => {
+    let mask = ' -';
+    while (~mask.indexOf(text[0])) {
+        text = text.slice(1);
+    }
+    while (~mask.indexOf(text[text.length - 1])) {
+        text = text.slice(0, -1);
+    }
+    return text;
+}
 
 export default {
     name: 'TokenName',
@@ -105,7 +115,6 @@ export default {
             if (!this.editable) {
                 return;
             }
-            this.newName = customTrimmer(this.name, ' -');
 
             if (null === this.isTokenExchanged || this.isTokenExchanged) {
                 this.$toasted.error('You need all your tokens to change token\'s name');
@@ -114,7 +123,8 @@ export default {
 
             if (this.icon === 'check') {
                 this.$v.$touch();
-                if (this.currentName === this.newName) {
+
+                if (this.currentName === this.newName || customTrimmer(this.newName) == this.currentName) {
                     this.cancelEditingMode();
                     return;
                 } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
@@ -184,6 +194,7 @@ export default {
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),
+                customTrimmer,
             },
         };
     },
