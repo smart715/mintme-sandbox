@@ -69,70 +69,16 @@ describe('TokenName', () => {
     //     });
     // });
 
-    it('can not be edited if not editable', (done) => {
+    it('can not be edited if not editable', () => {
         const localVue = mockVue();
         const wrapper = mount(TokenName, {
             localVue,
             propsData: {
                 name: 'foo',
                 identifier: 'bar',
-                updateUrl: 'updateUrl',
                 editable: false,
-                twofa: null,
             },
         });
-
-        moxios.stubRequest('is_token_exchanged', {
-            status: 200,
-            response: true,
-        });
-
-        moxios.wait(() => {
-            expect(wrapper.find('input').exists()).to.deep.equal(true);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            wrapper.vm.editName();
-
-            expect(wrapper.find('input').exists()).to.deep.equal(true);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            done();
-        });
-    });
-
-    it('can not be edited if token exchanged', (done) => {
-        const $toasted = {error: () => true};
-        const localVue = mockVue();
-        const wrapper = mount(TokenName, {
-            localVue,
-            mocks: {
-                $toasted,
-            },
-            methods: {addMessageHandler: () => {}},
-            propsData: {
-                name: 'foo',
-                identifier: 'bar',
-                updateUrl: 'updateUrl',
-                editable: true,
-                twofa: null,
-            },
-        });
-
-        moxios.stubRequest('is_token_exchanged', {
-            status: 200,
-            response: true,
-        });
-
-        moxios.wait(() => {
-            expect(wrapper.find('input').exists()).to.deep.equal(true);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            wrapper.vm.editName();
-
-            expect(wrapper.find('input').exists()).to.deep.equal(true);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            done();
-        });
+        expect(wrapper.find('svg').exists()).to.equal(false);
     });
 });
