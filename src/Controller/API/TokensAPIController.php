@@ -6,13 +6,17 @@ use App\Entity\Token\LockIn;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
+use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\EmailAuthManagerInterface;
+use App\Manager\Model\EmailAuthResultModel;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
@@ -27,7 +31,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 
@@ -51,16 +54,21 @@ class TokensAPIController extends AbstractFOSRestController
     /** @var UserActionLogger */
     private $userActionLogger;
 
+    /** @var int */
+    private $expirationTime;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        int $expirationTime = 60
     ) {
         $this->em = $entityManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->userActionLogger = $userActionLogger;
+        $this->expirationTime = $expirationTime;
     }
 
 
@@ -359,6 +367,85 @@ class TokensAPIController extends AbstractFOSRestController
         return $this->view(
             !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/delete", name="token_delete", options={"expose"=true})
+     * @Rest\RequestParam(name="name", nullable=true)
+     * @Rest\RequestParam(name="code", nullable=true)
+     */
+    public function delete(
+        ParamFetcherInterface $request,
+        TwoFactorManagerInterface $twoFactorManager,
+        EmailAuthManagerInterface $emailAuthManager,
+        BalanceHandlerInterface $balanceHandler,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
+            throw new ApiUnauthorizedException('Invalid 2fa code');
+        } elseif (!$user->isGoogleAuthenticatorEnabled()) {
+            $response = $emailAuthManager->checkCode($user, $request->get('code'));
+
+            if (!$response->getResult()) {
+                throw new ApiUnauthorizedException($response->getMessage());
+            }
+        }
+
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new ApiBadRequestException('You need all your tokens to delete token');
+        }
+
+        $this->em->remove($token);
+        $this->em->flush();
+
+        $this->userActionLogger->info('Delete token', $request->all());
+
+        return $this->view(['message' => 'Token successfully deleted'], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/send-code", name="token_send_code", options={"expose"=true})
+     */
+    public function sendCode(
+        MailerInterface $mailer,
+        EmailAuthManagerInterface $emailAuthManager,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        $user = $this->getUser();
+        $message = null;
+
+        if (!$user->isGoogleAuthenticatorEnabled()) {
+            $emailAuthManager->generateCode($user, $this->expirationTime);
+            $mailer->sendAuthCodeToMail(
+                'Confirm token deletion',
+                'Your code to confirm token deletion:',
+                $user
+            );
+            $message = "Code for confirmation of token deletion was send to email.";
+        }
+
+        return $this->view(['message' => $message], Response::HTTP_ACCEPTED);
     }
 
     private function getGoogleAuthenticatorErrorMessage(string $code, TwoFactorManagerInterface $twoFactorManager): ?string
