@@ -62,12 +62,25 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
     public function sendAuthCode(TwoFactorInterface $user): void
     {
+        $this->sendAuthCodeToMail(
+            'Confirm authentication',
+            'You verification code:',
+            $user
+        );
+    }
+
+    public function sendAuthCodeToMail(
+        string $subject,
+        string $label,
+        TwoFactorInterface $user
+    ): void {
         $body = $this->twigEngine->render('mail/auth_verification_code.html.twig', [
+            'label' => $label,
             'email' => $user->getEmailAuthRecipient(),
             'code' => $user->getEmailAuthCode(),
         ]);
 
-        $msg = (new Swift_Message('Confirm authentication'))
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmailAuthRecipient())
             ->setBody($body)

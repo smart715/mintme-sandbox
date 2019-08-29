@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Knowledge Base | mintMe{% endblock %}
+
+{% block content %}
+    <div id="kb_show" class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="article col-md-8 p-4">
+                <header>
+                    <h2 class="word-break">
+                        {{ article.title }}
+                    </h2>
+                </header>
+                <div class="pt-2 pb-4">
+                    {{ article.description | raw }}
+                </div>
+                <div id="back-btn">
+                    <a href="{{ path('kb') }}">&lt; Back to news</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

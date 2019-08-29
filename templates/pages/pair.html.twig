@@ -90,8 +90,7 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
-                                        update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                        twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
+                                        :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                         :editable="{{ isOwner ? 'true' : 'false' }}">
                                 </token-name>
                             </div>
