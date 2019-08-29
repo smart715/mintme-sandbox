@@ -42,6 +42,8 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
 
     access_control:
+        - { path: ^/api/tokens/[a-zA-Z0-9]+/send-code$, role: ROLE_USER }
+        - { path: ^/api/tokens/[a-zA-Z0-9]+/delete$, role: ROLE_USER }
         - { path: ^/api, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }

@@ -24,11 +24,6 @@ export default {
                     title: 'HACKER MENU',
                 },
                 {
-                    href: this.$routing.generate('hacker-delete-token'),
-                    title: 'Delete my token',
-                    icon: 'fa fa-bomb',
-                },
-                {
                     title: 'Permissions',
                     icon: 'fa fa-anchor',
                     child: [
