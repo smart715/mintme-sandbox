@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}405 - Method Not Allowed{% endblock %}
+
+{% block bodyclass %}errorpage{% endblock %}
+
+{% block messageClass %}d-none{% endblock %}
+
+{% block content %}
+    <div class="container top-4 h-100">
+        <div class="row justify-content-center align-content-center text-center text-white h-100">
+            <div class="col-12 py-5">
+                <div class="error-code">405</div>
+                <div class="error-text text-uppercase">Method Not Allowed</div>
+                <p class="error-msg">
+                    Something is broken. Please let us know what you were doing when this error occurred. We will fix it as soon as possible. Sorry for any inconvenience caused. 
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
