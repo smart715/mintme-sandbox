@@ -39,6 +39,10 @@ class LogoutListenerTest extends TestCase
         $event->method('getUser')->willReturn($token);
         $event->method('getRequest')->willReturn($request);
 
+        $checker->expects($this->once())->method('isGranted')
+            ->with('IS_AUTHENTICATED_REMEMBERED')
+            ->willReturn(true);
+
         $listener->logout($request, $response, $token);
     }
 }
