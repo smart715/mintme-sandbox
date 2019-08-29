@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Validator\Handler;
 
@@ -18,9 +18,15 @@ class DisposableEmailApiHandler
         $this->disposableApiLink = $disposableApiLink;
     }
 
+    /**
+     * @param mixed $email
+     *@return bool
+     */
     public function checkDisposable($email): bool
     {
-        if (!is_string($email)) return true;
+        if (!is_string($email)) {
+            return false;
+        }
 
         $domain = substr($email, strrpos($email, '@')+1);
         $response = $this->client->request('GET', $this->disposableApiLink.$domain);
