@@ -303,10 +303,14 @@ services:
             - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
 
     App\EventSubscriber\SitemapSubscriber:
-        arguments: 
+        arguments:
             - "@router"
         tags:
             - { name: "kernel.event_subscriber", priority: 100 }
+
+    App\Controller\API\TokensAPIController:
+        arguments:
+            $expirationTime: "%token_deletion_confirm_code_expiration_time%"
 
     two_factor.auth_require_handler:
         class: App\Security\TwoFactorRequireHandler
