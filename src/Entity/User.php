@@ -98,10 +98,16 @@ class User extends BaseUser implements
     protected $googleAuthenticatorEntry;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      * @var string|null
      */
     private $authCode;
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable
+     */
+    protected $authCodeExpirationTime;
 
     /**
      * @ORM\OneToMany(targetEntity="UserToken", mappedBy="user")
@@ -336,13 +342,23 @@ class User extends BaseUser implements
     /** @codeCoverageIgnore */
     public function getEmailAuthCode(): string
     {
-        return (string)$this->authCode;
+        return $this->authCode ?? '';
     }
 
     /** @codeCoverageIgnore */
     public function setEmailAuthCode(string $authCode): void
     {
         $this->authCode = $authCode;
+    }
+
+    public function getEmailAuthCodeExpirationTime(): \DateTimeImmutable
+    {
+        return $this->authCodeExpirationTime;
+    }
+
+    public function setEmailAuthCodeExpirationTime(\DateTimeImmutable $authCodeExpirationTime): void
+    {
+        $this->authCodeExpirationTime = $authCodeExpirationTime;
     }
 
     private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
