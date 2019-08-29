@@ -314,6 +314,6 @@ services:
     App\Validator\Handler\DisposableEmailApiHandler:
         arguments:
             $disposableApiLink: '%link_to_api_for_check_disposable_email%'
-            $client: "@http.client"
+#            $client: "@http_client"
         autowire: true
         public: true

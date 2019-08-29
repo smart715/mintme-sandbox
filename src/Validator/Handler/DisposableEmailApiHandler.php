@@ -2,19 +2,19 @@
 
 namespace App\Validator\Handler;
 
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\HttpClient;
 
 class DisposableEmailApiHandler
 {
-    /** @var HttpClientInterface */
+    /** @var HttpClient */
     protected $client;
 
     /** @var string */
     protected $disposableApiLink;
 
-    public function __construct(HttpClientInterface $client, string $disposableApiLink)
+    public function __construct(string $disposableApiLink)
     {
-        $this->client = $client;
+        $this->client = HttpClient::create();
         $this->disposableApiLink = $disposableApiLink;
     }
 
