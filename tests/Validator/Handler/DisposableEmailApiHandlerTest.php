@@ -4,7 +4,6 @@ namespace App\Tests\Validator\Handler;
 
 use App\Validator\Handler\DisposableEmailApiHandler;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\HttpClient\HttpClient;
 
 class DisposableEmailApiHandlerTest extends TestCase
 {

@@ -2,7 +2,7 @@
 
 namespace App\Validator\Handler;
 
-use Symfony\Contracts\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\HttpClient;
 
 class DisposableEmailApiHandler
 {
