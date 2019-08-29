@@ -195,7 +195,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/lock-in", name="lock_in")
+     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)

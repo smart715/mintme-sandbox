@@ -3,39 +3,100 @@
         <modal
             :visible="visible"
             :no-close="noClose"
-            @close="closeModal">
+            :without-padding="true"
+            @close="closeModal"
+        >
             <template slot="header">
                 <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
             </template>
             <template slot="body">
-                <div class="col-12 pb-3">
-                    <label for="tokenName" class="d-block text-left">
-                        Edit your token name:
-                    </label>
-                    <input
-                        id="tokenName"
-                        type="text"
-                        v-model.trim="newName"
-                        ref="tokenNameInput"
-                        class="token-name-input w-100 px-2"
-                        :class="{ 'is-invalid': $v.$invalid }">
-                </div>
-                <div class="col-12 pt-2 clearfix">
-                    <button
-                        class="btn btn-primary float-left"
-                        @click="editName">
-                        Save
-                    </button>
-                    <span
-                        class="btn-cancel pl-3 c-pointer float-left"
-                        @click="closeModal">
-                        <slot name="cancel">Cancel</slot>
-                    </span>
-                    <span
-                        class="btn-cancel pl-3 c-pointer float-right"
-                        @click="deleteToken">
-                        Delete token
-                    </span>
+                <div class="token-edit p-0">
+                    <div class="row faq-block mx-0 border-bottom border-top">
+                        <faq-item>
+                            <span slot="title">
+                                Change token name
+                            </span>
+                            <span slot="body">
+                                <div class="col-12 pb-3 px-0">
+                                    <label for="tokenName" class="d-block text-left">
+                                        Edit your token name:
+                                    </label>
+                                    <input
+                                        id="tokenName"
+                                        type="text"
+                                        v-model.trim="newName"
+                                        ref="tokenNameInput"
+                                        class="token-name-input w-100 px-2"
+                                        :class="{ 'is-invalid': $v.$invalid }"
+                                    >
+                                </div>
+                                <div class="col-12 pt-2 px-0 clearfix">
+                                    <button
+                                        class="btn btn-primary float-left"
+                                        :disabled="submitting"
+                                        @click="editName"
+                                    >
+                                        Save
+                                    </button>
+                                    <span
+                                        class="btn-cancel pl-3 c-pointer float-left"
+                                        @click="closeModal"
+                                    >
+                                        <slot name="cancel">Cancel</slot>
+                                    </span>
+                                </div>
+                            </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item>
+                            <span slot="title">
+                                Modify token withdrawal address
+                            </span>
+                            <span slot="body">
+                                Modify token withdrawal address
+                            </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item>
+                            <span slot="title">
+                                Token release period
+                            </span>
+                            <span slot="body">
+                                <token-release-period
+                                    :token-name="currentName"
+                                    :twofa="twofa"
+                                    @cancel="closeModal"
+                                />
+                            </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item>
+                            <span slot="title">
+                                Deploy token to blockchain
+                            </span>
+                            <span slot="body">
+                                Deploy token to blockchain
+                            </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                            <span slot="title">
+                                Delete token
+                            </span>
+                            <span slot="body">
+                                <span
+                                    class="btn-cancel px-0 c-pointer m-1"
+                                    @click="deleteToken"
+                                >
+                                    Delete this token
+                                </span>
+                            </span>
+                        </faq-item>
+                    </div>
                 </div>
             </template>
         </modal>
@@ -44,31 +105,36 @@
             :twofa="twofa"
             :no-close="noClose"
             @verify="doEditToken"
-            @close="closeTwoFactorModal">
-        </two-factor-modal>
+            @close="closeTwoFactorModal"
+        />
     </div>
 </template>
 
 <script>
-import TwoFactorModal from './TwoFactorModal';
-import Modal from './Modal';
+import FaqItem from '../FaqItem';
 import Guide from '../Guide';
+import Modal from './Modal';
+import TokenReleasePeriod from '../token/introduction/TokenIntroductionReleasePeriod';
+import TwoFactorModal from './TwoFactorModal';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
+const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
 export default {
     name: 'TokenEditModal',
     components: {
+        FaqItem,
         Guide,
         Modal,
+        TokenReleasePeriod,
         TwoFactorModal,
     },
     props: {
-        currentName: String,
+        isTokenExchanged: Boolean,
         noClose: Boolean,
+        currentName: String,
         twofa: Boolean,
         visible: Boolean,
     },
@@ -80,6 +146,7 @@ export default {
             needToSendCode: !this.twofa,
             newName: this.currentName,
             showTwoFactorModal: false,
+            submitting: false,
         };
     },
     methods: {
@@ -124,15 +191,21 @@ export default {
             }
         },
         doEditName: function(code = '') {
+            if (this.submitting) {
+                return;
+            }
+
+            this.submitting = true;
             this.$axios.single.patch(this.$routing.generate('token_update', {
-                    name: this.currentName,
-                }), {
-                    name: this.newName,
-                    code: code,
-                })
+                name: this.currentName,
+            }), {
+                name: this.newName,
+                code: code,
+            })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
                         this.currentName = response.data['tokenName'];
+                        this.$toasted.success('Token\'s name changed successfully');
 
                         this.showTwoFactorModal = false;
                         this.closeModal();
@@ -150,6 +223,9 @@ export default {
                     } else {
                         this.$toasted.error('An error has occurred, please try again later');
                     }
+                })
+                .then(() => {
+                    this.submitting = false;
                 });
         },
         deleteToken: function() {

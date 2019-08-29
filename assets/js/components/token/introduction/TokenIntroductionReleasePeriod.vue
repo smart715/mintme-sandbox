@@ -77,18 +77,19 @@ import {deepFlatten} from '../../../utils';
 import Guide from '../../Guide';
 import TwoFactorModal from '../../modal/TwoFactorModal';
 
+const defaultValue = '-';
+
 export default {
     name: 'TokenIntroductionReleasePeriod',
     props: {
-        releasePeriodRoute: String,
-        releasedDisabled: {type: Boolean, default: false},
-        period: {type: Number, default: 10},
-        twofa: String,
+        tokenName: String,
+        twofa: Boolean,
     },
     data() {
         return {
             released: 1,
             currentPeriod: this.period,
+            releasePeriod: defaultValue,
             showTwoFactorModal: false,
         };
     },
@@ -96,6 +97,21 @@ export default {
         vueSlider,
         Guide,
         TwoFactorModal,
+    },
+    computed: {
+        releasedDisabled: function() {
+            return this.releasePeriod !== defaultValue && this.isTokenExchanged;
+        },
+        period: function() {
+            return !this.releasedDisabled ? 10 : this.releasePeriod;
+        },
+    },
+    mounted: function() {
+        this.$axios.retry.get(this.$routing.generate('lock-period', {
+            name: this.tokenName,
+        }))
+            .then((res) => this.releasePeriod = res.data.releasePeriod || this.releasePeriod)
+            .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -112,7 +128,9 @@ export default {
             return this.showTwoFactorModal = true;
         },
         doSaveReleasePeriod: function(code = '') {
-            this.$axios.single.post(this.releasePeriodRoute, {
+            this.$axios.single.post(this.$routing.generate('lock_in', {
+                name: this.tokenName,
+            }), {
                 'released': this.released,
                 'releasePeriod': this.currentPeriod,
                 'code': code,

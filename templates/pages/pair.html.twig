@@ -72,11 +72,12 @@
                         <li class="nav-item float-sm-right">
                             <div class="nav-link">
                                 <token-name
-                                        websocket-url="{{ global_websocket_url }}"
-                                        identifier="{{ market.quote.identifier }}"
-                                        name="{{ market.quote.name }}"
-                                        :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                                        :editable="{{ isOwner ? 'true' : 'false' }}">
+                                    websocket-url="{{ global_websocket_url }}"
+                                    identifier="{{ market.quote.identifier }}"
+                                    name="{{ market.quote.name }}"
+                                    :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                >
                                 </token-name>
                             </div>
                         </li>
