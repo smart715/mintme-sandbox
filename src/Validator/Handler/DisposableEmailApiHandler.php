@@ -3,10 +3,11 @@
 namespace App\Validator\Handler;
 
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DisposableEmailApiHandler
 {
-    /** @var HttpClient */
+    /** @var HttpClientInterface */
     protected $client;
 
     /** @var string */
