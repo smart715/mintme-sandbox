@@ -58,6 +58,7 @@ class TokenController extends Controller
     /** @var UserActionLogger  */
     private $userActionLogger;
 
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
