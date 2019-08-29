@@ -315,3 +315,5 @@ services:
         arguments:
             $disposableApiLink: '%link_to_api_for_check_disposable_email%'
             $client: "@http_client"
+        autowire: true
+        public: true
