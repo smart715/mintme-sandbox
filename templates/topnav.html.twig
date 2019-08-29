@@ -37,6 +37,9 @@
                         Referrals
                     </b-nav-item>
                 {% endif %}
+                <b-nav-item class="align-self-center {{ app.request.get('_route') == 'kb' ? 'active' : '' }}" href="{{ path('kb') }}">
+                    Help
+                </b-nav-item>
                 {% if not app.user %}
                     <b-nav-item class="align-self-center {{ app.request.get('_route') == 'fos_user_security_login' ? 'active' : '' }}" href="{{ path('fos_user_security_login') }}">
                         Log In
