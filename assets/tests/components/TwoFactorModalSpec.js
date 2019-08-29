@@ -33,6 +33,13 @@ describe('TwoFactorModal', () => {
         expect(wrapper.emitted().verify[0]).to.deep.equal(['123']);
     });
 
+    it('clear code when close', () => {
+        textInput.setValue('123');
+        wrapper.vm.closeModal();
+        wrapper.vm.visible = true;
+        expect(textInput.element.value).to.equal('');
+    });
+
     it('2fa label when 2fa activated', () => {
         const wrapper = mount(TwoFactorModal, {
              propsData: {twofa: true},
