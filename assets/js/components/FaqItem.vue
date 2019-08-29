@@ -37,8 +37,8 @@
         methods: {
             switchIcon: function() {
                 switch (this.icon) {
-                    case 'arrow-down': this.icon = 'arrow-up'; break;
-                    case 'arrow-up': this.icon = 'arrow-down'; break;
+                    case 'chevron-down': this.icon = 'chevron-up'; break;
+                    case 'chevron-up': this.icon = 'chevron-down'; break;
                 }
             },
         },
