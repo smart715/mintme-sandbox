@@ -10,8 +10,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="homepage",
-     *      options={"sitemap" = true, "2fa_progress" = false}
+     * @Route("/",
+     *     name="homepage",
+     *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
      * )
      */
     public function index(): Response
