@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(
- *     name="user_crypto",
+ *     name="user_cryptos",
  *     uniqueConstraints={@UniqueConstraint(name="user_crypto_index", columns={"user_id", "crypto_id"})}
  * )
  */
