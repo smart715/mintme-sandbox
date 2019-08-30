@@ -82,13 +82,6 @@ export default {
             showTwoFactorModal: false,
         };
     },
-    watch: {
-        newName: function() {
-            if (this.newName.replace(/-|\s/g, '').length === 0) {
-                this.newName = '';
-            }
-        },
-    },
     methods: {
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
