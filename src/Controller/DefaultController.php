@@ -21,6 +21,14 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route(path="/sign-up", name="sign_up')
+     */
+    public function signUpLanding(): Response
+    {
+        return $this->render('pages/sign_up_landing.html.twig');
+    }
+
+    /**
      * @Rest\Route("/manifest.json")
      */
     public function manifest(): Response
