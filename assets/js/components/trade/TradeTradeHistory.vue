@@ -193,7 +193,7 @@ export default {
 
             this.addMessageHandler((response) => {
                 if (response.method === 'deals.update') {
-                    let orders = response.params[1];
+                    const orders = response.params[1];
 
                     if (orders.length !== 1) {
                         return;
@@ -204,14 +204,8 @@ export default {
                         quote: this.market.quote.symbol,
                         id: parseInt(orders[0].id),
                     })).then((res) => {
-                        console.log(res);
-                        this.tableData.unshift(res.data);
-                    }, (error) => {
-                        this.sendMessage(JSON.stringify({
-                            method: 'deals.error',
-                            params: error,
-                            id: parseInt(Math.random().toString().replace('0.', '')),
-                        }));
+                        if(this.tableData.findIndex(item => item.id === res.data.id) === -1)
+                            this.tableData.unshift(res.data);
                     });
                 }
             }, 'trade-tableData-update-deals');
