@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20190823120554 extends AbstractMigration
+final class Version20190815102753 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -21,9 +21,9 @@ final class Version20190823120554 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-        
-        $this->addSql('ALTER TABLE user_token DROP FOREIGN KEY FK_BDF55A6341DEE7B9');
-        $this->addSql('ALTER TABLE user_token ADD CONSTRAINT FK_BDF55A6341DEE7B9 FOREIGN KEY (token_id) REFERENCES token (id) ON DELETE CASCADE');
+
+        $this->addSql('ALTER TABLE knowledge_base CHANGE url url VARCHAR(255) NOT NULL');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_AF81B455F47645AE ON knowledge_base (url)');
     }
 
     public function down(Schema $schema) : void
@@ -31,7 +31,7 @@ final class Version20190823120554 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE user_token DROP FOREIGN KEY FK_BDF55A6341DEE7B9');
-        $this->addSql('ALTER TABLE user_token ADD CONSTRAINT FK_BDF55A6341DEE7B9 FOREIGN KEY (token_id) REFERENCES token (id)');
+        $this->addSql('DROP INDEX UNIQ_AF81B455F47645AE ON knowledge_base');
+        $this->addSql('ALTER TABLE knowledge_base CHANGE url url VARCHAR(255) DEFAULT NULL COLLATE utf8mb4_unicode_ci');
     }
 }
