@@ -204,7 +204,7 @@ export default {
                         quote: this.market.quote.symbol,
                         id: parseInt(orders[0].id),
                     })).then((res) => {
-                        if (this.tableData.findIndex(item => item.id === res.data.id) === -1) {
+                        if (this.tableData.findIndex((item) => item.id === res.data.id) === -1) {
                             this.tableData.unshift(res.data);
                         }
                     });
