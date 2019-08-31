@@ -96,7 +96,7 @@ export default {
                 return {
                     trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
                     url: this.$routing.generate('profile-view', {pageUrl: row.user.profile.page_url}),
-                    date: moment.unix(row.timestamp).format(GENERAL.dateFormat),
+                    date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
                     amount: Math.round(row.balance),
                 };
             }));
