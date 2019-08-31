@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20190817073019 extends AbstractMigration
+final class Version20190829122559 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -22,8 +22,8 @@ final class Version20190817073019 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('CREATE UNIQUE INDEX user_token_index ON user_token (user_id, token_id)');
-        $this->addSql('CREATE UNIQUE INDEX user_crypto_index ON user_crypto (user_id, crypto_id)');
+        $this->addSql('ALTER TABLE user_tokens DROP FOREIGN KEY FK_CF080AB341DEE7B9');
+        $this->addSql('ALTER TABLE user_tokens ADD CONSTRAINT FK_CF080AB341DEE7B9 FOREIGN KEY (token_id) REFERENCES token (id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema) : void
@@ -31,7 +31,7 @@ final class Version20190817073019 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('DROP INDEX user_crypto_index ON user_crypto');
-        $this->addSql('DROP INDEX user_token_index ON user_token');
+        $this->addSql('ALTER TABLE user_tokens DROP FOREIGN KEY FK_CF080AB341DEE7B9');
+        $this->addSql('ALTER TABLE user_tokens ADD CONSTRAINT FK_CF080AB341DEE7B9 FOREIGN KEY (token_id) REFERENCES token (id)');
     }
 }
