@@ -184,7 +184,6 @@ class TokenController extends Controller
                     'name' => $token->getName(),
                     'tab' => 'intro',
                 ]);
-
             } catch (Throwable $exception) {
                 $this->em->rollback();
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');
