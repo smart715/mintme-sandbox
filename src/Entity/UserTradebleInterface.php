@@ -10,5 +10,5 @@ interface UserTradebleInterface
 
     public function getUser(): User;
 
-    public function getCreated(): DateTimeImmutable;
+    public function getCreated(): ?DateTimeImmutable;
 }
