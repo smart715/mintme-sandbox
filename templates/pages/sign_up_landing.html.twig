@@ -7,7 +7,7 @@
 {% block content %}
     <div class="container" id="sign-up-langing">
         <div class="row pt-5 pl-5">
-            <div class="col-lg-3 col-md-4">
+            <div class="col-4 pr-0">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
@@ -38,6 +38,16 @@
                         {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
                     </div>
                 </div>
+            </div>
+            <div class="col-3 pl-0">
+                <div class="landing-logo">
+                    <img id="web" src="{{ asset('build/images/landing-web.png') }}">
+                    <img id="logo" src="{{ asset('build/images/favicon.e6effb97.png') }}">
+                </div>
+            </div>
+            <div class="col-5">
+                We will PAY YOU
+                if you register NOW!
             </div>
         </div>
     </div>
