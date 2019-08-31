@@ -15,17 +15,17 @@ class TraderBalanceView
     /** @var string */
     private $balance;
 
-    /** @var DateTimeImmutable */
+    /** @var DateTimeImmutable|null */
     private $date;
 
-    public function __construct(User $user, string $balance, DateTimeImmutable $date)
+    public function __construct(User $user, string $balance, ?DateTimeImmutable $date)
     {
         $this->user = $user;
         $this->balance = $balance;
         $this->date = $date;
     }
 
-    public function getDate(): DateTimeImmutable
+    public function getDate(): ?DateTimeImmutable
     {
         return $this->date;
     }
@@ -34,9 +34,11 @@ class TraderBalanceView
      * @Groups({"API"})
      * @return int
      */
-    public function getTimestamp(): int
+    public function getTimestamp(): ?int
     {
-        return $this->date->getTimestamp();
+        return $this->date
+            ? $this->date->getTimestamp()
+            : null;
     }
 
     /**
