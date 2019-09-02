@@ -70,6 +70,25 @@ describe('TokenEditModal', () => {
         expect(wrapper.vm.$v.$error).to.deep.equal(true);
     });
 
+    it('throw required error when token name has dashes in the beggining', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'foobar',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: false,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('---   newName');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(true);
+    });
+
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
         const wrapper = mount(TokenEditModal, {
             propsData: {
