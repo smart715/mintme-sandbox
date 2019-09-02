@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
 use App\Entity\Token\LockIn;
+use App\Entity\User;
 use App\Entity\Token\Token;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
