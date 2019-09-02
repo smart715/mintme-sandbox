@@ -192,7 +192,7 @@ export default {
             }));
 
             this.addMessageHandler((response) => {
-                if (response.method === 'deals.update') {
+                if ('deals.update' === response.method) {
                     const orders = response.params[1];
 
                     if (orders.length !== 1) {
@@ -204,9 +204,7 @@ export default {
                         quote: this.market.quote.symbol,
                         id: parseInt(orders[0].id),
                     })).then((res) => {
-                        if (this.tableData.findIndex((item) => item.id === res.data.id) === -1) {
                             this.tableData.unshift(res.data);
-                        }
                     });
                 }
             }, 'trade-tableData-update-deals');
