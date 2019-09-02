@@ -11,7 +11,6 @@ parameters:
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 imports:
     - { resource: parameters.yaml }
-    - { resource: '@FOSRestBundle/Resources/config/exception_listener.xml' }
 
 services:
     # default configuration for services in *this* file
@@ -345,10 +344,3 @@ services:
     two_factor.auth_require_handler:
         class: App\Security\TwoFactorRequireHandler
         public: true
-
-
-    FOS\RestBundle\Controller\ExceptionController:
-        public: true
-        arguments:
-            $exceptionCodes: 'fos_rest.exception.codes_map'
-            $showException: bool
