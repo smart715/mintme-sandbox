@@ -193,6 +193,7 @@ class TokenController extends Controller
                 return $this->redirectToOwnToken('intro');
             } catch (Throwable $exception) {
                 $this->em->rollback();
+                $this->userActionLogger->error('Registration token error', $exception->getMessage());
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');
             }
         }
