@@ -5,7 +5,7 @@
 {% set formHeader = "Sign Up" %}
 
 {% block content %}
-    <div class="container" id="sign-up-langing">
+    <div class="container px-5" id="sign-up-langing">
         <div class="row py-5 pl-5">
             <div class="col-4 pr-0">
                 <div class="card">
@@ -52,10 +52,26 @@
                 </span>
             </div>
         </div>
-        <div class="row pt-5 justify-content-center">
-            <div class="col-5 what-is">
+        <div class="row py-5 justify-content-center">
+            <div class="col-5 what-is text-center">
                 <span>What is <i>mintMe?</i></span> <br>
                 <span class="">It's new innovative crowdfunding platform where both sides can earn!</span>
+            </div>
+        </div>
+        <div class="steps py-5 mx-5">
+            <div class="row">
+                <div class="col-4">
+                    <img src="{{ asset('build/images/number-one.png'    ) }}">
+                    Content creator issues his own tokens
+                </div>
+                <div class="col-4">
+                    <img src="{{ asset('build/images/number-two.png') }}">
+                    Person supporting buys such tokens and if project suceeds
+                </div>
+                <div class="col-4">
+                    <img src="{{ asset('build/images/number-three.png') }}">
+                    Such tokens gain in value and can be sold for more money!
+                </div>
             </div>
         </div>
     </div>
