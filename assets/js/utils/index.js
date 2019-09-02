@@ -3,6 +3,7 @@ import * as Constants from './constants';
 import Interval from './interval';
 import EchartTheme from './echart-theme';
 import {useMarkitup} from './markitup.js';
+import {correctTokenName} from './validate.js';
 
 /**
  * Checks that given url is valid
@@ -139,4 +140,5 @@ export {
     getUserOffset,
     useMarkitup,
     getBreakPoint,
+    correctTokenName,
 };

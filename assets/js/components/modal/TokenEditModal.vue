@@ -55,6 +55,7 @@ import Modal from './Modal';
 import Guide from '../Guide';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
+import {correctTokenName} from '../../utils';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
@@ -107,6 +108,9 @@ export default {
                 return;
             } else if (!this.$v.newName.tokenContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
+                return;
+            } else if (!this.$v.newName.correctTokenName) {
+                this.$toasted.error('Token name can not contain dashes or spaces in the beggining');
                 return;
             } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
                 this.$toasted.error('Token name should have at least 4 symbols');
@@ -218,6 +222,7 @@ export default {
         return {
             newName: {
                 required,
+                correctTokenName,
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
