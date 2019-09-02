@@ -204,7 +204,7 @@ export default {
                         quote: this.market.quote.symbol,
                         id: parseInt(orders[0].id),
                     })).then((res) => {
-                            this.tableData.unshift(res.data);
+                        this.tableData.unshift(res.data);
                     });
                 }
             }, 'trade-tableData-update-deals');
