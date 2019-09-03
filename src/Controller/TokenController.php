@@ -193,8 +193,12 @@ class TokenController extends Controller
                 return $this->redirectToOwnToken('intro');
             } catch (Throwable $exception) {
                 $this->em->rollback();
-                $this->userActionLogger->error('Got an error, when registering a token', ['error' => $exception, 'detailed error' => $exception->getMessage()]);
-                $this->addFlash('danger', 'Exchanger connection lost. Try again.');
+                $this->userActionLogger->error('Got an error, when registering a token', ['message' => $exception->getMessage()]);
+                if(strpos($exception, 'cURL')){
+                    $this->addFlash('danger', 'Exchanger connection lost. Try again.');
+                } else {
+                    $this->addFlash('danger', 'Error creating token. Try again.');
+                }
             }
         }
 
