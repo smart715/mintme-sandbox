@@ -77,7 +77,8 @@
                     So you invest in some idea <br>
                     not just give money to support it!
                 </span>
-                <a href="{{ path('fos_user_registration_register') }}" class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 ml-5 py-2 pl-3 float-left">
+                <a href="{{ path('fos_user_registration_register') }}"
+                   class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 ml-5 py-2 pl-3 float-left">
                     REGISTER NOW
                 </a>
                 <span>
@@ -90,7 +91,21 @@
                 <img class="lamp" src="{{ asset('build/images/lamp.png') }}">
             </div>
         </div>
-
+        <div class="row">
+            <div class="col-2">
+                <img src="{{ asset('build/images/diagram.png') }}">
+            </div>
+            <div class="col-8">
+                WEB will show up immediately on your mintMe account and you can withdraw it if you want.<br>
+                Webchain is native blockchain currency for mintMe exchange, on which all tokens will be based.<br>
+                If mintme succeeds, 5 WEB can be worth a lot more than now.
+                Can you imagine having opportunity to get 5 BTC for free and not doing it back in 2010 when it wasn't
+                worth much?
+            </div>
+            <div class="col-2">
+                <img src="{{ asset('build/images/diagram-2.png') }}">
+            </div>
+        </div>
     </div>
 {% endblock %}
 
