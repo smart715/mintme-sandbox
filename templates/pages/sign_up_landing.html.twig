@@ -58,22 +58,39 @@
                 <span class="">It's new innovative crowdfunding platform where both sides can earn!</span>
             </div>
         </div>
-        <div class="steps py-5 mx-5">
-            <div class="row">
-                <div class="col-4">
-                    <img src="{{ asset('build/images/number-one.png'    ) }}">
-                    Content creator issues his own tokens
-                </div>
-                <div class="col-4">
-                    <img src="{{ asset('build/images/number-two.png') }}">
-                    Person supporting buys such tokens and if project suceeds
-                </div>
-                <div class="col-4">
-                    <img src="{{ asset('build/images/number-three.png') }}">
-                    Such tokens gain in value and can be sold for more money!
-                </div>
+        <div class="row steps py-5 mx-5 justify-content-center">
+            <div class="col-12">
+                <img src="{{ asset('build/images/number-one.png'    ) }}">
+                <div>Content creator issues his own tokens</div>
+                <img src="{{ asset('build/images/number-two.png') }}">
+                <div>Person supporting buys such tokens and if project suceeds</div>
+                <img src="{{ asset('build/images/number-three.png') }}">
+                <div>Such tokens gain in value and can be sold for more money!</div>
             </div>
         </div>
+        <div class="row register-now border border-white m-5 py-3">
+            <div class="col-3 text-center">
+                <img class="hand-coin" src="{{ asset('build/images/hand-coin.png') }}">
+            </div>
+            <div class="col-6 text-center">
+                <span class="title text-white h2">
+                    So you invest in some idea <br>
+                    not just give money to support it!
+                </span>
+                <a href="{{ path('fos_user_registration_register') }}" class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 ml-5 py-2 pl-3 float-left">
+                    REGISTER NOW
+                </a>
+                <span>
+                    To encourage you to our new service,
+                    we give you 5 WEB (Webchain) coins
+                    if you register now. For free
+                </span>
+            </div>
+            <div class="col-3 text-center">
+                <img class="lamp" src="{{ asset('build/images/lamp.png') }}">
+            </div>
+        </div>
+
     </div>
 {% endblock %}
 
