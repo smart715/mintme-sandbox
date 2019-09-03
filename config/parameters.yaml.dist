@@ -59,6 +59,10 @@ parameters:
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
 
+    # Expiration time for token deletion confirm code (minutes)
+    # Accepts an integer value:
+    token_deletion_confirm_code_expiration_time: 60
+
     # If the trusted device feature should be enabled
     trusted_device_enabled: true
 

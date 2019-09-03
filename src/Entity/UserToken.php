@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(
- *     name="user_token",
+ *     name="user_tokens",
  *     uniqueConstraints={@UniqueConstraint(name="user_token_index", columns={"user_id", "token_id"})}
  *     )
  */
@@ -34,14 +34,14 @@ class UserToken implements UserTradebleInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="tokens")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      * @var Token
      */
     protected $token;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
-     * @var DateTimeImmutable
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var DateTimeImmutable|null
      */
     protected $created;
 
@@ -74,7 +74,7 @@ class UserToken implements UserTradebleInterface
         return $this;
     }
 
-    public function getCreated(): DateTimeImmutable
+    public function getCreated(): ?DateTimeImmutable
     {
         return $this->created;
     }

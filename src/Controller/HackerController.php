@@ -75,24 +75,4 @@ class HackerController extends AbstractController
 
         return $this->redirect($referer);
     }
-
-    /** @Route("/token/delete", name="hacker-delete-token", options={"expose"=true}) */
-    public function deleteToken(Request $request): RedirectResponse
-    {
-        /** @var User|null $user */
-        $user = $this->getUser();
-
-        /** @var string $referer */
-        $referer = $request->headers->get('referer');
-
-        if (!$user || !$user->getProfile() || !($token = $user->getProfile()->getToken())) {
-            return $this->redirect($referer);
-        }
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($token);
-        $em->flush();
-
-        return $this->redirect($referer);
-    }
 }
