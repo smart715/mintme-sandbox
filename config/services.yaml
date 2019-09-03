@@ -44,7 +44,7 @@ services:
     disposable_email.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
-            $urL: '%link_to_api_for_check_disposable_email%'
+            $url: '%link_to_api_for_check_disposable_email%'
             $timeoutSeconds: '%disposable_email_timeout_seconds%'
 
     viabtc.json_rpc:
