@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Manager\UserManagerInterface;
 use App\Validator\Constraints\IsNotBlacklisted;
 use App\Validator\Constraints\UserEmailValidator;
-use App\Validator\Handler\DisposableEmailApiHandler;
+use App\Communications\DisposableEmailCommunicator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -37,12 +37,15 @@ class UserEmailValidatorTest extends TestCase
         $storage = $this->createMock(TokenStorageInterface::class);
         $storage->method('getToken')->willReturn($token);
 
-        $disposableEmail = $this->createMock(DisposableEmailApiHandler::class);
+        $disposableEmail = $this->createMock(DisposableEmailCommunicator::class);
         $disposableEmail->method('checkDisposable')->willReturn(false);
 
         $validator = new UserEmailValidator($um, $storage, $disposableEmail);
         $validator->user = $user;
         $validator->initialize($context);
+
+        $disposableEmail->method('checkDisposable')->willReturn(true);
+
         $validator->validate($email, $constraint);
         $validator->validate('uniqueemail', $constraint);
         $validator->validate(null, $constraint);

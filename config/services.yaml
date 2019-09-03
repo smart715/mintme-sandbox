@@ -41,6 +41,12 @@ services:
             $headers:
                 Accept: application/json
 
+    disposable_email.json_rpc:
+        class: App\Communications\GuzzleWrapper
+        arguments:
+            $urL: '%link_to_api_for_check_disposable_email%'
+            $timeoutSeconds: '%disposable_email_timeout_seconds%'
+
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
@@ -311,9 +317,9 @@ services:
         class: App\Security\TwoFactorRequireHandler
         public: true
 
-    App\Validator\Handler\DisposableEmailApiHandler:
+    App\Communications\DisposableEmailCommunicator:
         arguments:
             $disposableApiLink: '%link_to_api_for_check_disposable_email%'
-#            $client: "@http_client"
+            $rps: '@disposable_email.json_rpc'
         autowire: true
         public: true

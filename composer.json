@@ -31,8 +31,6 @@
         "sensiolabs/security-checker": "^5.0",
         "sonata-project/admin-bundle": "^3.31",
         "sonata-project/block-bundle": "^3.12",
-        "symfony/http-client": "^4.3",
-        "symfony/http-foundation": "4.3.*",
         "sonata-project/classification-bundle": "^3.6",
         "sonata-project/doctrine-orm-admin-bundle": "^3.4",
         "sonata-project/formatter-bundle": "^3.4",
