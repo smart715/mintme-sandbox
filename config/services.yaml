@@ -354,6 +354,6 @@ services:
     App\Communications\DisposableEmailCommunicator:
         arguments:
             $disposableApiLink: '%link_to_api_for_check_disposable_email%'
-            $rps: '@disposable_email.json_rpc'
+            $rpc: '@disposable_email.json_rpc'
         autowire: true
         public: true
