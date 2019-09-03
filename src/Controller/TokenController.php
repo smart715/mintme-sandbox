@@ -195,7 +195,7 @@ class TokenController extends Controller
                 $this->em->rollback();
                 $this->userActionLogger->error('Got an error, when registering a token', ['message' => $exception->getMessage()]);
 
-                if (strpos($exception, 'cURL')) {
+                if (strpos($exception->getMessage(), 'cURL')) {
                     $this->addFlash('danger', 'Exchanger connection lost. Try again.');
                 } else {
                     $this->addFlash('danger', 'Error creating token. Try again.');
