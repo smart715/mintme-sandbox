@@ -13,7 +13,7 @@ class DisposableEmailCommunicatorTest extends TestCase
         $email = 'foobar@0x01.gq';
 
         $rpc = $this->createMock(RestRpcInterface::class);
-        $rpc->method('send')->willReturn(json_encode(false));
+        $rpc->method('send')->willReturn(json_encode(['disposable' => false]));
 
         $disposableEmail = new DisposableEmailCommunicator($rpc);
 
