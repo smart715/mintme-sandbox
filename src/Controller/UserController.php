@@ -206,4 +206,12 @@ class UserController extends AbstractController
 
         return "backup-codes-{$name}-{$time}.txt";
     }
+
+    /** @Route("/finish2fa", name="finish_two_factor")*/
+    public function finishTwoFactor(){
+        $this->addFlash('download_backup_codes', '');
+        $this->addFlash('success', 'Downloading backup codes...');
+
+        return $this->redirectToRoute('settings');
+    }
 }
