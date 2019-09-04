@@ -192,15 +192,14 @@ class UserController extends AbstractController
             $content .= $backupCode."\n";
         }
 
-        $response = new Response($content, Response::HTTP_OK, [
+        return new Response($content, Response::HTTP_OK, [
             'content-disposition' => 'attachment; filename="'.$this->generateBackupCodeFileName().'"',
             'content-type' => 'text/plain',
         ]);
 
-        return $response;
     }
 
-    private function generateBackupCodeFileName()
+    private function generateBackupCodeFileName(): string
     {
         $name = $this->getUser()->getUsername();
         $time = date("H-i-d-m-Y");
@@ -209,7 +208,7 @@ class UserController extends AbstractController
     }
 
     /** @Route("/finish2fa", name="finish_two_factor")*/
-    public function finishTwoFactor()
+    public function finishTwoFactor(): Response
     {
         $this->addFlash('download_backup_codes', '');
         $this->addFlash('success', 'Downloading backup codes...');
