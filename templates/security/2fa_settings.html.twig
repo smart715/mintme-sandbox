@@ -65,7 +65,22 @@
                 <div class="text-center card-body">
                     <div class="row">
                         <div class="col-12">
-                            {% block formBody %}{{ form(form) }}{% endblock %}
+                            {% block formBody %}
+                                    {{ form_start(form) }}
+                                        <div class="form-group">
+                                            {{ form_label(form.code, '', { 'label_attr': { 'class': isTwoFactor ? 'float-left' : '' } }) }}
+                                            {{ form_widget(form.code) }}
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="submit" id="_submit" name="submit" class="btn btn-primary">
+                                                Verify Code 
+                                            </button>
+                                            {% if isTwoFactor %}
+                                                <a href="{{path('settings')}}" class="btn btn-primary ml-2">Cancel</a>
+                                            {% endif %}
+                                        </div>
+                                    {{ form_end(form) }}
+                            {% endblock %}
                         </div>
                     </div>
                 </div>
