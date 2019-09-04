@@ -196,7 +196,6 @@ class UserController extends AbstractController
             'content-disposition' => 'attachment; filename="'.$this->generateBackupCodeFileName().'"',
             'content-type' => 'text/plain',
         ]);
-
     }
 
     private function generateBackupCodeFileName(): string
