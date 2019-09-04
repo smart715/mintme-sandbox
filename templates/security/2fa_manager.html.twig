@@ -19,12 +19,12 @@
                                     Please save them in a safe place, or you <b>will</b> lose access to your account.
                                 </small>
                             </p>
-                            <code class="html hljs">
+                            <code class="html hljs text-white">
                                 {% for backupCode in backupCodes %}
                                     <p>{{ backupCode }}</p>
                                 {% endfor %}
                             </code>
-                            <p><a href="{{ path('finish_two_factor') }}" class="btn btn-primary" role="button">Proceed</a></p>
+                            <p><a href="{{ path('finish_two_factor') }}" class="btn btn-primary" role="button">Save and Finish</a></p>
                         </div>
                     </div>
                 </div>
