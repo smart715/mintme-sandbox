@@ -180,7 +180,7 @@ class UserController extends AbstractController
         $this->userActionLogger->info('Disable Two-Factor Authentication');
     }
 
-    /** @Route("/downloadbackupcodes", name="download_backup_codes")*/
+    /** @Route("/settings/2fa/backupcodes/download", name="download_backup_codes")*/
     public function downloadBackupCodes(): Response
     {
         /** @var User */
@@ -206,7 +206,7 @@ class UserController extends AbstractController
         return "backup-codes-{$name}-{$time}.txt";
     }
 
-    /** @Route("/finish2fa", name="finish_two_factor")*/
+    /** @Route("/settings/2fa/finish", name="two_factor_finish")*/
     public function finishTwoFactor(): Response
     {
         $this->addFlash('download_backup_codes', '');
