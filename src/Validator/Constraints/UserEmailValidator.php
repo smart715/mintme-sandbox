@@ -2,7 +2,7 @@
 
 namespace App\Validator\Constraints;
 
-use App\Communications\DisposableEmailCommunicator;
+use App\Communications\DisposableEmailCommunicatorInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
@@ -16,13 +16,13 @@ class UserEmailValidator extends ConstraintValidator
     /** @var UserManagerInterface */
     private $userManager;
 
-    /** @var DisposableEmailCommunicator */
+    /** @var DisposableEmailCommunicatorInterface */
     private $apiHandler;
 
     public function __construct(
         UserManagerInterface $userManager,
         TokenStorageInterface $token,
-        DisposableEmailCommunicator $apiHandler
+        DisposableEmailCommunicatorInterface $apiHandler
     ) {
         $this->user = $token->getToken()->getUser();
         $this->userManager = $userManager;

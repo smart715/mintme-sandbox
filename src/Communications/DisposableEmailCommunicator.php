@@ -19,11 +19,15 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
     }
 
     /**
-     *@param string $email
+     *@param mixed $email
      *@return bool
      */
-    public function checkDisposable(string $email): bool
+    public function checkDisposable($email): bool
     {
+        if (!is_string($email)) {
+            return false;
+        }
+
         $domain = substr($email, strrpos($email, '@') + 1);
         $response = $this->rpc->send(
             $this->disposableApiLink.$domain,

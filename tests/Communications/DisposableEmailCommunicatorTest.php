@@ -3,7 +3,7 @@
 namespace App\Tests\Validator\Handler;
 
 use App\Communications\DisposableEmailCommunicator;
-use App\Communications\GuzzleRestWrapper;
+use App\Communications\RestRpcInterface;
 use PHPUnit\Framework\TestCase;
 
 class DisposableEmailCommunicatorTest extends TestCase

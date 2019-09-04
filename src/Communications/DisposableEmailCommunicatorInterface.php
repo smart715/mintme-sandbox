@@ -6,7 +6,7 @@ interface DisposableEmailCommunicatorInterface
 {
     /**
      * @return bool
-     * @param string $email
+     * @param mixed $email
      */
-    public function checkDisposable(string $email): bool;
+    public function checkDisposable($email): bool;
 }
