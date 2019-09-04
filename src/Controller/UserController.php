@@ -179,4 +179,31 @@ class UserController extends AbstractController
         $this->addFlash('success', 'You have disabled two-factor authentication!');
         $this->userActionLogger->info('Disable Two-Factor Authentication');
     }
+
+    /** @Route("/downloadbackupcodes", name="download_backup_codes")*/
+    public function downloadBackupCodes(): Response
+    {
+        /** @var User */
+        $user = $this->getUser();
+        $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
+        $content = '';
+
+        foreach($backupCodes as $backupCode){
+            $content .= $backupCode."\n";
+        }
+
+        $response = new Response($content, Response::HTTP_OK, [
+            'content-disposition' => 'attachment; filename="'.$this->generateBackupCodeFileName().'"',
+            'content-type' => 'text/plain'
+        ]);
+
+        return $response;
+    }
+
+    private function generateBackupCodeFileName(){
+        $name = $this->getUser()->getUsername();
+        $time = date("H-i-d-m-Y");
+
+        return "backup-codes-{$name}-{$time}.txt";
+    }
 }
