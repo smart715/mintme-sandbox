@@ -188,19 +188,20 @@ class UserController extends AbstractController
         $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
         $content = '';
 
-        foreach($backupCodes as $backupCode){
+        foreach ($backupCodes as $backupCode) {
             $content .= $backupCode."\n";
         }
 
         $response = new Response($content, Response::HTTP_OK, [
             'content-disposition' => 'attachment; filename="'.$this->generateBackupCodeFileName().'"',
-            'content-type' => 'text/plain'
+            'content-type' => 'text/plain',
         ]);
 
         return $response;
     }
 
-    private function generateBackupCodeFileName(){
+    private function generateBackupCodeFileName()
+    {
         $name = $this->getUser()->getUsername();
         $time = date("H-i-d-m-Y");
 
@@ -208,7 +209,8 @@ class UserController extends AbstractController
     }
 
     /** @Route("/finish2fa", name="finish_two_factor")*/
-    public function finishTwoFactor(){
+    public function finishTwoFactor()
+    {
         $this->addFlash('download_backup_codes', '');
         $this->addFlash('success', 'Downloading backup codes...');
 
