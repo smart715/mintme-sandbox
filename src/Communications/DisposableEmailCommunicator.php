@@ -9,13 +9,9 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
     /** @var RestRpcInterface */
     private $rpc;
 
-    /** @var string */
-    protected $disposableApiLink;
-
-    public function __construct(string $disposableApiLink, RestRpcInterface $rpc)
+    public function __construct(RestRpcInterface $rpc)
     {
         $this->rpc = $rpc;
-        $this->disposableApiLink = $disposableApiLink;
     }
 
     /**
@@ -30,7 +26,7 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
 
         $domain = substr($email, strrpos($email, '@') + 1);
         $response = $this->rpc->send(
-            $this->disposableApiLink.$domain,
+            $domain,
             Request::METHOD_GET
         );
         $response = json_decode($response, true);
