@@ -95,11 +95,17 @@ class UserController extends AbstractController
         $user = $this->getUser();
         $form = $this->createForm(TwoFactorType::class);
         $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
+        $backupCodes = [];
 
         if (!$isTwoFactor) {
             $user->setGoogleAuthenticatorSecret($twoFactorManager->generateSecretCode());
             $imgUrl = $twoFactorManager->generateUrl($user);
             $formHeader = 'Enable two-factor authentication';
+        }
+
+        if (!$request->get('notNeedBackupCodes')) {
+            $formHeader = 'Enable two-factor authentication';
+            $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
         }
 
         $form->handleRequest($request);
@@ -108,7 +114,7 @@ class UserController extends AbstractController
             'form' => $form->createView(),
             'imgUrl' => $imgUrl ?? '',
             'formHeader' => $formHeader ?? 'Disable two-factor authentication',
-            'backupCodes' => [],
+            'backupCodes' => $backupCodes,
             'isTwoFactor' => $isTwoFactor,
             'twoFactorKey' => $user->getGoogleAuthenticatorSecret(),
         ];

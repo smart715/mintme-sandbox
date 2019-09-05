@@ -24,7 +24,12 @@
                                     <p>{{ backupCode }}</p>
                                 {% endfor %}
                             </code>
-                            <p><a href="{{ path('settings') }}" class="btn btn-primary" role="button">Proceed</a></p>
+                            <p>
+                                <form action="{{ path('settings') }}" method="POST">
+                                    <input type="hidden" name="notNeedBackupCodes" value="1">
+                                    <input type="submit" class="btn btn-primary" value="Proceed">
+                                </form>
+                            </p>
                         </div>
                     </div>
                 </div>
