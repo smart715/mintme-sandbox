@@ -12,6 +12,7 @@ use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +50,7 @@ class RegistrationController extends FOSRegistrationController
      */
     public function signUpLanding(Request $request): Response
     {
-        $form = $this->createForm(RegistrationType::class);
+        $form = $this->createForm(RegistrationType::class)->add('bonus', HiddenType::class);
         $form->handleRequest($request);
 
         return $this->render('pages/sign_up_landing.html.twig', [
