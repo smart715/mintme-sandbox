@@ -1,6 +1,7 @@
 /**
  * check for dashes or spaces in the beggining of token name
  * @param {string} value
+ * @return {bool}
  */
 function correctTokenName(value) {
     const matches = value.match(/^[-\s]+/);
