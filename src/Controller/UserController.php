@@ -221,9 +221,7 @@ class UserController extends AbstractController
         $this->turnOnAuthenticator($twoFactorManager, $this->getUser());
         
         $this->container->get('session')->getFlashBag()->get('success');
-        $this->addFlash('download_backup_codes', '');
-        $this->addFlash('success', 'Downloading backup codes...');
-
-        return $this->redirectToRoute('settings');
+        
+        return $this->finishTwoFactor();
     }
 }
