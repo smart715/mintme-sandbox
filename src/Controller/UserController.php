@@ -186,11 +186,8 @@ class UserController extends AbstractController
         /** @var User */
         $user = $this->getUser();
         $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
-        $content = '';
 
-        foreach ($backupCodes as $backupCode) {
-            $content .= $backupCode."\n";
-        }
+        $content = implode("\n", $backupCodes);
 
         return new Response($content, Response::HTTP_OK, [
             'content-disposition' => 'attachment; filename="'.$this->generateBackupCodeFileName().'"',
