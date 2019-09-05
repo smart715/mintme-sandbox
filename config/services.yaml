@@ -272,6 +272,15 @@ services:
             - '@fos_user.mailer'
             - '%fos_user.resetting.retry_ttl%'
 
+    App\Controller\RegistrationController:
+        decorates: fos_user.registration.controller
+        public: true
+        arguments:
+            $eventDispatcher: '@event_dispatcher'
+            $formFactory: '@fos_user.registration.form.factory'
+            $userManager: '@fos_user.user_manager'
+            $tokenStorage: '@security.token_storage'
+
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"

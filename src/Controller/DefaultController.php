@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Form\RegistrationType;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,16 +18,6 @@ class DefaultController extends Controller
     public function index(): Response
     {
         return $this->render('pages/index.html.twig');
-    }
-
-    /**
-     * @Route("/sign-up", name="sign_up")
-     */
-    public function signUpLanding(): Response
-    {
-        return $this->render('pages/sign_up_landing.html.twig', [
-            'form' => $this->createForm(RegistrationType::class)->createView(),
-        ]);
     }
 
     /**
