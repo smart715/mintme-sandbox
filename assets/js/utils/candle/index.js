@@ -573,6 +573,7 @@
         let min = 'dataMin';
         let max = 'dataMax';
         let gridIndex = 1;
+        let axisPointer = {label: SHOW_FALSE};
 
         return [{
             type: type,
@@ -595,6 +596,7 @@
             axisLabel: axisLabel,
             min: min,
             max: max,
+            axisPointer: axisPointer,
         }];
     }
 
@@ -832,7 +834,6 @@
             digit: digit,
             itemStyle: itemStyle,
         });
-        let axisPointer = {link: {xAxisIndex: 'all'}};
         return {
             legend: legend$$1,
             tooltip: tooltip$$1,
@@ -842,7 +843,6 @@
             yAxis: yAxis,
             dataZoom: dataZoom$$1,
             series: series,
-            axisPointer: axisPointer,
         };
     };
 
