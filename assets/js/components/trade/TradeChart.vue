@@ -103,7 +103,7 @@ export default {
                     top: 20,
                     bottom: 60,
                     left: 75,
-                    right: '10%',
+                    right: 75,
                 },
                 xAxis: {
                     boundaryGap: true,
