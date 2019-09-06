@@ -92,8 +92,6 @@ import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
 import {FiltersMixin} from '../../mixins';
 
-const HTTP_ACCEPTED = 202;
-
 export default {
     name: 'TokenEditModal',
     components: {

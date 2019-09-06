@@ -20,6 +20,11 @@
 import Toasted from 'vue-toasted';
 import TwoFactorModal from '../modal/TwoFactorModal';
 
+Vue.use(Toasted, {
+    position: 'top-center',
+    duration: 5000,
+});
+
 const HTTP_ACCEPTED = 202;
 
 export default {
