@@ -14,6 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
+use App\Logger\UserActionLogger;
 
 class GuzzleWrapperTest extends TestCase
 {
@@ -35,7 +36,7 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getLoggerMock(),
+            $this->getUserActionLoggerMock(),
             $url,
             $timeout
         );
@@ -66,7 +67,7 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getLoggerMock(),
+            $this->getUserActionLoggerMock(),
             $url,
             $timeout
         );
@@ -93,7 +94,7 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getLoggerMock(),
+            $this->getUserActionLoggerMock(),
             $url,
             $timeout
         );
@@ -120,7 +121,7 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getLoggerMock(),
+            $this->getUserActionLoggerMock(),
             'http://localhost:8080',
             10,
             ['auth' => ['type' => 'basic']]
@@ -147,6 +148,12 @@ class GuzzleWrapperTest extends TestCase
     private function getLoggerMock(): LoggerInterface
     {
         return $this->createMock(LoggerInterface::class);
+    }
+
+    /** @return MockObject|UserActionLogger */
+    private function getUserActionLoggerMock(): UserActionLogger
+    {
+        return $this->createMock(UserActionLogger::class);
     }
 
     /**
