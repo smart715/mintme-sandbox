@@ -3,14 +3,15 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use FOS\UserBundle\Model\UserInterface;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\PendingWithdrawRepository")
- * @ORM\Table(name="landing_bonus")
+ * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
+ * @ORM\Table(name="bonus")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class LandingBonus
+class Bonus
 {
     public const BONUS_WEB = 5;
 
@@ -29,9 +30,9 @@ class LandingBonus
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     * @var int
+     * @var UserInterface
      */
-    private $userId;
+    private $user;
 
     /**
      * @ORM\Column(type="string")
@@ -39,19 +40,32 @@ class LandingBonus
      */
     private $status;
 
+    /**
+     * @ORM\Column(type="integer")
+     * @var int
+     */
+    private $quantityWeb;
+
+    public function __construct(UserInterface $user, string $status, int $quantityWeb)
+    {
+        $this->user = $user;
+        $this->status = $status;
+        $this->quantityWeb = $quantityWeb;
+    }
+
     public function getId(): int
     {
         return $this->id;
     }
 
-    public function getUserId(): int
+    public function getUser(): UserInterface
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): void
+    public function setUser(User $user): void
     {
-        $this->userId = $userId;
+        $this->user = $user;
     }
 
     public function getStatus(): string
@@ -62,5 +76,15 @@ class LandingBonus
     public function setStatus(string $status): void
     {
         $this->status = $status;
+    }
+
+    public function getQuantityWeb(): int
+    {
+        return $this->quantityWeb;
+    }
+
+    public function setQuantityWeb(int $quantityWeb): void
+    {
+        $this->quantityWeb = $quantityWeb;
     }
 }
