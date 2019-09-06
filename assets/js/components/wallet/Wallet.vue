@@ -93,7 +93,6 @@
             :fee="withdraw.fee"
             :withdraw-url="withdrawUrl"
             :max-amount="withdraw.amount"
-            :address-length="addressLength"
             :twofa="twofa"
             :subunit="withdraw.subunit"
             :no-close="true"
@@ -170,11 +169,6 @@ export default {
         };
     },
     computed: {
-        addressLength: function() {
-            return this.depositAddresses[this.selectedCurrency] && this.depositAddresses[this.selectedCurrency].length
-                ? this.depositAddresses[this.selectedCurrency].length
-                : 1;
-        },
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },
