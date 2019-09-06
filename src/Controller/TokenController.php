@@ -192,7 +192,7 @@ class TokenController extends Controller
 
                 return $this->redirectToOwnToken('intro');
             } catch (Throwable $exception) {
-                if (strpos($exception->getMessage(), 'cURL') !== false) {
+                if (false !== strpos($exception->getMessage(), 'cURL')) {
                     $this->addFlash('danger', 'Exchanger connection lost. Try again');
                 } else {
                     $this->em->rollback();

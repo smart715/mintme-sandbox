@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Communications\Factory\RpcClientFactoryInterface;
 use App\Communications\GuzzleWrapper;
 use App\Communications\JsonRpcResponse;
+use App\Logger\UserActionLogger;
 use App\Utils\RandomNumber;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\RequestInterface;
@@ -14,7 +15,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
-use App\Logger\UserActionLogger;
 
 class GuzzleWrapperTest extends TestCase
 {
