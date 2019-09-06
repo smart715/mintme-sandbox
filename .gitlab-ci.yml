@@ -8,7 +8,6 @@
 
 stages:
   - build-sites
-  - clean-unused-sites
 
 before_script:
   - shopt -s expand_aliases
@@ -30,18 +29,4 @@ build_mintme_sites:
     - mintme.abchosting.org
   only:
     # this job only will be executed for branches
-    - branches
-
-clean_mintme_unused_sites:
-  stage: clean-unused-sites
-  script:
-    - sudo /usr/local/bin/clean-unused-sites-mintme-sandbox.py
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for branches named
-    # master
-    - branches
-  allow_failure: true
-
+    - /^sb-.*$/
