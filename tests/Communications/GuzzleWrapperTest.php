@@ -35,6 +35,7 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
+            $this->getLoggerMock(),
             $url,
             $timeout
         );
@@ -65,6 +66,7 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
+            $this->getLoggerMock(),
             $url,
             $timeout
         );
@@ -91,6 +93,7 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
+            $this->getLoggerMock(),
             $url,
             $timeout
         );
@@ -116,6 +119,7 @@ class GuzzleWrapperTest extends TestCase
         $wrapper = new GuzzleWrapper(
             $this->getRandomNumber(),
             $clientFactory,
+            $this->getLoggerMock(),
             $this->getLoggerMock(),
             'http://localhost:8080',
             10,
