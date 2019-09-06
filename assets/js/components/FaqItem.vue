@@ -40,6 +40,7 @@
                     case 'chevron-down': this.icon = 'chevron-up'; break;
                     case 'chevron-up': this.icon = 'chevron-down'; break;
                 }
+                this.$emit('switch');
             },
         },
     };

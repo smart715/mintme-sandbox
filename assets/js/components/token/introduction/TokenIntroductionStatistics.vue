@@ -157,7 +157,6 @@
 
 <script>
 import {Decimal} from 'decimal.js';
-import ReleasePeriodComponent from './TokenIntroductionReleasePeriod';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
 import {WSAPI} from '../../../utils/constants';
@@ -169,7 +168,6 @@ export default {
     name: 'TokenIntroductionStatistics',
     mixins: [MoneyFilterMixin],
     components: {
-        ReleasePeriodComponent,
         Guide,
     },
     props: {
