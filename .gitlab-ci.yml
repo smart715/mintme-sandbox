@@ -7,59 +7,19 @@
 # *********************
 
 stages:
-  - update-repository
-  - tests
   - build-sites
   - clean-unused-sites
-  - auto-merge
-
-update_repository_redmine_training.abchosting.org:
-  script:
-    - cd /home/git/gitlab/mintme-panel.git && sudo git fetch --all -p
-  stage: update-repository
-  tags:
-    # this job will be executed only on training.abchosting.org server
-    - training.abchosting.org
 
 before_script:
   - shopt -s expand_aliases
   - alias php='/usr/bin/php7.2'
   - alias npm='/usr/local/bin/npm'
 
-tests_php:
-  stage: tests
-  script:
-    - export $(grep -v '^#' .env.dist | xargs)
-    - composer install
-    - make phpunit
-    - make syntax_check
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    paths:
-      - node_modules/
-      - vendor/
-  tags:
-    - mintme.abchosting.org
-
-tests_assets:
-  stage: tests
-  script:
-    - npm ci
-    - make syntax_check_assets
-    - make karma
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    paths:
-      - node_modules/
-      - vendor/
-  tags:
-    - mintme.abchosting.org
-
 build_mintme_sites:
   stage: build-sites
   script:
     - SRC=$(pwd)
-    - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
+    - sudo build-sites-mintme-sandbox.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -75,25 +35,13 @@ build_mintme_sites:
 clean_mintme_unused_sites:
   stage: clean-unused-sites
   script:
-    - sudo /usr/local/bin/clean-unused-sites-mintme.py
+    - sudo /usr/local/bin/clean-unused-sites-mintme-sandbox.py
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
   only:
     # this job only will be executed for branches named
     # master
-    - master
+    - branches
   allow_failure: true
 
-auto_merge_release_branch:
-  stage: auto-merge
-  script:
-    - sudo auto-merge-release-branch.py
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
