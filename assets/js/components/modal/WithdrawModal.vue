@@ -96,6 +96,16 @@ import {toMoney} from '../../utils';
 
 const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 const WEB_SYMBOL = 'WEB';
+const ADDRESS_LENGTH = {
+    WEB: {
+        min: 42,
+        max: 42,
+    },
+    BTC: {
+        min: 25,
+        max: 42,
+    },
+};
 
 export default {
     name: 'WithdrawModal',
@@ -110,7 +120,6 @@ export default {
         withdrawUrl: String,
         maxAmount: String,
         availableWeb: String,
-        addressLength: Number,
         subunit: Number,
         twofa: String,
         noClose: Boolean,
@@ -221,8 +230,12 @@ export default {
             address: {
                 required,
                 tokenContain: tokenContain,
-                minLength: minLength(this.addressLength),
-                maxLength: maxLength(this.addressLength),
+                minLength: minLength(
+                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].min : ADDRESS_LENGTH.WEB.min
+                ),
+                maxLength: maxLength(
+                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].max : ADDRESS_LENGTH.WEB.max
+                ),
             },
         };
     },

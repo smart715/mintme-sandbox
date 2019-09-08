@@ -122,7 +122,6 @@
             :available-web="withdraw.availableWeb"
             :withdraw-url="withdrawUrl"
             :max-amount="withdraw.amount"
-            :address-length="addressLength"
             :twofa="twofa"
             :subunit="withdraw.subunit"
             :no-close="true"
@@ -205,12 +204,6 @@ export default {
         };
     },
     computed: {
-        addressLength: function() {
-            let currency = this.isTokenModal ? TOK_SYMBOL : this.selectedCurrency;
-            return this.depositAddresses[currency] && this.depositAddresses[currency].length
-                ? this.depositAddresses[currency].length
-                : 1;
-        },
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },
