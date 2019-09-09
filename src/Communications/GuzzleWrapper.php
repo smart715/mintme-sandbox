@@ -67,6 +67,8 @@ class GuzzleWrapper implements JsonRpcInterface
                     'Got an error, when registering a token',
                     ['message' => $e->getMessage(), 'response_url' => $this->url, 'method' => $methodName]
                 );
+
+                unset($_SESSION['creation_token']);
             }
 
             $this->logger->error(

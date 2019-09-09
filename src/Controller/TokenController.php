@@ -149,9 +149,6 @@ class TokenController extends Controller
             return $this->redirectToOwnToken('trade');
         }
 
-        session_start();
-        $_SESSION['creation_token'] = 'true';
-
         $token = new Token();
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
@@ -178,6 +175,9 @@ class TokenController extends Controller
             }
 
             try {
+                session_start();
+                $_SESSION['creation_token'] = 'true';
+
                 $balanceHandler->deposit(
                     $this->getUser(),
                     $token,
@@ -193,6 +193,8 @@ class TokenController extends Controller
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
+                unset($_SESSION['creation_token']);
+
                 return $this->redirectToOwnToken('intro');
             } catch (Throwable $exception) {
                 if (false !== strpos($exception->getMessage(), 'cURL')) {
@@ -201,6 +203,8 @@ class TokenController extends Controller
                     $this->em->rollback();
                     $this->addFlash('danger', 'Error creating token. Try again');
                     $this->userActionLogger->error('Got an error, when registering a token', ['message' => $exception->getMessage()]);
+
+                    unset($_SESSION['creation_token']);
                 }
             }
         }
