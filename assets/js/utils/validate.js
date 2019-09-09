@@ -3,16 +3,12 @@
  * @param {string} value
  * @return {bool}
  */
-function correctTokenName(value) {
+function validTokenName(value) {
     const matches = value.match(/^[-\s]+/);
 
-    if (null === matches) {
-        return true;
-    }
-
-    return 0 === matches.length;
+    return null === matches || 0 === matches.length;
 }
 
 export {
-    correctTokenName,
+    validTokenName,
 };

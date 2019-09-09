@@ -55,7 +55,7 @@ import Modal from './Modal';
 import Guide from '../Guide';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
-import {correctTokenName} from '../../utils';
+import {validTokenName} from '../../utils';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
@@ -222,7 +222,7 @@ export default {
         return {
             newName: {
                 required,
-                correctTokenName,
+                validTokenName,
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
