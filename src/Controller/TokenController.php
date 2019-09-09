@@ -149,6 +149,9 @@ class TokenController extends Controller
             return $this->redirectToOwnToken('trade');
         }
 
+        session_start();
+        $_SESSION['creation_token'] = 'true';
+
         $token = new Token();
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
