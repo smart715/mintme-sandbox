@@ -8,6 +8,7 @@
                 <div class="row">
                     <div class="col-12">
                         <font-awesome-icon
+                            v-if="editable"
                             class="icon-edit float-right c-pointer"
                             :icon="editingUrlsIcon"
                             transform="shrink-4 up-1.5"
