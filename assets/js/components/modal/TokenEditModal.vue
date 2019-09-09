@@ -55,7 +55,6 @@ import Modal from './Modal';
 import Guide from '../Guide';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
-import {validTokenName} from '../../utils';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
@@ -109,7 +108,7 @@ export default {
             } else if (!this.$v.newName.tokenContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
-            } else if (!this.$v.newName.validTokenName) {
+            } else if (!this.$v.newName.validFirstChar) {
                 this.$toasted.error('Token name can not contain dashes or spaces in the beggining');
                 return;
             } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
@@ -217,12 +216,17 @@ export default {
                     }
                 });
         },
+        validFirstChar: function(value) {
+            const matches = value.match(/^[-\s]+/);
+
+            return null === matches || 0 === matches.length;
+        },
     },
     validations() {
         return {
             newName: {
                 required,
-                validTokenName,
+                validFirstChar: this.validFirstChar,
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
