@@ -356,5 +356,3 @@ services:
     App\Communications\DisposableEmailCommunicator:
         arguments:
             $rpc: '@disposable_email.json_rpc'
-        autowire: true
-        public: true
