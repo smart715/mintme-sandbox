@@ -344,3 +344,8 @@ services:
     two_factor.auth_require_handler:
         class: App\Security\TwoFactorRequireHandler
         public: true
+
+    App\Controller\ExceptionController:
+        public: true
+        arguments:
+            $debug: '%kernel.debug%'
