@@ -11,6 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Twig\Environment;
 
@@ -67,6 +68,15 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
                     'error_message' => 'ARTICLE NOT FOUND',
+                ]),
+                404
+            ));
+        }
+
+        if ($exception instanceof MethodNotAllowedHttpException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => 'PAGE NOT FOUND',
                 ]),
                 404
             ));
