@@ -109,7 +109,7 @@ export default {
             } else if (!this.$v.newName.tokenContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
-            } else if (!this.$v.newName.correctTokenName) {
+            } else if (!this.$v.newName.validTokenName) {
                 this.$toasted.error('Token name can not contain dashes or spaces in the beggining');
                 return;
             } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
