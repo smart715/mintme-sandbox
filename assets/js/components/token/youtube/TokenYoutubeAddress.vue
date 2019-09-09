@@ -44,7 +44,6 @@ import Guide from '../../Guide';
 library.add(faTimes, faYoutubeSquare);
 
 const HTTP_ACCEPTED = 202;
-
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
 

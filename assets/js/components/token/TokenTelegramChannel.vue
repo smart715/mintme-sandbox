@@ -163,6 +163,7 @@ export default {
         },
         toggleEdit: function() {
             this.editing = !this.editing;
+
             if (this.editing) {
                 this.$emit('toggleEdit', 'telegram');
             }

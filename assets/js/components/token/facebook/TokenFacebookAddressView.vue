@@ -21,8 +21,8 @@
                         target="_blank"
                         :href="'https://www.facebook.com/sharer/sharer.php?u='
                         +currentAddressEncoded+'&amp;src=sdkpreparse'"
-                        class="fb-xfbml-parse-ignore">
-                    </a>
+                        class="fb-xfbml-parse-ignore"
+                    ></a>
                 </div>
                 <guide>
                     <template slot="header">

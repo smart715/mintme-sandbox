@@ -47,14 +47,14 @@
                                         :tokenName="tokenName"
                                         @saveTelegram="saveTelegram"
                                         @toggleEdit="toggleEdit"
-                                    ></token-telegram-channel>
+                                    />
                                     <token-discord-channel
                                         :currentDiscord="currentDiscord"
                                         :editingDiscord="editingDiscord"
                                         :tokenName="tokenName"
                                         @saveDiscord="saveDiscord"
                                         @toggleEdit="toggleEdit"
-                                    ></token-discord-channel>
+                                    />
                                 </template>
                                 <template v-else>
                                     <token-website-address-view
@@ -97,8 +97,7 @@
                                                 :title="twitterDescription"
                                                 :description="description"
                                                 :quote="description"
-                                                hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,
-                                                    Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
+                                                hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
                                                 inline-template
                                             >
                                                 <div class="px-2">

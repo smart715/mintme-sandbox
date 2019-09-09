@@ -57,9 +57,7 @@ export default {
             return 'https://www.youtube.com/channel/' + id;
         },
         renderYtSubscribeButton: function(channelId) {
-            let options = {
-                'channelid': channelId,
-            };
+            let options = {'channelid': channelId};
             gapi.ytsubscribe.render(this.$refs.ytButtonContainer, options);
         },
     },
