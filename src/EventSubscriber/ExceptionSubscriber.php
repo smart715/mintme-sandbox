@@ -75,9 +75,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         if ($exception instanceof MethodNotAllowedHttpException) {
             $event->setResponse(new Response(
-                $this->template->render('pages/404.html.twig', [
-                    'error_message' => 'PAGE NOT FOUND',
-                ]),
+                $this->template->render('bundles/TwigBundle/Exception/error404.html.twig'),
                 404
             ));
         }
