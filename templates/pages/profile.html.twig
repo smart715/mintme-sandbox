@@ -59,9 +59,9 @@
                                     <div class="pb-1">
                                         {{ form_row(form.firstName, {'attr':
                                             {
-                                                'v-model': '$v.firstName.$model',
-                                                'class' : 'form-control',
-                                                'ref' : 'firstName'
+                                                'v-model.trim': '$v.firstName.$model',
+                                                'class': 'form-control',
+                                                'ref': 'firstName'
                                             }
                                         }) }}
                                     </div>
@@ -74,8 +74,8 @@
                                     <div class="pb-1">
                                         {{ form_row(form.lastName, {'attr':
                                             {
-                                                'v-model': '$v.lastName.$model',
-                                                'class' : 'form-control',
+                                                'v-model.trim': '$v.lastName.$model',
+                                                'class': 'form-control',
                                                 'ref': 'lastName'
                                             }
                                         }) }}
@@ -89,9 +89,9 @@
                                     <div class="pb-1">
                                         {{ form_row(form.city, {'attr':
                                             {
-                                                'v-model': '$v.city.$model',
-                                                'class' : 'form-control',
-                                                'ref' : 'city'
+                                                'v-model.trim': '$v.city.$model',
+                                                'class': 'form-control',
+                                                'ref': 'city'
                                             }
                                         }) }}
                                     </div>
@@ -109,8 +109,8 @@
                                     <div>
                                         {{ form_row(form.description, {'attr':
                                             {
-                                                'class' : 'form-control form-control-md',
-                                                'ref' : 'description'
+                                                'class': 'form-control form-control-md',
+                                                'ref': 'description'
                                             }
                                         }) }}
                                     </div>
