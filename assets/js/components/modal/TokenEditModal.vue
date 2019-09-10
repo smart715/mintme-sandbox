@@ -15,10 +15,11 @@
                     <input
                         id="tokenName"
                         type="text"
-                        v-model.trim="newName"
+                        v-model="newName"
                         ref="tokenNameInput"
                         class="token-name-input w-100 px-2"
-                        :class="{ 'is-invalid': $v.$invalid }">
+                        :class="{ 'is-invalid': $v.$invalid }"
+                    >
                 </div>
                 <div class="col-12 pt-2 clearfix">
                     <button
@@ -56,7 +57,7 @@ import Guide from '../Guide';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
+const tokenContain = helpers.regex('names', /^[a-zA-Z0-9-]*$/u);
 const HTTP_ACCEPTED = 202;
 
 export default {
@@ -105,11 +106,11 @@ export default {
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');
                 return;
-            } else if (!this.$v.newName.tokenContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
             } else if (!this.$v.newName.validFirstChar) {
                 this.$toasted.error('Token name can not contain dashes or spaces in the beggining');
+                return;
+            } else if (!this.$v.newName.tokenContain) {
+                this.$toasted.error('Token name can contain alphabets, numbers and dashes');
                 return;
             } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
                 this.$toasted.error('Token name should have at least 4 symbols');
