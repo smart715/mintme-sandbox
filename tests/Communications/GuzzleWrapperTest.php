@@ -102,13 +102,8 @@ class GuzzleWrapperTest extends TestCase
             $timeout
         );
 
-        $session = new Session(new NativeSessionStorage(), new AttributeBag());
-        $session->get('creation_token');
-
         $this->expectException(\Throwable::class);
         $wrapper->send($method, $params);
-
-        $session->clear();
     }
 
     /** @dataProvider failedResponseProvider */
@@ -135,8 +130,13 @@ class GuzzleWrapperTest extends TestCase
             ['auth' => ['type' => 'basic']]
         );
 
+        $session = new Session(new NativeSessionStorage(), new AttributeBag());
+        $session->get('creation_token');
+
         $this->expectException(FetchException::class);
         $wrapper->send('stubMethod', [['param1', 'param2']]);
+
+        $session->clear();
     }
 
     public function failedResponseProvider(): array
