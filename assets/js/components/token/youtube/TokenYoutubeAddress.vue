@@ -76,7 +76,9 @@ export default {
     },
     computed: {
         computedChannel: function() {
-            return 'https://www.youtube.com/channel/' + this.currentChannelId || 'Add Youtube channel';
+            return this.currentChannelId
+                ? 'https://www.youtube.com/channel/' + this.currentChannelId
+                : 'Add Youtube channel';
         },
     },
     methods: {
