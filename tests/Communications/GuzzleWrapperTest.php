@@ -15,9 +15,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 class GuzzleWrapperTest extends TestCase
 {
@@ -130,13 +127,8 @@ class GuzzleWrapperTest extends TestCase
             ['auth' => ['type' => 'basic']]
         );
 
-        $session = new Session(new NativeSessionStorage(), new AttributeBag());
-        $session->get('creation_token');
-
         $this->expectException(FetchException::class);
         $wrapper->send('stubMethod', [['param1', 'param2']]);
-
-        $session->clear();
     }
 
     public function failedResponseProvider(): array
