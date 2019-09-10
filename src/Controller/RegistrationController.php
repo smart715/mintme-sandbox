@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Bonus;
+use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Form\RegistrationType;
+use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
@@ -21,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Throwable;
 
 class RegistrationController extends FOSRegistrationController
 {
@@ -36,17 +40,32 @@ class RegistrationController extends FOSRegistrationController
     /** @var EntityManagerInterface */
     private $repo;
 
+    /** @var BalanceHandlerInterface */
+    private $balanceHandler;
+
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
         UserManagerInterface $userManager,
         TokenStorageInterface $tokenStorage,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        BalanceHandlerInterface $balanceHandler,
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
         $this->userManager = $userManager;
         $this->repo = $entityManager;
+        $this->balanceHandler = $balanceHandler;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->cryptoManager = $cryptoManager;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
     }
 
@@ -148,7 +167,30 @@ class RegistrationController extends FOSRegistrationController
         $user = $this->getUser();
 
         if ($user->getBonus() && Bonus::PENDING_STATUS === $user->getBonus()->getStatus()) {
+            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
+            if (!$crypto) {
+                return parent::confirmedAction($request);
+            }
+
+            $bonus = $user->getBonus();
+            $bonus->setStatus(Bonus::PAID_STATUS);
+            $this->repo->persist($bonus);
+            $this->repo->flush();
+
+            try {
+                $this->balanceHandler->deposit(
+                    $user,
+                    Token::getFromCrypto($crypto),
+                    $this->moneyWrapper->parse(
+                        (string)Bonus::BONUS_WEB,
+                        $crypto->getSymbol()
+                    )
+                );
+            } catch (Throwable $exception) {
+                $this->repo->rollback();
+                $this->addFlash('danger', 'Exchanger connection lost. Try again.');
+            }
         }
 
         return parent::confirmedAction($request);
