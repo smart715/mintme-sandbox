@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace App\Controller;
 
 use App\Entity\Bonus;
+use App\Entity\User;
 use App\Form\RegistrationType;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -56,7 +57,7 @@ class RegistrationController extends FOSRegistrationController
      */
     public function signUpLanding(Request $request): Response
     {
-        $form = $this->createForm(RegistrationType::class)->add('bonus', HiddenType::class);
+        $form = $this->formFactory->createForm()->add('bonus', HiddenType::class);
 
         $response = $this->checkForm($form, $request);
 
@@ -116,6 +117,7 @@ class RegistrationController extends FOSRegistrationController
                     $bonus = new Bonus($user, Bonus::PENDING_STATUS, Bonus::BONUS_WEB);
                     $this->repo->persist($bonus);
                     $this->repo->flush();
+                    $user->setBonus($bonus);
                 }
 
                 if (null === $response = $event->getResponse()) {
@@ -138,5 +140,17 @@ class RegistrationController extends FOSRegistrationController
                 return $response;
             }
         }
+    }
+
+    public function confirmedAction(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user->getBonus() && Bonus::PENDING_STATUS === $user->getBonus()->getStatus()) {
+
+        }
+
+        return parent::confirmedAction($request);
     }
 }
