@@ -8,8 +8,11 @@ fos_rest:
         json: true
 
     exception:
+        enabled: true
         codes:
             'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException': 401
+        messages:
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': true
 
     view:
         view_response_listener:  true
@@ -22,5 +25,5 @@ fos_rest:
 
     format_listener:
         rules:
-            - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [ json, js ] }
+            - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [ json, js, html ] }
             - { path: ^/, prefer_extension: true, fallback_format: html, priorities: [ html, '*/*' ] }
