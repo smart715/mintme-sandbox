@@ -7,15 +7,23 @@
 # *********************
 
 stages:
+  - update-repository
   - build-sites
 
-before_script:
-  - shopt -s expand_aliases
-  - alias php='/usr/bin/php7.2'
-  - alias npm='/usr/local/bin/npm'
+update_repository_redmine_training.abchosting.org:
+  stage: update-repository
+  script:
+    - cd /home/git/gitlab/coinimp-sandbox.git && sudo git fetch --all -p
+  tags:
+    # this job will be executed only on training.abchosting.org server
+    - training.abchosting.org
 
 build_mintme_sites:
   stage: build-sites
+  before_script:
+    - shopt -s expand_aliases
+    - alias php='/usr/bin/php7.2'
+    - alias npm='/usr/local/bin/npm'
   script:
     - SRC=$(pwd)
     - sudo build-sites-mintme-sandbox.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
@@ -30,3 +38,5 @@ build_mintme_sites:
   only:
     # this job only will be executed for branches
     - /^sb-.*$/
+
+    
