@@ -144,7 +144,7 @@ export default {
             );
 
             return toMoney(
-                amount.add(!this.isToken && amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
+                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
                 this.subunit
             );
         },
@@ -213,9 +213,8 @@ export default {
         },
         setMaxAmount: function() {
             let amount = new Decimal(this.maxAmount);
-            let fee = this.isToken ? 0 : this.fee;
-            this.amount = amount.greaterThan(fee) ?
-                toMoney(amount.sub(fee).toString(), this.subunit) : toMoney(0, this.subunit);
+            this.amount = amount.greaterThan(this.fee) ?
+                toMoney(amount.sub(this.fee).toString(), this.subunit) : toMoney(0, this.subunit);
         },
     },
     validations() {

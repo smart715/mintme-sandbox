@@ -119,6 +119,7 @@
             :currency="selectedCurrency"
             :is-token="isTokenModal"
             :fee="withdraw.fee"
+            :web-fee="withdraw.webFee"
             :available-web="withdraw.availableWeb"
             :withdraw-url="withdrawUrl"
             :max-amount="withdraw.amount"
@@ -193,6 +194,7 @@ export default {
             },
             withdraw: {
                 fee: '0',
+                webFee: '0',
                 amount: '0',
                 subunit: 4,
                 availableWeb: '0',
@@ -273,7 +275,11 @@ export default {
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
-            this.withdraw.fee = toMoney(isToken ? this.predefinedTokens[WEB_SYMBOL].fee : fee, subunit);
+            this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
+            this.withdraw.webFee = toMoney(
+                isToken || WEB_SYMBOL === currency ? this.predefinedTokens[WEB_SYMBOL].fee : 0,
+                subunit
+            );
             this.withdraw.availableWeb = this.predefinedTokens[WEB_SYMBOL].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
