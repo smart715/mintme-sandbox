@@ -62,7 +62,7 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ fee | toMoney(subunit) }} {{ feeCurrency }}</span>
+                    <span class="float-right">{{ feeAmount | toMoney(subunit) }} {{ feeCurrency }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
@@ -117,6 +117,7 @@ export default {
         currency: String,
         isToken: Boolean,
         fee: String,
+        webFee: String,
         withdrawUrl: String,
         maxAmount: String,
         availableWeb: String,
@@ -147,6 +148,9 @@ export default {
                 amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
                 this.subunit
             );
+        },
+        feeAmount: function() {
+            return this.isToken ? this.webFee : this.fee;
         },
         feeCurrency: function() {
             return this.isToken ? WEB_SYMBOL : this.currency;
@@ -183,7 +187,7 @@ export default {
                 return;
             }
 
-            if (this.isToken && new Decimal(this.availableWeb).lessThan(this.fee)) {
+            if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
                 this.$toasted.error('You don\'t have enough web to pay fee');
                 return;
             }
@@ -231,10 +235,10 @@ export default {
                 required,
                 tokenContain: tokenContain,
                 minLength: minLength(
-                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].min : ADDRESS_LENGTH.WEB.min
+                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].min : ADDRESS_LENGTH[this.feeCurrency].min
                 ),
                 maxLength: maxLength(
-                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].max : ADDRESS_LENGTH.WEB.max
+                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].max : ADDRESS_LENGTH[this.feeCurrency].max
                 ),
             },
         };
