@@ -16,7 +16,7 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
 
     public function checkDisposable(?string $email): bool
     {
-        if (!is_null($email)) {
+        if (is_null($email)) {
             return false;
         }
 
