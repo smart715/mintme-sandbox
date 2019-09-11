@@ -6,6 +6,7 @@ use App\Entity\Bonus;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,8 +38,8 @@ class RegistrationController extends FOSRegistrationController
     /** @var UserManagerInterface */
     private $userManager;
 
-    /** @var EntityManagerInterface */
-    private $repo;
+    /** @var BonusManagerInterface */
+    private $bonusManager;
 
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
@@ -49,23 +50,28 @@ class RegistrationController extends FOSRegistrationController
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
         UserManagerInterface $userManager,
         TokenStorageInterface $tokenStorage,
-        EntityManagerInterface $entityManager,
+        BonusManagerInterface $bonusManager,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        EntityManagerInterface $entityManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
         $this->userManager = $userManager;
-        $this->repo = $entityManager;
+        $this->bonusManager = $bonusManager;
         $this->balanceHandler = $balanceHandler;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
+        $this->em = $entityManager;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
     }
 
@@ -77,6 +83,10 @@ class RegistrationController extends FOSRegistrationController
     public function signUpLanding(Request $request): Response
     {
         $form = $this->formFactory->createForm()->add('bonus', HiddenType::class);
+
+        if ($this->bonusManager->isLimitReached($this->getParameter('landing_web_bonus_limit'))) {
+            return $this->redirectToRoute('homepage');
+        }
 
         $response = $this->checkForm($form, $request);
 
@@ -111,6 +121,7 @@ class RegistrationController extends FOSRegistrationController
      */
     private function checkForm(FormInterface $form, Request $request)
     {
+        /** @var User $user */
         $user = $this->userManager->createUser();
         $user->setEnabled(true);
 
@@ -134,14 +145,16 @@ class RegistrationController extends FOSRegistrationController
 
                 if ($form->has('bonus')) {
                     $bonus = new Bonus($user, Bonus::PENDING_STATUS, Bonus::BONUS_WEB);
-                    $this->repo->persist($bonus);
-                    $this->repo->flush();
+                    $this->em->persist($bonus);
+                    $this->em->flush();
                     $user->setBonus($bonus);
                 }
 
-                if (null === $response = $event->getResponse()) {
+                if (null === $event->getResponse()) {
                     $url = $this->generateUrl('fos_user_registration_confirmed');
                     $response = new RedirectResponse($url);
+                } else {
+                    $response = $event->getResponse();
                 }
 
                 $this->eventDispatcher->dispatch(
@@ -165,18 +178,18 @@ class RegistrationController extends FOSRegistrationController
     {
         /** @var User $user */
         $user = $this->getUser();
+        $bonus = $user->getBonus();
 
-        if ($user->getBonus() && Bonus::PENDING_STATUS === $user->getBonus()->getStatus()) {
+        if ($bonus && Bonus::PENDING_STATUS === $user->getBonus()->getStatus()) {
             $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
             if (!$crypto) {
                 return parent::confirmedAction($request);
             }
-
-            $bonus = $user->getBonus();
+            
             $bonus->setStatus(Bonus::PAID_STATUS);
-            $this->repo->persist($bonus);
-            $this->repo->flush();
+            $this->em->persist($bonus);
+            $this->em->flush();
 
             try {
                 $this->balanceHandler->deposit(
@@ -188,7 +201,7 @@ class RegistrationController extends FOSRegistrationController
                     )
                 );
             } catch (Throwable $exception) {
-                $this->repo->rollback();
+                $this->em->rollback();
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');
             }
         }

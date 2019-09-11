@@ -72,6 +72,10 @@ parameters:
 
     # Lifetime of the trusted device token (default 48 hours)
     trusted_device_cookie_lifetime: 172800
-    
+
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true
+
+    # WEB limit for landing page bonus
+    landing_web_bonus_limit: 50000
+

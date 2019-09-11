@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\UserInterface;
 
 /**
- * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\BonusRepository")
  * @ORM\Table(name="bonus")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
