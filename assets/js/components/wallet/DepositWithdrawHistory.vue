@@ -130,6 +130,7 @@ export default {
         },
         sanitizeHistory: function(historyData) {
             historyData.forEach((item) => {
+                item['url'] = this.generatePairUrl(item.crypto);
                 item['date'] = item.date
                     ? moment(item.date).format(GENERAL.dateFormat)
                     : null;
@@ -148,7 +149,6 @@ export default {
                 item['type'] = item.type.typeCode
                     ? item.type.typeCode
                     : null;
-                item['url'] = this.generatePairUrl(item.tradable);
             });
 
             return historyData;
