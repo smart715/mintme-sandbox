@@ -235,10 +235,10 @@ export default {
                 required,
                 tokenContain: tokenContain,
                 minLength: minLength(
-                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].min : ADDRESS_LENGTH[this.feeCurrency].min
+                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].min : ADDRESS_LENGTH.WEB.min
                 ),
                 maxLength: maxLength(
-                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].max : ADDRESS_LENGTH[this.feeCurrency].max
+                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].max : ADDRESS_LENGTH.WEB.max
                 ),
             },
         };
