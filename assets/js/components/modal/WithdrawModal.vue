@@ -213,8 +213,9 @@ export default {
         },
         setMaxAmount: function() {
             let amount = new Decimal(this.maxAmount);
-            this.amount = amount.greaterThan(this.fee) ?
-                toMoney(amount.sub(this.fee).toString(), this.subunit) : toMoney(0, this.subunit);
+            let fee = this.isToken ? 0 : this.fee;
+            this.amount = amount.greaterThan(fee) ?
+                toMoney(amount.sub(fee).toString(), this.subunit) : toMoney(0, this.subunit);
         },
     },
     validations() {
