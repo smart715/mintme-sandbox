@@ -4,9 +4,5 @@ namespace App\Communications;
 
 interface DisposableEmailCommunicatorInterface
 {
-    /**
-     * @return bool
-     * @param mixed $email
-     */
-    public function checkDisposable($email): bool;
+    public function checkDisposable(?string $email): bool;
 }

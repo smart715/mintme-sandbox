@@ -18,5 +18,12 @@ class DisposableEmailCommunicatorTest extends TestCase
         $disposableEmail = new DisposableEmailCommunicator($rpc);
 
         $this->assertEquals($disposableEmail->checkDisposable($email), false);
+
+        $rpc = $this->createMock(RestRpcInterface::class);
+        $rpc->method('send')->willReturn(json_encode(['disposable' => true]));
+
+        $disposableEmail = new DisposableEmailCommunicator($rpc);
+
+        $this->assertEquals($disposableEmail->checkDisposable($email), true);
     }
 }

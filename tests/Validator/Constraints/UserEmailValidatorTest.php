@@ -47,5 +47,16 @@ class UserEmailValidatorTest extends TestCase
         $validator->validate($email, $constraint);
         $validator->validate('uniqueemail', $constraint);
         $validator->validate(null, $constraint);
+
+        $disposableEmail = $this->createMock(DisposableEmailCommunicatorInterface::class);
+        $disposableEmail->method('checkDisposable')->willReturn(true);
+
+        $validator = new UserEmailValidator($um, $storage, $disposableEmail);
+        $validator->user = $user;
+        $validator->initialize($context);
+
+        $validator->validate($email, $constraint);
+        $validator->validate('uniqueemail', $constraint);
+        $validator->validate(null, $constraint);
     }
 }

@@ -14,13 +14,9 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
         $this->rpc = $rpc;
     }
 
-    /**
-     *@param mixed $email
-     *@return bool
-     */
-    public function checkDisposable($email): bool
+    public function checkDisposable(?string $email): bool
     {
-        if (!is_string($email)) {
+        if (!is_null($email)) {
             return false;
         }
 
@@ -30,7 +26,8 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
             Request::METHOD_GET
         );
         $response = json_decode($response, true);
+        $response = $response['disposable'];
 
-        return $response['disposable'];
+        return $response;
     }
 }
