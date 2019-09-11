@@ -48,6 +48,11 @@ class UserEmailValidatorTest extends TestCase
         $validator->validate('uniqueemail', $constraint);
         $validator->validate(null, $constraint);
 
+        $context = $this->createMock(ExecutionContextInterface::class);
+        $context->expects($this->once())->method('buildViolation')->willReturn(
+            $this->createMock(ConstraintViolationBuilderInterface::class)
+        );
+
         $disposableEmail = $this->createMock(DisposableEmailCommunicatorInterface::class);
         $disposableEmail->method('checkDisposable')->willReturn(true);
 
