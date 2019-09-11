@@ -119,7 +119,9 @@ class DepositConsumer implements ConsumerInterface
                 $this->balanceHandler->withdraw(
                     $user,
                     Token::getFromSymbol(Token::WEB_SYMBOL),
-                    $this->depositCommunicator->getFee($tradable)
+                    $this->depositCommunicator->getFee(
+                        Token::getFromSymbol(Token::WEB_SYMBOL)
+                    )
                 );
 
                 if (!in_array($user, $tradable->getUsers(), true)) {
