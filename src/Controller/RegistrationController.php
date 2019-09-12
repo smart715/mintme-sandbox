@@ -186,7 +186,7 @@ class RegistrationController extends FOSRegistrationController
             if (!$crypto) {
                 return parent::confirmedAction($request);
             }
-            
+
             $bonus->setStatus(Bonus::PAID_STATUS);
             $this->em->persist($bonus);
             $this->em->flush();
@@ -202,7 +202,6 @@ class RegistrationController extends FOSRegistrationController
                 );
             } catch (Throwable $exception) {
                 $this->em->rollback();
-                $this->addFlash('danger', 'Exchanger connection lost. Try again.');
             }
         }
 
