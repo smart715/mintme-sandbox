@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Manager\ReciprocalLinksManager;
+use App\Manager\ReciprocalLinksManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,7 +65,7 @@ class DefaultController extends Controller
      *      options={"sitemap" = false}
      * )
      */
-    public function links(ReciprocalLinksManager $manager): Response
+    public function links(ReciprocalLinksManagerInterface $manager): Response
     {
         return $this->render('pages/links.html.twig', [
             'links' => $manager->getAll(),
