@@ -3,7 +3,8 @@
         <modal
             :visible="visible"
             :no-close="noClose"
-            @close="closeModal">
+            @close="closeModal"
+        >
             <template slot="header">
                 <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
             </template>
@@ -45,8 +46,8 @@
             :twofa="twofa"
             :no-close="noClose"
             @verify="doEditToken"
-            @close="closeTwoFactorModal">
-        </two-factor-modal>
+            @close="closeTwoFactorModal"
+        />
     </div>
 </template>
 
@@ -57,7 +58,7 @@ import Guide from '../Guide';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9-]*$/u);
+const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
 
 export default {
@@ -109,8 +110,11 @@ export default {
             } else if (!this.$v.newName.validFirstChar) {
                 this.$toasted.error('Token name can not contain dashes or spaces in the beggining');
                 return;
+            } else if (!this.$v.newName.noSpaceBetweenDashes) {
+                this.$toasted.error('Token name can not contain space between dashes');
+                return;
             } else if (!this.$v.newName.tokenContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers and dashes');
+                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
             } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
                 this.$toasted.error('Token name should have at least 4 symbols');
@@ -222,12 +226,18 @@ export default {
 
             return null === matches || 0 === matches.length;
         },
+        noSpaceBetweenDashes: function(value) {
+            const matches = value.match(/-+\s+-+/);
+
+            return null === matches || 0 === matches.length;
+        },
     },
     validations() {
         return {
             newName: {
                 required,
                 validFirstChar: this.validFirstChar,
+                noSpaceBetweenDashes: this.noSpaceBetweenDashes,
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
