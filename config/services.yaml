@@ -153,6 +153,16 @@ services:
             - { name: sonata.admin, manager_type: orm, label: Blacklist }
         public: true
 
+    admin.reciprocal.links:
+        class: App\Admin\ReciprocalLinksAdmin
+        arguments:
+            - null
+            - App\Entity\ReciprocalLinks
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Reciprocal Links }
+        public: true
+
     admin.knowledgebase:
         class: App\Admin\KnowledgeBase\KnowledgeBaseAdmin
         arguments:
