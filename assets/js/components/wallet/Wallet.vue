@@ -60,7 +60,11 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template slot="name" slot-scope="data">
-                    <a :href="generatePairUrl(data.item)" class="text-white">{{ data.item.name }}</a>
+                    <a :href="generatePairUrl(data.item)" class="text-white">
+                        <span v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                            {{ data.item.name | truncate(15) }}
+                        </span>
+                    </a>
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -145,7 +149,7 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, MoneyFilterMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
@@ -153,7 +157,7 @@ const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
     components: {
         WithdrawModal,
         DepositModal,

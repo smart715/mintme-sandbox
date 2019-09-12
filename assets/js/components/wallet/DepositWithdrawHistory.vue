@@ -9,7 +9,11 @@
                 :class="{'empty-table': noHistory}"
             >
                 <template slot="symbol" slot-scope="data">
-                    <a :href="data.item.url" class="text-white">{{ data.item.symbol }}</a>
+                    <a :href="data.item.url" class="text-white">
+                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                            {{ data.item.symbol | truncate(15) }}
+                        </span>
+                    </a>
                 </template>
                 <template slot="toAddress" slot-scope="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
@@ -40,14 +44,13 @@
 <script>
 import moment from 'moment';
 import {toMoney, formatMoney} from '../../utils';
-import {LazyScrollTableMixin} from '../../mixins';
+import {LazyScrollTableMixin, FiltersMixin} from '../../mixins';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
-
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin],
+    mixins: [LazyScrollTableMixin, FiltersMixin],
     components: {CopyLink},
     data() {
         return {
