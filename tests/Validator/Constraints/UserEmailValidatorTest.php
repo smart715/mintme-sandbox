@@ -59,7 +59,7 @@ class UserEmailValidatorTest extends TestCase
         $um->method('findUserByEmail')->willReturn(null);
 
         $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->exactly(2))->method('buildViolation')->willReturn(
+        $context->expects($this->exactly(3))->method('buildViolation')->willReturn(
             $this->createMock(ConstraintViolationBuilderInterface::class)
         );
 
