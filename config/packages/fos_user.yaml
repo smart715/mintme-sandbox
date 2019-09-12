@@ -11,6 +11,7 @@ fos_user:
     resetting:
         email:
             template: bundles/FOSUserBundle/Resetting/email.html.twig
+        token_ttl: 7200
     from_email:
         address: "%env(MAILER_USER)%"
         sender_name: "%env(MAILER_USER)%"
