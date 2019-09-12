@@ -112,6 +112,10 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiBadRequestException('You need all your tokens to change token\'s name');
         }
 
+        if ($request->get('name') && Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+            throw new ApiBadRequestException('Token is deploying or deployed.');
+        }
+
         $form = $this->createForm(TokenType::class, $token, [
             'csrf_protection' => false,
             'allow_extra_fields' => true,
@@ -362,6 +366,23 @@ class TokensAPIController extends AbstractFOSRestController
 
         return $this->view(
             !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))
+        );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/is-not_deployed", name="is_token_not_deployed", options={"expose"=true})
+     */
+    public function isTokenNotDeployed(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(
+            Token::NOT_DEPLOYED === $token->deploymentStatus()
         );
     }
 
