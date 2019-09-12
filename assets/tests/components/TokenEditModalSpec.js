@@ -83,7 +83,45 @@ describe('TokenEditModal', () => {
         });
         const textInput = wrapper.find('input');
 
-        textInput.setValue('---   newName');
+        textInput.setValue('---newName');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(true);
+    });
+
+    it('throw required error when token name has spaces in the beggining', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'foobar',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: false,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('   newName');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(true);
+    });
+
+    it('throw required error when token name has spaces between dashes', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'foobar',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: false,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('new--- ---Name');
         wrapper.vm.editName();
         wrapper.vm.$v.$touch();
         expect(wrapper.vm.$v.$error).to.deep.equal(true);
