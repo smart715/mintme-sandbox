@@ -90,6 +90,21 @@ function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true
  * @param {string} str
  * @return {string}
  */
+function formatFee(str) {
+    while (str[str.length-1] === '0') {
+        str = str.substring(0, str.length-1);
+    }
+    if (str[str.length-1] === '.') {
+        str = str.substring(0, str.length-1);
+    }
+
+    return str;
+}
+
+/**
+ * @param {string} str
+ * @return {string}
+ */
 function formatMoney(str) {
     str = str ? str.toString() : '';
     let regx = /(\d{1,3})(\d{3}(?:,|$))/;
@@ -132,6 +147,7 @@ export {
     isValidUrl,
     deepFlatten,
     toMoney,
+    formatFee,
     formatMoney,
     Constants,
     EchartTheme,
