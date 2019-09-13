@@ -2,12 +2,6 @@
 
 {% block title %}Settings | mintMe{% endblock %}
 
-{% block meta %}
-    {% if app.flashes('download_backup_codes') is not empty %}
-        <meta http-equiv="refresh" content="5;url={{ path('download_backup_codes') }}">
-    {% endif %}
-{% endblock %}
-
 {% block content %}
     <div id="settings" class="container">
         <div class="row justify-content-center pt-5">

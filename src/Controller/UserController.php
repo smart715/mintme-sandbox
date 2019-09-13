@@ -17,9 +17,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class UserController extends AbstractController
@@ -56,7 +58,13 @@ class UserController extends AbstractController
     {
         $passwordForm = $this->getPasswordForm($request);
 
-        return $this->renderSettings($passwordForm);
+        $response = $this->renderSettings($passwordForm);
+
+        if ($this->container->get('session')->getBag('attributes')->has('download_backup_codes')) {
+            $response->headers->set('Refresh', "5;{$this->generateUrl('download_backup_codes', [], UrlGeneratorInterface::ABSOLUTE_URL)}");
+        }
+
+        return $response;
     }
 
     /**
@@ -128,6 +136,51 @@ class UserController extends AbstractController
         return $this->render('security/2fa_manager.html.twig', $parameters);
     }
 
+    /** @Route("/settings/2fa/backupcodes/download", name="download_backup_codes")*/
+    public function downloadBackupCodes(): Response
+    {
+        if (!$this->container->get('session')->getBag('attributes')->remove('download_backup_codes')) {
+            return $this->redirectToRoute('settings');
+        }
+
+        /** @var User */
+        $user = $this->getUser();
+        $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
+
+        $content = implode("\n", $backupCodes);
+
+        $response = new Response($content);
+
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            $this->generateBackupCodesFileName()
+        );
+
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
+    }
+
+    /** @Route("/settings/2fa/finish", name="two_factor_finish")*/
+    public function finishTwoFactor(): Response
+    {
+        if ($this->container->get('session')->getBag('attributes')->remove('2fa_finished')) {
+            $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
+            $this->addFlash('success', 'Downloading backup codes...');
+        }
+
+        return $this->redirectToRoute('settings');
+    }
+
+    /** @Route("/settings/2fa/backupcodes/generate", name="generate_backup_codes")*/
+    public function generateBackupCodes(TwoFactorManagerInterface $twoFactorManager): Response
+    {
+        $this->turnOnAuthenticator($twoFactorManager, $this->getUser());
+        $this->container->get('session')->getFlashBag()->get('success');
+
+        return $this->finishTwoFactor();
+    }
+
     private function getPasswordForm(Request $request): FormInterface
     {
         $user = $this->getUser();
@@ -163,6 +216,7 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
         $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
+        $this->container->get('session')->getBag('attributes')->set('2fa_finished', 'finished');
         $this->userActionLogger->info('Enable Two-Factor Authentication');
 
         return $backupCodes;
@@ -180,45 +234,11 @@ class UserController extends AbstractController
         $this->userActionLogger->info('Disable Two-Factor Authentication');
     }
 
-    /** @Route("/settings/2fa/backupcodes/download", name="download_backup_codes")*/
-    public function downloadBackupCodes(): Response
-    {
-        /** @var User */
-        $user = $this->getUser();
-        $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
-
-        $content = implode("\n", $backupCodes);
-
-        return new Response($content, Response::HTTP_OK, [
-            'content-disposition' => 'attachment; filename="'.$this->generateBackupCodeFileName().'"',
-            'content-type' => 'text/plain',
-        ]);
-    }
-
-    private function generateBackupCodeFileName(): string
+    private function generateBackupCodesFileName(): string
     {
         $name = $this->getUser()->getUsername();
         $time = date("H-i-d-m-Y");
 
         return "backup-codes-{$name}-{$time}.txt";
-    }
-
-    /** @Route("/settings/2fa/finish", name="two_factor_finish")*/
-    public function finishTwoFactor(): Response
-    {
-        $this->addFlash('download_backup_codes', '');
-        $this->addFlash('success', 'Downloading backup codes...');
-
-        return $this->redirectToRoute('settings');
-    }
-
-    /** @Route("/settings/2fa/backupcodes/generate", name="generate_backup_codes")*/
-    public function generateBackupCodes(TwoFactorManagerInterface $twoFactorManager): Response
-    {
-        $this->turnOnAuthenticator($twoFactorManager, $this->getUser());
-        
-        $this->container->get('session')->getFlashBag()->get('success');
-        
-        return $this->finishTwoFactor();
     }
 }
