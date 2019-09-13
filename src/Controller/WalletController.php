@@ -39,7 +39,13 @@ class WalletController extends Controller
         ]);
     }
 
-    /** @Route("/withdraw/{hash}", name="withdraw-confirm", options={"expose"=true}) */
+    /**
+     * @Route("/withdraw/{hash}",
+     *     name="withdraw-confirm",
+     *     options={"expose"=true},
+     *     schemes={"https"}
+     * )
+     */
     public function withdrawConfirm(string $hash, WalletInterface $wallet): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
