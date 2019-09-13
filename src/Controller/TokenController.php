@@ -202,6 +202,8 @@ class TokenController extends Controller
                     $this->em->rollback();
                     $this->addFlash('danger', 'Error creating token. Try again');
                     $this->userActionLogger->error('Got an error, when registering a token', ['message' => $exception->getMessage()]);
+                    
+                    unset($_SESSION['token_creation']);
                 }
             }
         }
