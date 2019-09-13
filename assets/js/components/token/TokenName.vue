@@ -2,18 +2,18 @@
     <div>
         <template v-if="editable">
             <token-edit-modal
-                    v-if="editable"
-                    :no-close="true"
-                    :twofa="twofa"
-                    :visible="showTokenEditModal"
-                    :current-name="currentName"
-                    @close="closeTokenEditModal">
+                v-if="editable"
+                :no-close="true"
+                :twofa="twofa"
+                :visible="showTokenEditModal"
+                :current-name="currentName"
+                @close="closeTokenEditModal">
             </token-edit-modal>
             <font-awesome-icon
-                    class="icon-edit c-pointer align-middle"
-                    icon="edit"
-                    transform="shrink-4 up-1.5"
-                    @click="editToken"
+                class="icon-edit c-pointer align-middle"
+                icon="edit"
+                transform="shrink-4 up-1.5"
+                @click="editToken"
             />
         </template>
         <span class="token-name-font" v-b-tooltip="{title: currentName, boundary:'viewport'}">

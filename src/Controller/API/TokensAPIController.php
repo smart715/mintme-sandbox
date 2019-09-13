@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\LockIn;
+use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;

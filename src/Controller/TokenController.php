@@ -58,6 +58,7 @@ class TokenController extends Controller
     /** @var UserActionLogger  */
     private $userActionLogger;
 
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -179,7 +180,10 @@ class TokenController extends Controller
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                return $this->redirectToOwnToken('intro');
+                return $this->redirectToRoute('token_show', [
+                    'name' => $token->getName(),
+                    'tab' => 'intro',
+                ]);
             } catch (Throwable $exception) {
                 $this->em->rollback();
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');
