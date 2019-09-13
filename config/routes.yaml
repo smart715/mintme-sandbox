@@ -15,6 +15,11 @@ fos_user_registration:
     resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
     prefix: /register
 
+fos_user_registration_confirm:
+    controller: "fos_user.registration.controller:confirmAction"
+    path: /register/confirm/{token}
+    schemes: [https]
+
 fos_user_resetting:
     resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
     prefix: /resetting
