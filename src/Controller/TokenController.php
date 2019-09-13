@@ -193,6 +193,7 @@ class TokenController extends Controller
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
                 unset($_SESSION['token_creation']);
+
                 return $this->redirectToOwnToken('intro');
             } catch (Throwable $exception) {
                 if (false !== strpos($exception->getMessage(), 'cURL')) {
