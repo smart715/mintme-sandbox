@@ -152,6 +152,29 @@ describe('TokenEditModal', () => {
         expect(wrapper.vm.needToSendCode).to.equal(true);
     });
 
+    it('test custom trimmer', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'Ninjo',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: true,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('- Ninjo- - ');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(false);
+        expect(wrapper.vm.mode).to.equal(null);
+        expect(wrapper.vm.currentName).to.equal('Ninjo');
+        expect(wrapper.vm.newName).to.equal('Ninjo');
+        expect(textInput.element.value).to.equal('Ninjo');
+    });
+
     it('do not need send auth code when it already sent', (done) => {
         const localVue = mockVue();
         const wrapper = mount(TokenEditModal, {
