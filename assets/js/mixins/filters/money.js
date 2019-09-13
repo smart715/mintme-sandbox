@@ -1,4 +1,4 @@
-import {formatMoney, toMoney} from '../../utils';
+import {formatMoney, toMoney, formatFee} from '../../utils';
 
 export default {
     filters: {
@@ -7,6 +7,9 @@ export default {
         },
         formatMoney: function(val) {
             return formatMoney(val);
+        },
+        formatFee: function(val) {
+            return formatFee(val);
         },
     },
 };
