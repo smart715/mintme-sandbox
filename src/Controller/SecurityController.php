@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -23,15 +24,19 @@ class SecurityController extends FOSSecurityController
 
     /** @var UserActionLogger */
     private $userActionLogger;
-
+    
+    /** @var SessionInterface */
+    private $session;
 
     public function __construct(
         ContainerInterface $container,
         UserActionLogger $userActionLogger,
+        SessionInterface $session,
         ?CsrfTokenManagerInterface $tokenManager = null
     ) {
         $this->container = $container;
         $this->userActionLogger = $userActionLogger;
+        $this->session = $session;
         parent::__construct($tokenManager);
     }
 
@@ -57,14 +62,25 @@ class SecurityController extends FOSSecurityController
         return parent::loginAction($request);
     }
 
+    /** @Route("/logout_success", name="logout_success") */
+    public function postLogoutRedirectAction(): Response
+    {
+        $hasAuthenticated = $this->session->get('has_authenticated');
+        $this->session->clear();
+
+        return $hasAuthenticated
+            ? $this->redirectToRoute("homepage")
+            : $this->redirectToRoute("login");
+    }
+
     /** @Route("/login_success", name="login_success") */
     public function postLoginRedirectAction(PrelaunchConfig $prelaunchConfig): Response
     {
         $this->userActionLogger->info('Log in');
 
-         return $prelaunchConfig->isFinished()
-         ? $this->redirectToRoute("trading")
-         : $this->redirectToRoute("referral-program");
+        return $prelaunchConfig->isFinished()
+            ? $this->redirectToRoute("trading")
+            : $this->redirectToRoute("referral-program");
     }
 
     /**
