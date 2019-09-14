@@ -189,7 +189,7 @@ export default {
                 this.closeModal();
             })
             .catch((error) => {
-                this.$toasted.error(error.response.data.error);
+                this.$toasted.error(error.response.data.message);
             })
             .then(() => this.withdrawing = false);
 

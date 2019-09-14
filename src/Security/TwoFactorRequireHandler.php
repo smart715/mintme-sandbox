@@ -37,9 +37,9 @@ class TwoFactorRequireHandler implements AuthenticationRequiredHandlerInterface
     {
         $routeName = $request->get('_route');
         $options = $this->router->getRouteCollection()->get($routeName)->getOptions();
-        $is_2fa_progress = $options['2fa_progress'] ?? true;
+        $is2faProgress = $options['2fa_progress'] ?? true;
 
-        if (!$is_2fa_progress) {
+        if (!$is2faProgress) {
             $request->getSession()->invalidate();
             $this->tokenStorage->setToken(null);
             $uri = $this->httpUtils->generateUri($request, $routeName);
