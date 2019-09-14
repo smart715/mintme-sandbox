@@ -18,6 +18,9 @@ do
     sleep 5
 done
 
+# Need a little wait until BTC service is fully ready
+sleep 10
+
 if test ! -f ".env"; then
     cp .env.dist .env
 fi
