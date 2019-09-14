@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class DisposableEmailCommunicatorTest extends TestCase
 {
-    public function testDisposableEmail(): void
+    public function testDisposableEmailFalseResponse(): void
     {
         $email = 'foobar@0x01.gq';
 
@@ -18,6 +18,11 @@ class DisposableEmailCommunicatorTest extends TestCase
         $disposableEmail = new DisposableEmailCommunicator($rpc);
 
         $this->assertEquals($disposableEmail->checkDisposable($email), false);
+    }
+
+    public function testDisposableEmailTrueResponse(): void
+    {
+        $email = 'foobar@0x01.gq';
 
         $rpc = $this->createMock(RestRpcInterface::class);
         $rpc->method('send')->willReturn(json_encode(['disposable' => true]));
