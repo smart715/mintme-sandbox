@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  *     name="user_cryptos",
  *     uniqueConstraints={@UniqueConstraint(name="user_crypto_index", columns={"user_id", "crypto_id"})}
  * )
+ * @codeCoverageIgnore
  */
 class UserCrypto implements UserTradebleInterface
 {
