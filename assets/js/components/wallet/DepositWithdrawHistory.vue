@@ -43,7 +43,7 @@
 
 <script>
 import moment from 'moment';
-import {toMoney, formatMoney} from '../../utils';
+import {toMoney, formatMoney, formatFee} from '../../utils';
 import {LazyScrollTableMixin, FiltersMixin} from '../../mixins';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
@@ -83,7 +83,7 @@ export default {
                 fee: {
                     label: 'Fee',
                     sortable: true,
-                    formatter: formatMoney,
+                    formatter: (val) => formatMoney(formatFee(val)),
                 },
             },
             tableData: null,

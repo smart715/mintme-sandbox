@@ -62,7 +62,7 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ feeAmount | toMoney(subunit) }} {{ feeCurrency }}</span>
+                    <span class="float-right">{{ feeAmount | formatFee }} {{ feeCurrency }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
@@ -93,6 +93,7 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
+import {MoneyFilterMixin} from '../../mixins';
 
 const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 const WEB_SYMBOL = 'WEB';
@@ -109,6 +110,7 @@ const ADDRESS_LENGTH = {
 
 export default {
     name: 'WithdrawModal',
+    mixins: [MoneyFilterMixin],
     components: {
         Modal,
     },
@@ -242,11 +244,6 @@ export default {
                 ),
             },
         };
-    },
-    filters: {
-        toMoney: function(val, subunit) {
-            return toMoney(val, subunit);
-        },
     },
 };
 </script>
