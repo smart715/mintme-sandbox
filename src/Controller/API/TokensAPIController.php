@@ -519,9 +519,10 @@ class TokensAPIController extends AbstractFOSRestController
 
         try {
             $balances = [
-                'balance' => $moneyWrapper->format(
-                    $balanceHandler->balance($this->getUser(), Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable()
-                ),
+                'balance' => $balanceHandler->balance(
+                    $this->getUser(),
+                    Token::getFromSymbol(Token::WEB_SYMBOL)
+                )->getAvailable(),
                 'webCost' => $costFetcher->getDeployWebCost(),
             ];
         } catch (Throwable $ex) {
