@@ -6,7 +6,6 @@ use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -28,21 +27,16 @@ class DeployConsumer implements ConsumerInterface
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
     public function __construct(
         LoggerInterface $logger,
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $em,
-        BalanceHandlerInterface $balanceHandler,
-        MoneyWrapperInterface $moneyWrapper
+        BalanceHandlerInterface $balanceHandler
     ) {
         $this->logger = $logger;
         $this->tokenManager = $tokenManager;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
-        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
@@ -80,7 +74,7 @@ class DeployConsumer implements ConsumerInterface
                     $this->balanceHandler->deposit(
                         $token->getProfile()->getUser(),
                         Token::getFromSymbol(Token::WEB_SYMBOL),
-                        $this->moneyWrapper->parse($token->getDeployCost(), Token::WEB_SYMBOL)
+                        new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL))
                     );
                     $token->setDeployCost('');
                 }

@@ -23,7 +23,7 @@ class DeployCostFetcher implements DeployCostFetcherInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    const USD_SYMBOL = 'USD';
+    private const USD_SYMBOL = 'USD';
 
     public function __construct(RestRpcInterface $rpc, int $usdCost, MoneyWrapperInterface $moneyWrapper)
     {

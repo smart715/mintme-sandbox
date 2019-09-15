@@ -39,7 +39,7 @@ class DeployCostFetcherTest extends TestCase
         $fetcher = new DeployCostFetcher($rpc, 49, $this->mockMoneyWrapper());
         $this->assertEquals(
             '24500000000000000000000',
-            $fetcher->getDeployWebCost()>getAmount()
+            $fetcher->getDeployWebCost()->getAmount()
         );
     }
 

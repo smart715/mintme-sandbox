@@ -508,7 +508,6 @@ class TokensAPIController extends AbstractFOSRestController
     public function tokenDeployBalances(
         string $name,
         BalanceHandlerInterface $balanceHandler,
-        MoneyWrapperInterface $moneyWrapper,
         DeployCostFetcherInterface $costFetcher
     ): View {
         $token = $this->tokenManager->findByName($name);
@@ -539,7 +538,6 @@ class TokensAPIController extends AbstractFOSRestController
     public function deploy(
         string $name,
         BalanceHandlerInterface $balanceHandler,
-        MoneyWrapperInterface $moneyWrapper,
         ContractHandlerInterface $contractHandler,
         DeployCostFetcherInterface $costFetcher
     ): View {
@@ -574,11 +572,11 @@ class TokensAPIController extends AbstractFOSRestController
             $balanceHandler->withdraw(
                 $this->getUser(),
                 Token::getFromSymbol(Token::WEB_SYMBOL),
-                $moneyWrapper->parse($cost, Token::WEB_SYMBOL)
+                $cost
             );
 
             $token->setPendingDeployment();
-            $token->setDeployCost($cost);
+            $token->setDeployCost($cost->getAmount());
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
