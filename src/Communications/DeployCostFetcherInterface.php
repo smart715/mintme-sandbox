@@ -3,13 +3,13 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
-use Symfony\Component\HttpFoundation\Request;
+use Money\Money;
 
 interface DeployCostFetcherInterface
 {
     /**
      * @throws FetchException
-     * @return string
+     * @return Money
      */
-    public function getDeployWebCost(): string;
+    public function getDeployWebCost(): Money;
 }

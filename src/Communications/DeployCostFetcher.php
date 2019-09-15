@@ -3,6 +3,13 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
+use App\Entity\Token\Token;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Converter;
+use Money\Currencies\CurrencyList;
+use Money\Currency;
+use Money\Exchange\FixedExchange;
+use Money\Money;
 use Symfony\Component\HttpFoundation\Request;
 
 class DeployCostFetcher implements DeployCostFetcherInterface
@@ -13,13 +20,19 @@ class DeployCostFetcher implements DeployCostFetcherInterface
     /** @var int */
     private $usdCost;
 
-    public function __construct(RestRpcInterface $rpc, int $usdCost)
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
+    const USD_SYMBOL = 'USD';
+
+    public function __construct(RestRpcInterface $rpc, int $usdCost, MoneyWrapperInterface $moneyWrapper)
     {
         $this->rpc = $rpc;
         $this->usdCost = $usdCost;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function getDeployWebCost(): string
+    public function getDeployWebCost(): Money
     {
         $response = $this->rpc->send(
             'simple/price?ids=webchain&vs_currencies=usd',
@@ -32,10 +45,21 @@ class DeployCostFetcher implements DeployCostFetcherInterface
             throw new FetchException();
         }
 
-        $usdPerWeb = $response['webchain']['usd'];
+        $WebUsd = $response['webchain']['usd'];
 
-        bcscale(8);
+        $exchange = new FixedExchange([
+            self::USD_SYMBOL => [
+                Token::WEB_SYMBOL => 1 / $WebUsd,
+            ],
+        ]);
 
-        return bcdiv((string)$this->usdCost, (string)$usdPerWeb);
+        $converter = new Converter(new CurrencyList([
+            Token::WEB_SYMBOL => $this->moneyWrapper->getRepository()->subunitFor(new Currency(Token::WEB_SYMBOL)),
+            self::USD_SYMBOL => 0,
+        ]), $exchange);
+
+        $usd = Money::USD($this->usdCost);
+
+        return $converter->convert($usd, new Currency(Token::WEB_SYMBOL));
     }
 }
