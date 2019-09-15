@@ -5,8 +5,8 @@ namespace App\Tests\SmartContract;
 use App\Communications\DeployCostFetcherInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentProcess;
@@ -29,7 +29,7 @@ class DeploymentProcessTest extends TestCase
 
         $process->execute(
             $this->createMock(User::class),
-            $this->mockToken($this->once())
+            $this->mockToken($this->once(), $this->once())
         );
     }
 
@@ -37,16 +37,16 @@ class DeploymentProcessTest extends TestCase
     {
         $process = new DeploymentProcess(
             $this->createMock(EntityManager::class),
-            $this->mockCostFetcher('1000000000000000000'),
-            $this->mockBalanceHandler($this->never(), '2000000000000000000'),
+            $this->mockCostFetcher('2000000000000000000'),
+            $this->mockBalanceHandler($this->never(), '1000000000000000000'),
             $this->mockContractHandler($this->never())
         );
 
-        $this->expectException(ApiBadRequestException::class);
+        $this->expectException(BalanceException::class);
 
         $process->execute(
             $this->createMock(User::class),
-            $this->mockToken($this->never())
+            $this->mockToken($this->never(), $this->never())
         );
     }
 
@@ -81,11 +81,11 @@ class DeploymentProcessTest extends TestCase
         return $costFetcher;
     }
 
-    private function mockToken(Invocation $invocation): Token
+    private function mockToken(Invocation $pendingInvocation, Invocation $costInvocation): Token
     {
         $token = $this->createMock(Token::class);
-        $token->expects($invocation)->method('setPendingDeployment');
-        $token->expects($invocation)->method('setDeployCost');
+        $token->expects($pendingInvocation)->method('setPendingDeployment');
+        $token->expects($costInvocation)->method('setDeployCost');
 
         return $token;
     }
