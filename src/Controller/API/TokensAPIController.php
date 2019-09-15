@@ -18,9 +18,7 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
-use App\Manager\Model\EmailAuthResultModel;
 use App\Manager\TokenManagerInterface;
-use App\Manager\TwoFactorManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentProcessInterface;
 use App\SmartContract\TokenDeployInterface;
@@ -81,7 +79,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}", name="token_update", options={"expose"=true})
+     * @Rest\Patch("/{name}", name="token_update", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
@@ -91,7 +89,6 @@ class TokensAPIController extends AbstractFOSRestController
     public function update(
         ParamFetcherInterface $request,
         BalanceHandlerInterface $balanceHandler,
-        TwoFactorManagerInterface $twoFactorManager,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -100,11 +97,6 @@ class TokensAPIController extends AbstractFOSRestController
 
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
-        }
-
-        if ($request->get('name')
-            && ($errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager))) {
-                throw new ApiNotFoundException($errorMessage);
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
@@ -206,7 +198,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/lock-in", name="lock_in")
+     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"2fa"="optional"})
      * @Rest\RequestParam(name="code", nullable=true)
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
@@ -214,19 +206,12 @@ class TokensAPIController extends AbstractFOSRestController
     public function setTokenReleasePeriod(
         string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler,
-        TwoFactorManagerInterface $twoFactorManager
+        BalanceHandlerInterface $balanceHandler
     ): View {
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             throw $this->createNotFoundException('Token does not exist');
-        }
-
-        $errorMessage = $this->getGoogleAuthenticatorErrorMessage($request->get('code'), $twoFactorManager);
-
-        if ($errorMessage) {
-            return $this->view($errorMessage, Response::HTTP_UNAUTHORIZED);
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
@@ -372,6 +357,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
+<<<<<<< HEAD
      * @Rest\Get("/{name}/is-not_deployed", name="is_token_not_deployed", options={"expose"=true})
      */
     public function isTokenNotDeployed(string $name): View
@@ -390,12 +376,14 @@ class TokensAPIController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/delete", name="token_delete", options={"expose"=true})
+=======
+     * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
+>>>>>>> 952f3c4afc036081d7fd202311852cc0ec15812a
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */
     public function delete(
         ParamFetcherInterface $request,
-        TwoFactorManagerInterface $twoFactorManager,
         EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
         string $name
@@ -411,9 +399,7 @@ class TokensAPIController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
-        if ($user->isGoogleAuthenticatorEnabled() && !$twoFactorManager->checkCode($user, $request->get('code'))) {
-            throw new ApiUnauthorizedException('Invalid 2fa code');
-        } elseif (!$user->isGoogleAuthenticatorEnabled()) {
+        if (!$user->isGoogleAuthenticatorEnabled()) {
             $response = $emailAuthManager->checkCode($user, $request->get('code'));
 
             if (!$response->getResult()) {
@@ -464,22 +450,6 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         return $this->view(['message' => $message], Response::HTTP_ACCEPTED);
-    }
-
-    private function getGoogleAuthenticatorErrorMessage(string $code, TwoFactorManagerInterface $twoFactorManager): ?string
-    {
-        $user = $this->getUser();
-
-        if (!$user) {
-            return 'Invalid user';
-        }
-
-        if ($user->isGoogleAuthenticatorEnabled()
-            && !$twoFactorManager->checkCode($user, $code)) {
-            return 'Invalid 2fa code';
-        }
-
-        return null;
     }
 
     /**

@@ -8,7 +8,6 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Manager\TwoFactorManagerInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapper;
@@ -63,11 +62,11 @@ class WalletAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/withdraw", name="withdraw")
+     * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="required"})
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(
-     *     name="address",
+     *      name="address",
      *      allowBlank=false,
      *      requirements="^[a-zA-Z0-9]+$"
      *     )
@@ -77,43 +76,22 @@ class WalletAPIController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        TwoFactorManagerInterface $twoFactorManager,
         MoneyWrapperInterface $moneyWrapper,
         WalletInterface $wallet,
         MailerInterface $mailer
     ): View {
-        $user = $this->getUser();
-
-        if (!$user) {
-            return $this->view([
-                'error' => 'Invalid user',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
         $tradable = $cryptoManager->findBySymbol($request->get('crypto'))
             ?? $tokenManager->findByName($request->get('crypto'));
 
         if (!$tradable) {
             return $this->view([
                 'error' => 'Not found',
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        if (!$user->isGoogleAuthenticatorEnabled()) {
-            return $this->view([
-                'error' => '2FA is not enabled',
-                ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        if (!$twoFactorManager->checkCode($user, $request->get('code'))) {
-            return $this->view([
-                'error' => 'Invalid 2fa code',
-                ], Response::HTTP_UNAUTHORIZED);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         try {
             $pendingWithdraw = $wallet->withdrawInit(
-                $user,
+                $this->getUser(),
                 new Address(trim((string)$request->get('address'))),
                 new Amount($moneyWrapper->parse(
                     $request->get('amount'),
@@ -127,7 +105,7 @@ class WalletAPIController extends AbstractFOSRestController
             ], Response::HTTP_BAD_GATEWAY);
         }
 
-        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+        $mailer->sendWithdrawConfirmationMail($this->getUser(), $pendingWithdraw);
 
         $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
