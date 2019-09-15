@@ -515,10 +515,6 @@ class TokensAPIController extends AbstractFOSRestController
 
         $token = $this->tokenManager->findByName($name);
 
-        if (!$this->getUser()) {
-            throw new ApiUnauthorizedException('Unauthorized');
-        }
-
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
         }
@@ -531,7 +527,7 @@ class TokensAPIController extends AbstractFOSRestController
                 'webCost' => $costFetcher->getDeployWebCost(),
             ];
         } catch (Throwable $ex) {
-            return $this->view(null, Response::HTTP_BAD_REQUEST);
+            throw new ApiBadRequestException();
         }
 
         return $this->view($balances, Response::HTTP_ACCEPTED);
@@ -589,7 +585,7 @@ class TokensAPIController extends AbstractFOSRestController
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
-            throw new ApiBadRequestException('Internal error,Please try again later');
+            throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
@@ -600,8 +596,8 @@ class TokensAPIController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"expose"=true})
-     * @Rest\RequestParam(name="address")
-     * @Rest\RequestParam(name="lock",requirements="true|false")
+     * @Rest\RequestParam(name="address", allowBlank=false)
+     * @Rest\RequestParam(name="lock", requirements="true|false")
      */
     public function contractUpdate(
         string $name,
@@ -628,18 +624,18 @@ class TokensAPIController extends AbstractFOSRestController
             $contractHandler->updateMinDestination($token, $request->get('address'), $request->get('lock'));
             $token->setMinDestination($request->get('address'));
 
-            if (true === $request->get('lock')) {
+            if ("true" === $request->get('lock')) {
                 $token->lockMinDestination();
             }
 
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
-            throw new ApiBadRequestException('Internal error,Please try again later');
+            throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
         $this->userActionLogger->info('Update token minDestination', ['name' => $name]);
 
-        return $this->view();
+        return $this->view(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -9,6 +9,9 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Strategy\BalanceContext;
+use App\Strategy\PaymentCryptoStrategy;
+use App\Strategy\PaymentTokenStrategy;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -98,23 +101,12 @@ class PaymentConsumer implements ConsumerInterface
                     return true;
                 }
 
-                if ($tradable instanceof Token
-                    && null != ($crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL))) {
-                    $this->balanceHandler->deposit(
-                        $user,
-                        Token::getFromCrypto($crypto),
-                        $crypto->getFee()
-                    );
-                }
+                $strategy = $tradable instanceof Token
+                    ? new PaymentTokenStrategy($this->balanceHandler, $this->cryptoManager)
+                    : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
-                $this->balanceHandler->deposit(
-                    $user,
-                    $tradable instanceof Token ? $tradable: Token::getFromCrypto($tradable),
-                    $tradable instanceof Token
-                        ? new Money($clbResult->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL))
-                        : $this->moneyWrapper->parse($clbResult->getAmount(), $tradable->getSymbol())
-                            ->add($tradable->getFee())
-                );
+                $balanceContext = new BalanceContext($strategy);
+                $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
 
                 $this->logger->info(
                     '[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back'

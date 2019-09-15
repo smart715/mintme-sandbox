@@ -67,7 +67,7 @@ class UpdatePendingWithdrawals extends Command
         $expires = new DateInterval('PT'.PendingWithdraw::EXPIRES_HOURS.'H');
 
         /** @var PendingWithdraw $item */
-        foreach ($this->getRepository()->findAll() as $item) {
+        foreach ($this->getPendingWithdrawRepository()->findAll() as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $this->em->beginTransaction();
 
@@ -87,11 +87,8 @@ class UpdatePendingWithdrawals extends Command
             }
         }
 
-        /** @var PendingWithdrawRepository $repo */
-        $repo = $this->em->getRepository(PendingTokenWithdraw::class);
-
         /** @var PendingTokenWithdraw $item */
-        foreach ($repo->findAll() as $item) {
+        foreach ($this->getPendingTokenWithdrawRepository()->findAll() as $item) {
             $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
             if (!$crypto) {
@@ -125,8 +122,13 @@ class UpdatePendingWithdrawals extends Command
         $this->logger->info('[withdrawals] Update job finished..');
     }
 
-    private function getRepository(): PendingWithdrawRepository
+    private function getPendingWithdrawRepository(): PendingWithdrawRepository
     {
         return $this->em->getRepository(PendingWithdraw::class);
+    }
+
+    private function getPendingTokenWithdrawRepository(): PendingWithdrawRepository
+    {
+        return $this->em->getRepository(PendingTokenWithdraw::class);
     }
 }

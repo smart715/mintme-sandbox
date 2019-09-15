@@ -9,6 +9,9 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Strategy\BalanceContext;
+use App\Strategy\BalanceCryptoStrategy;
+use App\Strategy\BalanceTokenStrategy;
 use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapper;
@@ -115,31 +118,12 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
-            if ($tradable instanceof Token) {
-                $this->balanceHandler->withdraw(
-                    $user,
-                    Token::getFromSymbol(Token::WEB_SYMBOL),
-                    $this->depositCommunicator->getFee(
-                        Token::getFromSymbol(Token::WEB_SYMBOL)
-                    )
-                );
+            $strategy = $tradable instanceof Token
+                ? new BalanceTokenStrategy($this->balanceHandler, $this->depositCommunicator, $this->em)
+                : new BalanceCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
-                if (!in_array($user, $tradable->getUsers(), true)) {
-                    $userToken = (new UserToken())->setToken($tradable)->setUser($user);
-                    $this->em->persist($userToken);
-                    $user->addToken($userToken);
-                    $this->em->persist($user);
-                    $this->em->flush();
-                }
-            }
-
-            $this->balanceHandler->deposit(
-                $user,
-                $tradable instanceof Token ? $tradable: Token::getFromCrypto($tradable),
-                $tradable instanceof Token
-                    ? new Money($clbResult->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL))
-                    : $this->moneyWrapper->parse($clbResult->getAmount(), $tradable->getSymbol())
-            );
+            $balanceContext = new BalanceContext($strategy);
+            $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
