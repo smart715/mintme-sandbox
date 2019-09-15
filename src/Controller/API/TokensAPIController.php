@@ -511,8 +511,6 @@ class TokensAPIController extends AbstractFOSRestController
         MoneyWrapperInterface $moneyWrapper,
         DeployCostFetcherInterface $costFetcher
     ): View {
-        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
-
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
@@ -544,9 +542,7 @@ class TokensAPIController extends AbstractFOSRestController
         ContractHandlerInterface $contractHandler,
         DeployCostFetcherInterface $costFetcher
     ): View {
-        $token = $this->tokenManager->findByName(
-            (new StringConverter(new ParseStringStrategy()))->convert($name)
-        );
+        $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
@@ -604,9 +600,7 @@ class TokensAPIController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ContractHandlerInterface $contractHandler
     ): View {
-        $token = $this->tokenManager->findByName(
-            (new StringConverter(new ParseStringStrategy()))->convert($name)
-        );
+        $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
