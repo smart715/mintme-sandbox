@@ -22,6 +22,7 @@ use App\Manager\Model\EmailAuthResultModel;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
+use App\SmartContract\DeploymentProcessInterface;
 use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
@@ -537,9 +538,7 @@ class TokensAPIController extends AbstractFOSRestController
      */
     public function deploy(
         string $name,
-        BalanceHandlerInterface $balanceHandler,
-        ContractHandlerInterface $contractHandler,
-        DeployCostFetcherInterface $costFetcher
+        DeploymentProcessInterface $deploymentProcess
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -556,29 +555,7 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         try {
-            $cost = $costFetcher->getDeployWebCost();
-            $balance = $balanceHandler
-                ->balance($this->getUser(), Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable();
-
-            if ($balanceHandler->balance(
-                $this->getUser(),
-                Token::getFromSymbol(Token::WEB_SYMBOL)
-            )->getAvailable()->greaterThan($balance)) {
-                throw new ApiBadRequestException('Low balance');
-            }
-
-            $contractHandler->deploy($token);
-
-            $balanceHandler->withdraw(
-                $this->getUser(),
-                Token::getFromSymbol(Token::WEB_SYMBOL),
-                $cost
-            );
-
-            $token->setPendingDeployment();
-            $token->setDeployCost($cost->getAmount());
-            $this->em->persist($token);
-            $this->em->flush();
+            $deploymentProcess->execute($this->getUser(), $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
