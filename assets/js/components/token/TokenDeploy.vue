@@ -47,9 +47,7 @@ import Modal from '../modal/Modal';
 import {toMoney, formatMoney} from '../../utils';
 import {WebSocketMixin} from '../../mixins';
 import Decimal from 'decimal.js';
-
-const WEB = 'web';
-const STATUS = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
+import {tokenDeploymentStatus, webSymbol} from '../../utils/constants'
 
 export default {
     name: 'TokenDeploy',
@@ -72,13 +70,13 @@ export default {
     },
     computed: {
         notDeployed: function() {
-            return STATUS.notDeployed === this.status;
+            return tokenDeploymentStatus.notDeployed === this.status;
         },
         pending: function() {
-            return STATUS.pending === this.status;
+            return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
-            return STATUS.deployed === this.status;
+            return tokenDeploymentStatus.deployed === this.status;
         },
         showPending: function() {
             return this.isOwner && this.pending;
@@ -112,7 +110,7 @@ export default {
                 name: this.name,
             }))
             .then(() => {
-                this.status = STATUS.pending;
+                this.status = tokenDeploymentStatus.pending;
                 this.setModalVisible(false);
                 this.$toasted.success('Process in pending status and it will take some minutes to be done.');
             })
@@ -148,9 +146,9 @@ export default {
             this.addMessageHandler((response) => {
                 if (
                     'asset.update' === response.method &&
-                    response.params[0].hasOwnProperty(WEB)
+                    response.params[0].hasOwnProperty(webSymbol)
                 ) {
-                    this.balance = response.params[0][WEB].available;
+                    this.balance = response.params[0][webSymbol].available;
                 }
             }, 'trade-buy-order-asset');
         } else {

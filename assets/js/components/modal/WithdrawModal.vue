@@ -94,19 +94,9 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin} from '../../mixins';
+import {addressLength, webSymbol} from '../../utils/constants';
 
 const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
-const WEB_SYMBOL = 'WEB';
-const ADDRESS_LENGTH = {
-    WEB: {
-        min: 42,
-        max: 42,
-    },
-    BTC: {
-        min: 25,
-        max: 42,
-    },
-};
 
 export default {
     name: 'WithdrawModal',
@@ -155,7 +145,7 @@ export default {
             return this.isToken ? this.webFee : this.fee;
         },
         feeCurrency: function() {
-            return this.isToken ? WEB_SYMBOL : this.currency;
+            return this.isToken ? webSymbol : this.currency;
         },
     },
     methods: {
@@ -237,10 +227,10 @@ export default {
                 required,
                 tokenContain: tokenContain,
                 minLength: minLength(
-                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].min : ADDRESS_LENGTH.WEB.min
+                    addressLength[this.currency] ? addressLength[this.currency].min : addressLength.WEB.min
                 ),
                 maxLength: maxLength(
-                    ADDRESS_LENGTH[this.currency] ? ADDRESS_LENGTH[this.currency].max : ADDRESS_LENGTH.WEB.max
+                    addressLength[this.currency] ? addressLength[this.currency].max : addressLength.WEB.max
                 ),
             },
         };

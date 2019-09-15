@@ -46,8 +46,7 @@
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
 import {MoneyFilterMixin} from '../../mixins';
-
-const WEB_SYMBOL = 'WEB';
+import {webSymbol} from '../../utils/constants';
 
 export default {
     name: 'DepositModal',
@@ -68,7 +67,7 @@ export default {
     },
     computed: {
       feeCurrency: function() {
-          return this.isToken ? WEB_SYMBOL : this.currency;
+          return this.isToken ? webSymbol : this.currency;
       },
     },
     methods: {
