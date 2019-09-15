@@ -47,7 +47,7 @@ import Modal from '../modal/Modal';
 import {toMoney, formatMoney} from '../../utils';
 import {WebSocketMixin} from '../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol} from '../../utils/constants'
+import {tokenDeploymentStatus, webSymbol} from '../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
