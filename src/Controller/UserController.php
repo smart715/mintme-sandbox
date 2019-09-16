@@ -117,6 +117,7 @@ class UserController extends AbstractController
             $parameters['backupCodes'] = $request->get('backupCodes');
             $parameters['formHeader'] = 'Two-Factor authentication backup codes';
             return $this->render('security/2fa_manager.html.twig', $parameters);
+
         }
 
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -136,7 +137,6 @@ class UserController extends AbstractController
         $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
 
         return $this->redirectToRoute('two_factor_auth', ['backupCodes' => $parameters['backupCodes'] ]);
-
     }
 
     private function getPasswordForm(Request $request): FormInterface
