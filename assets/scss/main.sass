@@ -504,6 +504,15 @@ nav.top-navbar
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
 
+.is-invalid
+  &:focus, &:active
+    border: 1px solid $red !important
+    outline: 0!important
+    outline-color: transparent!important
+    outline-width: 0!important
+    outline-style: none!important
+    box-shadow: 0 0 0 0 rgba(0,123,255,0)!important
+
 meter
   width: 100%
   height: .5em
