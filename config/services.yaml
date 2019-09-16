@@ -312,11 +312,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed }
 
-    App\EventListener\UnfinishedTwoFactorListener:
-        tags:
-             - { name: "kernel.event_listener", event: kernel.request }
-
-
     kernel.listener.command_dispatch:
         class: App\EventListener\ConsoleCommandsListener
         tags:
