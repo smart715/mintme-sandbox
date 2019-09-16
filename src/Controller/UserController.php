@@ -116,8 +116,8 @@ class UserController extends AbstractController
         if ($request->get('backupCodes') && is_array($request->get('backupCodes'))) {
             $parameters['backupCodes'] = $request->get('backupCodes');
             $parameters['formHeader'] = 'Two-Factor authentication backup codes';
-            return $this->render('security/2fa_manager.html.twig', $parameters);
 
+            return $this->render('security/2fa_manager.html.twig', $parameters);
         }
 
         if (!$form->isSubmitted() || !$form->isValid()) {
