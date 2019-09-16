@@ -30,14 +30,15 @@
                         <div class="text-center">
                             <p>Increase your account's security by enabling Two-Factor Authentication (2FA).</p>
                         </div>
-                        <form action="{{ path('two_factor_auth') }}" method="POST">
-                            <input type="hidden" name="notNeedBackupCodes" value="1">
-                            <input
-                                type="submit"
-                                class="btn btn-primary btn-block"
-                                value="{{ twoFactorAuth ? 'Manage two-factor authentication' : 'Enable two-factor authentication' }}"
-                            >
-                        </form>
+                        {% if twoFactorAuth %}
+                            <a href="{{ path('two_factor_auth') }}" class="btn btn-primary btn-block" role="button">
+                                Manage two-factor authentication
+                            </a>
+                        {% else %}
+                            <a href="{{ path('two_factor_auth') }}" class="btn btn-primary btn-block" role="button">
+                                Enable two-factor authentication
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

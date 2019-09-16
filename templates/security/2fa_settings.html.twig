@@ -65,10 +65,7 @@
                 <div class="text-center card-body">
                     <div class="row">
                         <div class="col-12">
-                            {{ form_start(form) }}
-                                {{ form_row(form.notNeedBackupCodes, {'attr': {'value' : (isTwoFactor ? 1 : 0)}}) }}
-                                {{ form_row(form.code) }}
-                            {{ form_end(form) }}
+                            {% block formBody %}{{ form(form) }}{% endblock %}
                         </div>
                     </div>
                 </div>
