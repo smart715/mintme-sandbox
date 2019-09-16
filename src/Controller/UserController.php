@@ -95,7 +95,6 @@ class UserController extends AbstractController
         $user = $this->getUser();
         $form = $this->createForm(TwoFactorType::class);
         $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
-        $backupCodes = [];
 
         if (!$isTwoFactor) {
             $user->setGoogleAuthenticatorSecret($twoFactorManager->generateSecretCode());
@@ -137,6 +136,7 @@ class UserController extends AbstractController
         $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
 
         return $this->redirectToRoute('two_factor_auth', ['backupCodes' => $parameters['backupCodes'] ]);
+
     }
 
     private function getPasswordForm(Request $request): FormInterface
