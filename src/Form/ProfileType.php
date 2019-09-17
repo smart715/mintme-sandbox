@@ -59,6 +59,10 @@ class ProfileType extends AbstractType
                 'label' => 'Country:',
                 'required' => false,
                 'placeholder' => 'Select the country',
+            ])            
+            ->add('zipCode', TextType::class, [
+                'label' => 'ZIP code:',
+                'required' => false,
             ])
             ->add('description', BbcodeEditorType::class, [
                 'label' => 'Description:',

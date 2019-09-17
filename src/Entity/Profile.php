@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ZipCodeValidator\Constraints\ZipCode;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
@@ -112,6 +113,13 @@ class Profile
      * @Groups({"API"})
      */
     private $page_url;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @ZipCode(getter="getCountry", strict=false, ignoreEmpty=true)
+     * @var string|null
+     */
+    protected $zipCode;
 
     public function __construct(User $user)
     {
@@ -256,5 +264,17 @@ class Profile
     public function getToken(): ?Token
     {
         return $this->token;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->zipCode;
+    }
+
+    public function setZipCode(?string $zipCode = null): self
+    {
+        $this->zipCode = $zipCode;
+
+        return $this;
     }
 }

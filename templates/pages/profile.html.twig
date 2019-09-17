@@ -41,6 +41,11 @@
                                         Country: {{ profile.getCountryFullName() }}
                                     {% endif %}
                                 </div>
+                                <div class="pb-1">
+                                    {% if profile.zipCode is not empty %}
+                                        ZIP code: {{ profile.zipCode }}
+                                    {% endif %}
+                                </div>
                                 {% if token is not empty %}
                                     <div class="pb-1">
                                         Token: <a href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
@@ -87,6 +92,9 @@
                                         Last name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
+                                        {{ form_row(form.country) }}
+                                    </div>
+                                    <div class="pb-1">
                                         {{ form_row(form.city, {'attr':
                                             {
                                                 'v-model.trim': '$v.city.$model',
@@ -102,7 +110,7 @@
                                         City must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_row(form.country) }}
+                                        {{ form_row(form.zipCode) }}
                                     </div>
                                 </div>
                                 <div class="col-12 pt-3">
