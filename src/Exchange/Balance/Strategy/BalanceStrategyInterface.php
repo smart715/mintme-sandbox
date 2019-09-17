@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Strategy;
+namespace App\Exchange\Balance\Strategy;
 
 use App\Entity\TradebleInterface;
 use App\Entity\User;

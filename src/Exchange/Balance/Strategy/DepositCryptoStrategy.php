@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Strategy;
+namespace App\Exchange\Balance\Strategy;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
@@ -9,7 +9,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 
-class BalanceCryptoStrategy implements BalanceStrategyInterface
+class DepositCryptoStrategy implements BalanceStrategyInterface
 {
     /** @var BalanceHandlerInterface */
     private $balanceHandler;

@@ -4,22 +4,18 @@ namespace App\Consumers;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserToken;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Strategy\BalanceContext;
+use App\Exchange\Balance\Strategy\DepositCryptoStrategy;
+use App\Exchange\Balance\Strategy\DepositTokenStrategy;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Strategy\BalanceContext;
-use App\Strategy\BalanceCryptoStrategy;
-use App\Strategy\BalanceTokenStrategy;
 use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
-use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -119,8 +115,8 @@ class DepositConsumer implements ConsumerInterface
             }
 
             $strategy = $tradable instanceof Token
-                ? new BalanceTokenStrategy($this->balanceHandler, $this->depositCommunicator, $this->em)
-                : new BalanceCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
+                ? new DepositTokenStrategy($this->balanceHandler, $this->depositCommunicator, $this->em)
+                : new DepositCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
             $balanceContext = new BalanceContext($strategy);
             $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());

@@ -5,7 +5,7 @@ namespace App\SmartContract;
 use App\Entity\Token\Token;
 use App\Entity\User;
 
-interface DeploymentProcessInterface
+interface DeploymentFacadeInterface
 {
     public function execute(User $user, Token $token): void;
 }

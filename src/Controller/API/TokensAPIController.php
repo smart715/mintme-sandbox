@@ -20,7 +20,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
-use App\SmartContract\DeploymentProcessInterface;
+use App\SmartContract\DeploymentFacadeInterface;
 use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
@@ -357,7 +357,6 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-<<<<<<< HEAD
      * @Rest\Get("/{name}/is-not_deployed", name="is_token_not_deployed", options={"expose"=true})
      */
     public function isTokenNotDeployed(string $name): View
@@ -508,7 +507,7 @@ class TokensAPIController extends AbstractFOSRestController
      */
     public function deploy(
         string $name,
-        DeploymentProcessInterface $deploymentProcess
+        DeploymentFacadeInterface $deployment
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -525,7 +524,7 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         try {
-            $deploymentProcess->execute($this->getUser(), $token);
+            $deployment->execute($this->getUser(), $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }

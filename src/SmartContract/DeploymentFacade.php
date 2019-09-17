@@ -9,7 +9,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use Doctrine\ORM\EntityManagerInterface;
 
-class DeploymentProcess implements DeploymentProcessInterface
+class DeploymentFacade implements DeploymentFacadeInterface
 {
     /** @var EntityManagerInterface */
     private $em;

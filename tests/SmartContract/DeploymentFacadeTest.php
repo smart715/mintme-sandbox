@@ -9,18 +9,18 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\SmartContract\ContractHandlerInterface;
-use App\SmartContract\DeploymentProcess;
+use App\SmartContract\DeploymentFacade;
 use Doctrine\ORM\EntityManager;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 
-class DeploymentProcessTest extends TestCase
+class DeploymentFacadeTest extends TestCase
 {
     public function testExecute(): void
     {
-        $process = new DeploymentProcess(
+        $process = new DeploymentFacade(
             $this->createMock(EntityManager::class),
             $this->mockCostFetcher('2000000000000000000'),
             $this->mockBalanceHandler($this->once(), '2000000000000000000'),
@@ -35,7 +35,7 @@ class DeploymentProcessTest extends TestCase
 
     public function testExecuteWithLowBalance(): void
     {
-        $process = new DeploymentProcess(
+        $process = new DeploymentFacade(
             $this->createMock(EntityManager::class),
             $this->mockCostFetcher('2000000000000000000'),
             $this->mockBalanceHandler($this->never(), '1000000000000000000'),

@@ -4,9 +4,8 @@ namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Converter;
-use Money\Currencies\CurrencyList;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
@@ -22,8 +21,6 @@ class DeployCostFetcher implements DeployCostFetcherInterface
 
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
-
-    private const USD_SYMBOL = 'USD';
 
     public function __construct(RestRpcInterface $rpc, int $usdCost, MoneyWrapperInterface $moneyWrapper)
     {
@@ -45,21 +42,12 @@ class DeployCostFetcher implements DeployCostFetcherInterface
             throw new FetchException();
         }
 
-        $WebUsd = $response['webchain']['usd'];
-
-        $exchange = new FixedExchange([
-            self::USD_SYMBOL => [
-                Token::WEB_SYMBOL => 1 / $WebUsd,
-            ],
-        ]);
-
-        $converter = new Converter(new CurrencyList([
-            Token::WEB_SYMBOL => $this->moneyWrapper->getRepository()->subunitFor(new Currency(Token::WEB_SYMBOL)),
-            self::USD_SYMBOL => 0,
-        ]), $exchange);
-
-        $usd = Money::USD($this->usdCost);
-
-        return $converter->convert($usd, new Currency(Token::WEB_SYMBOL));
+        return $this->moneyWrapper->convert(
+            Money::USD($this->usdCost),
+            new Currency(Token::WEB_SYMBOL),
+            new FixedExchange([
+                MoneyWrapper::USD_SYMBOL => [ Token::WEB_SYMBOL => 1 / $response['webchain']['usd'] ],
+            ])
+        );
     }
 }

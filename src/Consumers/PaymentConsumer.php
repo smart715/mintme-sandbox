@@ -2,22 +2,18 @@
 
 namespace App\Consumers;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Strategy\BalanceContext;
+use App\Exchange\Balance\Strategy\PaymentCryptoStrategy;
+use App\Exchange\Balance\Strategy\PaymentTokenStrategy;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Strategy\BalanceContext;
-use App\Strategy\PaymentCryptoStrategy;
-use App\Strategy\PaymentTokenStrategy;
 use App\Utils\ClockInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
-use Money\Currency;
-use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;

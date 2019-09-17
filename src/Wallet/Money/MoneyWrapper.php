@@ -3,8 +3,10 @@
 namespace App\Wallet\Money;
 
 use App\Manager\CryptoManagerInterface;
+use Money\Converter;
 use Money\Currencies;
 use Money\Currency;
+use Money\Exchange\FixedExchange;
 use Money\Formatter\DecimalMoneyFormatter;
 use Money\Money;
 use Money\Parser\DecimalMoneyParser;
@@ -13,6 +15,8 @@ final class MoneyWrapper implements MoneyWrapperInterface
 {
     public const TOK_SYMBOL = 'TOK';
     private const TOK_SUBUNIT = 12;
+    public const USD_SYMBOL = 'USD';
+    private const USD_SUBUNIT = 0;
 
     /** @var CryptoManagerInterface */
     private $cryptoManager;
@@ -26,7 +30,13 @@ final class MoneyWrapper implements MoneyWrapperInterface
     public function getRepository(): Currencies
     {
         return new Currencies\CurrencyList(
-            array_merge($this->fetchCurrencies(), [ self::TOK_SYMBOL => self::TOK_SUBUNIT ])
+            array_merge(
+                $this->fetchCurrencies(),
+                [
+                    self::TOK_SYMBOL => self::TOK_SUBUNIT,
+                    self::USD_SYMBOL => self::USD_SUBUNIT,
+                ]
+            )
         );
     }
 
@@ -65,5 +75,12 @@ final class MoneyWrapper implements MoneyWrapperInterface
         }
 
         return $currencies;
+    }
+
+    public function convert(Money $money, Currency $currency, FixedExchange $exchange): Money
+    {
+        $converter = new Converter($this->getRepository(), $exchange);
+
+        return $converter->convert($money, $currency);
     }
 }

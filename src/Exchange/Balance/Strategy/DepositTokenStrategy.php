@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Strategy;
+namespace App\Exchange\Balance\Strategy;
 
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 
-class BalanceTokenStrategy implements BalanceStrategyInterface
+class DepositTokenStrategy implements BalanceStrategyInterface
 {
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
