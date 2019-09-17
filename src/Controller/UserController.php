@@ -130,13 +130,7 @@ class UserController extends AbstractController
             return $this->redirectToRoute('settings');
         }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->get("security.csrf.token_manager")->refreshToken("form_intention");
-        }
-
-        $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
-
-        return $this->redirectToRoute('two_factor_auth', ['backupCodes' => $parameters['backupCodes'] ]);
+        return $this->redirectToRoute('two_factor_auth', ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager, $user) ]);
     }
 
     private function getPasswordForm(Request $request): FormInterface
