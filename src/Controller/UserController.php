@@ -130,7 +130,10 @@ class UserController extends AbstractController
             return $this->redirectToRoute('settings');
         }
 
-        return $this->redirectToRoute('two_factor_auth', ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager, $user) ]);
+        return $this->redirectToRoute(
+            'two_factor_auth',
+            ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager, $user) ]
+        );
     }
 
     private function getPasswordForm(Request $request): FormInterface
