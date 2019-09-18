@@ -146,11 +146,14 @@ class TokenManager implements TokenManagerInterface
         $toDashedTokenName = str_replace(' ', '-', $tokenName);
         $toDashedToken = $this->findByName($toDashedTokenName);
 
+        if (null !== $toDashedToken && $tokenName !== $toDashedTokenName) {
+             return true;
+        }
+        
         $toSpaceTokenName = str_replace('-', ' ', $tokenName);
         $toSpaceToken = $this->findByName($toSpaceTokenName);
 
-        return (null !== $toDashedToken && $tokenName !== $toDashedTokenName)
-            || (null !== $toSpaceToken && $tokenName !== $toSpaceTokenName);
+        return (null !== $toSpaceToken && $tokenName !== $toSpaceTokenName);
     }
 
     private function getProfile(): ?Profile
