@@ -153,7 +153,7 @@ class TokenManager implements TokenManagerInterface
         $toSpaceTokenName = str_replace('-', ' ', $tokenName);
         $toSpaceToken = $this->findByName($toSpaceTokenName);
 
-        return (null !== $toSpaceToken && $tokenName !== $toSpaceTokenName);
+        return null !== $toSpaceToken && $tokenName !== $toSpaceTokenName;
     }
 
     private function getProfile(): ?Profile
