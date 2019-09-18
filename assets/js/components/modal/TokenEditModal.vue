@@ -60,6 +60,8 @@ const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
 const HTTP_BAD_REQUEST = 400;
 
+// customTrimmer function used to recursively trim 
+// all chars in mask string(spaces and dashes in this case).
 const customTrimmer = (text) => {
     const mask = ' -';
     const preText = text;
