@@ -137,7 +137,7 @@ describe('TokenEditModal', () => {
         expect(wrapper.vm.needToSendCode).to.equal(false);
     });
 
-    it('need to send auth code whe 2fa disabled', () => {
+    it('need to send auth code when 2fa disabled', () => {
         const wrapper = mount(TokenEditModal, {
             propsData: {
                 visible: true,

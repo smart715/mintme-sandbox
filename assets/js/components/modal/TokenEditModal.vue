@@ -60,20 +60,6 @@ const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
 const HTTP_BAD_REQUEST = 400;
 
-const customTrimmer = (text) => {
-    const mask = ' -';
-    const preText = text;
-
-    while (~mask.indexOf(text[0])) {
-        text = text.slice(1);
-    }
-    while (~mask.indexOf(text[text.length - 1])) {
-        text = text.slice(0, -1);
-    }
-
-    return (preText === text ? text : customTrimmer(text));
-};
-
 export default {
     name: 'TokenEditModal',
     components: {
@@ -113,9 +99,12 @@ export default {
                 this.mode = null;
             }
         },
+        trimName: function(name) {
+              return name.replace(/^[\s\-]+/, '').replace(/[\s\-]+$/, '');
+        },
         editName: function() {
             this.$v.$touch();
-            if (this.currentName === this.newName || customTrimmer(this.newName) == this.currentName) {
+            if (this.currentName === this.newName || this.trimName(this.newName) === this.currentName) {
                 this.closeModal();
                 return;
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
@@ -235,7 +224,7 @@ export default {
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),
-                customTrimmer,
+                customTrimmer: this.trimName,
             },
         };
     },
