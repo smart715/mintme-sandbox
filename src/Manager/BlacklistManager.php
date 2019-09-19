@@ -22,6 +22,12 @@ class BlacklistManager implements BlacklistManagerInterface
 
     public function isBlacklisted(string $value, string $type, bool $sensetive = true): bool
     {
+        if ('email' === $type) {
+            $value = substr($value, strrpos($value, '@') + 1);
+
+            return $this->repository->matchValue($value, $type, $sensetive);
+        }
+
         return $this->repository->matchValue($value, $type, $sensetive);
     }
 

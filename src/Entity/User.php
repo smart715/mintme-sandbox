@@ -69,6 +69,7 @@ class User extends BaseUser implements
      *     mode = "strict"
      * )
      * @AppAssert\UserEmail
+     * @AppAssert\IsNotBlacklisted(type="email", message="This domain is not allowed")
      * @var string
      */
     protected $email;
@@ -145,15 +146,6 @@ class User extends BaseUser implements
      * @var int
      */
     private $trustedTokenVersion = 0;
-
-    /** @codeCoverageIgnore */
-    public function __construct()
-    {
-        parent::__construct();
-
-        // Add role
-        $this->addRole("ROLE_ADMIN");
-    }
 
     /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string

@@ -76,6 +76,6 @@ parameters:
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true
 
-    link_to_api_for_check_disposable_email: 'https://open.kickbox.com/v1/disposable/'
+    link_to_api_for_check_disposable_email: 'https://www.validator.pizza/email/'
 
     disposable_email_timeout_seconds: 10

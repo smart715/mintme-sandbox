@@ -19,10 +19,9 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
         if (is_null($email)) {
             return false;
         }
-
-        $domain = substr($email, strrpos($email, '@') + 1);
+        
         $response = $this->rpc->send(
-            $domain,
+            $email,
             Request::METHOD_GET
         );
         $response = json_decode($response, true);
