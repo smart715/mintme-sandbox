@@ -1,7 +1,7 @@
 <template>
     <div class="trading">
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-            <span class="float-left">Top {{ marketsCount }} tokens</span>
+            <span class="float-left">Top {{ marketsCount }} tokens | Market Cap: {{ globalMarketCap }} BTC</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
                 <input
                     type="checkbox"
@@ -30,6 +30,17 @@
                             </template>
                             <template slot="body">
                                 The amount of crypto that has been traded in the last 24 hours.
+                            </template>
+                        </guide>
+                    </template>
+                    <template slot="HEAD_marketCap" slot-scope="data">
+                        {{ data.label }}
+                        <guide>
+                            <template slot="header">
+                                Market Cap
+                            </template>
+                            <template slot=body>
+                                Market cap of each token based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
                             </template>
                         </guide>
                     </template>
@@ -63,6 +74,7 @@
 import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
+import Decimal from 'decimal.js/decimal.js';
 
 export default {
     name: 'Trading',
@@ -103,6 +115,11 @@ export default {
                     sortable: true,
                     formatter: formatMoney,
                 },
+                marketCap: {
+                    label: 'Market Cap',
+                    sortable: true,
+                    formatter: formatMoney,
+                },
             },
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
@@ -130,6 +147,21 @@ export default {
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
+        },
+        globalMarketCap: function() {
+            if (!Object.keys(this.sanitizedMarkets).length) {
+                return 0;
+            }
+
+            let sanitizedMarketsArray = Object.keys(this.sanitizedMarkets);
+
+            let globalMarketCap = sanitizedMarketsArray.reduce((acc, curr) => {
+                return Decimal.mul(this.markets[curr].lastPrice, 1e7).plus(acc);
+            }, 0);
+
+            globalMarketCap = globalMarketCap.times(this.markets['WEBBTC'].lastPrice);
+
+            return toMoney(globalMarketCap, 8);
         },
     },
     mounted: function() {
@@ -234,6 +266,13 @@ export default {
             } else {
                 Vue.set(this.sanitizedMarkets, marketName, market);
             }
+
+            this.markets[marketName] = {
+                ...this.markets[marketName],
+                openPrice: marketInfo.open,
+                lastPrice: marketInfo.last,
+                dayVolume: marketInfo.deal,
+            };
         },
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, subunit) {
             let hiddenName = this.findHiddenName(token);
@@ -246,6 +285,7 @@ export default {
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
+                marketCap: toMoney(Decimal.mul(lastPrice, 1e7), subunit) + ' ' + currency,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
