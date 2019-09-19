@@ -62,7 +62,7 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ fee | toMoney(subunit) }}</span>
+                    <span class="float-right">{{ fee | formatFee }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
@@ -93,11 +93,23 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
+import {MoneyFilterMixin} from '../../mixins';
 
 const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
+const ADRESS_LENGTH = {
+    WEB: {
+        min: 42,
+        max: 42,
+    },
+    BTC: {
+        min: 25,
+        max: 42,
+    },
+};
 
 export default {
     name: 'WithdrawModal',
+    mixins: [MoneyFilterMixin],
     components: {
         Modal,
     },
@@ -107,7 +119,6 @@ export default {
         fee: String,
         withdrawUrl: String,
         maxAmount: String,
-        addressLength: Number,
         subunit: Number,
         twofa: String,
         noClose: Boolean,
@@ -178,7 +189,7 @@ export default {
                 this.closeModal();
             })
             .catch((error) => {
-                this.$toasted.error(error.response.data.error);
+                this.$toasted.error(error.response.data.message);
             })
             .then(() => this.withdrawing = false);
 
@@ -207,15 +218,10 @@ export default {
             address: {
                 required,
                 tokenContain: tokenContain,
-                minLength: minLength(this.addressLength),
-                maxLength: maxLength(this.addressLength),
+                minLength: minLength(ADRESS_LENGTH[this.currency] ? ADRESS_LENGTH[this.currency].min : 1),
+                maxLength: maxLength(ADRESS_LENGTH[this.currency] ? ADRESS_LENGTH[this.currency].max : 1),
             },
         };
-    },
-    filters: {
-        toMoney: function(val, subunit) {
-            return toMoney(val, subunit);
-        },
     },
 };
 </script>

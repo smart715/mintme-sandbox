@@ -71,7 +71,6 @@ export default function(precision) {
         },
 
         axisPointer: {
-            link: {xAxisIndex: 'all'},
             label: {
                 backgroundColor: 'rgba(0,0,0,0.7)',
                 showMinLabel: false,

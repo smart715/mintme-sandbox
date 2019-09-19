@@ -46,6 +46,7 @@ services:
         arguments:
             $url: '%env(VIABTC_RPC)%'
             $timeoutSeconds: '%viabtc_response_timeout_seconds%'
+            $auth: '%viabtc_auth%'
 
     deposit.json_rpc:
         class: App\Communications\GuzzleWrapper
@@ -150,6 +151,16 @@ services:
             - Sonata\AdminBundle\Controller\CRUDController
         tags:
             - { name: sonata.admin, manager_type: orm, label: Blacklist }
+        public: true
+
+    admin.reciprocal.links:
+        class: App\Admin\ReciprocalLinksAdmin
+        arguments:
+            - null
+            - App\Entity\ReciprocalLinks
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Reciprocal Links }
         public: true
 
     admin.knowledgebase:
