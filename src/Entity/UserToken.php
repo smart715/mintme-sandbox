@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  *     name="user_tokens",
  *     uniqueConstraints={@UniqueConstraint(name="user_token_index", columns={"user_id", "token_id"})}
  *     )
+ * @codeCoverageIgnore
  */
 class UserToken implements UserTradebleInterface
 {
