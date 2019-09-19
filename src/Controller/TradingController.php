@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Exchange\Factory\MarketFactoryInterface;
+use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -28,10 +28,14 @@ class TradingController extends Controller
      *     }
      * )
      */
-    public function trading(string $page, MarketFactoryInterface $marketManager): Response
+    public function trading(string $page): Response
     {
+        $entityManager = $this->getDoctrine()->getManager();
+        $repository = $entityManager->getRepository(Token::class);
+        $tokensCount = $repository->count([]);
+
         return $this->render('pages/trading.html.twig', [
-            'marketsLength' => count($marketManager->createAll()),
+            'tokensCount' => $tokensCount,
             'page' => $page,
         ]);
     }

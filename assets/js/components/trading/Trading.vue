@@ -1,7 +1,7 @@
 <template>
     <div class="trading">
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-            <span class="float-left">Top {{ marketsCount }} tokens</span>
+            <span class="float-left">Top {{ tokensCount }} tokens</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
                 <input
                     type="checkbox"
@@ -69,7 +69,7 @@ export default {
     mixins: [WebSocketMixin, FiltersMixin],
     props: {
         page: Number,
-        marketsCount: Number,
+        tokensCount: Number,
         userId: Number,
     },
     components: {
