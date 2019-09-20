@@ -172,7 +172,7 @@ export default {
                     this.sanitizeMarket(result);
                 }
 
-                this.$axios.retry.get(`${this.coinbaseUrl}/coins/webchain`).then(res => {
+                this.$axios.retry.get(`${this.coinbaseUrl}/coins/webchain`).then((res) => {
                     this.webchainSupply = res.data.market_data.circulating_supply;
                     this.updateWEBBTCMarket();
                 });
@@ -362,7 +362,6 @@ export default {
         },
         updateWEBBTCMarket: function() {
             let market = this.markets['WEBBTC'];
-            
             market = this.getSanitizedMarket(
                 market.crypto.symbol,
                 market.quote.symbol,
@@ -377,7 +376,7 @@ export default {
             );
 
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
-        }
+        },
     },
 };
 </script>
