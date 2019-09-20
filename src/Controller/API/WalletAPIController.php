@@ -10,6 +10,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -74,17 +75,17 @@ class WalletAPIController extends AbstractFOSRestController
     public function withdraw(
         ParamFetcherInterface $request,
         CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
         MoneyWrapperInterface $moneyWrapper,
         WalletInterface $wallet,
         MailerInterface $mailer
     ): View {
-        $crypto = $cryptoManager->findBySymbol(
-            $request->get('crypto')
-        );
+        $tradable = $cryptoManager->findBySymbol($request->get('crypto'))
+            ?? $tokenManager->findByName($request->get('crypto'));
 
-        if (!$crypto) {
+        if (!$tradable) {
             return $this->view([
-                'error' => 'Not found currency',
+                'error' => 'Not found',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -92,8 +93,11 @@ class WalletAPIController extends AbstractFOSRestController
             $pendingWithdraw = $wallet->withdrawInit(
                 $this->getUser(),
                 new Address(trim((string)$request->get('address'))),
-                new Amount($moneyWrapper->parse($request->get('amount'), $crypto->getSymbol())),
-                $crypto
+                new Amount($moneyWrapper->parse(
+                    $request->get('amount'),
+                    $tradable instanceof Token ? MoneyWrapper::TOK_SYMBOL : $tradable->getSymbol()
+                )),
+                $tradable
             );
         } catch (Throwable $exception) {
             return $this->view([
@@ -103,7 +107,7 @@ class WalletAPIController extends AbstractFOSRestController
 
         $mailer->sendWithdrawConfirmationMail($this->getUser(), $pendingWithdraw);
 
-        $this->userActionLogger->info("Sent withdrawal email for {$crypto->getSymbol()}", [
+        $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
@@ -120,13 +124,14 @@ class WalletAPIController extends AbstractFOSRestController
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
+         $depositAddresses = $depositCommunicator->getDepositCredentials(
+             $this->getUser(),
+             $cryptoManager->findAll()
+         );
 
-        $depositAddresses = $depositCommunicator->getDepositCredentials(
-            $this->getUser(),
-            $cryptoManager->findAll()
-        );
+        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($this->getUser());
 
-        return $this->view($depositAddresses);
+        return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
     }
 
     /**
