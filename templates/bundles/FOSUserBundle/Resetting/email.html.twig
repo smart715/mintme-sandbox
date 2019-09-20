@@ -6,7 +6,17 @@
     {%- endautoescape -%}
 {% endblock %}
 
-{% block body_text %}{% endblock %}
+{% block body_text %}
+ {% embed('mail/layout.txt.twig') %}
+   {% block content %}
+     Hello
+     {{user.userName}}
+     Resetting your password!
+     You can reset your password by click on the following link:
+     {{confirmationUrl}}
+   {% endblock %}
+ {% endembed %}
+{% endblock %}
 
 {% block body_html %}
   {% embed 'mail/layout.html.twig' %}

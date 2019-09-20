@@ -6,7 +6,17 @@
     {%- endautoescape -%}
 {% endblock %}
 
-{% block body_text %}{% endblock %}
+{% block body_text %}
+ {% embed('mail/layout.txt.twig') %}
+    {% block content %}
+      Hello
+      {{user.userName}}
+      Welcome to MintMe!
+      To complete your registration, click on the following link:
+      {{confirmationUrl}}
+    {% endblock %}
+ {% endembed %}
+{% endblock %}
 
 {% block body_html %}
   {% embed 'mail/layout.html.twig' %}
