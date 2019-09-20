@@ -3,13 +3,14 @@
 namespace App\Repository;
 
 use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityRepository;
 
 class PendingWithdrawRepository extends EntityRepository
 {
     /** @codeCoverageIgnore */
-    public function getWithdrawByHash(string $hash): ?PendingWithdraw
+    public function getWithdrawByHash(string $hash): ?PendingWithdrawInterface
     {
         $datetime = new DateTimeImmutable('now - '.PendingWithdraw::EXPIRES_HOURS.' hours');
 

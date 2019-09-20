@@ -51,6 +51,10 @@ to listen for incoming deposits
 php bin/console rabbitmq:consumer market &
 ```
 to listen for new data in markets
+```
+php bin/console rabbitmq:consumer deploy &
+```
+to listen for token deploy
 
 Development
 -----------

@@ -4,6 +4,7 @@ import TokenIntroductionProfile from './components/token/introduction/TokenIntro
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenName from './components/token/TokenName';
+import TokenDeploy from './components/token/TokenDeploy';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
 
@@ -15,6 +16,7 @@ new Vue({
       tokenDescription: null,
       editingName: false,
       tokenName: null,
+      tokenPeriodAdded: null,
     };
   },
   components: {
@@ -23,6 +25,7 @@ new Vue({
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
     TokenName,
+    TokenDeploy,
     TopHolders,
     Tabs,
   },
@@ -41,6 +44,12 @@ new Vue({
         );
         document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';
       }
+    },
+    updateTokenPeriod: function() {
+      this.tokenPeriodAdded = true;
+    },
+    isTokenPeriodAdded: function(isAdded) {
+      return null !== this.tokenPeriodAdded ? this.tokenPeriodAdded : isAdded;
     },
   },
   store,

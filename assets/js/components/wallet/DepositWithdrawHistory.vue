@@ -8,8 +8,12 @@
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
             >
-                <template slot="crypto" slot-scope="data">
-                    <a :href="data.item.url" class="text-white">{{ data.item.crypto }}</a>
+                <template slot="symbol" slot-scope="data">
+                    <a :href="data.item.url" class="text-white">
+                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                            {{ data.item.symbol | truncate(15) }}
+                        </span>
+                    </a>
                 </template>
                 <template slot="toAddress" slot-scope="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
@@ -40,14 +44,13 @@
 <script>
 import moment from 'moment';
 import {toMoney, formatMoney, formatFee} from '../../utils';
-import {LazyScrollTableMixin} from '../../mixins';
+import {LazyScrollTableMixin, FiltersMixin} from '../../mixins';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
-
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin],
+    mixins: [LazyScrollTableMixin, FiltersMixin],
     components: {CopyLink},
     data() {
         return {
@@ -60,7 +63,7 @@ export default {
                     label: 'Type',
                     sortable: true,
                 },
-                crypto: {
+                symbol: {
                     label: 'Name',
                     sortable: true,
                 },
@@ -130,18 +133,18 @@ export default {
         },
         sanitizeHistory: function(historyData) {
             historyData.forEach((item) => {
-                item['url'] = this.generateCoinUrl(item.crypto);
+                item['url'] = this.generatePairUrl(item.tradable);
                 item['date'] = item.date
                     ? moment(item.date).format(GENERAL.dateFormat)
                     : null;
                 item['fee'] = item.fee
-                    ? toMoney(item.fee, item.crypto.subunit)
+                    ? toMoney(item.fee, item.tradable.subunit)
                     : null;
                 item['amount'] = item.amount
-                    ? toMoney(item.amount, item.crypto.subunit)
+                    ? toMoney(item.amount, item.tradable.subunit)
                     : null;
-                item['crypto'] = item.crypto.symbol
-                    ? item.crypto.symbol
+                item['symbol'] = item.tradable.symbol
+                    ? item.tradable.symbol
                     : null;
                 item['status'] = item.status.statusCode
                     ? item.status.statusCode
@@ -153,13 +156,17 @@ export default {
 
             return historyData;
         },
-        generateCoinUrl: function(crypto) {
-            /** @TODO In future we need to use another solution and remove hardcoded BTC & WEB symbols **/
-            let params = {
-                base: !crypto.exchangeble ? crypto.symbol : 'BTC',
-                quote: crypto.exchangeble && crypto.tradable ? crypto.symbol : 'WEB',
-            };
-            return this.$routing.generate('coin', params);
+        generatePairUrl: function(quote) {
+            if (quote.hasOwnProperty('exchangeble')) {
+                /** @TODO In future we need to use another solution and remove hardcoded BTC & WEB symbols **/
+                let params = {
+                    base: !quote.exchangeble ? quote.symbol : 'BTC',
+                    quote: quote.exchangeble && quote.tradable ? quote.symbol : 'WEB',
+                };
+                return this.$routing.generate('coin', params);
+            }
+
+            return this.$routing.generate('token_show', {name: quote.name});
         },
     },
 };
