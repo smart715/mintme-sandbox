@@ -63,13 +63,20 @@ class MarketStatus
      */
     private $dayVolume;
 
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    private $monthVolume;
+
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
         $this->setQuote($quote);
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
-        $this->dayVolume = $marketInfo->getVolume()->getAmount();
+        $this->dayVolume = $marketInfo->getDeal()->getAmount();
+        $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
     }
 
     /**
@@ -119,6 +126,16 @@ class MarketStatus
         ));
     }
 
+    /**
+     * @Groups({"API"})
+     */
+    public function getMonthVolume(): Money
+    {
+        return new Money($this->monthVolume, new Currency(
+            $this->quoteCrypto ? $this->quoteCrypto->getSymbol() : MoneyWrapper::TOK_SYMBOL
+        ));
+    }
+
     public function setQuote(?TradebleInterface $quote): self
     {
         if ($quote instanceof Crypto) {
@@ -145,6 +162,7 @@ class MarketStatus
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getDeal()->getAmount();
+        $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
 
         return $this;
     }

@@ -366,6 +366,10 @@ class MarketHandlerTest extends TestCase
         $fetcher->method('getMarketInfo')
             ->with('convertedmarket')
             ->willReturn($data);
+        $fetcher->method('getKLineStat')
+            ->with('convertedmarket', $this->anything(), $this->anything(), 604800)
+            ->willReturn([]);
+
 
         $mh = new MarketHandler(
             $fetcher,
@@ -386,6 +390,8 @@ class MarketHandlerTest extends TestCase
             'low' => $info->getLow()->getAmount(),
             'deal' => $info->getDeal()->getAmount(),
         ]);
+
+        $this->assertEquals(0, $info->getMonthDeal()->getAmount());
     }
 
     public function testGetMarketInfoWithException(): void
@@ -407,6 +413,74 @@ class MarketHandlerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $mh->getMarketInfo($market);
+    }
+
+    public function testGetMonthlyMarketInfo(): void
+    {
+        $data = [
+            [0, "1", "2", "3", "1", "4", "7"],
+            [604800, "2", "1", "3", "1", "4", "7"],
+            [1209600, "1", "3", "4", "1", "4", "9"],
+            [1814400, "3", "2", "4", "2", "4", "11"],
+            [2419200, "2", "5", "6", "2", "4", "15"],
+        ];
+
+        $fetcher = $this->mockMarketFetcher();
+        $fetcher->method('getKLineStat')
+            ->with('convertedmarket', $this->anything(), $this->anything(), 604800)
+            ->willReturn($data);
+
+        $mh = new MarketHandler(
+            $fetcher,
+            $this->mockMoneyWrapper(),
+            $this->mockUserManager(),
+            $this->mockMarketNameConverter()
+        );
+
+        $market = $this->mockMarket('FOO', 'BAR');
+        $info = $mh->getMonthlyMarketInfo($market);
+
+        $expectedResult = [
+            "period" => 2592000,
+            "open" => "1",
+            "close" => "5",
+            "high" => "6",
+            "low" => "1",
+            "volume" => "20",
+            "deal" => "49",
+        ];
+
+        $this->assertEquals($expectedResult, $info);
+    }
+
+    public function testGetMonthlyMarketInfoWithEmptyKlineResult(): void
+    {
+        $fetcher = $this->mockMarketFetcher();
+        $fetcher->method('getKLineStat')
+            ->with('convertedmarket', $this->anything(), $this->anything(), 604800)
+            ->willReturn([]);
+
+        $mh = new MarketHandler(
+            $fetcher,
+            $this->mockMoneyWrapper(),
+            $this->mockUserManager(),
+            $this->mockMarketNameConverter()
+        );
+
+        $market = $this->mockMarket('FOO', 'BAR');
+        $info = $mh->getMonthlyMarketInfo($market);
+
+        $expectedResult = [
+            "period" => 2592000,
+            "open" => "0",
+            "close" => "0",
+            "high" => "0",
+            "low" => "0",
+            "volume" => "0",
+            "deal" => "0",
+        ];
+
+        $this->assertEquals($expectedResult, $info);
     }
 
     private function getExecutedOrders(): array
