@@ -54,6 +54,7 @@ export default {
         return {
             currentName: this.name,
             isTokenExchanged: true,
+            isTokenNotDeployed: false,
             showTokenEditModal: false,
         };
     },
@@ -63,6 +64,7 @@ export default {
         }
 
         this.checkIfTokenExchanged();
+        this.checkIfTokenNotDeployed();
 
         this.addMessageHandler((response) => {
             if (
@@ -81,8 +83,15 @@ export default {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
                 name: this.currentName,
             }))
-                .then((res) => this.isTokenExchanged = res.data)
-                .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
+            .then((res) => this.isTokenExchanged = res.data)
+            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
+        },
+        checkIfTokenNotDeployed: function() {
+            this.$axios.retry.get(this.$routing.generate('is_token_not_deployed', {
+                name: this.currentName,
+            }))
+            .then((res) => this.isTokenNotDeployed = res.data)
+            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
         },
         editToken: function() {
             if (!this.editable) {
@@ -91,6 +100,11 @@ export default {
 
             if (null === this.isTokenExchanged || this.isTokenExchanged) {
                 this.$toasted.error('You need all your tokens to change token\'s name or delete token');
+                return;
+            }
+
+            if (!this.isTokenNotDeployed) {
+                this.$toasted.error('Token is deploying or deployed.');
                 return;
             }
 

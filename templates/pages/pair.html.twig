@@ -45,6 +45,7 @@
                                 >
                                 </token-introduction-profile>
                                 <token-introduction-statistics
+                                    v-on:period-updated="updateTokenPeriod"
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
@@ -69,6 +70,20 @@
                         </b-tab>
                     {% endif %}
                     <template slot="tabs">
+                        {% if token is defined %}
+                        <li class="nav-item">
+                            <div class="nav-link pr-md-0">
+                                <token-deploy
+                                        websocket-url="{{ global_websocket_url }}"
+                                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                        name="{{ market.quote.name }}"
+                                        :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
+                                        :precision="{{ precision }}"
+                                        :status-prop="{{ token.deploymentStatus | json_encode }}"
+                                />
+                            </div>
+                        </li>
+                        {% endif %}
                         <li class="nav-item float-sm-right">
                             <div class="nav-link">
                                 <token-name
