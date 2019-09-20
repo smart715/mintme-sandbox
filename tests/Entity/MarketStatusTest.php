@@ -26,6 +26,7 @@ class MarketStatusTest extends TestCase
         $o = $ms->getOpenPrice();
         $l = $ms->getLastPrice();
         $v = $ms->getDayVolume();
+        $w = $ms->getMonthVolume();
 
         $this->assertEquals($mi->getOpen()->getAmount(), $o->getAmount());
         $this->assertEquals($res, $o->getCurrency()->getCode());
@@ -33,17 +34,20 @@ class MarketStatusTest extends TestCase
         $this->assertEquals($mi->getLast()->getAmount(), $l->getAmount());
         $this->assertEquals($res, $l->getCurrency()->getCode());
 
-        $this->assertEquals($mi->getVolume()->getAmount(), $v->getAmount());
+        $this->assertEquals($mi->getDeal()->getAmount(), $v->getAmount());
         $this->assertEquals($res, $v->getCurrency()->getCode());
+
+        $this->assertEquals($mi->getMonthDeal()->getAmount(), $w->getAmount());
+        $this->assertEquals($res, $w->getCurrency()->getCode());
     }
 
     public function gettersDataProvider(): array
     {
         return [
-            [$this->mockCrypto('FOO'), $this->mockCrypto('BAR'), $this->mockMarketInfo(1, 2, 3), 'BAR'],
-            [$this->mockCrypto('FOO'), $this->mockCrypto('BAZ'), $this->mockMarketInfo(2, 2, 6), 'BAZ'],
-            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(1, 2, 3), MoneyWrapper::TOK_SYMBOL],
-            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(6, 5, 1), MoneyWrapper::TOK_SYMBOL],
+            [$this->mockCrypto('FOO'), $this->mockCrypto('BAR'), $this->mockMarketInfo(1, 2, 3, 4), 'BAR'],
+            [$this->mockCrypto('FOO'), $this->mockCrypto('BAZ'), $this->mockMarketInfo(2, 2, 6, 6), 'BAZ'],
+            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(1, 2, 3, 4), MoneyWrapper::TOK_SYMBOL],
+            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(6, 5, 1, 2), MoneyWrapper::TOK_SYMBOL],
         ];
     }
 
@@ -54,7 +58,7 @@ class MarketStatusTest extends TestCase
         $ms = new MarketStatus(
             $this->mockCrypto('FOO'),
             $quote,
-            $this->mockMarketInfo(1, 2, 3)
+            $this->mockMarketInfo(1, 2, 3, 4)
         );
 
         $this->assertEquals($quote, $ms->getQuote());
@@ -71,21 +75,23 @@ class MarketStatusTest extends TestCase
         $ms = new MarketStatus(
             $this->mockCrypto('FOO'),
             $this->mockToken(),
-            $this->mockMarketInfo(1, 2, 3)
+            $this->mockMarketInfo(1, 2, 3, 4)
         );
 
-        $this->assertEquals([1, 2, 3], [
+        $this->assertEquals([1, 2, 3, 4], [
             $ms->getOpenPrice()->getAmount(),
             $ms->getLastPrice()->getAmount(),
             $ms->getDayVolume()->getAmount(),
+            $ms->getMonthVolume()->getAmount(),
         ]);
 
-        $ms->updateStats($this->mockMarketInfo(3, 4, 5));
+        $ms->updateStats($this->mockMarketInfo(3, 4, 5, 6));
 
-        $this->assertEquals([3, 4, 5], [
+        $this->assertEquals([3, 4, 5, 6], [
             $ms->getOpenPrice()->getAmount(),
             $ms->getLastPrice()->getAmount(),
             $ms->getDayVolume()->getAmount(),
+            $ms->getMonthVolume()->getAmount(),
         ]);
     }
 
@@ -103,14 +109,14 @@ class MarketStatusTest extends TestCase
         return $this->createMock(Token::class);
     }
 
-    private function mockMarketInfo(int $o, int $l, int $v): MarketInfo
+    private function mockMarketInfo(int $o, int $l, int $d, int $wd): MarketInfo
     {
         $mi = $this->createMock(MarketInfo::class);
 
         $mi->method('getOpen')->willReturn($this->mockMoney($o));
         $mi->method('getLast')->willReturn($this->mockMoney($l));
-        $mi->method('getVolume')->willReturn($this->mockMoney($v));
-        $mi->method('getDeal')->willReturn($this->mockMoney($v));
+        $mi->method('getDeal')->willReturn($this->mockMoney($d));
+        $mi->method('getMonthDeal')->willReturn($this->mockMoney($wd));
 
         return $mi;
     }

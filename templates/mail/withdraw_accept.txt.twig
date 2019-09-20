@@ -1,0 +1,8 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+Hello
+{{user.userName}}
+Confirm your withdrawal!
+You can confirm your withdrawal by click on the following link:
+{{confirmationUrl}}
+{% endblock %}
