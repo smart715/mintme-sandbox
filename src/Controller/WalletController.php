@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Wallet\WalletInterface;
@@ -53,8 +55,11 @@ class WalletController extends Controller
         /** @var PendingWithdrawRepository $withdrawRepo */
         $withdrawRepo = $entityManager->getRepository(PendingWithdraw::class);
 
-        /** @var PendingWithdraw|null */
-        $pendingWithdraw = $withdrawRepo->getWithdrawByHash($hash);
+        /** @var PendingWithdrawRepository $withdrawTokenRepo */
+        $withdrawTokenRepo = $entityManager->getRepository(PendingTokenWithdraw::class);
+
+        /** @var PendingWithdrawInterface|null */
+        $pendingWithdraw = $withdrawRepo->getWithdrawByHash($hash) ?? $withdrawTokenRepo->getWithdrawByHash($hash);
 
         if (!$pendingWithdraw) {
             return $this->createWalletRedirection(
@@ -72,7 +77,7 @@ class WalletController extends Controller
             );
         }
 
-        $this->userActionLogger->info("Confirm withdrawal for {$pendingWithdraw->getCrypto()->getSymbol()}.", [
+        $this->userActionLogger->info("Confirm withdrawal for {$pendingWithdraw->getSymbol()}.", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);

@@ -246,6 +246,7 @@ export default {
         },
         statsUpdated: function(res) {
             this.stats = res.data;
+            this.$emit('period-updated');
         },
     },
     computed: {
