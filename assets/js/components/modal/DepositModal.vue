@@ -27,7 +27,7 @@
                     </b-row>
                     <b-row>
                         <b-col v-if="min" cols="auto" class="text-left">Minimal value: {{ min }} {{ currency }}</b-col>
-                        <b-col v-if="fee" class="text-right">Fee: {{ fee | formatFee }} {{ currency }}</b-col>
+                        <b-col v-if="fee" class="text-right">Fee: {{ fee | formatFee }} {{ feeCurrency }}</b-col>
                     </b-row>
                 </div>
                 <div class="pt-2 text-center">
@@ -46,6 +46,7 @@
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
 import {MoneyFilterMixin} from '../../mixins';
+import {webSymbol} from '../../utils/constants';
 
 export default {
     name: 'DepositModal',
@@ -59,9 +60,15 @@ export default {
         address: String,
         description: String,
         currency: String,
+        isToken: Boolean,
         min: String,
         fee: String,
         noClose: Boolean,
+    },
+    computed: {
+      feeCurrency: function() {
+          return this.isToken ? webSymbol : this.currency;
+      },
     },
     methods: {
         closeModal: function() {

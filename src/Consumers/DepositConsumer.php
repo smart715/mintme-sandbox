@@ -5,11 +5,17 @@ namespace App\Consumers;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Strategy\BalanceContext;
+use App\Exchange\Balance\Strategy\DepositCryptoStrategy;
+use App\Exchange\Balance\Strategy\DepositTokenStrategy;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapperInterface;
+use App\Wallet\WalletInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -28,26 +34,41 @@ class DepositConsumer implements ConsumerInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
     /** @var ClockInterface */
     private $clock;
 
+    /** @var WalletInterface */
+    private $depositCommunicator;
+
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
         CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
-        ClockInterface $clock
+        ClockInterface $clock,
+        WalletInterface $depositCommunicator,
+        EntityManagerInterface $em
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
         $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->clock = $clock;
+        $this->depositCommunicator = $depositCommunicator;
+        $this->em = $em;
     }
 
     /** {@inheritdoc} */
@@ -84,22 +105,21 @@ class DepositConsumer implements ConsumerInterface
         }
 
         try {
-            $crypto = $this->cryptoManager->findBySymbol($clbResult->getCrypto());
+            $tradable =$this->cryptoManager->findBySymbol($clbResult->getCrypto())
+                ?? $this->tokenManager->findByName($clbResult->getCrypto());
 
-            if (!$crypto) {
+            if (!$tradable) {
                 $this->logger->info('[deposit-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
 
                 return true;
             }
 
-            $this->balanceHandler->deposit(
-                $user,
-                Token::getFromCrypto($crypto),
-                $this->moneyWrapper->parse(
-                    $clbResult->getAmount(),
-                    $crypto->getSymbol()
-                )
-            );
+            $strategy = $tradable instanceof Token
+                ? new DepositTokenStrategy($this->balanceHandler, $this->depositCommunicator, $this->em)
+                : new DepositCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
+
+            $balanceContext = new BalanceContext($strategy);
+            $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
