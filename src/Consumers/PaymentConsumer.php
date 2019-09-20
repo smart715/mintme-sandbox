@@ -5,13 +5,15 @@ namespace App\Consumers;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Strategy\BalanceContext;
+use App\Exchange\Balance\Strategy\PaymentCryptoStrategy;
+use App\Exchange\Balance\Strategy\PaymentTokenStrategy;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
-use Money\Currency;
-use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -30,6 +32,9 @@ class PaymentConsumer implements ConsumerInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
@@ -40,6 +45,7 @@ class PaymentConsumer implements ConsumerInterface
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
         CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
         ClockInterface $clock
@@ -47,6 +53,7 @@ class PaymentConsumer implements ConsumerInterface
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
         $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->clock = $clock;
@@ -81,22 +88,22 @@ class PaymentConsumer implements ConsumerInterface
 
         if ('fail' === $clbResult->getStatus()) {
             try {
-                $crypto = $this->cryptoManager->findBySymbol($clbResult->getCrypto());
+                $tradable = $this->cryptoManager->findBySymbol($clbResult->getCrypto())
+                    ?? $this->tokenManager->findByName($clbResult->getCrypto());
 
-                if (!$crypto) {
+                if (!$tradable) {
                     $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
 
                     return true;
                 }
 
-                $this->balanceHandler->deposit(
-                    $user,
-                    Token::getFromCrypto($crypto),
-                    $this->moneyWrapper->parse(
-                        $clbResult->getAmount(),
-                        $crypto->getSymbol()
-                    )->add($crypto->getFee())
-                );
+                $strategy = $tradable instanceof Token
+                    ? new PaymentTokenStrategy($this->balanceHandler, $this->cryptoManager)
+                    : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
+
+                $balanceContext = new BalanceContext($strategy);
+                $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
+
                 $this->logger->info(
                     '[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back'
                 );
