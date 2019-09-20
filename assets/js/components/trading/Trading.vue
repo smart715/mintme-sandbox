@@ -83,6 +83,7 @@ export default {
         page: Number,
         marketsCount: Number,
         userId: Number,
+        coinbaseUrl: String,
     },
     components: {
         Guide,
@@ -170,6 +171,11 @@ export default {
                 if ('state.update' === result.method) {
                     this.sanitizeMarket(result);
                 }
+
+                this.$axios.retry.get(`${this.coinbaseUrl}/coins/webchain`).then(res => {
+                    this.webchainSupply = res.data.market_data.circulating_supply;
+                    this.updateWEBBTCMarket();
+                });
             });
         });
     },
@@ -249,6 +255,7 @@ export default {
             const marketCurrency = this.markets[marketName].crypto.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
             const marketPrecision = this.markets[marketName].crypto.subunit;
+            const supply = marketName === 'WEBBTC' ? this.webchainSupply || 1e7 : 1e7;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -258,6 +265,7 @@ export default {
                 changePercentage,
                 marketLastPrice,
                 parseFloat(marketInfo.deal),
+                supply,
                 marketPrecision
             );
 
@@ -274,7 +282,7 @@ export default {
                 dayVolume: marketInfo.deal,
             };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, subunit) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, supply, subunit) {
             let hiddenName = this.findHiddenName(token);
 
             return {
@@ -285,7 +293,7 @@ export default {
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
-                marketCap: toMoney(Decimal.mul(lastPrice, 1e7), subunit) + ' ' + currency,
+                marketCap: toMoney(Decimal.mul(lastPrice, supply), subunit) + ' ' + currency,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -307,6 +315,7 @@ export default {
                     const cryptoSymbol = this.markets[market].crypto.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
+                    const supply = 1e7;
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
                         tokenName,
@@ -316,6 +325,7 @@ export default {
                         ),
                         parseFloat(this.markets[market].lastPrice),
                         parseFloat(this.markets[market].dayVolume),
+                        supply,
                         this.markets[market].crypto.subunit
                     );
 
@@ -350,6 +360,24 @@ export default {
 
             return result;
         },
+        updateWEBBTCMarket: function() {
+            let market = this.markets['WEBBTC'];
+            
+            market = this.getSanitizedMarket(
+                market.crypto.symbol,
+                market.quote.symbol,
+                this.getPercentage(
+                    parseFloat(market.lastPrice),
+                    parseFloat(market.openPrice)
+                ),
+                parseFloat(market.lastPrice),
+                parseFloat(market.dayVolume),
+                this.webchainSupply,
+                market.crypto.subunit
+            );
+
+            Vue.set(this.sanitizedMarketsOnTop, 0, market);
+        }
     },
 };
 </script>

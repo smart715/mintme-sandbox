@@ -17,7 +17,8 @@
                             websocket-url="{{ global_websocket_url }}" v-cloak
                             :page="{{ page }}"
                             :markets-count="{{ marketsLength }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}">
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            coinbase-url="{{ global_coinbase_url }}">
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                         </trading>
                     </div>
