@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Repository\TokenRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,13 +31,14 @@ class TradingController extends Controller
      */
     public function trading(string $page): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $repository = $entityManager->getRepository(Token::class);
-        $tokensCount = $repository->count([]);
-
         return $this->render('pages/trading.html.twig', [
-            'tokensCount' => $tokensCount,
+            'tokensCount' => $this->getTokenRepository()->count([]),
             'page' => $page,
         ]);
+    }
+
+    private function getTokenRepository(): TokenRepository
+    {
+        return $this->getDoctrine()->getManager()->getRepository(Token::class);
     }
 }
