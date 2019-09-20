@@ -3,7 +3,7 @@
         <div class="card-body p-2">
             <div class="row mx-2">
                 <div class="col text-left">
-                    Last price: {{ marketStatus.last | formatMoney }}
+                    <span>Last price: </span>
                     <guide>
                         <template slot="header">
                             Last price
@@ -12,39 +12,47 @@
                             Price per one {{ market.quote.symbol }} for last transaction.
                         </template>
                     </guide>
+                    <br>
+                    {{ marketStatus.last | formatMoney }} {{ market.base.symbol }}
                 </div>
                 <div class="col text-center">
-                    24h change: {{ marketStatus.change }}%
+                    <span>24h/30d change: </span>
                     <guide>
                         <template slot="header">
-                            24h change
+                            24h/30d change
                         </template>
                         <template slot="body">
-                            Price change in last 24h
+                            Price change in last 24 hours and last 30 days.
                         </template>
                     </guide>
+                    <br>
+                    {{ marketStatus.change }}%/{{ marketStatus.monthChange }}%
                 </div>
                 <div class="col text-center">
-                    24h volume: {{ marketStatus.volume | formatMoney }} Tokens
+                    <span>24h/30d volume: </span>
                     <guide>
                         <template slot="header">
-                            24h volume
+                            24h/30d volume
                         </template>
                         <template slot="body">
-                            The amount of {{ market.quote.symbol }} that has been traded in the last 24 hours.
+                            The amount of {{ market.quote.symbol }} that has been traded in the last 24 hours and the last 30 days.
                         </template>
                     </guide>
+                    <br>
+                    {{ marketStatus.volume | formatMoney }}/{{ marketStatus.monthVolume | formatMoney }} Tokens
                 </div>
                 <div class="col text-right">
-                    24h volume: {{ marketStatus.amount | formatMoney }} {{ market.base.symbol }}
+                    <span>24h/30d volume: </span>
                     <guide>
                         <template slot="header">
-                            24h volume
+                            24h/30d volume
                         </template>
                         <template slot="body">
-                            The amount of {{ market.base.symbol }} that has been traded in the last 24 hours.
+                            The amount of {{ market.base.symbol }} that has been traded in the last 24 hours and the last 30 days.
                         </template>
                     </guide>
+                    <br>
+                    {{ marketStatus.amount | formatMoney }}/{{ marketStatus.monthAmount | formatMoney }} {{ market.base.symbol }}
                 </div>
             </div>
             <div class="row">
@@ -74,6 +82,7 @@ import Guide from '../Guide';
 import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
+import Decimal from 'decimal.js/decimal.js';
 
 export default {
     name: 'TradeChart',
@@ -119,9 +128,13 @@ export default {
                 last: '0',
                 change: '0',
                 amount: '0',
+                monthVolume: '0',
+                monthChange: '0',
+                monthAmount: '0',
             },
             stats: null,
             maxAvailableDays: 30,
+            monthInfoRequestId: 0,
         };
     },
     computed: {
@@ -185,6 +198,9 @@ export default {
                         volume: result.params[0][5],
                     });
                 }
+                if (result.id === this.monthInfoRequestId) {
+                    this.updateMonthMarketData(result.result);
+                }
             }, 'trade-chart-state');
 
             this.sendMessage(JSON.stringify({
@@ -194,7 +210,7 @@ export default {
             }));
             this.sendMessage(JSON.stringify({
                 method: 'kline.subscribe',
-                params: [this.market.identifier, 24*60*60],
+                params: [this.market.identifier, 24 * 60 * 60],
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
         }).catch(() => {
@@ -215,12 +231,46 @@ export default {
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
 
-            this.marketStatus = {
+            const marketStatus = {
                 change: changePercentage.toFixed(2),
                 last: toMoney(marketLastPrice, this.market.base.subunit),
                 volume: toMoney(marketVolume, this.market.quote.subunit),
                 amount: toMoney(marketAmount, this.market.base.subunit),
             };
+
+            this.marketStatus = {...this.marketStatus, ...marketStatus};
+
+            this.monthInfoRequestId = parseInt(Math.random().toString().replace('0.', ''));
+            this.sendMessage(JSON.stringify({
+                method: 'kline.query',
+                params: [
+                    this.market.identifier,
+                    Math.round(Date.now() / 1000) - 30 * 24 * 60 * 60,
+                    Math.round(Date.now() / 1000),
+                    7 * 24 * 60 * 60,
+                ],
+                id: this.monthInfoRequestId,
+            }));
+        },
+        updateMonthMarketData: function(marketData) {
+            const marketOpenPrice = marketData[0] ? marketData[0][1] || 0 : 0;
+            const marketLastPrice = marketData[marketData.length -1] ? marketData[marketData.length -1][2] || 0 : 0;
+            const marketVolume = marketData.reduce(function(acc, cur) {
+                return Decimal.add(acc, cur[5]);
+            }, 0);
+            const marketAmount = marketData.reduce(function(acc, cur) {
+                return Decimal.add(acc, cur[6]);
+            }, 0);
+            const priceDiff = marketLastPrice - marketOpenPrice;
+            const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
+
+            const monthInfo = {
+                monthChange: changePercentage.toFixed(2),
+                monthVolume: toMoney(marketVolume, this.market.quote.subunit),
+                monthAmount: toMoney(marketAmount, this.market.base.subunit),
+            };
+
+            this.marketStatus = {...this.marketStatus, ...monthInfo};
         },
         getDate: function(timestamp) {
             return moment.utc((timestamp + 3600) * 1000).format('YYYY-MM-DD');
