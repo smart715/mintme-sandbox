@@ -70,9 +70,20 @@ services:
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
             $auth: '%withdraw_auth%'
 
+    deploy.json_rpc:
+        class: App\Communications\GuzzleWrapper
+        arguments:
+            $url: '%deploy_rpc%'
+            $timeoutSeconds: '%deploy_response_timeout_seconds%'
+
     App\Communications\CoinmarketcapCommunicator:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\DeployCostFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+            $usdCost: '%deploy_cost%'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -99,6 +110,9 @@ services:
     App\Exchange\Balance\BalanceFetcher:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
+
+    App\SmartContract\ContractHandler:
+        $rpc: '@deploy.json_rpc'
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 
@@ -223,6 +237,13 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
+    deploy_consumer:
+        class: 'App\Consumers\DeployConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
     wallet:
         class: 'App\Wallet\Wallet'
         arguments:
@@ -294,6 +315,11 @@ services:
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
+
+    App\SmartContract\Config\Config:
+        arguments:
+            $mintmeAddress: "%mintme_address%"
+            $tokenQuantity: "%token_quantity%"
 
     App\Controller\API\WebSocketAPIController:
         arguments:
