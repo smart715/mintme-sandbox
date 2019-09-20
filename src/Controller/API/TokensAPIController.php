@@ -2,7 +2,9 @@
 
 namespace App\Controller\API;
 
+use App\Communications\DeployCostFetcherInterface;
 use App\Entity\Token\LockIn;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
@@ -17,9 +19,13 @@ use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\SmartContract\ContractHandlerInterface;
+use App\SmartContract\DeploymentFacadeInterface;
+use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -31,6 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
+use Throwable;
 
 /**
  * @Rest\Route("/api/tokens")
@@ -98,6 +105,10 @@ class TokensAPIController extends AbstractFOSRestController
 
         if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
             throw new ApiBadRequestException('You need all your tokens to change token\'s name');
+        }
+
+        if ($request->get('name') && Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+            throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
         $form = $this->createForm(TokenType::class, $token, [
@@ -356,7 +367,27 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
+     * @Rest\Get("/{name}/is-not_deployed", name="is_token_not_deployed", options={"expose"=true})
+     */
+    public function isTokenNotDeployed(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(
+            Token::NOT_DEPLOYED === $token->deploymentStatus()
+        );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/delete", name="token_delete", options={"expose"=true})
+=======
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
+>>>>>>> 952f3c4afc036081d7fd202311852cc0ec15812a
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */
@@ -448,5 +479,112 @@ class TokensAPIController extends AbstractFOSRestController
         $topTraders = $balanceHandler->topHolders($tradable, self::TOP_HOLDERS_COUNT);
 
         return $this->view($topTraders, Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/deploy", name="token_deploy_balances", options={"expose"=true})
+     */
+    public function tokenDeployBalances(
+        string $name,
+        BalanceHandlerInterface $balanceHandler,
+        DeployCostFetcherInterface $costFetcher
+    ): View {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        try {
+            $balances = [
+                'balance' => $balanceHandler->balance(
+                    $this->getUser(),
+                    Token::getFromSymbol(Token::WEB_SYMBOL)
+                )->getAvailable(),
+                'webCost' => $costFetcher->getDeployWebCost(),
+            ];
+        } catch (Throwable $ex) {
+            throw new ApiBadRequestException();
+        }
+
+        return $this->view($balances, Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
+     */
+    public function deploy(
+        string $name,
+        DeploymentFacadeInterface $deployment
+    ): View {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        if (!$token->getLockIn()) {
+            throw new ApiBadRequestException('Token not has released period');
+        }
+
+        if (!$this->isGranted('edit', $token)) {
+            throw new ApiUnauthorizedException('Unauthorized');
+        }
+
+        try {
+            $deployment->execute($this->getUser(), $token);
+        } catch (Throwable $ex) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
+        $this->userActionLogger->info('Deploy Token', ['name' => $name]);
+
+        return $this->view();
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"expose"=true})
+     * @Rest\RequestParam(name="address", allowBlank=false)
+     * @Rest\RequestParam(name="lock", requirements="true|false")
+     */
+    public function contractUpdate(
+        string $name,
+        ParamFetcherInterface $request,
+        ContractHandlerInterface $contractHandler
+    ): View {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        if ($token->isMinDestinationLocked()) {
+            throw new ApiBadRequestException('Can\'t change the address');
+        }
+
+        if (!$this->isGranted('edit', $token)) {
+            throw new ApiUnauthorizedException('Unauthorized');
+        }
+
+        try {
+            $contractHandler->updateMinDestination($token, $request->get('address'), $request->get('lock'));
+            $token->setMinDestination($request->get('address'));
+
+            if ("true" === $request->get('lock')) {
+                $token->lockMinDestination();
+            }
+
+            $this->em->persist($token);
+            $this->em->flush();
+        } catch (Throwable $ex) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
+        $this->userActionLogger->info('Update token minDestination', ['name' => $name]);
+
+        return $this->view(null, Response::HTTP_NO_CONTENT);
     }
 }

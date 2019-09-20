@@ -27,6 +27,9 @@ class Token implements TradebleInterface
     public const BTC_SYMBOL = "BTC";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
+    public const NOT_DEPLOYED = 'not-deployed';
+    public const PENDING = 'pending';
+    public const DEPLOYED = 'deployed';
 
     /**
      * @ORM\Id()
@@ -52,6 +55,24 @@ class Token implements TradebleInterface
      * @var string|null
      */
     protected $address;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    protected $deployCost;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    protected $minDestination;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     * @var bool
+     */
+    protected $minDestinationLocked = false;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -188,6 +209,56 @@ class Token implements TradebleInterface
         return $this->address;
     }
 
+    public function setPendingDeployment(): self
+    {
+        $this->address = '0x';
+
+        return $this;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function setDeployCost(string $cost): self
+    {
+        $this->deployCost = $cost;
+
+        return $this;
+    }
+
+    public function getDeployCost(): ?string
+    {
+        return $this->deployCost;
+    }
+
+    public function getMinDestination(): ?string
+    {
+        return $this->minDestination;
+    }
+
+    public function setMinDestination(string $minDestination): self
+    {
+        $this->minDestination = $minDestination;
+
+        return $this;
+    }
+
+    public function isMinDestinationLocked(): bool
+    {
+        return $this->minDestinationLocked;
+    }
+
+    public function lockMinDestination(): self
+    {
+        $this->minDestinationLocked = true;
+
+        return $this;
+    }
+
     public function getWebsiteUrl(): ?string
     {
         return $this->websiteUrl;
@@ -259,10 +330,24 @@ class Token implements TradebleInterface
     {
         return $this->profile;
     }
+    
+    public function deploymentStatus(): string
+    {
+        return !$this->address
+            ? self::NOT_DEPLOYED
+            : ('0x' === $this->address
+                ? self::PENDING
+                : self::DEPLOYED);
+    }
 
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());
+    }
+
+    public static function getFromSymbol(string $symbol): self
+    {
+        return (new self())->setName($symbol);
     }
 
     public function getCreated(): \DateTimeImmutable
