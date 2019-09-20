@@ -32,6 +32,9 @@ class BalanceView
     /** @var bool */
     public $tradable;
 
+    /** @var bool */
+    public $deployed;
+
     public function __construct(
         string $identifier,
         Money $available,
@@ -40,7 +43,8 @@ class BalanceView
         ?Money $fee,
         int $subunit,
         bool $exchangeble,
-        bool $tradable
+        bool $tradable,
+        bool $deployed
     ) {
         $this->identifier = $identifier;
         $this->available = $available;
@@ -50,6 +54,7 @@ class BalanceView
         $this->fee = $fee;
         $this->exchangeble = $exchangeble;
         $this->tradable = $tradable;
+        $this->deployed = $deployed;
     }
 
     /** @Groups({"API"}) */
@@ -98,5 +103,11 @@ class BalanceView
     public function isTradable(): bool
     {
         return $this->tradable;
+    }
+
+     /** @Groups({"API"}) */
+    public function isDeployed(): bool
+    {
+        return $this->deployed;
     }
 }
