@@ -51,11 +51,16 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'confirmationUrl' => $confirmLink,
         ]);
 
+        $textBody = $this->twigEngine->render('mail/withdraw_accept.txt.twig', [
+            'user' => $user,
+            'confirmationUrl' => $confirmLink,
+        ]);
+
         $msg = (new Swift_Message('Confirm withdraw'))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
-            ->setBody($body)
-            ->setContentType('text/html');
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
 
         $this->mailer->send($msg);
     }
@@ -80,11 +85,18 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'code' => $user->getEmailAuthCode(),
         ]);
 
+        $textBody = $this->twigEngine->render('mail/auth_verification_code.txt.twig', [
+            'label' => $label,
+            'email' => $user->getEmailAuthRecipient(),
+            'code' => $user->getEmailAuthCode(),
+        ]);
+
+
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmailAuthRecipient())
-            ->setBody($body)
-            ->setContentType('text/html');
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
 
         $this->mailer->send($msg);
     }
