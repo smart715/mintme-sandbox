@@ -4,6 +4,7 @@ namespace App\Consumers;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\WithdrawCompletedEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\PaymentCryptoStrategy;
@@ -17,6 +18,7 @@ use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentConsumer implements ConsumerInterface
 {
@@ -41,6 +43,9 @@ class PaymentConsumer implements ConsumerInterface
     /** @var ClockInterface */
     private $clock;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -48,7 +53,8 @@ class PaymentConsumer implements ConsumerInterface
         TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
-        ClockInterface $clock
+        ClockInterface $clock,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -57,6 +63,7 @@ class PaymentConsumer implements ConsumerInterface
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->clock = $clock;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
@@ -103,6 +110,11 @@ class PaymentConsumer implements ConsumerInterface
 
                 $balanceContext = new BalanceContext($strategy);
                 $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
+
+                $this->eventDispatcher->dispatch(
+                    WithdrawCompletedEvent::NAME,
+                    new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount())
+                );
 
                 $this->logger->info(
                     '[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back'
