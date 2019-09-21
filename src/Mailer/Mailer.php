@@ -3,6 +3,7 @@
 namespace App\Mailer;
 
 use App\Entity\PendingWithdrawInterface;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
@@ -95,6 +96,29 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmailAuthRecipient())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendDepositCompletedMail(TradebleInterface $tradable, User $user, string $amount): void
+    {
+        $body = $this->twigEngine->render('mail/deposit_completed.html.twig', [
+            'username' => $user->getUsername(),
+            'symbol' => $tradable->getSymbol(),
+            'amount' => $amount,
+        ]);
+
+        $textBody = $this->twigEngine->render('mail/deposit_completed.txt.twig', [
+            'username' => $user->getUsername(),
+            'symbol' => $tradable->getSymbol(),
+            'amount' => $amount,
+        ]);
+
+        $msg = (new Swift_Message('Deposit Completed'))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
             ->addPart($textBody, 'text/plain');
 
