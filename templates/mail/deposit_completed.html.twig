@@ -10,7 +10,7 @@
         </tr>
         <tr>
             <th>
-                <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; color: #fff;">Your deposit of {{ amount }} {{ symbol }} was completed. You can now see it available on your account.</p>
+                <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; color: #fff;">Your deposit of {{ amount | number_format( tradable.showSubunit ?? 4, '.', ',') }} {{ tradable.symbol }} was completed. You can now see it available on your account.</p>
             </th>
         </tr>
         <tr>

@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Entity\Crypto;
 use App\Events\WithdrawCompletedEvent;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -26,11 +27,10 @@ class WithdrawCompletedListener
 
         $user = $event->getUser();
 
+        $symbol = $tradable instanceof Crypto ? $tradable->getSymbol() : $this->moneyWrapper::TOK_SYMBOL;
+
         $amount = $this->moneyWrapper->format(
-            $this->moneyWrapper->parse(
-                $event->getAmount(),
-                $tradable->getSymbol()
-            )
+            $this->moneyWrapper->parse($event->getAmount(), $symbol)
         );
 
         $this->mailer->sendWithdrawCompletedMail($tradable, $user, $amount);

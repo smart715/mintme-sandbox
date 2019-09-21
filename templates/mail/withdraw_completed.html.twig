@@ -10,7 +10,7 @@
         </tr>
         <tr>
             <th>
-                <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; color: #fff;">Your withdraw of {{ amount }} {{ symbol }} was sent to address that you specified. You should see it soon in your wallet.</p>
+                <p style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal; color: #fff;">Your withdraw of {{ amount | number_format( tradable.showSubunit ?? 4, '.', ',') }} {{ tradable.symbol }} was sent to address that you specified. You should see it soon in your wallet.</p>
             </th>
         </tr>
         <tr>

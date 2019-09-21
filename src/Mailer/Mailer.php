@@ -106,13 +106,13 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     {
         $body = $this->twigEngine->render('mail/deposit_completed.html.twig', [
             'username' => $user->getUsername(),
-            'symbol' => $tradable->getSymbol(),
+            'tradable' => $tradable,
             'amount' => $amount,
         ]);
 
         $textBody = $this->twigEngine->render('mail/deposit_completed.txt.twig', [
             'username' => $user->getUsername(),
-            'symbol' => $tradable->getSymbol(),
+            'tradable' => $tradable,
             'amount' => $amount,
         ]);
 
@@ -129,13 +129,13 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     {
         $body = $this->twigEngine->render('mail/withdraw_completed.html.twig', [
             'username' => $user->getUsername(),
-            'symbol' => $tradable->getSymbol(),
+            'tradable' => $tradable,
             'amount' => $amount,
         ]);
 
         $textBody = $this->twigEngine->render('mail/withdraw_completed.txt.twig', [
             'username' => $user->getUsername(),
-            'symbol' => $tradable->getSymbol(),
+            'tradable' => $tradable,
             'amount' => $amount,
         ]);
 

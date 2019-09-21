@@ -2,6 +2,6 @@
 {% block content %}
 Hello
 {{username}}
-Your deposit of {{ amount }} {{ symbol }} was completed.
+Your deposit of {{ amount | number_format( tradable.showSubunit ?? 4, '.', ',') }} {{ tradable.symbol }} was completed.
 You can now see it available on your account.
 {% endblock %}

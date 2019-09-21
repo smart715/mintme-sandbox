@@ -26,11 +26,10 @@ class DepositCompletedListener
 
         $user = $event->getUser();
 
+        $symbol = $tradable instanceof Crypto ? $tradable->getSymbol() : $this->moneyWrapper::TOK_SYMBOL;
+
         $amount = $this->moneyWrapper->format(
-            $this->moneyWrapper->parse(
-                $event->getAmount(),
-                $tradable->getSymbol()
-            )
+            $this->moneyWrapper->parse($event->getAmount(), $symbol)
         );
 
         $this->mailer->sendDepositCompletedMail($tradable, $user, $amount);
