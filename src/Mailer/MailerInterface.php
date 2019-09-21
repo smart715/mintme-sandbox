@@ -12,4 +12,5 @@ interface MailerInterface
     public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void;
     public function sendAuthCodeToMail(string $subject, string $label, TwoFactorInterface $user): void;
     public function sendDepositCompletedMail(TradebleInterface $tradable, User $user, string $amount): void;
+    public function sendWithdrawCompletedMail(TradebleInterface $tradable, User $user, string $amount): void;
 }
