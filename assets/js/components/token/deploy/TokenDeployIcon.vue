@@ -20,7 +20,7 @@ export default {
     },
     computed: {
         deployed: function() {
-            return tokenDeploymentStatus.deployed === this.statusProp;   
+            return tokenDeploymentStatus.deployed === this.statusProp;
         },
         showPending: function() {
             return this.isOwner && tokenDeploymentStatus.pending === this.statusProp;
@@ -28,4 +28,3 @@ export default {
     },
 };
 </script>
-

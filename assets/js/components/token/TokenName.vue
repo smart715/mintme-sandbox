@@ -8,10 +8,12 @@
                 :is-owner="editable"
                 :no-close="true"
                 :precision="precision"
+                :prevent-address-edition="preventAddressEdition"
                 :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"
                 :websocket-url="websocketUrl"
+                :withdrawal-address="withdrawalAddress"
                 @close="closeTokenEditModal"
             />
             <font-awesome-icon
@@ -49,10 +51,12 @@ export default {
         hasReleasePeriodProp: Boolean,
         identifier: String,
         name: String,
+        preventAddressEdition: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
         websocketUrl: String,
+        withdrawalAddress: String,
     },
     components: {
         FontAwesomeIcon,

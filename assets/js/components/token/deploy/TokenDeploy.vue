@@ -61,7 +61,7 @@
                 <p class="bg-info">
                     Token is already deployed.
                 </p>
-            </div>            
+            </div>
         </template>
         <div
             v-else

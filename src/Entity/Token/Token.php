@@ -57,6 +57,12 @@ class Token implements TradebleInterface
     protected $address;
 
     /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     * @var bool
+     */
+    protected $preventAddressEdition = false;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
      */
@@ -345,6 +351,18 @@ class Token implements TradebleInterface
     public function setCreatedValue(): self
     {
         $this->created = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function isPreventAddressEdition(): bool
+    {
+        return $this->preventAddressEdition;
+    }
+
+    public function setPreventAddressEdition(bool $preventAddressEdition): self
+    {
+        $this->preventAddressEdition = $preventAddressEdition;
 
         return $this;
     }

@@ -139,7 +139,7 @@ describe('TokenDeploy', () => {
                 done();
             });
         });
-        
+
         it('should be called on mounted if isOwner and token is not deployed', (done) => {
             moxios.stubRequest('token_deploy_balances', {status: 200, response: {
                     balance: 999,

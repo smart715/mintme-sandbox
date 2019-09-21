@@ -26,13 +26,22 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div
+                        v-if="!preventAddressEdition"
+                        class="row faq-block mx-0 border-bottom"
+                    >
                         <faq-item>
                             <template slot="title">
                                 Modify token withdrawal address
                             </template>
                             <template slot="body">
-                                Modify token withdrawal address
+                                <token-withdrawal-address
+                                    :is-token-exchanged="isTokenExchanged"
+                                    :token-name="currentName"
+                                    :twofa="twofa"
+                                    :withdrawal-address="withdrawalAddress"
+                                    @close="$emit('close')"
+                                />
                             </template>
                         </faq-item>
                     </div>
@@ -99,6 +108,7 @@ import TokenChangeName from '../token/TokenChangeName';
 import TokenDelete from '../token/TokenDelete';
 import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
+import TokenWithdrawalAddress from '../token/TokenWithdrawalAddress';
 import TwoFactorModal from './TwoFactorModal';
 import {FiltersMixin} from '../../mixins';
 
@@ -112,6 +122,7 @@ export default {
         TokenDelete,
         TokenDeploy,
         TokenReleasePeriod,
+        TokenWithdrawalAddress,
         TwoFactorModal,
     },
     props: {
@@ -120,11 +131,13 @@ export default {
         isOwner: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
+        preventAddressEdition: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
         visible: Boolean,
         websocketUrl: String,
+        withdrawalAddress: String,
     },
     mixins: [FiltersMixin],
     data() {
