@@ -3,6 +3,19 @@ export const GENERAL = {
     dateFormat: 'DD.MM.YYYY hh:mm:ss',
 };
 
+export const webSymbol = 'web';
+export const tokenDeploymentStatus = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
+export const addressLength = {
+    WEB: {
+        min: 42,
+        max: 42,
+    },
+    BTC: {
+        min: 25,
+        max: 42,
+    },
+};
+
 export const WSAPI = {
     order: {
         status: {

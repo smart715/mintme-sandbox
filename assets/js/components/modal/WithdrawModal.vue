@@ -62,13 +62,13 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ fee | formatFee }}</span>
+                    <span class="float-right">{{ feeAmount | formatFee }} {{ feeCurrency }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney(subunit) }}</span>
+                    <span class="float-right">{{ fullAmount | toMoney(subunit) }} {{currency}}</span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
@@ -94,18 +94,9 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin} from '../../mixins';
+import {addressLength, webSymbol} from '../../utils/constants';
 
 const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
-const ADRESS_LENGTH = {
-    WEB: {
-        min: 42,
-        max: 42,
-    },
-    BTC: {
-        min: 25,
-        max: 42,
-    },
-};
 
 export default {
     name: 'WithdrawModal',
@@ -116,9 +107,12 @@ export default {
     props: {
         visible: Boolean,
         currency: String,
+        isToken: Boolean,
         fee: String,
+        webFee: String,
         withdrawUrl: String,
         maxAmount: String,
+        availableWeb: String,
         subunit: Number,
         twofa: String,
         noClose: Boolean,
@@ -142,7 +136,16 @@ export default {
                 new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
             );
 
-            return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(), this.subunit);
+            return toMoney(
+                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
+                this.subunit
+            );
+        },
+        feeAmount: function() {
+            return this.isToken ? this.webFee : this.fee;
+        },
+        feeCurrency: function() {
+            return this.isToken ? webSymbol : this.currency;
         },
     },
     methods: {
@@ -173,6 +176,11 @@ export default {
             this.$v.$touch();
             if (this.$v.$error) {
                 this.$toasted.error('Correct your form fields');
+                return;
+            }
+
+            if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
+                this.$toasted.error('You don\'t have enough web to pay fee');
                 return;
             }
 
@@ -218,8 +226,12 @@ export default {
             address: {
                 required,
                 tokenContain: tokenContain,
-                minLength: minLength(ADRESS_LENGTH[this.currency] ? ADRESS_LENGTH[this.currency].min : 1),
-                maxLength: maxLength(ADRESS_LENGTH[this.currency] ? ADRESS_LENGTH[this.currency].max : 1),
+                minLength: minLength(
+                    addressLength[this.currency] ? addressLength[this.currency].min : addressLength.WEB.min
+                ),
+                maxLength: maxLength(
+                    addressLength[this.currency] ? addressLength[this.currency].max : addressLength.WEB.max
+                ),
             },
         };
     },

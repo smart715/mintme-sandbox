@@ -63,6 +63,12 @@ parameters:
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
 
+    # the cost of deploying token to blockchain in USD
+    deploy_cost: 49
+    deploy_rpc: 'http://localhost:3001'
+    deploy_response_timeout_seconds: 10
+    mintme_address: ''
+
     # Expiration time for token deletion confirm code (minutes)
     # Accepts an integer value:
     token_deletion_confirm_code_expiration_time: 60
@@ -72,6 +78,6 @@ parameters:
 
     # Lifetime of the trusted device token (default 48 hours)
     trusted_device_cookie_lifetime: 172800
-    
+
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true

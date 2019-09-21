@@ -2,7 +2,7 @@
 
 namespace App\Wallet\Model;
 
-use App\Entity\Crypto;
+use App\Entity\TradebleInterface;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -27,8 +27,8 @@ class Transaction
     /** @var Money */
     private $fee;
 
-    /** @var Crypto|null */
-    private $crypto;
+    /** @var TradebleInterface|null */
+    private $tradable;
 
     /** @var Status */
     private $status;
@@ -43,7 +43,7 @@ class Transaction
         string $to,
         Money $amount,
         Money $fee,
-        ?Crypto $crypto,
+        ?TradebleInterface $tradable,
         Status $status,
         Type $type
     ) {
@@ -53,7 +53,7 @@ class Transaction
         $this->to = $to;
         $this->amount = $amount;
         $this->fee = $fee;
-        $this->crypto = $crypto;
+        $this->tradable = $tradable;
         $this->status = $status;
         $this->type = $type;
     }
@@ -95,9 +95,9 @@ class Transaction
     }
 
     /** @Groups({"API"}) */
-    public function getCrypto(): ?Crypto
+    public function getTradable(): ?TradebleInterface
     {
-        return $this->crypto;
+        return $this->tradable;
     }
 
     /** @Groups({"API"}) */
