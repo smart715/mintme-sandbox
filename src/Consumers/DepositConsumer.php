@@ -63,7 +63,8 @@ class DepositConsumer implements ConsumerInterface
         MoneyWrapperInterface $moneyWrapper,
         ClockInterface $clock,
         WalletInterface $depositCommunicator,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -74,6 +75,7 @@ class DepositConsumer implements ConsumerInterface
         $this->clock = $clock;
         $this->depositCommunicator = $depositCommunicator;
         $this->em = $em;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
