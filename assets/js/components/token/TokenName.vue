@@ -3,12 +3,17 @@
         <template v-if="editable">
             <token-edit-modal
                 v-if="editable"
+                :current-name="currentName"
+                :has-release-period="hasReleasePeriod"
+                :is-owner="editable"
                 :no-close="true"
+                :precision="precision"
+                :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"
-                :current-name="currentName"
-                @close="closeTokenEditModal">
-            </token-edit-modal>
+                :websocket-url="websocketUrl"
+                @close="closeTokenEditModal"
+            />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 icon="edit"
@@ -40,10 +45,14 @@ Vue.use(Toasted, {
 export default {
     name: 'TokenName',
     props: {
-        name: String,
-        identifier: String,
         editable: Boolean,
+        hasReleasePeriod: Boolean,
+        identifier: String,
+        name: String,
+        precision: Number,
+        statusProp: String,
         twofa: Boolean,
+        websocketUrl: String,
     },
     components: {
         FontAwesomeIcon,

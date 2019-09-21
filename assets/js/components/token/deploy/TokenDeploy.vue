@@ -1,0 +1,158 @@
+<template>
+    <div>
+        <template v-if="visible">
+            <div
+                v-if="hasReleasePeriod"
+                class="text-left"
+            >
+                <p>
+                    This is final step for token creation. After you pay for deploying token to blockchain
+                    you and others will be able to withdraw tokens from mintme to your Webchain wallet.
+                </p>
+                <p class="bg-danger">
+                    This process is irreversible, once confirm payment there is no going back.
+                </p>
+                <p class="mt-5">
+                    Your current balance: {{ balance | toMoney(precision) | formatMoney }} WEB coins <br>
+                    <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
+                </p>
+                <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
+                <div class="pt-3">
+                    <button
+                        class="btn btn-info"
+                        :disabled="btnDisabled"
+                        @click="deploy"
+                    >
+                        Deploy to blockchain
+                    </button>
+                    <span
+                        class="btn-cancel pl-3 c-pointer"
+                        @click="$emit('cancel')"
+                    >
+                        Cancel
+                    </span>
+                </div>
+            </div>
+            <div
+                v-else
+                class="text-left"
+            >
+                <p class="bg-info">
+                    Please edit token release period before deploying.
+                </p>
+            </div>
+        </template>
+        <template v-else>
+            <div class="text-center">
+                <font-awesome-icon
+                    icon="circle-notch"
+                    spin
+                    class="loading-spinner"
+                    fixed-width
+                />
+            </div>
+        </template>
+    </div>
+</template>
+
+<script>
+import {toMoney, formatMoney} from '../../../utils';
+import {WebSocketMixin} from '../../../mixins';
+import Decimal from 'decimal.js';
+import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
+
+export default {
+    name: 'TokenDeploy',
+    mixins: [WebSocketMixin],
+    props: {
+        hasReleasePeriod: Boolean,
+        isOwner: Boolean,
+        name: String,
+        precision: Number,
+        statusProp: String,
+    },
+    data() {
+        return {
+            balance: null,
+            deploying: false,
+            status: this.statusProp,
+            webCost: null,
+        };
+    },
+    computed: {
+        notDeployed: function() {
+            return tokenDeploymentStatus.notDeployed === this.status;
+        },
+        pending: function() {
+            return tokenDeploymentStatus.pending === this.status;
+        },
+        deployed: function() {
+            return tokenDeploymentStatus.deployed === this.status;
+        },
+        btnDisabled: function() {
+            return this.costExceed || this.deploying;
+        },
+        visible: function() {
+            return null !== this.webCost || null !== this.balance;
+        },
+        costExceed: function() {
+            return new Decimal(this.webCost).greaterThan(this.balance);
+        },
+    },
+    methods: {
+        fetchBalances: function() {
+            this.$axios.retry.get(this.$routing.generate('token_deploy_balances', {
+                name: this.name,
+            }))
+            .then(({data}) => {
+                this.balance = data.balance;
+                this.webCost = data.webCost;
+            });
+        },
+        deploy: function() {
+            this.deploying = true;
+            this.$axios.single.post(this.$routing.generate('token_deploy', {
+                name: this.name,
+            }))
+            .then(() => {
+                this.status = tokenDeploymentStatus.pending;
+                this.$emit('cancel');
+                this.$toasted.success('Process in pending status and it will take some minutes to be done.');
+            })
+            .catch(({response}) => {
+                if (!response) {
+                    this.$toasted.error('Network error');
+                } else {
+                    this.$toasted.error('An error has occurred, please try again later');
+                }
+            })
+            .then(() => this.deploying = false);
+        },
+    },
+    mounted() {
+        if (this.notDeployed && this.isOwner) {
+            this.fetchBalances();
+            this.addMessageHandler((response) => {
+                if (
+                    'asset.update' === response.method &&
+                    response.params[0].hasOwnProperty(webSymbol)
+                ) {
+                    this.balance = response.params[0][webSymbol].available;
+                }
+            }, 'trade-buy-order-asset');
+        } else {
+            this.webCost = 0;
+            this.balance = 0;
+        }
+    },
+    filters: {
+        toMoney: function(val, precision) {
+            return toMoney(val, precision);
+        },
+        formatMoney: function(val) {
+            return formatMoney(val);
+        },
+    },
+};
+</script>
+

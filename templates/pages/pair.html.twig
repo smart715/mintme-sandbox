@@ -73,13 +73,13 @@
                         {% if token is defined %}
                         <li class="nav-item">
                             <div class="nav-link pr-md-0">
-                                <token-deploy
-                                        websocket-url="{{ global_websocket_url }}"
-                                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                        name="{{ market.quote.name }}"
-                                        :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
-                                        :precision="{{ precision }}"
-                                        :status-prop="{{ token.deploymentStatus | json_encode }}"
+                                <token-deploy-icon
+                                    :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
+                                    :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                    name="{{ market.quote.name }}"
+                                    :precision="{{ precision }}"
+                                    :status-prop="{{ token.deploymentStatus | json_encode }}"
+                                    websocket-url="{{ global_websocket_url }}"
                                 />
                             </div>
                         </li>
@@ -87,13 +87,15 @@
                         <li class="nav-item float-sm-right">
                             <div class="nav-link">
                                 <token-name
-                                    websocket-url="{{ global_websocket_url }}"
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
                                     identifier="{{ market.quote.identifier }}"
                                     name="{{ market.quote.name }}"
+                                    :precision="{{ precision }}"
+                                    :status-prop="{{ token.deploymentStatus | json_encode }}"
                                     :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                >
-                                </token-name>
+                                    websocket-url="{{ global_websocket_url }}"
+                                />
                             </div>
                         </li>
                         <div class="clearfix"></div>

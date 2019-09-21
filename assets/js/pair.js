@@ -4,7 +4,7 @@ import TokenIntroductionProfile from './components/token/introduction/TokenIntro
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenName from './components/token/TokenName';
-import TokenDeploy from './components/token/TokenDeploy';
+import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
 
@@ -25,7 +25,7 @@ new Vue({
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
     TokenName,
-    TokenDeploy,
+    TokenDeployIcon,
     TopHolders,
     Tabs,
   },

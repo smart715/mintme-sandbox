@@ -58,7 +58,15 @@
                                 Deploy token to blockchain
                             </template>
                             <template slot="body">
-                                Deploy token to blockchain
+                                <token-deploy
+                                    :has-release-period="hasReleasePeriod"
+                                    :is-owner="isOwner"
+                                    :name="currentName"
+                                    :precision="precision"
+                                    :status-prop="statusProp"
+                                    :websocket-url="websocketUrl"
+                                    @cancel="$emit('close')"
+                                />
                             </template>
                         </faq-item>
                     </div>
@@ -88,6 +96,7 @@ import Guide from '../Guide';
 import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
 import TokenDelete from '../token/TokenDelete';
+import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
 import {FiltersMixin} from '../../mixins';
@@ -100,15 +109,21 @@ export default {
         Modal,
         TokenChangeName,
         TokenDelete,
+        TokenDeploy,
         TokenReleasePeriod,
         TwoFactorModal,
     },
     props: {
+        currentName: String,
+        hasReleasePeriod: Boolean,
+        isOwner: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
-        currentName: String,
+        precision: Number,
+        statusProp: String,
         twofa: Boolean,
         visible: Boolean,
+        websocketUrl: String,
     },
     mixins: [FiltersMixin],
     methods: {
