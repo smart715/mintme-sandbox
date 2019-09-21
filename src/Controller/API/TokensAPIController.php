@@ -374,10 +374,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/delete", name="token_delete", options={"expose"=true})
-=======
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
->>>>>>> 952f3c4afc036081d7fd202311852cc0ec15812a
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */
