@@ -1,5 +1,5 @@
 import {createLocalVue, mount} from '@vue/test-utils';
-import TokenDeploy from '../../js/components/token/TokenDeploy';
+import TokenDeploy from '../../js/components/token/deploy/TokenDeploy';
 import moxios from 'moxios';
 import Vuex from 'vuex';
 import makeOrder from '../../js/storage/modules/make_order';
@@ -63,97 +63,61 @@ describe('TokenDeploy', () => {
         moxios.uninstall();
     });
 
-    it('should be not exist if balances not fetched yet', () => {
+    it('show loading icon if balances not fetched yet', () => {
         const wrapper = mockTokenDeploy(false);
-        expect(wrapper.find('div').exists()).to.be.false;
+        wrapper.vm.hasReleasePeriod = true;
+        expect(wrapper.find('.loading-spinner').exists()).to.be.true;
         wrapper.vm.balance = 999;
         wrapper.vm.webCost = 999;
-        expect(wrapper.find('div').exists()).to.be.true;
+        expect(wrapper.find('.loading-spinner').exists()).to.be.false;
     });
 
-    it('should be hidden if not owner & not deployed', () => {
+    it('show message that editing of token release period is needed', () => {
         const wrapper = mockTokenDeploy(true);
-        wrapper.vm.webCost = 999;
-        wrapper.vm.isOwner = false;
-        wrapper.vm.status = 'not-deployed';
-        expect(wrapper.find('button').exists()).to.be.false;
-        expect(wrapper.find('.deployed-icon').exists()).to.be.false;
+        const message = wrapper.find('.bg-info');
+        expect(message.exists()).to.be.true;
+        expect(message.text()).to.equal('Please edit token release period before deploying.');
     });
 
-    it('should has deployed-icon if deployed', () => {
+    it('should disabled button if the cost is higher than the balance or is deploying', () => {
         const wrapper = mockTokenDeploy(true);
-        wrapper.vm.status = 'deployed';
-        wrapper.vm.isOwner = true;
-        expect(wrapper.find('button').exists()).to.be.false;
-        expect(wrapper.find('.deployed-icon').exists()).to.be.true;
-        wrapper.vm.isOwner = false;
-        expect(wrapper.find('button').exists()).to.be.false;
-        expect(wrapper.find('.deployed-icon').exists()).to.be.true;
+        wrapper.vm.balance = 999;
+        wrapper.vm.webCost = 99;
+        wrapper.vm.deploying = false;
+        expect(wrapper.vm.btnDisabled).to.be.false;
+
+        wrapper.vm.balance = 999;
+        wrapper.vm.webCost = 99;
+        wrapper.vm.deploying = true;
+        expect(wrapper.vm.btnDisabled).to.be.true;
+
+        wrapper.vm.balance = 999;
+        wrapper.vm.webCost = 9999;
+        wrapper.vm.deploying = false;
+        expect(wrapper.vm.btnDisabled).to.be.true;
     });
 
-    describe('button', () => {
-        it('should be visible if not deployed & isOwner', () => {
-            const wrapper = mockTokenDeploy(true);
-            wrapper.vm.isOwner = true;
-            wrapper.vm.status = 'not-deployed';
-            expect(wrapper.find('button').exists()).to.be.true;
-        });
+    it('should show exceed cost message if the cost is higher than the balance', () => {
+        const wrapper = mockTokenDeploy(true);
+        wrapper.vm.balance = 999;
+        wrapper.vm.webCost = 99;
+        expect(wrapper.vm.costExceed).to.be.false;
 
-        it('should not open modal if toke has not release period', () => {
-            const wrapper = mockTokenDeploy(true);
-            wrapper.vm.hasReleasePeriod = false;
-            wrapper.vm.setModalVisible(true);
-            expect(wrapper.vm.modalVisible).to.be.false;
-            wrapper.vm.hasReleasePeriod = true;
-            wrapper.vm.setModalVisible(true);
-            expect(wrapper.vm.modalVisible).to.be.true;
-        });
+        wrapper.vm.balance = 999;
+        wrapper.vm.webCost = 9999;
+        expect(wrapper.vm.costExceed).to.be.true;
     });
 
-    describe('modal', () => {
-        it('should disabled button if the cost is higher than the balance or is deploying', () => {
-            const wrapper = mockTokenDeploy(true);
-            wrapper.vm.balance = 999;
-            wrapper.vm.webCost = 99;
-            wrapper.vm.deploying = false;
-            expect(wrapper.vm.btnModalDisabled).to.be.false;
+    it('deploy() function should work correctly', (done) => {
+        const wrapper = mockTokenDeploy(true, true, 'not-deployed');
+        wrapper.vm.deploy();
+        expect(wrapper.vm.status).to.deep.equal('not-deployed');
 
-            wrapper.vm.balance = 999;
-            wrapper.vm.webCost = 99;
-            wrapper.vm.deploying = true;
-            expect(wrapper.vm.btnModalDisabled).to.be.true;
+        moxios.stubRequest('token_deploy', {status: 200, response: true});
 
-            wrapper.vm.balance = 999;
-            wrapper.vm.webCost = 9999;
-            wrapper.vm.deploying = false;
-            expect(wrapper.vm.btnModalDisabled).to.be.true;
-        });
-
-        it('should show exceed cost message if the cost is higher than the balance', () => {
-            const wrapper = mockTokenDeploy(true);
-            wrapper.vm.balance = 999;
-            wrapper.vm.webCost = 99;
-            expect(wrapper.vm.costExceed).to.be.false;
-
-            wrapper.vm.balance = 999;
-            wrapper.vm.webCost = 9999;
-            expect(wrapper.vm.costExceed).to.be.true;
-        });
-    });
-
-    describe('deploy() function', () => {
-        it('should work correctly', (done) => {
-            const wrapper = mockTokenDeploy(true, true, 'not-deployed');
-            wrapper.vm.modalVisible = true;
-            wrapper.vm.deploy();
-            expect(wrapper.vm.status).to.deep.equal('not-deployed');
-
-            moxios.stubRequest('token_deploy', {status: 200, response: true});
-
-            moxios.wait(() => {
-                expect(wrapper.vm.status).to.deep.equal('pending');
-                done();
-            });
+        moxios.wait(() => {
+            expect(wrapper.vm.status).to.deep.equal('pending');
+            done();
         });
     });
 
@@ -175,6 +139,7 @@ describe('TokenDeploy', () => {
                 done();
             });
         });
+        
         it('should be called on mounted if isOwner and token is not deployed', (done) => {
             moxios.stubRequest('token_deploy_balances', {status: 200, response: {
                     balance: 999,
