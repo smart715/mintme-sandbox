@@ -107,13 +107,13 @@ export default {
                 this.closeModal();
                 return;
             } else if (!this.$v.newAddress.addressContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
+                this.$toasted.error('Withdrawal address can contain alphabets and numbers');
                 return;
             } else if (!this.$v.newAddress.minLength) {
-                this.$toasted.error('Token name should have at least 4 symbols');
+                this.$toasted.error(`Withdrawal address should have at least ${addressLength.WEB.min} symbols`);
                 return;
             } else if (!this.$v.newAddress.maxLength) {
-                this.$toasted.error('Token name can not be longer than 60 characters');
+                this.$toasted.error(`Withdrawal address can not be longer than ${addressLength.WEB.max} characters`);
                 return;
             }
 
