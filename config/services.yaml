@@ -338,6 +338,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: fos_user.registration.completed }
 
+    App\EventListener\DepositCompletedListener:
+        tags:
+             - { name: "kernel.event_listener", event: deposit.completed }
+
     kernel.listener.command_dispatch:
         class: App\EventListener\ConsoleCommandsListener
         tags:
