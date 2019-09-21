@@ -1,0 +1,7 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+Hello
+{{username}}
+Your deposit of {{ amount }} {{ symbol }} was completed.
+You can now see it available on your account.
+{% endblock %}
