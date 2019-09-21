@@ -21,7 +21,7 @@ export default {
     data() {
         return {
             deployed: tokenDeploymentStatus.deployed === this.statusProp,
-            showPending: this.isOwner && this.pending,
+            showPending: this.isOwner && tokenDeploymentStatus.pending === this.statusProp,
         };
     },
 };
