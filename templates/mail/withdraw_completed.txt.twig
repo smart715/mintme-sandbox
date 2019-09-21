@@ -1,0 +1,7 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+Hello
+{{username}}
+Your withdraw of {{ amount }} {{ symbol }} was sent to address that you specified.
+You should see it soon in your wallet.
+{% endblock %}
