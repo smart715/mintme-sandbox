@@ -1,57 +1,76 @@
 <template>
     <div>
-        <template v-if="visible">
-            <div
-                v-if="hasReleasePeriod"
-                class="text-left"
-            >
-                <p>
-                    This is final step for token creation. After you pay for deploying token to blockchain
-                    you and others will be able to withdraw tokens from mintme to your Webchain wallet.
-                </p>
-                <p class="bg-danger">
-                    This process is irreversible, once confirm payment there is no going back.
-                </p>
-                <p class="mt-5">
-                    Your current balance: {{ balance | toMoney(precision) | formatMoney }} WEB coins <br>
-                    <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
-                </p>
-                <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
-                <div class="pt-3">
-                    <button
-                        class="btn btn-info"
-                        :disabled="btnDisabled"
-                        @click="deploy"
-                    >
-                        Deploy to blockchain
-                    </button>
-                    <span
-                        class="btn-cancel pl-3 c-pointer"
-                        @click="$emit('cancel')"
-                    >
-                        Cancel
-                    </span>
+        <template v-if="hasReleasePeriod">
+            <template v-if="notDeployed">
+                <div
+                    v-if="visible"
+                    class="text-left"
+                >
+                    <p>
+                        This is final step for token creation. After you pay for deploying token to blockchain
+                        you and others will be able to withdraw tokens from mintme to your Webchain wallet.
+                    </p>
+                    <p class="bg-danger">
+                        This process is irreversible, once confirm payment there is no going back.
+                    </p>
+                    <p class="mt-5">
+                        Your current balance: {{ balance | toMoney(precision) | formatMoney }} WEB coins <br>
+                        <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
+                    </p>
+                    <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
+                    <div class="pt-3">
+                        <button
+                            class="btn btn-info"
+                            :disabled="btnDisabled"
+                            @click="deploy"
+                        >
+                            Deploy to blockchain
+                        </button>
+                        <span
+                            class="btn-cancel pl-3 c-pointer"
+                            @click="$emit('cancel')"
+                        >
+                            Cancel
+                        </span>
+                    </div>
                 </div>
-            </div>
+                <div
+                    v-else
+                    class="text-center"
+                >
+                    <font-awesome-icon
+                        icon="circle-notch"
+                        spin
+                        class="loading-spinner"
+                        fixed-width
+                    />
+                </div>
+            </template>
             <div
-                v-else
+                v-else-if="showPending"
                 class="text-left"
             >
                 <p class="bg-info">
-                    Please edit token release period before deploying.
+                    Deploy is pending.
                 </p>
             </div>
+            <div
+                v-else-if="deployed"
+                class="text-left"
+            >
+                <p class="bg-info">
+                    Token is already deployed.
+                </p>
+            </div>            
         </template>
-        <template v-else>
-            <div class="text-center">
-                <font-awesome-icon
-                    icon="circle-notch"
-                    spin
-                    class="loading-spinner"
-                    fixed-width
-                />
-            </div>
-        </template>
+        <div
+            v-else
+            class="text-left"
+        >
+            <p class="bg-info">
+                Please edit token release period before deploying.
+            </p>
+        </div>
     </div>
 </template>
 
@@ -88,6 +107,9 @@ export default {
         },
         deployed: function() {
             return tokenDeploymentStatus.deployed === this.status;
+        },
+        showPending: function() {
+            return this.isOwner && this.pending;
         },
         btnDisabled: function() {
             return this.costExceed || this.deploying;

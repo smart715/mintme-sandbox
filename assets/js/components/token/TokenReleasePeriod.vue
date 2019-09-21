@@ -136,7 +136,7 @@ export default {
                 'releasePeriod': this.currentPeriod,
                 'code': code,
             }).then((response) => {
-                this.$emit('onStatsUpdate', response);
+                this.$emit('update', response);
                 this.$toasted.success('Release period updated.');
                 this.cancelAction();
             }).catch((error) => {

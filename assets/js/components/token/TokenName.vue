@@ -4,7 +4,7 @@
             <token-edit-modal
                 v-if="editable"
                 :current-name="currentName"
-                :has-release-period="hasReleasePeriod"
+                :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
                 :no-close="true"
                 :precision="precision"
@@ -46,7 +46,7 @@ export default {
     name: 'TokenName',
     props: {
         editable: Boolean,
-        hasReleasePeriod: Boolean,
+        hasReleasePeriodProp: Boolean,
         identifier: String,
         name: String,
         precision: Number,

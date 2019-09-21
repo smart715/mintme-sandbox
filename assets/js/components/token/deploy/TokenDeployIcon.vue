@@ -18,11 +18,13 @@ export default {
         isOwner: Boolean,
         statusProp: String,
     },
-    data() {
-        return {
-            deployed: tokenDeploymentStatus.deployed === this.statusProp,
-            showPending: this.isOwner && tokenDeploymentStatus.pending === this.statusProp,
-        };
+    computed: {
+        deployed: function() {
+            return tokenDeploymentStatus.deployed === this.statusProp;   
+        },
+        showPending: function() {
+            return this.isOwner && tokenDeploymentStatus.pending === this.statusProp;
+        },
     },
 };
 </script>

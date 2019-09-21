@@ -88,7 +88,7 @@
                             <div class="nav-link">
                                 <token-name
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
+                                    :has-release-period-prop="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
                                     identifier="{{ market.quote.identifier }}"
                                     name="{{ market.quote.name }}"
                                     :precision="{{ precision }}"

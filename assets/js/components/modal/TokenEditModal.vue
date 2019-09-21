@@ -47,6 +47,7 @@
                                     :is-token-exchanged="isTokenExchanged"
                                     :token-name="currentName"
                                     :twofa="twofa"
+                                    @update="releasePeriodUpdated"
                                     @cancel="$emit('close')"
                                 />
                             </template>
@@ -115,7 +116,7 @@ export default {
     },
     props: {
         currentName: String,
-        hasReleasePeriod: Boolean,
+        hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
@@ -126,7 +127,15 @@ export default {
         websocketUrl: String,
     },
     mixins: [FiltersMixin],
+    data() {
+        return {
+            hasReleasePeriod: this.hasReleasePeriodProp,
+        };
+    },
     methods: {
+        releasePeriodUpdated: function() {
+            this.hasReleasePeriod = true;
+        },
         refreshSliders: function() {
             this.$refs['token-release-period-component'].$refs['released-slider'].refresh();
             this.$refs['token-release-period-component'].$refs['release-period-slider'].refresh();
