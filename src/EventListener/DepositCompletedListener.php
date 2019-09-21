@@ -2,8 +2,10 @@
 
 namespace App\EventListener;
 
+use App\Entity\Crypto;
 use App\Events\DepositCompletedEvent;
 use App\Mailer\MailerInterface;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 
 class DepositCompletedListener
@@ -26,7 +28,7 @@ class DepositCompletedListener
 
         $user = $event->getUser();
 
-        $symbol = $tradable instanceof Crypto ? $tradable->getSymbol() : $this->moneyWrapper::TOK_SYMBOL;
+        $symbol = $tradable instanceof Crypto ? $tradable->getSymbol() : MoneyWrapper::TOK_SYMBOL;
 
         $amount = $this->moneyWrapper->format(
             $this->moneyWrapper->parse($event->getAmount(), $symbol)
