@@ -28,7 +28,9 @@ class DepositCompletedListener
 
         $user = $event->getUser();
 
-        $symbol = $tradable instanceof Crypto ? $tradable->getSymbol() : MoneyWrapper::TOK_SYMBOL;
+        $symbol = $tradable instanceof Crypto
+            ? $tradable->getSymbol()
+            : MoneyWrapper::TOK_SYMBOL;
 
         $amount = $this->moneyWrapper->format(
             $this->moneyWrapper->parse($event->getAmount(), $symbol)
