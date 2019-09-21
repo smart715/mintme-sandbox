@@ -342,6 +342,10 @@ services:
         tags:
              - { name: "kernel.event_listener", event: deposit.completed }
 
+    App\EventListener\WithdrawCompletedListener:
+        tags:
+             - { name: "kernel.event_listener", event: withdraw.completed }
+
     kernel.listener.command_dispatch:
         class: App\EventListener\ConsoleCommandsListener
         tags:
