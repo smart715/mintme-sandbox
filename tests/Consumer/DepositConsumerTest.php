@@ -21,6 +21,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DepositConsumerTest extends TestCase
 {
@@ -36,7 +37,8 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
@@ -60,7 +62,8 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
@@ -84,7 +87,8 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
@@ -108,7 +112,8 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
@@ -131,7 +136,8 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager($this->once())
+            $this->mockEntityManager($this->once()),
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
@@ -156,7 +162,8 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager($this->never())
+            $this->mockEntityManager($this->never()),
+            $this->mockEventDispatcher()
         );
 
         $this->assertTrue(
@@ -186,7 +193,8 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockEventDispatcher()
         );
 
         $this->assertFalse(
@@ -287,5 +295,10 @@ class DepositConsumerTest extends TestCase
         });
 
         return $mw;
+    }
+
+    private function mockEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->createMock(EventDispatcherInterface::class);
     }
 }
