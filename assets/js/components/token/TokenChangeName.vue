@@ -16,7 +16,7 @@
         <div class="col-12 pt-2 px-0 clearfix">
             <button
                 class="btn btn-primary float-left"
-                :disabled="submitting || isTokenExchanged"
+                :disabled="btnDisabled"
                 @click="editName"
             >
                 Save
@@ -51,6 +51,7 @@ export default {
     },
     props: {
         isTokenExchanged: Boolean,
+        isTokenNotDeployed: Boolean,
         currentName: String,
         twofa: Boolean,
     },
@@ -61,6 +62,11 @@ export default {
             showTwoFactorModal: false,
             submitting: false,
         };
+    },
+    computed: {
+        btnDisabled: function() {
+            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
+        },
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -80,6 +86,12 @@ export default {
             this.$v.$touch();
             if (this.currentName === this.newName) {
                 this.closeModal();
+                return;
+            } else if (this.isTokenExchanged) {
+                this.$toasted.error('You need all your tokens to change token\'s name');
+                return;
+            } else if (!this.isTokenNotDeployed) {
+                this.$toasted.error('Token is deploying or deployed.');
                 return;
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');

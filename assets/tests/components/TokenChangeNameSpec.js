@@ -12,19 +12,27 @@ describe('TokenChangeName', () => {
             propsData: {
                 currentName: 'foobar',
                 twofa: false,
-                isTokenExchanged: true,
             },
         });
+
         expect(wrapper.vm.currentName).to.equal('foobar');
         expect(wrapper.vm.newName).to.equal('foobar');
         expect(wrapper.find('input').element.value).to.equal('foobar');
-        expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
-    });
 
-    it('renders correctly with assigned props 2', () => {
-        const wrapper = mount(TokenChangeName, {
-            propsData: {isTokenExchanged: false},
-        });
+        wrapper.vm.isTokenExchanged = true;
+        wrapper.vm.isTokenNotDeployed = false;
+        expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+
+        wrapper.vm.isTokenExchanged = true;
+        wrapper.vm.isTokenNotDeployed = true;
+        expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+
+        wrapper.vm.isTokenExchanged = false;
+        wrapper.vm.isTokenNotDeployed = false;
+        expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+
+        wrapper.vm.isTokenExchanged = false;
+        wrapper.vm.isTokenNotDeployed = true;
         expect(wrapper.find('button').attributes('disabled')).to.equal(undefined);
     });
 
@@ -43,6 +51,8 @@ describe('TokenChangeName', () => {
             propsData: {
                 currentName: 'foobar',
                 twofa: true,
+                isTokenExchanged: false,
+                isTokenNotDeployed: true,
             },
         });
         expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);

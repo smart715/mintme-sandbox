@@ -11,6 +11,7 @@ describe('TokenDeployIcon', () => {
         });
         expect(wrapper.find('.deployed-icon').exists()).to.be.false;
         expect(wrapper.find('.loading-spinner').exists()).to.be.false;
+        expect(wrapper.find('.not-deployed-icon').exists()).to.be.true;
     });
 
     it('do not show if not owner & not deployed', () => {
@@ -22,6 +23,7 @@ describe('TokenDeployIcon', () => {
         });
         expect(wrapper.find('.deployed-icon').exists()).to.be.false;
         expect(wrapper.find('.loading-spinner').exists()).to.be.false;
+        expect(wrapper.find('.not-deployed-icon').exists()).to.be.true;
     });
 
     it('show pending icon if owner & pending', () => {
@@ -33,6 +35,7 @@ describe('TokenDeployIcon', () => {
         });
         expect(wrapper.find('.deployed-icon').exists()).to.be.false;
         expect(wrapper.findAll('.loading-spinner').exists()).to.be.true;
+        expect(wrapper.find('.not-deployed-icon').exists()).to.be.false;
     });
 
     it('do not show pending icon if not owner & pending', () => {
@@ -44,6 +47,7 @@ describe('TokenDeployIcon', () => {
         });
         expect(wrapper.find('.deployed-icon').exists()).to.be.false;
         expect(wrapper.find('.loading-spinner').exists()).to.be.false;
+        expect(wrapper.find('.not-deployed-icon').exists()).to.be.false;
     });
 
     it('show deployed icon if deployed', () => {
@@ -54,5 +58,6 @@ describe('TokenDeployIcon', () => {
         });
         expect(wrapper.find('.deployed-icon').exists()).to.be.true;
         expect(wrapper.find('.loading-spinner').exists()).to.be.false;
+        expect(wrapper.find('.not-deployed-icon').exists()).to.be.false;
     });
 });

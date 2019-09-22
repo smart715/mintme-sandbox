@@ -6,9 +6,11 @@
                 :current-name="currentName"
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
+                :is-token-exchanged="isTokenExchanged"
+                :is-token-not-deployed="isTokenNotDeployed"
                 :no-close="true"
                 :precision="precision"
-                :prevent-address-edition="preventAddressEdition"
+                :prevent-address-edition-prop="preventAddressEditionProp"
                 :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"
@@ -51,7 +53,7 @@ export default {
         hasReleasePeriodProp: Boolean,
         identifier: String,
         name: String,
-        preventAddressEdition: Boolean,
+        preventAddressEditionProp: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
@@ -108,16 +110,6 @@ export default {
         },
         editToken: function() {
             if (!this.editable) {
-                return;
-            }
-
-            if (null === this.isTokenExchanged || this.isTokenExchanged) {
-                this.$toasted.error('You need all your tokens to change token\'s name or delete token');
-                return;
-            }
-
-            if (!this.isTokenNotDeployed) {
-                this.$toasted.error('Token is deploying or deployed.');
                 return;
             }
 

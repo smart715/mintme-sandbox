@@ -1,7 +1,25 @@
 <template>
     <div>
+        <template v-if="btnDisabled">
+            <span class="btn-cancel px-0 m-1 text-muted">
+                Delete this token
+            </span>
+            <guide>
+                <template slot="header">
+                    Delete token
+                </template>
+                <template slot="body">
+                    <p v-if="isTokenExchanged">
+                        You need all your tokens to delete token.
+                    </p>
+                    <p v-else-if="!isTokenNotDeployed">
+                        Token is deploying or deployed.
+                    </p>
+                </template>
+            </guide>
+        </template>
         <span
-            :disabled="isTokenExchanged"
+            v-else
             class="btn-cancel px-0 c-pointer m-1"
             @click="deleteToken"
         >
@@ -17,6 +35,7 @@
 </template>
 
 <script>
+import Guide from '../Guide';
 import Toasted from 'vue-toasted';
 import TwoFactorModal from '../modal/TwoFactorModal';
 
@@ -31,10 +50,12 @@ export default {
     name: 'TokenDelete',
     props: {
         isTokenExchanged: Boolean,
+        isTokenNotDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
     },
     components: {
+        Guide,
         TwoFactorModal,
     },
     data() {
@@ -42,6 +63,11 @@ export default {
             needToSendCode: !this.twofa,
             showTwoFactorModal: false,
         };
+    },
+    computed: {
+        btnDisabled: function() {
+            return this.isTokenExchanged || !this.isTokenNotDeployed;
+        },
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -57,6 +83,14 @@ export default {
             this.sendConfirmCode();
         },
         doDeleteToken: function(code = '') {
+            if (this.isTokenExchanged) {
+                this.$toasted.error('You need all your tokens to delete token.');
+                return;
+            } else if (!this.isTokenNotDeployed) {
+                this.$toasted.error('Token is deploying or deployed.');
+                return;
+            }
+
             this.$axios.single.post(this.$routing.generate('token_delete', {
                     name: this.tokenName,
                 }), {
@@ -82,6 +116,11 @@ export default {
                 });
         },
         sendConfirmCode: function() {
+            if (this.btnDisabled) {
+                this.needToSendCode = false;
+                return;
+            }
+
             this.$axios.single.post(this.$routing.generate('token_send_code', {
                     name: this.tokenName,
                 }))

@@ -20,7 +20,7 @@
                     <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
                     <div class="pt-3">
                         <button
-                            class="btn btn-info"
+                            class="btn btn-primary"
                             :disabled="btnDisabled"
                             @click="deploy"
                         >
@@ -50,7 +50,7 @@
                 v-else-if="showPending"
                 class="text-left"
             >
-                <p class="bg-info">
+                <p class="bg-info m-0 py-1 px-3">
                     Deploy is pending.
                 </p>
             </div>
@@ -58,7 +58,7 @@
                 v-else-if="deployed"
                 class="text-left"
             >
-                <p class="bg-info">
+                <p class="bg-info m-0 py-1 px-3">
                     Token is already deployed.
                 </p>
             </div>
@@ -67,7 +67,7 @@
             v-else
             class="text-left"
         >
-            <p class="bg-info">
+            <p class="bg-info m-0 py-1 px-3">
                 Please edit token release period before deploying.
             </p>
         </div>

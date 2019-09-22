@@ -26,8 +26,8 @@
                             :min="1" :max="99"
                             :interval="1"
                             :tooltip="false"
-                            width="100%">
-                        </vue-slider>
+                            width="100%"
+                        />
                     </b-col>
                     <b-col cols="2" class="text-center px-0">
                         <b>99%</b>
@@ -47,8 +47,8 @@
                             :data="[1,2,3,5,10,15,20,30,40,50]"
                             :interval="10"
                             :tooltip="false"
-                            width="100%">
-                        </vue-slider>
+                            width="100%"
+                        />
                     </b-col>
                     <b-col cols="2" class="text-center px-0">
                         <font-awesome-icon icon="lock" class="ml-1 mb-1" />
@@ -57,8 +57,20 @@
             </b-col>
             <b-col cols="12" class="mt-3">
                 <div class="text-left">
-                    <b-button type="submit" class="px-4" variant="primary" @click="saveReleasePeriod">Save</b-button>
-                    <span class="btn-cancel pl-3 c-pointer" @click="cancelAction">Cancel</span>
+                    <b-button
+                        type="submit"
+                        class="px-4"
+                        variant="primary"
+                        @click="saveReleasePeriod"
+                    >
+                        Save
+                    </b-button>
+                    <span
+                        class="btn-cancel pl-3 c-pointer"
+                        @click="cancelAction"
+                    >
+                        Cancel
+                    </span>
                 </div>
             </b-col>
         </b-row>

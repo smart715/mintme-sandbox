@@ -38,7 +38,7 @@
         <div class="col-12 px-0 clearfix">
             <button
                 class="btn btn-primary float-left"
-                :disabled="submitting || isTokenExchanged"
+                :disabled="submitting"
                 @click="editAddress"
             >
                 Save
@@ -73,7 +73,6 @@ export default {
         TwoFactorModal,
     },
     props: {
-        isTokenExchanged: Boolean,
         tokenName: String,
         twofa: Boolean,
         withdrawalAddress: String,
@@ -143,6 +142,10 @@ export default {
 
                         this.showTwoFactorModal = false;
                         this.closeModal();
+
+                        if (this.preventEdition) {
+                            this.$emit('prevent-edition');
+                        }
                     }
                 }, (error) => {
                     if (!error.response) {

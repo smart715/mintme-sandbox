@@ -33,21 +33,32 @@ describe('TokenDelete', () => {
     });
 
     it('renders correctly with assigned props', () => {
-        const wrapper = mount(TokenDelete, {
-            propsData: {isTokenExchanged: true},
-        });
-        expect(wrapper.find('span').attributes('disabled')).to.equal('disabled');
-    });
+        const wrapper = mount(TokenDelete);
 
-    it('renders correctly with assigned props 2', () => {
-        const wrapper = mount(TokenDelete, {
-            propsData: {isTokenExchanged: false},
-        });
-        expect(wrapper.find('span').attributes('disabled')).to.equal(undefined);
+        wrapper.vm.isTokenExchanged = true;
+        wrapper.vm.isTokenNotDeployed = false;
+        expect(wrapper.find('span').classes('text-muted')).to.be.true;
+
+        wrapper.vm.isTokenExchanged = true;
+        wrapper.vm.isTokenNotDeployed = true;
+        expect(wrapper.find('span').classes('text-muted')).to.be.true;
+
+        wrapper.vm.isTokenExchanged = false;
+        wrapper.vm.isTokenNotDeployed = false;
+        expect(wrapper.find('span').classes('text-muted')).to.be.true;
+
+        wrapper.vm.isTokenExchanged = false;
+        wrapper.vm.isTokenNotDeployed = true;
+        expect(wrapper.find('span').classes('text-muted')).to.be.false;
     });
 
     it('open TwoFactorModal for token deletion', () => {
-        const wrapper = mount(TokenDelete);
+        const wrapper = mount(TokenDelete, {
+            propsData: {
+                isTokenExchanged: false,
+                isTokenNotDeployed: true,
+            },
+        });
         wrapper.find('span').trigger('click');
         expect(wrapper.vm.showTwoFactorModal).to.deep.equal(true);
     });

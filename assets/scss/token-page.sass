@@ -1,6 +1,10 @@
 #token
-  .deployed-icon
+  .deployed-icon, .not-deployed-icon
     height: 25px
+  
+  .not-deployed-icon
+    img
+      filter: grayscale(100%)
 
   .buy-order, .sell-order
     @include media-breakpoint-up('xl')

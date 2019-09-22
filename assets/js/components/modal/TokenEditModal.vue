@@ -19,6 +19,7 @@
                             <template slot="body">
                                 <token-change-name
                                     :is-token-exchanged="isTokenExchanged"
+                                    :is-token-not-deployed="isTokenNotDeployed"
                                     :current-name="currentName"
                                     :twofa="twofa"
                                     @close="$emit('close')"
@@ -29,6 +30,7 @@
                     <div
                         v-if="!preventAddressEdition"
                         class="row faq-block mx-0 border-bottom"
+                        ref="withdrawal-address"
                     >
                         <faq-item>
                             <template slot="title">
@@ -36,10 +38,10 @@
                             </template>
                             <template slot="body">
                                 <token-withdrawal-address
-                                    :is-token-exchanged="isTokenExchanged"
                                     :token-name="currentName"
                                     :twofa="twofa"
                                     :withdrawal-address="withdrawalAddress"
+                                    @prevent-edition="preventEditionAddressUpdated"
                                     @close="$emit('close')"
                                 />
                             </template>
@@ -88,6 +90,7 @@
                             <template slot="body">
                                 <token-delete
                                     :is-token-exchanged="isTokenExchanged"
+                                    :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
                                     :twofa="twofa"
                                 />
@@ -130,8 +133,9 @@ export default {
         hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
         isTokenExchanged: Boolean,
+        isTokenNotDeployed: Boolean,
         noClose: Boolean,
-        preventAddressEdition: Boolean,
+        preventAddressEditionProp: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
@@ -143,9 +147,13 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
+            preventAddressEdition: this.preventAddressEditionProp,
         };
     },
     methods: {
+        preventEditionAddressUpdated: function() {
+            this.preventEditionAddress = true;
+        },
         releasePeriodUpdated: function() {
             this.hasReleasePeriod = true;
         },

@@ -174,17 +174,6 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiBadRequestException('Withdrawal address can\'t be null');
         }
 
-        /** @var User $user */
-        $user = $this->getUser();
-
-        if (!$user->isGoogleAuthenticatorEnabled()) {
-            $response = $emailAuthManager->checkCode($user, $request->get('code'));
-
-            if (!$response->getResult()) {
-                throw new ApiUnauthorizedException($response->getMessage());
-            }
-        }
-
         $token->setAddress($address);
         $token->setPreventAddressEdition($preventEdition);
         $this->em->persist($token);
