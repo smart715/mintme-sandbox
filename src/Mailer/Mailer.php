@@ -102,44 +102,21 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendDepositCompletedMail(TradebleInterface $tradable, User $user, string $amount): void
+    public function sendTransactionCompletedMail(TradebleInterface $tradable, User $user, string $amount, string $transactionType): void
     {
-        $body = $this->twigEngine->render('mail/deposit_completed.html.twig', [
+        $body = $this->twigEngine->render("mail/{$transactionType}_completed.html.twig", [
             'username' => $user->getUsername(),
             'tradable' => $tradable,
             'amount' => $amount,
         ]);
 
-        $textBody = $this->twigEngine->render('mail/deposit_completed.txt.twig', [
+        $textBody = $this->twigEngine->render("mail/{$transactionType}_completed.txt.twig", [
             'username' => $user->getUsername(),
             'tradable' => $tradable,
             'amount' => $amount,
         ]);
 
-        $msg = (new Swift_Message('Deposit Completed'))
-            ->setFrom([$this->mail => 'Mintme'])
-            ->setTo($user->getEmail())
-            ->setBody($body, 'text/html')
-            ->addPart($textBody, 'text/plain');
-
-        $this->mailer->send($msg);
-    }
-
-    public function sendWithdrawCompletedMail(TradebleInterface $tradable, User $user, string $amount): void
-    {
-        $body = $this->twigEngine->render('mail/withdraw_completed.html.twig', [
-            'username' => $user->getUsername(),
-            'tradable' => $tradable,
-            'amount' => $amount,
-        ]);
-
-        $textBody = $this->twigEngine->render('mail/withdraw_completed.txt.twig', [
-            'username' => $user->getUsername(),
-            'tradable' => $tradable,
-            'amount' => $amount,
-        ]);
-
-        $msg = (new Swift_Message('Withdraw Completed'))
+        $msg = (new Swift_Message(ucfirst($transactionType)." Completed"))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')

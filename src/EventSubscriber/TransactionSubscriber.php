@@ -1,14 +1,17 @@
 <?php declare(strict_types = 1);
 
-namespace App\EventListener;
+namespace App\EventSubscriber;
 
 use App\Entity\Crypto;
+use App\Events\DepositCompletedEvent;
+use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WithdrawCompletedListener
+class TransactionSubscriber implements EventSubscriberInterface
 {
     /** @var MailerInterface */
     private $mailer;
@@ -22,10 +25,17 @@ class WithdrawCompletedListener
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function onWithdrawCompleted(WithdrawCompletedEvent $event): void
+    public static function getSubscribedEvents(): array
+    {
+        return [
+           DepositCompletedEvent::NAME => 'onTransactionCompleted',
+           WithdrawCompletedEvent::NAME => 'onTransactionCompleted',
+        ];
+    }
+
+    public function onTransactionCompleted(TransactionCompletedEvent $event): void
     {
         $tradable = $event->getTradable();
-
         $user = $event->getUser();
 
         $symbol = $tradable instanceof Crypto
@@ -36,6 +46,6 @@ class WithdrawCompletedListener
             $this->moneyWrapper->parse($event->getAmount(), $symbol)
         );
 
-        $this->mailer->sendWithdrawCompletedMail($tradable, $user, $amount);
+        $this->mailer->sendTransactionCompletedMail($tradable, $user, $amount, $event::TYPE);
     }
 }
