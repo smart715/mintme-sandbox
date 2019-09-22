@@ -28,12 +28,12 @@ class TransactionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-           DepositCompletedEvent::NAME => 'onTransactionCompleted',
-           WithdrawCompletedEvent::NAME => 'onTransactionCompleted',
+           DepositCompletedEvent::NAME => 'sendTransactionCompletedMail',
+           WithdrawCompletedEvent::NAME => 'sendTransactionCompletedMail',
         ];
     }
 
-    public function onTransactionCompleted(TransactionCompletedEvent $event): void
+    public function sendTransactionCompletedMail(TransactionCompletedEvent $event): void
     {
         $tradable = $event->getTradable();
         $user = $event->getUser();

@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class TransactionSubscriberTest extends TestCase
 {
-    public function testOnTransactionCompletedWithCrypto(): void
+    public function testSendTransactionCompletedMailWithCrypto(): void
     {
         $subscriber = new TransactionSubscriber(
             $this->mockMailer(),
@@ -26,14 +26,14 @@ class TransactionSubscriberTest extends TestCase
         $tradable = $this->createMock(Crypto::class);
         $tradable->method('getSymbol')->willReturn('WEB');
 
-        $subscriber->onTransactionCompleted(
+        $subscriber->sendTransactionCompletedMail(
             $this->mockTransactionCompletedEvent($tradable, '1')
         );
 
         $this->assertTrue(true);
     }
 
-    public function testOnTransactionCompletedWithToken(): void
+    public function testSendTransactionCompletedMailWithToken(): void
     {
         $subscriber = new TransactionSubscriber(
             $this->mockMailer(),
@@ -42,7 +42,7 @@ class TransactionSubscriberTest extends TestCase
 
         $tradable = $this->createMock(Token::class);
 
-        $subscriber->onTransactionCompleted(
+        $subscriber->sendTransactionCompletedMail(
             $this->mockTransactionCompletedEvent($tradable, '1')
         );
 
