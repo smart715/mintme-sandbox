@@ -7,10 +7,9 @@
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
                 :is-token-exchanged="isTokenExchanged"
-                :is-token-not-deployed="isTokenNotDeployed"
                 :no-close="true"
                 :precision="precision"
-                :prevent-address-edition-prop="preventAddressEditionProp"
+                :min-destination-locked-prop="minDestinationLocked"
                 :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"
@@ -53,7 +52,7 @@ export default {
         hasReleasePeriodProp: Boolean,
         identifier: String,
         name: String,
-        preventAddressEditionProp: Boolean,
+        minDestinationLocked: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
@@ -79,7 +78,6 @@ export default {
         }
 
         this.checkIfTokenExchanged();
-        this.checkIfTokenNotDeployed();
 
         this.addMessageHandler((response) => {
             if (
@@ -99,13 +97,6 @@ export default {
                 name: this.currentName,
             }))
             .then((res) => this.isTokenExchanged = res.data)
-            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
-        },
-        checkIfTokenNotDeployed: function() {
-            this.$axios.retry.get(this.$routing.generate('is_token_not_deployed', {
-                name: this.currentName,
-            }))
-            .then((res) => this.isTokenNotDeployed = res.data)
             .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
         },
         editToken: function() {

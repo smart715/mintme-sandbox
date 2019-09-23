@@ -28,7 +28,7 @@
                         </faq-item>
                     </div>
                     <div
-                        v-if="!preventAddressEdition"
+                        v-if="!minDestinationLocked"
                         class="row faq-block mx-0 border-bottom"
                         ref="withdrawal-address"
                     >
@@ -38,10 +38,11 @@
                             </template>
                             <template slot="body">
                                 <token-withdrawal-address
+                                    :is-token-deployed="isTokenDeployed"
                                     :token-name="currentName"
                                     :twofa="twofa"
                                     :withdrawal-address="withdrawalAddress"
-                                    @prevent-edition="preventEditionAddressUpdated"
+                                    @locked="minDestinationLockUpdated"
                                     @close="$emit('close')"
                                 />
                             </template>
@@ -114,6 +115,7 @@ import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TokenWithdrawalAddress from '../token/TokenWithdrawalAddress';
 import TwoFactorModal from './TwoFactorModal';
 import {FiltersMixin} from '../../mixins';
+import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'TokenEditModal',
@@ -133,9 +135,8 @@ export default {
         hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
         isTokenExchanged: Boolean,
-        isTokenNotDeployed: Boolean,
         noClose: Boolean,
-        preventAddressEditionProp: Boolean,
+        minDestinationLockedProp: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
@@ -147,12 +148,20 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
-            preventAddressEdition: this.preventAddressEditionProp,
+            minDestinationLocked: this.minDestinationLockedProp,
         };
     },
+    computed: {
+        isTokenNotDeployed: function() {
+            return tokenDeploymentStatus.notDeployed === this.statusProp;
+        },
+        isTokenDeployed: function() {
+            return tokenDeploymentStatus.deployed === this.statusProp;
+        },
+    },
     methods: {
-        preventEditionAddressUpdated: function() {
-            this.preventEditionAddress = true;
+        minDestinationLockUpdated: function() {
+            this.minDestinationLocked = true;
         },
         releasePeriodUpdated: function() {
             this.hasReleasePeriod = true;

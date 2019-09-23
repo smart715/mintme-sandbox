@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div v-if="isTokenDeployed">
         <div class="col-12 pb-0 px-0">
-            <label for="tokenName" class="d-block text-left">
+            <label for="address" class="d-block text-left">
                 New address:
             </label>
             <input
@@ -20,14 +20,14 @@
             </div>
             <label class="custom-control custom-checkbox pt-2">
                 <input
-                    v-model="preventEdition"
+                    v-model="locked"
                     type="checkbox"
-                    id="prevent-edition"
+                    id="locked"
                     class="custom-control-input"
                 >
                 <label
                     class="custom-control-label"
-                    for="prevent-edition">
+                    for="locked">
                     Prevent another edition of withdrawal address.
                 </label>
             </label>
@@ -57,6 +57,14 @@
             @close="closeTwoFactorModal"
         />
     </div>
+    <div
+        v-else
+        class="text-left"
+    >
+        <p class="bg-info m-0 py-1 px-3">
+            Token is not deployed yet.
+        </p>
+    </div>
 </template>
 
 <script>
@@ -74,6 +82,7 @@ export default {
     },
     props: {
         tokenName: String,
+        isTokenDeployed: Boolean,
         twofa: Boolean,
         withdrawalAddress: String,
     },
@@ -81,7 +90,7 @@ export default {
         return {
             currentAddress: this.withdrawalAddress,
             newAddress: this.withdrawalAddress,
-            preventEdition: false,
+            locked: false,
             showTwoFactorModal: false,
             submitting: false,
         };
@@ -92,7 +101,6 @@ export default {
         },
         closeModal: function() {
             this.cancelEditingMode();
-            this.$emit('close');
         },
         cancelEditingMode: function() {
             if (!this.showTwoFactorModal) {
@@ -128,12 +136,11 @@ export default {
             }
 
             this.submitting = true;
-            this.$axios.single.post(this.$routing.generate('withdrawal_address_update', {
+            this.$axios.single.post(this.$routing.generate('token_contract_update', {
                 name: this.tokenName,
             }), {
                 address: this.newAddress,
-                code: code,
-                preventEdition: this.preventEdition,
+                lock: this.locked,
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
@@ -143,8 +150,8 @@ export default {
                         this.showTwoFactorModal = false;
                         this.closeModal();
 
-                        if (this.preventEdition) {
-                            this.$emit('prevent-edition');
+                        if (this.locked) {
+                            this.$emit('locked');
                         }
                     }
                 }, (error) => {

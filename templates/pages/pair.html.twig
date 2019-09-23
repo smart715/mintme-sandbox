@@ -92,7 +92,7 @@
                                     identifier="{{ market.quote.identifier }}"
                                     name="{{ market.quote.name }}"
                                     :precision="{{ precision }}"
-                                    :prevent-address-edition-prop="{{ token.preventAddressEdition ? 'true' : 'false' }}"
+                                    :min-destination-locked="{{ token.minDestinationLocked ? 'true' : 'false' }}"
                                     :status-prop="{{ token.deploymentStatus | json_encode }}"
                                     :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                     websocket-url="{{ global_websocket_url }}"

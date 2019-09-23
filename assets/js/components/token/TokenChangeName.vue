@@ -74,7 +74,6 @@ export default {
         },
         closeModal: function() {
             this.cancelEditingMode();
-            this.$emit('close');
         },
         cancelEditingMode: function() {
             if (!this.showTwoFactorModal) {
@@ -85,7 +84,7 @@ export default {
         editName: function() {
             this.$v.$touch();
             if (this.currentName === this.newName) {
-                this.closeModal();
+                this.$toasted.error('You didn\'t change the token name');
                 return;
             } else if (this.isTokenExchanged) {
                 this.$toasted.error('You need all your tokens to change token\'s name');

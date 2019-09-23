@@ -138,7 +138,6 @@ export default {
             }))
             .then(() => {
                 this.status = tokenDeploymentStatus.pending;
-                this.$emit('cancel');
                 this.$toasted.success('Process in pending status and it will take some minutes to be done.');
             })
             .catch(({response}) => {

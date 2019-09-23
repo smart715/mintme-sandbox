@@ -141,51 +141,6 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/withdrawal-address",
-     *     name="withdrawal_address_update",
-     *     options={"2fa"="optional", "expose"=true}
-     * )
-     * @Rest\RequestParam(name="name", nullable=true)
-      *@Rest\RequestParam(name="address", nullable=true)
-      *@Rest\RequestParam(name="code", nullable=true)
-      *@Rest\RequestParam(name="preventEdition", nullable=true)
-     */
-    public function withdrawalAddressUpdate(
-        ParamFetcherInterface $request,
-        EmailAuthManagerInterface $emailAuthManager,
-        string $name
-    ): View {
-        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
-
-        $token = $this->tokenManager->findByName($name);
-
-        if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
-        }
-
-        if ($token->isPreventAddressEdition()) {
-            throw new ApiBadRequestException('Withdrawal address can\'t be changed');
-        }
-
-        $preventEdition = (bool) $request->get('preventEdition');
-        $address = $request->get('address');
-
-        if (null === $address) {
-            throw new ApiBadRequestException('Withdrawal address can\'t be null');
-        }
-
-        $token->setAddress($address);
-        $token->setPreventAddressEdition($preventEdition);
-        $this->em->persist($token);
-        $this->em->flush();
-
-        $this->userActionLogger->info('Withdrawal address updated', $request->all());
-
-        return $this->view(['message' => 'Withdrawal address successfully updated'], Response::HTTP_ACCEPTED);
-    }
-
-    /**
-     * @Rest\View()
      * @Rest\Post("/{name}/website-confirmation", name="token_website_confirm")
      * @Rest\RequestParam(name="url", allowBlank=false)
      */
@@ -605,7 +560,7 @@ class TokensAPIController extends AbstractFOSRestController
             $contractHandler->updateMinDestination($token, $request->get('address'), $request->get('lock'));
             $token->setMinDestination($request->get('address'));
 
-            if ("true" === $request->get('lock')) {
+            if ((bool) $request->get('lock')) {
                 $token->lockMinDestination();
             }
 

@@ -13,18 +13,31 @@ describe('TokenWithdrawalAddress', () => {
         const wrapper = mount(TokenWithdrawalAddress, {
             propsData: {
                 withdrawalAddress: 'foobar',
+                isTokenDeployed: true,
                 twofa: false,
             },
         });
         expect(wrapper.vm.currentAddress).to.equal('foobar');
-        expect(wrapper.vm.newAddress).to.equal('foobar');
-        expect(wrapper.find('input').element.value).to.equal('foobar');
+    });
+
+    it('can be edited if deployed only', () => {
+        const wrapper = mount(TokenWithdrawalAddress, {
+            propsData: {
+                withdrawalAddress: 'foobar',
+                isTokenDeployed: false,
+                twofa: true,
+            },
+        });
+        expect(wrapper.find('input').exists()).to.be.false;
+        wrapper.vm.isTokenDeployed = true;
+        expect(wrapper.find('input').exists()).to.be.true;
     });
 
     it('open TwoFactorModal for saving address when 2fa is enabled', () => {
         const wrapper = mount(TokenWithdrawalAddress, {
             propsData: {
                 withdrawalAddress: 'foobar',
+                isTokenDeployed: true,
                 twofa: true,
             },
         });
@@ -38,6 +51,7 @@ describe('TokenWithdrawalAddress', () => {
         const wrapper = mount(TokenWithdrawalAddress, {
             propsData: {
                 currentName: 'foobar',
+                isTokenDeployed: true,
                 twofa: false,
             },
         });
