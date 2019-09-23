@@ -6,8 +6,6 @@ import TokenWithdrawalAddress from '../../js/components/token/TokenWithdrawalAdd
 Vue.use(Vuelidate);
 Vue.use(Toasted);
 
-const newAddress = '0x1111111111111111111111111111111111111111';
-
 describe('TokenWithdrawalAddress', () => {
     it('renders correctly with assigned props', () => {
         const wrapper = mount(TokenWithdrawalAddress, {
