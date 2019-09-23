@@ -7,7 +7,7 @@ import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
-import {tokenDeploymentStatus} from "./utils/constants";
+import {tokenDeploymentStatus} from './utils/constants';
 
 new Vue({
   el: '#token',
