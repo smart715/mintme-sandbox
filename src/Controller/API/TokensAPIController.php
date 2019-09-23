@@ -521,7 +521,7 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         try {
-            $deployment->execute($this->getUser(), $token);
+//            $deployment->execute($this->getUser(), $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
@@ -557,12 +557,8 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         try {
-            $contractHandler->updateMinDestination($token, $request->get('address'), $request->get('lock'));
-            $token->setMinDestination($request->get('address'));
-
-            if ((bool) $request->get('lock')) {
-                $token->lockMinDestination();
-            }
+            $contractHandler->updateMinDestination($token, $request->get('address'), (bool) $request->get('lock'));
+            $token->setUpdatingMinDestination();
 
             $this->em->persist($token);
             $this->em->flush();

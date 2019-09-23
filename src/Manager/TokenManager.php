@@ -78,6 +78,11 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
+    public function findByAddress(string $address): ?Token
+    {
+        return $this->repository->findByAddress($address);
+    }
+
     /**
      * {@inheritdoc}
      *

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isTokenDeployed">
+    <div v-if="canUpdate">
         <div class="col-12 pb-0 px-0">
             <label for="address" class="d-block text-left">
                 New address:
@@ -50,19 +50,21 @@
                 <slot name="cancel">Cancel</slot>
             </span>
         </div>
-        <two-factor-modal
-            :visible="showTwoFactorModal"
-            :twofa="twofa"
-            @verify="doEditAddress"
-            @close="closeTwoFactorModal"
-        />
+    </div>
+    <div
+        v-else-if="!isTokenDeployed"
+        class="text-left"
+    >
+        <p class="bg-info m-0 py-1 px-3">
+            Token is not deployed yet.
+        </p>
     </div>
     <div
         v-else
         class="text-left"
     >
         <p class="bg-info m-0 py-1 px-3">
-            Token is not deployed yet.
+            updating address is pending.
         </p>
     </div>
 </template>
@@ -72,7 +74,6 @@ import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {addressLength} from '../../utils/constants';
 
-const HTTP_ACCEPTED = 202;
 const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 
 export default {
@@ -91,22 +92,24 @@ export default {
             currentAddress: this.withdrawalAddress,
             newAddress: this.withdrawalAddress,
             locked: false,
-            showTwoFactorModal: false,
             submitting: false,
         };
     },
-    methods: {
-        closeTwoFactorModal: function() {
-            this.showTwoFactorModal = false;
+    computed: {
+        canUpdate: function() {
+            return this.isTokenDeployed && '0x' !== this.currentAddress;
         },
+    },
+    methods: {
         closeModal: function() {
             this.cancelEditingMode();
         },
+        steUpdatingState: function() {
+            this.currentAddress = '0x';
+        },
         cancelEditingMode: function() {
-            if (!this.showTwoFactorModal) {
-                this.$v.$reset();
-                this.newAddress = this.currentAddress;
-            }
+            this.$v.$reset();
+            this.newAddress = this.currentAddress;
         },
         editAddress: function() {
             this.$v.$touch();
@@ -124,13 +127,9 @@ export default {
                 return;
             }
 
-            if (this.twofa) {
-                this.showTwoFactorModal = true;
-            } else {
-                this.doEditAddress();
-            }
+            this.doEditAddress();
         },
-        doEditAddress: function(code = '') {
+        doEditAddress: function() {
             if (this.submitting) {
                 return;
             }
@@ -142,18 +141,9 @@ export default {
                 address: this.newAddress,
                 lock: this.locked,
             })
-                .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        this.currentAddress = this.newAddress;
-                        this.$toasted.success('Withdrawal address changed successfully');
-
-                        this.showTwoFactorModal = false;
-                        this.closeModal();
-
-                        if (this.locked) {
-                            this.$emit('locked');
-                        }
-                    }
+                .then(() => {
+                    this.$toasted.success('Withdrawal address changed successfully');
+                    this.steUpdatingState();
                 }, (error) => {
                     if (!error.response) {
                         this.$toasted.error('Network error');

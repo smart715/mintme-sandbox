@@ -78,7 +78,7 @@
                                         :is-owner="{{ isOwner ? 'true' : 'false' }}"
                                         name="{{ market.quote.name }}"
                                         :precision="{{ precision }}"
-                                        :status-prop="{{ token.deploymentStatus | json_encode }}"
+                                        :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
                                         websocket-url="{{ global_websocket_url }}"
                                     />
                                 </div>
@@ -96,7 +96,8 @@
                                     :status-prop="{{ token.deploymentStatus | json_encode }}"
                                     :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                     websocket-url="{{ global_websocket_url }}"
-                                    withdrawal-address="{{ token.address }}"
+                                    withdrawal-address="{{ token.minDestination }}"
+                                    v-on:token-deploy-pending="setTokenPending"
                                 />
                             </div>
                         </li>

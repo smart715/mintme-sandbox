@@ -28,8 +28,8 @@ class Token implements TradebleInterface
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
     public const NOT_DEPLOYED = 'not-deployed';
-    public const PENDING = 'pending';
     public const DEPLOYED = 'deployed';
+    public const PENDING = 'pending';
 
     /**
      * @ORM\Id()
@@ -198,6 +198,13 @@ class Token implements TradebleInterface
     public function setPendingDeployment(): self
     {
         $this->address = '0x';
+
+        return $this;
+    }
+
+    public function setUpdatingMinDestination(): self
+    {
+        $this->minDestination = '0x';
 
         return $this;
     }

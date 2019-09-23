@@ -7,6 +7,7 @@ import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
+import {tokenDeploymentStatus} from "./utils/constants";
 
 new Vue({
   el: '#token',
@@ -17,6 +18,7 @@ new Vue({
       editingName: false,
       tokenName: null,
       tokenPeriodAdded: null,
+      tokenPending: null,
     };
   },
   components: {
@@ -48,8 +50,14 @@ new Vue({
     updateTokenPeriod: function() {
       this.tokenPeriodAdded = true;
     },
+    setTokenPending: function() {
+      this.tokenPending = true;
+    },
     isTokenPeriodAdded: function(isAdded) {
       return null !== this.tokenPeriodAdded ? this.tokenPeriodAdded : isAdded;
+    },
+    getTokenStatus: function(status) {
+      return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
     },
   },
   store,

@@ -3,9 +3,8 @@
 namespace App\Consumers;
 
 use App\Entity\Token\Token;
-use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\TokenManagerInterface;
-use App\SmartContract\Model\DeployCallbackMessage;
+use App\SmartContract\Model\ContractUpdateCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -13,7 +12,7 @@ use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
 
-class DeployConsumer implements ConsumerInterface
+class ContractUpdateConsumer implements ConsumerInterface
 {
     /** @var LoggerInterface */
     private $logger;
@@ -24,36 +23,31 @@ class DeployConsumer implements ConsumerInterface
     /** @var EntityManagerInterface */
     private $em;
 
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
     public function __construct(
         LoggerInterface $logger,
         TokenManagerInterface $tokenManager,
-        EntityManagerInterface $em,
-        BalanceHandlerInterface $balanceHandler
+        EntityManagerInterface $em
     ) {
         $this->logger = $logger;
         $this->tokenManager = $tokenManager;
         $this->em = $em;
-        $this->balanceHandler = $balanceHandler;
     }
 
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
-        $this->logger->info('[deploy-consumer] Received new message: '.json_encode($msg->body));
+        $this->logger->info('[contract-update-consumer] Received new message: '.json_encode($msg->body));
 
         /** @var string|null $body */
         $body = $msg->body;
 
         try {
-            $clbResult = DeployCallbackMessage::parse(
+            $clbResult = contractUpdateCallbackMessage::parse(
                 json_decode((string)$body, true)
             );
         } catch (\Throwable $exception) {
             $this->logger->warning(
-                '[deploy-consumer] Failed to parse incoming message',
+                '[contract-update-consumer] Failed to parse incoming message',
                 [$msg->body]
             );
 
@@ -61,32 +55,24 @@ class DeployConsumer implements ConsumerInterface
         }
 
         try {
-            $token = $this->tokenManager->findByName($clbResult->getTokenName());
+            $token = $this->tokenManager->findByAddress($clbResult->getTokenAddress());
 
             if (!$token) {
-                $this->logger->info('[deploy-consumer] Invalid token "'.$clbResult->getTokenName().'" given');
+                $this->logger->info(
+                    '[contract-update-consumer] Invalid token address "'.$clbResult->getTokenAddress().'" given'
+                );
 
                 return true;
             }
 
-            if (!$clbResult->getAddress()) {
-                if (null !== $token->getDeployCost()) {
-                    $this->balanceHandler->deposit(
-                        $token->getProfile()->getUser(),
-                        Token::getFromSymbol(Token::WEB_SYMBOL),
-                        new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL))
-                    );
-                    $token->setDeployCost('');
-                }
-            }
-
-            $token->setAddress($clbResult->getAddress());
+            $token->setMinDestination($clbResult->getMinDestination());
 
             $this->em->persist($token);
             $this->em->flush();
         } catch (\Throwable $exception) {
             $this->logger->error(
-                '[deploy-consumer] Failed to update token address. Retry operation. Reason:'. $exception->getMessage()
+                '[contract-update-consumer] Failed to update token address. Retry operation. Reason:'
+                .$exception->getMessage()
             );
 
             return false;

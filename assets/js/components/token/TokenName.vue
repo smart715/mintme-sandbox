@@ -16,6 +16,7 @@
                 :websocket-url="websocketUrl"
                 :withdrawal-address="withdrawalAddress"
                 @close="closeTokenEditModal"
+                @token-deploy-pending="$emit('token-deploy-pending')"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"

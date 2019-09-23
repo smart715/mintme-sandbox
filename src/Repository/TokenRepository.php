@@ -24,6 +24,16 @@ class TokenRepository extends EntityRepository
             ->getOneOrNullResult();
     }
 
+    /** @codeCoverageIgnore */
+    public function findByAddress(string $address): ?Token
+    {
+        return $this->createQueryBuilder('token')
+            ->where('token.address=:name')
+            ->setParameter(':name', $address)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * @codeCoverageIgnore
      * @return Token[]

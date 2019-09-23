@@ -42,8 +42,6 @@
                                     :token-name="currentName"
                                     :twofa="twofa"
                                     :withdrawal-address="withdrawalAddress"
-                                    @locked="minDestinationLockUpdated"
-                                    @close="$emit('close')"
                                 />
                             </template>
                         </faq-item>
@@ -60,7 +58,6 @@
                                     :token-name="currentName"
                                     :twofa="twofa"
                                     @update="releasePeriodUpdated"
-                                    @cancel="$emit('close')"
                                 />
                             </template>
                         </faq-item>
@@ -78,7 +75,7 @@
                                     :precision="precision"
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
-                                    @cancel="$emit('close')"
+                                    @pending="$emit('token-deploy-pending')"
                                 />
                             </template>
                         </faq-item>
@@ -136,7 +133,7 @@ export default {
         isOwner: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
-        minDestinationLockedProp: Boolean,
+        minDestinationLocked: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
@@ -148,7 +145,6 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
-            minDestinationLocked: this.minDestinationLockedProp,
         };
     },
     computed: {
@@ -160,9 +156,6 @@ export default {
         },
     },
     methods: {
-        minDestinationLockUpdated: function() {
-            this.minDestinationLocked = true;
-        },
         releasePeriodUpdated: function() {
             this.hasReleasePeriod = true;
         },
