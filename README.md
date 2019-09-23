@@ -55,6 +55,10 @@ to listen for new data in markets
 php bin/console rabbitmq:consumer deploy &
 ```
 to listen for token deploy
+```
+php bin/console rabbitmq:consumer contract_update &
+```
+to listen for updating minDestination
 
 Development
 -----------
