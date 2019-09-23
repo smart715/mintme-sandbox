@@ -56,7 +56,7 @@ function isValidUrl(url) {
  * @return {boolean} whether is valid or not
  */
 function isValidTelegramUrl(url) {
-    let regex = new RegExp('^https:\/\/t\.me\/joinchat\/([\\w]{1,})$');
+    let regex = new RegExp('^https:\/\/t\.me\/joinchat\/([-\\w]{1,})$');
     return regex.test(url);
 }
 
@@ -66,7 +66,7 @@ function isValidTelegramUrl(url) {
  * @return {boolean} whether is valid or not
  */
 function isValidDiscordUrl(url) {
-    let regex = new RegExp('^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([\\w]{1,})$');
+    let regex = new RegExp('^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\\w]{1,})$');
     return regex.test(url);
 }
 
