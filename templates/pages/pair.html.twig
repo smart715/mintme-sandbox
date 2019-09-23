@@ -45,7 +45,6 @@
                                 >
                                 </token-introduction-profile>
                                 <token-introduction-statistics
-                                    v-on:period-updated="updateTokenPeriod"
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
@@ -74,12 +73,8 @@
                             <li class="nav-item">
                                 <div class="nav-link pr-md-0">
                                     <token-deploy-icon
-                                        :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
                                         :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                        name="{{ market.quote.name }}"
-                                        :precision="{{ precision }}"
                                         :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
-                                        websocket-url="{{ global_websocket_url }}"
                                     />
                                 </div>
                             </li>
@@ -88,7 +83,7 @@
                             <div class="nav-link">
                                 <token-name
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    :has-release-period-prop="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
+                                    :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
                                     identifier="{{ market.quote.identifier }}"
                                     name="{{ market.quote.name }}"
                                     :precision="{{ precision }}"

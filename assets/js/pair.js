@@ -17,7 +17,6 @@ new Vue({
       tokenDescription: null,
       editingName: false,
       tokenName: null,
-      tokenPeriodAdded: null,
       tokenPending: null,
     };
   },
@@ -47,14 +46,8 @@ new Vue({
         document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';
       }
     },
-    updateTokenPeriod: function() {
-      this.tokenPeriodAdded = true;
-    },
     setTokenPending: function() {
       this.tokenPending = true;
-    },
-    isTokenPeriodAdded: function(isAdded) {
-      return null !== this.tokenPeriodAdded ? this.tokenPeriodAdded : isAdded;
     },
     getTokenStatus: function(status) {
       return true === this.tokenPending ? tokenDeploymentStatus.pending : status;

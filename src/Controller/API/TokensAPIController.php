@@ -521,7 +521,7 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         try {
-//            $deployment->execute($this->getUser(), $token);
+            $deployment->execute($this->getUser(), $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
