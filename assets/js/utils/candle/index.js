@@ -562,6 +562,7 @@
 
     function getCandleXAxis(args) {
         let data = args.dims;
+        let showVol = args.showVol;
 
         let type = 'category';
         let scale = true;
@@ -573,7 +574,7 @@
         let min = 'dataMin';
         let max = 'dataMax';
         let gridIndex = 1;
-        let axisPointer = {label: SHOW_FALSE};
+        let axisPointer = showVol ? {} : SHOW_FALSE;
 
         return [{
             type: type,
@@ -671,15 +672,6 @@
             },
         };
         let lineStyle = {normal: {opacity: 0.5}};
-        let rightAxis = args.rightLabel
-            ? [{
-                name: 'extraAxis',
-                type: 'candlestick',
-                yAxisIndex: 1,
-                data: values,
-                itemStyle: style,
-            }]
-            : [];
         let series = [
             {
                 name: labelMap[DEFAULT_K_NAME] == null ? DEFAULT_K_NAME : labelMap[DEFAULT_K_NAME],
@@ -687,7 +679,6 @@
                 data: values,
                 itemStyle: style,
             },
-            ...rightAxis,
         ];
 
         if (showMA) {
@@ -708,8 +699,18 @@
                 name: 'Volume',
                 type: 'bar',
                 xAxisIndex: 1,
-                yAxisIndex: 1,
+                yAxisIndex: 2,
                 data: volumes,
+            });
+        }
+
+        if(args.rightLabel){
+            series.push({
+                name: 'extraAxis',
+                type: 'candlestick',
+                yAxisIndex: 1,
+                data: values,
+                itemStyle: style,
             });
         }
 
@@ -819,7 +820,7 @@
         });
         let dataZoom$$1 = showDataZoom && getCandleDataZoom({start: start, end: end});
         let grid = getCandleGrid({showVol: showVol});
-        let xAxis = getCandleXAxis({dims: dims});
+        let xAxis = getCandleXAxis({dims: dims, showVol: showVol});
         let yAxis = getCandleYAxis({dataType: dataType, digit: digit});
         let series = getCandleSeries({
             rightLabel: rightLabel,
@@ -834,6 +835,7 @@
             digit: digit,
             itemStyle: itemStyle,
         });
+        let axisPointer = {link: {xAxisIndex: 'all'}};
         return {
             legend: legend$$1,
             tooltip: tooltip$$1,
@@ -843,6 +845,7 @@
             yAxis: yAxis,
             dataZoom: dataZoom$$1,
             series: series,
+            axisPointer: axisPointer,
         };
     };
 
@@ -878,10 +881,31 @@
                 options[attr] = value(options[attr]);
             } else {
                 // mixin extend value
-                if (isArray(options[attr]) && isObject(options[attr][0])) {
-                    // eg: [{ xx: 1 }, { xx: 2 }]
+                if (isArray(options[attr]) && isObject(options[attr][0]) && isObject(value)) {
+                    // eg: options: [{ xx: 1 }, { xx: 2 }] value: { xx: 1 }
                     options[attr].forEach(function(option, index) {
                         options[attr][index] = _extends({}, option, value);
+                    });
+                } else if (isArray(options[attr]) && isArray(value) && isObject(options[attr][0]) && isObject(value[0])) {
+                    // eg: options: [{ xx: 1 }, { xx: 2 }] value: [{ xx: 1 }, { xx: 2 }]
+                    value.forEach(function(value, index){
+                        if(value.apply === 'all'){
+                            let value1 = Object.assign({}, value);
+                            delete value1.apply;
+
+                            options[attr].forEach(function(option, index) {
+                                options[attr][index] = _extends({}, option, value1);
+                            });
+                        } else if (isArray(value.apply)) {
+                            let value1 = Object.assign({}, value);
+                            delete value1.apply;
+
+                            value.apply.forEach(function(index) {
+                                options[attr][index] = _extends({}, options[attr][index], value1);
+                            });
+                        } else {
+                            options[attr][index] = _extends({}, options[attr][index], value);
+                        }
                     });
                 } else if (isObject(options[attr])) {
                     // eg: { xx: 1, yy: 2 }
