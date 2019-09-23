@@ -9,7 +9,7 @@
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
-                :min-destination-locked-prop="minDestinationLocked"
+                :min-destination-locked="minDestinationLocked"
                 :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"

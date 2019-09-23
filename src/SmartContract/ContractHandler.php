@@ -95,6 +95,14 @@ class ContractHandler implements ContractHandlerInterface
 
     public function updateMinDestination(Token $token, string $address, bool $lock): void
     {
+        if (Token::DEPLOYED !== $token->deploymentStatus()) {
+            $this->logger->error(
+                "Failed to Update minDestination for '{$token->getName()}' because it is not deployed"
+            );
+
+            throw new Exception('Token dose not deployed yet');
+        }
+
         if ($token->isMinDestinationLocked()) {
             $this->logger->error("Failed to Update minDestination for '{$token->getName()}' because It is locked");
 
@@ -104,7 +112,7 @@ class ContractHandler implements ContractHandlerInterface
         $response = $this->rpc->send(
             self::UPDATE_MIN_DESTINATION,
             [
-                'tokenContract' => $token->getAddress(),
+                'contractAddress' => $token->getAddress(),
                 'mintDestination' => $address,
                 'lock'=> $lock,
             ]

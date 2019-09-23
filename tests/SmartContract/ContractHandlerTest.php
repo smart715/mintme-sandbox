@@ -110,7 +110,7 @@ class ContractHandlerTest extends TestCase
             ->expects($this->once())->method('send')->with(
                 'update_mint_destination',
                 [
-                    'tokenContract' => '0x123',
+                    'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
                     'lock'=> false,
                 ]
@@ -125,7 +125,35 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager()
         );
 
-        $handler->updateMinDestination($this->mockToken(true), '0x456', false);
+        $handler->updateMinDestination(
+            $this->mockToken(true, '0x123', false, 'deployed'),
+            '0x456',
+            false
+        );
+    }
+
+    public function testUpdateMinDestinationIfNotDeployed(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->never())->method('send');
+
+        $handler = new ContractHandler(
+            $rpc,
+            $this->mockConfig(),
+            $this->mockLoggerInterface(),
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager()
+        );
+
+        $this->expectException(\Throwable::class);
+
+        $handler->updateMinDestination(
+            $this->mockToken(true, '0x123', true, 'not-deployed'),
+            '0x456',
+            false
+        );
     }
 
     public function testUpdateMinDestinationWithLocked(): void
@@ -145,17 +173,21 @@ class ContractHandlerTest extends TestCase
 
         $this->expectException(\Throwable::class);
 
-        $handler->updateMinDestination($this->mockToken(true, '0x123', true), '0x456', false);
+        $handler->updateMinDestination(
+            $this->mockToken(true, '0x123', true, 'deployed'),
+            '0x456',
+            false
+        );
     }
 
     public function testUpdateMinDestinationWithResponseError(): void
     {
         $rpc = $this->mockRpc();
         $rpc
-            ->expects($this->once())->method('send')->with(
+            ->expects($this->never())->method('send')->with(
                 'update_mint_destination',
                 [
-                    'tokenContract' => '0x123',
+                    'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
                     'lock'=> false,
                 ]

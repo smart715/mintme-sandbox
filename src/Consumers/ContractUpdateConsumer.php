@@ -2,12 +2,9 @@
 
 namespace App\Consumers;
 
-use App\Entity\Token\Token;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\Model\ContractUpdateCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
-use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -66,6 +63,10 @@ class ContractUpdateConsumer implements ConsumerInterface
             }
 
             $token->setMinDestination($clbResult->getMinDestination());
+
+            if ($clbResult->getLock()) {
+                $token->lockMinDestination();
+            }
 
             $this->em->persist($token);
             $this->em->flush();

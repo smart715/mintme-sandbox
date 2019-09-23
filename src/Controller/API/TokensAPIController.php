@@ -535,7 +535,7 @@ class TokensAPIController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"expose"=true})
      * @Rest\RequestParam(name="address", allowBlank=false)
-     * @Rest\RequestParam(name="lock", requirements="true|false")
+     * @Rest\RequestParam(name="lock", allowBlank=true)
      */
     public function contractUpdate(
         string $name,

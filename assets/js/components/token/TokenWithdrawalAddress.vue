@@ -70,7 +70,6 @@
 </template>
 
 <script>
-import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {addressLength} from '../../utils/constants';
 
@@ -78,13 +77,9 @@ const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 
 export default {
     name: 'TokenWithdrawalAddress',
-    components: {
-        TwoFactorModal,
-    },
     props: {
         tokenName: String,
         isTokenDeployed: Boolean,
-        twofa: Boolean,
         withdrawalAddress: String,
     },
     data() {
