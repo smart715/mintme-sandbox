@@ -7,7 +7,7 @@ sonata_media:
 
     db_driver:       doctrine_orm
     force_disable_category: true
-  
+
     default_context: default
     contexts:
         default:
@@ -19,6 +19,7 @@ sonata_media:
                 - sonata.media.provider.image
                 - sonata.media.provider.file
                 - sonata.media.provider.vimeo
+                - app.media.provider.document
 
             formats:
                 small: { width: 100, quality: 100}
@@ -67,7 +68,7 @@ sonata_media:
         local:
             directory:  '%kernel.root_dir%/../public/uploads/media'
             create:     true
-        
+
     providers:
         # ...
         file:

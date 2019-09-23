@@ -381,3 +381,20 @@ services:
     two_factor.auth_require_handler:
         class: App\Security\TwoFactorRequireHandler
         public: true
+
+    # Media providers
+    app.media.provider.document:
+        class: App\Media\Provider\DocumentProvider
+        tags:
+            - { name: sonata.media.provider }
+        arguments:
+            - app.media.provider.document
+            - '@sonata.media.filesystem.local'
+            - '@sonata.media.cdn.server'
+            - '@sonata.media.generator.default'
+            - '@sonata.media.thumbnail.format'
+            - ['pdf', 'txt', 'rtf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'odg', 'odp', 'ods', 'odc', 'odf', 'odb', 'csv', 'xml',]
+            - ['application/pdf', 'application/x-pdf', 'application/rtf', 'text/html', 'text/rtf', 'text/plain', 'application/excel', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.text', 'application/vnd.oasis.opendocument.graphics', 'application/vnd.oasis.opendocument.presentation', 'application/vnd.oasis.opendocument.spreadsheet', 'application/vnd.oasis.opendocument.chart', 'application/vnd.oasis.opendocument.formula', 'application/vnd.oasis.opendocument.database', 'application/vnd.oasis.opendocument.image', 'text/comma-separated-values', 'text/xml', 'application/xml', 'application/zip']
+            - '@sonata.media.metadata.proxy'
+        calls:
+            - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]
