@@ -32,32 +32,4 @@ describe('TokenWithdrawalAddress', () => {
         wrapper.vm.isTokenDeployed = true;
         expect(wrapper.find('input').exists()).to.be.true;
     });
-
-    it('open TwoFactorModal for saving address when 2fa is enabled', () => {
-        const wrapper = mount(TokenWithdrawalAddress, {
-            propsData: {
-                withdrawalAddress: 'foobar',
-                isTokenDeployed: true,
-                twofa: true,
-            },
-        });
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
-        wrapper.find('input').setValue(newAddress);
-        wrapper.find('.btn-primary').trigger('click');
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(true);
-    });
-
-    it('do not open TwoFactorModal for saving address when 2fa is disabled', () => {
-        const wrapper = mount(TokenWithdrawalAddress, {
-            propsData: {
-                currentName: 'foobar',
-                isTokenDeployed: true,
-                twofa: false,
-            },
-        });
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
-        wrapper.find('input').setValue(newAddress);
-        wrapper.find('.btn-primary').trigger('click');
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
-    });
 });
