@@ -92,6 +92,7 @@ export default {
         market: Object,
     },
     data() {
+        let min = 1 / Math.pow(10, this.market.base.subunit);
         return {
             rightLabel: true,
             chartTheme: VeLineTheme,
@@ -108,20 +109,33 @@ export default {
                 end: 100,
             },
             additionalAttributes: {
-                grid: {
-                    top: 20,
-                    bottom: 60,
-                    left: 75,
-                    right: 75,
-                },
+                grid: [
+                    {
+                        top: 20,
+                        bottom: 60,
+                    },
+                    {
+                        apply: 'all',
+                        left: 75,
+                        right: 75,
+                    },
+                ],
                 xAxis: {
                     boundaryGap: true,
                 },
-                yAxis: {
-                    axisLabel: {
-                        formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit)).toString(),
+                yAxis: [
+                    {
+                        apply: [0, 1],
+                        min,
+                        minInterval: min,
                     },
-                },
+                    {
+                        apply: 'all',
+                        axisLabel: {
+                            formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit)).toString(),
+                        },
+                    },
+                ],
             },
             marketStatus: {
                 volume: '0',
@@ -134,6 +148,7 @@ export default {
             },
             stats: null,
             maxAvailableDays: 30,
+            min,
             monthInfoRequestId: 0,
         };
     },
@@ -142,7 +157,7 @@ export default {
             return this.chartRows.length === 0;
         },
         chartRows: function() {
-            if (!this.stats.length) {
+            if (!this.stats || !this.stats.length) {
                 return [[new Date().toISOString().slice(0, 10), 0, 0, 0, 0, 0]];
             }
 
@@ -165,6 +180,17 @@ export default {
         },
         loaded: function() {
             return this.stats !== null;
+        },
+    },
+    watch: {
+        chartRows: function(rows) {
+            const MIN_RUNGS = 5;
+
+            let max = rows.reduce( (acc, curr) => Decimal.max(acc, ...curr.slice(1, 5)), 0);
+
+            max = max.lessThan(this.min*MIN_RUNGS) ? this.min*MIN_RUNGS : null;
+
+            this.additionalAttributes.yAxis[0].max = max;
         },
     },
     mounted() {
