@@ -128,10 +128,12 @@ class DepositConsumer implements ConsumerInterface
             $balanceContext = new BalanceContext($strategy);
             $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
 
-            $this->eventDispatcher->dispatch(
+            $event = $this->eventDispatcher->dispatch(
                 DepositCompletedEvent::NAME,
                 new DepositCompletedEvent($tradable, $user, $clbResult->getAmount())
             );
+
+            $this->logger->info("Event ".$event::NAME." dispatched");
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
