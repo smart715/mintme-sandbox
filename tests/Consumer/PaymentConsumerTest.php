@@ -28,7 +28,7 @@ class PaymentConsumerTest extends TestCase
         $dc = new PaymentConsumer(
             $this->mockBalanceHandler($this->never()),
             $this->mockUserManager($this->createMock(User::class)),
-            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->never()),
+            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol), $this->once()),
             $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),

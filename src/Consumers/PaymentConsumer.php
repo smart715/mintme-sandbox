@@ -93,28 +93,23 @@ class PaymentConsumer implements ConsumerInterface
             return true;
         }
 
+        $tradable = $this->cryptoManager->findBySymbol($clbResult->getCrypto())
+            ?? $this->tokenManager->findByName($clbResult->getCrypto());
+
+        if (!$tradable) {
+            $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
+
+            return true;
+        }
+
         if ('fail' === $clbResult->getStatus()) {
             try {
-                $tradable = $this->cryptoManager->findBySymbol($clbResult->getCrypto())
-                    ?? $this->tokenManager->findByName($clbResult->getCrypto());
-
-                if (!$tradable) {
-                    $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
-
-                    return true;
-                }
-
                 $strategy = $tradable instanceof Token
                     ? new PaymentTokenStrategy($this->balanceHandler, $this->cryptoManager)
                     : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
                 $balanceContext = new BalanceContext($strategy);
                 $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
-
-                $this->eventDispatcher->dispatch(
-                    WithdrawCompletedEvent::NAME,
-                    new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount())
-                );
 
                 $this->logger->info(
                     '[payment-consumer] Payment ('.json_encode($clbResult->toArray()).') returned back'
@@ -127,6 +122,11 @@ class PaymentConsumer implements ConsumerInterface
 
                 return false;
             }
+        } elseif ('ok' === $clbResult->getStatus()) {
+            $this->eventDispatcher->dispatch(
+                WithdrawCompletedEvent::NAME,
+                new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount())
+            );
         }
 
         return true;
