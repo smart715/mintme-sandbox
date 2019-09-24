@@ -3,7 +3,6 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
-use App\Logger\UserActionLogger;
 use App\Utils\RandomNumberInterface;
 use Exception;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
@@ -33,14 +32,10 @@ class GuzzleWrapper implements JsonRpcInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var UserActionLogger  */
-    private $userActionLogger;
-
     public function __construct(
         RandomNumberInterface $randomNumber,
         Factory\RpcClientFactoryInterface $clientFactory,
         LoggerInterface $logger,
-        UserActionLogger $userActionLogger,
         string $url,
         int $timeoutSeconds,
         array $auth = []
@@ -51,7 +46,6 @@ class GuzzleWrapper implements JsonRpcInterface
         $this->timeoutSeconds = $timeoutSeconds;
         $this->random = $randomNumber;
         $this->auth = $auth;
-        $this->userActionLogger = $userActionLogger;
     }
 
     public function send(string $methodName, array $requestParams): JsonRpcResponse
@@ -62,15 +56,6 @@ class GuzzleWrapper implements JsonRpcInterface
 
             return $this->parseResponse($response);
         } catch (\Throwable $e) {
-            if (isset($_SESSION['token_creation'])) {
-                $this->userActionLogger->error(
-                    'Got an error, when registering a token: ',
-                    ['message' => $e->getMessage(), 'response_url' => $this->url, 'method' => $methodName]
-                );
-
-                unset($_SESSION['token_creation']);
-            }
-
             $this->logger->error(
                 "Failed to get response from '$this->url' with method '$methodName' and params: " .
                 json_encode($requestParams) . " Error: " . $e->getCode() .". ". $e->getMessage()
