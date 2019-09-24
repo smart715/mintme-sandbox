@@ -197,7 +197,7 @@ class TokenController extends Controller
                     
                     $this->userActionLogger->error(
                         'Got an error, when registering a token: ',
-                        ['message' => $e->getMessage()]
+                        ['message' => $exception->getMessage()]
                     );
                 } else {
                     $this->em->rollback();
