@@ -37,44 +37,7 @@ class UserEmailValidatorTest extends TestCase
         $storage = $this->createMock(TokenStorageInterface::class);
         $storage->method('getToken')->willReturn($token);
 
-        $disposableEmail = $this->createMock(DisposableEmailCommunicatorInterface::class);
-        $disposableEmail->method('checkDisposable')->willReturn(false);
-
-        $validator = new UserEmailValidator($um, $storage, $disposableEmail);
-        $validator->user = $user;
-        $validator->initialize($context);
-
-        $validator->validate($email, $constraint);
-        $validator->validate('uniqueemail', $constraint);
-        $validator->validate(null, $constraint);
-    }
-
-    public function testValidateDisposableTrue(): void
-    {
-        $email = 'foo@invalid.domain';
-        $user = $this->createMock(User::class);
-        $user->method('getEmail')->willReturn('foo@bar.baz');
-
-        $um = $this->createMock(UserManagerInterface::class);
-        $um->method('findUserByEmail')->willReturn(null);
-
-        $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->exactly(3))->method('buildViolation')->willReturn(
-            $this->createMock(ConstraintViolationBuilderInterface::class)
-        );
-
-        $constraint = $this->createMock(UserEmail::class);
-        $constraint->domainMessage = 'test';
-
-        $token = $this->createMock(TokenInterface::class);
-
-        $storage = $this->createMock(TokenStorageInterface::class);
-        $storage->method('getToken')->willReturn($token);
-
-        $disposableEmail = $this->createMock(DisposableEmailCommunicatorInterface::class);
-        $disposableEmail->method('checkDisposable')->willReturn(true);
-
-        $validator = new UserEmailValidator($um, $storage, $disposableEmail);
+        $validator = new UserEmailValidator($um, $storage);
         $validator->user = $user;
         $validator->initialize($context);
 

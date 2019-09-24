@@ -14,18 +14,13 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
         $this->rpc = $rpc;
     }
 
-    public function checkDisposable(?string $email): bool
+    public function fetchDomains(): array
     {
-        if (is_null($email)) {
-            return false;
-        }
-        
         $response = $this->rpc->send(
-            $email,
+            '',
             Request::METHOD_GET
         );
         $response = json_decode($response, true);
-        $response = $response['disposable'];
 
         return $response;
     }

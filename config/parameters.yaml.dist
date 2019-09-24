@@ -76,6 +76,6 @@ parameters:
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true
 
-    link_to_api_for_check_disposable_email: 'https://www.validator.pizza/email/'
+    link_to_disposable_email_domains: 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/index.json'
 
     disposable_email_timeout_seconds: 10

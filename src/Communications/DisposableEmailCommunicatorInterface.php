@@ -4,5 +4,5 @@ namespace App\Communications;
 
 interface DisposableEmailCommunicatorInterface
 {
-    public function checkDisposable(?string $email): bool;
+    public function fetchDomains(): array;
 }
