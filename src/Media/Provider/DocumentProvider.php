@@ -2,8 +2,9 @@
 
 namespace App\Media\Provider;
 
+use Gaufrette\Adapter\Local;
 use Gaufrette\Filesystem;
-use Sonata\MediaBundle\CDN\CDNInterface;
+use Sonata\MediaBundle\CDN\Server;
 use Sonata\MediaBundle\Generator\GeneratorInterface;
 use Sonata\MediaBundle\Metadata\MetadataBuilderInterface;
 use Sonata\MediaBundle\Model\MediaInterface;
@@ -12,25 +13,40 @@ use Sonata\MediaBundle\Thumbnail\ThumbnailInterface;
 
 class DocumentProvider extends FileProvider
 {
+    /** @var mixed[] */
     protected $allowedExtensions;
 
+    /** @var mixed[] */
     protected $allowedMimeTypes;
 
+    /** @var MetadataBuilderInterface|null  */
     protected $metadata;
 
     /**
-     * @param string                   $name
-     * @param Filesystem               $filesystem
-     * @param CDNInterface             $cdn
-     * @param GeneratorInterface       $pathGenerator
-     * @param ThumbnailInterface       $thumbnail
-     * @param array                    $allowedExtensions
-     * @param array                    $allowedMimeTypes
-     * @param MetadataBuilderInterface $metadata
+     * @param string $name
+     * @param GeneratorInterface $pathGenerator
+     * @param ThumbnailInterface $thumbnail
+     * @param string $path
+     * @param array $allowedExtensions
+     * @param array $allowedMimeTypes
+     * @param MetadataBuilderInterface|null $metadata
      */
-    public function __construct($name, Filesystem $filesystem, CDNInterface $cdn, GeneratorInterface $pathGenerator, ThumbnailInterface $thumbnail, array $allowedExtensions = [], array $allowedMimeTypes = [], MetadataBuilderInterface $metadata = null)
-    {
-        parent::__construct($name, $filesystem, $cdn, $pathGenerator, $thumbnail);
+    public function __construct(
+        string $name,
+        GeneratorInterface $pathGenerator,
+        ThumbnailInterface $thumbnail,
+        string $path,
+        array $allowedExtensions = [],
+        array $allowedMimeTypes = [],
+        ?MetadataBuilderInterface $metadata = null
+    ) {
+        parent::__construct(
+            $name,
+            new Filesystem(new Local(getcwd().$path, true)),
+            new Server($path),
+            $pathGenerator,
+            $thumbnail
+        );
 
         $this->allowedExtensions = $allowedExtensions;
         $this->allowedMimeTypes = $allowedMimeTypes;
@@ -50,8 +66,7 @@ class DocumentProvider extends FileProvider
         $oldMedia = clone $media;
         // if no previous reference is provided, it prevents
         // Filesystem from trying to remove a directory
-//        dump($this->getFilesystem());
-//        exit;
+
         if (null !== $media->getPreviousProviderReference()) {
             $oldMedia->setProviderReference($media->getPreviousProviderReference());
 
