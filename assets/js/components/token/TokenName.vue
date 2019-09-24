@@ -16,7 +16,7 @@
                 @click="editToken"
             />
         </template>
-        <span class="token-name-font" v-b-tooltip="{title: currentName, boundary:'viewport'}">
+        <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
             {{ currentName | truncate(7) }}
         </span>
     </div>

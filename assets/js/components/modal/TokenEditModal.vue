@@ -17,7 +17,7 @@
                         type="text"
                         v-model="newName"
                         ref="tokenNameInput"
-                        class="token-name-input token-name-font w-100 px-2"
+                        class="token-name-input w-100 px-2"
                         :class="{ 'is-invalid': $v.$invalid }">
                 </div>
                 <div class="col-12 pt-2 clearfix">
