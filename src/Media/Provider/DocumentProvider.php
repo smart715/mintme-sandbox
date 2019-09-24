@@ -2,6 +2,7 @@
 
 namespace App\Media\Provider;
 
+use App\Utils\Converter\FriendlyUrlConverterInterface;
 use Gaufrette\Adapter\Local;
 use Gaufrette\Filesystem;
 use Sonata\MediaBundle\CDN\Server;
@@ -22,11 +23,15 @@ class DocumentProvider extends FileProvider
     /** @var MetadataBuilderInterface|null  */
     protected $metadata;
 
+    /** @var FriendlyUrlConverterInterface */
+    private $urlConverter;
+
     /**
      * @param string $name
      * @param GeneratorInterface $pathGenerator
      * @param ThumbnailInterface $thumbnail
      * @param string $path
+     * @param FriendlyUrlConverterInterface $urlConverter
      * @param array $allowedExtensions
      * @param array $allowedMimeTypes
      * @param MetadataBuilderInterface|null $metadata
@@ -36,6 +41,7 @@ class DocumentProvider extends FileProvider
         GeneratorInterface $pathGenerator,
         ThumbnailInterface $thumbnail,
         string $path,
+        FriendlyUrlConverterInterface $urlConverter,
         array $allowedExtensions = [],
         array $allowedMimeTypes = [],
         ?MetadataBuilderInterface $metadata = null
@@ -48,11 +54,24 @@ class DocumentProvider extends FileProvider
             $thumbnail
         );
 
+        $this->urlConverter = $urlConverter;
         $this->allowedExtensions = $allowedExtensions;
         $this->allowedMimeTypes = $allowedMimeTypes;
         $this->metadata = $metadata;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getReferenceImage(MediaInterface $media)
+    {
+        return $media->getProviderReference();
+    }
+
+    public function generatePath(MediaInterface $media): string
+    {
+        return '';
+    }
     /**
      * {@inheritdoc}
      */
@@ -85,21 +104,9 @@ class DocumentProvider extends FileProvider
 
         $media->resetBinaryContent();
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function updateMetadata(MediaInterface $media, $force = true)
+    
+    protected function generateReferenceName(MediaInterface $media): string
     {
-        if (!$media->getBinaryContent() instanceof \SplFileInfo) {
-            // this is now optimized at all!!!
-            $path = tempnam(sys_get_temp_dir(), 'sonata_update_metadata_');
-            $fileObject = new \SplFileObject($path, 'w');
-            $fileObject->fwrite($this->getReferenceFile($media)->getContent());
-        } else {
-            $fileObject = $media->getBinaryContent();
-        }
-
-        $media->setSize($fileObject->getSize());
+        return $this->urlConverter->convert($media->getName()).'.'.$media->getBinaryContent()->guessExtension();
     }
 }
