@@ -8,6 +8,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Events\TransactionCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
+use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
@@ -20,7 +21,8 @@ class TransactionSubscriberTest extends TestCase
     {
         $subscriber = new TransactionSubscriber(
             $this->mockMailer(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockLogger()
         );
 
         $tradable = $this->createMock(Crypto::class);
@@ -37,7 +39,8 @@ class TransactionSubscriberTest extends TestCase
     {
         $subscriber = new TransactionSubscriber(
             $this->mockMailer(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockLogger()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -77,5 +80,10 @@ class TransactionSubscriberTest extends TestCase
         $event->method('getAmount')->willReturn($amount);
 
         return $event;
+    }
+
+    private function mockLogger(): UserActionLogger
+    {
+        return $this->createMock(UserActionLogger::class);
     }
 }

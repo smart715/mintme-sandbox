@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
+use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -19,10 +20,17 @@ class TransactionSubscriber implements EventSubscriberInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    public function __construct(MailerInterface $mailer, MoneyWrapperInterface $moneyWrapper)
-    {
+    /** @var UserActionLogger */
+    private $logger;
+
+    public function __construct(
+        MailerInterface $mailer,
+        MoneyWrapperInterface $moneyWrapper,
+        UserActionLogger $logger
+    ) {
         $this->mailer = $mailer;
         $this->moneyWrapper = $moneyWrapper;
+        $this->logger = $logger;
     }
 
     public static function getSubscribedEvents(): array
@@ -46,6 +54,11 @@ class TransactionSubscriber implements EventSubscriberInterface
             $this->moneyWrapper->parse($event->getAmount(), $symbol)
         );
 
-        $this->mailer->sendTransactionCompletedMail($tradable, $user, $amount, $event::TYPE);
+        try {
+            $this->mailer->sendTransactionCompletedMail($tradable, $user, $amount, $event::TYPE);
+            $this->logger->info("Sent ".$event::TYPE." completed e-mail to user ".$user->getEmail());
+        } catch (\Throwable $e) {
+            $this->logger->error("Couldn't send ".$event::TYPE." completed e-mail to user ".$user->getEmail()."Reason: ".$e->getMessage());
+        }
     }
 }
