@@ -175,8 +175,6 @@ class TokenController extends Controller
             }
 
             try {
-                $_SESSION['token_creation'] = 'True';
-
                 $balanceHandler->deposit(
                     $this->getUser(),
                     $token,
@@ -192,22 +190,24 @@ class TokenController extends Controller
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                unset($_SESSION['token_creation']);
-
                 return $this->redirectToOwnToken('intro');
             } catch (Throwable $exception) {
                 if (false !== strpos($exception->getMessage(), 'cURL')) {
                     $this->addFlash('danger', 'Exchanger connection lost. Try again');
+                    
+                    $this->userActionLogger->error(
+                    'Got an error, when registering a token: ',
+                    ['message' => $e->getMessage()]
+                );
+
                 } else {
                     $this->em->rollback();
                     $this->addFlash('danger', 'Error creating token. Try again');
+                    
                     $this->userActionLogger->error(
                         'Got an error, when registering a token',
                         ['message' => $exception->getMessage()]
                     );
-
-                    
-                    unset($_SESSION['token_creation']);
                 }
             }
         }
