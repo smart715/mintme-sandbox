@@ -1,7 +1,7 @@
 <template>
     <div class="trading">
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-            <span class="float-left">Top {{ marketsCount }} tokens | Market Cap: {{ globalMarketCap }} BTC</span>
+            <span class="float-left">Top {{ marketsCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }} BTC</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
                 <input
                     type="checkbox"
@@ -72,18 +72,17 @@
 
 <script>
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin} from '../../mixins';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import Decimal from 'decimal.js/decimal.js';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
     props: {
         page: Number,
         marketsCount: Number,
         userId: Number,
-        coinbaseUrl: String,
     },
     components: {
         Guide,
@@ -150,19 +149,29 @@ export default {
             return this.markets !== null && !this.loading;
         },
         globalMarketCap: function() {
-            if (!Object.keys(this.sanitizedMarkets).length) {
+            let markets = Object.keys(this.markets || {});
+
+            if (!markets.length) {
                 return 0;
             }
 
-            let sanitizedMarketsArray = Object.keys(this.sanitizedMarkets);
+            let globalMarketCap = markets.reduce((acc, curr) => {
+                // Current market
+                let current = this.markets[curr];
 
-            let globalMarketCap = sanitizedMarketsArray.reduce((acc, curr) => {
-                return Decimal.mul(this.markets[curr].lastPrice, 1e7).plus(acc);
+                // Calculate MarketCap
+                let marketCap = Decimal.mul(current.lastPrice, current.supply);
+
+                // If current's market crypto is WEB, we will calculate marketCap in BTC
+                if ('WEB' === current.crypto.symbol) {
+                    marketCap = marketCap.times(this.markets['WEBBTC'].lastPrice);
+                }
+
+                // Finally, we add it to the accumulator
+                return marketCap.plus(acc);
             }, 0);
 
-            globalMarketCap = globalMarketCap.times(this.markets['WEBBTC'].lastPrice);
-
-            return toMoney(globalMarketCap, 8);
+            return toMoney(globalMarketCap, this.markets['WEBBTC'].crypto.subunit);
         },
     },
     mounted: function() {
@@ -171,11 +180,6 @@ export default {
                 if ('state.update' === result.method) {
                     this.sanitizeMarket(result);
                 }
-
-                this.$axios.retry.get(`${this.coinbaseUrl}/coins/webchain`).then((res) => {
-                    this.webchainSupply = res.data.market_data.circulating_supply;
-                    this.updateWEBBTCMarket();
-                });
             });
         });
     },
@@ -233,6 +237,8 @@ export default {
                             );
                         }
 
+                        this.fetchWEBsupply().then(this.updateWEBBTCMarket.bind(this));
+
                         resolve();
                     })
                     .catch((err) => {
@@ -255,7 +261,7 @@ export default {
             const marketCurrency = this.markets[marketName].crypto.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
             const marketPrecision = this.markets[marketName].crypto.subunit;
-            const supply = marketName === 'WEBBTC' ? this.webchainSupply || 1e7 : 1e7;
+            const supply = this.markets[marketName].supply;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -312,10 +318,11 @@ export default {
             this.sanitizedMarkets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
+                    this.markets[market].supply = 1e7;
+
                     const cryptoSymbol = this.markets[market].crypto.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
-                    const supply = 1e7;
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
                         tokenName,
@@ -325,7 +332,7 @@ export default {
                         ),
                         parseFloat(this.markets[market].lastPrice),
                         parseFloat(this.markets[market].dayVolume),
-                        supply,
+                        this.markets[market].supply,
                         this.markets[market].crypto.subunit
                     );
 
@@ -360,6 +367,26 @@ export default {
 
             return result;
         },
+        fetchWEBsupply: function() {
+            return new Promise((resolve, reject) => {
+                let config = {
+                    transformRequest: function(data, headers) {
+                        headers.common = {};
+                        return data;
+                    },
+                };
+
+                this.$axios.retry.get(`https://webchain.network/supply.txt`, config)
+                    .then((res) => {
+                        this.markets['WEBBTC'].supply = res.data;
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.$toasted.error('Can not update WEB circulation supply. WEB market cap might not be accurate.');
+                        reject(err);
+                    });
+            });
+        },
         updateWEBBTCMarket: function() {
             let market = this.markets['WEBBTC'];
             market = this.getSanitizedMarket(
@@ -371,7 +398,7 @@ export default {
                 ),
                 parseFloat(market.lastPrice),
                 parseFloat(market.dayVolume),
-                this.webchainSupply,
+                market.supply,
                 market.crypto.subunit
             );
 
