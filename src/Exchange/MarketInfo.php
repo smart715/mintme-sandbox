@@ -29,6 +29,9 @@ class MarketInfo
     /** @var Money */
     private $deal;
 
+    /** @var Money */
+    private $monthDeal;
+
     /** @var string */
     private $tokenName;
 
@@ -44,7 +47,8 @@ class MarketInfo
         Money $close,
         Money $high,
         Money $low,
-        Money $deal
+        Money $deal,
+        Money $monthDeal
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
         $this->tokenName = $tokenName;
@@ -55,6 +59,7 @@ class MarketInfo
         $this->high = $high;
         $this->low = $low;
         $this->deal = $deal;
+        $this->monthDeal = $monthDeal;
     }
 
     /** @Groups({"Default", "API"}) */
@@ -66,6 +71,11 @@ class MarketInfo
     public function getDeal(): Money
     {
         return $this->deal;
+    }
+
+    public function getMonthDeal(): Money
+    {
+        return $this->monthDeal;
     }
 
     public function getLow(): Money

@@ -20,12 +20,12 @@ class BalanceViewFactoryTest extends TestCase
     public function testCreate(): void
     {
         $tokens = [
-            ['name' => 'foo', 'hidden' => true, 'crypto' => true, 'lockIn' => true],
-            ['name' => 'bar', 'hidden' => false, 'crypto' => true, 'lockIn' => false],
-            ['name' => 'baz', 'hidden' => false, 'crypto' => false, 'lockIn' => true],
-            ['name' => 'qux', 'hidden' => true, 'crypto' => false, 'lockIn' => false],
-            ['name' => 'empty', 'hidden' => null, 'crypto' => false, 'lockIn' => false],
-            ['name' => 'lok', 'hidden' => false, 'crypto' => true, 'lockIn' => true],
+            ['name' => 'foo', 'hidden' => true, 'crypto' => true, 'lockIn' => true, 'status' => 'not-deployed'],
+            ['name' => 'bar', 'hidden' => false, 'crypto' => true, 'lockIn' => false, 'status' => 'not-deployed'],
+            ['name' => 'baz', 'hidden' => false, 'crypto' => false, 'lockIn' => true, 'status' => 'pending'],
+            ['name' => 'qux', 'hidden' => true, 'crypto' => false, 'lockIn' => false, 'status' => 'pending'],
+            ['name' => 'empty', 'hidden' => null, 'crypto' => false, 'lockIn' => false, 'status' => 'deployed'],
+            ['name' => 'lok', 'hidden' => false, 'crypto' => true, 'lockIn' => true, 'status' => 'deployed'],
         ];
 
         $factory = new BalanceViewFactory(
@@ -41,11 +41,11 @@ class BalanceViewFactoryTest extends TestCase
         );
 
         $this->assertEquals([
-            'foo' => ['1', '1', '1', 'FOO', 'fooBAR', 4, false, true],
-            'bar' => ['1', '1', null, 'FOO', 'barBAR', 4, true, true],
-            'baz' => ['1', null, '1', 'baz', 'bazBAR', 4, false, false],
-            'qux' => ['1', null, null, 'qux', 'quxBAR', 4, false, false],
-            'lok' => ['1', '1', '1', 'FOO', 'lokBAR', 4, true, true],
+            'foo' => ['1', '1', '1', 'FOO', 'fooBAR', 4, false, true, false],
+            'bar' => ['1', '1', null, 'FOO', 'barBAR', 4, true, true, false],
+            'baz' => ['1', null, '1', 'baz', 'bazBAR', 4, false, false, false],
+            'qux' => ['1', null, null, 'qux', 'quxBAR', 4, false, false, false],
+            'lok' => ['1', '1', '1', 'FOO', 'lokBAR', 4, true, true, true],
         ], array_map(function (BalanceView $view): array {
             return [
                 $view->getAvailable()->getAmount(),
@@ -56,6 +56,7 @@ class BalanceViewFactoryTest extends TestCase
                 $view->getSubunit(),
                 $view->isExchangeble(),
                 $view->isTradable(),
+                $view->isDeployed(),
             ];
         }, $view));
     }
@@ -77,7 +78,7 @@ class BalanceViewFactoryTest extends TestCase
         $tm->method('findByName')->willReturnCallback(function ($name) use ($tokens): ?Token {
             foreach ($tokens as $token) {
                 if (false === $token['hidden'] && $token['name'] === $name) {
-                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden']);
+                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden'], $token['status']);
                 }
             }
 
@@ -87,7 +88,7 @@ class BalanceViewFactoryTest extends TestCase
         $tm->method('findByHiddenName')->willReturnCallback(function ($name) use ($tokens): ?Token {
             foreach ($tokens as $token) {
                 if (true === $token['hidden'] && $token['name'] === $name) {
-                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden']);
+                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden'], $token['status']);
                 }
             }
 
@@ -112,7 +113,7 @@ class BalanceViewFactoryTest extends TestCase
         return $converter;
     }
 
-    private function mockToken(string $name, bool $hasCrypto, bool $hasLockIn, bool $isHidden): Token
+    private function mockToken(string $name, bool $hasCrypto, bool $hasLockIn, bool $isHidden, string $status): Token
     {
         $tok = $this->createMock(Token::class);
         $tok->method('getName')->willReturn($name);
@@ -124,6 +125,8 @@ class BalanceViewFactoryTest extends TestCase
         $lockIn->method('getFrozenAmount')->willReturn(new Money(1, new Currency('FOO')));
 
         $tok->method('getLockIn')->willReturn($hasLockIn ? $lockIn : null);
+
+        $tok->method('deploymentStatus')->willReturn($status);
 
         return $tok;
     }

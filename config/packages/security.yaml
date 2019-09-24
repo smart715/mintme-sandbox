@@ -44,6 +44,8 @@ security:
     access_control:
         - { path: ^/api/tokens/[a-zA-Z0-9]+/send-code$, role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/delete$, role: ROLE_USER }
+        - { path: ^/api/tokens/[a-zA-Z0-9]+/deploy, role: ROLE_USER }
+        - { path: ^/api/tokens/[a-zA-Z0-9]+/contract/update, role: ROLE_USER }
         - { path: ^/api, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
