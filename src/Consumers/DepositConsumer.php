@@ -128,6 +128,7 @@ class DepositConsumer implements ConsumerInterface
             $balanceContext = new BalanceContext($strategy);
             $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
 
+            /** @var DepositCompletedEvent */
             $event = $this->eventDispatcher->dispatch(
                 DepositCompletedEvent::NAME,
                 new DepositCompletedEvent($tradable, $user, $clbResult->getAmount())
