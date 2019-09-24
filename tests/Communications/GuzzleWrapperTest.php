@@ -6,7 +6,6 @@ use App\Communications\Exception\FetchException;
 use App\Communications\Factory\RpcClientFactoryInterface;
 use App\Communications\GuzzleWrapper;
 use App\Communications\JsonRpcResponse;
-use App\Logger\UserActionLogger;
 use App\Utils\RandomNumber;
 use Graze\GuzzleHttp\JsonRpc\ClientInterface;
 use Graze\GuzzleHttp\JsonRpc\Message\RequestInterface;
@@ -36,7 +35,6 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getUserActionLoggerMock(),
             $url,
             $timeout
         );
@@ -67,7 +65,6 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getUserActionLoggerMock(),
             $url,
             $timeout
         );
@@ -94,7 +91,6 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getUserActionLoggerMock(),
             $url,
             $timeout
         );
@@ -121,7 +117,6 @@ class GuzzleWrapperTest extends TestCase
             $this->getRandomNumber(),
             $clientFactory,
             $this->getLoggerMock(),
-            $this->getUserActionLoggerMock(),
             'http://localhost:8080',
             10,
             ['auth' => ['type' => 'basic']]
@@ -148,12 +143,6 @@ class GuzzleWrapperTest extends TestCase
     private function getLoggerMock(): LoggerInterface
     {
         return $this->createMock(LoggerInterface::class);
-    }
-
-    /** @return MockObject|UserActionLogger */
-    private function getUserActionLoggerMock(): UserActionLogger
-    {
-        return $this->createMock(UserActionLogger::class);
     }
 
     /**
