@@ -196,10 +196,9 @@ class TokenController extends Controller
                     $this->addFlash('danger', 'Exchanger connection lost. Try again');
                     
                     $this->userActionLogger->error(
-                    'Got an error, when registering a token: ',
-                    ['message' => $e->getMessage()]
-                );
-
+                        'Got an error, when registering a token: ',
+                        ['message' => $e->getMessage()]
+                    );
                 } else {
                     $this->em->rollback();
                     $this->addFlash('danger', 'Error creating token. Try again');
