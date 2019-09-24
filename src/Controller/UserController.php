@@ -113,6 +113,13 @@ class UserController extends AbstractController
             'twoFactorKey' => $user->getGoogleAuthenticatorSecret(),
         ];
 
+        if ($request->get('backupCodes') && is_array($request->get('backupCodes'))) {
+            $parameters['backupCodes'] = $request->get('backupCodes');
+            $parameters['formHeader'] = 'Two-Factor authentication backup codes';
+
+            return $this->render('security/2fa_manager.html.twig', $parameters);
+        }
+
         if (!$form->isSubmitted() || !$form->isValid()) {
             return $this->render('security/2fa_manager.html.twig', $parameters);
         }
@@ -123,9 +130,10 @@ class UserController extends AbstractController
             return $this->redirectToRoute('settings');
         }
 
-        $parameters['backupCodes'] = $this->turnOnAuthenticator($twoFactorManager, $user);
-
-        return $this->render('security/2fa_manager.html.twig', $parameters);
+        return $this->redirectToRoute(
+            'two_factor_auth',
+            ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager, $user) ]
+        );
     }
 
     private function getPasswordForm(Request $request): FormInterface
