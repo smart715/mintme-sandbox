@@ -28,9 +28,10 @@ function mockVue() {
  * @param {Boolean} balanceFetched
  * @param {Boolean} isOwner
  * @param {String} status
+ * @param {Boolean} twofa
  * @return {Wrapper<Vue>}
  */
-function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed') {
+function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed', twofa = false) {
     const store = new Vuex.Store({
         modules: {makeOrder},
     });
@@ -43,6 +44,7 @@ function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed'
             isOwner: isOwner,
             precision: 4,
             statusProp: status,
+            twofa: twofa,
         },
     });
 
@@ -180,6 +182,25 @@ describe('TokenDeploy', () => {
                 expect(wrapper.vm.webCost).to.deep.equal(0);
                 done();
             });
+        });
+    });
+
+    describe('2fa modal', () => {
+        it('is displayed after submit if 2fa is enabled', () => {
+            const wrapper = mockTokenDeploy(true, true, 'not-deployed', true);
+            wrapper.vm.hasReleasePeriod = true;
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
+            wrapper.find('.btn-primary').trigger('click');
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(true);
+        });
+
+
+        it('is not displayed after submit if 2fa is disabled', () => {
+            const wrapper = mockTokenDeploy(true, true, 'not-deployed', false);
+            wrapper.vm.hasReleasePeriod = true;
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
+            wrapper.find('.btn-primary').trigger('click');
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
         });
     });
 });

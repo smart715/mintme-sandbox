@@ -6,6 +6,8 @@ import TokenWithdrawalAddress from '../../js/components/token/TokenWithdrawalAdd
 Vue.use(Vuelidate);
 Vue.use(Toasted);
 
+const newAddress = '0x1111111111111111111111111111111111111111';
+
 describe('TokenWithdrawalAddress', () => {
     it('renders correctly with assigned props', () => {
         const wrapper = mount(TokenWithdrawalAddress, {
@@ -31,31 +33,33 @@ describe('TokenWithdrawalAddress', () => {
         expect(wrapper.find('input').exists()).to.be.true;
     });
 
-    it('open TwoFactorModal for saving address when 2fa is enabled', () => {
-        const wrapper = mount(TokenWithdrawalAddress, {
-            propsData: {
-                withdrawalAddress: 'foobar',
-                isTokenDeployed: false,
-                twofa: true,
-            },
+    describe('2fa modal', () => {
+        it('is displayed after submit if 2fa is enabled', () => {
+            const wrapper = mount(TokenWithdrawalAddress, {
+                propsData: {
+                    withdrawalAddress: 'foobar',
+                    isTokenDeployed: true,
+                    twofa: true,
+                },
+            });
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
+            wrapper.find('input').setValue(newAddress);
+            wrapper.find('.btn-primary').trigger('click');
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(true);
         });
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
-        wrapper.find('input').setValue(newAddress);
-        wrapper.find('.btn-primary').trigger('click');
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(true);
-    });
 
-
-    it('do not open TwoFactorModal for saving address when 2fa is disabled', () => {
-        const wrapper = mount(TokenWithdrawalAddress, {
-            propsData: {
-                currentName: 'foobar',
-                twofa: false,
-            },
+        it('is not displayed after submit if 2fa is disabled', () => {
+            const wrapper = mount(TokenWithdrawalAddress, {
+                propsData: {
+                    withdrawalAddress: 'foobar',
+                    isTokenDeployed: true,
+                    twofa: false,
+                },
+            });
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
+            wrapper.find('input').setValue(newAddress);
+            wrapper.find('.btn-primary').trigger('click');
+            expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
         });
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
-        wrapper.find('input').setValue(newAddress);
-        wrapper.find('.btn-primary').trigger('click');
-        expect(wrapper.vm.showTwoFactorModal).to.deep.equal(false);
     });
 });
