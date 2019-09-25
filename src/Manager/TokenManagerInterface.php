@@ -29,5 +29,5 @@ interface TokenManagerInterface
     /** @return Token[] */
     public function getTokensByPattern(string $pattern): array;
 
-    public function isExisted(Token $token): bool;
+    public function isExisted(string $tokenName): bool;
 }
