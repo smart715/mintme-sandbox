@@ -23,12 +23,17 @@ class BlacklistManager implements BlacklistManagerInterface
     public function isBlacklisted(string $value, string $type, bool $sensetive = true): bool
     {
         if ('email' === $type) {
-            $value = substr($value, strrpos($value, '@') + 1);
-
-            return $this->repository->matchValue($value, $type, $sensetive);
+            return $this->isBlackListedEmail($value, $type, $sensetive);
         }
 
         return $this->repository->matchValue($value, $type, $sensetive);
+    }
+
+    private function isBlackListedEmail(string $email, string $type, bool $sensetive = true): bool
+    {
+        $domain = substr($email, strrpos($email, '@') + 1);
+
+        return $this->repository->matchValue($domain, $type, $sensetive);
     }
 
     public function addToBlacklist(string $value, string $type, bool $flush = true): void
@@ -56,4 +61,6 @@ class BlacklistManager implements BlacklistManagerInterface
     {
         $this->em->persist(new Blacklist($value, $type));
     }
+
+
 }
