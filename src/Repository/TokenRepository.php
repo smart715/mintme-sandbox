@@ -19,6 +19,7 @@ class TokenRepository extends EntityRepository
     {
         return $this->createQueryBuilder('token')
             ->where('REPLACE(token.name, \' \', \'-\' ) = (:name)')
+            ->orWhere('REPLACE(token.name, \'-\', \' \' ) = (:name)')
             ->setParameter('name', $name)
             ->getQuery()
             ->getOneOrNullResult();
