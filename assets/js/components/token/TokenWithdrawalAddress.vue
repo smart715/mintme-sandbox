@@ -146,21 +146,21 @@ export default {
                 lock: this.locked,
                 code,
             })
-                .then(() => {
-                    this.$toasted.success('Withdrawal address changed successfully');
-                    this.steUpdatingState();
-                }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
-                })
-                .then(() => {
-                    this.submitting = false;
-                });
+            .then(() => {
+                this.steUpdatingState();
+                this.$toasted.success('Withdrawal address changed successfully');
+            }, (error) => {
+                if (!error.response) {
+                    this.$toasted.error('Network error');
+                } else if (error.response.data.message) {
+                    this.$toasted.error(error.response.data.message);
+                } else {
+                    this.$toasted.error('An error has occurred, please try again later');
+                }
+            })
+            .then(() => {
+                this.submitting = false;
+            });
         },
     },
     validations() {

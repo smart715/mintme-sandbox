@@ -65,6 +65,7 @@
                     >
                         Save
                     </b-button>
+
                 </div>
             </b-col>
         </b-row>
@@ -134,9 +135,9 @@ export default {
             this.$axios.single.post(this.$routing.generate('lock_in', {
                 name: this.tokenName,
             }), {
-                'released': this.released,
-                'releasePeriod': this.currentPeriod,
-                'code': code,
+                released: this.released,
+                releasePeriod: this.currentPeriod,
+                code,
             }).then((response) => {
                 this.$emit('update', response);
                 this.$toasted.success('Release period updated.');
