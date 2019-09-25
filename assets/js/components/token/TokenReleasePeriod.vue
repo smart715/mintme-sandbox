@@ -151,15 +151,13 @@ export default {
                 this.$emit('update', response);
                 this.$toasted.success('Release period updated.');
                 this.cancelAction();
-            }).catch((error) => {
-                if (400 === error.response.status) {
-                    deepFlatten(error.response.data.errors).forEach((err) => {
-                        this.$toasted.error(err);
-                    });
-                } else if (401 === error.response.status) {
-                    this.$toasted.error(error.response.data);
+            }).catch(({response}) => {
+                if (!response) {
+                    this.$toasted.error('Network error');
+                } else if (response.data.message) {
+                    this.$toasted.error(response.data.message);
                 } else {
-                    this.$toasted.error('Connection problem. Try again later.');
+                    this.$toasted.error('An error has occurred, please try again later');
                 }
             });
         },

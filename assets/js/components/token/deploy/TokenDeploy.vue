@@ -46,10 +46,10 @@
                     />
                 </div>
                 <two-factor-modal
-                        :visible="showTwoFactorModal"
-                        :twofa="twofa"
-                        @verify="doDeploy"
-                        @close="closeTwoFactorModal"
+                    :visible="showTwoFactorModal"
+                    :twofa="twofa"
+                    @verify="doDeploy"
+                    @close="closeTwoFactorModal"
                 />
             </template>
             <div

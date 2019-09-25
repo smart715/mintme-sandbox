@@ -47,10 +47,10 @@
             </span>
         </div>
         <two-factor-modal
-                :visible="showTwoFactorModal"
-                :twofa="twofa"
-                @verify="doEditAddress"
-                @close="closeTwoFactorModal"
+            :visible="showTwoFactorModal"
+            :twofa="twofa"
+            @verify="doEditAddress"
+            @close="closeTwoFactorModal"
         />
     </div>
     <div
