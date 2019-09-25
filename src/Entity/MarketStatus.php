@@ -94,9 +94,7 @@ class MarketStatus
      */
     public function getOpenPrice(): Money
     {
-        return new Money($this->openPrice, new Currency(
-            $this->quoteCrypto ? $this->quoteCrypto->getSymbol() : MoneyWrapper::TOK_SYMBOL
-        ));
+        return new Money($this->openPrice, new Currency($this->crypto->getSymbol()));
     }
 
     /**
@@ -104,9 +102,7 @@ class MarketStatus
      */
     public function getLastPrice(): Money
     {
-        return new Money($this->lastPrice, new Currency(
-            $this->quoteCrypto ? $this->quoteCrypto->getSymbol() : MoneyWrapper::TOK_SYMBOL
-        ));
+        return new Money($this->lastPrice, new Currency($this->crypto->getSymbol()));
     }
 
     /**
@@ -114,9 +110,7 @@ class MarketStatus
      */
     public function getDayVolume(): Money
     {
-        return new Money($this->dayVolume, new Currency(
-            $this->quoteCrypto ? $this->quoteCrypto->getSymbol() : MoneyWrapper::TOK_SYMBOL
-        ));
+        return new Money($this->dayVolume, new Currency($this->crypto->getSymbol()));
     }
 
     public function setQuote(?TradebleInterface $quote): self
