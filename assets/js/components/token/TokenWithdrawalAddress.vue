@@ -7,15 +7,11 @@
             <input
                 id="address"
                 type="text"
-                v-model.trim="newAddress"
-                ref="addressInput"
-                class="w-100 px-2"
-                :class="{ 'is-invalid': $v.$invalid }"
+                v-model.trim="$v.newAddress.$model"
+                class="form-control"
+                :class="{ 'is-invalid': $v.newAddress.$error }"
             >
-            <div
-                class="invalid-feedback"
-                :class="{ 'd-block': $v.newAddress.$invalid }"
-            >
+            <div v-if="$v.newAddress.$error" class="invalid-feedback">
                 Wrong address
             </div>
             <label class="custom-control custom-checkbox pt-2">
@@ -77,10 +73,8 @@
 
 <script>
 import TwoFactorModal from '../modal/TwoFactorModal';
-import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
-import {addressLength} from '../../utils/constants';
-
-const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
+import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {addressLength, addressContain} from '../../utils/constants';
 
 export default {
     name: 'TokenWithdrawalAddress',
