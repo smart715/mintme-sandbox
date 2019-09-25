@@ -33,8 +33,8 @@
 
 <script>
 import TwoFactorModal from '../modal/TwoFactorModal';
-import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
-import {addressContain} from '../../utils/constants'
+import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {addressContain} from '../../utils/constants';
 
 const HTTP_ACCEPTED = 202;
 

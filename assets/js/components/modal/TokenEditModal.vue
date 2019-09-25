@@ -112,10 +112,7 @@ import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TokenWithdrawalAddress from '../token/TokenWithdrawalAddress';
 import TwoFactorModal from './TwoFactorModal';
 import {FiltersMixin} from '../../mixins';
-import {tokenDeploymentStatus, addressContain} from '../../utils/constants';
-
-const HTTP_ACCEPTED = 202;
-const HTTP_BAD_REQUEST = 400;
+import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'TokenEditModal',
