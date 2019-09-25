@@ -17,8 +17,8 @@ class ParseStringStrategy implements StringConverterInterface
     public function convert(?string $tokenName): string
     {
         return (string)preg_replace(
-            ['/\s+/', '/\s*\-{1,}\s*/'],
-            [' ', '-'],
+            ['/\s+/', '/\s*\-{1,}\s*/', '/\-+\s*\-+/'],
+            [' ', '-', '-'],
             trim($tokenName ?? '', ' -')
         );
     }
