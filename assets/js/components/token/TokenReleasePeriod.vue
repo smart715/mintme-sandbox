@@ -139,6 +139,7 @@ export default {
                 releasePeriod: this.currentPeriod,
                 code,
             }).then((response) => {
+                this.closeTwoFactorModal();
                 this.$emit('update', response);
                 this.$toasted.success('Release period updated.');
             }).catch(({response}) => {
