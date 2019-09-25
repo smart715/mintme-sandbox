@@ -71,6 +71,7 @@
                                 <token-deploy
                                     :has-release-period="hasReleasePeriod"
                                     :is-owner="isOwner"
+                                    :twofa="twofa"
                                     :name="currentName"
                                     :precision="precision"
                                     :status-prop="statusProp"

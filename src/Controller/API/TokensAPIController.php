@@ -25,7 +25,6 @@ use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -526,7 +525,7 @@ class TokensAPIController extends AbstractFOSRestController
         }
 
         try {
-            $deployment->execute($this->getUser(), $token);
+//            $deployment->execute($this->getUser(), $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
