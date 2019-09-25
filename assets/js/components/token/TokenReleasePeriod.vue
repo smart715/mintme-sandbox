@@ -85,7 +85,6 @@
 
 <script>
 import vueSlider from 'vue-slider-component';
-import {deepFlatten} from '../../utils';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 
