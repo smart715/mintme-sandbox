@@ -139,11 +139,13 @@ class TokenManagerTest extends TestCase
     public function testIsExisted(): void
     {
         $fooTok = $this->mockToken(' foo   23-fg  fd  ');
-        $barTok = $this->mockToken('bar');
+
+        $ninjoTok = $this->mockToken('ninjo');
 
         /** @var MockObject|TokenRepository $tokenRepository */
         $tokenRepository = $this->createMock(TokenRepository::class);
-        $tokenRepository->method('findByName')->with('FOO-23-FG-FD')->willReturn($barTok);
+
+        $tokenRepository->method('findByName')->willReturn($fooTok);
 
         /** @var MockObject|EntityManagerInterface $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -157,7 +159,8 @@ class TokenManagerTest extends TestCase
             $this->mockConfig(0)
         );
 
-        $this->assertTrue($tokenManager->isExisted($fooTok));
+        $this->assertTrue($tokenManager->isExisted($fooTok->getName()));
+        $this->assertFalse($tokenManager->isExisted($ninjoTok->getName()));
     }
 
     /** @dataProvider getRealBalanceProvider */
