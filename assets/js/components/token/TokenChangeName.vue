@@ -34,9 +34,9 @@
 <script>
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+import {addressContain} from '../../utils/constants'
 
 const HTTP_ACCEPTED = 202;
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 
 export default {
     name: 'TokenChangeName',
@@ -89,7 +89,7 @@ export default {
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');
                 return;
-            } else if (!this.$v.newName.tokenContain) {
+            } else if (!this.$v.newName.addressContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
             } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
@@ -118,40 +118,44 @@ export default {
                 name: this.newName,
                 code: code,
             })
-                .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        this.currentName = response.data['tokenName'];
-                        this.$toasted.success('Token\'s name changed successfully');
+            .then((response) => {
+                if (response.status === HTTP_ACCEPTED) {
+                    this.currentName = response.data['tokenName'];
+                    this.$toasted.success('Token\'s name changed successfully');
 
-                        this.showTwoFactorModal = false;
-                        this.closeModal();
+                    this.showTwoFactorModal = false;
+                    this.closeModal();
 
-                        // TODO: update name in a related components and link path instead of redirecting
-                        location.href = this.$routing.generate('token_show', {
-                            name: this.currentName,
-                        });
-                    }
-                }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
-                })
-                .then(() => {
-                    this.submitting = false;
-                });
+                    // TODO: update name in a related components and link path instead of redirecting
+                    location.href = this.$routing.generate('token_show', {
+                        name: this.currentName,
+                    });
+                }
+            }, (error) => {
+                if (!error.response) {
+                    this.$toasted.error('Network error');
+                } else if (error.response.data.message) {
+                    this.$toasted.error(error.response.data.message);
+                } else {
+                    this.$toasted.error('An error has occurred, please try again later');
+                }
+            })
+            .then(() => {
+                this.submitting = false;
+            });
+        },
+        trimName: function(name) {
+              return name.replace(/^[\s\-]+/, '').replace(/[\s\-]+$/, '');
         },
     },
     validations() {
         return {
             newName: {
                 required,
-                tokenContain: tokenContain,
+                addressContain,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
+                customTrimmer: this.trimName,
             },
         };
     },
