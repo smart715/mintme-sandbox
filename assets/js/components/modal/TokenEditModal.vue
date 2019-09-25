@@ -60,6 +60,7 @@ import {FiltersMixin} from '../../mixins';
 
 const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
 const HTTP_ACCEPTED = 202;
+const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenEditModal',
@@ -78,6 +79,7 @@ export default {
     data() {
         return {
             minLength: 4,
+            maxLength: 60,
             mode: null,
             needToSendCode: !this.twofa,
             newName: this.currentName,
@@ -106,9 +108,12 @@ export default {
                 this.mode = null;
             }
         },
+        trimName: function(name) {
+              return name.replace(/^[\s\-]+/, '').replace(/[\s\-]+$/, '');
+        },
         editName: function() {
             this.$v.$touch();
-            if (this.currentName === this.newName) {
+            if (this.currentName === this.newName || this.trimName(this.newName) === this.currentName) {
                 this.closeModal();
                 return;
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
@@ -155,9 +160,7 @@ export default {
                         });
                     }
                 }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
+                    if (error.response.status === HTTP_BAD_REQUEST) {
                         this.$toasted.error(error.response.data.message);
                     } else {
                         this.$toasted.error('An error has occurred, please try again later');
@@ -238,7 +241,8 @@ export default {
                 noSpaceBetweenDashes: this.noSpaceBetweenDashes,
                 tokenContain: tokenContain,
                 minLength: minLength(this.minLength),
-                maxLength: maxLength(60),
+                maxLength: maxLength(this.maxLength),
+                customTrimmer: this.trimName,
             },
         };
     },
