@@ -50,6 +50,12 @@
                 <slot name="cancel">Cancel</slot>
             </span>
         </div>
+        <two-factor-modal
+                :visible="showTwoFactorModal"
+                :twofa="twofa"
+                @verify="doEditAddress"
+                @close="closeTwoFactorModal"
+        />
     </div>
     <div
         v-else-if="!isTokenDeployed"
@@ -70,6 +76,7 @@
 </template>
 
 <script>
+import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {addressLength} from '../../utils/constants';
 
@@ -77,13 +84,18 @@ const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
 
 export default {
     name: 'TokenWithdrawalAddress',
+    components: {
+        TwoFactorModal,
+    },
     props: {
+        twofa: Boolean,
         tokenName: String,
         isTokenDeployed: Boolean,
         withdrawalAddress: String,
     },
     data() {
         return {
+            showTwoFactorModal: false,
             currentAddress: this.withdrawalAddress,
             newAddress: this.withdrawalAddress,
             locked: false,
@@ -96,6 +108,9 @@ export default {
         },
     },
     methods: {
+        closeTwoFactorModal: function() {
+            this.showTwoFactorModal = false;
+        },
         closeModal: function() {
             this.cancelEditingMode();
         },
@@ -103,8 +118,10 @@ export default {
             this.currentAddress = '0x';
         },
         cancelEditingMode: function() {
-            this.$v.$reset();
-            this.newAddress = this.currentAddress;
+            if (!this.showTwoFactorModal) {
+                this.$v.$reset();
+                this.newAddress = this.currentAddress;
+            }
         },
         editAddress: function() {
             this.$v.$touch();
@@ -122,9 +139,13 @@ export default {
                 return;
             }
 
-            this.doEditAddress();
+            if (this.twofa) {
+                this.showTwoFactorModal = true;
+            } else {
+                this.doEditAddress();
+            }
         },
-        doEditAddress: function() {
+        doEditAddress: function(code = '') {
             if (this.submitting) {
                 return;
             }
@@ -135,6 +156,7 @@ export default {
             }), {
                 address: this.newAddress,
                 lock: this.locked,
+                code,
             })
                 .then(() => {
                     this.$toasted.success('Withdrawal address changed successfully');

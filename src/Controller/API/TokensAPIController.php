@@ -84,7 +84,7 @@ class TokensAPIController extends AbstractFOSRestController
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
-      *@Rest\RequestParam(name="code", nullable=true)
+     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function update(
         ParamFetcherInterface $request,
@@ -392,6 +392,10 @@ class TokensAPIController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        if (Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+            throw new ApiBadRequestException('Token is deploying or deployed.');
+        }
+
         /** @var User $user */
         $user = $this->getUser();
 
@@ -500,7 +504,8 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
+     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"2fa"="optional", "expose"=true})
+     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function deploy(
         string $name,
@@ -533,9 +538,10 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"expose"=true})
+     * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="address", allowBlank=false)
      * @Rest\RequestParam(name="lock", allowBlank=true)
+     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function contractUpdate(
         string $name,
