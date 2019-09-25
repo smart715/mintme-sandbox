@@ -2,7 +2,6 @@
 
 namespace App\Tests\Validator\Constraints;
 
-use App\Communications\DisposableEmailCommunicatorInterface;
 use App\Entity\User;
 use App\Manager\UserManagerInterface;
 use App\Validator\Constraints\UserEmail;
