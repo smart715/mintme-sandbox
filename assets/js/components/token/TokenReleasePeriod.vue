@@ -65,12 +65,6 @@
                     >
                         Save
                     </b-button>
-                    <span
-                        class="btn-cancel pl-3 c-pointer"
-                        @click="cancelAction"
-                    >
-                        Cancel
-                    </span>
                 </div>
             </b-col>
         </b-row>
@@ -129,9 +123,6 @@ export default {
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
         },
-        cancelAction: function() {
-            this.$emit('cancel');
-        },
         saveReleasePeriod: function() {
             if (!this.twofa) {
                 return this.doSaveReleasePeriod();
@@ -149,7 +140,6 @@ export default {
             }).then((response) => {
                 this.$emit('update', response);
                 this.$toasted.success('Release period updated.');
-                this.cancelAction();
             }).catch(({response}) => {
                 if (!response) {
                     this.$toasted.error('Network error');

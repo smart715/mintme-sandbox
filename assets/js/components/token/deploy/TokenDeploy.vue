@@ -26,12 +26,6 @@
                         >
                             Deploy to blockchain
                         </button>
-                        <span
-                            class="btn-cancel pl-3 c-pointer"
-                            @click="$emit('cancel')"
-                        >
-                            Cancel
-                        </span>
                     </div>
                 </div>
                 <div

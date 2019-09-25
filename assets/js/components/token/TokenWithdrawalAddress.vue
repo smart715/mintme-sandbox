@@ -39,12 +39,6 @@
             >
                 Save
             </button>
-            <span
-                class="btn-cancel pl-3 c-pointer float-left"
-                @click="closeModal"
-            >
-                <slot name="cancel">Cancel</slot>
-            </span>
         </div>
         <two-factor-modal
             :visible="showTwoFactorModal"
