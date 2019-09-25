@@ -61,6 +61,4 @@ class BlacklistManager implements BlacklistManagerInterface
     {
         $this->em->persist(new Blacklist($value, $type));
     }
-
-
 }
