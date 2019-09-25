@@ -22,7 +22,6 @@
                                     :is-token-not-deployed="isTokenNotDeployed"
                                     :current-name="currentName"
                                     :twofa="twofa"
-                                    @close="$emit('close')"
                                 />
                             </template>
                         </faq-item>
