@@ -212,7 +212,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/website-confirmation", name="token_website_confirmation")
+     * @Route("/{name}/website-confirmation", name="token_website_confirmation", options={"expose"=true})
      */
     public function getWebsiteConfirmationFile(string $name): Response
     {
