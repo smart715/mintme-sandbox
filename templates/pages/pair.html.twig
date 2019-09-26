@@ -32,16 +32,15 @@
                                     class="col-12 col-lg-6 pr-lg-2"
                                     youtube-client-id="{{ global_youtube_client_id }}"
                                     facebook-app-id="{{ global_facebook_app_id }}"
-                                    confirm-website-file-url="{{ path('token_website_confirmation', {'name': market.quote.name}) }}"
-                                    confirm-website-url="{{ path('token_website_confirm', {'name': market.quote.name}) }}"
                                     profile-name="{{ profile.firstName }} {{ profile.lastName }}"
                                     website-url="{{ token.websiteUrl }}"
                                     facebook-url="{{ token.facebookUrl }}"
                                     youtube-channel-id="{{ token.youtubeChannelId }}"
-                                    update-url="{{ path('token_update', {'name': market.quote.name}) }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
-                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
+                                    token-name="{{ market.quote.name }}"
+                                    telegram-url="{{ token.telegramUrl }}"
+                                    discord-url="{{ token.discordUrl }}"
                                 >
                                 </token-introduction-profile>
                                 <token-introduction-statistics
