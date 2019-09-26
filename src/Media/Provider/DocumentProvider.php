@@ -88,7 +88,6 @@ class DocumentProvider extends FileProvider
 
         if (null !== $media->getPreviousProviderReference()) {
             $oldMedia->setProviderReference($media->getPreviousProviderReference());
-
             $path = $this->getReferenceImage($oldMedia);
 
             if ($this->getFilesystem()->has($path)) {
@@ -104,9 +103,9 @@ class DocumentProvider extends FileProvider
 
         $media->resetBinaryContent();
     }
-    
+
     protected function generateReferenceName(MediaInterface $media): string
     {
-        return $this->urlConverter->convert($media->getName()).'.'.$media->getBinaryContent()->guessExtension();
+        return $this->urlConverter->convert($media->getName());
     }
 }

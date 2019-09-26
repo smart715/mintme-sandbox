@@ -59,6 +59,12 @@ class DefaultController extends Controller
         return $this->render('pages/terms_of_service.html.twig');
     }
 
+    public function pressKit(): Response
+    {
+
+        return $this->redirect('mintme-press-kit.pdf');
+    }
+
     /**
      * @Route("/links",
      *      name="links",

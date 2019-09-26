@@ -11,7 +11,7 @@ class FriendlyUrlConverter implements FriendlyUrlConverterInterface
         $find = [' ', '&', '\r\n', '\n', '+', ','];
         $url = str_replace($find, '-', $url);
 
-        $find = ['/[^a-z0-9\-<>]/', '/[\-]+/', '/<[^>]*>/'];
+        $find = ['/[^a-z0-9\-<>.]/', '/[\-]+/', '/<[^>]*>/'];
         $repl = ['', '-', ''];
         $url = preg_replace($find, $repl, $url);
 
