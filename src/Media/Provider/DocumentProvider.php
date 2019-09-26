@@ -106,6 +106,7 @@ class DocumentProvider extends FileProvider
 
     protected function generateReferenceName(MediaInterface $media): string
     {
-        return $this->urlConverter->convert($media->getName());
+        return $this->urlConverter->convert($media->getName()) ??
+            $this->generateMediaUniqId($media).'.'.$media->getBinaryContent()->guessExtension();
     }
 }

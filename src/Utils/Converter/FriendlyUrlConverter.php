@@ -1,10 +1,10 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace App\Utils\Converter;
 
 class FriendlyUrlConverter implements FriendlyUrlConverterInterface
 {
-    public function convert(string $name): string
+    public function convert(string $name): ?string
     {
         $url = strtolower(trim($name));
 

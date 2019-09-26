@@ -61,7 +61,6 @@ class DefaultController extends Controller
 
     public function pressKit(): Response
     {
-
         return $this->redirect('mintme-press-kit.pdf');
     }
 

@@ -4,5 +4,5 @@ namespace App\Utils\Converter;
 
 interface FriendlyUrlConverterInterface
 {
-    public function convert(string $name): string;
+    public function convert(string $name): ?string;
 }
