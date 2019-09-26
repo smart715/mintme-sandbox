@@ -10,6 +10,7 @@ use Sonata\MediaBundle\Generator\GeneratorInterface;
 use Sonata\MediaBundle\Metadata\MetadataBuilderInterface;
 use Sonata\MediaBundle\Model\MediaInterface;
 use Sonata\MediaBundle\Provider\FileProvider;
+use Sonata\MediaBundle\Provider\Metadata;
 use Sonata\MediaBundle\Thumbnail\ThumbnailInterface;
 
 class DocumentProvider extends FileProvider
@@ -58,6 +59,17 @@ class DocumentProvider extends FileProvider
         $this->allowedExtensions = $allowedExtensions;
         $this->allowedMimeTypes = $allowedMimeTypes;
         $this->metadata = $metadata;
+    }
+
+    public function getProviderMetadata(): Metadata
+    {
+        return new Metadata(
+            'Documents',
+            'Documents'.'.description',
+            null,
+            'SonataMediaBundle',
+            ['class' => 'fa fa-file-text-o']
+        );
     }
 
     /**
