@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
@@ -13,7 +15,7 @@ final class Version20190924142525 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         $this->addSql('INSERT INTO cron_job (name, command, schedule, description, enabled) 
-            VALUE ("synchronize-domains", "blacklist:synchronize-domains", "0 1 * * *", "This command updates statistic", 1);');
+            VALUE ("synchronize-domains", "blacklist:synchronize-domains", "*/5 * * * *", "This command updates black List of domains", 1);');
     }
 
     public function down(Schema $schema) : void
