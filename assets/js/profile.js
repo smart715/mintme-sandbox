@@ -13,11 +13,21 @@ new Vue({
         firstName: '',
         lastName: '',
         city: '',
+        country: '',
+    },
+    watch: {
+        country: function() {
+            if ('' === this.country) {
+                this.$refs.zipCode.value = '';
+            }
+            this.$refs.zipCode.disabled = '' === this.country;
+        },
     },
     mounted: function() {
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.city = this.$refs.city.getAttribute('value');
+        this.country = this.$refs.savedCountry.value;
         this.showEditForm = this.$refs.editFormShowFirst.value;
     },
     components: {

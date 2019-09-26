@@ -92,7 +92,13 @@
                                         Last name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_row(form.country) }}
+                                        <input type="hidden" ref="savedCountry" value="{{ profile.country }}">
+                                        {{ form_row(form.country, {'attr':
+                                            {
+                                                'v-model': 'country',
+                                                'ref': 'country'
+                                            }
+                                        }) }}
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.city, {'attr':
@@ -110,7 +116,7 @@
                                         City must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_row(form.zipCode) }}
+                                        {{ form_row(form.zipCode, {'attr': {'ref': 'zipCode'}}) }}
                                     </div>
                                 </div>
                                 <div class="col-12 pt-3">
