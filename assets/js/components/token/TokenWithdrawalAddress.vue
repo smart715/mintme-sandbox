@@ -148,7 +148,7 @@ export default {
             })
             .then(() => {
                 this.steUpdatingState();
-                this.$toasted.success('Withdrawal address changed successfully');
+                this.$toasted.success('Updating address is pending.');
             }, (error) => {
                 if (!error.response) {
                     this.$toasted.error('Network error');
