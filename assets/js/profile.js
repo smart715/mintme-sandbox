@@ -3,8 +3,14 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import {minLength, helpers} from 'vuelidate/lib/validators';
+const postalCodes = require('postal-codes-js');
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
+
+const zipCodeValidation = (zipCode) => {
+    const country = document.getElementById('profile_country').value;
+    true === postalCodes.validate(country, zipCode);
+};
 
 new Vue({
     el: '#profile',
@@ -14,6 +20,7 @@ new Vue({
         lastName: '',
         city: '',
         country: '',
+        zipCode: '',
     },
     watch: {
         country: function() {
@@ -28,6 +35,7 @@ new Vue({
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.city = this.$refs.city.getAttribute('value');
         this.country = this.$refs.savedCountry.value;
+        this.zipCode = this.$refs.zipCode.getAttribute('value');
         this.showEditForm = this.$refs.editFormShowFirst.value;
     },
     components: {
@@ -48,6 +56,9 @@ new Vue({
         city: {
             helpers: names,
             minLength: minLength(2),
+        },
+        zipCode: {
+            zipCodeValidation,
         },
     },
 });

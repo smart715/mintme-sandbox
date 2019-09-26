@@ -116,7 +116,20 @@
                                         City must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_row(form.zipCode, {'attr': {'ref': 'zipCode'}}) }}
+                                        {{ form_row(form.zipCode, {'attr':
+                                            {
+                                                'v-model.trim': '$v.zipCode.$model',
+                                                'class': 'form-control',
+                                                'ref': 'zipCode'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div
+                                        v-if="!$v.zipCode.zipCodeValidation"
+                                        v-cloak="$v.zipCode"
+                                        class="text-danger text-center"
+                                    >
+                                        Zip code is not valid for chosen country
                                     </div>
                                 </div>
                                 <div class="col-12 pt-3">
