@@ -96,6 +96,20 @@ class Token implements TradebleInterface
     protected $youtubeChannelId;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Url()
+     * @var string|null
+     */
+    protected $telegramUrl;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Url()
+     * @var string|null
+     */
+    protected $discordUrl;
+
+    /**
      * @ORM\Column(type="string", length=10000, nullable=true)
      * @var string|null
      */
@@ -263,7 +277,7 @@ class Token implements TradebleInterface
         return $this->facebookUrl;
     }
 
-    public function setFacebookUrl(string $facebookUrl): self
+    public function setFacebookUrl(?string $facebookUrl): self
     {
         $this->facebookUrl = $facebookUrl;
 
@@ -275,7 +289,7 @@ class Token implements TradebleInterface
         return $this->youtubeChannelId;
     }
 
-    public function setYoutubeChannelId(string $youtubeChannelId): self
+    public function setYoutubeChannelId(?string $youtubeChannelId): self
     {
         $this->youtubeChannelId = $youtubeChannelId;
 
@@ -346,6 +360,30 @@ class Token implements TradebleInterface
     public function setCreatedValue(): self
     {
         $this->created = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getTelegramUrl(): ?string
+    {
+        return $this->telegramUrl;
+    }
+
+    public function setTelegramUrl(?string $url): self
+    {
+        $this->telegramUrl = $url;
+
+        return $this;
+    }
+
+    public function getDiscordUrl(): ?string
+    {
+        return $this->discordUrl;
+    }
+
+    public function setDiscordUrl(?string $url): self
+    {
+        $this->discordUrl = $url;
 
         return $this;
     }
