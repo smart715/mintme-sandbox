@@ -13,10 +13,6 @@ use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * @codeCoverageIgnore
- * Ignored due the conflicting ConsoleSectionOutput class.
- */
 class UpdateDisposableEmailDomains extends Command
 {
     /** @var BlacklistManagerInterface */
