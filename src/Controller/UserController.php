@@ -163,7 +163,8 @@ class UserController extends AbstractController
         return $response;
     }
 
-    private function addDownloadCodesToResponse(Response $response){
+    private function addDownloadCodesToResponse(Response $response): Response
+    {
         if ($this->container->get('session')->getBag('attributes')->has('download_backup_codes')) {
             $response->headers->set('Refresh', "5;{$this->generateUrl('download_backup_codes', [], UrlGeneratorInterface::ABSOLUTE_URL)}");
         }
