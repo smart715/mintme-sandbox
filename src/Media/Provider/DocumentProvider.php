@@ -84,37 +84,6 @@ class DocumentProvider extends FileProvider
     {
         return '';
     }
-    /**
-     * {@inheritdoc}
-     */
-    public function postUpdate(MediaInterface $media)
-    {
-        if (!$media->getBinaryContent() instanceof \SplFileInfo) {
-            return;
-        }
-
-        // Delete the current file from the FS
-        $oldMedia = clone $media;
-        // if no previous reference is provided, it prevents
-        // Filesystem from trying to remove a directory
-
-        if (null !== $media->getPreviousProviderReference()) {
-            $oldMedia->setProviderReference($media->getPreviousProviderReference());
-            $path = $this->getReferenceImage($oldMedia);
-
-            if ($this->getFilesystem()->has($path)) {
-                $this->getFilesystem()->delete($path);
-            }
-        }
-
-        $this->fixBinaryContent($media);
-
-        $this->setFileContents($media);
-
-        $this->generateThumbnails($media);
-
-        $media->resetBinaryContent();
-    }
 
     protected function generateReferenceName(MediaInterface $media): string
     {
