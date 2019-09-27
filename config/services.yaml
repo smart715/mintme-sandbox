@@ -391,3 +391,4 @@ services:
     App\Communications\DisposableEmailCommunicator:
         arguments:
             $rpc: '@disposable_email.json_rpc'
+            $fileName: "%name_of_files_for_disposable_domains%"
