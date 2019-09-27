@@ -28,4 +28,15 @@ class MarketStatusRepository extends EntityRepository
             ->getQuery()
             ->getResult()[0] ?? null;
     }
+
+    /** @codeCoverageIgnore */
+    public function getTokenMarkets(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.quoteToken IS NOT NULL')
+            ->leftJoin('m.crypto', 'c')
+            ->leftJoin('m.quoteToken', 'qt')
+            ->getQuery()
+            ->getResult();
+    }
 }
