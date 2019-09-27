@@ -2,15 +2,15 @@
 
 namespace App\Exchange\Market;
 
-use App\Entity\Token\Token;
 use App\Entity\MarketStatus;
+use App\Entity\Token\Token;
 use App\Repository\MarketStatusRepository;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Money;
 use Money\Converter;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
+use Money\Money;
 
 class MarketCapCalculator
 {
@@ -42,7 +42,7 @@ class MarketCapCalculator
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function calculate()
+    public function calculate(): string
     {
         # Calculate MarketCap for token/WEB markets
         $tokenMarketCap = $this->calculateTokenMarketCap();
@@ -54,19 +54,19 @@ class MarketCapCalculator
         $marketCap = $this->getWEBMarketCap()->add($tokenMarketCap);
 
         # Return formatted
-        return $this->format($marketCap); 
+        return $this->format($marketCap);
     }
 
     private function calculateTokenMarketCap(): Money
     {
         $tokenMarkets = $this->repository->getTokenMarkets();
 
-        return array_reduce($tokenMarkets, function($marketCap, $market){
+        return array_reduce($tokenMarkets, function ($marketCap, $market) {
             return $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Token::WEB_SYMBOL));
     }
 
-    private function getZero($base): Money
+    private function getZero(string $base): Money
     {
         return new Money(0, new Currency($base));
     }
@@ -92,7 +92,7 @@ class MarketCapCalculator
     {
         return $this->exchange ?? $this->exchange = new FixedExchange([
             'WEB' => [
-                'BTC' => floatval($this->moneyWrapper->format($this->getWEBBTCMarket()->getLastPrice()))
+                'BTC' => floatval($this->moneyWrapper->format($this->getWEBBTCMarket()->getLastPrice())),
             ],
         ]);
     }
@@ -102,7 +102,7 @@ class MarketCapCalculator
         return $this->converter ?? new Converter($this->moneyWrapper->getRepository(), $this->getExchange());
     }
 
-    private function format(Money $money)
+    private function format(Money $money): string
     {
         return $this->moneyWrapper->format($money);
     }

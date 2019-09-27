@@ -126,13 +126,13 @@ export default {
                     sortable: true,
                     formatter: formatMoney,
                 },
-                marketCap: {
-                    label: 'Market Cap',
+                monthVolume: {
+                    label: '30d Volume',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                monthVolume: {
-                    label: '30d Volume',
+                marketCap: {
+                    label: 'Market Cap',
                     sortable: true,
                     formatter: formatMoney,
                 },
