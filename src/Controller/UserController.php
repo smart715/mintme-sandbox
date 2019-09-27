@@ -139,8 +139,15 @@ class UserController extends AbstractController
     }
 
     /** @Route("/settings/2fa/backupcodes/download", name="download_backup_codes")*/
-    public function downloadBackupCodes(): Response
+    public function downloadBackupCodes(Request $request): Response
     {
+        /** @var string */
+        $userAgent = $request->headers->get('User-Agent');
+
+        $lineBreak = preg_match('/Windows/i', $userAgent)
+            ? "\r\n"
+            : "\n";
+
         if (!$this->container->get('session')->getBag('attributes')->remove('download_backup_codes')) {
             return $this->redirectToRoute('settings');
         }
@@ -149,7 +156,7 @@ class UserController extends AbstractController
         $user = $this->getUser();
         $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
 
-        $content = implode("\n", $backupCodes);
+        $content = implode($lineBreak, $backupCodes);
 
         $response = new Response($content);
 
@@ -177,6 +184,7 @@ class UserController extends AbstractController
     {
         $this->turnOnAuthenticator($twoFactorManager, $this->getUser());
         $this->container->get('session')->getFlashBag()->get('success');
+        $this->addFlash('success', 'Downloading backup codes...');
 
         return $this->redirectToRoute('settings');
     }
