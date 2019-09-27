@@ -58,13 +58,7 @@ class UserController extends AbstractController
     {
         $passwordForm = $this->getPasswordForm($request);
 
-        $response = $this->renderSettings($passwordForm);
-
-        if ($this->container->get('session')->getBag('attributes')->has('download_backup_codes')) {
-            $response->headers->set('Refresh', "5;{$this->generateUrl('download_backup_codes', [], UrlGeneratorInterface::ABSOLUTE_URL)}");
-        }
-
-        return $response;
+        return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm));
     }
 
     /**
@@ -125,7 +119,7 @@ class UserController extends AbstractController
             $parameters['backupCodes'] = $request->get('backupCodes');
             $parameters['formHeader'] = 'Two-Factor authentication backup codes';
 
-            return $this->render('security/2fa_manager.html.twig', $parameters);
+            return $this->addDownloadCodesToResponse($this->render('security/2fa_manager.html.twig', $parameters));
         }
 
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -169,15 +163,12 @@ class UserController extends AbstractController
         return $response;
     }
 
-    /** @Route("/settings/2fa/finish", name="two_factor_finish")*/
-    public function finishTwoFactor(): Response
-    {
-        if ($this->container->get('session')->getBag('attributes')->remove('2fa_finished')) {
-            $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
-            $this->addFlash('success', 'Downloading backup codes...');
+    private function addDownloadCodesToResponse(Response $response){
+        if ($this->container->get('session')->getBag('attributes')->has('download_backup_codes')) {
+            $response->headers->set('Refresh', "5;{$this->generateUrl('download_backup_codes', [], UrlGeneratorInterface::ABSOLUTE_URL)}");
         }
 
-        return $this->redirectToRoute('settings');
+        return $response;
     }
 
     /** @Route("/settings/2fa/backupcodes/generate", name="generate_backup_codes")*/
@@ -186,7 +177,7 @@ class UserController extends AbstractController
         $this->turnOnAuthenticator($twoFactorManager, $this->getUser());
         $this->container->get('session')->getFlashBag()->get('success');
 
-        return $this->finishTwoFactor();
+        return $this->redirectToRoute('settings');
     }
 
     private function getPasswordForm(Request $request): FormInterface
@@ -224,7 +215,8 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
         $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
-        $this->container->get('session')->getBag('attributes')->set('2fa_finished', 'finished');
+        $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
+        $this->addFlash('success', 'Downloading backup codes...');
         $this->userActionLogger->info('Enable Two-Factor Authentication');
 
         return $backupCodes;
