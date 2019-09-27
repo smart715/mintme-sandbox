@@ -61,6 +61,8 @@ class UpdateDisposableEmailDomains extends Command
             $progressBar->advance();
         }
 
+        $this->blacklistManager->addToBlacklist('awebro', 'email', false);
+
         $progressBar->finish();
 
         $this->em->flush();
