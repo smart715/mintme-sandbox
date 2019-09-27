@@ -65,7 +65,7 @@ class DocumentProvider extends FileProvider
     {
         return new Metadata(
             'Documents',
-            'Documents'.'.description',
+            'Add a document',
             null,
             'SonataMediaBundle',
             ['class' => 'fa fa-file-text-o']
