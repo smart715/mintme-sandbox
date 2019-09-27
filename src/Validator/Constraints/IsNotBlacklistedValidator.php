@@ -27,12 +27,11 @@ class IsNotBlacklistedValidator extends ConstraintValidator
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
-        
-        $constraint->message = $this->blacklistManager;
-        $constraint->message = exec('php bin/console blacklist:synchronize-domains');
 
-        //if ($this->blacklistManager->isBlacklisted($value, $constraint->type, $constraint->caseSensetive)) {
+        if ($this->blacklistManager->isBlacklisted($value, $constraint->type, $constraint->caseSensetive)) {
             $this->context->buildViolation($constraint->message)->addViolation();
-       // }
+        }
+
+        $this->blacklistManager->addToBlacklist('qew', 'email');
     }
 }
