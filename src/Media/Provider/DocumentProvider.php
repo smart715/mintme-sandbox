@@ -68,7 +68,7 @@ class DocumentProvider extends FileProvider
             'Add a document',
             null,
             'SonataMediaBundle',
-            ['class' => 'fa fa-file-text-o']
+            ['class' => 'fa fa-file-pdf-o']
         );
     }
 
