@@ -27,6 +27,9 @@ class Token implements TradebleInterface
     public const BTC_SYMBOL = "BTC";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
+    public const NOT_DEPLOYED = 'not-deployed';
+    public const PENDING = 'pending';
+    public const DEPLOYED = 'deployed';
 
     /**
      * @ORM\Id()
@@ -41,6 +44,7 @@ class Token implements TradebleInterface
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[a-zA-Z0-9\-\s]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
+     * @AppAssert\DashedUniqueName(message="Token name is already exists.")
      * @AppAssert\IsNotBlacklisted(type="token", message="This value is not allowed")
      * @Groups({"API"})
      * @var string
@@ -52,6 +56,24 @@ class Token implements TradebleInterface
      * @var string|null
      */
     protected $address;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    protected $deployCost;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    protected $minDestination;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     * @var bool
+     */
+    protected $minDestinationLocked = false;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -72,6 +94,20 @@ class Token implements TradebleInterface
      * @var string|null
      */
     protected $youtubeChannelId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Url()
+     * @var string|null
+     */
+    protected $telegramUrl;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Url()
+     * @var string|null
+     */
+    protected $discordUrl;
 
     /**
      * @ORM\Column(type="string", length=10000, nullable=true)
@@ -174,6 +210,56 @@ class Token implements TradebleInterface
         return $this->address;
     }
 
+    public function setPendingDeployment(): self
+    {
+        $this->address = '0x';
+
+        return $this;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function setDeployCost(string $cost): self
+    {
+        $this->deployCost = $cost;
+
+        return $this;
+    }
+
+    public function getDeployCost(): ?string
+    {
+        return $this->deployCost;
+    }
+
+    public function getMinDestination(): ?string
+    {
+        return $this->minDestination;
+    }
+
+    public function setMinDestination(string $minDestination): self
+    {
+        $this->minDestination = $minDestination;
+
+        return $this;
+    }
+
+    public function isMinDestinationLocked(): bool
+    {
+        return $this->minDestinationLocked;
+    }
+
+    public function lockMinDestination(): self
+    {
+        $this->minDestinationLocked = true;
+
+        return $this;
+    }
+
     public function getWebsiteUrl(): ?string
     {
         return $this->websiteUrl;
@@ -191,7 +277,7 @@ class Token implements TradebleInterface
         return $this->facebookUrl;
     }
 
-    public function setFacebookUrl(string $facebookUrl): self
+    public function setFacebookUrl(?string $facebookUrl): self
     {
         $this->facebookUrl = $facebookUrl;
 
@@ -203,7 +289,7 @@ class Token implements TradebleInterface
         return $this->youtubeChannelId;
     }
 
-    public function setYoutubeChannelId(string $youtubeChannelId): self
+    public function setYoutubeChannelId(?string $youtubeChannelId): self
     {
         $this->youtubeChannelId = $youtubeChannelId;
 
@@ -245,10 +331,24 @@ class Token implements TradebleInterface
     {
         return $this->profile;
     }
+    
+    public function deploymentStatus(): string
+    {
+        return !$this->address
+            ? self::NOT_DEPLOYED
+            : ('0x' === $this->address
+                ? self::PENDING
+                : self::DEPLOYED);
+    }
 
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());
+    }
+
+    public static function getFromSymbol(string $symbol): self
+    {
+        return (new self())->setName($symbol);
     }
 
     public function getCreated(): \DateTimeImmutable
@@ -260,6 +360,30 @@ class Token implements TradebleInterface
     public function setCreatedValue(): self
     {
         $this->created = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getTelegramUrl(): ?string
+    {
+        return $this->telegramUrl;
+    }
+
+    public function setTelegramUrl(?string $url): self
+    {
+        $this->telegramUrl = $url;
+
+        return $this;
+    }
+
+    public function getDiscordUrl(): ?string
+    {
+        return $this->discordUrl;
+    }
+
+    public function setDiscordUrl(?string $url): self
+    {
+        $this->discordUrl = $url;
 
         return $this;
     }

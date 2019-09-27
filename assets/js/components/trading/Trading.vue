@@ -33,6 +33,17 @@
                             </template>
                         </guide>
                     </template>
+                    <template slot="HEAD_monthVolume" slot-scope="data">
+                        {{ data.label }}
+                        <guide>
+                            <template slot="header">
+                                30d volume
+                            </template>
+                            <template slot="body">
+                                The amount of crypto that has been traded in the last 30 days.
+                            </template>
+                        </guide>
+                    </template>
                     <template slot="HEAD_marketCap" slot-scope="data">
                         {{ data.label }}
                         <guide>
@@ -120,12 +131,18 @@ export default {
                     sortable: true,
                     formatter: formatMoney,
                 },
+                monthVolume: {
+                    label: '30d Volume',
+                    sortable: true,
+                    formatter: formatMoney,
+                },
             },
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
                 {currency: 'BTC', token: 'WEB'},
             ],
+            klineQueriesIdsTokensMap: new Map(),
         };
     },
     computed: {
@@ -179,6 +196,9 @@ export default {
             this.addMessageHandler((result) => {
                 if ('state.update' === result.method) {
                     this.sanitizeMarket(result);
+                    this.requestKline(result.params[0]);
+                } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                    this.updateMonthVolume(result.id, result.result);
                 }
             });
         });
@@ -262,6 +282,7 @@ export default {
             const marketToken = this.markets[marketName].quote.symbol;
             const marketPrecision = this.markets[marketName].crypto.subunit;
             const supply = this.markets[marketName].supply;
+            const monthVolume = this.markets[marketName].monthVolume;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -271,6 +292,7 @@ export default {
                 changePercentage,
                 marketLastPrice,
                 parseFloat(marketInfo.deal),
+                monthVolume,
                 supply,
                 marketPrecision
             );
@@ -288,7 +310,7 @@ export default {
                 dayVolume: marketInfo.deal,
             };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, supply, subunit) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit) {
             let hiddenName = this.findHiddenName(token);
 
             return {
@@ -296,6 +318,7 @@ export default {
                 change: changePercentage.toFixed(2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 volume: toMoney(volume, subunit) + ' ' + currency,
+                monthVolume: toMoney(monthVolume, subunit) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
@@ -332,6 +355,7 @@ export default {
                         ),
                         parseFloat(this.markets[market].lastPrice),
                         parseFloat(this.markets[market].dayVolume),
+                        parseFloat(this.markets[market].monthVolume),
                         this.markets[market].supply,
                         this.markets[market].crypto.subunit
                     );
@@ -366,6 +390,40 @@ export default {
             }
 
             return result;
+        },
+        updateMonthVolume: function(requestId, kline) {
+            const marketName = this.klineQueriesIdsTokensMap.get(requestId);
+            const marketCurrency = this.markets[marketName].crypto.symbol;
+            const marketToken = this.markets[marketName].quote.symbol;
+            const marketPrecision = this.markets[marketName].crypto.subunit;
+            const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
+
+            let monthVolume = kline.reduce(function(acc, curr) {
+                return Decimal.add(acc, curr[6]);
+            }, 0);
+
+            monthVolume = toMoney(monthVolume, marketPrecision) + ' ' + marketCurrency;
+
+            if (marketOnTopIndex > -1) {
+                this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
+            } else {
+                this.sanitizedMarkets[marketName].monthVolume = monthVolume;
+            }
+        },
+        requestKline: function(market) {
+            let id = parseInt(Math.random().toString().replace('0.', ''));
+            this.sendMessage(JSON.stringify({
+                method: 'kline.query',
+                params: [
+                    market,
+                    Math.round(Date.now() / 1000) - 30 * 24 * 60 * 60,
+                    Math.round(Date.now() / 1000),
+                    7 * 24 * 60 * 60,
+                ],
+                id,
+            }));
+
+            this.klineQueriesIdsTokensMap.set(id, market);
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {

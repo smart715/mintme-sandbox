@@ -33,6 +33,8 @@ class TokenType extends AbstractType
             ->add('name')
             ->add('websiteUrl')
             ->add('facebookUrl')
+            ->add('telegramUrl')
+            ->add('discordUrl')
             ->add('youtubeChannelId')
             ->add('description')
         ;

@@ -60,10 +60,41 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template slot="name" slot-scope="data">
-                    <a :href="generatePairUrl(data.item)" class="text-white">{{ data.item.name }}</a>
+                    <a :href="generatePairUrl(data.item)" class="text-white">
+                        <span v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                            {{ data.item.name | truncate(15) }}
+                        </span>
+                    </a>
                 </template>
                 <template slot="available" slot-scope="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                </template>
+                <template slot="action" slot-scope="data">
+                    <div
+                        v-if="data.item.deployed"
+                        class="row">
+                        <div class="d-flex flex-row c-pointer pl-2"
+                            @click="openDeposit(data.item.name, data.item.subunit, true)">
+                            <div><i class="icon-deposit"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                            </div>
+                        </div>
+                        <div
+                            class="d-flex flex-row c-pointer pl-2"
+                            @click="openWithdraw(
+                                        data.item.name,
+                                        data.item.fee,
+                                        data.item.available,
+                                        data.item.subunit,
+                                        true)"
+                        >
+                                <div><i class="icon-withdraw"></i></div>
+                                <div>
+                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                </div>
+                        </div>
+                    </div>
                 </template>
             </b-table>
         </div>
@@ -90,7 +121,10 @@
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
+            :is-token="isTokenModal"
             :fee="withdraw.fee"
+            :web-fee="withdraw.webFee"
+            :available-web="withdraw.availableWeb"
             :withdraw-url="withdrawUrl"
             :max-amount="withdraw.amount"
             :twofa="twofa"
@@ -103,6 +137,7 @@
             :visible="showDepositModal"
             :description="depositDescription"
             :currency="selectedCurrency"
+            :is-token="isTokenModal"
             :fee="deposit.fee"
             :min="deposit.min"
             :no-close="false"
@@ -114,13 +149,15 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, MoneyFilterMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
+const TOK_SYMBOL = 'TOK';
+const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
     components: {
         WithdrawModal,
         DepositModal,
@@ -138,6 +175,7 @@ export default {
             depositAddresses: {},
             showModal: false,
             selectedCurrency: null,
+            isTokenModal: false,
             depositAddress: null,
             depositDescription: null,
             showDepositModal: null,
@@ -156,11 +194,14 @@ export default {
             tokenFields: {
                 name: {label: 'Name'},
                 available: {label: 'Amount'},
+                action: {label: 'Actions', sortable: false},
             },
             withdraw: {
                 fee: '0',
+                webFee: '0',
                 amount: '0',
                 subunit: 4,
+                availableWeb: '0',
             },
             deposit: {
                 fee: undefined,
@@ -230,28 +271,36 @@ export default {
             });
     },
     methods: {
-        openWithdraw: function(currency, fee, amount, subunit) {
+        openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
             if (!this.twofa) {
                 this.$toasted.info('Please enable 2FA before withdrawing');
                 return;
             }
             this.showModal = true;
             this.selectedCurrency = currency;
-            this.withdraw.fee = toMoney(fee, subunit);
+            this.isTokenModal = isToken;
+            this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
+            this.withdraw.webFee = toMoney(
+                isToken || WEB_SYMBOL === currency ? this.predefinedTokens[WEB_SYMBOL].fee : 0,
+                subunit
+            );
+            this.withdraw.availableWeb = this.predefinedTokens[WEB_SYMBOL].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
         closeWithdraw: function() {
             this.showModal = false;
         },
-        openDeposit: function(currency, subunit) {
-            this.depositAddress = this.depositAddresses[currency] || 'Loading..';
+        openDeposit: function(currency, subunit, isToken = false) {
+            this.depositAddress = (isToken ? this.depositAddresses[TOK_SYMBOL] : this.depositAddresses[currency])
+                || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
+            this.isTokenModal = isToken;
 
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
-                    crypto: currency,
+                    crypto: isToken ? WEB_SYMBOL : currency,
                 }))
                 .then((res) => this.deposit.fee = res.data && parseFloat(res.data) !== 0.0 ?
                     toMoney(res.data, subunit) :

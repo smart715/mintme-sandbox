@@ -156,16 +156,6 @@ class TokenController extends Controller
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
 
-            if ($this->tokenManager->isExisted($token)) {
-                $form->addError(new FormError('Token name is already exists.'));
-
-                return $this->render('pages/token_creation.html.twig', [
-                    'formHeader' => 'Create your own token',
-                    'form' => $form->createView(),
-                    'profileCreated' => true,
-                ]);
-            }
-
             $this->em->beginTransaction();
 
             if (null !== $profile) {
@@ -190,7 +180,10 @@ class TokenController extends Controller
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                return $this->redirectToOwnToken('intro');
+                return $this->redirectToRoute('token_show', [
+                    'name' => $token->getName(),
+                    'tab' => 'intro',
+                ]);
             } catch (Throwable $exception) {
                 $this->em->rollback();
                 $this->addFlash('danger', 'Exchanger connection lost. Try again.');
@@ -205,7 +198,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/website-confirmation", name="token_website_confirmation")
+     * @Route("/{name}/website-confirmation", name="token_website_confirmation", options={"expose"=true})
      */
     public function getWebsiteConfirmationFile(string $name): Response
     {
