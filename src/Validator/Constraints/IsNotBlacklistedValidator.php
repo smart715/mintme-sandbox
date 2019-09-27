@@ -28,10 +28,6 @@ class IsNotBlacklistedValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        if ('aaandhammer@mail.ru' === $value && 'email' === $constraint->type) {
-            $this->context->buildViolation($constraint->message)->addViolation();
-        }
-
         if ($this->blacklistManager->isBlacklisted($value, $constraint->type, $constraint->caseSensetive)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
