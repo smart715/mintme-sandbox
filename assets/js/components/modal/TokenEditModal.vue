@@ -122,6 +122,9 @@ export default {
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');
                 return;
+            } else if (!this.$v.newName.validFirstChar) {
+                this.$toasted.error('Token name can not contain spaces and dashes in the beggining');
+                return;
             } else if (!this.$v.newName.noSpaceBetweenDashes) {
                 this.$toasted.error('Token name can not contain space between dashes');
                 return;
@@ -236,12 +239,18 @@ export default {
 
             return null === matches || 0 === matches.length;
         },
+        validFirstChar: function(value) {
+            const matches = value.match(/^[-\s]+/);
+
+            return null === matches || 0 === matches.length;
+        },
     },
     validations() {
         return {
             newName: {
                 required,
                 tokenContain,
+                validFirstChar: this.validFirstChar,
                 noSpaceBetweenDashes: this.noSpaceBetweenDashes,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),
