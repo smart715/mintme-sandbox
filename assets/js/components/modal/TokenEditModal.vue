@@ -3,7 +3,8 @@
         <modal
             :visible="visible"
             :no-close="noClose"
-            @close="closeModal">
+            @close="closeModal"
+        >
             <template slot="header">
                 <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
             </template>
@@ -18,22 +19,26 @@
                         v-model="newName"
                         ref="tokenNameInput"
                         class="token-name-input w-100 px-2"
-                        :class="{ 'is-invalid': $v.$invalid }">
+                        :class="{ 'is-invalid': $v.$invalid }"
+                    >
                 </div>
                 <div class="col-12 pt-2 clearfix">
                     <button
                         class="btn btn-primary float-left"
-                        @click="editName">
+                        @click="editName"
+                    >
                         Save
                     </button>
                     <span
                         class="btn-cancel pl-3 c-pointer float-left"
-                        @click="closeModal">
+                        @click="closeModal"
+                    >
                         <slot name="cancel">Cancel</slot>
                     </span>
                     <span
                         class="btn-cancel pl-3 c-pointer float-right"
-                        @click="deleteToken">
+                        @click="deleteToken"
+                    >
                         Delete token
                     </span>
                 </div>
@@ -44,15 +49,15 @@
             :twofa="twofa"
             :no-close="noClose"
             @verify="doEditToken"
-            @close="closeTwoFactorModal">
-        </two-factor-modal>
+            @close="closeTwoFactorModal"
+        />
     </div>
 </template>
 
 <script>
-import TwoFactorModal from './TwoFactorModal';
-import Modal from './Modal';
 import Guide from '../Guide';
+import Modal from './Modal';
+import TwoFactorModal from './TwoFactorModal';
 import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
 
@@ -84,6 +89,13 @@ export default {
             showTwoFactorModal: false,
         };
     },
+    watch: {
+        newName: function() {
+            if (this.newName.replace(/-|\s/g, '').length === 0) {
+                this.newName = '';
+            }
+        },
+    },
     methods: {
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
@@ -100,7 +112,7 @@ export default {
             }
         },
         trimName: function(name) {
-              return name.replace(/^[\s\-]+/, '').replace(/[\s\-]+$/, '');
+            return name.replace(/^[\s\-]+/, '').replace(/[\s\-]+$/, '');
         },
         editName: function() {
             this.$v.$touch();
@@ -109,6 +121,12 @@ export default {
                 return;
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');
+                return;
+            } else if (!this.$v.newName.validFirstChar) {
+                this.$toasted.error('Token name can not contain spaces and dashes in the beggining');
+                return;
+            } else if (!this.$v.newName.noSpaceBetweenDashes) {
+                this.$toasted.error('Token name can not contain space between dashes');
                 return;
             } else if (!this.$v.newName.tokenContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
@@ -130,11 +148,11 @@ export default {
         },
         doEditName: function(code = '') {
             this.$axios.single.patch(this.$routing.generate('token_update', {
-                    name: this.currentName,
-                }), {
-                    name: this.newName,
-                    code: code,
-                })
+                name: this.currentName,
+            }), {
+                name: this.newName,
+                code: code,
+            })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
                         this.currentName = response.data['tokenName'];
@@ -167,10 +185,10 @@ export default {
         },
         doDeleteToken: function(code = '') {
             this.$axios.single.post(this.$routing.generate('token_delete', {
-                    name: this.currentName,
-                }), {
-                    code: code,
-                })
+                name: this.currentName,
+            }), {
+                code: code,
+            })
                 .then((response) => {
                     if (HTTP_ACCEPTED === response.status) {
                         this.$toasted.success(response.data.message);
@@ -199,8 +217,8 @@ export default {
         },
         sendConfirmCode: function() {
             this.$axios.single.post(this.$routing.generate('token_send_code', {
-                    name: this.currentName,
-                }))
+                name: this.currentName,
+            }))
                 .then((response) => {
                     if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
                         this.$toasted.success(response.data.message);
@@ -216,12 +234,24 @@ export default {
                     }
                 });
         },
+        noSpaceBetweenDashes: function(value) {
+            const matches = value.match(/-+\s+-+/);
+
+            return null === matches || 0 === matches.length;
+        },
+        validFirstChar: function(value) {
+            const matches = value.match(/^[-\s]+/);
+
+            return null === matches || 0 === matches.length;
+        },
     },
     validations() {
         return {
             newName: {
                 required,
-                tokenContain: tokenContain,
+                tokenContain,
+                validFirstChar: this.validFirstChar,
+                noSpaceBetweenDashes: this.noSpaceBetweenDashes,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),
                 customTrimmer: this.trimName,
