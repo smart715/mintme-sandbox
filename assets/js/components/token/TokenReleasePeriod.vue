@@ -43,7 +43,7 @@
                     <b-col class="p-0">
                         <vue-slider
                             ref="release-period-slider"
-                            :disabled="releasedDisabled"
+                            :disabled="currentPeriodDisabled"
                             v-model="currentPeriod"
                             :data="[1,2,3,5,10,15,20,30,40,50]"
                             :interval="10"
@@ -109,7 +109,10 @@ export default {
     },
     computed: {
         releasedDisabled: function() {
-            return this.releasePeriod !== defaultValue && this.isTokenExchanged && !this.isTokenNotDeployed;
+            return this.releasePeriod !== defaultValue && this.isTokenExchanged;
+        },
+        currentPeriodDisabled: function() {
+            return this.releasedDisabled && !this.isTokenNotDeployed;
         },
         period: function() {
             return this.releasedDisabled ? this.releasePeriod : 10;

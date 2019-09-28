@@ -148,7 +148,7 @@ export default {
             }
         },
         doDeploy: function(code = '') {
-            if (this.deploy) {
+            if (this.deploying) {
                 return;
             }
 
