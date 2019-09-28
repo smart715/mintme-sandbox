@@ -5,6 +5,7 @@ namespace App\Wallet\Money;
 use App\Manager\CryptoManagerInterface;
 use Money\Converter;
 use Money\Currencies;
+use Money\Currencies\CurrencyList;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Formatter\DecimalMoneyFormatter;
@@ -21,15 +22,24 @@ final class MoneyWrapper implements MoneyWrapperInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var CurrencyList */
+    private $currencies;
+
+    /** @var DecimalMoneyFormatter */
+    private $formatter;
+
+    /** @var DecimalMoneyParser */
+    private $parser;
+
+    /** @var Converter */
+    private $converter;
+
     public function __construct(
         CryptoManagerInterface $cryptoManager
     ) {
         $this->cryptoManager = $cryptoManager;
-    }
 
-    public function getRepository(): Currencies
-    {
-        return new Currencies\CurrencyList(
+        $this->currencies = new CurrencyList(
             array_merge(
                 $this->fetchCurrencies(),
                 [
@@ -38,11 +48,19 @@ final class MoneyWrapper implements MoneyWrapperInterface
                 ]
             )
         );
+
+        $this->formatter = new DecimalMoneyFormatter($this->currencies);
+        $this->parser = new DecimalMoneyParser($this->currencies);
+    }
+
+    public function getRepository(): Currencies
+    {
+        return $this->currencies;
     }
 
     public function format(Money $money): string
     {
-        return (new DecimalMoneyFormatter($this->getRepository()))->format($money);
+        return $this->formatter->format($money);
     }
 
     public function convertToDecimalIfNotation(string $notation, string $symbol): string
@@ -50,7 +68,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
         $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) ) [eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';
 
         if (preg_match($regEx, $notation, $matches)) {
-            bcscale($this->getRepository()->subunitFor(new Currency($symbol)));
+            bcscale($this->currencies->subunitFor(new Currency($symbol)));
 
             return bcmul($matches['left'], bcpow('10', $matches['right']));
         }
@@ -60,7 +78,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
 
     public function parse(string $value, string $symbol): Money
     {
-        return (new DecimalMoneyParser($this->getRepository()))->parse(
+        return $this->parser->parse(
             $this->convertToDecimalIfNotation($value, $symbol),
             $symbol
         );
@@ -77,10 +95,14 @@ final class MoneyWrapper implements MoneyWrapperInterface
         return $currencies;
     }
 
-    public function convert(Money $money, Currency $currency, FixedExchange $exchange): Money
+    public function convert(Money $money, Currency $currency, ?FixedExchange $exchange = null): Money
     {
-        $converter = new Converter($this->getRepository(), $exchange);
+        if (null !== $exchange) {
+            $this->converter = new Converter($this->currencies, $exchange);
+        } elseif (!isset($this->converter)) {
+            throw new \Exception('You can only omit parameter $exchange if you already passed it on a previous call to method MoneyWrapper::convert');
+        }
 
-        return $converter->convert($money, $currency);
+        return $this->converter->convert($money, $currency);
     }
 }
