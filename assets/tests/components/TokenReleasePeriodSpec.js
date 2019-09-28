@@ -27,25 +27,60 @@ describe('TokenReleasePeriod', () => {
         moxios.uninstall();
     });
 
-    it('releasedDisabled returns true', (done) => {
-        const localVue = mockVue();
-        const wrapper = mount(TokenReleasePeriod, {
-            localVue,
-            propsData: {isTokenExchanged: true},
+    describe('releasedDisabled', () => {
+        it('returns true', (done) => {
+            const localVue = mockVue();
+            const wrapper = mount(TokenReleasePeriod, {
+                localVue,
+                propsData: {isTokenExchanged: true},
+            });
+
+            moxios.stubRequest('lock-period', {status: 200, response: {releasePeriod: 10}});
+
+            moxios.wait(() => {
+                expect(wrapper.vm.releasedDisabled).to.equal(true);
+                done();
+            });
         });
 
-        moxios.stubRequest('lock-period', {status: 200, response: {releasePeriod: 10}});
+        it('returns false', () => {
+            const localVue = mockVue();
+            const wrapper = mount(TokenReleasePeriod, {localVue});
 
-        moxios.wait(() => {
-            expect(wrapper.vm.releasedDisabled).to.equal(true);
-            done();
+            expect(wrapper.vm.releasedDisabled).to.equal(false);
         });
     });
 
-    it('releasedDisabled returns false', () => {
-        const localVue = mockVue();
-        const wrapper = mount(TokenReleasePeriod, {localVue});
+    describe('currentPeriodDisabled', () => {
+        it('returns true', (done) => {
+            const localVue = mockVue();
+            const wrapper = mount(TokenReleasePeriod, {
+                localVue,
+                propsData: {
+                    isTokenExchanged: true,
+                    isTokenNotDeployed: false,
+                },
+            });
 
-        expect(wrapper.vm.releasedDisabled).to.equal(false);
+            moxios.stubRequest('lock-period', {status: 200, response: {releasePeriod: 10}});
+
+            moxios.wait(() => {
+                expect(wrapper.vm.releasedDisabled).to.equal(true);
+                done();
+            });
+        });
+
+        it('returns false', () => {
+            const localVue = mockVue();
+            const wrapper = mount(TokenReleasePeriod, {
+                localVue,
+                propsData: {
+                    isTokenExchanged: false,
+                    isTokenNotDeployed: true,
+                },
+            });
+
+            expect(wrapper.vm.releasedDisabled).to.equal(false);
+        });
     });
 });

@@ -36,14 +36,17 @@ describe('TokenChangeName', () => {
         expect(wrapper.find('button').attributes('disabled')).to.equal(undefined);
     });
 
-    it('throw required error when value is not set', () => {
+    it('throw required error when value is not set', (done) => {
         const wrapper = mount(TokenChangeName, {
             propsData: {currentName: 'foobar'},
         });
         wrapper.find('input').setValue('');
         wrapper.vm.editName();
         wrapper.vm.$v.$touch();
-        expect(wrapper.vm.$v.$error).to.deep.equal(true);
+        wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.$v.$error).to.deep.equal(true);
+            done();
+        });
     });
 
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
