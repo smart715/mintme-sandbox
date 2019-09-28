@@ -61,6 +61,23 @@ export default {
         btnDisabled: function() {
             return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
         },
+        noSpaceBetweenDashes: function(value) {
+            const matches = value.match(/-+\s+-+/);
+
+            return null === matches || 0 === matches.length;
+        },
+        validFirstChar: function(value) {
+            const matches = value.match(/^[-\s]+/);
+
+            return null === matches || 0 === matches.length;
+        },
+    },
+    watch: {
+        newName: function() {
+            if (this.newName.replace(/-|\s/g, '').length === 0) {
+                this.newName = '';
+            }
+        },
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -88,6 +105,12 @@ export default {
                 return;
             } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
                 this.$toasted.error('Token name shouldn\'t be blank');
+                return;
+            } else if (!this.$v.newName.validFirstChar) {
+                this.$toasted.error('Token name can not contain spaces and dashes in the beggining');
+                return;
+            } else if (!this.$v.newName.noSpaceBetweenDashes) {
+                this.$toasted.error('Token name can not contain space between dashes');
                 return;
             } else if (!this.$v.newName.addressContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
@@ -153,6 +176,8 @@ export default {
             newName: {
                 required,
                 addressContain,
+                validFirstChar: this.validFirstChar,
+                noSpaceBetweenDashes: this.noSpaceBetweenDashes,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
                 customTrimmer: this.trimName,

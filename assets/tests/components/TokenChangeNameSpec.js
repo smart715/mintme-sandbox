@@ -3,6 +3,7 @@ import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
 import {mount} from '@vue/test-utils';
 import TokenChangeName from '../../js/components/token/TokenChangeName';
+import { exists } from 'fs';
 Vue.use(Vuelidate);
 Vue.use(Toasted);
 
@@ -36,16 +37,59 @@ describe('TokenChangeName', () => {
         expect(wrapper.find('button').attributes('disabled')).to.equal(undefined);
     });
 
-    it('throw required error when value is not set', (done) => {
-        const wrapper = mount(TokenChangeName, {
-            propsData: {currentName: 'foobar'},
+    describe('throw error', () => {
+        it('when value is not set', (done) => {
+            const wrapper = mount(TokenChangeName, {
+                propsData: {currentName: 'foobar'},
+            });
+            wrapper.find('input').setValue('');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
+            wrapper.vm.$nextTick(() => {
+                expect(wrapper.vm.$v.$error).to.deep.equal(true);
+                done();
+            });
         });
-        wrapper.find('input').setValue('');
-        wrapper.vm.editName();
-        wrapper.vm.$v.$touch();
-        wrapper.vm.$nextTick(() => {
-            expect(wrapper.vm.$v.$error).to.deep.equal(true);
-            done();
+
+        it('when token name has dashes in the beginning', (done) => {
+            const wrapper = mount(TokenChangeName, {
+                propsData: {currentName: 'foobar'},
+            });
+            wrapper.find('input').setValue('---newName');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
+            wrapper.vm.$nextTick(() => {
+                expect(wrapper.vm.$v.$error).to.deep.equal(true);
+                done();
+            });
+        });
+
+        it('when token name has spaces in the beginning', (done) => {
+            const wrapper = mount(TokenChangeName, {
+                propsData: {currentName: 'foobar'},
+            });
+            wrapper.find('input').setValue('   newName');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
+            console.log(wrapper.vm.newName);
+            exit();
+            wrapper.vm.$nextTick(() => {
+                expect(wrapper.vm.$v.$error).to.deep.equal(true);
+                done();
+            });
+        });
+
+        it('when token name has spaces between dashes', (done) => {
+            const wrapper = mount(TokenChangeName, {
+                propsData: {currentName: 'foobar'},
+            });
+            wrapper.find('input').setValue('new--- ---Name');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
+            wrapper.vm.$nextTick(() => {
+                expect(wrapper.vm.$v.$error).to.deep.equal(true);
+                done();
+            });
         });
     });
 
