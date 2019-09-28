@@ -52,6 +52,10 @@ class ContractUpdateConsumer implements ConsumerInterface
         }
 
         try {
+            if (!$this->em->getConnection()->isConnected()) {
+                $this->em->getConnection()->connect();
+            }
+
             $token = $this->tokenManager->findByAddress($clbResult->getTokenAddress());
 
             if (!$token) {

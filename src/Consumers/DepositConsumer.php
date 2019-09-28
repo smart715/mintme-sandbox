@@ -105,6 +105,10 @@ class DepositConsumer implements ConsumerInterface
         }
 
         try {
+            if (!$this->em->getConnection()->isConnected()) {
+                $this->em->getConnection()->connect();
+            }
+
             $tradable =$this->cryptoManager->findBySymbol($clbResult->getCrypto())
                 ?? $this->tokenManager->findByName($clbResult->getCrypto());
 

@@ -61,6 +61,10 @@ class DeployConsumer implements ConsumerInterface
         }
 
         try {
+            if (!$this->em->getConnection()->isConnected()) {
+                $this->em->getConnection()->connect();
+            }
+
             $token = $this->tokenManager->findByName($clbResult->getTokenName());
 
             if (!$token) {
