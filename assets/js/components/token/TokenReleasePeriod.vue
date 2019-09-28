@@ -90,7 +90,7 @@ export default {
     name: 'TokenReleasePeriod',
     props: {
         isTokenExchanged: Boolean,
-        isTokeNotDeployed: Boolean,
+        isTokenNotDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
     },
@@ -109,10 +109,10 @@ export default {
     },
     computed: {
         releasedDisabled: function() {
-            return this.releasePeriod !== defaultValue && this.isTokenExchanged;
+            return (this.releasePeriod !== defaultValue && this.isTokenExchanged) || !this.isTokenNotDeployed;
         },
         currentPeriodDisabled: function() {
-            return this.releasedDisabled && !this.isTokenNotDeployed;
+            return !this.isTokenNotDeployed;
         },
         period: function() {
             return this.releasedDisabled ? this.releasePeriod : 10;
