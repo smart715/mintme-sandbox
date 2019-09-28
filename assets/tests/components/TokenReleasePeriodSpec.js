@@ -28,11 +28,14 @@ describe('TokenReleasePeriod', () => {
     });
 
     describe('releasedDisabled', () => {
-        it('returns true', (done) => {
+        it('returns true if token is exchanged even if not deployed', (done) => {
             const localVue = mockVue();
             const wrapper = mount(TokenReleasePeriod, {
                 localVue,
-                propsData: {isTokenExchanged: true},
+                propsData: {
+                    isTokenExchanged: true,
+                    isTokenNotDeployed: true,
+                },
             });
 
             moxios.stubRequest('lock-period', {status: 200, response: {releasePeriod: 10}});
@@ -43,21 +46,12 @@ describe('TokenReleasePeriod', () => {
             });
         });
 
-        it('returns false', () => {
-            const localVue = mockVue();
-            const wrapper = mount(TokenReleasePeriod, {localVue});
-
-            expect(wrapper.vm.releasedDisabled).to.equal(false);
-        });
-    });
-
-    describe('currentPeriodDisabled', () => {
-        it('returns true', (done) => {
+        it('returns true if token deployed even if not exchanged', (done) => {
             const localVue = mockVue();
             const wrapper = mount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
-                    isTokenExchanged: true,
+                    isTokenExchanged: false,
                     isTokenNotDeployed: false,
                 },
             });
@@ -70,7 +64,7 @@ describe('TokenReleasePeriod', () => {
             });
         });
 
-        it('returns false', () => {
+        it('returns false if token not exchanged and not deployed', () => {
             const localVue = mockVue();
             const wrapper = mount(TokenReleasePeriod, {
                 localVue,
@@ -81,6 +75,39 @@ describe('TokenReleasePeriod', () => {
             });
 
             expect(wrapper.vm.releasedDisabled).to.equal(false);
+        });
+    });
+
+    describe('currentPeriodDisabled', () => {
+        it('returns true if token deployed or pending', (done) => {
+            const localVue = mockVue();
+            const wrapper = mount(TokenReleasePeriod, {
+                localVue,
+                propsData: {
+                    isTokenExchanged: true,
+                    isTokenNotDeployed: false,
+                },
+            });
+
+            moxios.stubRequest('lock-period', {status: 200, response: {releasePeriod: 10}});
+
+            moxios.wait(() => {
+                expect(wrapper.vm.currentPeriodDisabled).to.equal(true);
+                done();
+            });
+        });
+
+        it('returns false if not deployed', () => {
+            const localVue = mockVue();
+            const wrapper = mount(TokenReleasePeriod, {
+                localVue,
+                propsData: {
+                    isTokenExchanged: true,
+                    isTokenNotDeployed: true,
+                },
+            });
+
+            expect(wrapper.vm.currentPeriodDisabled).to.equal(false);
         });
     });
 });
