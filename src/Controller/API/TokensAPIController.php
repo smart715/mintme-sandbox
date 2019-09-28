@@ -223,6 +223,10 @@ class TokensAPIController extends AbstractFOSRestController
             throw $this->createNotFoundException('Token does not exist');
         }
 
+        if (Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+            throw new ApiBadRequestException('Token is deploying or deployed.');
+        }
+
         $this->denyAccessUnlessGranted('edit', $token);
 
         $lock = $token->getLockIn() ?? new LockIn($token);
