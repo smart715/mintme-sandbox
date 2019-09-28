@@ -228,7 +228,7 @@ class DepositConsumerTest extends TestCase
         bool $isConnected = true,
         ?Invocation $connectionInv = null
     ): EntityManagerInterface {
-        $connection = $this->getMockBuilder('SomeClass')->setMethods(['isConnected', 'connect'])->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('isConnected')->willReturn($isConnected);
 
         $em = $this->createMock(EntityManagerInterface::class);
