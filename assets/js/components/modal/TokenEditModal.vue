@@ -54,6 +54,7 @@
                                 <token-release-period
                                     ref="token-release-period-component"
                                     :is-token-exchanged="isTokenExchanged"
+                                    :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
                                     :twofa="twofa"
                                     @update="releasePeriodUpdated"

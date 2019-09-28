@@ -9,28 +9,28 @@
                     Period it will take for the full release of your newly created token,
                     something similar to escrow. Mintme acts as 3rd party that ensure you won’t
                     flood market with all of your tokens which could lower price significantly,
-                    because unlocking all tokens take time. It’s released hourly
+                    because unlocking all tokens take time.
                 </div>
             </b-col>
             <b-col cols="12">
                 <div>Amount released at beginning: {{ released }}%</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
-                        <b>1%</b>
+                        <b>0%</b>
                     </b-col>
                     <b-col class="p-0">
                         <vue-slider
                             ref="released-slider"
                             :disabled="releasedDisabled"
                             v-model="released"
-                            :min="1" :max="99"
+                            :min="0" :max="100"
                             :interval="1"
                             :tooltip="false"
                             width="100%"
                         />
                     </b-col>
                     <b-col cols="2" class="text-center px-0">
-                        <b>99%</b>
+                        <b>100%</b>
                     </b-col>
                 </b-row>
             </b-col>
@@ -43,6 +43,7 @@
                     <b-col class="p-0">
                         <vue-slider
                             ref="release-period-slider"
+                            :disabled="releasedDisabled"
                             v-model="currentPeriod"
                             :data="[1,2,3,5,10,15,20,30,40,50]"
                             :interval="10"
@@ -89,13 +90,14 @@ export default {
     name: 'TokenReleasePeriod',
     props: {
         isTokenExchanged: Boolean,
+        isTokeNotDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
     },
     data() {
         return {
             currentPeriod: this.period,
-            released: 1,
+            released: 10,
             releasePeriod: defaultValue,
             showTwoFactorModal: false,
         };
@@ -107,7 +109,7 @@ export default {
     },
     computed: {
         releasedDisabled: function() {
-            return this.releasePeriod !== defaultValue && this.isTokenExchanged;
+            return this.releasePeriod !== defaultValue && this.isTokenExchanged && !this.isTokenNotDeployed;
         },
         period: function() {
             return this.releasedDisabled ? this.releasePeriod : 10;

@@ -148,6 +148,10 @@ export default {
             }
         },
         doDeploy: function(code = '') {
+            if (this.deploy) {
+                return;
+            }
+
             this.deploying = true;
             this.$axios.single.post(this.$routing.generate('token_deploy', {
                 name: this.name,
