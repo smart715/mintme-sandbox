@@ -2,9 +2,9 @@ import {helpers} from 'vuelidate/lib/validators';
 
 // validation for address
 export const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
-export const tokenFirstValidChars = helpers.regex('firstChars', /^[-\s]+/u);
-export const tokenEndValidChars = helpers.regex('endChars', /[-\s]+$/u);
-export const tokenNoSpaceBetweenDashes = helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
+export const tokenValidFirstChars = !helpers.regex('firstChars', /^[-\s]+/u);
+export const tokenValidLastChars = !helpers.regex('lastChars', /[-\s]+$/u);
+export const tokenNoSpaceBetweenDashes = !helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
 
 export const GENERAL = {
     precision: 8,

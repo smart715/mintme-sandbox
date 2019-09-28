@@ -7,7 +7,7 @@
             <input
                 id="tokenName"
                 type="text"
-                v-model.trim="newName"
+                v-model="newName"
                 ref="tokenNameInput"
                 class="token-name-input w-100 px-2"
                 :class="{ 'is-invalid': $v.$invalid }"
@@ -36,8 +36,8 @@ import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
     addressContain,
-    tokenFirstValidChars,
-    tokenEndValidChars,
+    tokenValidFirstChars,
+    tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
 } from '../../utils/constants';
 
@@ -104,7 +104,7 @@ export default {
             } else if (!this.$v.newName.validFirstChars) {
                 this.$toasted.error('Token name can not contain spaces or dashes in the beginning');
                 return;
-            } else if (!this.$v.newName.validEndChars) {
+            } else if (!this.$v.newName.validLastChars) {
                 this.$toasted.error('Token name can not contain spaces or dashes in the end');
                 return;
             } else if (!this.$v.newName.noSpaceBetweenDashes) {
@@ -171,8 +171,8 @@ export default {
             newName: {
                 required,
                 addressContain,
-                validFirstChars: tokenFirstValidChars,
-                validEndChars: tokenEndValidChars,
+                validFirstChars: tokenValidFirstChars,
+                validLastChars: tokenValidLastChars,
                 noSpaceBetweenDashes: tokenNoSpaceBetweenDashes,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
