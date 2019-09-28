@@ -14,6 +14,7 @@ use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -48,6 +49,30 @@ class DepositConsumerTest extends TestCase
         );
     }
 
+    public function testIfEmNotConnectedWillReconnect(): void
+    {
+        $cryptoSymbol = 'WEB';
+        $dc = new DepositConsumer(
+            $this->mockBalanceHandler($this->once()),
+            $this->mockUserManager($this->createMock(User::class)),
+            $this->mockCryptoManager($this->mockCrypto($cryptoSymbol)),
+            $this->mockTokenManager(null),
+            $this->mockLogger(),
+            $this->mockMoneyWrapper(),
+            $this->createMock(ClockInterface::class),
+            $this->mockWallet(),
+            $this->mockEntityManager($this->never(), false, $this->exactly(2))
+        );
+
+        $this->assertTrue(
+            $dc->execute($this->mockMessage((string)json_encode([
+                'userId' => 1,
+                'crypto' => $cryptoSymbol,
+                'amount' => '10000',
+            ])))
+        );
+    }
+
     public function testExecuteWithoutUser(): void
     {
         $cryptoSymbol = 'WEB';
@@ -60,7 +85,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager()
+            $this->mockEntityManager($this->never(), true, $this->never())
         );
 
         $this->assertTrue(
@@ -108,7 +133,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager()
+            $this->mockEntityManager($this->never(), true, $this->never())
         );
 
         $this->assertTrue(
@@ -198,10 +223,17 @@ class DepositConsumerTest extends TestCase
         );
     }
 
-    private function mockEntityManager(?Invocation $invocation = null): EntityManagerInterface
-    {
+    private function mockEntityManager(
+        ?Invocation $invocation = null,
+        bool $isConnected = true,
+        ?Invocation $connectionInv = null
+    ): EntityManagerInterface {
+        $connection = $this->getMockBuilder('SomeClass')->setMethods(['isConnected', 'connect'])->getMock();
+        $connection->method('isConnected')->willReturn($isConnected);
+
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($invocation ?? $this->never())->method('flush');
+        $em->expects($connectionInv ?? $this->once())->method('getConnection')->willReturn($connection);
 
         return $em;
     }
