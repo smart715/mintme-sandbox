@@ -34,7 +34,12 @@
 <script>
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
-import {addressContain} from '../../utils/constants';
+import {
+    addressContain,
+    tokenFirstValidChars,
+    tokenEndValidChars,
+    tokenNoSpaceBetweenDashes,
+} from '../../utils/constants';
 
 const HTTP_ACCEPTED = 202;
 
@@ -93,14 +98,14 @@ export default {
             } else if (!this.isTokenNotDeployed) {
                 this.$toasted.error('Token is deploying or deployed.');
                 return;
-            } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
+            } else if (!this.newName) {
                 this.$toasted.error('Token name shouldn\'t be blank');
                 return;
-            } else if (!this.$v.newName.validFirstChar) {
-                this.$toasted.error('Token name can not contain spaces and dashes in the beginning');
+            } else if (!this.$v.newName.validFirstChars) {
+                this.$toasted.error('Token name can not contain spaces or dashes in the beginning');
                 return;
-            } else if (!this.$v.newName.validEndChar) {
-                this.$toasted.error('Token name can not contain spaces and dashes in the end');
+            } else if (!this.$v.newName.validEndChars) {
+                this.$toasted.error('Token name can not contain spaces or dashes in the end');
                 return;
             } else if (!this.$v.newName.noSpaceBetweenDashes) {
                 this.$toasted.error('Token name can not contain space between dashes');
@@ -108,7 +113,7 @@ export default {
             } else if (!this.$v.newName.addressContain) {
                 this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
-            } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
+            } else if (!this.$v.newName.minLength) {
                 this.$toasted.error('Token name should have at least 4 symbols');
                 return;
             } else if (!this.$v.newName.maxLength) {
@@ -160,30 +165,15 @@ export default {
                 this.submitting = false;
             });
         },
-        noSpaceBetweenDashes: function(value) {
-            const matches = value.match(/-+\s+-+/);
-
-            return null === matches || 0 === matches.length;
-        },
-        validFirstChar: function(value) {
-            const matches = value.match(/^[-\s]+/);
-
-            return null === matches || 0 === matches.length;
-        },
-        validEndChar: function(value) {
-            const matches = value.match(/[-\s]+$/);
-
-            return null === matches || 0 === matches.length;
-        },
     },
     validations() {
         return {
             newName: {
                 required,
                 addressContain,
-                validFirstChar: this.validFirstChar,
-                validEndChar: this.validEndChar,
-                noSpaceBetweenDashes: this.noSpaceBetweenDashes,
+                validFirstChars: tokenFirstValidChars,
+                validEndChars: tokenEndValidChars,
+                noSpaceBetweenDashes: tokenNoSpaceBetweenDashes,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(60),
             },
