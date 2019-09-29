@@ -5,6 +5,7 @@ namespace App\Exchange\Market;
 use App\Communications\RestRpcInterface;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
+use App\Manager\CryptoManagerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,8 +26,8 @@ class MarketCapCalculator
     /** @var MarketStatusRepository */
     private $repository;
 
-    /** @var MarketStatus */
-    private $WEBBTCMarket;
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
 
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
@@ -39,21 +40,29 @@ class MarketCapCalculator
         int $tokenSupply,
         EntityManagerInterface $em,
         MoneyWrapperInterface $moneyWrapper,
-        RestRpcInterface $rpc
+        RestRpcInterface $rpc,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->supplyLinks = $supplyLinks;
         $this->tokenSupply = $tokenSupply;
         $this->moneyWrapper = $moneyWrapper;
         $this->rpc = $rpc;
-
-        /** @var MarketStatusRepository $repository */
-        $repository = $em->getRepository(MarketStatus::class);
-        $this->repository = $repository;
-        $this->WEBBTCMarket = $repository->findByBaseQuoteNames(Token::BTC_SYMBOL, Token::WEB_SYMBOL);
+        $this->cryptoManager = $cryptoManager;
+        $this->repository = $em->getRepository(MarketStatus::class);
     }
 
-    public function calculate(): string
+    public function calculate(string $base = 'BTC'): string
     {
+        $crypto = $this->cryptoManager->findBySymbol($base);
+
+        if ('USD' === $base) {
+            # We'll calculate it as if it was BTC, and will convert the final amount to USD
+            $base = 'BTC';
+            $calculatingUSD = true;
+        } elseif (null === $crypto || !$crypto->isTradable()) {
+            throw new \Exception('Parameter base should be a valid tradable crypto or USD');
+        }
+
         # Calculate MarketCap for token/WEB markets
         $tokenMarketCap = $this->calculateTokenMarketCap();
 
@@ -63,13 +72,28 @@ class MarketCapCalculator
             new Currency(Token::BTC_SYMBOL),
             new FixedExchange([
                 'WEB' => [
-                    'BTC' => $this->format($this->WEBBTCMarket->getLastPrice()),
+                    $base => $this->getWEBBasePrice($base),
                 ],
             ])
         );
 
         # Add it to WEBMarketCap
-        $marketCap = $this->getExchangeableCryptosMarketCap('BTC')->add($tokenMarketCap);
+        $marketCap = $this->getExchangeableCryptosMarketCap($base)->add($tokenMarketCap);
+
+        if (isset($calculatingUSD)) {
+            $response = $this->rpc->send('simple/price?ids=bitcoin&vs_currencies=usd', Request::METHOD_GET);
+            $response = json_decode($response, true);
+
+            $marketCap = $this->moneyWrapper->convert(
+                $marketCap,
+                new Currency('USD'),
+                new FixedExchange([
+                    'BTC' => [
+                        'USD' => $response['bitcoin']['usd'],
+                    ],
+                ])
+            );
+        }
 
         # Return formatted
         return $this->format($marketCap);
@@ -135,6 +159,11 @@ class MarketCapCalculator
                 ? $market->getLastPrice()->multiply($supplies[$market->getQuote()->getName()])->add($marketCap)
                 : $marketCap;
         }, $this->getZero($base));
+    }
+
+    private function getWEBBasePrice(string $base): string
+    {
+        return $this->format($this->repository->findByBaseQuoteNames($base, Token::WEB_SYMBOL)->getLastPrice());
     }
 
     private function format(Money $money): string
