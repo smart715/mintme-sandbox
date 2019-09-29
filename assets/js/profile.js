@@ -3,13 +3,17 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import {minLength, helpers} from 'vuelidate/lib/validators';
-const postalCodes = require('postal-codes-js');
+const i18nZipcodes = require('i18n-zipcodes');
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
 const zipCodeValidation = (zipCode) => {
-    const country = document.getElementById('profile_country').value;
-    true === postalCodes.validate(country, zipCode);
+    try {
+        const country = document.getElementById('profile_country').value;
+        return i18nZipcodes(country, zipCode);
+    } catch (e) {
+        return true;
+    }
 };
 
 new Vue({
