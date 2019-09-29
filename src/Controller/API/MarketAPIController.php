@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Entity\Token\Token;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketCapCalculator;
@@ -89,7 +90,7 @@ class MarketAPIController extends APIController
      * @Rest\View()
      * @Rest\Get("/marketcap/{base}", name="marketcap", options={"expose"=true})
      */
-    public function getMarketCap(string $base, MarketCapCalculator $marketCapCalculator): View
+    public function getMarketCap(MarketCapCalculator $marketCapCalculator, string $base = Token::BTC_SYMBOL): View
     {
         $cache = new FilesystemAdapter();
 
