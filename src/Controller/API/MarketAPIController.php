@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketCapCalculator;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -15,6 +16,8 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @Rest\Route("/api/markets")
@@ -80,5 +83,24 @@ class MarketAPIController extends APIController
         return $this->view(
             $marketHandler->getKLineStatDaily($market)
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/marketcap/{base}", name="marketcap", options={"expose"=true})
+     */
+    public function getMarketCap(string $base, MarketCapCalculator $marketCapCalculator): View
+    {
+        $cache = new FilesystemAdapter();
+
+        $marketCap = $cache->get("marketcap_{$base}", function (ItemInterface $item) use ($marketCapCalculator, $base) {
+            $item->expiresAfter(3600);
+
+            return $marketCapCalculator->calculate($base);
+        });
+
+        return $this->view([
+            'marketcap' => $marketCap,
+        ]);
     }
 }
