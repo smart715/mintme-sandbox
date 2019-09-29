@@ -20,14 +20,8 @@ class MarketCapCalculator
     /** @var MarketStatusRepository */
     private $repository;
 
-    /** @var MarketStatus|null */
-    private $WEBBTCMarket = null;
-
-    /** @var FixedExchange|null */
-    private $exchange = null;
-
-    /** @var Converter|null */
-    private $converter = null;
+    /** @var MarketStatus */
+    private $WEBBTCMarket;
 
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
@@ -40,6 +34,8 @@ class MarketCapCalculator
         $this->tokenSupply = $tokenSupply;
         $this->repository = $em->getRepository(MarketStatus::class);
         $this->moneyWrapper = $moneyWrapper;
+
+        $this->WEBBTCMarket = $this->repository->findByBaseQuoteNames(Token::BTC_SYMBOL, Token::WEB_SYMBOL);
     }
 
     public function calculate(): string
@@ -48,7 +44,15 @@ class MarketCapCalculator
         $tokenMarketCap = $this->calculateTokenMarketCap();
 
         # Convert to BTC
-        $tokenMarketCap = $this->getConverter()->convert($tokenMarketCap, new Currency(Token::BTC_SYMBOL));
+        $tokenMarketCap = $this->moneyWrapper->convert(
+            $tokenMarketCap,
+            new Currency(Token::BTC_SYMBOL),
+            new FixedExchange([
+                'WEB' => [
+                    'BTC' => $this->format($this->WEBBTCMarket->getLastPrice()),
+                ],
+            ])
+        );
 
         # Add it to WEBMarketCap
         $marketCap = $this->getWEBMarketCap()->add($tokenMarketCap);
@@ -78,28 +82,7 @@ class MarketCapCalculator
 
     private function getWEBMarketCap(): Money
     {
-        $market = $this->getWEBBTCMarket();
-
-        return $market->getLastPrice()->multiply($this->getWEBSupply());
-    }
-
-    private function getWEBBTCMarket(): MarketStatus
-    {
-        return $this->WEBBTCMarket ?? $this->WEBBTCMarket = $this->repository->findByBaseQuoteNames(Token::BTC_SYMBOL, Token::WEB_SYMBOL);
-    }
-
-    private function getExchange(): FixedExchange
-    {
-        return $this->exchange ?? $this->exchange = new FixedExchange([
-            'WEB' => [
-                'BTC' => floatval($this->moneyWrapper->format($this->getWEBBTCMarket()->getLastPrice())),
-            ],
-        ]);
-    }
-
-    private function getConverter(): Converter
-    {
-        return $this->converter ?? new Converter($this->moneyWrapper->getRepository(), $this->getExchange());
+        return $this->WEBBTCMarket->getLastPrice()->multiply($this->getWEBSupply());
     }
 
     private function format(Money $money): string
