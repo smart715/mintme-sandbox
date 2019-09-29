@@ -7,3 +7,6 @@
 [submodule ".docker/withdraw"]
 	path = .docker/withdraw
 	url = ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurrencies/coinimp-payment.git
+[submodule ".docker/tokdeploy"]
+	path = .docker/tokdeploy
+	url = ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurrencies/mintme/token-contract.git
