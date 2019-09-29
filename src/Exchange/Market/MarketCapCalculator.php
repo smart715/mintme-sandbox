@@ -7,6 +7,7 @@ use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
 use App\Repository\MarketStatusRepository;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Converter;
@@ -80,6 +81,7 @@ class MarketCapCalculator
         # Add it to WEBMarketCap
         $marketCap = $this->getExchangeableCryptosMarketCap($base)->add($tokenMarketCap);
 
+        # Convert to USD if that's what we want
         if (isset($calculatingUSD)) {
             $response = $this->rpc->send('simple/price?ids=bitcoin&vs_currencies=usd', Request::METHOD_GET);
             $response = json_decode($response, true);
