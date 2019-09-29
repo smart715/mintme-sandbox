@@ -52,13 +52,13 @@ class MarketCapCalculator
         $this->repository = $em->getRepository(MarketStatus::class);
     }
 
-    public function calculate(string $base = 'BTC'): string
+    public function calculate(string $base = Token::BTC_SYMBOL): string
     {
         $crypto = $this->cryptoManager->findBySymbol($base);
 
-        if ('USD' === $base) {
+        if (MoneyWrapper::USD_SYMBOL === $base) {
             # We'll calculate it as if it was BTC, and will convert the final amount to USD
-            $base = 'BTC';
+            $base = Token::BTC_SYMBOL;
             $calculatingUSD = true;
         } elseif (null === $crypto || !$crypto->isTradable()) {
             throw new \Exception('Parameter base should be a valid tradable crypto or USD');
@@ -72,7 +72,7 @@ class MarketCapCalculator
             $tokenMarketCap,
             new Currency($base),
             new FixedExchange([
-                'WEB' => [
+                Token::WEB_SYMBOL => [
                     $base => $this->getWEBBasePrice($base),
                 ],
             ])
@@ -88,10 +88,10 @@ class MarketCapCalculator
 
             $marketCap = $this->moneyWrapper->convert(
                 $marketCap,
-                new Currency('USD'),
+                new Currency(MoneyWrapper::USD_SYMBOL),
                 new FixedExchange([
-                    'BTC' => [
-                        'USD' => $response['bitcoin']['usd'],
+                    Token::BTC_SYMBOL => [
+                        MoneyWrapper::USD_SYMBOL => $response['bitcoin']['usd'],
                     ],
                 ])
             );
