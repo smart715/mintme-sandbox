@@ -42,4 +42,15 @@ class MarketStatusRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /** @codeCoverageIgnore */
+    public function getExchangeableCryptoMarkets(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.crypto', 'c')
+            ->leftJoin('m.quoteCrypto', 'qc')
+            ->where('qc IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
 }

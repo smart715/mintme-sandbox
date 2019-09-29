@@ -62,6 +62,7 @@ parameters:
 
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
+    webchain_supply: 'https://webchain.network/supply.txt'
 
     # the cost of deploying token to blockchain in USD
     deploy_cost: 49
