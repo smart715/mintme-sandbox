@@ -149,10 +149,6 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
-    App\Command\BlackList\UpdateDisposableEmailDomains:
-        tags:
-            - { channel: cron }
-
     # SonataAdminBundle Registered Admin Classes
     # =======================================
     admin.user:
