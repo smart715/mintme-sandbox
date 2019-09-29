@@ -66,10 +66,10 @@ class MarketCapCalculator
         # Calculate MarketCap for token/WEB markets
         $tokenMarketCap = $this->calculateTokenMarketCap();
 
-        # Convert to BTC
+        # Convert to Base
         $tokenMarketCap = $this->moneyWrapper->convert(
             $tokenMarketCap,
-            new Currency(Token::BTC_SYMBOL),
+            new Currency($base),
             new FixedExchange([
                 'WEB' => [
                     $base => $this->getWEBBasePrice($base),
@@ -163,6 +163,10 @@ class MarketCapCalculator
 
     private function getWEBBasePrice(string $base): string
     {
+        if (Token::WEB_SYMBOL === $base) {
+            return '1';
+        }
+
         return $this->format($this->repository->findByBaseQuoteNames($base, Token::WEB_SYMBOL)->getLastPrice());
     }
 
