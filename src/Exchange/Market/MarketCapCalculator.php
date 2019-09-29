@@ -32,10 +32,12 @@ class MarketCapCalculator
         MoneyWrapperInterface $moneyWrapper
     ) {
         $this->tokenSupply = $tokenSupply;
-        $this->repository = $em->getRepository(MarketStatus::class);
         $this->moneyWrapper = $moneyWrapper;
 
-        $this->WEBBTCMarket = $this->repository->findByBaseQuoteNames(Token::BTC_SYMBOL, Token::WEB_SYMBOL);
+        /** @var MarketStatusRepository $repository */
+        $repository = $em->getRepository(MarketStatus::class);
+        $this->repository = $repository;
+        $this->WEBBTCMarket = $repository->findByBaseQuoteNames(Token::BTC_SYMBOL, Token::WEB_SYMBOL);
     }
 
     public function calculate(): string
