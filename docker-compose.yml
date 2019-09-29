@@ -8,6 +8,7 @@ services:
       - rabbitmq
       - withdraw
       - deposit
+      - deploytok
       - btc
     networks:
       - middleend
@@ -44,6 +45,22 @@ services:
     networks:
       - middleend
 
+  deploytok:
+    build: .docker/tokdeploy/contract-gateway
+    ports:
+      - 3001:3001
+    depends_on:
+      - db
+      - webchaind
+      - rabbitmq
+      - webchain-cli
+    volumes:
+      - .docker/tokdeploy.yaml:/src/config/default.yaml
+      - .docker/tokdeploy.env:/src/.env
+      - webchaind_root:/src/webchain_root
+    networks:
+      - middleend
+
   webchain-cli:
     image: 22116/webchain-cli
     networks:
@@ -64,6 +81,7 @@ services:
       # Replace next paths with actuals on your system
       - .docker/default/WEB/password.txt:/data/password
       - .docker/default/WEB/private.txt:/data/private
+      - webchaind_root:/root/.webchain/mainnet
 
   nginx:
     image: nginx:latest
@@ -221,6 +239,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - backend
+
+volumes:
+  webchaind_root: ~
 
 networks:
   backward:
