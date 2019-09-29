@@ -143,6 +143,7 @@ export default {
                 {currency: 'BTC', token: 'WEB'},
             ],
             klineQueriesIdsTokensMap: new Map(),
+            globalMarketCap: 0,
         };
     },
     computed: {
@@ -165,31 +166,6 @@ export default {
         loaded: function() {
             return this.markets !== null && !this.loading;
         },
-        globalMarketCap: function() {
-            let markets = Object.keys(this.markets || {});
-
-            if (!markets.length) {
-                return 0;
-            }
-
-            let globalMarketCap = markets.reduce((acc, curr) => {
-                // Current market
-                let current = this.markets[curr];
-
-                // Calculate MarketCap
-                let marketCap = Decimal.mul(current.lastPrice, current.supply);
-
-                // If current's market crypto is WEB, we will calculate marketCap in BTC
-                if ('WEB' === current.crypto.symbol) {
-                    marketCap = marketCap.times(this.markets['WEBBTC'].lastPrice);
-                }
-
-                // Finally, we add it to the accumulator
-                return marketCap.plus(acc);
-            }, 0);
-
-            return toMoney(globalMarketCap, this.markets['WEBBTC'].crypto.subunit);
-        },
     },
     mounted: function() {
         this.updateData(this.currentPage).then(() => {
@@ -202,6 +178,7 @@ export default {
                 }
             });
         });
+        this.fetchGlobalMarketCap();
     },
     methods: {
         sortCompare: function(a, b, key) {
@@ -461,6 +438,12 @@ export default {
             );
 
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
+        },
+        fetchGlobalMarketCap: function() {
+            this.$axios.retry.get(this.$routing.generate('marketcap'))
+                .then((res) => {
+                    this.globalMarketCap = toMoney(res.data.marketcap, 8);
+                });
         },
     },
 };
