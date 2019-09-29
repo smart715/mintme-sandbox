@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\MarketStatus;
+use App\Entity\Token\Token;
 use Doctrine\ORM\EntityRepository;
 
 class MarketStatusRepository extends EntityRepository
@@ -30,12 +31,14 @@ class MarketStatusRepository extends EntityRepository
     }
 
     /** @codeCoverageIgnore */
-    public function getTokenMarkets(): array
+    public function getTokenWEBMarkets(): array
     {
         return $this->createQueryBuilder('m')
-            ->where('m.quoteToken IS NOT NULL')
             ->leftJoin('m.crypto', 'c')
             ->leftJoin('m.quoteToken', 'qt')
+            ->where('qt IS NOT NULL')
+            ->andWhere('c.symbol = :web')
+            ->setParameter('web', Token::WEB_SYMBOL)
             ->getQuery()
             ->getResult();
     }

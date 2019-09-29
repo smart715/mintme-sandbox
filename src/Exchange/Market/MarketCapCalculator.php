@@ -65,7 +65,7 @@ class MarketCapCalculator
 
     private function calculateTokenMarketCap(): Money
     {
-        $tokenMarkets = $this->repository->getTokenMarkets();
+        $tokenMarkets = $this->repository->getTokenWEBMarkets();
 
         return array_reduce($tokenMarkets, function ($marketCap, $market) {
             return $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
