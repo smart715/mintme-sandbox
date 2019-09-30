@@ -7,6 +7,7 @@ use App\Entity\Crypto;
 use App\Entity\PendingWithdraw;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Wallet\Model\Amount;
@@ -37,7 +38,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->createMock(LoggerInterface::class),
             $this->mockEm($lockCount),
             $this->mockDate(new DateTimeImmutable()),
-            $handler
+            $handler,
+            $this->createMock(CryptoManagerInterface::class)
         ));
 
         $command = $application->find('app:update-pending-withdrawals');
@@ -65,7 +67,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->createMock(LoggerInterface::class),
             $em,
             $this->mockDate(new DateTimeImmutable()),
-            $handler
+            $handler,
+            $this->createMock(CryptoManagerInterface::class)
         ));
 
         $command = $application->find('app:update-pending-withdrawals');
@@ -89,7 +92,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $repo = $this->createMock(PendingWithdrawRepository::class);
-        $repo->expects($this->once())
+        $repo->expects($this->exactly(2))
             ->method('findAll')
             ->willReturn(array_map(function () {
                 return $this->mockPending();

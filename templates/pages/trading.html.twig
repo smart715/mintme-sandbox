@@ -16,7 +16,7 @@
                         <trading
                             websocket-url="{{ global_websocket_url }}" v-cloak
                             :page="{{ page }}"
-                            :markets-count="{{ marketsLength }}"
+                            :tokens-count="{{ tokensCount }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}">
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                         </trading>

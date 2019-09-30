@@ -70,6 +70,63 @@ describe('TokenEditModal', () => {
         expect(wrapper.vm.$v.$error).to.deep.equal(true);
     });
 
+    it('throw required error when token name has dashes in the beggining', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'foobar',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: false,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('---newName');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(true);
+    });
+
+    it('throw required error when token name has spaces in the beggining', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'foobar',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: false,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('   newName');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(true);
+    });
+
+    it('throw required error when token name has spaces between dashes', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'foobar',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: false,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('new--- ---Name');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(true);
+    });
+
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
         const wrapper = mount(TokenEditModal, {
             propsData: {
@@ -137,7 +194,7 @@ describe('TokenEditModal', () => {
         expect(wrapper.vm.needToSendCode).to.equal(false);
     });
 
-    it('need to send auth code whe 2fa disabled', () => {
+    it('need to send auth code when 2fa disabled', () => {
         const wrapper = mount(TokenEditModal, {
             propsData: {
                 visible: true,
@@ -150,6 +207,29 @@ describe('TokenEditModal', () => {
         });
 
         expect(wrapper.vm.needToSendCode).to.equal(true);
+    });
+
+    it('test custom trimmer', () => {
+        const wrapper = mount(TokenEditModal, {
+            propsData: {
+                visible: true,
+                currentName: 'Ninjo',
+                deleteUrl: 'deleteUrl',
+                sendCodeUrl: 'sendCodeUrl',
+                twofa: true,
+                updateUrl: 'updateUrl',
+            },
+        });
+        const textInput = wrapper.find('input');
+
+        textInput.setValue('- Ninjo- - ');
+        wrapper.vm.editName();
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.$error).to.deep.equal(false);
+        expect(wrapper.vm.mode).to.equal(null);
+        expect(wrapper.vm.currentName).to.equal('Ninjo');
+        expect(wrapper.vm.newName).to.equal('Ninjo');
+        expect(textInput.element.value).to.equal('Ninjo');
     });
 
     it('do not need send auth code when it already sent', (done) => {

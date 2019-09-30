@@ -3,7 +3,7 @@ parameters:
     locale: 'en'
 
     version: 'V1.0.0'
-    is_beta_version: true
+    is_beta_version: false
 
     viabtc_rpc: 'http://btc:8080'
     viabtc_response_timeout_seconds: 10
@@ -63,6 +63,12 @@ parameters:
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
 
+    # the cost of deploying token to blockchain in USD
+    deploy_cost: 49
+    deploy_rpc: 'http://localhost:3001'
+    deploy_response_timeout_seconds: 10
+    mintme_address: '0xf69a0cf26ac7cc8b516bfb1e7038f6756710e70f'
+
     # Expiration time for token deletion confirm code (minutes)
     # Accepts an integer value:
     token_deletion_confirm_code_expiration_time: 60
@@ -72,6 +78,6 @@ parameters:
 
     # Lifetime of the trusted device token (default 48 hours)
     trusted_device_cookie_lifetime: 172800
-    
+
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class PendingWithdraw
+class PendingWithdraw implements PendingWithdrawInterface
 {
     public const EXPIRES_HOURS = 1;
 
@@ -111,6 +111,11 @@ class PendingWithdraw
     public function getUser(): User
     {
         return $this->user;
+    }
+
+    public function getSymbol(): string
+    {
+        return $this->getCrypto()->getSymbol();
     }
 
     /** @ORM\PrePersist() */
