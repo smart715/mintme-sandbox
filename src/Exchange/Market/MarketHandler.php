@@ -226,16 +226,19 @@ class MarketHandler implements MarketHandlerInterface
     /** @return Order[] */
     private function parseExecutedOrders(array $result, Market $market): array
     {
-        return array_map(function (array $orderData) use ($market) {
+        /** @var Order[] */
+        $orders = [];
+
+        foreach ($result as $orderData) {
             $user = array_key_exists('maker_id', $orderData)
                 ? $this->userManager->find($orderData['maker_id'])
                 : null;
 
             if (!$user) {
-                throw new InvalidArgumentException();
+                continue;
             }
 
-            return new Order(
+            $orders[] = new Order(
                 $orderData['id'],
                 $user,
                 !empty($orderData['taker_id'])
@@ -255,7 +258,9 @@ class MarketHandler implements MarketHandlerInterface
                 !empty($orderData['fee']) ? $orderData['fee'] : 0,
                 isset($orderData['time']) ? intval($orderData['time']) : null
             );
-        }, $result);
+        }
+
+        return $orders;
     }
 
     /** @return Deal[] */
