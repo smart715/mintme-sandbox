@@ -7,6 +7,8 @@ const i18nZipcodes = require('i18n-zipcodes');
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
+const notAvailZipCodes = ['', 'AO', 'AG', 'AW', 'BS', 'BZ', 'BJ', 'BM', 'BO', 'BQ', 'BW', 'BF', 'BI', 'CM', 'CF', 'TD', 'KM', 'CD', 'CG', 'CK', 'CI', 'CW', 'DJ', 'DM', 'TL', 'GQ', 'ER', 'FJ', 'TF', 'GA', 'GM', 'GH', 'GD', 'GY', 'HM', 'HK', 'IE', 'KI', 'KP', 'LY', 'MO', 'MW', 'ML', 'MR', 'NA', 'NR', 'NL', 'NU', 'QA', 'RW', 'KN', 'ST', 'SC', 'SL', 'SX', 'SB', 'SR', 'SY', 'TG', 'TK', 'TO', 'TV', 'UG', 'AE', 'VU', 'YE', 'ZW'];
+
 const zipCodeValidation = (zipCode) => {
     try {
         const country = document.getElementById('profile_country').value;
@@ -28,10 +30,16 @@ new Vue({
     },
     watch: {
         country: function() {
-            if ('' === this.country) {
-                this.$refs.zipCode.value = '';
+            if (this.notAvailZipCode) {
+                this.zipCode = '';
             }
-            this.$refs.zipCode.disabled = '' === this.country;
+            this.$refs.zipCode.disabled = this.notAvailZipCode;
+            this.$v.zipCode.$touch();
+        },
+    },
+    computed: {
+        notAvailZipCode: function() {
+            return -1 !== notAvailZipCodes.indexOf(this.country.toUpperCase());
         },
     },
     mounted: function() {
