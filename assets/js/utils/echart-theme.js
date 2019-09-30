@@ -45,7 +45,7 @@ export default function(precision) {
                 },
             },
             textStyle: {
-                color: '#fff',
+                color: '#e1e1e1',
             },
         },
 
@@ -103,7 +103,7 @@ export default function(precision) {
                 margin: 8,
 
                 textStyle: {
-                    color: '#fff',
+                    color: '#e1e1e1',
                 },
             },
             splitLine: {
@@ -143,7 +143,7 @@ export default function(precision) {
                 margin: 8,
                 padding: [5, 0, 0, 0],
                 textStyle: {
-                    color: '#fff',
+                    color: '#e1e1e1',
                 },
             },
             splitLine: {

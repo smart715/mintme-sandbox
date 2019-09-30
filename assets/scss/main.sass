@@ -32,7 +32,7 @@ html
 
 body
   @include font-scale(sm)
-  color: $white
+  color: $dark-white
   font-family: $lato-font
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
@@ -63,7 +63,7 @@ a
   color: $color-link
 
   &.link-light
-    color: $white
+    color: $dark-white
 
   &:hover
     color: $color-link-hover
@@ -150,7 +150,7 @@ a
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
     background-color: $card-input-color !important
-    color: $white
+    color: $dark-white
     border-radius: 0
     border: none
     height: calc(2.0rem + 2px)
@@ -174,7 +174,7 @@ a
   .card-header
     border: none
     background: $card-header-bg
-    color: $white
+    color: $dark-white
     padding: .45rem 1.35rem
 
     @include font-scale(md)
@@ -184,7 +184,7 @@ a
 
     .card-header-icon
       float: right
-      color: $white
+      color: $dark-white
 
   .card-body
     background: $card-body-bg
@@ -193,11 +193,11 @@ a
     background-color: transparent
 
     >.card-header
-      background-color: $white
+      background-color: $dark-white
       color: inherit
 
 .btn-primary
-  color: $white
+  color: $dark-white
   background-color: #007DC0
   border-color: #007DC0
 
@@ -214,7 +214,7 @@ a
       width: 120px
 
 .custom-scrollbar
-  scrollbar-color: $primary-light $white
+  scrollbar-color: $primary-light $dark-white
   cursor: default
 
   &::-webkit-scrollbar
@@ -222,7 +222,7 @@ a
     height: 10px
 
   &::-webkit-scrollbar-track-piece
-    background-color: $white
+    background-color: $dark-white
 
   &::-webkit-scrollbar-thumb:horizontal
     background-color: $primary-light
@@ -291,7 +291,7 @@ a
 
   .active
     .page-link
-      color: $white
+      color: $dark-white
       cursor: default !important
       pointer-events: none !important
 
@@ -307,12 +307,12 @@ a
       flex: 1 1 auto
       padding: 0
       border: none
-      color: $white
+      color: $dark-white
 
       .nav-link
         border: none
         background-color: $color-tabs
-        color: $white
+        color: $dark-white
         padding: .45rem 1.35rem
 
         @include font-scale(md)
@@ -338,7 +338,7 @@ a
       background: $secondary
       text-align: left
       border: 2px solid $secondary
-      
+
       .nav-item
         display: inline-block
         flex: initial
@@ -386,7 +386,7 @@ a
     .modal-close
       @include font-scale(lg)
 
-      color: $white
+      color: $dark-white
       font-weight: lighter
 
   .modal-title
@@ -425,12 +425,12 @@ nav.top-navbar
   &.alert-danger
     border-color: $red
     background-color: $red
-    color: $white
+    color: $dark-white
 
   &.alert-success
     border-color: $green
     background-color: $green
-    color: $white
+    color: $dark-white
 
 .empty-table
   .b-table-has-details
