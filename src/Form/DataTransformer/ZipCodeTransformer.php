@@ -11,12 +11,12 @@ class ZipCodeTransformer implements DataTransformerInterface
     /** @inheritdoc */
     public function transform($value)
     {
-        return mb_strtoupper($value);
+        return mb_strtoupper($value ?? '');
     }
 
     /** @inheritdoc */
     public function reverseTransform($value)
     {
-        return mb_strtoupper($value);
+        return mb_strtoupper($value ?? '');
     }
 }
