@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace App\Tests\Command\Blacklist;
+namespace App\Tests\Command;
 
-use App\Command\Blacklist\UpdateDisposableEmailDomains;
+use App\Command\UpdateDisposableEmailDomains;
 use App\Communications\DisposableEmailCommunicatorInterface;
 use App\Entity\Blacklist;
 use App\Manager\BlacklistManagerInterface;
