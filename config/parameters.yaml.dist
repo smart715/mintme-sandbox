@@ -76,7 +76,7 @@ parameters:
     # If the trusted device feature should be enabled
     trusted_device_enabled: true
 
-    # Lifetime of the trusted device token (default 48 hours)
+    # Lifetime of the trusted device token (default 7 days)
     trusted_device_cookie_lifetime: 604800
 
     # Automatically extend lifetime of the trusted cookie on re-login
