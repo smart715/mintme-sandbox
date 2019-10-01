@@ -83,6 +83,7 @@
                             class="form-control"
                             @keypress="$emit('check-input', market.base.subunit)"
                             @paste="$emit('check-input', market.base.subunit)"
+                            @keydown="setBalanceManuallyEdited(true)"
                             :disabled="useMarketPrice || !loggedIn"
                         >
                     </div>
@@ -96,8 +97,8 @@
                             v-model="buyAmount"
                             type="text"
                             id="buy-price-amount"
-                            @keypress="$emit('check-input', market.quote.subunit)"
-                            @paste="$emit('check-input', market.quote.subunit)"
+                            @keypress="checkPriceInput"
+                            @paste="checkPriceInput"
                             class="form-control"
                             :disabled="!loggedIn"
                         >
@@ -166,9 +167,17 @@ export default {
         return {
             action: 'buy',
             placingOrder: false,
+            balanceManuallyEdited: false,
         };
     },
     methods: {
+        setBalanceManuallyEdited: function(val = true) {
+            this.balanceManuallyEdited = val;
+        },
+        checkPriceInput() {
+            this.$emit('check-input', this.market.quote.subunit);
+            this.setBalanceManuallyEdited(true);
+        },
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
@@ -216,11 +225,15 @@ export default {
             }
         },
         balanceClicked: function() {
+            if (!this.balanceManuallyEdited || !parseInt(this.buyPrice)) {
+                this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
+                this.setBalanceManuallyEdited(false);
+            }
+
             this.buyAmount = toMoney(
-                new Decimal(this.immutableBalance).div(parseFloat(this.price)|| 1).toString(),
+                new Decimal(this.immutableBalance).div(parseFloat(this.buyPrice)|| 1).toString(),
                 this.market.quote.subunit
             );
-            this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
         },
         ...mapMutations('makeOrder', [
             'setBuyPriceInput',

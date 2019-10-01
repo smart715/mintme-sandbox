@@ -82,8 +82,8 @@
                             id="sell-price-input"
                             class="form-control"
                             :disabled="useMarketPrice || !loggedIn"
-                            @keypress="$emit('check-input', market.base.subunit)"
-                            @paste="$emit('check-input', market.base.subunit)"
+                            @keypress="checkPriceInput"
+                            @paste="checkPriceInput"
                         >
                     </div>
                     <div class="col-12 pt-2">
@@ -169,9 +169,17 @@ export default {
         return {
             action: 'sell',
             placingOrder: false,
+            balanceManuallyEdited: false,
         };
     },
     methods: {
+        setBalanceManuallyEdited: function(val = true) {
+            this.balanceManuallyEdited = val;
+        },
+        checkPriceInput() {
+            this.$emit('check-input', this.market.base.subunit);
+            this.setBalanceManuallyEdited(true);
+        },
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 if ((new Decimal(this.sellPrice)).times(this.sellAmount).lessThan(this.minTotalPrice)) {
@@ -217,8 +225,12 @@ export default {
             }
         },
         balanceClicked: function() {
+            if (!this.balanceManuallyEdited || !parseInt(this.sellPrice)) {
+                this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
+                this.setBalanceManuallyEdited(false);
+            }
+
             this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
-            this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
         },
         ...mapMutations('makeOrder', [
             'setSellPriceInput',
