@@ -81,9 +81,8 @@
                             type="text"
                             id="buy-price-input"
                             class="form-control"
-                            @keypress="$emit('check-input', market.base.subunit)"
-                            @paste="$emit('check-input', market.base.subunit)"
-                            @keydown="setBalanceManuallyEdited(true)"
+                            @keypress="checkPriceInput"
+                            @paste="checkPriceInput"
                             :disabled="useMarketPrice || !loggedIn"
                         >
                     </div>
@@ -97,8 +96,8 @@
                             v-model="buyAmount"
                             type="text"
                             id="buy-price-amount"
-                            @keypress="checkPriceInput"
-                            @paste="checkPriceInput"
+                            @keypress="$emit('check-input', market.quote.subunit)"
+                            @paste="$emit('check-input', market.quote.subunit)"
                             class="form-control"
                             :disabled="!loggedIn"
                         >
