@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Command\Blacklist;
+namespace App\Command;
 
 use App\Communications\DisposableEmailCommunicatorInterface;
 use App\Entity\Blacklist;
@@ -45,7 +45,7 @@ class UpdateDisposableEmailDomains extends Command
 
     protected function configure(): void
     {
-        $this->setName('blacklist:synchronize-domains')
+        $this->setName('app:synchronize-domains')
             ->setDescription('Synchronize domains list');
     }
 
@@ -54,8 +54,6 @@ class UpdateDisposableEmailDomains extends Command
         $this->logger->info('[blacklist] Update job started..');
 
         /** @var ConsoleSectionOutput $section */
-        $section = $output->section();
-        $style = new SymfonyStyle($input, $section);
         $list = $this->domainSynchronizer->fetchDomains();
         $existed = $this->blacklistManager->getList('email');
         $progressBar = new ProgressBar($section, count($list));
@@ -75,9 +73,6 @@ class UpdateDisposableEmailDomains extends Command
         $progressBar->finish();
 
         $this->em->flush();
-
-        $section->clear();
-        $style->success('Synchronization completed.');
 
         $this->logger->info('[blacklist] Update job finished..');
     }

@@ -149,7 +149,7 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
-    App\Command\Blacklist\UpdateDisposableEmailDomains:
+    App\Command\UpdateDisposableEmailDomains:
         arguments:
             $logger: '@logger'
         tags:
