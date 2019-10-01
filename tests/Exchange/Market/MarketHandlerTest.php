@@ -129,34 +129,6 @@ class MarketHandlerTest extends TestCase
         }, $orders));
     }
 
-    public function testGetExecutedOrdersWithException(): void
-    {
-        $fetcher = $this->mockMarketFetcher();
-        $fetcher->method('getExecutedOrders')
-            ->with('convertedmarket', 2, 100)
-            ->willReturn(
-                $this->getExecutedOrders()
-            );
-
-        $userManager = $this->mockUserManager();
-        $userManager->method('find')->willReturnCallback(function () {
-            return null;
-        });
-
-        $mh = new MarketHandler(
-            $fetcher,
-            $this->mockMoneyWrapper(),
-            $userManager,
-            $this->mockMarketNameConverter()
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $mh->getExecutedOrders(
-            $this->mockMarket('FOO', 'FOO', true),
-            2
-        );
-    }
-
     public function testGetPendingOrder(): void
     {
         $fetcher = $this->mockMarketFetcher();
