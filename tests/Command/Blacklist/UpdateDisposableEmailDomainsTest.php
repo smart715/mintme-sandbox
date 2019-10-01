@@ -7,6 +7,7 @@ use App\Communications\DisposableEmailCommunicatorInterface;
 use App\Entity\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -22,6 +23,7 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
         $kernel = self::bootKernel();
         $app = new Application($kernel);
         $app->add(new UpdateDisposableEmailDomains(
+            $this->createMock(LoggerInterface::class),
             $this->mockBlacklistManager(),
             $this->mockDomainsSynchronizer(),
             $this->mockEm()
