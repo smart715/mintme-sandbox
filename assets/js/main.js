@@ -14,7 +14,7 @@ import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from './components/token/TokenSearcher';
 import AdminMenu from './components/AdminMenu';
-import ClickOutside from 'vue-click-outside';
+import {directive as onClickaway} from 'vue-clickaway';
 
 /*
     To enable passive listeners,
@@ -55,7 +55,7 @@ imagesContext.keys().forEach(imagesContext);
 new Vue({
     el: '#navbar',
     directives: {
-        ClickOutside,
+        onClickaway,
     },
     data() {
         return {

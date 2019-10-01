@@ -71,7 +71,7 @@
                     </li>
                 {% else %}
                     {% if show_links %}
-                        <div class="d-lg-none align-self-center ">
+                        <div class="d-lg-none align-self-center">
                             {% if prelaunch.isFinished() %}
                                 <li class="text-center {{ route == 'profile' ? 'active' : '' }}">
                                     <a
@@ -99,13 +99,13 @@
                                     type="button" aria-haspopup="true"
                                     :aria-expanded="showProfileMenu"
                                     @click="toggleProfileMenu"
-                                    v-click-outside="hideProfileMenu"
+                                    v-on-clickaway="hideProfileMenu"
                                 >
                                     <i class="icon-user-avatar d-none d-lg-block"></i>
                                 </a>
                                 <div
                                     class="dropdown-menu dropdown-menu-right align-self-end align-self-lg-center"
-                                    :class="{ 'show': showProfileMenu }"
+                                    :class="{ 'show': showProfileMenu }"                                    
                                 >
                                     {% if prelaunch.isFinished() %}
                                         <a
