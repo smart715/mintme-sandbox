@@ -15,7 +15,7 @@ final class Version20190924142540 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         $this->addSql('INSERT INTO cron_job (name, command, schedule, description, enabled) 
-            VALUE ("synchronize-domain", "app:synchronize-domains", "0 * * * *", "This command updates black List of domains", 1);');
+            VALUE ("synchronize-domain-list", "app:synchronize-domains", "0 * * * *", "This command updates black List of domains", 1);');
     }
 
     public function down(Schema $schema) : void
