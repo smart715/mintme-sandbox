@@ -31,7 +31,5 @@ class IsNotBlacklistedValidator extends ConstraintValidator
         if ($this->blacklistManager->isBlacklisted($value, $constraint->type, $constraint->caseSensetive)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
-
-        $this->blacklistManager->addToBlacklist('qew', 'email');
     }
 }
