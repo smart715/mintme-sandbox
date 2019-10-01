@@ -8,11 +8,8 @@ use App\Manager\BlacklistManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /* Cron job added to DB. */
 class UpdateDisposableEmailDomains extends Command
@@ -53,24 +50,16 @@ class UpdateDisposableEmailDomains extends Command
     {
         $this->logger->info('[blacklist] Update job started..');
 
-        /** @var ConsoleSectionOutput $section */
         $list = $this->domainSynchronizer->fetchDomains();
         $existed = $this->blacklistManager->getList('email');
-        $progressBar = new ProgressBar($section, count($list));
-
-        $progressBar->start();
 
         foreach ($list as $name) {
             if (!$this->isValueExists($name, $existed)) {
                 $this->blacklistManager->addToBlacklist($name, 'email', false);
             }
-
-            $progressBar->advance();
         }
 
         $this->blacklistManager->addToBlacklist('awebro', 'email', false);
-
-        $progressBar->finish();
 
         $this->em->flush();
 
