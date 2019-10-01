@@ -18,6 +18,18 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class TradingController extends Controller
 {
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
+    public function __construct(
+        CryptoManagerInterface $cryptoManager,
+        NormalizerInterface $normalizer
+    ) {
+        $this->cryptoManager = $cryptoManager;
+
+        parent::__construct($normalizer);
+    }
+
     /**
      * @Route("/trading/{page}",
      *     defaults={"page"="1"},
@@ -34,6 +46,7 @@ class TradingController extends Controller
         return $this->render('pages/trading.html.twig', [
             'tokensCount' => $this->getTokenRepository()->count([]),
             'page' => $page,
+            'cryptos' => $this->normalize($this->cryptoManager->findAllIndexed('name')),
         ]);
     }
 
