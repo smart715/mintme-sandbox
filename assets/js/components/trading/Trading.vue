@@ -160,7 +160,6 @@ export default {
         },
     },
     mounted: function() {
-
         let updateDataPromise = this.updateData(this.currentPage);
         let conversionRatesPromise = this.fetchConversionRates();
 
@@ -399,7 +398,7 @@ export default {
                     vs_currencies: 'usd',
                 },
             };
-            
+
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
                 .then((res) => {
