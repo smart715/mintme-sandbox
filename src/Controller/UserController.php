@@ -179,7 +179,11 @@ class UserController extends AbstractController
         return $response;
     }
 
-    /** @Route("/settings/2fa/backupcodes/generate", name="generate_backup_codes")*/
+    /** @Route("/settings/2fa/backupcodes/generate",
+        name="generate_backup_codes",
+        options={"2fa"="required"},
+        defaults={"needToCheckCode" = false}
+    )*/
     public function generateBackupCodes(TwoFactorManagerInterface $twoFactorManager): Response
     {
         $this->turnOnAuthenticator($twoFactorManager, $this->getUser());
