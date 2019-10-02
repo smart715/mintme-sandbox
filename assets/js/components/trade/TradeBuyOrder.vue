@@ -81,8 +81,8 @@
                             type="text"
                             id="buy-price-input"
                             class="form-control"
-                            @keypress="$emit('check-input', market.base.subunit)"
-                            @paste="$emit('check-input', market.base.subunit)"
+                            @keypress="checkPriceInput"
+                            @paste="checkPriceInput"
                             :disabled="useMarketPrice || !loggedIn"
                         >
                     </div>
@@ -166,9 +166,17 @@ export default {
         return {
             action: 'buy',
             placingOrder: false,
+            balanceManuallyEdited: false,
         };
     },
     methods: {
+        setBalanceManuallyEdited: function(val = true) {
+            this.balanceManuallyEdited = val;
+        },
+        checkPriceInput() {
+            this.$emit('check-input', this.market.quote.subunit);
+            this.setBalanceManuallyEdited(true);
+        },
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
@@ -216,11 +224,15 @@ export default {
             }
         },
         balanceClicked: function() {
+            if (!this.balanceManuallyEdited || !parseFloat(this.buyPrice)) {
+                this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
+                this.setBalanceManuallyEdited(false);
+            }
+
             this.buyAmount = toMoney(
-                new Decimal(this.immutableBalance).div(parseFloat(this.price)|| 1).toString(),
+                new Decimal(this.immutableBalance).div(parseFloat(this.buyPrice)|| 1).toString(),
                 this.market.quote.subunit
             );
-            this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
         },
         ...mapMutations('makeOrder', [
             'setBuyPriceInput',
