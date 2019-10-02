@@ -89,16 +89,49 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.marketPrice = 0;
             expect(wrapper.vm.useMarketPrice).to.be.false;
         });
+    });
 
-        describe('balanceClicked', () => {
-            it('should add the correct amount to match the full balance', () => {
-                wrapper.vm.immutableBalance = 10;
-                wrapper.vm.marketPrice = 5;
-                wrapper.vm.balanceClicked();
+    describe('balanceClicked', () => {
+        it('should add the correct amount to match the full balance', () => {
+            wrapper.vm.immutableBalance = 10;
+            wrapper.vm.marketPrice = 5;
+            wrapper.vm.balanceClicked();
 
-                expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
-                expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
-            });
+            expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
+            expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
+        });
+
+        it('shouldn\'t add price if the price edited manually', () => {
+            wrapper.vm.immutableBalance = 10;
+            wrapper.vm.marketPrice = 5;
+            wrapper.vm.buyPrice = 2;
+            wrapper.vm.balanceManuallyEdited = true;
+            wrapper.vm.balanceClicked();
+
+            expect(wrapper.vm.buyAmount).to.deep.equal('5.0000');
+            expect(wrapper.vm.buyPrice).to.deep.equal(2);
+        });
+
+        it('should add price if the price edited manually but has 0 value', () => {
+            wrapper.vm.immutableBalance = 10;
+            wrapper.vm.marketPrice = 5;
+            wrapper.vm.buyPrice = '00';
+            wrapper.vm.balanceManuallyEdited = true;
+            wrapper.vm.balanceClicked();
+
+            expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
+            expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
+        });
+
+        it('should add price if the price edited manually but has null value', () => {
+            wrapper.vm.immutableBalance = 10;
+            wrapper.vm.marketPrice = 5;
+            wrapper.vm.buyPrice = null;
+            wrapper.vm.balanceManuallyEdited = true;
+            wrapper.vm.balanceClicked();
+
+            expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
+            expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
         });
     });
 });
