@@ -43,6 +43,9 @@ api_controllers:
     resource: ../src/Controller/API/
     type: rest
 
+press_kit:
+    path: /docs/mintme-press-kit.pdf
+
 news:
     resource: '@SonataNewsBundle/Resources/config/routing/news.xml'
     prefix: /news
