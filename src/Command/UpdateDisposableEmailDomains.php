@@ -59,8 +59,6 @@ class UpdateDisposableEmailDomains extends Command
             }
         }
 
-        $this->blacklistManager->addToBlacklist('awebro', 'email', false);
-
         $this->em->flush();
 
         $this->logger->info('[blacklist] Update job finished..');
