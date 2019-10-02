@@ -224,7 +224,7 @@ export default {
             }
         },
         balanceClicked: function() {
-            if (!this.balanceManuallyEdited || !parseInt(this.buyPrice)) {
+            if (!this.balanceManuallyEdited || !parseFloat(this.buyPrice)) {
                 this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
                 this.setBalanceManuallyEdited(false);
             }
