@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class SecurityController extends FOSSecurityController
@@ -53,6 +54,12 @@ class SecurityController extends FOSSecurityController
         $this->form = $this->createForm(CaptchaLoginType::class);
         $this->form->handleRequest($request);
 
+        $refers = $request->headers->get('Referer');
+
+        if (!empty($refers) && $refers !== $this->generateUrl('login', [], UrlGeneratorInterface::ABSOLUTE_URL)) {
+            $this->session->set('login_referer', $refers);
+        }
+
         if ($this->form->isSubmitted() && $this->form->isValid()) {
             return $this->redirectToRoute('fos_user_security_check', [
                 'request' => $request,
@@ -78,6 +85,15 @@ class SecurityController extends FOSSecurityController
     {
         $this->userActionLogger->info('Log in');
 
+        $referer = $this->session->get('login_referer');
+        $refererRoute = $this->refererMappings()[$referer] ?? '';
+
+        if ($refererRoute) {
+            $this->session->remove('login_referer');
+
+            return $this->redirectToRoute($refererRoute);
+        }
+
         return $prelaunchConfig->isFinished()
             ? $this->redirectToRoute("trading")
             : $this->redirectToRoute("referral-program");
@@ -92,5 +108,12 @@ class SecurityController extends FOSSecurityController
         return $this->render('@FOSUser/Security/login.html.twig', array_merge($data, [
             'form' => $this->form->createView(),
         ]));
+    }
+
+    private function refererMappings(): array
+    {
+        return [
+            $this->generateUrl('nelmio_api_doc.swagger_ui', [], UrlGeneratorInterface::ABSOLUTE_URL) => 'settings',
+        ];
     }
 }

@@ -110,7 +110,7 @@ class Profile
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
-     * @Groups({"API"})
+     * @Groups({"API", "API_TOK"})
      */
     private $page_url;
 

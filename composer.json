@@ -22,6 +22,7 @@
         "graze/guzzle-jsonrpc": "^3.2",
         "incenteev/composer-parameter-handler": "^2.1",
         "moneyphp/money": "^3.1",
+        "nelmio/api-doc-bundle": "^3.4",
         "oro/doctrine-extensions": "^1.2",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "pragmarx/random": "^0.2.2",
