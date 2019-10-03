@@ -31,6 +31,8 @@ class User extends BaseUser implements
     PreferredProviderInterface,
     TrustedDeviceInterface
 {
+    public const ROLE_API = 'ROLE_API';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -87,13 +89,13 @@ class User extends BaseUser implements
     protected $plainPassword;
 
     /**
-     * @ORM\OneToOne(targetEntity="Profile", mappedBy="user", cascade={"persist"})
+     * @ORM\OneToOne(targetEntity="Profile", mappedBy="user", cascade={"persist", "remove"})
      * @var Profile
      */
     protected $profile;
 
     /**
-     * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist"})
+     * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist", "remove"})
      * @var GoogleAuthenticatorEntry
      */
     protected $googleAuthenticatorEntry;
@@ -145,7 +147,19 @@ class User extends BaseUser implements
      * @ORM\Column(type="integer", nullable=true, options={"default": 0})
      * @var int
      */
-    private $trustedTokenVersion = 0;
+    protected $trustedTokenVersion = 0;
+
+    /**
+     * @ORM\OneToOne(targetEntity="ApiKey", mappedBy="user", cascade={"remove", "persist"})
+     * @var ApiKey
+     */
+    protected $apiKey;
+
+    /** @codeCoverageIgnore */
+    public function getApiKey(): ?ApiKey
+    {
+        return $this->apiKey;
+    }
 
     /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
