@@ -44,8 +44,8 @@ services:
     disposable_email.json_rpc:
         class: App\Communications\GuzzleRestWrapper
         arguments:
-            $url: '%link_to_disposable_email_domains%'
-            $timeoutSeconds: '%disposable_email_timeout_seconds%'
+            $url: '%origin_to_disposable_email_domains%'
+            $timeoutSeconds: '%disposable_domains_timeout_seconds%'
 
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
