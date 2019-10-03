@@ -30,11 +30,13 @@ new Vue({
     },
     watch: {
         country: function() {
-            if (this.notAvailZipCode) {
-                this.zipCode = '';
+            const savedCode = this.zipCode;
+            this.zipCode = '';
+            this.$v.zipCode.$reset();
+            if (!this.notAvailZipCode) {
+                this.zipCode = savedCode;
             }
             this.$refs.zipCode.disabled = this.notAvailZipCode;
-            this.$v.zipCode.$touch();
         },
     },
     computed: {
