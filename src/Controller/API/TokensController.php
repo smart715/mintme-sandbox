@@ -21,7 +21,6 @@ use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacadeInterface;
-use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
@@ -42,7 +41,7 @@ use Throwable;
  * @Rest\Route("/api/tokens")
  * @Security(expression="is_granted('prelaunch')")
  */
-class TokensAPIController extends AbstractFOSRestController
+class TokensController extends AbstractFOSRestController
 {
     private const TOP_HOLDERS_COUNT = 10;
 

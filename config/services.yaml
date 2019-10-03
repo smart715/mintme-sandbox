@@ -320,7 +320,7 @@ services:
             $mintmeAddress: "%mintme_address%"
             $tokenQuantity: "%token_quantity%"
 
-    App\Controller\API\WebSocketAPIController:
+    App\Controller\API\WebSocketController:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 
@@ -381,7 +381,7 @@ services:
         tags:
             - { name: "kernel.event_subscriber", priority: 100 }
 
-    App\Controller\API\TokensAPIController:
+    App\Controller\API\TokensController:
         arguments:
             $expirationTime: "%token_deletion_confirm_code_expiration_time%"
 

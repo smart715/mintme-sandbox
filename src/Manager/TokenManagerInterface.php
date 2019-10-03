@@ -17,7 +17,7 @@ interface TokenManagerInterface
     public function findByHiddenName(string $name): ?Token;
 
     /** @return Token[] */
-    public function findAll(): array;
+    public function findAll(?int $offset = null, ?int $limit = null): array;
 
     /** @return Token[] */
     public function findAllPredefined(): array;

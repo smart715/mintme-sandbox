@@ -2,7 +2,6 @@
 
 namespace App\Tests\Exchange\Market;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -13,17 +12,18 @@ use App\Exchange\Market\MarketHandler;
 use App\Exchange\Market\Model\LineStat;
 use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
+use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapperInterface;
 use InvalidArgumentException;
-use Money\Currency;
-use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class MarketHandlerTest extends TestCase
 {
+
+    use MockMoneyWrapper;
+
     public function testGetExecutedOrder(): void
     {
         $fetcher = $this->mockMarketFetcher();
@@ -108,7 +108,7 @@ class MarketHandlerTest extends TestCase
         );
 
         $this->assertEquals(array_map(function (array $row) {
-            $row['fee'] = $row['fee'] ?? 0.;
+            $row['fee'] = $row['fee'] ?? 0;
             $row['type'] = 'all' === $row['type']
                 ? 0
                 :
@@ -124,7 +124,7 @@ class MarketHandlerTest extends TestCase
                 'type' => $order->getSide(),
                 'price' => $order->getPrice()->getAmount(),
                 'time' => $order->getTimestamp(),
-                'fee' => $order->getFee(),
+                'fee' => $order->getFee()->getAmount(),
             ];
         }, $orders));
     }
@@ -162,8 +162,8 @@ class MarketHandlerTest extends TestCase
             'side'=> $order->getSide(),
             'price'=> $order->getPrice()->getAmount(),
             'mtime'=> $order->getTimestamp(),
-            'maker_fee'=> $order->getFee(),
-            'taker_fee'=> $order->getFee(),
+            'maker_fee'=> $order->getFee()->getAmount(),
+            'taker_fee'=> $order->getFee()->getAmount(),
         ]);
     }
 
@@ -237,8 +237,8 @@ class MarketHandlerTest extends TestCase
                 'side'=> $order->getSide(),
                 'price'=> $order->getPrice()->getAmount(),
                 'mtime'=> $order->getTimestamp(),
-                'maker_fee'=> $order->getFee(),
-                'taker_fee'=> $order->getFee(),
+                'maker_fee'=> $order->getFee()->getAmount(),
+                'taker_fee'=> $order->getFee()->getAmount(),
             ];
         }, $orders));
     }
@@ -458,8 +458,8 @@ class MarketHandlerTest extends TestCase
     private function getExecutedOrders(): array
     {
         return [
-            ['maker_id'=>1, 'id'=>2, 'taker_id'=>3, 'amount'=>'4', 'type'=>'all', 'price'=>'6', 'time'=>7, 'fee'=>8.],
-            ['maker_id'=>1, 'id'=>2, 'taker_id'=>null, 'amount'=>'4', 'type'=>'sell', 'price'=>'6', 'time'=>7, 'fee'=>8.],
+            ['maker_id'=>1, 'id'=>2, 'taker_id'=>3, 'amount'=>'4', 'type'=>'all', 'price'=>'6', 'time'=>7, 'fee'=> 8],
+            ['maker_id'=>1, 'id'=>2, 'taker_id'=>null, 'amount'=>'4', 'type'=>'sell', 'price'=>'6', 'time'=>7, 'fee'=> 8],
             ['maker_id'=>1, 'id'=>2, 'taker_id'=>3, 'amount'=>'4', 'type'=>'buy', 'price'=>'6', 'time'=>7, 'fee'=>null],
             ['maker_id'=>1, 'id'=>2, 'taker_id'=>3, 'amount'=>'4', 'type'=>'all', 'price'=>'6', 'time'=>null, 'fee'=>null],
         ];
@@ -499,8 +499,8 @@ class MarketHandlerTest extends TestCase
                 'side'=> $order->getSide(),
                 'price'=> $order->getPrice()->getAmount(),
                 'mtime'=> $order->getTimestamp(),
-                'maker_fee'=> $order->getFee(),
-                'taker_fee'=> $order->getFee(),
+                'maker_fee'=> $order->getFee()->getAmount(),
+                'taker_fee'=> $order->getFee()->getAmount(),
             ];
         }, $orders);
     }
@@ -552,16 +552,5 @@ class MarketHandlerTest extends TestCase
         $converter->method('convert')->willReturn('convertedmarket');
 
         return $converter;
-    }
-
-    /** @return MoneyWrapperInterface|MockObject */
-    private function mockMoneyWrapper(): MoneyWrapperInterface
-    {
-        $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
-            return new Money($amount, new Currency($symbol));
-        });
-
-        return $mw;
     }
 }

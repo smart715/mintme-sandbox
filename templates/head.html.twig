@@ -1,0 +1,62 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="description" content="Mintme revolutionizes how people help each other by allowing sides to earn">
+<meta name="keywords" content="mintMe,MINTME,crypto,exchanger,token,dapps">
+<meta name="author" content="mintme">
+<meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
+{% if viabtc_offset != 0 %}
+    <meta name="X-USER-OFFSET" content="{{ viabtc_offset }}">
+{% endif %}
+<link rel="icon" type="img/png" href="{{ asset('build/images/favicon.png') }}">
+<link rel="manifest" href="{{ asset('manifest.json') }}">
+<meta name="theme-color" content="#141C29">
+<title>
+    {% block title %}mintMe{% endblock %}
+</title>
+
+<style>
+    body {
+        background-color: #0c1a29;
+    }
+    .hidden {
+        display: none;
+    }
+</style>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ google_tracking_id }}"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '{{ google_tracking_id }}');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/5c61c14e7cf662208c950e23/default';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+    })();
+    Tawk_API.onLoad = function(){
+        Tawk_API.setAttributes({
+            'name'  : '{{ app.user.profile.firstName|default('') }}',
+            'email' : '{{ app.user.username|default('') }}',
+            'hash'  : '{{ app.user.getTawkHash(tawk_api_key)|default('') }}',
+            'user' : '{{ app.user.username|default('') }}',
+            'token' : '{{ app.user.getProfile().getToken().getName()|default('') }}',
+            'first-name' : '{{ app.user.getProfile().getFirstName()|default('') }}',
+            'last-name' : '{{ app.user.getProfile().getLastName()|default('') }}'
+        }, function(error){});
+    }
+</script>
+<!--End of Tawk.to Script-->
+
+{% include 'schema.html.twig' %}

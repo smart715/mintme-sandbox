@@ -46,13 +46,14 @@ class Token implements TradebleInterface
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
      * @AppAssert\DashedUniqueName(message="Token name is already exists.")
      * @AppAssert\IsNotBlacklisted(type="token", message="This value is not allowed")
-     * @Groups({"API"})
+     * @Groups({"API", "API_TOK"})
      * @var string
      */
     protected $name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $address;
@@ -78,6 +79,7 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $websiteUrl;
@@ -85,12 +87,14 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @AppAssert\IsUrlFromDomain("www.facebook.com")
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $facebookUrl;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $youtubeChannelId;
@@ -111,6 +115,7 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\Column(type="string", length=10000, nullable=true)
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $description;
@@ -123,6 +128,7 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
+     * @Groups({"API_TOK"})
      * @var Profile|null
      */
     protected $profile;
@@ -143,6 +149,7 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups({"API_TOK"})
      * @var \DateTimeImmutable
      */
     protected $created;

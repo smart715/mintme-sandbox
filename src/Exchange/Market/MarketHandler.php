@@ -16,6 +16,8 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
+use Money\Currency;
+use Money\Money;
 
 class MarketHandler implements MarketHandlerInterface
 {
@@ -204,18 +206,21 @@ class MarketHandler implements MarketHandlerInterface
                 null,
                 $market,
                 $this->moneyWrapper->parse(
-                    $orderData['left'],
+                    (string)$orderData['left'],
                     $this->getSymbol($market->getQuote())
                 ),
                 $orderData['side'],
                 $this->moneyWrapper->parse(
-                    $orderData['price'],
+                    (string)$orderData['price'],
                     $this->getSymbol($market->getQuote())
                 ),
                 Order::PENDING_STATUS,
-                self::SELL === $orderData['side'] ?
-                    floatval($orderData['maker_fee']) :
-                    floatval($orderData['taker_fee']),
+                $this->moneyWrapper->parse(
+                    self::SELL === $orderData['side'] ?
+                        (string)$orderData['maker_fee'] :
+                        (string)$orderData['taker_fee'],
+                    $this->getSymbol($market->getQuote())
+                ),
                 !empty($orderData['mtime']) ? intval($orderData['mtime']) : null
             );
         });
@@ -255,7 +260,10 @@ class MarketHandler implements MarketHandlerInterface
                     $this->getSymbol($market->getQuote())
                 ),
                 Order::FINISHED_STATUS,
-                !empty($orderData['fee']) ? $orderData['fee'] : 0,
+                $this->moneyWrapper->parse(
+                    !empty($orderData['fee']) ? (string)$orderData['fee'] : '0',
+                    $this->getSymbol($market->getQuote())
+                ),
                 isset($orderData['time']) ? intval($orderData['time']) : null
             );
         }
@@ -269,7 +277,7 @@ class MarketHandler implements MarketHandlerInterface
         return array_map(function (array $dealData) use ($market) {
             return new Deal(
                 $dealData['id'],
-                $dealData['time'],
+                (int)$dealData['time'],
                 $dealData['user'],
                 $dealData['side'],
                 $dealData['role'],
@@ -295,9 +303,12 @@ class MarketHandler implements MarketHandlerInterface
         }, $result);
     }
 
-    public function getMarketInfo(Market $market): MarketInfo
+    public function getMarketInfo(Market $market, int $period = 86400): MarketInfo
     {
-        $result = $this->marketFetcher->getMarketInfo($this->marketNameConverter->convert($market));
+        $result = $this->marketFetcher->getMarketInfo(
+            $this->marketNameConverter->convert($market),
+            $period
+        );
         $monthResult = $this->getMonthlyMarketInfo($market);
 
         if (!$result) {

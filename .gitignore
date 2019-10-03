@@ -25,3 +25,4 @@ public/build
 .vscode
 /coverage-php
 /coverage-js
+.phpunit.result.cache

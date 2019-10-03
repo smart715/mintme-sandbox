@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table(name="reciprocal_links")
  * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
+ * @codeCoverageIgnore
  */
 class ReciprocalLinks
 {
