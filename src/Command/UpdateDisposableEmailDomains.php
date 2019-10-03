@@ -49,16 +49,14 @@ class UpdateDisposableEmailDomains extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->logger->info('[blacklist] Update job started..');
+        $this->logger->info('[blacklist] Domains fetch start..');
 
         $list = $this->domainSynchronizer->fetchDomains();
+
+        $this->logger->info('[blacklist] Domains fetched..');
+        $this->logger->info('value = '.$list[0].$list[100]);
+
         $existed = $this->blacklistManager->getList('email');
-
-        $this->logger->info('test Value ='.$existed[0]->getValue());
-        $this->logger->error('cron error');
-
-        for ($i = 0; $i < 10; $i++) {
-            $this->logger->info($list[$i]);
-        }
 
         foreach ($list as $name) {
             if (!$this->isValueExists($name, $existed)) {

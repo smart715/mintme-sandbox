@@ -83,6 +83,6 @@ parameters:
     trusted_device_extend_lifetime: true
 
     link_to_disposable_email_domains: 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/'
-    name_of_files_for_disposable_domains: 'wildcard.json'
+    name_of_files_for_disposable_domains: 'index.json'
 
-    disposable_email_timeout_seconds: 40
+    disposable_email_timeout_seconds: 30
