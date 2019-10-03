@@ -85,4 +85,4 @@ parameters:
     link_to_disposable_email_domains: 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/'
     name_of_files_for_disposable_domains: 'index.json'
 
-    disposable_email_timeout_seconds: 10
+    disposable_email_timeout_seconds: 40

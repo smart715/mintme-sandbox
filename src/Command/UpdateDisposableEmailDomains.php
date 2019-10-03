@@ -53,6 +53,12 @@ class UpdateDisposableEmailDomains extends Command
         $list = $this->domainSynchronizer->fetchDomains();
         $existed = $this->blacklistManager->getList('email');
 
+        $this->logger->info($existed[0]);
+
+        for ($i = 0; $i < 10; $i++) {
+            $this->logger->info($list[$i]);
+        }
+        
         foreach ($list as $name) {
             if (!$this->isValueExists($name, $existed)) {
                 $this->blacklistManager->addToBlacklist($name, 'email', false);
