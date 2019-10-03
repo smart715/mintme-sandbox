@@ -26,7 +26,7 @@ use Throwable;
  * @Rest\Route("/api/wallet")
  * @Security(expression="is_granted('prelaunch')")
  */
-class WalletAPIController extends AbstractFOSRestController
+class WalletController extends AbstractFOSRestController
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 100;
 
