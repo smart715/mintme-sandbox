@@ -14,6 +14,7 @@ use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\UserManagerInterface;
+use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use DateTimeImmutable;
@@ -26,6 +27,9 @@ use Psr\Log\LoggerInterface;
 
 class BalanceHandlerTest extends TestCase
 {
+
+    use MockMoneyWrapper;
+
     public function testBalances(): void
     {
         $converter = $this->mockTokenNameConverter();
@@ -460,21 +464,6 @@ class BalanceHandlerTest extends TestCase
     private function mockTraderBalanceViewFactory(): TraderBalanceViewFactoryInterface
     {
         return $this->createMock(TraderBalanceViewFactoryInterface::class);
-    }
-
-    private function mockMoneyWrapper(): MoneyWrapperInterface
-    {
-        $wrapper = $this->createMock(MoneyWrapperInterface::class);
-
-        $wrapper->method('parse')->willReturnCallback(function (string $amount, string $symbol) {
-            return new Money($amount, new Currency($symbol));
-        });
-
-        $wrapper->method('format')->willReturnCallback(function (Money $money) {
-            return $money->getAmount();
-        });
-
-        return $wrapper;
     }
 
     /** @return EntityManagerInterface|MockObject */

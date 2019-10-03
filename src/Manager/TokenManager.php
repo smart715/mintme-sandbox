@@ -10,8 +10,6 @@ use App\Exchange\Config\Config;
 use App\Repository\TokenRepository;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
-use App\Utils\Converter\TokenNameConverter;
-use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -109,9 +107,9 @@ class TokenManager implements TokenManagerInterface
      *
      * @codeCoverageIgnore
      */
-    public function findAll(): array
+    public function findAll(?int $offset = null, ?int $limit = null): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findBy([], null, $limit, $offset);
     }
 
     public function getOwnToken(): ?Token
