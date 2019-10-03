@@ -1,6 +1,7 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import TokenName from '../../js/components/token/TokenName';
 import moxios from 'moxios';
+import axiosPlugin from '../../js/axios';
 import axios from 'axios';
 
 /**
@@ -8,7 +9,7 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axios);
+    localVue.use(axiosPlugin);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};

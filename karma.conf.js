@@ -9,43 +9,43 @@ context.runtimeConfig = parseRuntime(
 
 const webpackConfig = require('./webpack.config');
 
-module.exports = function(config) {
-  config.set({
-    basePath: '',
-    frameworks: ['mocha', 'requirejs', 'chai', 'es6-shim'],
-    files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
-      'test-main.js',
-      {pattern: 'assets/tests/**/*Spec.js', included: false},
-      {pattern: 'assets/js/*.js', included: false},
-    ],
-    webpack: webpackConfig,
-    webpackServer: {
-        noInfo: true,
-    },
-    webpackMiddleware: {
-        noInfo: true,
-    },
-    preprocessors: {
-        'assets/tests/**/*Spec.js': ['webpack'],
-        'assets/js/**/*.js': ['webpack', 'coverage'],
-        'assets/components/**/*.vue': ['webpack', 'coverage'],
-    },
-    coverageReporter: {
-      type: 'text-summary',
-      dir: 'coverage/',
-      includeAllSources: true,
-    },
-    reporters: ['progress', 'coverage'],
-    port: 9876,
-    client: {
-      captureConsole: false,
-    },
-    colors: true,
-    logLevel: config.LOG_INFO,
-    autoWatch: false,
-    browsers: ['PhantomJS'],
-    singleRun: true,
-    concurrency: Infinity,
-  });
+module.exports = function (config) {
+    config.set({
+        basePath: '',
+        frameworks: ['mocha', 'requirejs', 'chai', 'es6-shim'],
+        files: [
+            'node_modules/babel-polyfill/dist/polyfill.js',
+            'test-main.js',
+            {pattern: 'assets/tests/**/*Spec.js', included: false},
+            {pattern: 'assets/js/*.js', included: false},
+        ],
+        webpack: webpackConfig,
+        webpackServer: {
+            noInfo: true,
+        },
+        webpackMiddleware: {
+            noInfo: true,
+        },
+        preprocessors: {
+            'assets/tests/**/*Spec.js': ['webpack'],
+            'assets/js/**/*.js': ['webpack', 'coverage'],
+            'assets/components/**/*.vue': ['webpack', 'coverage'],
+        },
+        coverageReporter: {
+            type: 'text-summary',
+            dir: 'coverage/',
+            includeAllSources: true,
+        },
+        reporters: ['progress', 'coverage'],
+        port: 9876,
+        client: {
+            captureConsole: false,
+        },
+        colors: true,
+        logLevel: config.LOG_INFO,
+        autoWatch: false,
+        browsers: ['PhantomJS'],
+        singleRun: true,
+        concurrency: Infinity,
+    });
 };
