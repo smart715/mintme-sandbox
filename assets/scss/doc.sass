@@ -1,0 +1,106 @@
+header::before
+  content: none
+
+.swagger-ui
+  color: white
+
+  input::placeholder
+    color: $white
+
+  .auth-wrapper
+    padding-right: 5px
+
+  .scheme-container
+    box-shadow: none
+    background: none
+
+  .arrow
+    filter: invert(1)
+
+  .wrapper
+    .models
+      background: white
+
+    @include media-breakpoint-down('sm')
+      margin: 0!important
+      padding: 0!important
+
+      section
+        margin: 0
+        padding: 0
+
+  .opblock-tag
+    background: $primary
+    color: white
+
+  .opblock-tag-section
+    background: $primary
+    padding: 10px 10px 0 10px
+
+  .swagger-ui .info .description p
+    color: $white
+
+  .title
+    display: none
+
+  .response-col_status
+    width: auto
+
+  .btn.authorize svg
+    fill: $white
+
+  .parameters-col_name
+    width: auto
+
+  .parameters-col_description
+    color: $black
+    width: auto
+
+  .opblock-summary-description
+    text-align: right
+
+  .modal-ux
+    border: none !important
+    border-radius: 0 !important
+    box-shadow: none !important
+
+    .modal-ux-header
+      background: $primary
+
+      h3
+        color: white
+
+      .close-modal
+        filter: invert(1)
+
+#swagger-ui.api-platform
+  .wrapper
+    padding: 0 10px
+
+  .opblock-tag:hover
+    background-color: rgba(0,0,0,.1)
+    color: white
+
+  .information-container.wrapper
+    display: none
+    background-color: transparent
+    border-bottom: none
+
+  .information-container
+    margin-bottom: auto !important
+
+  .btn
+    @extend .btn-primary
+    border: none !important
+    border-radius: inherit
+
+    &:hover
+      background-color: $secondary-dark !important
+      color: white
+      border: none !important
+
+  select
+    @include media-breakpoint-down('sm')
+      width: 100%
+      min-width: auto
+

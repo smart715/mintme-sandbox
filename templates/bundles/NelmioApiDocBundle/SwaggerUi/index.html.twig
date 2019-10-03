@@ -1,0 +1,72 @@
+{# templates/bundles/NelmioApiDocBundle/SwaggerUi/index.html.twig #}
+
+{#
+    To avoid a "reached nested level" error an exclamation mark `!` has to be added
+    See https://symfony.com/blog/new-in-symfony-3-4-improved-the-overriding-of-templates
+#}
+{% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('build/main.css') }}">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% include 'scripts.html.twig' %}
+{% endblock javascripts %}
+
+{% block header %}
+{% endblock header %}
+
+{% block swagger_ui %}
+    <div class="content-wrapper d-flex flex-column">
+        {% include 'topnav.html.twig' %}
+        <main class="flex-fill content">
+            <div class="container">
+                <div class="row pt-5 justify-content-center">
+                    <div class="col-xl-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>API Documentation</h2>
+                            </div>
+                            <div class="card-body py-2 px-0">
+                                <div class="mx-0 px-1 px-sm-4 mt-4 mb-0 pb-0">
+                                    <p>
+                                        All requests must be provided with unique API keys, which you can generate in dashboard.<br />
+                                        You have to pass API keys with each request in headers as <span class="text-danger">X-API-ID</span> (public)
+                                        and <span class="text-danger">X-API-KEY</span> (private) parameters.<br />
+                                        Our data is delivered to you on-demand using well-documented and simple HTTP RESTful API in JSON format.
+                                    </p>
+                                    <p>
+                                        Requests to API are limited to 5 per second with bursts not exceeding 10 requests.
+                                        All requests above this limit won't be processed and API will return 503 HTTP code.
+                                        To avoid exceeding the limit, it's recommended to implement a caching mechanism in your application.
+                                    </p>
+                                    <p>
+                                        {% if app.user is not null %}
+                                            Go to <a href="{{ path('settings') }}">settings</a> to generate your own API keys.
+                                        {% else %}
+                                            <a href="{{ path('login') }}">Log in</a> to generate your own API keys.
+                                        {% endif %}
+                                    </p>
+                                    <p>
+                                        You can test our API here. Authorize your generated keys and click on specific methods to see how they work live.
+                                    </p>
+                                </div>
+                                {{ parent() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        {% include 'footer.html.twig' %}
+    </div>
+{% endblock %}
+
+{% block meta %}
+    {% include 'head.html.twig' %}
+{% endblock %}
+
+{% block title %}{% endblock %}
