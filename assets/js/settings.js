@@ -1,8 +1,9 @@
 import Passwordmeter from './components/PasswordMeter';
+import ApiKeys from './components/ApiKeys';
 
 new Vue({
     el: '#settings',
-    components: {Passwordmeter},
+    components: {Passwordmeter, ApiKeys},
     data: {
         password: '',
         disabled: false,

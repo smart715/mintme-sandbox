@@ -20,13 +20,13 @@ class Market
         $this->quote = $quote;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /** @Groups({"Default", "API", "dev"}) */
     public function getBase(): TradebleInterface
     {
         return $this->base;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /** @Groups({"Default", "API", "dev"}) */
     public function getQuote(): TradebleInterface
     {
         return $this->quote;
@@ -35,5 +35,10 @@ class Market
     public function isTokenMarket(): bool
     {
         return $this->base instanceof Token || $this->quote instanceof Token;
+    }
+
+    public function __toString(): string
+    {
+        return $this->base->getSymbol() . '/' . $this->quote->getSymbol();
     }
 }
