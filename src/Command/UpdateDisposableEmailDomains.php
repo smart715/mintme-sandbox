@@ -53,7 +53,8 @@ class UpdateDisposableEmailDomains extends Command
         $list = $this->domainSynchronizer->fetchDomains();
         $existed = $this->blacklistManager->getList('email');
 
-        $this->logger->info($existed[0]->getValue());
+        $this->logger->info('test Value ='.$existed[0]->getValue());
+        $this->logger->error('cron error');
 
         for ($i = 0; $i < 10; $i++) {
             $this->logger->info($list[$i]);
