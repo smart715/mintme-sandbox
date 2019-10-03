@@ -86,13 +86,11 @@ class Crypto implements TradebleInterface
         }, $this->users->toArray());
     }
 
-    /** {@inheritdoc} */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /** {@inheritdoc} */
     public function getSymbol(): string
     {
         return $this->symbol;

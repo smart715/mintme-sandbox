@@ -21,11 +21,9 @@ use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacadeInterface;
-use App\SmartContract\TokenDeployInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -43,7 +41,7 @@ use Throwable;
  * @Rest\Route("/api/tokens")
  * @Security(expression="is_granted('prelaunch')")
  */
-class TokensAPIController extends AbstractFOSRestController
+class TokensController extends AbstractFOSRestController
 {
     private const TOP_HOLDERS_COUNT = 10;
 
@@ -384,10 +382,7 @@ class TokensAPIController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/delete", name="token_delete", options={"expose"=true})
-=======
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
->>>>>>> 952f3c4afc036081d7fd202311852cc0ec15812a
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */

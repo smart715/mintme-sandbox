@@ -30,7 +30,7 @@ interface MarketHandlerInterface
      */
     public function getPendingOrdersByUser(User $user, array $markets, int $offset = 0, int $limit = 50): array;
 
-    public function getMarketInfo(Market $market): MarketInfo;
+    public function getMarketInfo(Market $market, int $period = 86400): MarketInfo;
 
     /**
      * @return Market\Model\LineStat[]
