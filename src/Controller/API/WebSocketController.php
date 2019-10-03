@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @Rest\Route("/api/ws")
  * @Security(expression="is_granted('prelaunch')")
  */
-class WebSocketAPIController extends AbstractFOSRestController
+class WebSocketController extends AbstractFOSRestController
 {
     /** @var bool */
     private $isAuth;

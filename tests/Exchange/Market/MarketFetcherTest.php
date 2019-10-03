@@ -471,6 +471,7 @@ class MarketFetcherTest extends TestCase
                 1,
                 $this->createMoney(1),
                 Order::FINISHED_STATUS,
+                null,
                 1492697636
             ),
         ];

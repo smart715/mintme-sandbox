@@ -220,6 +220,7 @@ class Trader implements TraderInterface
                 new Currency($this->getSymbol($market->getQuote()))
             ),
             $status,
+            null,
             $orderData['mtime']
         );
     }
