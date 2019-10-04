@@ -424,7 +424,7 @@ export default {
         updateWEBBTCMarket: function() {
             let market = this.markets['WEBBTC'];
             market = this.getSanitizedMarket(
-                market.crypto.symbol,
+                market.base.symbol,
                 market.quote.symbol,
                 this.getPercentage(
                     parseFloat(market.lastPrice),
@@ -433,7 +433,7 @@ export default {
                 parseFloat(market.lastPrice),
                 parseFloat(market.dayVolume),
                 market.supply,
-                market.crypto.subunit
+                market.base.subunit
             );
 
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
