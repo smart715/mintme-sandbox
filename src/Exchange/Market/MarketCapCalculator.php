@@ -61,7 +61,7 @@ class MarketCapCalculator
             $base = Token::BTC_SYMBOL;
             $calculatingUSD = true;
         } elseif (null === $crypto || !$crypto->isTradable()) {
-            throw new \Exception('Parameter base should be a valid tradable crypto or USD');
+            throw new \DomainException('Parameter base should be a valid tradable crypto or USD');
         }
 
         # Calculate MarketCap for token/WEB markets

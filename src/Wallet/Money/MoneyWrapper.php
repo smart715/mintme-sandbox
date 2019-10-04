@@ -100,7 +100,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
         if (null !== $exchange) {
             $this->converter = new Converter($this->currencies, $exchange);
         } elseif (!isset($this->converter)) {
-            throw new \Exception('You can only omit parameter $exchange if you already passed it on a previous call to method MoneyWrapper::convert');
+            throw new \BadMethodCallException('You can only omit parameter $exchange if you already passed it on a previous call to method MoneyWrapper::convert');
         }
 
         return $this->converter->convert($money, $currency);
