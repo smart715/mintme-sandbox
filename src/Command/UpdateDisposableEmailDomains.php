@@ -63,6 +63,8 @@ class UpdateDisposableEmailDomains extends Command
             }
         }
 
+        $this->em->flush();
+
         $this->logger->info('[blacklist] Domains from wildcard fetch start..');
 
         $list = $this->domainSynchronizer->fetchDomainsWildcard();

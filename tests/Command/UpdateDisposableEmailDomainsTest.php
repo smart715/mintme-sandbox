@@ -42,7 +42,7 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
-        $em->expects($this->once())->method('flush');
+        $em->expects($this->exactly(2))->method('flush');
 
         return $em;
     }
