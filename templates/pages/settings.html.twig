@@ -4,8 +4,8 @@
 
 {% block content %}
     <div id="settings" class="container">
-        <div class="row justify-content-center pt-5">
-            <div class="col-lg-4 col-md-6">
+        <div class="row pt-5 justify-content-center">
+            <div class="col-lg-4 col-md-6 pl-lg-0">
                 <div class="card">
                     <div class="card-header">Account settings</div>
                     <div class="card-body m-0">
@@ -23,7 +23,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 pt-2 pt-md-0">
+            <div class="col-lg-4 col-md-6 pt-2 pt-md-0 pr-lg-0">
                 <div class="card card-featured">
                     <div class="card-header">Two-Factor Authentication</div>
                     <div class="card-body m-0">
@@ -39,6 +39,24 @@
                                 Enable two-factor authentication
                             </a>
                         {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-3 justify-content-center">
+            <div class="col-xs-12 col-lg-8 p-0 m-3">
+                <div class="card">
+                    <div class="card-header text-uppercase">API</div>
+                    <div class="card-body m-0 pt-4">
+                        <div class="text-center">
+                            <div v-cloak>
+                                {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
+                                <api-keys class="mb-2" :api-keys="{{ keys | json_encode }}" v-cloak></api-keys>
+                            </div>
+                            <p>
+                                Check <a href="{{ path('nelmio_api_doc.swagger_ui') }}">documentation</a> for more information
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

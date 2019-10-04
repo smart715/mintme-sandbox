@@ -24,7 +24,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  * @Rest\Route("/api/markets")
  * @Security(expression="is_granted('prelaunch')")
  */
-class MarketAPIController extends APIController
+class MarketsController extends APIController
 {
     private const OFFSET = 50;
 

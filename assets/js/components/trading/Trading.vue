@@ -255,9 +255,9 @@ export default {
             const marketLastPrice = parseFloat(marketInfo.last);
             const changePercentage = this.getPercentage(marketLastPrice, parseFloat(marketInfo.open));
 
-            const marketCurrency = this.markets[marketName].crypto.symbol;
+            const marketCurrency = this.markets[marketName].base.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
-            const marketPrecision = this.markets[marketName].crypto.subunit;
+            const marketPrecision = this.markets[marketName].base.subunit;
             const supply = this.markets[marketName].supply;
             const monthVolume = this.markets[marketName].monthVolume;
 
@@ -319,8 +319,7 @@ export default {
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
                     this.markets[market].supply = 1e7;
-
-                    const cryptoSymbol = this.markets[market].crypto.symbol;
+                    const cryptoSymbol = this.markets[market].base.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const sanitizedMarket = this.getSanitizedMarket(
@@ -334,7 +333,7 @@ export default {
                         parseFloat(this.markets[market].dayVolume),
                         parseFloat(this.markets[market].monthVolume),
                         this.markets[market].supply,
-                        this.markets[market].crypto.subunit
+                        this.markets[market].base.subunit
                     );
 
                     if (marketOnTopIndex > -1) {
@@ -370,9 +369,9 @@ export default {
         },
         updateMonthVolume: function(requestId, kline) {
             const marketName = this.klineQueriesIdsTokensMap.get(requestId);
-            const marketCurrency = this.markets[marketName].crypto.symbol;
+            const marketCurrency = this.markets[marketName].base.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
-            const marketPrecision = this.markets[marketName].crypto.subunit;
+            const marketPrecision = this.markets[marketName].base.subunit;
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
             let monthVolume = kline.reduce(function(acc, curr) {

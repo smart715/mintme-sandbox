@@ -8,7 +8,9 @@ use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MarketStatusRepository")
@@ -26,10 +28,10 @@ class MarketStatus
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
+     * @SWG\Property(ref="#/definitions/Сurrency", property="base")
      * @var Crypto
      */
     private $crypto;
-
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
@@ -47,18 +49,21 @@ class MarketStatus
 
     /**
      * @ORM\Column(type="string")
+     * @SWG\Property(type="number")
      * @var string
      */
     private $openPrice;
 
     /**
      * @ORM\Column(type="string")
+     * @SWG\Property(type="number")
      * @var string
      */
     private $lastPrice;
 
     /**
      * @ORM\Column(type="string")
+     * @SWG\Property(type="number")
      * @var string
      */
     private $dayVolume;
@@ -81,7 +86,8 @@ class MarketStatus
 
     /**
      * @codeCoverageIgnore
-     * @Groups({"API"})
+     * @SerializedName("base")
+     * @Groups({"API", "dev"})
      */
     public function getCrypto(): Crypto
     {
@@ -97,7 +103,7 @@ class MarketStatus
     }
 
     /**
-     * @Groups({"API"})
+     * @Groups({"API", "dev"})
      */
     public function getOpenPrice(): Money
     {
@@ -105,7 +111,7 @@ class MarketStatus
     }
 
     /**
-     * @Groups({"API"})
+     * @Groups({"API", "dev"})
      */
     public function getLastPrice(): Money
     {
@@ -113,7 +119,7 @@ class MarketStatus
     }
 
     /**
-     * @Groups({"API"})
+     * @Groups({"API", "dev"})
      */
     public function getDayVolume(): Money
     {
@@ -142,7 +148,7 @@ class MarketStatus
     }
 
     /**
-     * @Groups({"API"})
+     * @Groups({"API", "dev"})
      */
     public function getQuote(): ?TradebleInterface
     {
