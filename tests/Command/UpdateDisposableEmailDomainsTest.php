@@ -29,7 +29,7 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
             $this->mockEm()
         ));
 
-        $command = $app->find('blacklist:synchronize-domains');
+        $command = $app->find('app:synchronize-domains');
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
@@ -51,12 +51,12 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
     {
         $manager = $this->createMock(BlacklistManagerInterface::class);
 
-        $manager->expects($this->once())->method('getList')->willReturn([
+        $manager->expects($this->exactly(2))->method('getList')->willReturn([
             $this->mockBlacklist('foo', 'bar'),
             $this->mockBlacklist('foo', 'qux'),
         ]);
 
-        $manager->expects($this->once())->method('addToBlacklist');
+        $manager->expects($this->exactly(2))->method('addToBlacklist');
 
         return $manager;
     }
@@ -65,7 +65,12 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
     {
         $syn = $this->createMock(DisposableEmailCommunicatorInterface::class);
 
-        $syn->expects($this->once())->method('fetchDomains')->willReturn([
+        $syn->expects($this->once())->method('fetchDomainsIndex')->willReturn([
+            $this->mockBlacklist('foo', 'bar'),
+            $this->mockBlacklist('foo', 'baz'),
+        ]);
+
+        $syn->expects($this->once())->method('fetchDomainsWildcard')->willReturn([
             $this->mockBlacklist('foo', 'bar'),
             $this->mockBlacklist('foo', 'baz'),
         ]);

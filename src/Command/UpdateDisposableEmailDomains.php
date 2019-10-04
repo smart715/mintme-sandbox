@@ -49,12 +49,25 @@ class UpdateDisposableEmailDomains extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->logger->info('[blacklist] Update job started..');
-        $this->logger->info('[blacklist] Domains fetch start..');
+        $this->logger->info('[blacklist] Domains from index fetch start..');
 
-        $list = $this->domainSynchronizer->fetchDomains();
+        $list = $this->domainSynchronizer->fetchDomainsIndex();
 
-        $this->logger->info('[blacklist] Domains fetched..');
-        $this->logger->info('value = '.$list[0].$list[100]);
+        $this->logger->info('[blacklist] Domains from index fetched..');
+
+        $existed = $this->blacklistManager->getList('email');
+
+        foreach ($list as $name) {
+            if (!$this->isValueExists($name, $existed)) {
+                $this->blacklistManager->addToBlacklist($name, 'email', false);
+            }
+        }
+
+        $this->logger->info('[blacklist] Domains from wildcard fetch start..');
+
+        $list = $this->domainSynchronizer->fetchDomainsWildcard();
+
+        $this->logger->info('[blacklist] Domains from wildcard fetched..');
 
         $existed = $this->blacklistManager->getList('email');
 
@@ -66,6 +79,7 @@ class UpdateDisposableEmailDomains extends Command
 
         $this->em->flush();
 
+        $output->writeln('Synchronization completed');
         $this->logger->info('[blacklist] Update job finished..');
     }
 

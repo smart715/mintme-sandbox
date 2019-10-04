@@ -19,7 +19,12 @@ class DisposableEmailCommunicatorTest extends TestCase
         $rpc->method('send')->willReturn(json_encode($data));
 
         $disposableEmail = new DisposableEmailCommunicator($rpc, 'test');
-        $domains = $disposableEmail->fetchDomains();
+        $domains = $disposableEmail->fetchDomainsIndex();
+
+        $this->assertEquals($domains[0], '0-180.com');
+        $this->assertEquals($domains[1], '0-420.com');
+
+        $domains = $disposableEmail->fetchDomainsWildcard();
 
         $this->assertEquals($domains[0], '0-180.com');
         $this->assertEquals($domains[1], '0-420.com');

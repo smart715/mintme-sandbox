@@ -4,5 +4,6 @@ namespace App\Communications;
 
 interface DisposableEmailCommunicatorInterface
 {
-    public function fetchDomains(): array;
+    public function fetchDomainsIndex(): array;
+    public function fetchDomainsWildcard(): array;
 }

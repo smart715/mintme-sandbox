@@ -10,18 +10,33 @@ class DisposableEmailCommunicator implements DisposableEmailCommunicatorInterfac
     private $rpc;
 
     /** @var string */
-    private $fileName;
+    private $fileNameIndex;
 
-    public function __construct(RestRpcInterface $rpc, string $fileName)
+    /** @var string */
+    private $fileNameWildcard;
+
+    public function __construct(RestRpcInterface $rpc, string $fileNameIndex, string $fileNameWildcard)
     {
         $this->rpc = $rpc;
-        $this->fileName = $fileName;
+        $this->fileNameIndex = $fileNameIndex;
+        $this->fileNameWildcard = $fileNameWildcard;
     }
 
-    public function fetchDomains(): array
+    public function fetchDomainsIndex(): array
     {
         $response = $this->rpc->send(
-            $this->fileName,
+            $this->fileNameIndex,
+            Request::METHOD_GET
+        );
+        $response = json_decode($response, true);
+
+        return $response;
+    }
+
+    public function fetchDomainsWildcard(): array
+    {
+        $response = $this->rpc->send(
+            $this->fileNameWildcard,
             Request::METHOD_GET
         );
         $response = json_decode($response, true);
