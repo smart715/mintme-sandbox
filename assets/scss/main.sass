@@ -54,10 +54,7 @@ body
   @include media-breakpoint-up(xl)
     content: "xl"
 
-input
-  color: white !important
-
-.text-white
+.text-white:not(input):not(.bg-danger)
   color: $dark-white !important
 
 .text-bold
@@ -157,7 +154,7 @@ a
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
     background-color: $card-input-color !important
-    color: $dark-white
+    color: $white
     border-radius: 0
     border: none
     height: calc(2.0rem + 2px)
@@ -204,7 +201,7 @@ a
       color: inherit
 
 .btn-primary
-  color: $dark-white
+  color: $white
   background-color: #007DC0
   border-color: #007DC0
 
@@ -564,7 +561,6 @@ meter
     outline-width: 0 !important
     outline-style: none !important
     box-shadow: 0 0 0 0 rgba(0,123,255,0) !important
-
 
 input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
   cursor: url('../img/input-cursor.png'), auto
