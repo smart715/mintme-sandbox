@@ -1,16 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}404 | mintMe{% endblock %}
+{% block title %}404 - Page not found{% endblock %}
 
 {% block bodyclass %}errorpage{% endblock %}
 
 {% block messageClass %}d-none{% endblock %}
 
 {% block content %}
-    <div class="container h-100 pt-5">
-        <div class="row">
-            <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
-                {{ error_message }}
+    <div class="container top-4 h-100">
+        <div class="row justify-content-center align-content-center text-center text-white h-100">
+            <div class="col-12 py-5">
+                <div class="error-code">404</div>
+                <div class="error-text text-uppercase">Page not found</div>
+                <p class="error-msg">
+                    The requested page couldn't be located. Checkout for any URL misspelling or
+                    <a href="{{ path('homepage') }}" class="backlink">return to the homepage</a>.
+                </p>
             </div>
         </div>
     </div>

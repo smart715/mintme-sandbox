@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\TwoFactorType;
@@ -23,6 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UserController extends AbstractController
 {
@@ -38,16 +40,21 @@ class UserController extends AbstractController
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var NormalizerInterface */
+    private $normalizer;
+
     public function __construct(
         UserManagerInterface $userManager,
         ProfileManagerInterface $profileManager,
         UserActionLogger $userActionLogger,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        NormalizerInterface $normalizer
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
+        $this->normalizer = $normalizer;
     }
 
     /**
@@ -56,9 +63,13 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
-        $passwordForm = $this->getPasswordForm($request);
+        $user = $this->getUser();
+        $keys = $user
+            ? $user->getApiKey()
+            : null;
+        $passwordForm = $this->getPasswordForm($request, $keys);
 
-        return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm));
+        return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys));
     }
 
     /**
@@ -193,7 +204,7 @@ class UserController extends AbstractController
         return $this->redirectToRoute('settings');
     }
 
-    private function getPasswordForm(Request $request): FormInterface
+    private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
     {
         $user = $this->getUser();
         $passwordForm = $this->createForm(ChangePasswordFormType::class, $user);
@@ -205,16 +216,19 @@ class UserController extends AbstractController
             $this->addFlash('success', 'Password was updated successfully');
             $this->eventDispatcher->dispatch(
                 FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
-                new FilterUserResponseEvent($user, $request, $this->renderSettings($passwordForm))
+                new FilterUserResponseEvent($user, $request, $this->renderSettings($passwordForm, $apiKey))
             );
         }
 
         return $passwordForm;
     }
 
-    private function renderSettings(FormInterface $passwordForm): Response
+    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey): Response
     {
         return $this->render('pages/settings.html.twig', [
+            'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
+                "groups" => ["API"],
+            ]),
             'passwordForm' => $passwordForm->createView(),
             'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
         ]);
