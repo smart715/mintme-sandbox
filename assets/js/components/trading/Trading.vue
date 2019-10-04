@@ -22,7 +22,7 @@
                     :sort-by="fields.lastPrice.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
-                    <template slot="HEAD_volume" slot-scope="data">
+                    <template :slot="`HEAD_${fields.volume.key}`" slot-scope="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -33,7 +33,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template slot="HEAD_monthVolume" slot-scope="data">
+                    <template :slot="`HEAD_${fields.monthVolume.key}`" slot-scope="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
