@@ -62,6 +62,7 @@
                         type="submit"
                         class="px-4"
                         variant="primary"
+                        :disabled="currentPeriodDisabled"
                         @click="saveReleasePeriod"
                     >
                         Save
