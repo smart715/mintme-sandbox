@@ -8,7 +8,7 @@
             <img src="{{ asset('build/images/logo.png') }}" height="55" alt="mintMe" {% if is_beta_version %} class="ml-3 ml-lg-0" {% endif %}>
         </b-navbar-brand>
         <b-navbar-toggle target="topnav_collapse" class="mt-2"></b-navbar-toggle>
-        <b-collapse is-nav="is-nav" id="topnav_collapse">
+        <b-collapse is-nav id="topnav_collapse">
             <b-navbar-nav class="ml-auto">
                 {% if prelaunch.isFinished() %}
                     <li class="search nav-item align-self-center py-3 py-lg-0 pr-0 pr-lg-3">
