@@ -11,8 +11,6 @@ class DBConnection
         try {
             $em->getConnection()->executeQuery('SELECT 1')->closeCursor();
         } catch (\Throwable $e) {
-//            var_dump($e->getMessage());
-//            exit;
             $em->getConnection()->close();
             $em->getConnection()->connect();
         }
