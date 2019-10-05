@@ -1,11 +1,11 @@
 import '../../js/main';
 import {mount} from '../testHelper';
 import Trading from '../../js/components/trading/Trading';
-import bPagination from 'bootstrap-vue/es/components/pagination/pagination';
-import bTable from 'bootstrap-vue/es/components/table/table';
+import {BPagination} from 'bootstrap-vue';
+import {BTable} from 'bootstrap-vue';
 
-Vue.component('b-pagination', bPagination);
-Vue.component('b-table', bTable);
+Vue.component('b-pagination', BPagination);
+Vue.component('b-table', BTable);
 
 describe('Trading', () => {
     describe('data field', () => {
