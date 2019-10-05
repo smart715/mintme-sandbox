@@ -2,6 +2,7 @@
 
 namespace App\Consumers;
 
+use App\Consumers\Helpers\DBConnection;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\Model\ContractUpdateCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +34,8 @@ class ContractUpdateConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
+        DBConnection::reconnectIfDisconnected($this->em);
+
         $this->logger->info('[contract-update-consumer] Received new message: '.json_encode($msg->body));
 
         /** @var string|null $body */
@@ -52,10 +55,6 @@ class ContractUpdateConsumer implements ConsumerInterface
         }
 
         try {
-            if (!$this->em->getConnection()->isConnected()) {
-                $this->em->getConnection()->connect();
-            }
-
             $token = $this->tokenManager->findByAddress($clbResult->getTokenAddress());
 
             if (!$token) {

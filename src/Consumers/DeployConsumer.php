@@ -2,6 +2,7 @@
 
 namespace App\Consumers;
 
+use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\TokenManagerInterface;
@@ -42,6 +43,8 @@ class DeployConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
+        DBConnection::reconnectIfDisconnected($this->em);
+
         $this->logger->info('[deploy-consumer] Received new message: '.json_encode($msg->body));
 
         /** @var string|null $body */
@@ -61,10 +64,6 @@ class DeployConsumer implements ConsumerInterface
         }
 
         try {
-            if (!$this->em->getConnection()->isConnected()) {
-                $this->em->getConnection()->connect();
-            }
-
             $token = $this->tokenManager->findByName($clbResult->getTokenName());
 
             if (!$token) {
