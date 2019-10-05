@@ -43,7 +43,7 @@ export default {
             tableData: null,
             currentPage: 1,
             fields: [
-                {key:'date', label: 'Date', sortable: true},
+                {key: 'date', label: 'Date', sortable: true},
                 {key: 'side', label: 'Type', sortable: true},
                 {
                     key: 'name',
