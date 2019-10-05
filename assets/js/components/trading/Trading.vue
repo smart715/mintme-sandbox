@@ -19,10 +19,10 @@
                 <b-table
                     :items="tokens"
                     :fields="fields"
-                    :sort-by="fields.lastPrice.key"
+                    sort-by="lastPrice"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
-                    <template slot="HEAD_volume" slot-scope="data">
+                    <template v-slot:head(volume)="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -33,7 +33,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template slot="HEAD_monthVolume" slot-scope="data">
+                    <template v-slot:head(monthVolume)="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -44,7 +44,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template slot="pair" slot-scope="row">
+                    <template v-slot:cell(pair)="row">
                         <a class="d-block text-truncate truncate-responsive text-white"
                             v-b-tooltip:title="row.value"
                             :href="row.item.tokenUrl">
@@ -95,32 +95,36 @@ export default {
             totalRows: 25,
             loading: false,
             userTokensEnabled: false,
-            fields: {
-                pair: {
+            fields: [
+                {
+                    key: 'pair',
                     label: 'Pair',
                     sortable: true,
                 },
-                change: {
+                {
+                    key: 'change',
                     label: 'Change',
                     sortable: true,
                 },
-                lastPrice: {
-                    label: 'Last Price',
+                {
                     key: 'lastPrice',
+                    label: 'Last Price',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                volume: {
+                {
+                    key: 'volume',
                     label: '24H Volume',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                monthVolume: {
+                {
+                    key: 'monthVolume',
                     label: '30d Volume',
                     sortable: true,
                     formatter: formatMoney,
                 },
-            },
+            ],
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
