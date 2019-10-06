@@ -297,11 +297,6 @@ class PaymentConsumerTest extends TestCase
 
     private function mockEventDispatcher(): EventDispatcherInterface
     {
-        $ed = $this->createMock(EventDispatcherInterface::class);
-        $ed->method('dispatch')->willReturnCallback(function ($eventName, $event) {
-            return $event;
-        });
-
-        return $ed;
+        return $this->createMock(EventDispatcherInterface::class);
     }
 }

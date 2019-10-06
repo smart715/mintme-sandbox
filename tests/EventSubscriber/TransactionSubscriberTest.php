@@ -8,12 +8,12 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Events\TransactionCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
-use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class TransactionSubscriberTest extends TestCase
 {
@@ -82,8 +82,8 @@ class TransactionSubscriberTest extends TestCase
         return $event;
     }
 
-    private function mockLogger(): UserActionLogger
+    private function mockLogger(): LoggerInterface
     {
-        return $this->createMock(UserActionLogger::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

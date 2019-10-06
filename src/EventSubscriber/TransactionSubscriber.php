@@ -10,6 +10,7 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TransactionSubscriber implements EventSubscriberInterface
@@ -20,13 +21,13 @@ class TransactionSubscriber implements EventSubscriberInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var UserActionLogger */
+    /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
         MailerInterface $mailer,
         MoneyWrapperInterface $moneyWrapper,
-        UserActionLogger $logger
+        LoggerInterface $logger
     ) {
         $this->mailer = $mailer;
         $this->moneyWrapper = $moneyWrapper;
