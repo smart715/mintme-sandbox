@@ -207,6 +207,16 @@ services:
             - { name: sonata.admin, manager_type: orm, label: KB Subcategories }
         public: true
 
+    admin.main.documents:
+        class: App\Admin\MainDocumentsAdmin
+        arguments:
+            - null
+            - App\Entity\MainDocument
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Main Documents }
+        public: true
+
     # Required by rabbitmq bundle
     market_consumer:
         class: 'App\Consumers\MarketConsumer'
