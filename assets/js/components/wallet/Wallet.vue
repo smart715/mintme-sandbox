@@ -62,7 +62,7 @@
                 <template slot="name" slot-scope="data">
                     <a :href="generatePairUrl(data.item)" class="text-white">
                         <span v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
-                            {{ data.item.name | truncate(15) }}
+                            {{ data.item.name | truncate(100) }}
                         </span>
                     </a>
                 </template>
