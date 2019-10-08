@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Media\Gallery;
 use App\Entity\Media\Media;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -61,7 +62,7 @@ class MainDocument
         return $this->document ?? '';
     }
 
-    public function setDocument(?Crypto $document): void
+    public function setDocument(?Media $document): void
     {
         $this->document = $document;
     }
