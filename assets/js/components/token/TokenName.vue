@@ -17,7 +17,7 @@
             />
         </template>
         <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
-            {{ currentName | truncate(7) }}
+            {{ currentName | truncate(25) }}
         </span>
     </div>
 </template>
