@@ -285,6 +285,12 @@ services:
 
     App\Mailer\MailerInterface: "@app.mailer"
 
+    app.instant.mailer:
+        class: App\Mailer\Mailer
+        arguments:
+            $mail: "%env(MAILER_USER)%"
+            $mailer: '@swiftmailer.mailer.instant_mailer'
+
     App\Exchange\Balance\Factory\BalanceViewFactory:
         arguments:
             $tokenSubunit: "%token_precision%"
@@ -381,3 +387,7 @@ services:
     two_factor.auth_require_handler:
         class: App\Security\TwoFactorRequireHandler
         public: true
+
+    App\EventSubscriber\TransactionSubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
