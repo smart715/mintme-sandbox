@@ -62,7 +62,7 @@ class MainDocument
         return $this->document ?? '';
     }
 
-    public function setDocument(?Media $document): void
+    public function setDocument(Media $document): void
     {
         $this->document = $document;
     }

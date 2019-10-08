@@ -25,6 +25,7 @@ final class Version20191007191525 extends AbstractMigration
         $this->addSql('CREATE TABLE main_documents (id INT AUTO_INCREMENT NOT NULL, media_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, INDEX IDX_8206D52AEA9FDD75 (media_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
         $this->addSql('ALTER TABLE main_documents ADD CONSTRAINT FK_8206D52AEA9FDD75 FOREIGN KEY (media_id) REFERENCES media__media (id)');
         $this->addSql('ALTER TABLE market_status CHANGE month_volume month_volume VARCHAR(255) NOT NULL');
+        $this->addSql('INSERT INTO `main_documents` VALUES (1,44,\'MintMe Press Kit\');');
     }
 
     public function down(Schema $schema) : void

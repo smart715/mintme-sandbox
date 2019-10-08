@@ -81,3 +81,6 @@ parameters:
 
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true
+
+    # Path for all main documents
+    docs_path: '/docs'
