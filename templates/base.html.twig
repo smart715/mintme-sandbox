@@ -7,6 +7,9 @@
         {% endblock %}
         {% block head %}{% endblock %}
         {% include 'head.html.twig' %}
+        <title>
+            {% block title %}mintMe{% endblock %}
+        </title>
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}
