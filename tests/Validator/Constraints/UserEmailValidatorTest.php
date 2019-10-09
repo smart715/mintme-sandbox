@@ -32,12 +32,13 @@ class UserEmailValidatorTest extends TestCase
         $constraint->message = 'test';
 
         $token = $this->createMock(TokenInterface::class);
+        $token->method('getUser')->willReturn($user);
 
         $storage = $this->createMock(TokenStorageInterface::class);
         $storage->method('getToken')->willReturn($token);
 
+
         $validator = new UserEmailValidator($um, $storage);
-        $validator->user = $user;
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);
