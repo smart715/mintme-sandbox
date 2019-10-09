@@ -10,5 +10,5 @@ use Symfony\Component\Validator\Constraint;
 class UserEmail extends Constraint
 {
     /** @var string */
-    private $message = "Email already in use";
+    public $message = "Email already in use";
 }
