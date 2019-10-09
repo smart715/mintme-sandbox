@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use App\Entity\Media\Gallery;
 use App\Entity\Media\Media;
+use App\Validator\Constraints\MainDocument as MainDocs;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
@@ -29,7 +30,9 @@ class MainDocument
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Media\Media")
-     * @ORM\JoinColumn(name="media_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="media_id", referencedColumnName="id")
+     * @Assert\NotBlank
+     * @MainDocs()
      * @var Media
      */
     private $document;

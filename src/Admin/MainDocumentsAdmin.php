@@ -6,13 +6,15 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Form\Type\ModelListType;
+use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class MainDocumentsAdmin extends AbstractAdmin
 {
+    public const PROVIDER_NAME = 'app.media.provider.document';
+
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
 
@@ -26,8 +28,18 @@ class MainDocumentsAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $form): void
     {
         $form
-            ->add('name', null, ['disabled'  => true,])
-            ->add('document', ModelListType::class);
+            ->add('name', null, ['disabled' => true,])
+            ->add(
+                'document',
+                ModelType::class,
+                [],
+                ['link_parameters' =>
+                    [
+                        'provider' => self::PROVIDER_NAME,
+                        'filter' => ['providerName' => ['value' => self::PROVIDER_NAME]],
+                    ],
+                ]
+            );
     }
 
     protected function configureListFields(ListMapper $listMapper): void
