@@ -18,8 +18,6 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
     {
         $this->markTestSkipped('Confliction class exists');
 
-        return;
-
         $kernel = self::bootKernel();
         $app = new Application($kernel);
         $app->add(new UpdateDisposableEmailDomains(
