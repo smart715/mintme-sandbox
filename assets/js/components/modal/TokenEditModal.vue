@@ -27,7 +27,7 @@
                         </faq-item>
                     </div>
                     <div
-                        v-if="!minDestinationLocked"
+                        v-if="!mintDestinationLocked"
                         class="row faq-block mx-0 border-bottom"
                         ref="withdrawal-address"
                     >
@@ -134,7 +134,7 @@ export default {
         isOwner: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
-        minDestinationLocked: Boolean,
+        mintDestinationLocked: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,

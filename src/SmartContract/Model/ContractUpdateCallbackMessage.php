@@ -9,18 +9,18 @@ class ContractUpdateCallbackMessage
     private $tokenAddress;
 
     /** @var string */
-    private $minDestination;
+    private $mintDestination;
 
     /** @var bool */
     private $lock;
 
     private function __construct(
         string $tokenAddress,
-        string $minDestination,
+        string $mintDestination,
         bool $lock
     ) {
         $this->tokenAddress = $tokenAddress;
-        $this->minDestination = $minDestination;
+        $this->mintDestination = $mintDestination;
         $this->lock = $lock;
     }
 
@@ -29,9 +29,9 @@ class ContractUpdateCallbackMessage
         return $this->tokenAddress;
     }
 
-    public function getMinDestination(): string
+    public function getMintDestination(): string
     {
-        return $this->minDestination;
+        return $this->mintDestination;
     }
 
     public function getLock(): bool
@@ -44,7 +44,7 @@ class ContractUpdateCallbackMessage
     {
         return new self(
             $data['tokenAddress'],
-            $data['minDestination'],
+            $data['mintDestination'],
             $data['lock']
         );
     }
@@ -53,7 +53,7 @@ class ContractUpdateCallbackMessage
     {
         return [
             'tokenAddress' => $this->getTokenAddress(),
-            'minDestination' => $this->getMinDestination(),
+            'mintDestination' => $this->getMintDestination(),
             'lock' => $this->getLock(),
         ];
     }

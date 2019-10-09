@@ -103,7 +103,7 @@ class ContractHandlerTest extends TestCase
         $handler->deploy($this->mockToken(true));
     }
 
-    public function testUpdateMinDestination(): void
+    public function testUpdateMintDestination(): void
     {
         $rpc = $this->mockRpc();
         $rpc
@@ -125,14 +125,14 @@ class ContractHandlerTest extends TestCase
             $this->mockTokenManager()
         );
 
-        $handler->updateMinDestination(
+        $handler->updateMintDestination(
             $this->mockToken(true, '0x123', false, 'deployed'),
             '0x456',
             false
         );
     }
 
-    public function testUpdateMinDestinationIfNotDeployed(): void
+    public function testUpdateMintDestinationIfNotDeployed(): void
     {
         $rpc = $this->mockRpc();
         $rpc
@@ -149,14 +149,14 @@ class ContractHandlerTest extends TestCase
 
         $this->expectException(\Throwable::class);
 
-        $handler->updateMinDestination(
+        $handler->updateMintDestination(
             $this->mockToken(true, '0x123', true, 'not-deployed'),
             '0x456',
             false
         );
     }
 
-    public function testUpdateMinDestinationWithLocked(): void
+    public function testUpdateMintDestinationWithLocked(): void
     {
         $rpc = $this->mockRpc();
         $rpc
@@ -173,14 +173,14 @@ class ContractHandlerTest extends TestCase
 
         $this->expectException(\Throwable::class);
 
-        $handler->updateMinDestination(
+        $handler->updateMintDestination(
             $this->mockToken(true, '0x123', true, 'deployed'),
             '0x456',
             false
         );
     }
 
-    public function testUpdateMinDestinationWithResponseError(): void
+    public function testUpdateMintDestinationWithResponseError(): void
     {
         $rpc = $this->mockRpc();
         $rpc
@@ -205,7 +205,7 @@ class ContractHandlerTest extends TestCase
 
         $this->expectException(\Throwable::class);
 
-        $handler->updateMinDestination($this->mockToken(true, '0x123', false), '0x456', false);
+        $handler->updateMintDestination($this->mockToken(true, '0x123', false), '0x456', false);
     }
 
     public function testWithdraw(): void
@@ -476,7 +476,7 @@ class ContractHandlerTest extends TestCase
         $token = $this->createMock(Token::class);
         $token->method('getName')->willReturn('foo');
         $token->method('getAddress')->willReturn($address);
-        $token->method('isMinDestinationLocked')->willReturn($minLocked);
+        $token->method('isMintDestinationLocked')->willReturn($minLocked);
         $token->method('deploymentStatus')->willReturn($status);
 
         if (!$hasReleasePeriod) {

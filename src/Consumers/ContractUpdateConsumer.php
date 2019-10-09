@@ -65,10 +65,10 @@ class ContractUpdateConsumer implements ConsumerInterface
                 return true;
             }
 
-            $token->setMinDestination($clbResult->getMinDestination());
+            $token->setMintDestination($clbResult->getMintDestination());
 
             if ($clbResult->getLock()) {
-                $token->lockMinDestination();
+                $token->lockMintDestination();
             }
 
             $this->em->persist($token);

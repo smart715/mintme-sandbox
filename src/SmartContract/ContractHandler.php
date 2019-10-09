@@ -93,18 +93,18 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function updateMinDestination(Token $token, string $address, bool $lock): void
+    public function updateMintDestination(Token $token, string $address, bool $lock): void
     {
         if (Token::DEPLOYED !== $token->deploymentStatus()) {
             $this->logger->error(
-                "Failed to Update minDestination for '{$token->getName()}' because it is not deployed"
+                "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
             );
 
             throw new Exception('Token dose not deployed yet');
         }
 
-        if ($token->isMinDestinationLocked()) {
-            $this->logger->error("Failed to Update minDestination for '{$token->getName()}' because It is locked");
+        if ($token->isMintDestinationLocked()) {
+            $this->logger->error("Failed to Update mintDestination for '{$token->getName()}' because It is locked");
 
             throw new Exception('Token dose not has release period');
         }
@@ -119,7 +119,7 @@ class ContractHandler implements ContractHandlerInterface
         );
 
         if ($response->hasError()) {
-            $this->logger->error("Failed to update minDestination for '{$token->getName()}'");
+            $this->logger->error("Failed to update mintDestination for '{$token->getName()}'");
 
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
@@ -142,7 +142,7 @@ class ContractHandler implements ContractHandlerInterface
     public function withdraw(User $user, Money $balance, string $address, Token $token): void
     {
         if (Token::DEPLOYED !== $token->deploymentStatus()) {
-            $this->logger->error("Failed to Update minDestination for '{$token->getName()}' because It is locked");
+            $this->logger->error("Failed to Update mintDestination for '{$token->getName()}' because It is locked");
 
             throw new Exception('Token not deployed yet');
         }

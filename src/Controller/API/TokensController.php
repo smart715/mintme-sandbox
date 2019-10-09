@@ -566,7 +566,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        if ($token->isMinDestinationLocked()) {
+        if ($token->isMintDestinationLocked()) {
             throw new ApiBadRequestException('Can\'t change the address');
         }
 
@@ -575,8 +575,8 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
-            $contractHandler->updateMinDestination($token, $request->get('address'), (bool) $request->get('lock'));
-            $token->setUpdatingMinDestination();
+            $contractHandler->updateMintDestination($token, $request->get('address'), (bool) $request->get('lock'));
+            $token->setUpdatingMintDestination();
 
             $this->em->persist($token);
             $this->em->flush();
@@ -584,7 +584,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
-        $this->userActionLogger->info('Update token minDestination', ['name' => $name]);
+        $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
     }

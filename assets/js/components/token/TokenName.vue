@@ -9,7 +9,7 @@
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
-                :min-destination-locked="minDestinationLocked"
+                :mint-destination-locked="mintDestinationLocked"
                 :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"
@@ -53,7 +53,7 @@ export default {
         hasReleasePeriodProp: Boolean,
         identifier: String,
         name: String,
-        minDestinationLocked: Boolean,
+        mintDestinationLocked: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,

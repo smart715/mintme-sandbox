@@ -68,13 +68,13 @@ class Token implements TradebleInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
      */
-    protected $minDestination;
+    protected $mintDestination;
 
     /**
      * @ORM\Column(type="boolean", options={"default": 0})
      * @var bool
      */
-    protected $minDestinationLocked = false;
+    protected $mintDestinationLocked = false;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -224,9 +224,9 @@ class Token implements TradebleInterface
         return $this;
     }
 
-    public function setUpdatingMinDestination(): self
+    public function setUpdatingMintDestination(): self
     {
-        $this->minDestination = '0x';
+        $this->mintDestination = '0x';
 
         return $this;
     }
@@ -250,26 +250,26 @@ class Token implements TradebleInterface
         return $this->deployCost;
     }
 
-    public function getMinDestination(): ?string
+    public function getMintDestination(): ?string
     {
-        return $this->minDestination;
+        return $this->mintDestination;
     }
 
-    public function setMinDestination(string $minDestination): self
+    public function setMintDestination(string $mintDestination): self
     {
-        $this->minDestination = $minDestination;
+        $this->mintDestination = $mintDestination;
 
         return $this;
     }
 
-    public function isMinDestinationLocked(): bool
+    public function isMintDestinationLocked(): bool
     {
-        return $this->minDestinationLocked;
+        return $this->mintDestinationLocked;
     }
 
-    public function lockMinDestination(): self
+    public function lockMintDestination(): self
     {
-        $this->minDestinationLocked = true;
+        $this->mintDestinationLocked = true;
 
         return $this;
     }

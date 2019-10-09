@@ -6,12 +6,12 @@ describe('TokenEditModal', () => {
         const wrapper = shallowMount(TokenEditModal, {
             propsData: {
                 currentName: 'foobar',
-                minDestinationLockedProp: false,
+                mintDestinationLockedProp: false,
             },
         });
 
         expect(wrapper.find({ref: 'withdrawal-address'}).exists()).to.be.true;
-        wrapper.vm.minDestinationLocked = true;
+        wrapper.vm.mintDestinationLocked = true;
         expect(wrapper.find({ref: 'withdrawal-address'}).exists()).to.be.false;
     });
 });
