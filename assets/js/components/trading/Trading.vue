@@ -284,9 +284,9 @@ export default {
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
-                lastPriceUSD: toMoney(Decimal.mul(lastPrice, this.conversionRates[currency]), 2) + ' ' + 'USD',
-                volumeUSD: toMoney(Decimal.mul(volume, this.conversionRates[currency]), 2) + ' ' + 'USD',
-                monthVolumeUSD: toMoney(Decimal.mul(monthVolume, this.conversionRates[currency]), 2) + ' ' + 'USD',
+                lastPriceUSD: this.toUSD(lastPrice, currency),
+                volumeUSD: this.toUSD(volume, currency),
+                monthVolumeUSD: this.toUSD(monthVolume, currency),
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -411,6 +411,9 @@ export default {
                     reject();
                 });
             });
+        },
+        toUSD: function(amount, currency) {
+            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), 2) + ' ' + 'USD';
         },
     },
 };

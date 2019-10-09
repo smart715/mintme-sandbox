@@ -14,4 +14,9 @@ new Vue({
     Pagination,
   },
   store,
+  methods: {
+    toggleUsd: function() {
+      this.showUsd = !this.showUsd;
+    },
+  },
 });
