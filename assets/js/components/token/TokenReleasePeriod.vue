@@ -85,7 +85,7 @@ import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 
-const defaultValue = '-';
+const DEFAULT_VALUE = '-';
 
 export default {
     name: 'TokenReleasePeriod',
@@ -99,7 +99,7 @@ export default {
         return {
             currentPeriod: this.period,
             released: 10,
-            releasePeriod: defaultValue,
+            releasePeriod: DEFAULT_VALUE,
             showTwoFactorModal: false,
         };
     },
@@ -110,7 +110,7 @@ export default {
     },
     computed: {
         releasedDisabled: function() {
-            return (this.releasePeriod !== defaultValue && this.isTokenExchanged) || !this.isTokenNotDeployed;
+            return (this.releasePeriod !== DEFAULT_VALUE && this.isTokenExchanged) || !this.isTokenNotDeployed;
         },
         currentPeriodDisabled: function() {
             return !this.isTokenNotDeployed;

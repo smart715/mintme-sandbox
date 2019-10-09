@@ -57,6 +57,7 @@ export default {
     data() {
         return {
             minLength: 4,
+            maxLength: 60,
             newName: this.currentName,
             showTwoFactorModal: false,
             submitting: false,
@@ -175,7 +176,7 @@ export default {
                 validLastChars: tokenValidLastChars,
                 noSpaceBetweenDashes: tokenNoSpaceBetweenDashes,
                 minLength: minLength(this.minLength),
-                maxLength: maxLength(60),
+                maxLength: maxLength(this.maxLength),
             },
         };
     },
