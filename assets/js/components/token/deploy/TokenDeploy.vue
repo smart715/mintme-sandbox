@@ -11,6 +11,9 @@
                         you and others will be able to withdraw tokens from mintme to your Webchain wallet.
                     </p>
                     <p class="bg-danger">
+                        WEB spent on mintMe, will be inaccessible by us (frozen) for 5 years. So you lower WEB circulating supply with each purchase and increase probability of WEB price going up.
+                    </p>
+                    <p class="bg-danger">
                         This process is irreversible, once confirm payment there is no going back.
                     </p>
                     <p class="mt-5">
