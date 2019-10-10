@@ -4,6 +4,14 @@ header::before
 .swagger-ui
   color: $dark-white
 
+  .response-col_description
+    .markdown
+      color: $dark-white !important
+
+  .opblock-body
+    pre span
+      color: $dark-white !important
+
   input::placeholder
     color: $dark-white
 
@@ -19,7 +27,7 @@ header::before
 
   .wrapper
     .models
-      background: $dark-white
+      background: white
 
     @include media-breakpoint-down('sm')
       margin: 0!important
