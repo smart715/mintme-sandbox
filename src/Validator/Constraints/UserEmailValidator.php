@@ -10,13 +10,15 @@ use Symfony\Component\Validator\ConstraintValidator;
 class UserEmailValidator extends ConstraintValidator
 {
     /** @var mixed */
-    public $user;
+    private $user;
 
     /** @var UserManagerInterface */
     private $userManager;
 
-    public function __construct(UserManagerInterface $userManager, TokenStorageInterface $token)
-    {
+    public function __construct(
+        UserManagerInterface $userManager,
+        TokenStorageInterface $token
+    ) {
         $this->user = $token->getToken()->getUser();
         $this->userManager = $userManager;
     }

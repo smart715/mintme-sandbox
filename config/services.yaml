@@ -41,6 +41,12 @@ services:
             $headers:
                 Accept: application/json
 
+    disposable_email.json_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%origin_to_disposable_email_domains%'
+            $timeoutSeconds: '%disposable_domains_timeout_seconds%'
+
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
@@ -138,6 +144,12 @@ services:
             - { name: monolog.logger, channel: cron }
 
     App\Command\UpdatePendingWithdrawals:
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: cron }
+
+    App\Command\UpdateDisposableEmailDomains:
         arguments:
             $logger: '@logger'
         tags:
@@ -381,3 +393,9 @@ services:
     two_factor.auth_require_handler:
         class: App\Security\TwoFactorRequireHandler
         public: true
+
+    App\Communications\DisposableEmailCommunicator:
+        arguments:
+            $rpc: '@disposable_email.json_rpc'
+            $fileNameIndex: "%name_of_files_for_disposable_domains_index%"
+            $fileNameWildcard: "%name_of_files_for_disposable_domains_wildcard%"
