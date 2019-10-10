@@ -14,6 +14,8 @@ class BlacklistManager implements BlacklistManagerInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    private const EMAIL_TYPE = "email";
+
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
@@ -22,7 +24,18 @@ class BlacklistManager implements BlacklistManagerInterface
 
     public function isBlacklisted(string $value, string $type, bool $sensetive = true): bool
     {
+        if (self::EMAIL_TYPE === $type) {
+            return $this->isBlackListedEmail($value, $sensetive);
+        }
+
         return $this->repository->matchValue($value, $type, $sensetive);
+    }
+
+    private function isBlackListedEmail(string $email, bool $sensetive): bool
+    {
+        $domain = substr($email, strrpos($email, '@') + 1);
+
+        return $this->repository->matchValue($domain, self::EMAIL_TYPE, $sensetive);
     }
 
     public function addToBlacklist(string $value, string $type, bool $flush = true): void
