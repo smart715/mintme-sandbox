@@ -86,11 +86,11 @@
                                     identifier="{{ market.quote.identifier }}"
                                     name="{{ market.quote.name }}"
                                     :precision="{{ precision }}"
-                                    :min-destination-locked="{{ token.minDestinationLocked ? 'true' : 'false' }}"
+                                    :mint-destination-locked="{{ token.mintDestinationLocked ? 'true' : 'false' }}"
                                     :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
                                     :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                     websocket-url="{{ global_websocket_url }}"
-                                    withdrawal-address="{{ token.minDestination }}"
+                                    withdrawal-address="{{ token.mintDestination }}"
                                     v-on:token-deploy-pending="setTokenPending"
                                 />
                             </div>

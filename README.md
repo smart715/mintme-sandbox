@@ -58,7 +58,7 @@ to listen for token deploy
 ```
 php bin/console rabbitmq:consumer contract_update &
 ```
-to listen for updating minDestination
+to listen for updating mintDestination
 
 Development
 -----------
