@@ -81,3 +81,9 @@ parameters:
 
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true
+
+    origin_to_disposable_email_domains: 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/'
+    name_of_files_for_disposable_domains_index: 'index.json'
+    name_of_files_for_disposable_domains_wildcard: 'wildcard.json'
+
+    disposable_domains_timeout_seconds: 30
