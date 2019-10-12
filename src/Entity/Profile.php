@@ -115,7 +115,7 @@ class Profile
     private $page_url;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      * @ZipCode(getter="getCountry", strict=false, ignoreEmpty=true)
      * @var string|null
      */
