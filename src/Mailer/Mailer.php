@@ -124,4 +124,14 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
         $this->mailer->send($msg);
     }
+
+    public function checkConnection(): void
+    {
+        $transport = $this->mailer->getTransport();
+
+        if (!$transport->ping()) {
+            $transport->stop();
+            $transport->start();
+        }
+    }
 }

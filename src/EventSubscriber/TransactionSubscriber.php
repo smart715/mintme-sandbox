@@ -56,6 +56,7 @@ class TransactionSubscriber implements EventSubscriberInterface
         );
 
         try {
+            $this->mailer->checkConnection();
             $this->mailer->sendTransactionCompletedMail($tradable, $user, $amount, $event::TYPE);
             $this->logger->info("Sent ".$event::TYPE." completed e-mail to user ".$user->getEmail());
         } catch (\Throwable $e) {
