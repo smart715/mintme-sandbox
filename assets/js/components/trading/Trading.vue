@@ -363,7 +363,7 @@ export default {
                 return Decimal.add(acc, curr[6]);
             }, 0);
 
-            let monthVolumeUSD = toMoney(Decimal.mul(monthVolume, this.conversionRates[marketCurrency]), 2) + ' ' + 'USD';
+            let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
             monthVolume = toMoney(monthVolume, marketPrecision) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
