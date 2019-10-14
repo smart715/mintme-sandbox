@@ -1,8 +1,7 @@
 import '../../js/main';
 import {mount} from '../testHelper';
 import Trading from '../../js/components/trading/Trading';
-import {BPagination} from 'bootstrap-vue';
-import {BTable} from 'bootstrap-vue';
+import {BPagination, BTable} from 'bootstrap-vue';
 
 Vue.component('b-pagination', BPagination);
 Vue.component('b-table', BTable);
