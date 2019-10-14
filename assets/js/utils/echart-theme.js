@@ -1,4 +1,7 @@
 /* eslint-disable valid-jsdoc */
+
+const DARK_WHITE = '#e1e1e1';
+
 /**
  * @param {Number} precision
  * @return Object
@@ -17,7 +20,7 @@ export default function(precision) {
         legend: {
             show: false,
             textStyle: {
-                color: '#fff',
+                color: DARK_WHITE,
             },
             top: 0,
         },
@@ -45,7 +48,7 @@ export default function(precision) {
                 },
             },
             textStyle: {
-                color: '#e1e1e1',
+                color: DARK_WHITE,
             },
         },
 
@@ -103,7 +106,7 @@ export default function(precision) {
                 margin: 8,
 
                 textStyle: {
-                    color: '#e1e1e1',
+                    color: DARK_WHITE,
                 },
             },
             splitLine: {
@@ -143,7 +146,7 @@ export default function(precision) {
                 margin: 8,
                 padding: [5, 0, 0, 0],
                 textStyle: {
-                    color: '#e1e1e1',
+                    color: DARK_WHITE,
                 },
             },
             splitLine: {
