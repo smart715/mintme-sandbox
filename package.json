@@ -35,7 +35,6 @@
     "markitup": "^3.0.0-0",
     "moment": "^2.22.2",
     "phantomjs-prebuilt": "^2.1.16",
-    "swagger-vue-generator": "^1.0.6",
     "url-parse": "^1.4.4",
     "v-autocomplete": "^1.8.2",
     "v-charts": "^1.19.0",
