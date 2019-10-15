@@ -20,5 +20,9 @@ require.config({
   deps: allTestFiles,
 
   // we have to kickoff jasmine, as it is asynchronous
-  callback: window.__karma__.start
+  callback: window.__karma__.start,
+
+  // The number of seconds to wait before giving up on loading a script.
+  // Setting it to 0 disables the timeout. The default is 7 seconds.
+  waitSeconds: 0,
 });
