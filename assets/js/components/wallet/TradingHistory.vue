@@ -51,7 +51,7 @@ export default {
                     formatter: (name) => {
                         return {
                             full: name,
-                            truncate: this.truncateFunc(name, 15),
+                            truncate: this.truncateFunc(name, 18),
                         };
                     },
                 },
