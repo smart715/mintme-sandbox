@@ -15,8 +15,8 @@ new Vue({
   },
   store,
   methods: {
-    toggleUsd: function() {
-      this.showUsd = !this.showUsd;
+    toggleUsd: function(show) {
+      this.showUsd = show;
     },
   },
 });
