@@ -87,3 +87,6 @@ parameters:
     name_of_files_for_disposable_domains_wildcard: 'wildcard.json'
 
     disposable_domains_timeout_seconds: 30
+
+    # Path for all main documents
+    docs_path: '/docs'
