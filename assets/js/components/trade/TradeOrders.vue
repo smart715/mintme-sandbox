@@ -142,7 +142,7 @@ export default {
                 };
             });
         },
-        truncateFullName: function(profile, owner) {
+        truncateFullName: function(profile) {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
@@ -151,7 +151,7 @@ export default {
                     ? first.slice(0, 9) + '..'
                     : first + ' ' +second.slice(0, 9 - firstLength) + '..';
             } else {
-                return first + '\n' + second;
+                return first + ' ' + second;
             }
         },
         groupByPrice: function(orders) {
