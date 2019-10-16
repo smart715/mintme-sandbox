@@ -3,6 +3,7 @@
 namespace App\Admin;
 
 use App\Form\DataTransformer\MediaTransformer;
+use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\MediaBundle\Admin\BaseMediaAdmin;
@@ -47,5 +48,11 @@ class MediaAdmin extends BaseMediaAdmin
                 ],
             ]);
         }
+    }
+
+    protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
+    {
+        $datagridMapper
+            ->add('providerName', null);
     }
 }
