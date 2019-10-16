@@ -7,13 +7,14 @@ sonata_media:
 
     db_driver:       doctrine_orm
     force_disable_category: true
-  
+
     default_context: default
     contexts:
         default:
             download:
                 mode: http # X-Sendfile | http
             providers:
+                - app.media.provider.document
                 - sonata.media.provider.dailymotion
                 - sonata.media.provider.youtube
                 - sonata.media.provider.image
@@ -67,7 +68,7 @@ sonata_media:
         local:
             directory:  '%kernel.root_dir%/../public/uploads/media'
             create:     true
-        
+
     providers:
         # ...
         file:
