@@ -128,7 +128,7 @@ export default {
                     amount: toMoney(order.amount, this.market.quote.subunit),
                     sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
                     trader: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? this.truncateFullName(order.maker.profile, order.owner)
+                        ? this.truncateFullName(order.maker.profile)
                         : 'Anonymous',
                     traderFullName: order.maker.profile !== null && !order.maker.profile.anonymous
                         ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
@@ -146,16 +146,12 @@ export default {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 5 && owner) {
-                return first.length > 5
-                    ? first.slice(0, 5) + '..'
-                    : first + ' ' +second.slice(0, 5 - firstLength) + '..';
-            } else if (((first + second).length > 7 && !owner)) {
-                return first.length > 7
-                    ? first.slice(0, 7) + '..'
-                    : first + ' ' + second.slice(0, 7 - firstLength) + '..';
+            if ((first + second).length > 9) {
+                return first.length > 9
+                    ? first.slice(0, 9) + '..'
+                    : first + ' ' +second.slice(0, 9 - firstLength) + '..';
             } else {
-                return first + ' ' + second;
+                return first + '\n' + second;
             }
         },
         groupByPrice: function(orders) {
