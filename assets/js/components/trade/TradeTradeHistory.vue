@@ -244,10 +244,10 @@ export default {
         truncateFullName: function(profile) {
             let first = profile.firstName;
             let second = profile.lastName;
-            if ((first + second).length > 14) {
-                return first.length > 14
-                    ? first.slice(0, 14) + '..'
-                    : first + ' ' + second.slice(0, 14 - first.length) + '..';
+            if ((first + second).length > 12) {
+                return first.length > 12
+                    ? first.slice(0, 12) + '..'
+                    : first + ' ' + second.slice(0, 12 - first.length) + '...';
             } else {
                 return first + ' ' + second;
             }
