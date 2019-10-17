@@ -339,7 +339,7 @@ a
       background: $secondary
       text-align: left
       border: 2px solid $secondary
-      
+
       .nav-item
         display: inline-block
         flex: initial
@@ -444,11 +444,9 @@ nav.top-navbar
   .link
     color: $blue
 
-.v-cloak--block
+.v-cloak--block, .v-cloak--inline, .v-cloak--inline-block
   display: none
 
-.v-cloak--inline
-  display: none
 
 [v-cloak]
   & > .v-cloak--block
@@ -456,6 +454,12 @@ nav.top-navbar
 
   & > .v-cloak--inline
     display: inline
+
+  & > .v-cloak--inline-block
+    display: inline-block
+  
+  & > .v-cloak--hidden
+    display: none
 
   & > *:not(.v-cloak--inline)
     display: none
@@ -551,7 +555,7 @@ meter
   background: $module-background
 
 .is-invalid
-  border: 1px solid $red !important  
+  border: 1px solid $red !important
   &:focus, &:active
     outline: 0 !important
     outline-color: transparent !important

@@ -26,11 +26,26 @@
         <div class="collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
             <ul class="navbar-nav ml-auto">
                 {% if prelaunch.isFinished() %}
-                    <li class="search nav-item align-self-center py-3 py-lg-0 pr-0 pr-lg-3">
+                    <li class="search nav-item align-self-center py-3 py-lg-0 pr-0 pr-lg-3" v-cloak>
                         <token-searcher
-                            class="justify-content-center pr-0"
+                            class="justify-content-center pr-0 v-cloak--hidden"
                             search-url="{{ path('token_search') }}"
                         ></token-searcher>
+                        <div class="input-group v-cloak--inline">
+                            <input
+                                class="search-input form-control pr-3 no-bg-img"
+                                placeholder="Search for the token"
+                                type="text"
+                            >
+                            <div class="input-group-append">
+                                <span class="input-group-text text-white pl-2">
+                                    <font-awesome-icon
+                                        class="c-pointer"
+                                        icon="search"
+                                    ></font-awesome-icon>
+                                </span>
+                            </div>
+                        </div>
                     </li>
                     {% if show_links %}
                         <li class="nav-item menu-token align-self-center {{ route == 'token' ? 'active' : '' }}">
