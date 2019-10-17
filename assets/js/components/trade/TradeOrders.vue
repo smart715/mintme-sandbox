@@ -128,7 +128,7 @@ export default {
                     amount: toMoney(order.amount, this.market.quote.subunit),
                     sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
                     trader: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? this.truncateFullName(order.maker.profile, order.owner)
+                        ? this.truncateFullName(order.maker.profile)
                         : 'Anonymous',
                     traderFullName: order.maker.profile !== null && !order.maker.profile.anonymous
                         ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
@@ -142,7 +142,7 @@ export default {
                 };
             });
         },
-        truncateFullName: function(profile, owner) {
+        truncateFullName: function(profile) {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
@@ -150,10 +150,6 @@ export default {
                 return first.length > 3
                     ? first.slice(0, 3) + '...'
                     : first + ' ' +second.slice(0, 3 - firstLength) + '...';
-            } else if (((first + second).length > 3 && !owner)) {
-                return first.length > 3
-                    ? first.slice(0, 3) + '..'
-                    : first + ' ' + second.slice(0, 3 - firstLength) + '...';
             } else {
                 return first + ' ' + second;
             }
