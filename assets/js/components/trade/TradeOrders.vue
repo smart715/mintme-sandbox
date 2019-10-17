@@ -146,14 +146,14 @@ export default {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 8 && owner) {
-                return first.length > 9
-                    ? first.slice(0, 9) + '..'
-                    : first + ' ' +second.slice(0, 9 - firstLength) + '..';
-            } else if (((first + second).length > 9 && !owner)) {
-                return first.length > 9
-                    ? first.slice(0, 9) + '..'
-                    : first + ' ' + second.slice(0, 9 - firstLength) + '..';
+            if ((first + second).length > 3 && owner) {
+                return first.length > 3
+                    ? first.slice(0, 3) + '...'
+                    : first + ' ' +second.slice(0, 3 - firstLength) + '...';
+            } else if (((first + second).length > 3 && !owner)) {
+                return first.length > 3
+                    ? first.slice(0, 3) + '..'
+                    : first + ' ' + second.slice(0, 3 - firstLength) + '...';
             } else {
                 return first + ' ' + second;
             }
