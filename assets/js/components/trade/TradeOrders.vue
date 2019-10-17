@@ -146,7 +146,7 @@ export default {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 3 && owner) {
+            if ((first + second).length > 3) {
                 return first.length > 3
                     ? first.slice(0, 3) + '...'
                     : first + ' ' +second.slice(0, 3 - firstLength) + '...';
