@@ -158,7 +158,7 @@ export default {
                 },
             };
         },
-        fieldsArray: function () {
+        fieldsArray: function() {
             return Object.values(this.fields);
         },
     },
