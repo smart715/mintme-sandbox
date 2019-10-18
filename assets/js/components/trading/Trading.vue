@@ -18,11 +18,11 @@
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
-                    :fields="fields"
+                    :fields="fieldsArray"
                     sort-by="lastPrice"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
-                    <template v-slot:head(volume)="data">
+                    <template v-slot:[`head(${fields.volume.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -33,7 +33,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template v-slot:head(monthVolume)="data">
+                    <template v-slot:[`head(${fields.monthVolume.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -75,6 +75,7 @@ import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import Decimal from 'decimal.js/decimal.js';
+import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
@@ -83,6 +84,9 @@ export default {
         page: Number,
         tokensCount: Number,
         userId: Number,
+        cryptos: Object,
+        coinbaseUrl: String,
+        showUsd: Boolean,
     },
     components: {
         Guide,
@@ -95,42 +99,13 @@ export default {
             totalRows: 25,
             loading: false,
             userTokensEnabled: false,
-            fields: [
-                {
-                    key: 'pair',
-                    label: 'Pair',
-                    sortable: true,
-                },
-                {
-                    key: 'change',
-                    label: 'Change',
-                    sortable: true,
-                },
-                {
-                    key: 'lastPrice',
-                    label: 'Last Price',
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-                {
-                    key: 'volume',
-                    label: '24H Volume',
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-                {
-                    key: 'monthVolume',
-                    label: '30d Volume',
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-            ],
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
                 {currency: 'BTC', token: 'WEB'},
             ],
             klineQueriesIdsTokensMap: new Map(),
+            conversionRates: {},
         };
     },
     computed: {
@@ -153,18 +128,58 @@ export default {
         loaded: function() {
             return this.markets !== null && !this.loading;
         },
+        fields: function() {
+            return {
+                pair: {
+                    label: 'Pair',
+                    sortable: true,
+                },
+                change: {
+                    label: 'Change',
+                    sortable: true,
+                },
+                lastPrice: {
+                    label: 'Last Price',
+                    key: 'lastPrice' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+                volume: {
+                    label: '24H Volume',
+                    key: 'volume' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+                monthVolume: {
+                    label: '30d Volume',
+                    key: 'monthVolume' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+            };
+        },
+        fieldsArray: function () {
+            return Object.values(this.fields);
+        },
     },
     mounted: function() {
-        this.updateData(this.currentPage).then(() => {
-            this.addMessageHandler((result) => {
-                if ('state.update' === result.method) {
-                    this.sanitizeMarket(result);
-                    this.requestKline(result.params[0]);
-                } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
-                    this.updateMonthVolume(result.id, result.result);
-                }
+        let updateDataPromise = this.updateData(this.currentPage);
+        let conversionRatesPromise = this.fetchConversionRates();
+
+        Promise.all([updateDataPromise, conversionRatesPromise])
+            .then(() => {
+                this.updateDataWithMarkets();
+                this.loading = false;
+
+                this.addMessageHandler((result) => {
+                    if ('state.update' === result.method) {
+                        this.sanitizeMarket(result);
+                        this.requestKline(result.params[0]);
+                    } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                        this.updateMonthVolume(result.id, result.result);
+                    }
+                });
             });
-        });
     },
     methods: {
         sortCompare: function(a, b, key) {
@@ -210,8 +225,6 @@ export default {
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
-                        this.updateDataWithMarkets();
-                        this.loading = false;
 
                         if (window.history.replaceState) {
                             // prevents browser from storing history with each change:
@@ -274,6 +287,9 @@ export default {
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
+                lastPriceUSD: this.toUSD(lastPrice, currency),
+                volumeUSD: this.toUSD(volume, currency),
+                monthVolumeUSD: this.toUSD(monthVolume, currency),
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -350,12 +366,15 @@ export default {
                 return Decimal.add(acc, curr[6]);
             }, 0);
 
+            let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
             monthVolume = toMoney(monthVolume, marketPrecision) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
+                this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolumeUSD = monthVolumeUSD;
             } else {
                 this.sanitizedMarkets[marketName].monthVolume = monthVolume;
+                this.sanitizedMarkets[marketName].monthVolumeUSD = monthVolumeUSD;
             }
         },
         requestKline: function(market) {
@@ -372,6 +391,32 @@ export default {
             }));
 
             this.klineQueriesIdsTokensMap.set(id, market);
+        },
+        fetchConversionRates: function() {
+            let ids = Object.keys(this.cryptos).map((name) => name.toLowerCase()).join();
+
+            let config = {
+                params: {
+                    ids,
+                    vs_currencies: 'usd',
+                },
+            };
+
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
+                .then((res) => {
+                    Object.keys(res.data).map((name) => {
+                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name]['usd'];
+                    });
+                    resolve();
+                })
+                .catch((err) => {
+                    reject();
+                });
+            });
+        },
+        toUSD: function(amount, currency) {
+            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), 2) + ' ' + 'USD';
         },
     },
 };
