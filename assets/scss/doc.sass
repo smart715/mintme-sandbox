@@ -2,10 +2,22 @@ header::before
   content: none
 
 .swagger-ui
-  color: white
+  .download-contents
+    width: auto
+
+  color: $dark-white
+
+  .response-col_description span
+    color: #3b4151
+
+  .curl, .request-url pre, .response-col_description .markdown, .opblock-body pre span
+    color: $dark-white !important
+
+  .curl
+    -webkit-text-fill-color: $dark-white
 
   input::placeholder
-    color: $white
+    color: $dark-white
 
   .auth-wrapper
     padding-right: 5px
@@ -31,14 +43,14 @@ header::before
 
   .opblock-tag
     background: $primary
-    color: white
+    color: $dark-white
 
   .opblock-tag-section
     background: $primary
     padding: 10px 10px 0 10px
 
   .swagger-ui .info .description p
-    color: $white
+    color: $dark-white
 
   .title
     display: none
@@ -47,7 +59,7 @@ header::before
     width: auto
 
   .btn.authorize svg
-    fill: $white
+    fill: $dark-white
 
   .parameters-col_name
     width: auto
@@ -68,7 +80,7 @@ header::before
       background: $primary
 
       h3
-        color: white
+        color: $dark-white
 
       .close-modal
         filter: invert(1)
@@ -79,7 +91,7 @@ header::before
 
   .opblock-tag:hover
     background-color: rgba(0,0,0,.1)
-    color: white
+    color: $dark-white
 
   .information-container.wrapper
     display: none
@@ -96,7 +108,7 @@ header::before
 
     &:hover
       background-color: $secondary-dark !important
-      color: white
+      color: $dark-white
       border: none !important
 
   select
