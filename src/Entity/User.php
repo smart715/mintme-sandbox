@@ -70,7 +70,6 @@ class User extends BaseUser implements
      *     checkMX = true,
      *     mode = "strict"
      * )
-     * @AppAssert\UserEmail
      * @AppAssert\IsNotBlacklisted(type="email", message="This domain is not allowed")
      * @var string
      */
