@@ -10,14 +10,40 @@
             <div class="col-xl-8">
                 <div class="card">
                     <div class="card-header">
-                        Trading
+                        <span>Trading</span>
+                        <b-dropdown
+                            id="currency"
+                            variant="primary"
+                            class="float-right"
+                            lazy="true">
+                            <template slot="button-content">
+                                Currency:
+                                <span v-if="showUsd">
+                                    USD
+                                </span>
+                                <span v-else>
+                                    Crypto
+                                </span>
+                            </template>
+                            <template>
+                                <b-dropdown-item @click="toggleUsd(false)">
+                                    Crypto
+                                </b-dropdown-item>
+                                <b-dropdown-item @click="toggleUsd(true)">
+                                    USD
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown> 
                     </div>
                     <div class="card-body p-0">
                         <trading
                             websocket-url="{{ global_websocket_url }}" v-cloak
+                            coinbase-url="{{ global_coinbase_url }}"
                             :page="{{ page }}"
                             :tokens-count="{{ tokensCount }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}">
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            :cryptos="{{ cryptos | json_encode }}"
+                            :show-usd="showUsd">
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                         </trading>
                     </div>

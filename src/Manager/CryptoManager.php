@@ -26,4 +26,11 @@ class CryptoManager implements CryptoManagerInterface
     {
         return $this->repository->findAll();
     }
+
+    public function findAllIndexed(string $index): array
+    {
+        return $this->repository->createQueryBuilder('c', "c.{$index}")
+            ->getQuery()
+            ->getArrayResult();
+    }
 }
