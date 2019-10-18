@@ -26,6 +26,7 @@ $orange: #f7931e;
 $green: #8dc63f;
 $red: #fe6e43;
 $white: white;
+$dark-white: #e1e1e1;
 $black: #131313;
 $secondary: #152D47;
 $secondary-dark: #112438;
@@ -71,7 +72,7 @@ $body-background: $black url("../img/sky_image.jpg") no-repeat fixed;
 $body-background-sm: linear-gradient(#184b80, #193a5d);
 $module-background: linear-gradient(#0b3c57, #19263d);
 $body-text-color: #1a1a1a;
-$color-nav: $white;
+$color-nav: $dark-white;
 $color-nav-active: #0071bc;
 $color-nav-hover: #0071bc;
 $color-link: $blue;
@@ -101,7 +102,7 @@ $card-border-color: $ghost-dark;
 $card-input-color: $grey-dark;
 $card-header-bg: $primary;
 $card-body-bg: $secondary;
-$card-text-color: $white;
+$card-text-color: $dark-white;
 
 // Pagination
 $pagination-color: $primary;

@@ -219,6 +219,16 @@ services:
             - { name: sonata.admin, manager_type: orm, label: KB Subcategories }
         public: true
 
+    admin.main.documents:
+        class: App\Admin\MainDocumentsAdmin
+        arguments:
+            - null
+            - App\Entity\MainDocument
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Main Documents }
+        public: true
+
     # Required by rabbitmq bundle
     market_consumer:
         class: 'App\Consumers\MarketConsumer'
@@ -408,3 +418,22 @@ services:
             $rpc: '@disposable_email.json_rpc'
             $fileNameIndex: "%name_of_files_for_disposable_domains_index%"
             $fileNameWildcard: "%name_of_files_for_disposable_domains_wildcard%"
+
+    App\Utils\Converter\FriendlyUrlConverterInterface: '@App\Utils\Converter\FriendlyUrlConverter'
+
+    # Media providers
+    app.media.provider.document:
+        class: App\Media\Provider\DocumentProvider
+        tags:
+            - { name: sonata.media.provider }
+        arguments:
+            - app.media.provider.document
+            - '@sonata.media.generator.default'
+            - '@sonata.media.thumbnail.format'
+            - '%docs_path%'
+            - '@App\Utils\Converter\FriendlyUrlConverterInterface'
+            - ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+            - ['application/pdf', 'application/x-pdf', 'application/rtf', 'text/html', 'text/rtf', 'text/plain', 'application/excel', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.text', 'application/vnd.oasis.opendocument.graphics', 'application/vnd.oasis.opendocument.presentation', 'application/vnd.oasis.opendocument.spreadsheet', 'application/vnd.oasis.opendocument.chart', 'application/vnd.oasis.opendocument.formula', 'application/vnd.oasis.opendocument.database', 'application/vnd.oasis.opendocument.image', 'text/comma-separated-values', 'text/xml', 'application/xml', 'application/zip']
+            - '@sonata.media.metadata.proxy'
+        calls:
+            - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]

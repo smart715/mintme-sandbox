@@ -88,6 +88,9 @@ parameters:
 
     disposable_domains_timeout_seconds: 30
 
+    # Path for all main documents
+    docs_path: '/docs'
+
     # WEB limit for landing page bonus
     landing_web_bonus_limit: 50000
 
