@@ -12,6 +12,7 @@ twig:
         version: '%version%'
         is_beta_version: '%is_beta_version%'
         global_websocket_url: '%env(WEBSOCKET_URL)%'
+        global_coinbase_url: '%coinbase_api_url%'
         prelaunch: '@App\Exchange\Trade\Config\PrelaunchConfig'
         google_tracking_id: '%google_tracking_id%'
         tawk_api_key: '%tawk_api_key%'
