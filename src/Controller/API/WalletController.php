@@ -101,7 +101,7 @@ class WalletController extends AbstractFOSRestController
             );
         } catch (Throwable $exception) {
             return $this->view([
-                'error' => 'Withdrawal failed',
+                'error' => 'Error: '.$exception->getMessage().' File: '.$exception->getFile().' Line: '.$exception->getLine(),
             ], Response::HTTP_BAD_GATEWAY);
         }
 
