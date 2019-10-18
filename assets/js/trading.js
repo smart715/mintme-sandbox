@@ -5,11 +5,18 @@ import store from './storage';
 new Vue({
   el: '#trading',
   data() {
-    return {};
+    return {
+        showUsd: false,
+    };
   },
   components: {
     Trading,
     Pagination,
   },
   store,
+  methods: {
+    toggleUsd: function(show) {
+      this.showUsd = show;
+    },
+  },
 });
