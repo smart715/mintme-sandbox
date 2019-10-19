@@ -8,6 +8,11 @@ sonata_admin:
             - { position: left, type: sonata.admin.block.admin_list }
 
         groups:
+            main.documents:
+                label: Main Documents
+                items:
+                    - admin.main.documents
+
             reciprocal.links:
                 label: reciprocal links
                 items:

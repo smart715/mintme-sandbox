@@ -22,7 +22,7 @@
                     :sort-by="fields.lastPrice.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
-                    <template slot="HEAD_volume" slot-scope="data">
+                    <template :slot="`HEAD_${fields.volume.key}`" slot-scope="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -33,7 +33,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template slot="HEAD_monthVolume" slot-scope="data">
+                    <template :slot="`HEAD_${fields.monthVolume.key}`" slot-scope="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -44,7 +44,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template slot="HEAD_marketCap" slot-scope="data">
+                    <template :slot="`HEAD_${fields.marketCap.key}`" slot-scope="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -86,6 +86,7 @@ import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import Decimal from 'decimal.js/decimal.js';
+import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
@@ -94,6 +95,9 @@ export default {
         page: Number,
         tokensCount: Number,
         userId: Number,
+        cryptos: Object,
+        coinbaseUrl: String,
+        showUsd: Boolean,
     },
     components: {
         Guide,
@@ -106,43 +110,13 @@ export default {
             totalRows: 25,
             loading: false,
             userTokensEnabled: false,
-            fields: {
-                pair: {
-                    label: 'Pair',
-                    sortable: true,
-                },
-                change: {
-                    label: 'Change',
-                    sortable: true,
-                },
-                lastPrice: {
-                    label: 'Last Price',
-                    key: 'lastPrice',
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-                volume: {
-                    label: '24H Volume',
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-                monthVolume: {
-                    label: '30d Volume',
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-                marketCap: {
-                    label: 'Market Cap',
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-            },
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
                 {currency: 'BTC', token: 'WEB'},
             ],
             klineQueriesIdsTokensMap: new Map(),
+            conversionRates: {},
             globalMarketCap: 0,
         };
     },
@@ -166,19 +140,62 @@ export default {
         loaded: function() {
             return this.markets !== null && !this.loading;
         },
+        fields: function() {
+            return {
+                pair: {
+                    label: 'Pair',
+                    sortable: true,
+                },
+                change: {
+                    label: 'Change',
+                    sortable: true,
+                },
+                lastPrice: {
+                    label: 'Last Price',
+                    key: 'lastPrice' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+                volume: {
+                    label: '24H Volume',
+                    key: 'volume' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+                monthVolume: {
+                    label: '30d Volume',
+                    key: 'monthVolume' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+                marketCap: {
+                    label: 'Market Cap',
+                    key: 'marketCap' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
+            };
+        },
     },
     mounted: function() {
-        this.updateData(this.currentPage).then(() => {
-            this.addMessageHandler((result) => {
-                if ('state.update' === result.method) {
-                    this.sanitizeMarket(result);
-                    this.requestKline(result.params[0]);
-                } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
-                    this.updateMonthVolume(result.id, result.result);
-                }
-            });
-        });
+        let updateDataPromise = this.updateData(this.currentPage);
+        let conversionRatesPromise = this.fetchConversionRates();
         this.fetchGlobalMarketCap();
+
+        Promise.all([updateDataPromise, conversionRatesPromise])
+            .then(() => {
+                this.updateDataWithMarkets();
+                this.loading = false;
+
+                this.addMessageHandler((result) => {
+                    if ('state.update' === result.method) {
+                        this.sanitizeMarket(result);
+                        this.requestKline(result.params[0]);
+                    } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                        this.updateMonthVolume(result.id, result.result);
+                    }
+                });
+            });
     },
     methods: {
         sortCompare: function(a, b, key) {
@@ -224,8 +241,6 @@ export default {
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
-                        this.updateDataWithMarkets();
-                        this.loading = false;
 
                         if (window.history.replaceState) {
                             // prevents browser from storing history with each change:
@@ -290,6 +305,8 @@ export default {
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit) {
             let hiddenName = this.findHiddenName(token);
 
+            let marketCap = Decimal.mul(lastPrice, supply);
+
             return {
                 pair: `${currency}/${token}`,
                 change: changePercentage.toFixed(2) + '%',
@@ -299,7 +316,11 @@ export default {
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
-                marketCap: toMoney(Decimal.mul(lastPrice, supply), subunit) + ' ' + currency,
+                lastPriceUSD: this.toUSD(lastPrice, currency),
+                volumeUSD: this.toUSD(volume, currency),
+                monthVolumeUSD: this.toUSD(monthVolume, currency),
+                marketCap: toMoney(marketCap, subunit) + ' ' + currency,
+                marketCapUSD: this.toUSD(marketCap, currency)
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -378,12 +399,15 @@ export default {
                 return Decimal.add(acc, curr[6]);
             }, 0);
 
+            let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
             monthVolume = toMoney(monthVolume, marketPrecision) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
+                this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolumeUSD = monthVolumeUSD;
             } else {
                 this.sanitizedMarkets[marketName].monthVolume = monthVolume;
+                this.sanitizedMarkets[marketName].monthVolumeUSD = monthVolumeUSD;
             }
         },
         requestKline: function(market) {
@@ -400,6 +424,32 @@ export default {
             }));
 
             this.klineQueriesIdsTokensMap.set(id, market);
+        },
+        fetchConversionRates: function() {
+            let ids = Object.keys(this.cryptos).map((name) => name.toLowerCase()).join();
+
+            let config = {
+                params: {
+                    ids,
+                    vs_currencies: 'usd',
+                },
+            };
+
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
+                .then((res) => {
+                    Object.keys(res.data).map((name) => {
+                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name]['usd'];
+                    });
+                    resolve();
+                })
+                .catch((err) => {
+                    reject();
+                });
+            });
+        },
+        toUSD: function(amount, currency) {
+            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), 2) + ' ' + 'USD';
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {

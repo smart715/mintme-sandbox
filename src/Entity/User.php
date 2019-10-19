@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
@@ -69,6 +70,7 @@ class User extends BaseUser implements
      *     checkMX = true,
      *     mode = "strict"
      * )
+     * @AppAssert\IsNotBlacklisted(type="email", message="This domain is not allowed")
      * @var string
      */
     protected $email;
