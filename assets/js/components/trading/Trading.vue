@@ -1,7 +1,7 @@
 <template>
     <div class="trading">
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-            <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }} BTC</span>
+            <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
                 <input
                     type="checkbox"
@@ -117,7 +117,10 @@ export default {
             ],
             klineQueriesIdsTokensMap: new Map(),
             conversionRates: {},
-            globalMarketCap: 0,
+            globalMarketCaps: {
+                BTC: 0,
+                USD: 0,
+            },
         };
     },
     computed: {
@@ -176,6 +179,12 @@ export default {
                 },
             };
         },
+        globalMarketCap: function() {
+            if (this.showUsd) {
+                return this.globalMarketCaps['USD'] + ' USD';
+            }
+            return this.globalMarketCaps['BTC'] + ' BTC';
+        }
     },
     mounted: function() {
         let updateDataPromise = this.updateData(this.currentPage);
@@ -491,7 +500,11 @@ export default {
         fetchGlobalMarketCap: function() {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
-                    this.globalMarketCap = toMoney(res.data.marketcap, 8);
+                    this.globalMarketCaps['BTC'] = toMoney(res.data.marketcap, 8);
+                });
+            this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
+                .then((res) => {
+                    this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 2);
                 });
         },
     },
