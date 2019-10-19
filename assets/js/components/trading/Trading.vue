@@ -184,7 +184,7 @@ export default {
                 return this.globalMarketCaps['USD'] + ' USD';
             }
             return this.globalMarketCaps['BTC'] + ' BTC';
-        }
+        },
     },
     mounted: function() {
         let updateDataPromise = this.updateData(this.currentPage);
@@ -329,7 +329,7 @@ export default {
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
                 marketCap: toMoney(marketCap, subunit) + ' ' + currency,
-                marketCapUSD: this.toUSD(marketCap, currency)
+                marketCapUSD: this.toUSD(marketCap, currency),
             };
         },
         getMarketOnTopIndex: function(currency, token) {
