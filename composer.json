@@ -100,7 +100,7 @@
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
         ],
         "auto-scripts": {
-            "cache:clear --no-warmup": "symfony-cmd",
+            "cache:clear": "symfony-cmd",
             "ckeditor:install --clear=drop": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "security-checker security:check": "script"
