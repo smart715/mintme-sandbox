@@ -43,6 +43,9 @@ class UserEmailValidatorTest extends TestCase
 
 
         $validator = new UserEmailValidator($um, $storage, $security);
+        $validator->method('getEmailName')->willReturn('');
+        $validator->method('getEmailDomain')->willReturn('');
+
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);
