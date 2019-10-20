@@ -64,7 +64,11 @@ class UserEmailValidator extends ConstraintValidator
             return $email = '';
         }
 
-        return substr($email, strrpos($email, '@') + 1) ?? '';
+        if (!substr($email, strrpos($email, '@') + 1)) {
+            return '';
+        }
+
+        return substr($email, strrpos($email, '@') + 1);
     }
 
     /** @inheritdoc */
@@ -74,7 +78,11 @@ class UserEmailValidator extends ConstraintValidator
             return $email = '';
         }
 
-        return  strstr($email, '@', true) ?? '';
+        if (!strstr($email, '@', true)) {
+            return '';
+        }
+
+        return  strstr($email, '@', true);
     }
 
 }
