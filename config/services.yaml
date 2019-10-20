@@ -25,7 +25,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Security,Entity,Migrations,Tests,Kernel.php,*/Model}'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,*/Model}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -431,3 +431,4 @@ services:
 
     fos_user.user_provider.username_email:
         class: App\Security\Providers\UserEmailProvider
+
