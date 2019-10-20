@@ -17,6 +17,7 @@ use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -71,6 +72,8 @@ class User extends BaseUser implements
      *     mode = "strict"
      * )
      * @AppAssert\IsNotBlacklisted(type="email", message="This domain is not allowed")
+     * @AppAssert\UserEmailSymbols()
+     * @AppAssert\UserEmail()
      * @var string
      */
     protected $email;

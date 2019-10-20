@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Form\DataTransformer\EmailTransformer;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
@@ -10,6 +11,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 /** @codeCoverageIgnore  */
 class RegistrationType extends AbstractType
 {
+    /** @var EmailTransformer */
+    private $transformer;
+
+    public function __construct(EmailTransformer $userEmailTransformer)
+    {
+        $this->transformer = $userEmailTransformer;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -27,6 +36,7 @@ class RegistrationType extends AbstractType
                 'constraints' => [ new RecaptchaTrue() ],
                 'label' => false,
             ])
+            ->get('email')->addModelTransformer($this->transformer)
         ;
     }
 

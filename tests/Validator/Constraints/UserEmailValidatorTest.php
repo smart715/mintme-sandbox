@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Manager\UserManagerInterface;
 use App\Validator\Constraints\UserEmail;
 use App\Validator\Constraints\UserEmailValidator;
+use Symfony\Component\Security\Core\Security;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class UserEmailValidatorTest extends TestCase
 {
-    public function testValidateDisposableFalse(): void
+    public function testValidate(): void
     {
         $email = 'foo@bar.baz';
         $user = $this->createMock(User::class);
@@ -22,6 +23,9 @@ class UserEmailValidatorTest extends TestCase
 
         $um = $this->createMock(UserManagerInterface::class);
         $um->method('findUserByEmail')->willReturn($user);
+
+        $security = $this->createMock(Security::class);
+        $security->method('getUser')->willReturn(null);
 
         $context = $this->createMock(ExecutionContextInterface::class);
         $context->expects($this->once())->method('buildViolation')->willReturn(
@@ -38,7 +42,7 @@ class UserEmailValidatorTest extends TestCase
         $storage->method('getToken')->willReturn($token);
 
 
-        $validator = new UserEmailValidator($um, $storage);
+        $validator = new UserEmailValidator($um, $storage, $security);
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);
