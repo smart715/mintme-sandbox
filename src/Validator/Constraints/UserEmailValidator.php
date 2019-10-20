@@ -84,5 +84,4 @@ class UserEmailValidator extends ConstraintValidator
 
         return  strstr($email, '@', true);
     }
-
 }

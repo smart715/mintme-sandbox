@@ -6,10 +6,10 @@ use App\Entity\User;
 use App\Manager\UserManagerInterface;
 use App\Validator\Constraints\UserEmail;
 use App\Validator\Constraints\UserEmailValidator;
-use Symfony\Component\Security\Core\Security;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
