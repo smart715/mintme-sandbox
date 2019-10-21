@@ -116,7 +116,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
-     * @ZipCode(getter="getCountry", strict=false, ignoreEmpty=true)
+     * @ZipCode(getter="getCountry", ignoreEmpty=true)
      * @var string|null
      */
     protected $zipCode;
