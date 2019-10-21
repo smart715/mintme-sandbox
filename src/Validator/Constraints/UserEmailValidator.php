@@ -41,7 +41,7 @@ class UserEmailValidator extends ConstraintValidator
     /** @inheritdoc */
     protected function getEmailDomain($email): string
     {
-        if (!substr($email, strrpos($email, '@') + 1) || !$email) {
+        if (!substr($email ?? '', strrpos($email ?? '', '@') + 1) || !$email) {
             return '';
         }
 
@@ -51,7 +51,7 @@ class UserEmailValidator extends ConstraintValidator
     /** @inheritdoc */
     protected function getEmailName($email): string
     {
-        if (!strstr($email, '@', true) || !$email) {
+        if (!strstr($email ?? '', '@', true) || !$email) {
             return '';
         }
 
@@ -62,11 +62,15 @@ class UserEmailValidator extends ConstraintValidator
      * @return bool */
     protected function gmailHandler(?string $email): bool
     {
-        foreach ($this->userManager->getGmailUsers() as $user) {
-            if ($this->getEmailName($user->getEmail())
-                ===
-                $this->getEmailName($email)) {
-                return true;
+        $users = $this->userManager->getGmailUsers();
+
+        if ($users) {
+            foreach ($users as $user) {
+                if ($this->getEmailName($user->getEmail())
+                    ===
+                    $this->getEmailName($email)) {
+                    return true;
+                }
             }
         }
 

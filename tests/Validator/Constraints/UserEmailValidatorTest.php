@@ -3,7 +3,7 @@
 namespace App\Tests\Validator\Constraints;
 
 use App\Entity\User;
-use App\Manager\UserManagerInterface;
+use App\Manager\UserManager;
 use App\Validator\Constraints\UserEmail;
 use App\Validator\Constraints\UserEmailValidator;
 use PHPUnit\Framework\TestCase;
@@ -15,14 +15,14 @@ class UserEmailValidatorTest extends TestCase
 {
     public function testValidate(): void
     {
-        $email = 'test@gmail.com';
-        $userEmail = 't.e.s.t@gmail.com';
+        $userEmail = 'test@gmail.com';
+        $email = 't.e.s.t@gmail.com';
 
         $user = $this->createMock(User::class);
         $user->method('getEmail')->willReturn($userEmail);
 
-        $um = $this->createMock(UserManagerInterface::class);
-        $um->method('getGmailUsers')->willReturn($user);
+        $um = $this->createMock(UserManager::class);
+        $um->method('getGmailUsers')->willReturn([$user]);
 
         $security = $this->createMock(Security::class);
         $security->method('getUser')->willReturn(null);
@@ -35,7 +35,7 @@ class UserEmailValidatorTest extends TestCase
         $constraint = $this->createMock(UserEmail::class);
         $constraint->message = 'test';
 
-        $validator = new UserEmailValidator($um, $security);
+        $validator = new UserEmailValidator($security, $um);
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);
@@ -50,9 +50,9 @@ class UserEmailValidatorTest extends TestCase
         $user = $this->createMock(User::class);
 
         $security = $this->createMock(Security::class);
-        $security->method('getUser')->willReturn($user);
+        $security->method('getUser')->willReturn([$user]);
 
-        $um = $this->createMock(UserManagerInterface::class);
+        $um = $this->createMock(UserManager::class);
 
         $context = $this->createMock(ExecutionContextInterface::class);
         $context->expects($this->exactly(0))->method('buildViolation')->willReturn(
@@ -62,7 +62,7 @@ class UserEmailValidatorTest extends TestCase
         $constraint = $this->createMock(UserEmail::class);
         $constraint->message = 'test';
 
-        $validator = new UserEmailValidator($um, $security);
+        $validator = new UserEmailValidator($security, $um);
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);
@@ -78,8 +78,8 @@ class UserEmailValidatorTest extends TestCase
         $user = $this->createMock(User::class);
         $user->method('getEmail')->willReturn($userEmail);
 
-        $um = $this->createMock(UserManagerInterface::class);
-        $um->method('findUserByEmail')->willReturn($user);
+        $um = $this->createMock(UserManager::class);
+        $um->method('getGmailUsers')->willReturn(null);
 
         $security = $this->createMock(Security::class);
         $security->method('getUser')->willReturn(null);
@@ -92,7 +92,7 @@ class UserEmailValidatorTest extends TestCase
         $constraint = $this->createMock(UserEmail::class);
         $constraint->message = 'test';
 
-        $validator = new UserEmailValidator($um, $security);
+        $validator = new UserEmailValidator($security, $um);
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);

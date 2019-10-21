@@ -65,7 +65,7 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
             ->execute();
     }
 
-    public function getGmailUsers(): array
+    public function getGmailUsers(): ?array
     {
         $qr = $this->getRepository()->createQueryBuilder('qr');
 
