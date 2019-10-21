@@ -338,19 +338,74 @@ a
   &.transparent
     .nav-tabs
       position: relative
-      display: block
       background: $secondary
       text-align: left
       border: 2px solid $secondary
+      overflow: hidden
+      white-space: nowrap
+      flex-wrap: nowrap
+
+    .nav-item-token
+      flex: initial
+      overflow: hidden
+      margin-left: auto
+
+      .nav-link-token
+        @extend .nav-link
+
+        @include font-scale(md)
+
+        &.active
+          color: $color-link
+
+        &.active::after
+          content: ' '
+          position: absolute
+          bottom: .75rem
+          left: 1.5rem
+          height: .125rem
+          background-color: unset
+          width: calc(100% - 3rem)
+
+    .nav-item
+      display: inline-block
+      flex: initial
+      overflow: visible
+
+      .nav-link
+        color: inherit
+        position: relative
+        background: $secondary
+
+        @include font-scale(md)
+
+        &.active
+          color: $color-link
+
+        &.active::after
+          content: ' '
+          position: absolute
+          bottom: .75rem
+          left: 1.5rem
+          height: .125rem
+          background-color: unset
+          width: calc(100% - 3rem)
+
+    @media (max-width: 767px)
+      .nav-tabs
+        text-align: center
+        display: block
+        white-space: normal
+        overflow: visible
 
       .nav-item
         display: inline-block
         flex: initial
+        overflow: visible
 
         .nav-link
             color: inherit
             position: relative
-            background: $secondary
 
             @include font-scale(md)
 
@@ -571,3 +626,9 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
 
 .no-bg-img
   background-image: none !important
+
+.truncate-token
+  width: 100%
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
