@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="truncate-token">
         <template v-if="editable">
             <token-edit-modal
                 v-if="editable"
@@ -17,7 +17,7 @@
             />
         </template>
         <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
-            {{ currentName | truncate(25) }}
+            {{ currentName }}
         </span>
     </div>
 </template>
