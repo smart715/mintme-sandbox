@@ -148,12 +148,12 @@ export default {
             let second = profile.lastName;
             if ((first + second).length > 5 && owner) {
                 return first.length > 5
-                    ? first.slice(0, 5) + '..'
-                    : first + ' ' +second.slice(0, 5 - firstLength) + '..';
+                    ? first.slice(0, 5) + '...'
+                    : first + ' ' +second.slice(0, 5 - firstLength) + '...';
             } else if (((first + second).length > 7 && !owner)) {
                 return first.length > 7
-                    ? first.slice(0, 7) + '..'
-                    : first + ' ' + second.slice(0, 7 - firstLength) + '..';
+                    ? first.slice(0, 7) + '...'
+                    : first + ' ' + second.slice(0, 7 - firstLength) + '...';
             } else {
                 return first + ' ' + second;
             }
