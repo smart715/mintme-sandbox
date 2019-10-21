@@ -105,7 +105,7 @@ describe('TradeOrders', () => {
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
+                    trader: 'foo ba...', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
                     isAnonymous: false},
             ]);
         });
@@ -118,7 +118,7 @@ describe('TradeOrders', () => {
 
             expect(wrapper.vm.filteredSellOrders).to.deep.equal([
                 {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'fooBaz b..', traderFullName: 'fooBaz bar', traderUrl: 'URL', side: 1, owner: false,
+                    trader: 'fooBaz b...', traderFullName: 'fooBaz bar', traderUrl: 'URL', side: 1, owner: false,
                     isAnonymous: false},
             ]);
         });

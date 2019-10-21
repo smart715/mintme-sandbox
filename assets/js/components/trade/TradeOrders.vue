@@ -146,10 +146,10 @@ export default {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 3) {
-                return first.length > 3
-                    ? first.slice(0, 3) + '...'
-                    : first + ' ' +second.slice(0, 3 - firstLength) + '...';
+            if ((first + second).length > 5) {
+                return first.length > 5
+                    ? first.slice(0, 5) + '...'
+                    : first + ' ' +second.slice(0, 5 - firstLength) + '...';
             } else {
                 return first + ' ' + second;
             }
