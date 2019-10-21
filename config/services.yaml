@@ -429,6 +429,4 @@ services:
         calls:
             - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]
 
-    fos_user.user_provider.username_email:
-        class: App\Security\Providers\UserEmailProvider
 

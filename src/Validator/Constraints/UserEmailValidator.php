@@ -2,17 +2,13 @@
 
 namespace App\Validator\Constraints;
 
-use FOS\UserBundle\Model\UserManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use App\Manager\UserManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class UserEmailValidator extends ConstraintValidator
 {
-    /** @var mixed */
-    private $user;
-
     /** @var UserManagerInterface */
     private $userManager;
 
@@ -23,13 +19,11 @@ class UserEmailValidator extends ConstraintValidator
     private $security;
 
     public function __construct(
-        UserManagerInterface $userManager,
-        TokenStorageInterface $token,
-        Security $security
+        Security $security,
+        UserManagerInterface $userManager
     ) {
-        $this->user = $token->getToken()->getUser();
-        $this->userManager = $userManager;
         $this->security = $security;
+        $this->userManager = $userManager;
     }
 
     /** {@inheritdoc} */
@@ -39,20 +33,7 @@ class UserEmailValidator extends ConstraintValidator
             return;
         }
 
-        $domain = $this->getEmailDomain($value);
-        $name = $this->getEmailName($value);
-
-        $user = $this->userManager->findUserByEmail($value ?? '');
-
-        if (is_null($user) && in_array($domain, $this->gmailDomains)) {
-            $user = $this->userManager->findUserByEmail($name.'@'.$this->gmailDomains[0]);
-
-            if (is_null($user)) {
-                $user = $this->userManager->findUserByEmail($name.'@'.$this->gmailDomains[1]);
-            }
-        }
-
-        if (!is_null($user) && ($this->user !== $user || $value === $user->getEmail())) {
+        if ($this->gmailHandler($value) && in_array($this->getEmailDomain($value), $this->gmailDomains)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
@@ -60,11 +41,7 @@ class UserEmailValidator extends ConstraintValidator
     /** @inheritdoc */
     protected function getEmailDomain($email): string
     {
-        if (!$email) {
-            return $email = '';
-        }
-
-        if (!substr($email, strrpos($email, '@') + 1)) {
+        if (!substr($email, strrpos($email, '@') + 1) || !$email) {
             return '';
         }
 
@@ -74,14 +51,25 @@ class UserEmailValidator extends ConstraintValidator
     /** @inheritdoc */
     protected function getEmailName($email): string
     {
-        if (!$email) {
-            return $email = '';
-        }
-
-        if (!strstr($email, '@', true)) {
+        if (!strstr($email, '@', true) || !$email) {
             return '';
         }
 
-        return  strstr($email, '@', true);
+        return str_replace('.', '', strstr($email, '@', true));
+    }
+
+    /**@param $email string|null
+     * @return bool */
+    protected function gmailHandler(?string $email): bool
+    {
+        foreach ($this->userManager->getGmailUsers() as $user) {
+            if ($this->getEmailName($user->getEmail())
+                ===
+                $this->getEmailName($email)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
