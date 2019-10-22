@@ -9,12 +9,11 @@
             <img 
                 {% if is_beta_version %} class="ml-3 ml-lg-0" {% endif %}
                 src="{{ asset('build/images/logo.png') }}" 
-                width="222" height="75" 
                 alt="mintMe" 
             >
         </a>
         <button
-            class="navbar-toggler"
+            class="navbar-toggler mt-2"
             :class="{ 'collapsed': !showNavbarMenu }"
             type="button"
             :aria-expanded="showNavbarMenu"
@@ -111,7 +110,7 @@
                         <li class="nav-item d-none d-lg-block">
                             <div id="nav-profile" class="dropdown" :class="{ 'show': showProfileMenu }">
                                 <a
-                                    class="nav-link dropdown-toggle"
+                                    class="nav-link dropdown-toggle c-pointer"
                                     aria-haspopup="true"
                                     :aria-expanded="showProfileMenu"
                                     @click="toggleProfileMenu"
