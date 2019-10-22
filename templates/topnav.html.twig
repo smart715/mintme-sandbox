@@ -5,7 +5,7 @@
             {% if is_beta_version %}
                 <div class="badge">BETA</div>
             {% endif %}
-            <img src="{{ asset('build/images/logo.png') }}" width="222" height="75" alt="mintMe" {% if is_beta_version %} class="ml-3 ml-lg-0" {% endif %}>
+            <img src="{{ asset('build/images/logo.png') }}" alt="mintMe" {% if is_beta_version %} class="ml-3 ml-lg-0" {% endif %}>
         </b-navbar-brand>
         <b-navbar-toggle target="topnav_collapse" class="mt-2"></b-navbar-toggle>
         <b-collapse is-nav="is-nav" id="topnav_collapse">
