@@ -491,6 +491,7 @@ export default {
                 ),
                 parseFloat(market.lastPrice),
                 parseFloat(market.dayVolume),
+                parseFloat(market.monthVolume),
                 market.supply,
                 market.base.subunit
             );
