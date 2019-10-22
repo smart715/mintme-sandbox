@@ -5,6 +5,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+###> sonata-project/media-bundle ###
+/public/uploads/
+###< sonata-project/media-bundle ###
+
 ###> symfony/web-server-bundle ###
 /.web-server-pid
 ###< symfony/web-server-bundle ###
