@@ -38,8 +38,11 @@ final class MoneyWrapper implements MoneyWrapperInterface
         CryptoManagerInterface $cryptoManager
     ) {
         $this->cryptoManager = $cryptoManager;
+    }
 
-        $this->currencies = new CurrencyList(
+    public function getRepository(): Currencies
+    {
+        return $this->currencies ?? $this->currencies = new CurrencyList(
             array_merge(
                 $this->fetchCurrencies(),
                 [
@@ -48,19 +51,11 @@ final class MoneyWrapper implements MoneyWrapperInterface
                 ]
             )
         );
-
-        $this->formatter = new DecimalMoneyFormatter($this->currencies);
-        $this->parser = new DecimalMoneyParser($this->currencies);
-    }
-
-    public function getRepository(): Currencies
-    {
-        return $this->currencies;
     }
 
     public function format(Money $money): string
     {
-        return $this->formatter->format($money);
+        return $this->getFormatter()->format($money);
     }
 
     public function convertToDecimalIfNotation(string $notation, string $symbol): string
@@ -68,7 +63,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
         $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) ) [eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';
 
         if (preg_match($regEx, $notation, $matches)) {
-            bcscale($this->currencies->subunitFor(new Currency($symbol)));
+            bcscale($this->getRepository()->subunitFor(new Currency($symbol)));
 
             return bcmul($matches['left'], bcpow('10', $matches['right']));
         }
@@ -78,7 +73,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
 
     public function parse(string $value, string $symbol): Money
     {
-        return $this->parser->parse(
+        return $this->getParser()->parse(
             $this->convertToDecimalIfNotation($value, $symbol),
             $symbol
         );
@@ -98,11 +93,21 @@ final class MoneyWrapper implements MoneyWrapperInterface
     public function convert(Money $money, Currency $currency, ?FixedExchange $exchange = null): Money
     {
         if (null !== $exchange) {
-            $this->converter = new Converter($this->currencies, $exchange);
+            $this->converter = new Converter($this->getRepository(), $exchange);
         } elseif (!isset($this->converter)) {
             throw new \BadMethodCallException('You can only omit parameter $exchange if you already passed it on a previous call to method MoneyWrapper::convert');
         }
 
         return $this->converter->convert($money, $currency);
+    }
+
+    private function getFormatter(): DecimalMoneyFormatter
+    {
+        return $this->formatter ?? $this->formatter = new DecimalMoneyFormatter($this->getRepository());
+    }
+
+    private function getParser(): DecimalMoneyParser
+    {
+        return $this->parser ?? $this->parser = new DecimalMoneyParser($this->getRepository());
     }
 }
