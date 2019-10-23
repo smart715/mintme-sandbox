@@ -399,6 +399,16 @@ services:
         tags:
             - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
 
+    app.form.change_password:
+        class: App\Form\ChangePasswordType
+        tags:
+            - { name: form.type, alias: app_user_change_password }
+
+    app.form.resetting:
+        class: App\Form\ResettingType
+        tags:
+            - { name: form.type, alias: app_user_resetting }
+
     App\EventSubscriber\SitemapSubscriber:
         arguments:
             - "@router"

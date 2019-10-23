@@ -624,6 +624,20 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
 .no-bg-img
   background-image: none !important
 
+.show-password
+  float: right
+  position: relative
+  top: 32px
+  right: 10px
+
+.show-password:hover
+  cursor: pointer
+  color: $color-toggle-password-active
+
+.show-password-active
+  @extend .show-password
+  color: $color-toggle-password-hover
+
 .truncate-token
   width: 100%
   white-space: nowrap
