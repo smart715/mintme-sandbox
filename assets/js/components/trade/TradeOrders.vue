@@ -83,6 +83,7 @@ export default {
         return {
             removeOrders: [],
             confirmModal: false,
+            windowWidth: window.innerWidth,
             fields: {
                 price: {
                     label: 'Price',
@@ -102,6 +103,11 @@ export default {
                 },
             },
         };
+    },
+    mounted() {
+        window.onresize = () => {
+            this.windowWidth = window.innerWidth
+        }
     },
     computed: {
         filteredBuyOrders: function() {
@@ -146,10 +152,30 @@ export default {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 5 && owner) {
+            if ((first + second).length > 6 && owner && this.windowWidth > 1250) {
+                return first.length > 6
+                    ? first.slice(0, 6) + '...'
+                    : first + ' ' +second.slice(0, 6 - firstLength) + '...';
+            } else if ((first + second).length > 5 && owner && this.windowWidth >= 1200 && this.windowWidth <= 1250) {
                 return first.length > 5
                     ? first.slice(0, 5) + '...'
                     : first + ' ' +second.slice(0, 5 - firstLength) + '...';
+            }else if ((first + second).length > 15 && owner && this.windowWidth >= 990 && this.windowWidth < 1200) {
+                return first.length > 15
+                    ? first.slice(0, 15) + '...'
+                    : first + ' ' +second.slice(0, 15 - firstLength) + '...';
+            } else if ((first + second).length > 8 && owner && this.windowWidth >= 770 && this.windowWidth < 990) {
+                return first.length > 8
+                    ? first.slice(0, 8) + '...'
+                    : first + ' ' +second.slice(0, 8 - firstLength) + '...';
+            } else if ((first + second).length > 6 && owner && this.windowWidth >= 530 && this.windowWidth < 770) {
+                return first.length > 6
+                    ? first.slice(0, 6) + '...'
+                    : first + ' ' +second.slice(0, 6 - firstLength) + '...';
+            } else if ((first + second).length > 3 && owner && this.windowWidth < 530) {
+                return first.length > 3
+                    ? first.slice(0, 3) + '...'
+                    : first + ' ' +second.slice(0, 3 - firstLength) + '...';
             } else if (((first + second).length > 7 && !owner)) {
                 return first.length > 7
                     ? first.slice(0, 7) + '...'
@@ -224,4 +250,19 @@ export default {
         },
     },
 };
+
+
+function getWidth() {
+  return Math.max(
+    document.body.scrollWidth,
+    document.documentElement.scrollWidth,
+    document.body.offsetWidth,
+    document.documentElement.offsetWidth,
+    document.documentElement.clientWidth
+  );
+}
+console.log('Width:  ' +  screen.width );
+
+
+
 </script>
