@@ -106,8 +106,8 @@ export default {
     },
     mounted() {
         window.onresize = () => {
-            this.windowWidth = window.innerWidth
-        }
+            this.windowWidth = window.innerWidth;
+        };
     },
     computed: {
         filteredBuyOrders: function() {
@@ -160,7 +160,7 @@ export default {
                 return first.length > 5
                     ? first.slice(0, 5) + '...'
                     : first + ' ' +second.slice(0, 5 - firstLength) + '...';
-            }else if ((first + second).length > 15 && this.windowWidth >= 990 && this.windowWidth < 1200) {
+            } else if ((first + second).length > 15 && this.windowWidth >= 990 && this.windowWidth < 1200) {
                 return first.length > 15
                     ? first.slice(0, 15) + '...'
                     : first + ' ' +second.slice(0, 15 - firstLength) + '...';
@@ -246,19 +246,5 @@ export default {
         },
     },
 };
-
-
-function getWidth() {
-  return Math.max(
-    document.body.scrollWidth,
-    document.documentElement.scrollWidth,
-    document.body.offsetWidth,
-    document.documentElement.offsetWidth,
-    document.documentElement.clientWidth
-  );
-}
-console.log('Width:  ' +  screen.width );
-
-
 
 </script>
