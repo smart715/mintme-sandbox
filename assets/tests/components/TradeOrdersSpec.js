@@ -113,24 +113,5 @@ describe('TradeOrders', () => {
             ]);
         });
 
-        it('should add  Anonymous if the profile is set to Anonymous', function() {
-            let newOrder = JSON.parse(JSON.stringify(order));
-            wrapper.vm.sellOrders = [newOrder];
-
-            expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    traderUrl: 'URL', side: 1, owner: true,
-                    isAnonymous: false},
-            ]);
-
-            newOrder.maker.profile.anonymous = true;
-            wrapper.vm.isAnonymous = true;
-
-            expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'Anonymous', traderFullName: 'Anonymous', traderUrl: '#', side: 1, owner: true,
-                    isAnonymous: true},
-            ]);
-        });
     });
 });
