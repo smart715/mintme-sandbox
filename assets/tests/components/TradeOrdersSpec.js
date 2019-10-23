@@ -112,6 +112,5 @@ describe('TradeOrders', () => {
                     isAnonymous: true},
             ]);
         });
-
     });
 });
