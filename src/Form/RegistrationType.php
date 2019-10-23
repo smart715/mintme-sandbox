@@ -5,6 +5,7 @@ namespace App\Form;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /** @codeCoverageIgnore  */
@@ -14,6 +15,7 @@ class RegistrationType extends AbstractType
     {
         $builder
             ->remove('username')
+            ->remove('plainPassword')
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'attr' => [
                     'options' => [
@@ -26,6 +28,9 @@ class RegistrationType extends AbstractType
                 'mapped' => false,
                 'constraints' => [ new RecaptchaTrue() ],
                 'label' => false,
+            ])
+            ->add('plainPassword', PasswordType::class, [
+                'label' => 'Password:',
             ])
         ;
     }
