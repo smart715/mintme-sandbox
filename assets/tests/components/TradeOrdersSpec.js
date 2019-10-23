@@ -80,7 +80,7 @@ describe('TradeOrders', () => {
     it('should group by price', function() {
         expect(wrapper.vm.filteredSellOrders).to.deep.equal([
             {price: toMoney(2), amount: toMoney(4), sum: toMoney(8),
-                trader: 'foo ba..', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
+                trader: 'foo ba...', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
                 isAnonymous: false},
         ]);
 

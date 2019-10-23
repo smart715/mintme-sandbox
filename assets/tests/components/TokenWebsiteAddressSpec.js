@@ -94,6 +94,6 @@ describe('TokenWebsiteAddress', () => {
                 editingWebsite: false,
             },
         });
-        expect(wrapper.find('#website-link').text()).to.equal('https://example.com0000000000000000..');
+        expect(wrapper.find('#website-link').text()).to.equal('https://example.com0000000000000000...');
     });
 });
