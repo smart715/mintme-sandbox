@@ -9,14 +9,15 @@
                 <div class="card">
                     <div class="card-header">Account settings</div>
                     <div class="card-body m-0">
-                        <div id="settings" class="mt-3">
+                        <div id="settings">
                             {{ form_start(passwordForm) }}
                                 {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off'}}) }}
                                 <passwordmeter :password="password" @toggle-error="toggleError">
-                                    {{ form_row(passwordForm.plainPassword.first, {'attr': {'v-model': 'password'}}) }}
+                                    <span @click="togglePassword()" class="show-password">
+                                        <i class="far fa-eye"></i>
+                                    </span>
+                                    {{ form_row(passwordForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
                                 </passwordmeter>
-                                {{ form_row(passwordForm.plainPassword.second) }}
-                                {{ form_rest(passwordForm) }}
                                 <button type="submit" :disabled="disabled" class="btn btn-primary">Save</button>
                             {{ form_end(passwordForm) }}
                         </div>
