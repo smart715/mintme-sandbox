@@ -77,25 +77,6 @@ describe('TradeOrders', () => {
         expect(wrapper.find('trade-buy-orders-stub').exists()).to.deep.equal(true);
     });
 
-    it('should group by price', function() {
-        expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-            {price: toMoney(2), amount: toMoney(4), sum: toMoney(8),
-                trader: 'foo ba...', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
-                isAnonymous: false},
-        ]);
-
-        wrapper.vm.sellOrders.push({...order, price: toMoney(3)});
-
-        expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-            {price: toMoney(2), amount: toMoney(4), sum: toMoney(8),
-                trader: 'foo ba...', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
-                isAnonymous: false},
-            {price: toMoney(3), amount: toMoney(2), sum: toMoney(6),
-                trader: 'foo ba...', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
-                isAnonymous: false},
-        ]);
-    });
-
     describe('truncate FullName correctly', function() {
         wrapper.vm.sellOrders = Array(2).fill(order);
         wrapper.vm.ordersLoaded = true;
