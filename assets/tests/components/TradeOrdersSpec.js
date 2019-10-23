@@ -100,16 +100,6 @@ describe('TradeOrders', () => {
         wrapper.vm.sellOrders = Array(2).fill(order);
         wrapper.vm.ordersLoaded = true;
 
-        it('should truncate FullName if is owner and fullName > 5', function() {
-            wrapper.vm.sellOrders = [order];
-
-            expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {price: toMoney(2), amount: toMoney(2), sum: toMoney(4),
-                    trader: 'foo ba...', traderFullName: 'foo bar', traderUrl: 'URL', side: 1, owner: true,
-                    isAnonymous: false},
-            ]);
-        });
-
         it('should add  Anonymous if the profile is null', function() {
             let newOrder = JSON.parse(JSON.stringify(order));
             newOrder.maker.profile = null;
