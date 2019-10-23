@@ -104,6 +104,6 @@ describe('TokenDiscordChannel', () => {
                 editingDiscord: false,
             },
         });
-        expect(wrapper.find('#discord-link').text()).to.equal('https://discord.gg/newdiscord000000..');
+        expect(wrapper.find('#discord-link').text()).to.equal('https://discord.gg/newdiscord000000...');
     });
 });
