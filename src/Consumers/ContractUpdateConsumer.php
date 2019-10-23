@@ -42,7 +42,7 @@ class ContractUpdateConsumer implements ConsumerInterface
         $body = $msg->body;
 
         try {
-            $clbResult = contractUpdateCallbackMessage::parse(
+            $clbResult = ContractUpdateCallbackMessage::parse(
                 json_decode((string)$body, true)
             );
         } catch (\Throwable $exception) {
