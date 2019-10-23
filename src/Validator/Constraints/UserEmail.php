@@ -4,6 +4,9 @@ namespace App\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * @Annotation
+ */
 class UserEmail extends Constraint
 {
     /** @var string */
