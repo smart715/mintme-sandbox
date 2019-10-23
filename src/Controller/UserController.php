@@ -5,13 +5,13 @@ namespace App\Controller;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Exchange\Trade\Config\PrelaunchConfig;
+use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\Form\Type\ChangePasswordFormType;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -207,7 +207,7 @@ class UserController extends AbstractController
     private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
     {
         $user = $this->getUser();
-        $passwordForm = $this->createForm(ChangePasswordFormType::class, $user);
+        $passwordForm = $this->createForm(ChangePasswordType::class, $user);
         $passwordForm->handleRequest($request);
 
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
