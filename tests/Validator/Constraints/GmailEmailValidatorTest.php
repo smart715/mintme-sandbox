@@ -4,14 +4,14 @@ namespace App\Tests\Validator\Constraints;
 
 use App\Entity\User;
 use App\Manager\UserManager;
-use App\Validator\Constraints\UserEmail;
-use App\Validator\Constraints\UserEmailValidator;
+use App\Validator\Constraints\GmailEmail;
+use App\Validator\Constraints\GmailEmailValidator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class UserEmailValidatorTest extends TestCase
+class GmailEmailValidatorTest extends TestCase
 {
     public function testValidate(): void
     {
@@ -32,10 +32,10 @@ class UserEmailValidatorTest extends TestCase
             $this->createMock(ConstraintViolationBuilderInterface::class)
         );
 
-        $constraint = $this->createMock(UserEmail::class);
+        $constraint = $this->createMock(GmailEmail::class);
         $constraint->message = 'test';
 
-        $validator = new UserEmailValidator($security, $um);
+        $validator = new GmailEmailValidator($security, $um);
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);
@@ -59,10 +59,10 @@ class UserEmailValidatorTest extends TestCase
             $this->createMock(ConstraintViolationBuilderInterface::class)
         );
 
-        $constraint = $this->createMock(UserEmail::class);
+        $constraint = $this->createMock(GmailEmail::class);
         $constraint->message = 'test';
 
-        $validator = new UserEmailValidator($security, $um);
+        $validator = new GmailEmailValidator($security, $um);
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);
@@ -89,10 +89,10 @@ class UserEmailValidatorTest extends TestCase
             $this->createMock(ConstraintViolationBuilderInterface::class)
         );
 
-        $constraint = $this->createMock(UserEmail::class);
+        $constraint = $this->createMock(GmailEmail::class);
         $constraint->message = 'test';
 
-        $validator = new UserEmailValidator($security, $um);
+        $validator = new GmailEmailValidator($security, $um);
         $validator->initialize($context);
 
         $validator->validate($email, $constraint);

@@ -4,8 +4,11 @@ namespace App\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class UserEmail extends Constraint
+/**
+ * @Annotation
+ */
+class GmailEmail extends Constraint
 {
     /** @var string */
-    public $message = "Email already in use";
+    public $message = "Email already in used";
 }

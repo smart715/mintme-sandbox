@@ -10,7 +10,7 @@ class UserEmailSymbolsValidator extends ConstraintValidator
     /** {@inheritdoc} */
     public function validate($value, Constraint $constraint): void
     {
-        if (strpos($value ?? '', '+')) {
+        if ($value && strpos($value, '+')) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
