@@ -17,13 +17,14 @@
             <label class="custom-control custom-checkbox pt-2">
                 <input
                     v-model="locked"
-                    type="checkbox"
                     id="locked"
+                    type="checkbox"
                     class="custom-control-input"
                 >
                 <label
                     class="custom-control-label"
-                    for="locked">
+                    for="locked"
+                >
                     Prevent another edition of withdrawal address.
                 </label>
             </label>
@@ -60,7 +61,7 @@
         class="text-left"
     >
         <p class="bg-info m-0 py-1 px-3">
-            updating address is pending.
+            Updating address is pending.
         </p>
     </div>
 </template>
@@ -76,17 +77,17 @@ export default {
         TwoFactorModal,
     },
     props: {
-        twofa: Boolean,
-        tokenName: String,
         isTokenDeployed: Boolean,
+        tokenName: String,
+        twofa: Boolean,
         withdrawalAddress: String,
     },
     data() {
         return {
-            showTwoFactorModal: false,
             currentAddress: this.withdrawalAddress,
-            newAddress: this.withdrawalAddress,
             locked: false,
+            newAddress: this.withdrawalAddress,
+            showTwoFactorModal: false,
             submitting: false,
         };
     },
@@ -102,7 +103,7 @@ export default {
         closeModal: function() {
             this.cancelEditingMode();
         },
-        steUpdatingState: function() {
+        setUpdatingState: function() {
             this.currentAddress = '0x';
         },
         cancelEditingMode: function() {
@@ -147,7 +148,7 @@ export default {
                 code,
             })
             .then(() => {
-                this.steUpdatingState();
+                this.setUpdatingState();
                 this.$toasted.success('Updating address is pending.');
             }, (error) => {
                 if (!error.response) {

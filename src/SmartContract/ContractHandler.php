@@ -68,7 +68,7 @@ class ContractHandler implements ContractHandlerInterface
         if (!$token->getLockIn()) {
             $this->logger->error("Failed to deploy token '{$token->getName()}' because It has not a release period");
 
-            throw new Exception('Token dose not has release period');
+            throw new Exception('Token does not have a release period');
         }
 
         $response = $this->rpc->send(
@@ -100,13 +100,13 @@ class ContractHandler implements ContractHandlerInterface
                 "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
             );
 
-            throw new Exception('Token dose not deployed yet');
+            throw new Exception('Token not deployed yet');
         }
 
         if ($token->isMintDestinationLocked()) {
-            $this->logger->error("Failed to Update mintDestination for '{$token->getName()}' because It is locked");
+            $this->logger->error("Failed to update mintDestination for '{$token->getName()}' because it is locked");
 
-            throw new Exception('Token dose not has release period');
+            throw new Exception('Token mintDestination is locked');
         }
 
         $response = $this->rpc->send(
@@ -142,7 +142,9 @@ class ContractHandler implements ContractHandlerInterface
     public function withdraw(User $user, Money $balance, string $address, Token $token): void
     {
         if (Token::DEPLOYED !== $token->deploymentStatus()) {
-            $this->logger->error("Failed to Update mintDestination for '{$token->getName()}' because It is locked");
+            $this->logger->error(
+                "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
+            );
 
             throw new Exception('Token not deployed yet');
         }
