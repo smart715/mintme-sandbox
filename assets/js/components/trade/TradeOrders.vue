@@ -152,7 +152,7 @@ export default {
             let first = profile.firstName;
             let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 6 && owner && this.windowWidth > 1250) {
+            if ((first + second).length > 6 && this.windowWidth > 1250) {
                 return first.length > 6
                     ? first.slice(0, 6) + '...'
                     : first + ' ' +second.slice(0, 6 - firstLength) + '...';
@@ -246,5 +246,10 @@ export default {
         },
     },
 };
+
+console.log('Width: ' + this.windowWidth );
+console.log('actual: ' + window.innerWidth)
+
+
 
 </script>
