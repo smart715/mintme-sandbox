@@ -266,10 +266,10 @@ export default {
                 return first.length > 6
                     ? first.slice(0, 6) + '..'
                     : first + ' ' + second.slice(0, 6 - first.length) + '...';
-            } else if ((first + second).length > 4 && this.windowWidth < 990) {
-                return first.length > 4
-                    ? first.slice(0, 4) + '..'
-                    : first + ' ' + second.slice(0, 4 - first.length) + '...';
+            } else if ((first + second).length > 3 && this.windowWidth < 990) {
+                return first.length > 3
+                    ? first.slice(0, 3) + '...'
+                    : first + ' ' + second.slice(0, 3 - first.length) + '...';
             } else {
                 return first + ' ' + second;
             }
