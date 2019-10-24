@@ -247,9 +247,4 @@ export default {
     },
 };
 
-console.log('Width: ' + this.windowWidth );
-console.log('actual: ' + window.innerWidth)
-
-
-
 </script>
