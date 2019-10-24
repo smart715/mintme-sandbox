@@ -160,22 +160,22 @@ export default {
                 return first.length > 6
                     ? first.slice(0, 6) + '...'
                     : first + ' ' +second.slice(0, 6 - firstLength) + '...';
-            } else if ((first + second).length > 5 && this.windowWidth >= 1200 && this.windowWidth <= 1250) {
-                return first.length > 5
-                    ? first.slice(0, 5) + '...'
-                    : first + ' ' +second.slice(0, 5 - firstLength) + '...';
+            } else if ((first + second).length > 4 && this.windowWidth >= 1200 && this.windowWidth <= 1250) {
+                return first.length > 4
+                    ? first.slice(0, 4) + '...'
+                    : first + ' ' +second.slice(0, 4 - firstLength) + '...';
             } else if ((first + second).length > 15 && this.windowWidth >= 990 && this.windowWidth < 1200) {
                 return first.length > 15
                     ? first.slice(0, 15) + '...'
                     : first + ' ' +second.slice(0, 15 - firstLength) + '...';
-            } else if ((first + second).length > 8 && this.windowWidth >= 770 && this.windowWidth < 990) {
-                return first.length > 8
-                    ? first.slice(0, 8) + '...'
-                    : first + ' ' +second.slice(0, 8 - firstLength) + '...';
-            } else if ((first + second).length > 6 && this.windowWidth >= 530 && this.windowWidth < 770) {
-                return first.length > 6
-                    ? first.slice(0, 6) + '...'
-                    : first + ' ' +second.slice(0, 6 - firstLength) + '...';
+            } else if ((first + second).length > 7 && this.windowWidth >= 770 && this.windowWidth < 990) {
+                return first.length > 7
+                    ? first.slice(0, 7) + '...'
+                    : first + ' ' +second.slice(0, 7 - firstLength) + '...';
+            } else if ((first + second).length > 5 && this.windowWidth >= 530 && this.windowWidth < 770) {
+                return first.length > 5
+                    ? first.slice(0, 5) + '...'
+                    : first + ' ' +second.slice(0, 5 - firstLength) + '...';
             } else if ((first + second).length > 3 && this.windowWidth >= 470 && this.windowWidth < 530) {
                 return first.length > 3
                     ? first.slice(0, 3) + '...'
