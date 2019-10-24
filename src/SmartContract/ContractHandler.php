@@ -112,6 +112,7 @@ class ContractHandler implements ContractHandlerInterface
         $response = $this->rpc->send(
             self::UPDATE_MIN_DESTINATION,
             [
+                'name' => $token->getName(),
                 'contractAddress' => $token->getAddress(),
                 'mintDestination' => $address,
                 'lock'=> $lock,
