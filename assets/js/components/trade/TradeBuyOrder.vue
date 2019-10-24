@@ -89,7 +89,7 @@
                     <div class="col-12 pt-2">
                         <label
                             for="buy-price-amount"
-                            class="text-white">
+                            class="truncate-token-name">
                             Amount in {{ market.quote.symbol }}:
                         </label>
                         <input
