@@ -104,11 +104,6 @@ export default {
             },
         };
     },
-    mounted() {
-        window.onresize = () => {
-            this.windowWidth = window.innerWidth;
-        };
-    },
     computed: {
         filteredBuyOrders: function() {
             return this.ordersList(this.groupByPrice(this.buyOrders));
@@ -117,7 +112,16 @@ export default {
             return this.ordersList(this.groupByPrice(this.sellOrders));
         },
     },
+    created() {
+      window.addEventListener("resize", this.handleResize);
+    },
+    destroyed() {
+      window.removeEventListener("resize", this.handleResize);
+    },
     methods: {
+        handleResize: function() {
+            this.windowWidth = window.innerWidth;
+        },
         updateBuyOrders: function({attach, resolve}) {
             return this.updateOrders(attach, 'buy', resolve);
         },
@@ -172,10 +176,14 @@ export default {
                 return first.length > 6
                     ? first.slice(0, 6) + '...'
                     : first + ' ' +second.slice(0, 6 - firstLength) + '...';
-            } else if ((first + second).length > 3 && this.windowWidth < 530) {
+            } else if ((first + second).length > 3 && this.windowWidth >= 470 && this.windowWidth < 530) {
                 return first.length > 3
                     ? first.slice(0, 3) + '...'
                     : first + ' ' +second.slice(0, 3 - firstLength) + '...';
+            } else if ((first + second).length > 2 && this.windowWidth < 470) {
+                return first.length > 2
+                    ? first.slice(0, 2) + '...'
+                    : first + ' ' +second.slice(0, 2 - firstLength) + '...';
             } else {
                 return first + ' ' + second;
             }

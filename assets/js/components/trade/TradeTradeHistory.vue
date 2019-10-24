@@ -212,11 +212,17 @@ export default {
                 }
             }, 'trade-tableData-update-deals');
         });
-        window.onresize = () => {
-                this.windowWidth = window.innerWidth;
-        };
+    },
+    created() {
+      window.addEventListener("resize", this.handleResize);
+    },
+    destroyed() {
+      window.removeEventListener("resize", this.handleResize);
     },
     methods: {
+        handleResize: function() {
+            this.windowWidth = window.innerWidth;
+        },
         startScrollListeningOnce: function(val) {
             // Disable listener from mixin
         },
@@ -248,18 +254,18 @@ export default {
         truncateFullName: function(profile) {
             let first = profile.firstName;
             let second = profile.lastName;
-            if ((first + second).length > 12 && this.windowWidth >= 1250) {
-                return first.length > 12
-                    ? first.slice(0, 12) + '..'
-                    : first + ' ' + second.slice(0, 12 - first.length) + '...';
+            if ((first + second).length > 11 && this.windowWidth >= 1250) {
+                return first.length > 11
+                    ? first.slice(0, 11) + '..'
+                    : first + ' ' + second.slice(0, 11 - first.length) + '...';
             } else if ((first + second).length > 9 && this.windowWidth >= 1200 && this.windowWidth < 1250) {
                 return first.length > 9
                     ? first.slice(0, 9) + '..'
                     : first + ' ' + second.slice(0, 9 - first.length) + '...';
-            } else if ((first + second).length > 7 && this.windowWidth >= 990 && this.windowWidth < 1200) {
-                return first.length > 7
-                    ? first.slice(0, 7) + '..'
-                    : first + ' ' + second.slice(0, 7 - first.length) + '...';
+            } else if ((first + second).length > 6 && this.windowWidth >= 990 && this.windowWidth < 1200) {
+                return first.length > 6
+                    ? first.slice(0, 6) + '..'
+                    : first + ' ' + second.slice(0, 6 - first.length) + '...';
             } else if ((first + second).length > 4 && this.windowWidth < 990) {
                 return first.length > 4
                     ? first.slice(0, 4) + '..'
