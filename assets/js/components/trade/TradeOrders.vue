@@ -113,10 +113,10 @@ export default {
         },
     },
     created() {
-      window.addEventListener("resize", this.handleResize);
+      window.addEventListener('resize', this.handleResize);
     },
     destroyed() {
-      window.removeEventListener("resize", this.handleResize);
+      window.removeEventListener('resize', this.handleResize);
     },
     methods: {
         handleResize: function() {
