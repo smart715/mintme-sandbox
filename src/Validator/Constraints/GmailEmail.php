@@ -10,5 +10,5 @@ use Symfony\Component\Validator\Constraint;
 class GmailEmail extends Constraint
 {
     /** @var string */
-    public $message = "Email already in used";
+    public $message = "This Gmail address is already used";
 }
