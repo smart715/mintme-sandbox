@@ -110,6 +110,7 @@ class ContractHandlerTest extends TestCase
             ->expects($this->once())->method('send')->with(
                 'update_mint_destination',
                 [
+                    'name' => 'foo',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
                     'lock'=> false,
@@ -187,6 +188,7 @@ class ContractHandlerTest extends TestCase
             ->expects($this->never())->method('send')->with(
                 'update_mint_destination',
                 [
+                    'name' => 'foo',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
                     'lock'=> false,
