@@ -65,15 +65,28 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
             ->execute();
     }
 
-    public function getGmailUsers(): ?array
+    /**
+     * @param array|null $domains
+     * @return array|null
+     */
+    public function getUsersByDomains(?array $domains): ?array
     {
         $qr = $this->getRepository()->createQueryBuilder('qr');
+        $merge = [];
 
-        return  $qr->select('u')
-            ->from(User::class, 'u')
-            ->orWhere("u.email LIKE '%@gmail.com'")
-            ->orWhere("u.email LIKE '%@googlemail.com'")
-            ->getQuery()
-            ->execute();
+        if ($domains) {
+            foreach ($domains as $domain) {
+                $merge = array_merge(
+                    $qr->select('u')
+                        ->from(User::class, 'u')
+                        ->orWhere("u.email LIKE '%@" . $domain . "'")
+                        ->getQuery()
+                        ->execute(),
+                    $merge
+                );
+            }
+        }
+
+        return $merge ?? null;
     }
 }

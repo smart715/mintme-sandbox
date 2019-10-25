@@ -70,7 +70,7 @@ class GmailEmailValidator extends ConstraintValidator
      */
     protected function gmailHandler(?string $email): bool
     {
-        $users = $this->userManager->getGmailUsers();
+        $users = $this->userManager->getUsersByDomains($this->gmailDomains);
 
         if ($users) {
             foreach ($users as $user) {
