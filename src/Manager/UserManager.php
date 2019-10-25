@@ -73,13 +73,13 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
     {
         $qr = $this->getRepository()->createQueryBuilder('qr');
         $merge = [];
+        $qr->select('u')
+            ->from(User::class, 'u');
 
         if ($domains) {
             foreach ($domains as $domain) {
                 $merge = array_merge(
-                    $qr->select('u')
-                        ->from(User::class, 'u')
-                        ->orWhere("u.email LIKE '%@" . $domain . "'")
+                    $qr->orWhere("u.email LIKE '%@".$domain."'")
                         ->getQuery()
                         ->execute(),
                     $merge
