@@ -22,7 +22,7 @@ class GmailEmailValidatorTest extends TestCase
         $user->method('getEmail')->willReturn($userEmail);
 
         $um = $this->createMock(UserManager::class);
-        $um->method('getGmailUsers')->willReturn([$user]);
+        $um->method('getUsersByDomains')->willReturn([$user]);
 
         $security = $this->createMock(Security::class);
         $security->method('getUser')->willReturn(null);
@@ -79,7 +79,7 @@ class GmailEmailValidatorTest extends TestCase
         $user->method('getEmail')->willReturn($userEmail);
 
         $um = $this->createMock(UserManager::class);
-        $um->method('getGmailUsers')->willReturn(null);
+        $um->method('getUsersByDomains')->willReturn(null);
 
         $security = $this->createMock(Security::class);
         $security->method('getUser')->willReturn(null);
