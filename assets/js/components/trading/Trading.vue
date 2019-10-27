@@ -131,10 +131,12 @@ export default {
         fields: function() {
             return {
                 pair: {
+                    key: 'pair',
                     label: 'Pair',
                     sortable: true,
                 },
                 change: {
+                    key: 'change',
                     label: 'Change',
                     sortable: true,
                 },
