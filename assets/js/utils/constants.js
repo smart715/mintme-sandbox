@@ -29,3 +29,8 @@ export const WSAPI = {
         },
     },
 };
+
+export const USD = {
+    symbol: 'USD',
+    subunit: 4,
+};
