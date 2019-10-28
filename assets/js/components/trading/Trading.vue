@@ -74,6 +74,7 @@
 import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
+import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import capitalize from 'lodash/capitalize';
 
@@ -142,19 +143,19 @@ export default {
                 },
                 lastPrice: {
                     label: 'Last Price',
-                    key: 'lastPrice' + ( this.showUsd ? 'USD' : ''),
+                    key: 'lastPrice' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
                 volume: {
                     label: '24H Volume',
-                    key: 'volume' + ( this.showUsd ? 'USD' : ''),
+                    key: 'volume' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
                 monthVolume: {
                     label: '30d Volume',
-                    key: 'monthVolume' + ( this.showUsd ? 'USD' : ''),
+                    key: 'monthVolume' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
@@ -400,7 +401,7 @@ export default {
             let config = {
                 params: {
                     ids,
-                    vs_currencies: 'usd',
+                    vs_currencies: USD.symbol.toLowerCase(),
                 },
             };
 
@@ -408,7 +409,7 @@ export default {
                 this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
                 .then((res) => {
                     Object.keys(res.data).map((name) => {
-                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name]['usd'];
+                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name][USD.symbol.toLowerCase()];
                     });
                     resolve();
                 })
@@ -418,7 +419,7 @@ export default {
             });
         },
         toUSD: function(amount, currency) {
-            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), 2) + ' ' + 'USD';
+            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), USD.subunit) + ' ' + USD.symbol;
         },
     },
 };
