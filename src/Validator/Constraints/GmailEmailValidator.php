@@ -74,9 +74,7 @@ class GmailEmailValidator extends ConstraintValidator
 
         if ($users) {
             foreach ($users as $user) {
-                if ($this->getEmailName($user->getEmail())
-                    ===
-                    $this->getEmailName($email)) {
+                if ($this->getEmailName($user->getEmail()) === $this->getEmailName($email)) {
                     return true;
                 }
             }
