@@ -115,7 +115,7 @@
                                     <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
                                         City must have at least 2 letters
                                     </div>
-                                    <div v-if="!notAvailZipCode" class="pb-1">
+                                    <div class="pb-1">
                                         {{ form_row(form.zipCode, {'attr':
                                             {
                                                 'v-model.trim': '$v.zipCode.$model',
@@ -125,7 +125,7 @@
                                         }) }}
                                     </div>
                                     <div
-                                        v-if="!$v.zipCode.zipCodeValidation && !notAvailZipCode"
+                                        v-if="!$v.zipCode.zipCodeValidation"
                                         v-cloak="$v.zipCode"
                                         class="text-danger text-center"
                                     >
