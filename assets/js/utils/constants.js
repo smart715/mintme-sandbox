@@ -29,3 +29,5 @@ export const WSAPI = {
         },
     },
 };
+
+export const notAvailZipCodes = ['', 'AO', 'AG', 'AW', 'BS', 'BZ', 'BJ', 'BM', 'BO', 'BQ', 'BW', 'BF', 'BI', 'CM', 'CF', 'TD', 'KM', 'CD', 'CG', 'CK', 'CI', 'CW', 'DJ', 'DM', 'TL', 'GQ', 'ER', 'FJ', 'TF', 'GA', 'GM', 'GH', 'GD', 'GY', 'HM', 'HK', 'IE', 'KI', 'KP', 'LY', 'MO', 'MW', 'ML', 'MR', 'NA', 'NR', 'NL', 'NU', 'QA', 'RW', 'KN', 'ST', 'SC', 'SL', 'SX', 'SB', 'SR', 'SY', 'TG', 'TK', 'TO', 'TV', 'UG', 'AE', 'VU', 'YE', 'ZW'];
