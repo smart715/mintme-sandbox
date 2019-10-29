@@ -44,7 +44,7 @@ class GmailEmailValidator extends ConstraintValidator
      */
     protected function getEmailDomain(?string $email): string
     {
-        if (!substr($email ?? '', strrpos($email ?? '', '@') + 1) || !$email) {
+        if (!$email || !substr($email, strrpos($email, '@') + 1)) {
             return '';
         }
 
@@ -57,7 +57,7 @@ class GmailEmailValidator extends ConstraintValidator
      */
     protected function getEmailName(?string $email): string
     {
-        if (!strstr($email ?? '', '@', true) || !$email) {
+        if (!$email || !strstr($email, '@', true)) {
             return '';
         }
 
