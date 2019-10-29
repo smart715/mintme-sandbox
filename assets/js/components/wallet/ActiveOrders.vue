@@ -7,12 +7,12 @@
                     v-if="hasOrders"
                     :items="history"
                     :fields="fields">
-                    <template slot="name" slot-scope="row">
+                    <template v-slot:cell(name)="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
                             <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
                         </div>
                     </template>
-                    <template slot="action" slot-scope="row">
+                    <template v-slot:cell(action)="row">
                         <a @click="removeOrderModal(row.item)">
                             <span class="icon-cancel c-pointer"></span>
                         </a>
@@ -71,10 +71,11 @@ export default {
             tokenName: null,
             amount: null,
             price: null,
-            fields: {
-                date: {label: 'Date', sortable: true},
-                type: {label: 'Type', sortable: true},
-                name: {
+            fields: [
+                {key: 'date', label: 'Date', sortable: true},
+                {key: 'type', label: 'Type', sortable: true},
+                {
+                    key: 'name',
                     label: 'Name',
                     sortable: true,
                     formatter: (name) => {
@@ -84,20 +85,22 @@ export default {
                         };
                     },
                 },
-                amount: {label: 'Amount', sortable: true},
-                price: {
+                {key: 'amount', label: 'Amount', sortable: true},
+                {
+                    key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                total: {
+                {
+                    key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                fee: {label: 'Fee', sortable: true},
-                action: {label: 'Action', sortable: false},
-            },
+                {key: 'fee', label: 'Fee', sortable: true},
+                {key: 'action', label: 'Action', sortable: false},
+            ],
         };
     },
     computed: {
