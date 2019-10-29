@@ -174,8 +174,6 @@ import TokenWebsiteAddress from '../website/TokenWebsiteAddress';
 import TokenWebsiteAddressView from '../website/TokenWebsiteAddressView';
 import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
 import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
-import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown';
-import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -209,8 +207,6 @@ export default {
         youtubeChannelId: String,
     },
     components: {
-        bDropdown,
-        bDropdownItem,
         FontAwesomeIcon,
         Guide,
         Modal,
