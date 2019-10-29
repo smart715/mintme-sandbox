@@ -8,7 +8,7 @@
                         :orders-list="filteredBuyOrders"
                         :token-name="market.base.symbol"
                         :fields="fields"
-                        :sort-by="fields.price.key"
+                        sort-by="price"
                         :sort-desc="true"
                         :basePrecision="market.base.subunit"
                         :quotePrecision="market.quote.subunit"
@@ -27,7 +27,7 @@
                         :orders-list="filteredSellOrders"
                         :token-name="market.quote.symbol"
                         :fields="fields"
-                        :sort-by="fields.price.key"
+                        sort-by="price"
                         :sort-desc="false"
                         :basePrecision="market.base.subunit"
                         :quotePrecision="market.quote.subunit"
@@ -83,24 +83,27 @@ export default {
         return {
             removeOrders: [],
             confirmModal: false,
-            fields: {
-                price: {
-                    label: 'Price',
+            fields: [
+                {
                     key: 'price',
+                    label: 'Price',
                     formatter: formatMoney,
                 },
-                amount: {
+                {
+                    key: 'amount',
                     label: 'Amount',
                     formatter: formatMoney,
                 },
-                sum: {
+                {
+                    key: 'sum',
                     label: 'Sum ' + this.market.base.symbol,
                     formatter: formatMoney,
                 },
-                trader: {
+                {
+                    key: 'trader',
                     label: 'Trader',
                 },
-            },
+            ],
         };
     },
     computed: {
