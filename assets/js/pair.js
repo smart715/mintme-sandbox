@@ -1,4 +1,3 @@
-import {Tabs} from 'bootstrap-vue/es/components';
 import Trade from './components/trade/Trade';
 import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
@@ -28,7 +27,6 @@ new Vue({
     TokenName,
     TokenDeployIcon,
     TopHolders,
-    Tabs,
   },
   methods: {
     descriptionUpdated: function(val) {
