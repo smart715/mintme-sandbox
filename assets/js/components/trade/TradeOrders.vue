@@ -138,7 +138,7 @@ export default {
                     amount: toMoney(order.amount, this.market.quote.subunit),
                     sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
                     trader: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? this.truncateFullName(order.maker.profile)
+                        ? this.traderFullName(order.maker.profile)
                         : 'Anonymous',
                     traderFullName: order.maker.profile !== null && !order.maker.profile.anonymous
                         ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
@@ -152,41 +152,10 @@ export default {
                 };
             });
         },
-        truncateFullName: function(profile) {
+        traderFullName: function(profile) {
             let first = profile.firstName;
-            let firstLength = first.length;
             let second = profile.lastName;
-            if ((first + second).length > 6 && this.windowWidth > 1250) {
-                return first.length > 6
-                    ? first.slice(0, 6) + '...'
-                    : first + ' ' +second.slice(0, 6 - firstLength) + '...';
-            } else if ((first + second).length > 4 && this.windowWidth >= 1200 && this.windowWidth <= 1250) {
-                return first.length > 4
-                    ? first.slice(0, 4) + '...'
-                    : first + ' ' +second.slice(0, 4 - firstLength) + '...';
-            } else if ((first + second).length > 15 && this.windowWidth >= 990 && this.windowWidth < 1200) {
-                return first.length > 15
-                    ? first.slice(0, 15) + '...'
-                    : first + ' ' +second.slice(0, 15 - firstLength) + '...';
-            } else if ((first + second).length > 7 && this.windowWidth >= 770 && this.windowWidth < 990) {
-                return first.length > 7
-                    ? first.slice(0, 7) + '...'
-                    : first + ' ' +second.slice(0, 7 - firstLength) + '...';
-            } else if ((first + second).length > 5 && this.windowWidth >= 530 && this.windowWidth < 770) {
-                return first.length > 5
-                    ? first.slice(0, 5) + '...'
-                    : first + ' ' +second.slice(0, 5 - firstLength) + '...';
-            } else if ((first + second).length > 3 && this.windowWidth >= 470 && this.windowWidth < 530) {
-                return first.length > 3
-                    ? first.slice(0, 3) + '...'
-                    : first + ' ' +second.slice(0, 3 - firstLength) + '...';
-            } else if ((first + second).length > 2 && this.windowWidth < 470) {
-                return first.length > 2
-                    ? first.slice(0, 2) + '...'
-                    : first + ' ' +second.slice(0, 2 - firstLength) + '...';
-            } else {
-                return first + ' ' + second;
-            }
+            return profile.firstName + ' ' + profile.lastName;
         },
         groupByPrice: function(orders) {
             let filtered = [];

@@ -28,21 +28,33 @@
                          :items="tableData"
                          :fields="fields">
                         <template slot="trader" slot-scope="row">
-                        <a v-if="!row.item.isAnonymous" :href="row.item.traderUrl">
-                            <span v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
-                                {{ row.value }}
-                            </span>
-                            <img
-                                src="../../../img/avatar.png"
-                                class="float-right"
-                                alt="avatar">
-                        </a>
-                        <span v-else>{{ row.value }}</span>
+                            <div class="row-orders">
+                                <div class="column-orders trader-slot">
+                                    <a v-if="!row.item.isAnonymous" :href="row.item.traderUrl">
+                                        <div class="row-orders">
+                                            <div class="column-orders">
+                                                <img
+                                                  src="../../../img/avatar.png"
+                                                  class="float-right"
+                                                  alt="avatar">
+                                            </div>
+                                            <div class="column-orders">
+                                                <span class="truncate-trader-name" v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
+                                                    {{ row.value }}
+                                                </span>
+                                            </div>
 
-                        <a @click="removeOrderModal(row.item)"
-                           v-if="row.item.owner">
-                            <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                        </a>
+                                        </div>
+                                    </a>
+                                    <span v-else>{{ row.value }}</span>
+                                </div>
+                                <div class="column-orders close-sign">
+                                    <a @click="removeOrderModal(row.item)"
+                                       v-if="row.item.owner">
+                                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                                    </a>
+                                </div>
+                            </div>
                         </template>
                     </b-table>
                     <div v-if="!hasOrders">
