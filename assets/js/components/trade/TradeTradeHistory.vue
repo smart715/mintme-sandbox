@@ -111,30 +111,38 @@ export default {
     data() {
         return {
             windowWidth: window.innerWidth,
-            fields: {
-                type: {
+            fields: [
+                {
+                    key: 'type',
                     label: 'Type',
                 },
-                orderMaker: {
+                {
+                    key: 'orderMaker',
                     label: 'Order maker',
                 },
-                orderTrader: {
+                {
+                    key: 'orderTrader',
                     label: 'Order taker',
                 },
-                pricePerQuote: {
+                {
+                    key: 'pricePerQuote',
                     formatter: formatMoney,
                 },
-                quoteAmount: {
+                {
+                    key: 'quoteAmount',
                     formatter: formatMoney,
                 },
-                baseAmount: {
+                {
+                    key: 'baseAmount',
                     label: this.market.base.symbol + ' amount',
                     formatter: formatMoney,
                 },
-                dateTime: {
+                {
+                    key: 'dateTime',
                     label: 'Date & Time',
                 },
-            },
+            ],
+
         };
     },
     computed: {
