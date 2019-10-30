@@ -24,19 +24,19 @@
                             :items="ordersList"
                             :fields="fields">
 
-                            <template slot="HEAD_pricePerQuote" slot-scope="row">
+                            <template v-slot:head(pricePerQuote)="row">
                                 <span v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
                                     Price per {{ market.quote.symbol | truncate(7) }}
                                 </span>
                             </template>
 
-                            <template slot="HEAD_quoteAmount" slot-scope="row">
+                            <template v-slot:head(quoteAmount)="row">
                                 <span v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
                                     {{ market.quote.symbol | truncate(7) }} amount
                                 </span>
                             </template>
 
-                            <template slot="orderMaker" slot-scope="row">
+                            <template v-slot:cell(orderMaker)="row">
                                 <a v-if="!row.item.isMakerAnonymous" :href="row.item.makerUrl">
                                     <span v-b-tooltip="{title: row.item.makerFullName, boundary:'viewport'}">
                                         {{ row.value }}
@@ -48,7 +48,7 @@
                                 </a>
                                 <span v-else>{{ row.value }}</span>
                             </template>
-                            <template slot="orderTrader" slot-scope="row">
+                            <template v-slot:cell(orderTrader)="row">
                                 <a v-if="!row.item.isTakerAnonymous" :href="row.item.takerUrl">
                                     <span v-b-tooltip="{title: row.item.takerFullName, boundary:'viewport'}">
                                         {{ row.value }}
@@ -60,7 +60,7 @@
                                 </a>
                                 <span v-else>{{ row.value }}</span>
                             </template>
-                            <template slot="dateTime" slot-scope="row">
+                            <template v-slot:cell(dateTime)="row">
                                  <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                         {{ row.value | truncate(13) }}
                                 </span>
@@ -142,7 +142,6 @@ export default {
                     label: 'Date & Time',
                 },
             ],
-
         };
     },
     computed: {

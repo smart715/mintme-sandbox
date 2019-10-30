@@ -6,7 +6,7 @@
                     v-if="hasHistory"
                     :items="history"
                     :fields="fields">
-                    <template slot="name" slot-scope="row">
+                    <template v-slot:cell(name)="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
                             <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
                         </div>
@@ -42,10 +42,11 @@ export default {
         return {
             tableData: null,
             currentPage: 1,
-            fields: {
-                date: {label: 'Date', sortable: true},
-                side: {label: 'Type', sortable: true},
-                name: {
+            fields: [
+                {key: 'date', label: 'Date', sortable: true},
+                {key: 'side', label: 'Type', sortable: true},
+                {
+                    key: 'name',
                     label: 'Name',
                     sortable: true,
                     formatter: (name) => {
@@ -55,27 +56,31 @@ export default {
                         };
                     },
                 },
-                amount: {
+                {
+                    key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                price: {
+                {
+                    key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                total: {
+                {
+                    key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                fee: {
+                {
+                    key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: (val) => formatMoney(formatFee(val)),
                 },
-            },
+            ],
         };
     },
     computed: {

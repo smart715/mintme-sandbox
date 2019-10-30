@@ -10,7 +10,7 @@
                      ref="table"
                     :items="traders"
                     :fields="fields">
-                    <template slot="trader" slot-scope="row">
+                    <template v-slot:cell(trader)="row">
                         <a :href="row.item.url">
                             <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                 {{ row.value | truncate(50) }}
@@ -58,18 +58,21 @@ export default {
     data() {
         return {
             traders: null,
-            fields: {
-                trader: {
+            fields: [
+                {
+                    key: 'trader',
                     label: 'Trader',
                 },
-                date: {
+                {
+                    key: 'date',
                     label: 'Date',
                 },
-                amount: {
+                {
+                    key: 'amount',
                     label: 'Amount',
                     formatter: formatMoney,
                 },
-            },
+            ],
         };
     },
     computed: {
