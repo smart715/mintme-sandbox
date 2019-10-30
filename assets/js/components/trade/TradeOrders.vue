@@ -83,7 +83,6 @@ export default {
         return {
             removeOrders: [],
             confirmModal: false,
-            windowWidth: window.innerWidth,
             fields: {
                 price: {
                     label: 'Price',
@@ -112,16 +111,7 @@ export default {
             return this.ordersList(this.groupByPrice(this.sellOrders));
         },
     },
-    created() {
-      window.addEventListener('resize', this.handleResize);
-    },
-    destroyed() {
-      window.removeEventListener('resize', this.handleResize);
-    },
     methods: {
-        handleResize: function() {
-            this.windowWidth = window.innerWidth;
-        },
         updateBuyOrders: function({attach, resolve}) {
             return this.updateOrders(attach, 'buy', resolve);
         },
@@ -153,8 +143,6 @@ export default {
             });
         },
         traderFullName: function(profile) {
-            let first = profile.firstName;
-            let second = profile.lastName;
             return profile.firstName + ' ' + profile.lastName;
         },
         groupByPrice: function(orders) {
