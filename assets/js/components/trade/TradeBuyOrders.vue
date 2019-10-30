@@ -85,7 +85,7 @@ export default {
     props: {
         ordersList: [Array],
         tokenName: String,
-        fields: Object,
+        fields: Array,
         sortBy: String,
         sortDesc: Boolean,
         basePrecision: Number,
