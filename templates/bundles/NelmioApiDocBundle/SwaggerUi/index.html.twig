@@ -6,6 +6,10 @@
 #}
 {% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
 
+{% block title %}
+    API Documentation | mintMe
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('build/main.css') }}">
@@ -68,5 +72,3 @@
 {% block meta %}
     {% include 'head.html.twig' %}
 {% endblock %}
-
-{% block title %}{% endblock %}
