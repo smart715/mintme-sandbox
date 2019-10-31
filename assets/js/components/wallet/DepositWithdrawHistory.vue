@@ -8,14 +8,14 @@
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
             >
-                <template slot="symbol" slot-scope="data">
+                <template v-slot:cell(symbol)="data">
                     <a :href="data.item.url" class="text-white">
                         <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
                             {{ data.item.symbol | truncate(15) }}
                         </span>
                     </a>
                 </template>
-                <template slot="toAddress" slot-scope="row">
+                <template v-slot:cell(toAddress)="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
                         <copy-link :content-to-copy="row.value" class="c-pointer">
                             <div class="text-truncate text-blue">
@@ -54,38 +54,45 @@ export default {
     components: {CopyLink},
     data() {
         return {
-            fields: {
-                date: {
+            fields: [
+                {
+                    key: 'date',
                     label: 'Date',
                     sortable: true,
                 },
-                type: {
+                {
+                    key: 'type',
                     label: 'Type',
                     sortable: true,
                 },
-                symbol: {
+                {
+                    key: 'symbol',
                     label: 'Name',
                     sortable: true,
                 },
-                toAddress: {
+                {
+                    key: 'toAddress',
                     label: 'Address',
                     sortable: true,
                 },
-                amount: {
+                {
+                    key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                status: {
+                {
+                    key: 'status',
                     label: 'Status',
                     sortable: true,
                 },
-                fee: {
+                {
+                    key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: (val) => formatMoney(formatFee(val)),
                 },
-            },
+            ],
             tableData: null,
             currentPage: 1,
         };

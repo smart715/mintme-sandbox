@@ -12,15 +12,15 @@
                     />
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
-                <template slot="name" slot-scope="data">
+                <template v-slot:cell(name)="data">
                     <a :href="generateCoinUrl(data.item)" class="text-white">
                         {{ data.item.fullname }} ({{ data.item.name }})
                     </a>
                 </template>
-                <template slot="available" slot-scope="data">
+                <template v-slot:cell(available)="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
-                <template slot="action" slot-scope="data">
+                <template v-slot:cell(action)="data">
                     <div
                         class="row">
                         <div class="d-flex flex-row c-pointer pl-2"
@@ -59,17 +59,17 @@
         </div>
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
-                <template slot="name" slot-scope="data">
+                <template v-slot:cell(name)="data">
                     <a :href="generatePairUrl(data.item)" class="text-white">
                         <span v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
                             {{ data.item.name | truncate(15) }}
                         </span>
                     </a>
                 </template>
-                <template slot="available" slot-scope="data">
+                <template v-slot:cell(available)="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
-                <template slot="action" slot-scope="data">
+                <template v-slot:cell(action)="data">
                     <div
                         v-if="data.item.deployed"
                         class="row">
@@ -186,16 +186,16 @@ export default {
                 trigger: 'mouseenter',
                 delay: [100, 200],
             },
-            predefinedTokenFields: {
-                name: {label: 'Name'},
-                available: {label: 'Amount'},
-                action: {label: 'Actions', sortable: false},
-            },
-            tokenFields: {
-                name: {label: 'Name'},
-                available: {label: 'Amount'},
-                action: {label: 'Actions', sortable: false},
-            },
+            predefinedTokenFields: [
+                {key: 'name', label: 'Name'},
+                {key: 'available', label: 'Amount'},
+                {key: 'action', label: 'Actions', sortable: false},
+            ],
+            tokenFields: [
+                {key: 'name', label: 'Name'},
+                {key: 'available', label: 'Amount'},
+                {key: 'action', label: 'Actions', sortable: false},
+            ],
             withdraw: {
                 fee: '0',
                 webFee: '0',
