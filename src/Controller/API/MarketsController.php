@@ -17,7 +17,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
@@ -90,10 +90,8 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/marketcap/{base}", name="marketcap", options={"expose"=true})
      */
-    public function getMarketCap(MarketCapCalculator $marketCapCalculator, string $base = Token::BTC_SYMBOL): View
+    public function getMarketCap(MarketCapCalculator $marketCapCalculator, CacheInterface $cache, string $base = Token::BTC_SYMBOL): View
     {
-        $cache = new FilesystemAdapter();
-
         $marketCap = $cache->get("marketcap_{$base}", function (ItemInterface $item) use ($marketCapCalculator, $base) {
             $item->expiresAfter(3600);
 
