@@ -12,11 +12,15 @@ use App\Repository\MarketStatusRepository;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
+use Money\Exchange\FixedExchange;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 
 class MarketCapCalculatorTest extends TestCase
 {
+    # Just to please phpstan
+    /** @var FixedExchange */
+    private $exchange;
 
     public function testCalculate(): void
     {
@@ -122,7 +126,7 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockCryptoManager()
         );
 
-        $this->assertEquals('110000', $marketCapCalculator->calculate('USD'));
+        $this->assertEquals('20000', $marketCapCalculator->calculate('USD'));
     }
 
     public function testCalculateWithInvalidBase(): void
@@ -233,12 +237,19 @@ class MarketCapCalculatorTest extends TestCase
     private function mockMoneyWrapper(): MoneyWrapperInterface
     {
         $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('convert')->willReturnCallback(function ($money, $currency, $exchange) {
+
+        $callback = function ($money, $currency, $exchange) {
+            if (null !== $exchange) {
+                $this->exchange = $exchange;
+            }
+
             return (new Money($money->getAmount(), $currency))
                 ->multiply(
-                    $exchange->quote($money->getCurrency(), $currency)->getConversionRatio()
+                    $this->exchange->quote($money->getCurrency(), $currency)->getConversionRatio()
                 );
-        });
+        };
+
+        $mw->method('convert')->willReturnCallback($callback->bindTo($mw));
         $mw->method('format')->willReturnCallback(function ($money) {
             return $money->getAmount();
         });
@@ -250,9 +261,12 @@ class MarketCapCalculatorTest extends TestCase
     {
         $rpc = $this->createMock(RestRpcInterface::class);
         $rpc->method('send')->willReturnCallback(function ($url) {
-            if ('simple/price?ids=bitcoin&vs_currencies=usd' === $url) {
+            if ('simple/price?ids=webchain,bitcoin&vs_currencies=usd' === $url) {
                 return json_encode([
                     'bitcoin' => [
+                        'usd' => 10,
+                    ],
+                    'webchain' => [
                         'usd' => 10,
                     ],
                 ]);
