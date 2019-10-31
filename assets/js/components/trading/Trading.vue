@@ -18,11 +18,11 @@
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
-                    :fields="fields"
-                    :sort-by="fields.lastPrice.key"
+                    :fields="fieldsArray"
+                    sort-by="lastPrice"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
-                    <template :slot="`HEAD_${fields.volume.key}`" slot-scope="data">
+                    <template v-slot:[`head(${fields.volume.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -33,7 +33,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template :slot="`HEAD_${fields.monthVolume.key}`" slot-scope="data">
+                    <template v-slot:[`head(${fields.monthVolume.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -55,7 +55,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template slot="pair" slot-scope="row">
+                    <template v-slot:cell(pair)="row">
                         <a class="d-block text-truncate truncate-responsive text-white"
                             v-b-tooltip:title="row.value"
                             :href="row.item.tokenUrl">
@@ -147,10 +147,12 @@ export default {
         fields: function() {
             return {
                 pair: {
+                    key: 'pair',
                     label: 'Pair',
                     sortable: true,
                 },
                 change: {
+                    key: 'change',
                     label: 'Change',
                     sortable: true,
                 },
@@ -179,6 +181,9 @@ export default {
                     formatter: formatMoney,
                 },
             };
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
         globalMarketCap: function() {
             if (this.showUsd) {
