@@ -18,11 +18,11 @@
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
-                    :fields="fields"
-                    :sort-by="fields.lastPrice.key"
+                    :fields="fieldsArray"
+                    sort-by="lastPrice"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
-                    <template :slot="`HEAD_${fields.volume.key}`" slot-scope="data">
+                    <template v-slot:[`head(${fields.volume.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -33,7 +33,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template :slot="`HEAD_${fields.monthVolume.key}`" slot-scope="data">
+                    <template v-slot:[`head(${fields.monthVolume.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -44,7 +44,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template slot="pair" slot-scope="row">
+                    <template v-slot:cell(pair)="row">
                         <a class="d-block text-truncate truncate-responsive text-white"
                             v-b-tooltip:title="row.value"
                             :href="row.item.tokenUrl">
@@ -74,6 +74,7 @@
 import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
+import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import capitalize from 'lodash/capitalize';
 
@@ -131,32 +132,37 @@ export default {
         fields: function() {
             return {
                 pair: {
+                    key: 'pair',
                     label: 'Pair',
                     sortable: true,
                 },
                 change: {
+                    key: 'change',
                     label: 'Change',
                     sortable: true,
                 },
                 lastPrice: {
                     label: 'Last Price',
-                    key: 'lastPrice' + ( this.showUsd ? 'USD' : ''),
+                    key: 'lastPrice' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
                 volume: {
                     label: '24H Volume',
-                    key: 'volume' + ( this.showUsd ? 'USD' : ''),
+                    key: 'volume' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
                 monthVolume: {
                     label: '30d Volume',
-                    key: 'monthVolume' + ( this.showUsd ? 'USD' : ''),
+                    key: 'monthVolume' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
             };
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
     },
     mounted: function() {
@@ -395,7 +401,7 @@ export default {
             let config = {
                 params: {
                     ids,
-                    vs_currencies: 'usd',
+                    vs_currencies: USD.symbol.toLowerCase(),
                 },
             };
 
@@ -403,7 +409,7 @@ export default {
                 this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
                 .then((res) => {
                     Object.keys(res.data).map((name) => {
-                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name]['usd'];
+                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name][USD.symbol.toLowerCase()];
                     });
                     resolve();
                 })
@@ -413,7 +419,7 @@ export default {
             });
         },
         toUSD: function(amount, currency) {
-            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), 2) + ' ' + 'USD';
+            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), USD.subunit) + ' ' + USD.symbol;
         },
     },
 };

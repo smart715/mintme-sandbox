@@ -32,13 +32,13 @@
                         <div class="row" v-if="!showEditForm">
                             <div class="col-12">
                                 <div class="pb-1">
-                                    {% if profile.city is not empty %}
-                                        City: {{ profile.city }}
+                                    {% if profile.country is not empty %}
+                                        Country: {{ profile.getCountryFullName() }}
                                     {% endif %}
                                 </div>
                                 <div class="pb-1">
-                                    {% if profile.country is not empty %}
-                                        Country: {{ profile.getCountryFullName() }}
+                                    {% if profile.city is not empty %}
+                                        City: {{ profile.city }}
                                     {% endif %}
                                 </div>
                                 <div class="pb-1">
