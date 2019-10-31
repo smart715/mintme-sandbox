@@ -505,20 +505,22 @@ nav.top-navbar
   .link
     color: $blue
 
-.v-cloak--block, .v-cloak--inline, .v-cloak--inline-block
+.v-cloak--block, .v-cloak--inline, .v-cloak--inline-block, .v-cloak--flex
   display: none
-
 
 [v-cloak]
   & > .v-cloak--block
-    display: block
+    display: block !important
 
   & > .v-cloak--inline
-    display: inline
+    display: inline !important
 
   & > .v-cloak--inline-block
-    display: inline-block
-  
+    display: inline-block !important
+
+  & > .v-cloak--flex
+    display: flex !important
+
   & > .v-cloak--hidden
     display: none
 
