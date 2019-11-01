@@ -5,7 +5,6 @@ namespace App\Exchange\Market;
 use App\Communications\RestRpcInterface;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
-use App\Manager\CryptoManagerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -27,41 +26,36 @@ class MarketCapCalculator
     /** @var MarketStatusRepository */
     private $repository;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
     /** @var RestRpcInterface */
     private $rpc;
 
+    /** @var FixedExchange */
+    private $exchange;
+
     public function __construct(
         array $supplyLinks,
         int $tokenSupply,
         EntityManagerInterface $em,
         MoneyWrapperInterface $moneyWrapper,
-        RestRpcInterface $rpc,
-        CryptoManagerInterface $cryptoManager
+        RestRpcInterface $rpc
     ) {
         $this->supplyLinks = $supplyLinks;
         $this->tokenSupply = $tokenSupply;
         $this->moneyWrapper = $moneyWrapper;
         $this->rpc = $rpc;
-        $this->cryptoManager = $cryptoManager;
         $this->repository = $em->getRepository(MarketStatus::class);
     }
 
     public function calculate(string $base = Token::BTC_SYMBOL): string
     {
-        $calculatingUSD = false;
-        $crypto = $this->cryptoManager->findBySymbol($base);
-
         if (MoneyWrapper::USD_SYMBOL === $base) {
             # We'll calculate it as if it was BTC, and will convert the final amount to USD. Pretty nice hack, not so obvious, but I liked it
             $calculatingUSD = Token::BTC_SYMBOL;
-        } elseif (null === $crypto || !$crypto->isTradable()) {
-            throw new \DomainException('Parameter $base should be a valid tradable crypto or USD');
+        } elseif (Token::BTC_SYMBOL !== $base && Token::WEB_SYMBOL !== $base) {
+            throw new \DomainException('Parameter $base can only be WEB, BTC or USD');
         }
 
         # Calculate MarketCap for WEB/token markets
@@ -71,14 +65,14 @@ class MarketCapCalculator
         $tokenMarketCap = $this->moneyWrapper->convert(
             $tokenMarketCap,
             new Currency($base),
-            $this->getExchange($base)
+            $this->getExchange()
         );
 
         # Calculate MarketCap for Base/ExchangeableCryptos
-        $marketCap = $this->getExchangeableCryptosMarketCap($calculatingUSD ?: $base);
+        $marketCap = $this->getExchangeableCryptosMarketCap($calculatingUSD ?? $base);
 
         # Convert to USD if that's what we want
-        if ($calculatingUSD) {
+        if (isset($calculatingUSD)) {
             $marketCap = $this->moneyWrapper->convert(
                 $marketCap,
                 new Currency(MoneyWrapper::USD_SYMBOL)
@@ -154,34 +148,23 @@ class MarketCapCalculator
         }, $this->getZero($base));
     }
 
-    private function getWEBBasePrice(string $base): string
+    private function getExchange(): FixedExchange
     {
-        if (Token::WEB_SYMBOL === $base) {
-            return '1';
+        if (isset($this->exchange)) {
+            return $this->exchange;
         }
 
-        return $this->format($this->repository->findByBaseQuoteNames($base, Token::WEB_SYMBOL)->getLastPrice());
-    }
-
-    private function getExchange(string $base): FixedExchange
-    {
-        if (MoneyWrapper::USD_SYMBOL !== $base) {
-            return new FixedExchange([
-                Token::WEB_SYMBOL => [
-                    $base => $this->getWEBBasePrice($base),
-                ],
-            ]);
-        }
-
-        $response = $this->rpc->send('simple/price?ids=webchain,bitcoin&vs_currencies=usd', Request::METHOD_GET);
+        $response = $this->rpc->send('simple/price?ids=webchain,bitcoin&vs_currencies=usd,btc', Request::METHOD_GET);
         $response = json_decode($response, true);
 
-        return new FixedExchange([
+        return $this->exchange = new FixedExchange([
             Token::BTC_SYMBOL => [
                 MoneyWrapper::USD_SYMBOL => $response['bitcoin']['usd'],
             ],
             Token::WEB_SYMBOL => [
                 MoneyWrapper::USD_SYMBOL => $response['webchain']['usd'],
+                Token::BTC_SYMBOL => $response['webchain']['btc'],
+                Token::WEB_SYMBOL => 1,
             ],
         ]);
     }
