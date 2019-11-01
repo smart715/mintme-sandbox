@@ -44,8 +44,7 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc(),
-            $this->mockCryptoManager()
+            $this->mockRpc()
         );
 
         $this->assertEquals('11000', $marketCapCalculator->calculate());
@@ -93,8 +92,7 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc(),
-            $this->mockCryptoManager()
+            $this->mockRpc()
         );
 
         $this->assertEquals('412800', $marketCapCalculator->calculate());
@@ -122,8 +120,7 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc(),
-            $this->mockCryptoManager()
+            $this->mockRpc()
         );
 
         $this->assertEquals('20000', $marketCapCalculator->calculate('USD'));
@@ -151,8 +148,7 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc(),
-            $this->mockCryptoManager()
+            $this->mockRpc()
         );
 
         $this->expectException(\Throwable::class);
@@ -216,24 +212,6 @@ class MarketCapCalculatorTest extends TestCase
         return $this->createMock(Token::class);
     }
 
-    private function mockCryptoManager(): CryptoManagerInterface
-    {
-        # Cryptos
-        $web = $this->mockCrypto('WEB', 'Webchain', true);
-        $btc = $this->mockCrypto('BTC', 'Bitcoin', true);
-
-        $cm = $this->createMock(CryptoManagerInterface::class);
-        $cm->method('findBySymbol')->willReturnCallback(function ($symbol) use ($web, $btc) {
-            if ('WEB' === $symbol) {
-                return $web;
-            } elseif ('BTC' === $symbol) {
-                return $btc;
-            }
-        });
-
-        return $cm;
-    }
-
     private function mockMoneyWrapper(): MoneyWrapperInterface
     {
         $mw = $this->createMock(MoneyWrapperInterface::class);
@@ -261,13 +239,15 @@ class MarketCapCalculatorTest extends TestCase
     {
         $rpc = $this->createMock(RestRpcInterface::class);
         $rpc->method('send')->willReturnCallback(function ($url) {
-            if ('simple/price?ids=webchain,bitcoin&vs_currencies=usd' === $url) {
+            if ('simple/price?ids=webchain,bitcoin&vs_currencies=usd,btc' === $url) {
                 return json_encode([
                     'bitcoin' => [
                         'usd' => 10,
+                        'btc' => 1,
                     ],
                     'webchain' => [
                         'usd' => 10,
+                        'btc' => 10,
                     ],
                 ]);
             } elseif (preg_match('/coins\/markets/', $url)) {
