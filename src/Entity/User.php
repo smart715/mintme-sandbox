@@ -218,6 +218,7 @@ class User extends BaseUser implements
      */
     public function setEmail($email)
     {
+        $email = strtolower($email);
         $this->username = $email;
 
         return parent::setEmail($email);
