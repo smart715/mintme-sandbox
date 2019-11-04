@@ -59,7 +59,8 @@ class DeployConsumer implements ConsumerInterface
         }
 
         try {
-            $token = $this->tokenManager->findByName($clbResult->getTokenName());
+            $repo = $this->em->getRepository(Token::class);
+            $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
             $this->logger->info("[deploy-consumer] ".gettype($token)." found");
 
