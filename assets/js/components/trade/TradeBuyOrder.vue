@@ -3,7 +3,7 @@
         <div class="card h-100">
             <div class="card-header text-left">
                 Buy Order
-                <span  class="card-header-icon">
+                <span class="card-header-icon">
                     <guide>
                         <template slot="header">
                             Buy Order
@@ -96,8 +96,8 @@
                             v-model="buyAmount"
                             type="text"
                             id="buy-price-amount"
-                            @keypress="$emit('check-input', market.quote.subunit)"
-                            @paste="$emit('check-input', market.quote.subunit)"
+                            @keypress="checkAmountInput"
+                            @paste="checkAmountInput"
                             class="form-control"
                             :disabled="!loggedIn"
                         >
@@ -174,8 +174,11 @@ export default {
             this.balanceManuallyEdited = val;
         },
         checkPriceInput() {
-            this.$emit('check-input', this.market.quote.subunit);
+            this.$emit('check-input', this.market.base.subunit);
             this.setBalanceManuallyEdited(true);
+        },
+        checkAmountInput() {
+            this.$emit('check-input', this.market.quote.subunit);
         },
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
