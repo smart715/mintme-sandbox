@@ -45,20 +45,15 @@ class DeployConsumer implements ConsumerInterface
     {
         DBConnection::reconnectIfDisconnected($this->em);
 
-        $this->logger->info('[deploy-consumer] Received new message: '.json_encode($msg->body));
+        /** @var string $body */
+        $body = (string) $msg->body;
 
-        /** @var string|null $body */
-        $body = $msg->body;
+        $this->logger->info("[deploy-consumer] Received new message: {$body}");
 
         try {
-            $clbResult = DeployCallbackMessage::parse(
-                json_decode((string)$body, true)
-            );
+            $clbResult = DeployCallbackMessage::parse(json_decode($body, true));
         } catch (\Throwable $exception) {
-            $this->logger->warning(
-                '[deploy-consumer] Failed to parse incoming message',
-                [$msg->body]
-            );
+            $this->logger->warning("[deploy-consumer] Failed to parse incoming message", [$msg->body]);
 
             return true;
         }
@@ -66,8 +61,10 @@ class DeployConsumer implements ConsumerInterface
         try {
             $token = $this->tokenManager->findByName($clbResult->getTokenName());
 
+            $this->logger->info("[deploy-consumer] ".gettype($token)." found");
+
             if (!$token) {
-                $this->logger->info('[deploy-consumer] Invalid token "'.$clbResult->getTokenName().'" given');
+                $this->logger->info("[deploy-consumer] Invalid token '{$clbResult->getTokenName()}' given");
 
                 return true;
             }
@@ -89,7 +86,7 @@ class DeployConsumer implements ConsumerInterface
             $this->em->flush();
         } catch (\Throwable $exception) {
             $this->logger->error(
-                '[deploy-consumer] Failed to update token address. Retry operation. Reason:'. $exception->getMessage()
+                "[deploy-consumer] Failed to update token address. Retry operation. Reason: {$exception->getMessage()}"
             );
 
             return false;
