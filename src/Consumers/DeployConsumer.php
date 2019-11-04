@@ -46,7 +46,7 @@ class DeployConsumer implements ConsumerInterface
         DBConnection::reconnectIfDisconnected($this->em);
 
         /** @var string $body */
-        $body = (string) $msg->body;
+        $body = $msg->body ?? '';
 
         $this->logger->info("[deploy-consumer] Received new message: {$body}");
 
