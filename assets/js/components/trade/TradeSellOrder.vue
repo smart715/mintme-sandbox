@@ -97,8 +97,8 @@
                             type="text"
                             id="sell-price-amount"
                             class="form-control"
-                            @keypress="$emit('check-input', market.quote.subunit)"
-                            @paste="$emit('check-input', market.quote.subunit)"
+                            @keypress="checkAmountInput"
+                            @paste="checkAmountInput"
                             :disabled="!loggedIn"
                         >
                     </div>
@@ -179,6 +179,9 @@ export default {
         checkPriceInput() {
             this.$emit('check-input', this.market.base.subunit);
             this.setBalanceManuallyEdited(true);
+        },
+        checkAmountInput() {
+            this.$emit('check-input', this.market.quote.subunit);
         },
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
@@ -323,9 +326,9 @@ export default {
 
                 this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
                     .then((res) => this.immutableBalance = res.data ?
-                            new Decimal(response.params[0][this.market.quote.identifier].available).sub(
-                                res.data.frozenAmount
-                            ) : response.params[0][this.market.quote.identifier].available
+                        new Decimal(response.params[0][this.market.quote.identifier].available).sub(
+                            res.data.frozenAmount
+                        ) : response.params[0][this.market.quote.identifier].available
                     )
                     .catch(() => {});
             }
