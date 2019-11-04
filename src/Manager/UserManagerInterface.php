@@ -25,4 +25,10 @@ interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterfac
      * @return UserToken[]
      */
     public function getUserCrypto(Crypto $crypto, array $userIds): array;
+
+    /**
+     * @param array|null $domains
+     * @return array|null
+     */
+    public function getUsersByDomains(?array $domains): ?array;
 }
