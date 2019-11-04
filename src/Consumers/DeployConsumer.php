@@ -5,7 +5,6 @@ namespace App\Consumers;
 use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Manager\TokenManagerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -19,9 +18,6 @@ class DeployConsumer implements ConsumerInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
     /** @var EntityManagerInterface */
     private $em;
 
@@ -30,12 +26,10 @@ class DeployConsumer implements ConsumerInterface
 
     public function __construct(
         LoggerInterface $logger,
-        TokenManagerInterface $tokenManager,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler
     ) {
         $this->logger = $logger;
-        $this->tokenManager = $tokenManager;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
     }
