@@ -44,7 +44,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template v-slot=[`head(${fields.marketCap.key})`]="data">
+                    <template v-slot:[`head(${fields.marketCap.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -99,7 +99,7 @@ export default {
         cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
-        webchainSupplyUrl,
+        webchainSupplyUrl: String,
     },
     components: {
         Guide,
