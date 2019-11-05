@@ -1,6 +1,6 @@
 {% set show_links = app.user and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %}
 {% set route = app.request.get('_route') %}
-<nav class="navbar navbar-expand-lg top-navbar pt-3" id="navbar">
+<nav class="navbar top-navbar navbar-expand-lg" id="navbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ path('homepage') }}">
             {% if is_beta_version %}
