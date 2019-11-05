@@ -438,3 +438,5 @@ services:
             - '@sonata.media.metadata.proxy'
         calls:
             - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]
+
+
