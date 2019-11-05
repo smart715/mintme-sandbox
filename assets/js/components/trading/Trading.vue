@@ -44,7 +44,7 @@
                             </template>
                         </guide>
                     </template>
-                    <template :slot="`HEAD_${fields.marketCap.key}`" slot-scope="data">
+                    <template v-slot=[`head(${fields.marketCap.key})`]="data">
                         {{ data.label }}
                         <guide>
                             <template slot="header">
@@ -99,6 +99,7 @@ export default {
         cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
+        webchainSupplyUrl,
     },
     components: {
         Guide,
@@ -475,13 +476,13 @@ export default {
                     },
                 };
 
-                this.$axios.retry.get(`https://webchain.network/supply.txt`, config)
+                this.$axios.retry.get(this.webchainSupplyUrl, config)
                     .then((res) => {
                         this.markets['WEBBTC'].supply = res.data;
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error('Can not update WEB circulation supply. WEB market cap might not be accurate.');
+                        this.$toasted.error('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
                         reject(err);
                     });
             });
