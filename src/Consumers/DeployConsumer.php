@@ -56,8 +56,6 @@ class DeployConsumer implements ConsumerInterface
             $repo = $this->em->getRepository(Token::class);
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
-            $this->logger->info("[deploy-consumer] ".gettype($token)." found");
-
             if (!$token) {
                 $this->logger->info("[deploy-consumer] Invalid token '{$clbResult->getTokenName()}' given");
 
@@ -80,9 +78,7 @@ class DeployConsumer implements ConsumerInterface
             $this->em->persist($token);
             $this->em->flush();
         } catch (\Throwable $exception) {
-            $this->logger->error(
-                "[deploy-consumer] Failed to update token address. Retry operation. Reason: {$exception->getMessage()}"
-            );
+            $this->logger->error("[deploy-consumer] Failed to update token address. Retry operation. Reason: {$exception->getMessage()}");
 
             return false;
         }
