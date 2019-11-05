@@ -2,7 +2,7 @@
 
 namespace App\Validator\Constraints;
 
-use FOS\UserBundle\Model\UserManagerInterface;
+use App\Manager\UserManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
