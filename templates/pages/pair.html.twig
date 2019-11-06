@@ -44,7 +44,6 @@
                                 >
                                 </token-introduction-profile>
                                 <token-introduction-statistics
-                                    v-on:period-updated="updateTokenPeriod"
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
@@ -70,28 +69,30 @@
                     {% endif %}
                     <template slot="tabs-end">
                         {% if token is defined %}
-                        <li class="nav-item">
-                            <div class="nav-link pr-md-0">
-                                <token-deploy
-                                        websocket-url="{{ global_websocket_url }}"
+                            <li class="nav-item">
+                                <div class="nav-link pr-md-0">
+                                    <token-deploy-icon
                                         :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                        name="{{ market.quote.name }}"
-                                        :has-release-period="isTokenPeriodAdded({{ token.getLockIn ? 'true' : 'false' }})"
-                                        :precision="{{ precision }}"
-                                        :status-prop="{{ token.deploymentStatus | json_encode }}"
-                                />
-                            </div>
-                        </li>
+                                        :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                    />
+                                </div>
+                            </li>
                         {% endif %}
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <token-name
-                                        websocket-url="{{ global_websocket_url }}"
-                                        identifier="{{ market.quote.identifier }}"
-                                        name="{{ market.quote.name }}"
-                                        :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                                        :editable="{{ isOwner ? 'true' : 'false' }}">
-                                </token-name>
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                                    identifier="{{ market.quote.identifier }}"
+                                    name="{{ market.quote.name }}"
+                                    :precision="{{ precision }}"
+                                    :mint-destination-locked="{{ token.mintDestinationLocked ? 'true' : 'false' }}"
+                                    :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                    :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    withdrawal-address="{{ token.mintDestination }}"
+                                    v-on:token-deploy-pending="setTokenPending"
+                                />
                             </div>
                         </li>
                         <div class="clearfix"></div>

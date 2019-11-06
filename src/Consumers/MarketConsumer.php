@@ -3,9 +3,11 @@
 namespace App\Consumers;
 
 use App\Communications\AMQP\MarketAMQPInterface;
+use App\Consumers\Helpers\DBConnection;
 use App\Exchange\Market;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -25,20 +27,27 @@ class MarketConsumer implements ConsumerInterface
     /** @var MarketAMQPInterface */
     private $marketProducer;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(
         LoggerInterface $logger,
         MarketStatusManagerInterface $statusManager,
         MarketNameConverterInterface $marketNameConverter,
-        MarketAMQPInterface $marketProducer
+        MarketAMQPInterface $marketProducer,
+        EntityManagerInterface $em
     ) {
         $this->logger = $logger;
         $this->statusManager = $statusManager;
         $this->marketNameConverter = $marketNameConverter;
         $this->marketProducer = $marketProducer;
+        $this->em = $em;
     }
 
     public function execute(AMQPMessage $msg): bool
     {
+        DBConnection::reconnectIfDisconnected($this->em);
+
         try {
             /** @var ?Market $market */
             $market = unserialize($msg->body);
