@@ -11,6 +11,7 @@
                     The password must contain at least one uppercase letter, a lowercase letter, and a number.
                 </li>
                 <li v-if="strengthtext === 3">This value is too long. It should have 72 characters or less.</li>
+                <li v-if="strengthtext === 4">The password must not contain spaces.</li>
             </ul>
         </div>
     </div>
@@ -70,6 +71,14 @@ export default {
                     this.strengthtext = 2;
                 } else if (val.length > 72) {
                     this.strengthtext = 3;
+                } else if (/\s/.test(val)) {
+                    this.strengthtext = 4;
+                } else {
+                    this.strengthtext = 0;
+                }
+            } else {
+                if (/\s/.test(val)) {
+                    this.strengthtext = 4;
                 } else {
                     this.strengthtext = 0;
                 }
