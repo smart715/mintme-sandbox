@@ -92,11 +92,10 @@
                                         Last name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        <input type="hidden" ref="savedCountry" value="{{ profile.country }}">
                                         {{ form_row(form.country, {'attr':
                                             {
-                                                'v-model': 'country',
-                                                'ref': 'country'
+                                                'ref': 'country',
+                                                'v-on:change': 'countryChanged'
                                             }
                                         }) }}
                                     </div>
@@ -120,6 +119,7 @@
                                             {
                                                 'v-model.trim': '$v.zipCode.$model',
                                                 'class': 'form-control',
+                                                'placeholder': (profile.country is empty ? 'Select the country for set up zip code' : ''),
                                                 'ref': 'zipCode'
                                             }
                                         }) }}
@@ -129,7 +129,14 @@
                                         v-cloak="$v.zipCode"
                                         class="text-danger text-center"
                                     >
-                                        Zip code is not valid for chosen country
+                                        Zip code is not valid for selected country
+                                    </div>
+                                    <div
+                                        v-if="!$v.zipCode.zipCodeContain"
+                                        v-cloak="$v.zipCode"
+                                        class="text-danger text-center"
+                                    >
+                                        Zip code can contain only letters, numbers, spaces and dashes
                                     </div>
                                 </div>
                                 <div class="col-12 pt-3">
