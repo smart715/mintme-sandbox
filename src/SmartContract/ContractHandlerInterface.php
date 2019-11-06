@@ -17,7 +17,7 @@ interface ContractHandlerInterface
      */
     public function deploy(Token $token): void;
 
-    public function updateMinDestination(Token $token, string $address, bool $lock): void;
+    public function updateMintDestination(Token $token, string $address, bool $lock): void;
 
     public function getDepositCredentials(User $user): string;
 
