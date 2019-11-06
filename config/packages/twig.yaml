@@ -19,3 +19,4 @@ twig:
         is_hacker_allowed: '%is_hacker_allowed%'
         trusted_device_enabled: '%trusted_device_enabled%'
         trusted_device_cookie_lifetime: '%trusted_device_cookie_lifetime%'
+        webchain_supply: '%webchain_supply%'
