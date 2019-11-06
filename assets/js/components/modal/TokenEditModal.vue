@@ -3,260 +3,167 @@
         <modal
             :visible="visible"
             :no-close="noClose"
-            @close="closeModal"
+            :without-padding="true"
+            @close="$emit('close')"
         >
             <template slot="header">
                 <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
             </template>
             <template slot="body">
-                <div class="col-12 pb-3">
-                    <label for="tokenName" class="d-block text-left">
-                        Edit your token name:
-                    </label>
-                    <input
-                        id="tokenName"
-                        type="text"
-                        v-model="newName"
-                        ref="tokenNameInput"
-                        class="token-name-input w-100 px-2"
-                        :class="{ 'is-invalid': $v.$invalid }"
+                <div class="token-edit p-0">
+                    <div class="row faq-block mx-0 border-bottom border-top">
+                        <faq-item>
+                            <template slot="title">
+                                Change token name
+                            </template>
+                            <template slot="body">
+                                <token-change-name
+                                    :is-token-exchanged="isTokenExchanged"
+                                    :is-token-not-deployed="isTokenNotDeployed"
+                                    :current-name="currentName"
+                                    :twofa="twofa"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div
+                        v-if="!mintDestinationLocked"
+                        class="row faq-block mx-0 border-bottom"
+                        ref="withdrawal-address"
                     >
-                </div>
-                <div class="col-12 pt-2 clearfix">
-                    <button
-                        class="btn btn-primary float-left"
-                        @click="editName"
-                    >
-                        Save
-                    </button>
-                    <span
-                        class="btn-cancel pl-3 c-pointer float-left"
-                        @click="closeModal"
-                    >
-                        <slot name="cancel">Cancel</slot>
-                    </span>
-                    <span
-                        class="btn-cancel pl-3 c-pointer float-right"
-                        @click="deleteToken"
-                    >
-                        Delete token
-                    </span>
+                        <faq-item>
+                            <template slot="title">
+                                Modify token withdrawal address
+                            </template>
+                            <template slot="body">
+                                <token-withdrawal-address
+                                    :is-token-deployed="isTokenDeployed"
+                                    :token-name="currentName"
+                                    :twofa="twofa"
+                                    :withdrawal-address="withdrawalAddress"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item @switch="refreshSliders">
+                            <template slot="title">
+                                Token release period
+                            </template>
+                            <template slot="body">
+                                <token-release-period
+                                    ref="token-release-period-component"
+                                    :is-token-exchanged="isTokenExchanged"
+                                    :is-token-not-deployed="isTokenNotDeployed"
+                                    :token-name="currentName"
+                                    :twofa="twofa"
+                                    @update="releasePeriodUpdated"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item>
+                            <template slot="title">
+                                Deploy token to blockchain
+                            </template>
+                            <template slot="body">
+                                <token-deploy
+                                    :has-release-period="hasReleasePeriod"
+                                    :is-owner="isOwner"
+                                    :twofa="twofa"
+                                    :name="currentName"
+                                    :precision="precision"
+                                    :status-prop="statusProp"
+                                    :websocket-url="websocketUrl"
+                                    @pending="$emit('token-deploy-pending')"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                            <template slot="title">
+                                Delete token
+                            </template>
+                            <template slot="body">
+                                <token-delete
+                                    :is-token-exchanged="isTokenExchanged"
+                                    :is-token-not-deployed="isTokenNotDeployed"
+                                    :token-name="currentName"
+                                    :twofa="twofa"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
                 </div>
             </template>
         </modal>
-        <two-factor-modal
-            :visible="showTwoFactorModal"
-            :twofa="twofa"
-            :no-close="noClose"
-            @verify="doEditToken"
-            @close="closeTwoFactorModal"
-        />
     </div>
 </template>
 
 <script>
+import FaqItem from '../FaqItem';
 import Guide from '../Guide';
 import Modal from './Modal';
+import TokenChangeName from '../token/TokenChangeName';
+import TokenDelete from '../token/TokenDelete';
+import TokenDeploy from '../token/deploy/TokenDeploy';
+import TokenReleasePeriod from '../token/TokenReleasePeriod';
+import TokenWithdrawalAddress from '../token/TokenWithdrawalAddress';
 import TwoFactorModal from './TwoFactorModal';
-import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
 import {FiltersMixin} from '../../mixins';
-
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
-const HTTP_ACCEPTED = 202;
-const HTTP_BAD_REQUEST = 400;
+import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'TokenEditModal',
     components: {
+        FaqItem,
         Guide,
         Modal,
+        TokenChangeName,
+        TokenDelete,
+        TokenDeploy,
+        TokenReleasePeriod,
+        TokenWithdrawalAddress,
         TwoFactorModal,
     },
     props: {
         currentName: String,
+        hasReleasePeriodProp: Boolean,
+        isOwner: Boolean,
+        isTokenExchanged: Boolean,
         noClose: Boolean,
+        mintDestinationLocked: Boolean,
+        precision: Number,
+        statusProp: String,
         twofa: Boolean,
         visible: Boolean,
+        websocketUrl: String,
+        withdrawalAddress: String,
     },
     mixins: [FiltersMixin],
     data() {
         return {
-            minLength: 4,
-            maxLength: 60,
-            mode: null,
-            needToSendCode: !this.twofa,
-            newName: this.currentName,
-            showTwoFactorModal: false,
+            hasReleasePeriod: this.hasReleasePeriodProp,
         };
     },
-    watch: {
-        newName: function() {
-            if (this.newName.replace(/-|\s/g, '').length === 0) {
-                this.newName = '';
-            }
+    computed: {
+        isTokenNotDeployed: function() {
+            return tokenDeploymentStatus.notDeployed === this.statusProp;
+        },
+        isTokenDeployed: function() {
+            return tokenDeploymentStatus.deployed === this.statusProp;
         },
     },
     methods: {
-        closeTwoFactorModal: function() {
-            this.showTwoFactorModal = false;
+        releasePeriodUpdated: function() {
+            this.hasReleasePeriod = true;
         },
-        closeModal: function() {
-            this.cancelEditingMode();
-            this.$emit('close');
+        refreshSliders: function() {
+            this.$refs['token-release-period-component'].$refs['released-slider'].refresh();
+            this.$refs['token-release-period-component'].$refs['release-period-slider'].refresh();
         },
-        cancelEditingMode: function() {
-            if (!this.showTwoFactorModal) {
-                this.$v.$reset();
-                this.newName = this.currentName;
-                this.mode = null;
-            }
-        },
-        trimName: function(name) {
-            return name.replace(/^[\s\-]+/, '').replace(/[\s\-]+$/, '');
-        },
-        editName: function() {
-            this.$v.$touch();
-            if (this.currentName === this.newName || this.trimName(this.newName) === this.currentName) {
-                this.closeModal();
-                return;
-            } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
-                this.$toasted.error('Token name shouldn\'t be blank');
-                return;
-            } else if (!this.$v.newName.validFirstChar) {
-                this.$toasted.error('Token name can not contain spaces and dashes in the beggining');
-                return;
-            } else if (!this.$v.newName.noSpaceBetweenDashes) {
-                this.$toasted.error('Token name can not contain space between dashes');
-                return;
-            } else if (!this.$v.newName.tokenContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
-            } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
-                this.$toasted.error('Token name should have at least 4 symbols');
-                return;
-            } else if (!this.$v.newName.maxLength) {
-                this.$toasted.error('Token name can not be longer than 60 characters');
-                return;
-            }
-
-            if (this.twofa) {
-                this.mode = 'edit';
-                this.showTwoFactorModal = true;
-            } else {
-                this.doEditName();
-            }
-        },
-        doEditName: function(code = '') {
-            this.$axios.single.patch(this.$routing.generate('token_update', {
-                name: this.currentName,
-            }), {
-                name: this.newName,
-                code: code,
-            })
-                .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        this.currentName = response.data['tokenName'];
-
-                        this.showTwoFactorModal = false;
-                        this.closeModal();
-
-                        // TODO: update name in a related components and link path instead of redirecting
-                        location.href = this.$routing.generate('token_show', {
-                            name: this.currentName,
-                        });
-                    }
-                }, (error) => {
-                    if (error.response.status === HTTP_BAD_REQUEST) {
-                        this.$toasted.error(error.response.data.message);
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
-                });
-        },
-        deleteToken: function() {
-            this.mode = 'delete';
-            this.showTwoFactorModal = true;
-
-            if (!this.needToSendCode) {
-                return;
-            }
-
-            this.sendConfirmCode();
-        },
-        doDeleteToken: function(code = '') {
-            this.$axios.single.post(this.$routing.generate('token_delete', {
-                name: this.currentName,
-            }), {
-                code: code,
-            })
-                .then((response) => {
-                    if (HTTP_ACCEPTED === response.status) {
-                        this.$toasted.success(response.data.message);
-                        this.showTwoFactorModal = false;
-                        location.href = this.$routing.generate('homepage');
-                    }
-                }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
-                        if ('2fa code is expired' === error.response.data.message) {
-                            this.sendConfirmCode();
-                        }
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
-                });
-        },
-        doEditToken: function(code = '') {
-            if ('delete' === this.mode) {
-                this.doDeleteToken(code);
-            } else if ('edit' === this.mode) {
-                this.doEditName(code);
-            }
-        },
-        sendConfirmCode: function() {
-            this.$axios.single.post(this.$routing.generate('token_send_code', {
-                name: this.currentName,
-            }))
-                .then((response) => {
-                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
-                        this.$toasted.success(response.data.message);
-                        this.needToSendCode = false;
-                    }
-                }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
-                });
-        },
-        noSpaceBetweenDashes: function(value) {
-            const matches = value.match(/-+\s+-+/);
-
-            return null === matches || 0 === matches.length;
-        },
-        validFirstChar: function(value) {
-            const matches = value.match(/^[-\s]+/);
-
-            return null === matches || 0 === matches.length;
-        },
-    },
-    validations() {
-        return {
-            newName: {
-                required,
-                tokenContain,
-                validFirstChar: this.validFirstChar,
-                noSpaceBetweenDashes: this.noSpaceBetweenDashes,
-                minLength: minLength(this.minLength),
-                maxLength: maxLength(this.maxLength),
-                customTrimmer: this.trimName,
-            },
-        };
     },
 };
 </script>

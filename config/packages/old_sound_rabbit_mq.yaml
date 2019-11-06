@@ -16,6 +16,10 @@ old_sound_rabbit_mq:
             connection: default
             queue_options:    {name: 'deploy', durable: true}
             callback: deploy_consumer
+        contract_update:
+            connection: default
+            queue_options:    {name: 'contract-update', durable: true}
+            callback: contract_update_consumer
         market:
             connection: default
             exchange_options: {name: 'market', type: fanout}
