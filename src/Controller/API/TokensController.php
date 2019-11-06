@@ -84,7 +84,7 @@ class TokensController extends AbstractFOSRestController
      * @Rest\RequestParam(name="telegramUrl", nullable=true)
      * @Rest\RequestParam(name="discordUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
-      *@Rest\RequestParam(name="code", nullable=true)
+     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function update(
         ParamFetcherInterface $request,
@@ -206,7 +206,7 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"2fa"="optional"})
+     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
@@ -220,6 +220,10 @@ class TokensController extends AbstractFOSRestController
 
         if (null === $token) {
             throw $this->createNotFoundException('Token does not exist');
+        }
+
+        if (Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+            throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
@@ -400,6 +404,10 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        if (Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+            throw new ApiBadRequestException('Token is deploying or deployed.');
+        }
+
         /** @var User $user */
         $user = $this->getUser();
 
@@ -508,7 +516,8 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
+     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"2fa"="optional", "expose"=true})
+     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function deploy(
         string $name,
@@ -541,9 +550,10 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"expose"=true})
+     * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="address", allowBlank=false)
-     * @Rest\RequestParam(name="lock", requirements="true|false")
+     * @Rest\RequestParam(name="lock", allowBlank=true)
+     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function contractUpdate(
         string $name,
@@ -556,7 +566,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        if ($token->isMinDestinationLocked()) {
+        if ($token->isMintDestinationLocked()) {
             throw new ApiBadRequestException('Can\'t change the address');
         }
 
@@ -565,12 +575,8 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
-            $contractHandler->updateMinDestination($token, $request->get('address'), $request->get('lock'));
-            $token->setMinDestination($request->get('address'));
-
-            if ("true" === $request->get('lock')) {
-                $token->lockMinDestination();
-            }
+            $contractHandler->updateMintDestination($token, $request->get('address'), (bool) $request->get('lock'));
+            $token->setUpdatingMintDestination();
 
             $this->em->persist($token);
             $this->em->flush();
@@ -578,7 +584,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
-        $this->userActionLogger->info('Update token minDestination', ['name' => $name]);
+        $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
     }

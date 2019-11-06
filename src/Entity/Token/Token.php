@@ -28,8 +28,8 @@ class Token implements TradebleInterface
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
     public const NOT_DEPLOYED = 'not-deployed';
-    public const PENDING = 'pending';
     public const DEPLOYED = 'deployed';
+    public const PENDING = 'pending';
 
     /**
      * @ORM\Id()
@@ -68,13 +68,13 @@ class Token implements TradebleInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
      */
-    protected $minDestination;
+    protected $mintDestination;
 
     /**
      * @ORM\Column(type="boolean", options={"default": 0})
      * @var bool
      */
-    protected $minDestinationLocked = false;
+    protected $mintDestinationLocked = false;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -224,6 +224,13 @@ class Token implements TradebleInterface
         return $this;
     }
 
+    public function setUpdatingMintDestination(): self
+    {
+        $this->mintDestination = '0x';
+
+        return $this;
+    }
+
     public function setAddress(string $address): self
     {
         $this->address = $address;
@@ -243,26 +250,26 @@ class Token implements TradebleInterface
         return $this->deployCost;
     }
 
-    public function getMinDestination(): ?string
+    public function getMintDestination(): ?string
     {
-        return $this->minDestination;
+        return $this->mintDestination;
     }
 
-    public function setMinDestination(string $minDestination): self
+    public function setMintDestination(string $mintDestination): self
     {
-        $this->minDestination = $minDestination;
+        $this->mintDestination = $mintDestination;
 
         return $this;
     }
 
-    public function isMinDestinationLocked(): bool
+    public function isMintDestinationLocked(): bool
     {
-        return $this->minDestinationLocked;
+        return $this->mintDestinationLocked;
     }
 
-    public function lockMinDestination(): self
+    public function lockMintDestination(): self
     {
-        $this->minDestinationLocked = true;
+        $this->mintDestinationLocked = true;
 
         return $this;
     }
@@ -338,7 +345,7 @@ class Token implements TradebleInterface
     {
         return $this->profile;
     }
-    
+
     public function deploymentStatus(): string
     {
         return !$this->address

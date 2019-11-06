@@ -12,6 +12,8 @@ use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -31,7 +33,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -56,7 +59,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -81,7 +85,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockTokenManager(null, $this->once()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -106,7 +111,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -135,7 +141,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->mockEM()
         );
 
         $this->assertFalse(
@@ -164,7 +171,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockTokenManager(),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -193,7 +201,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockTokenManager($this->mockToken($tokenName), $this->once()),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class)
+            $this->createMock(ClockInterface::class),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -285,5 +294,15 @@ class PaymentConsumerTest extends TestCase
         });
 
         return $mw;
+    }
+
+    private function mockEM(): EntityManagerInterface
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getConnection')->willReturn(
+            $this->createMock(Connection::class)
+        );
+
+        return $em;
     }
 }
