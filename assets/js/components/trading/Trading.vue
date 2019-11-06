@@ -1,7 +1,7 @@
 <template>
     <div class="trading">
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-            <span class="float-left">Top {{ tokensCount }} tokens</span>
+            <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
                 <input
                     type="checkbox"
@@ -44,6 +44,17 @@
                             </template>
                         </guide>
                     </template>
+                    <template v-slot:[`head(${fields.marketCap.key})`]="data">
+                        {{ data.label }}
+                        <guide>
+                            <template slot="header">
+                                Market Cap
+                            </template>
+                            <template slot=body>
+                                Market cap of each token based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                            </template>
+                        </guide>
+                    </template>
                     <template v-slot:cell(pair)="row">
                         <a class="d-block text-truncate truncate-responsive text-white"
                             v-b-tooltip:title="row.value"
@@ -72,7 +83,7 @@
 
 <script>
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin} from '../../mixins';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -80,7 +91,7 @@ import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
     props: {
         page: Number,
         tokensCount: Number,
@@ -88,6 +99,7 @@ export default {
         cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
+        webchainSupplyUrl: String,
     },
     components: {
         Guide,
@@ -107,6 +119,10 @@ export default {
             ],
             klineQueriesIdsTokensMap: new Map(),
             conversionRates: {},
+            globalMarketCaps: {
+                BTC: 0,
+                USD: 0,
+            },
         };
     },
     computed: {
@@ -159,15 +175,28 @@ export default {
                     sortable: true,
                     formatter: formatMoney,
                 },
+                marketCap: {
+                    label: 'Market Cap',
+                    key: 'marketCap' + ( this.showUsd ? 'USD' : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                },
             };
         },
         fieldsArray: function() {
             return Object.values(this.fields);
         },
+        globalMarketCap: function() {
+            if (this.showUsd) {
+                return this.globalMarketCaps['USD'] + ' USD';
+            }
+            return this.globalMarketCaps['BTC'] + ' BTC';
+        },
     },
     mounted: function() {
         let updateDataPromise = this.updateData(this.currentPage);
         let conversionRatesPromise = this.fetchConversionRates();
+        this.fetchGlobalMarketCap();
 
         Promise.all([updateDataPromise, conversionRatesPromise])
             .then(() => {
@@ -236,6 +265,8 @@ export default {
                             );
                         }
 
+                        this.fetchWEBsupply().then(this.updateWEBBTCMarket.bind(this));
+
                         resolve();
                     })
                     .catch((err) => {
@@ -258,6 +289,7 @@ export default {
             const marketCurrency = this.markets[marketName].base.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
             const marketPrecision = this.markets[marketName].base.subunit;
+            const supply = this.markets[marketName].supply;
             const monthVolume = this.markets[marketName].monthVolume;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
@@ -269,6 +301,7 @@ export default {
                 marketLastPrice,
                 parseFloat(marketInfo.deal),
                 monthVolume,
+                supply,
                 marketPrecision
             );
 
@@ -277,9 +310,18 @@ export default {
             } else {
                 Vue.set(this.sanitizedMarkets, marketName, market);
             }
+
+            this.markets[marketName] = {
+                ...this.markets[marketName],
+                openPrice: marketInfo.open,
+                lastPrice: marketInfo.last,
+                dayVolume: marketInfo.deal,
+            };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, subunit) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit) {
             let hiddenName = this.findHiddenName(token);
+
+            let marketCap = Decimal.mul(lastPrice, supply);
 
             return {
                 pair: `${currency}/${token}`,
@@ -293,6 +335,8 @@ export default {
                 lastPriceUSD: this.toUSD(lastPrice, currency),
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
+                marketCap: toMoney(marketCap, subunit) + ' ' + currency,
+                marketCapUSD: this.toUSD(marketCap, currency),
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -311,6 +355,7 @@ export default {
             this.sanitizedMarkets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
+                    this.markets[market].supply = 1e7;
                     const cryptoSymbol = this.markets[market].base.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
@@ -324,6 +369,7 @@ export default {
                         parseFloat(this.markets[market].lastPrice),
                         parseFloat(this.markets[market].dayVolume),
                         parseFloat(this.markets[market].monthVolume),
+                        this.markets[market].supply,
                         this.markets[market].base.subunit
                     );
 
@@ -420,6 +466,54 @@ export default {
         },
         toUSD: function(amount, currency) {
             return toMoney(Decimal.mul(amount, this.conversionRates[currency]), USD.subunit) + ' ' + USD.symbol;
+        },
+        fetchWEBsupply: function() {
+            return new Promise((resolve, reject) => {
+                let config = {
+                    transformRequest: function(data, headers) {
+                        headers.common = {};
+                        return data;
+                    },
+                };
+
+                this.$axios.retry.get(this.webchainSupplyUrl, config)
+                    .then((res) => {
+                        this.markets['WEBBTC'].supply = res.data;
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.$toasted.error('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        reject(err);
+                    });
+            });
+        },
+        updateWEBBTCMarket: function() {
+            let market = this.markets['WEBBTC'];
+            market = this.getSanitizedMarket(
+                market.base.symbol,
+                market.quote.symbol,
+                this.getPercentage(
+                    parseFloat(market.lastPrice),
+                    parseFloat(market.openPrice)
+                ),
+                parseFloat(market.lastPrice),
+                parseFloat(market.dayVolume),
+                parseFloat(market.monthVolume),
+                market.supply,
+                market.base.subunit
+            );
+
+            Vue.set(this.sanitizedMarketsOnTop, 0, market);
+        },
+        fetchGlobalMarketCap: function() {
+            this.$axios.retry.get(this.$routing.generate('marketcap'))
+                .then((res) => {
+                    this.globalMarketCaps['BTC'] = toMoney(res.data.marketcap, 8);
+                });
+            this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
+                .then((res) => {
+                    this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 2);
+                });
         },
     },
 };

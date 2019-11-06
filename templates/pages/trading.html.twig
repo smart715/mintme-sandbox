@@ -43,7 +43,8 @@
                             :tokens-count="{{ tokensCount }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}"
                             :cryptos="{{ cryptos | json_encode }}"
-                            :show-usd="showUsd">
+                            :show-usd="showUsd"
+                            webchain-supply-url="{{ webchain_supply }}">
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                         </trading>
                     </div>
