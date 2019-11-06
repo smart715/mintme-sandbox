@@ -2,6 +2,7 @@
 
 namespace App\Consumers;
 
+use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\WithdrawCompletedEvent;
@@ -15,6 +16,7 @@ use App\Manager\UserManagerInterface;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\Communicator\Model\WithdrawCallbackMessage;
+use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -43,6 +45,9 @@ class PaymentConsumer implements ConsumerInterface
     /** @var ClockInterface */
     private $clock;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -54,6 +59,7 @@ class PaymentConsumer implements ConsumerInterface
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
         ClockInterface $clock,
+        EntityManagerInterface $em,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->balanceHandler = $balanceHandler;
@@ -63,12 +69,15 @@ class PaymentConsumer implements ConsumerInterface
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->clock = $clock;
+        $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg): bool
     {
+        DBConnection::reconnectIfDisconnected($this->em);
+
         $this->logger->info('[payment-consumer] Received new message: '.json_encode($msg->body));
 
         try {

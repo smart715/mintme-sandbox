@@ -91,12 +91,10 @@
 <script>
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
-import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin} from '../../mixins';
-import {addressLength, webSymbol} from '../../utils/constants';
-
-const tokenContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
+import {addressLength, webSymbol, addressContain} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
@@ -225,7 +223,7 @@ export default {
             },
             address: {
                 required,
-                tokenContain: tokenContain,
+                addressContain,
                 minLength: minLength(
                     addressLength[this.currency] ? addressLength[this.currency].min : addressLength.WEB.min
                 ),

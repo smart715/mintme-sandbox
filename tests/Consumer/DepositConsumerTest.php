@@ -14,6 +14,7 @@ use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -62,7 +63,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager(),
+            $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher()
         );
 
@@ -112,7 +113,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager(),
+            $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher()
         );
 
@@ -210,6 +211,9 @@ class DepositConsumerTest extends TestCase
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($invocation ?? $this->never())->method('flush');
+        $em->method('getConnection')->willReturn(
+            $this->createMock(Connection::class)
+        );
 
         return $em;
     }

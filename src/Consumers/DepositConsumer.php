@@ -2,6 +2,7 @@
 
 namespace App\Consumers;
 
+use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\DepositCompletedEvent;
@@ -81,6 +82,8 @@ class DepositConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
+        DBConnection::reconnectIfDisconnected($this->em);
+
         $this->logger->info('[deposit-consumer] Received new message: '.json_encode($msg->body));
 
         /** @var string|null $body */
