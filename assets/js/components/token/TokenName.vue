@@ -3,12 +3,21 @@
         <template v-if="editable">
             <token-edit-modal
                 v-if="editable"
+                :current-name="currentName"
+                :has-release-period-prop="hasReleasePeriodProp"
+                :is-owner="editable"
+                :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
+                :precision="precision"
+                :mint-destination-locked="mintDestinationLocked"
+                :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"
-                :current-name="currentName"
-                @close="closeTokenEditModal">
-            </token-edit-modal>
+                :websocket-url="websocketUrl"
+                :withdrawal-address="withdrawalAddress"
+                @close="closeTokenEditModal"
+                @token-deploy-pending="$emit('token-deploy-pending')"
+            />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 icon="edit"
@@ -40,10 +49,16 @@ Vue.use(Toasted, {
 export default {
     name: 'TokenName',
     props: {
-        name: String,
-        identifier: String,
         editable: Boolean,
+        hasReleasePeriodProp: Boolean,
+        identifier: String,
+        name: String,
+        mintDestinationLocked: Boolean,
+        precision: Number,
+        statusProp: String,
         twofa: Boolean,
+        websocketUrl: String,
+        withdrawalAddress: String,
     },
     components: {
         FontAwesomeIcon,
@@ -64,7 +79,6 @@ export default {
         }
 
         this.checkIfTokenExchanged();
-        this.checkIfTokenNotDeployed();
 
         this.addMessageHandler((response) => {
             if (
@@ -86,25 +100,8 @@ export default {
             .then((res) => this.isTokenExchanged = res.data)
             .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
         },
-        checkIfTokenNotDeployed: function() {
-            this.$axios.retry.get(this.$routing.generate('is_token_not_deployed', {
-                name: this.currentName,
-            }))
-            .then((res) => this.isTokenNotDeployed = res.data)
-            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
-        },
         editToken: function() {
             if (!this.editable) {
-                return;
-            }
-
-            if (null === this.isTokenExchanged || this.isTokenExchanged) {
-                this.$toasted.error('You need all your tokens to change token\'s name or delete token');
-                return;
-            }
-
-            if (!this.isTokenNotDeployed) {
-                this.$toasted.error('Token is deploying or deployed.');
                 return;
             }
 
