@@ -12,7 +12,6 @@
                         Everything you should know before you buy {{ name }}.
                     </template>
                 </guide>
-
             </div>
             <div class="card-body">
                 <div class="row fix-height custom-scrollbar">
@@ -23,11 +22,12 @@
                                 class="float-right c-pointer icon-edit"
                                 icon="edit"
                                 transform="shrink-4 up-1.5"
-                                @click="editingDescription = true"/>
+                                @click="editingDescription = true"
+                            />
                         </span>
-                        <bbcode-view v-if="!editingDescription" :value="description"></bbcode-view>
+                        <bbcode-view v-if="!editingDescription" :value="description" />
                         <template v-if="editable">
-                            <div  v-show="editingDescription">
+                            <div v-show="editingDescription">
                                 <div class="pb-1">
                                     About your plan:
                                     <guide>
@@ -39,10 +39,11 @@
                                             identity and everything that may interest buyers.
                                         </template>
                                     </guide>
-                                    <bbcode-help class="d-inline" placement="right"></bbcode-help>
+                                    <bbcode-help class="d-inline" placement="right" />
                                 </div>
-                                <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
-
+                                <div class="pb-1 text-xs">
+                                    Please describe goals milestones plans promises
+                                </div>
                                 <bbcode-editor
                                     rows="5"
                                     class="form-control"
@@ -50,18 +51,33 @@
                                     :value="newDescriptionHtmlDecode"
                                     @change="onDescriptionChange"
                                     @input="onDescriptionChange"
-                                ></bbcode-editor>
-                                <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
-                                     class="text-sm text-danger">
+                                />
+                                <div
+                                    v-if="newDescription.length > 0 && !$v.newDescription.minLength"
+                                    class="text-sm text-danger"
+                                >
                                     Token Description must be more than one character
                                 </div>
-                                <div v-if="!$v.newDescription.maxLength" class="text-sm text-danger">
+                                <div
+                                    v-if="!$v.newDescription.maxLength"
+                                    class="text-sm text-danger"
+                                >
                                     Token Description must be less than {{ maxDescriptionLength }} characters
                                 </div>
                                 <div class="text-left pt-3">
-                                    <button class="btn btn-primary" @click="editDescription"
-                                            :disabled="$v.$invalid || !readyToSave">Save</button>
-                                    <span class="btn-cancel pl-3 c-pointer" @click="editingDescription = false">Cancel</span>
+                                    <button
+                                        class="btn btn-primary"
+                                        :disabled="$v.$invalid || !readyToSave"
+                                        @click="editDescription"
+                                    >
+                                        Save
+                                    </button>
+                                    <span
+                                        class="btn-cancel pl-3 c-pointer"
+                                        @click="editingDescription = false"
+                                    >
+                                        Cancel
+                                    </span>
                                 </div>
                             </div>
                         </template>
@@ -93,18 +109,17 @@ Vue.use(Toasted, {
 export default {
     name: 'TokenIntroductionDescription',
     props: {
-        name: String,
         description: String,
-        updateUrl: String,
         editable: Boolean,
+        name: String,
     },
     components: {
-        FontAwesomeIcon,
-        Guide,
-        LimitedTextarea,
         BbcodeEditor,
         BbcodeHelp,
         BbcodeView,
+        FontAwesomeIcon,
+        Guide,
+        LimitedTextarea,
     },
     data() {
         return {
@@ -141,7 +156,9 @@ export default {
                 return;
             }
 
-            this.$axios.single.patch(this.updateUrl, {
+            this.$axios.single.patch(this.$routing.generate('token_update', {
+                name: this.name,
+            }), {
                 description: this.newDescription,
             })
                 .then((response) => {

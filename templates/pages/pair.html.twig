@@ -58,12 +58,11 @@
                                 </top-holders>
                                 <token-introduction-description
                                     class="col-12 pt-3"
-                                    @updated="descriptionUpdated"
                                     name="{{ token.name }}"
                                     :description="tokenDescription"
-                                    update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}">
-                                </token-introduction-description>
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    @updated="descriptionUpdated"
+                                ></token-introduction-description>
                             </div>
                         </b-tab>
                     {% endif %}
