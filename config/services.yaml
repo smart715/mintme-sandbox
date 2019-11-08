@@ -452,6 +452,12 @@ services:
         calls:
             - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]
 
+    App\Exchange\Market\MarketCapCalculator:
+        arguments:
+            $supplyLinks: { Webchain: '%webchain_supply%' }
+            $tokenSupply: "%token_quantity%"
+            $rpc: '@coinmarketcap.rest_rpc'
+
     App\EventSubscriber\TransactionSubscriber:
         arguments:
             $mailer: '@app.instant.mailer'
