@@ -3,6 +3,7 @@ import * as Constants from './constants';
 import Interval from './interval';
 import EchartTheme from './echart-theme';
 import {useMarkitup} from './markitup.js';
+import {zipCodeAvailable, zipCodeValidate} from './zipcodevalidator.js';
 
 /**
  * Checks that given url is valid
@@ -177,4 +178,6 @@ export {
     getUserOffset,
     useMarkitup,
     getBreakPoint,
+    zipCodeAvailable,
+    zipCodeValidate,
 };
