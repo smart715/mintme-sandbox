@@ -59,7 +59,7 @@
                                     Token Description must be more than one character
                                 </div>
                                 <div
-                                    v-if="!$v.newDescription.maxLength"
+                                    v-if="!$v.encodedNewDescription.maxLength"
                                     class="text-sm text-danger"
                                 >
                                     Token Description must be less than {{ maxDescriptionLength }} characters
@@ -100,6 +100,9 @@ import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 
+const Entities = require('html-entities').XmlEntities;
+const entities = new Entities();
+
 library.add(faEdit);
 Vue.use(Toasted, {
     position: 'top-center',
@@ -138,6 +141,9 @@ export default {
                 .replace(/&lt;/g, '<')
                 .replace(/&gt;/g, '>');
         },
+        encodedNewDescription: function() {
+            return entities.encodeNonUTF(this.newDescription);
+        },
     },
     methods: {
         onDescriptionChange: function(val) {
@@ -150,8 +156,8 @@ export default {
             if (this.$v.$invalid) {
                 if (!this.$v.newDescription.minLength || !this.$v.newDescription.required) {
                     this.$toasted.error('Token Description must be more than one character');
-                } else if (!this.$v.newDescription.maxLength) {
-                    this.$toasted.error('Token Description must be less than '+this.maxDescriptionLength+' characters');
+                } else if (!this.$v.encodedNewDescription.maxLength) {
+                    this.$toasted.error(`Token Description must be less than ${this.maxDescriptionLength} characters`);
                 }
                 return;
             }
@@ -181,10 +187,12 @@ export default {
     },
     validations() {
         return {
+            encodedNewDescription: {
+                maxLength: maxLength(this.maxDescriptionLength),
+            },
             newDescription: {
                 required,
                 minLength: minLength(2),
-                maxLength: maxLength(this.maxDescriptionLength),
             },
         };
     },
