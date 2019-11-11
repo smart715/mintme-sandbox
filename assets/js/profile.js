@@ -3,22 +3,19 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import {minLength, helpers} from 'vuelidate/lib/validators';
-import {notAvailZipCodes, zipCodeContain} from './utils/constants.js';
-const i18nZipcodes = require('i18n-zipcodes');
+import {zipCodeContain} from './utils/constants.js';
+import {zipCodeAvailable, zipCodeValidate} from './utils/zipcodevalidator.js';
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
 const zipCodeValidation = (zipCode) => {
-    if ('' === zipCode) {
+    let countryCode = document.getElementById('profile_country').value;
+
+    if ('' === countryCode || '' === zipCode || !zipCodeAvailable(countryCode)) {
         return true;
     }
 
-    try {
-        const country = document.getElementById('profile_country').value;
-        return i18nZipcodes(country, zipCode);
-    } catch (e) {
-        return true;
-    }
+    return zipCodeValidate(countryCode, zipCode);
 };
 
 new Vue({
@@ -58,7 +55,7 @@ new Vue({
     },
     computed: {
         notAvailZipCode: function() {
-            return -1 !== notAvailZipCodes.indexOf(this.country.toUpperCase());
+            return !zipCodeAvailable(this.country);
         },
     },
     mounted: function() {

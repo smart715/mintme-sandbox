@@ -125,18 +125,18 @@
                                         }) }}
                                     </div>
                                     <div
-                                        v-if="!$v.zipCode.zipCodeValidation"
-                                        v-cloak="$v.zipCode"
-                                        class="text-danger text-center"
-                                    >
-                                        Zip code is not valid for selected country
-                                    </div>
-                                    <div
                                         v-if="!$v.zipCode.zipCodeContain"
                                         v-cloak="$v.zipCode"
                                         class="text-danger text-center"
                                     >
                                         Zip code can contain only letters, numbers, spaces and dashes
+                                    </div>
+                                    <div
+                                        v-else-if="!$v.zipCode.zipCodeValidation"
+                                        v-cloak="$v.zipCode"
+                                        class="text-danger text-center"
+                                    >
+                                        Zip code is not valid for selected country
                                     </div>
                                 </div>
                                 <div class="col-12 pt-3">
