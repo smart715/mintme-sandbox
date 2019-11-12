@@ -5,6 +5,7 @@ import BbcodeView from './components/bbcode/BbcodeView.vue';
 import {minLength, helpers} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {zipCodeAvailable, zipCodeValidate} from './utils/zipcodevalidator.js';
+
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
@@ -45,17 +46,23 @@ new Vue({
                 this.zipCode = savedCode;
             }
             this.$refs.zipCode.disabled = this.notAvailZipCode;
-            this.$refs.zipCode.setAttribute(
-                'placeholder',
-                this.notAvailZipCode
-                    ? ('' === this.country ? 'Select the country for set up zip code' : 'Selected country has no zip codes')
-                    : ''
-            );
+            this.$refs.zipCode.setAttribute('placeholder', this.selectCountryPlaceholder);
         },
     },
     computed: {
         notAvailZipCode: function() {
             return !zipCodeAvailable(this.country);
+        },
+        selectCountryPlaceholder: function() {
+            if (!this.notAvailZipCode) {
+                return '';
+            }
+
+            if ('' === this.country) {
+                return 'Select the country for set up zip code';
+            }
+
+            return 'Selected country has no zip codes';
         },
     },
     mounted: function() {

@@ -1,7 +1,4 @@
 {
-    "barbieswimcrew/zip-code-validator": {
-        "version": "v1.3.5"
-    },
     "cocur/slugify": {
         "version": "v3.1"
     },

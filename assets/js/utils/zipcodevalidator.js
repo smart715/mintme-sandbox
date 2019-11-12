@@ -200,20 +200,19 @@ const ZIP_REGEX_LIB = {
 function zipCodeValidate(countryCode, zipCode) {
     let countryCodeId;
     let zipCodeId;
-    let zipCodeRegex = null;
 
-    if (_.isString(countryCode) && _.isString(zipCode)) {
-        countryCodeId = _.toLower(_.trim(countryCode));
-        zipCodeId = _.toLower(_.trim(zipCode));
-    } else {
+    if (!_.isString(countryCode) || !_.isString(zipCode)) {
         return false;
     }
 
-    if (-1 !== _.indexOf(_.keys(ZIP_REGEX_LIB), countryCodeId)) {
-        zipCodeRegex = ZIP_REGEX_LIB[countryCodeId];
+    countryCodeId = _.toLower(_.trim(countryCode));
+    zipCodeId = _.toLower(_.trim(zipCode));
+
+    if (-1 === _.indexOf(_.keys(ZIP_REGEX_LIB), countryCodeId)) {
+        return false;
     }
 
-    return null === zipCodeRegex ? false : zipCodeRegex.test(zipCodeId);
+    return ZIP_REGEX_LIB[countryCodeId].test(zipCodeId);
 }
 
 /**

@@ -69,9 +69,6 @@ class ProfileType extends AbstractType
             ->add('zipCode', TextType::class, [
                 'label' => 'ZIP code:',
                 'required' => false,
-                'attr' => [
-                    'pattern' => "^[a-zA-Z0-9\-\s]*$",
-                ],
             ])
             ->add('description', BbcodeEditorType::class, [
                 'label' => 'Description:',
