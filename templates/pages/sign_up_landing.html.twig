@@ -13,14 +13,16 @@
                         {{ formHeader }}
                     </div>
                     <div class="card-body py-2">
-                        {{ form_start(form, {'method': 'post', 'action': path('sign_up'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
-                        {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required'} }) }}
+                        {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
+                        {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
                         <div>
                             <passwordmeter :password="password" @toggle-error="toggleError">
-                                {{ form_row(form.plainPassword.first, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
+                                <span @click="togglePassword()" class="show-password">
+                                    <i class="far fa-eye"></i>
+                                </span>
+                                {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
                             </passwordmeter>
                         </div>
-                        {{ form_row(form.plainPassword.second, { 'inline': false }) }}
                         <div class="py-2">
                             {{ form_row(form.recaptcha, { 'inline': false }) }}
                         </div>
@@ -30,9 +32,10 @@
                             <a class="btn-cancel" href="{{ path('fos_user_security_login') }}">Log In</a>
                         </div>
                         <p class="text-left pt-3">
-                            By clicking Sign Up, you accept <br>
-                            <a target="_blank" href="{{ path('terms_of_service') }}">Terms of Service</a> and
-                            <a target="_blank" href="{{ path('privacy_policy') }}">Privacy policy</a>
+                            By clicking Sign Up, you accept <br><a target="_blank"
+                                                                   href="{{ path('terms_of_service') }}">Terms of
+                                Service</a> and <a target="_blank" href="{{ path('privacy_policy') }}">Privacy
+                                policy</a>
                         </p>
                         {{ form_end(form) }}
                         {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
@@ -42,7 +45,7 @@
             <div class="col-5 pl-0">
                 <div class="landing-logo">
                     <img id="web" src="{{ asset('build/images/landing-web.png') }}">
-                    <img id="logo" src="{{ asset('build/images/favicon.e6effb97.png') }}">
+                    <img id="logo" src="{{ asset('build/images/favicon.png') }}">
                 </div>
             </div>
             <div class="col-3">
@@ -60,7 +63,7 @@
         </div>
         <div class="row steps py-5 mx-5 justify-content-center">
             <div class="col-xl-4 col-md-12 py-2">
-                <img src="{{ asset('build/images/number-one.png'    ) }}">
+                <img src="{{ asset('build/images/number-one.png') }}">
                 <div class="d-inline-block py-2">
                     <span>Content creator issues his own tokens</span>
                 </div>
@@ -85,7 +88,7 @@
             <div class="col-6 text-center">
                 <span class="title text-white h2">
                     So you invest in some idea <br>
-                    not just give money to support it!
+                    not just give money to support it! <br>
                 </span>
                 <a href="{{ path('fos_user_registration_register') }}"
                    class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 ml-5 py-2 pl-3 float-left">
@@ -93,8 +96,8 @@
                 </a>
                 <span>
                     To encourage you to our new service,
-                    we give you 5 WEB (Webchain) coins
-                    if you register now. For free
+                    we give you <b>5 WEB</b> (Webchain) coins
+                    if you <b>register now<b>. For free
                 </span>
             </div>
             <div class="col-3 text-center">
@@ -106,11 +109,11 @@
                 <img class="w-100" src="{{ asset('build/images/diagram.png') }}">
             </div>
             <div class="col-8 text-center">
-                WEB will show up immediately on your mintMe account and you can withdraw it if you want.<br>
-                Webchain is native blockchain currency for mintMe exchange, on which all tokens will be based.<br>
-                If mintme succeeds, 5 WEB can be worth a lot more than now.<br>
-                Can you imagine having opportunity to get 5 BTC for free and not doing it back in 2010 when it wasn't
-                worth much?
+                WEB will show up immediately on your <b><i>mintMe</i></b> account and you can withdraw it if you want.<br>
+                Webchain is native blockchain currency for <b><i>mintMe</i></b> exchange, on which all tokens will be based.<br>
+                If mintme succeeds, 5 WEB can be worth a lot more than now.
+                <b>Can you imagine having opportunity to get 5 BTC for free and not doing it back in 2010 when it wasn't
+                    worth much?</b>
             </div>
             <div class="col-2">
                 <img class="w-100" src="{{ asset('build/images/diagram-2.png') }}">
@@ -118,7 +121,7 @@
         </div>
         <div class="row feature-row border border-white m-5 py-3">
             <div class="col-4 p-4">
-                <img class="w-70" src="{{ asset('build/images/webchain-graphic.10deeaac.png') }}">
+                <img class="w-70" src="{{ asset('build/images/webchain-graphic.png') }}">
             </div>
             <div class="col-8 pl-2 pt-4 text-center">
                 <h1>Can you afford not to try?</h1>
