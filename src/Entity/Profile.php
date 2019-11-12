@@ -3,13 +3,12 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
-use App\Validator\Constraints\ProfilePeriodLock;
+use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use ZipCodeValidator\Constraints\ZipCode;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
@@ -32,7 +31,7 @@ class Profile
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @ProfilePeriodLock()
+     * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
      */
@@ -44,7 +43,7 @@ class Profile
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @ProfilePeriodLock()
+     * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
      */
@@ -116,7 +115,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
-     * @ZipCode(getter="getCountry", ignoreEmpty=true)
+     * @AppAssert\ZipCode(getter="getCountry")
      * @var string|null
      */
     protected $zipCode;
