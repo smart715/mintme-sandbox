@@ -41,6 +41,8 @@ Vue.use(Vuelidate);
 Vue.use(Toasted, {
     position: 'top-center',
     duration: 5000,
+    className: 'toast',
+    iconPack: 'custom-class',
 });
 
 Vue.options.delimiters = ['{[', ']}'];
