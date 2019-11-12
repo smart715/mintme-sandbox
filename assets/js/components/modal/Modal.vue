@@ -2,10 +2,12 @@
     <b-modal
         :visible="visible"
         :size="size"
+        :body-class="paddingClass"
         @hidden="closeModal"
         hide-footer
         :no-close-on-backdrop="noClose"
-        :no-close-on-esc="noClose">
+        :no-close-on-esc="noClose"
+    >
         <div slot="modal-header">
             <slot name="header"></slot>
             <slot name="close">
@@ -14,7 +16,10 @@
                 </a>
             </slot>
         </div>
-        <div class="modal-body">
+        <div
+            class="modal-body"
+            :class="paddingClass"
+        >
             <slot name="body"></slot>
         </div>
     </b-modal>
@@ -27,6 +32,12 @@ export default {
         visible: Boolean,
         size: String,
         noClose: Boolean,
+        withoutPadding: {type: Boolean, default: false},
+    },
+    computed: {
+        paddingClass: function() {
+            return this.withoutPadding ? 'm-0 p-0': '';
+        },
     },
     methods: {
         closeModal: function() {

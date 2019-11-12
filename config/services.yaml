@@ -258,6 +258,13 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
+    contract_update_consumer:
+        class: 'App\Consumers\ContractUpdateConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
     wallet:
         class: 'App\Wallet\Wallet'
         arguments:
@@ -390,6 +397,16 @@ services:
         tags:
             - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
 
+    app.form.change_password:
+        class: App\Form\ChangePasswordType
+        tags:
+            - { name: form.type, alias: app_user_change_password }
+
+    app.form.resetting:
+        class: App\Form\ResettingType
+        tags:
+            - { name: form.type, alias: app_user_resetting }
+
     App\EventSubscriber\SitemapSubscriber:
         arguments:
             - "@router"
@@ -428,3 +445,9 @@ services:
             - '@sonata.media.metadata.proxy'
         calls:
             - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]
+
+    App\Exchange\Market\MarketCapCalculator:
+        arguments:
+            $supplyLinks: { Webchain: '%webchain_supply%' }
+            $tokenSupply: "%token_quantity%"
+            $rpc: '@coinmarketcap.rest_rpc'
