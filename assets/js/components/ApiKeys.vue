@@ -43,7 +43,7 @@
 
     export default {
         name: 'ApiKeys',
-        mixins: [NotificationMixin];
+        mixins: [NotificationMixin],
         components: {ConfirmModal, CopyLink},
         props: {
             apiKeys: {type: [Object, Array], required: true},

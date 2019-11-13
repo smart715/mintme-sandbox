@@ -40,7 +40,7 @@ import {NotificationMixin} from '../../mixins';
 
 export default {
     name: 'TwoFactorModal',
-    mixins: [NotificationMixin];
+    mixins: [NotificationMixin],
     components: {
         Modal,
     },
