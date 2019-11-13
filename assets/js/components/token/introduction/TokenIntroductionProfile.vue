@@ -177,7 +177,6 @@ import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import Toasted from 'vue-toasted';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
 
@@ -186,10 +185,6 @@ let SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
 
 library.add(faEdit, faTimes);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 export default {
     name: 'TokenIntroductionProfile',

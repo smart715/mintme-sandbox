@@ -35,16 +35,11 @@
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
 import {WebSocketMixin, FiltersMixin} from '../../mixins';
 import TokenEditModal from '../modal/TokenEditModal';
 
 library.add(faEdit);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 export default {
     name: 'TokenName',

@@ -70,7 +70,6 @@
 </template>
 
 <script>
-import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faTelegram} from '@fortawesome/free-brands-svg-icons';
@@ -79,11 +78,6 @@ import {FiltersMixin} from '../../mixins/';
 import {isValidTelegramUrl} from '../../utils';
 
 library.add(faTelegram, faTimes);
-
-Vue.use(Toasted, {
-    duration: 5000,
-    position: 'top-center',
-});
 
 const HTTP_ACCEPTED = 202;
 

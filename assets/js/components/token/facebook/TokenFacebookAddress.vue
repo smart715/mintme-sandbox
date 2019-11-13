@@ -76,7 +76,6 @@
 </template>
 
 <script>
-import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
@@ -86,11 +85,6 @@ import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
 
 library.add(faFacebookSquare, faTimes);
-
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 const HTTP_ACCEPTED = 202;
 

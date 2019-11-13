@@ -157,7 +157,6 @@
 </template>
 
 <script>
-import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faGlobe, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -166,11 +165,6 @@ import {isValidUrl} from '../../../utils';
 import Modal from '../../modal/Modal';
 
 library.add(faGlobe, faTimes);
-
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 export default {
     name: 'TokenWebsiteAddress',
