@@ -26,8 +26,10 @@
                                         {% for message in messages %}
                                             <div class="d-block">
                                                 <div class="d-inline-block mx-auto text-center alert alert-{{ label }}">
-                                                    <i class="icon-{{label}}"></i>
-                                                    {{ message }}
+                                                    <div class="d-flex justify-content-center align-items-center">
+                                                        <i class="icon-{{label}}"></i>
+                                                        {{ message }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         {% endfor %}
