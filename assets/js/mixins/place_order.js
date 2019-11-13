@@ -1,4 +1,4 @@
-import NotificationMixin from './notification'
+import NotificationMixin from './notification';
 
 export default {
     mixins: [NotificationMixin],
