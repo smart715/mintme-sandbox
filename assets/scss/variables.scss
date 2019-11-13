@@ -24,7 +24,6 @@ $grey-dark: #778588;
 $yellow: #be8817;
 $orange: #f7931e;
 $green: #8dc63f;
-$green-dark: #2e7d32;
 $red: #fe6e43;
 $white: white;
 $dark-white: #e1e1e1;
@@ -122,3 +121,13 @@ $navbar-sm-background: radial-gradient(#184b80, #1b4776);
 $b-table-sort-icon-bg-not-sorted: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/></svg>") !default;
 $b-table-sort-icon-bg-ascending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' d='M51 1l25 23 24 22H1l25-22z'/><path fill='white' opacity='.3' d='M51 101l25-23 24-22H1l25 22z'/></svg>") !default;
 $b-table-sort-icon-bg-descending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22z'/><path fill='white' d='M51 101l25-23 24-22H1l25 22z'/></svg>") !default;
+
+// Notifications
+$toast-error-bg: #ff524e;
+$toast-error-text: #ffffff;
+$toast-info-bg: #6fcbfa;
+$toast-info-text: #003858;
+$toast-success-bg: #8dd7a6;
+$toast-success-text: #2e7d32;
+$toast-warning-bg: #ffcc7c;
+$toast-warning-text: #de3300;

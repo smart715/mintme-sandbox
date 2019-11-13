@@ -582,11 +582,18 @@ nav.top-navbar
     margin-right: 15px
   
   &.toasted-primary
+    &.error
+      background: $toast-error-bg !important
+      color: $toast-error-text !important
     &.info
-      background: $blue !important
-      color: $primary !important
+      background: $toast-info-bg !important
+      color: $toast-info-text !important
     &.success
-      color: $green-dark !important
+      background: $toast-success-bg
+      color: $toast-success-text !important
+    &.warning
+      background: $toast-warning-bg
+      color: $toast-warning-text
 
   font-size: 20px !important
   padding: 6px 15px !important
