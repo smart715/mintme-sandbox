@@ -114,7 +114,7 @@ class Token implements TradebleInterface
     protected $discordUrl;
 
     /**
-     * @ORM\Column(type="string", length=10000, nullable=true)
+     * @ORM\Column(type="string", length=60000, nullable=true)
      * @Groups({"API_TOK"})
      * @var string|null
      */
