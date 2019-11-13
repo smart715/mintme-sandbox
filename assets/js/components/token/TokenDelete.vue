@@ -37,6 +37,7 @@
 <script>
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
+import {NotificationMixin} from '../../mixins';
 
 const HTTP_ACCEPTED = 202;
 
@@ -78,10 +79,10 @@ export default {
         },
         doDeleteToken: function(code = '') {
             if (this.isTokenExchanged) {
-                this.$toasted.error('You need all your tokens to delete token.');
+                this.notifyError('You need all your tokens to delete token.');
                 return;
             } else if (!this.isTokenNotDeployed) {
-                this.$toasted.error('Token is deploying or deployed.');
+                this.notifyError('Token is deploying or deployed.');
                 return;
             }
 
@@ -92,20 +93,20 @@ export default {
                 })
                 .then((response) => {
                     if (HTTP_ACCEPTED === response.status) {
-                        this.$toasted.success(response.data.message);
+                        this.notifySuccess(response.data.message);
                         this.showTwoFactorModal = false;
                         location.href = this.$routing.generate('homepage');
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.$toasted.error('Network error');
+                        this.notifyError('Network error');
                     } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
+                        this.notifyError(error.response.data.message);
                         if ('2fa code is expired' === error.response.data.message) {
                             this.sendConfirmCode();
                         }
                     } else {
-                        this.$toasted.error('An error has occurred, please try again later');
+                        this.notifyError('An error has occurred, please try again later');
                     }
                 });
         },
@@ -120,16 +121,16 @@ export default {
                 }))
                 .then((response) => {
                     if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
-                        this.$toasted.success(response.data.message);
+                        this.notifySuccess(response.data.message);
                         this.needToSendCode = false;
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.$toasted.error('Network error');
+                        this.notifyError('Network error');
                     } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
+                        this.notifyError(error.response.data.message);
                     } else {
-                        this.$toasted.error('An error has occurred, please try again later');
+                        this.notifyError('An error has occurred, please try again later');
                     }
                 });
         },

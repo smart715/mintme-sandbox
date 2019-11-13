@@ -79,14 +79,14 @@
 <script>
 import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
-import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
+import {WebSocketMixin, MoneyFilterMixin, NotificationMixin} from '../../../js/mixins';
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
 
 export default {
     name: 'TradeChart',
-    mixins: [WebSocketMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, MoneyFilterMixin, NotificationMixin],
     props: {
         websocketUrl: String,
         market: Object,
@@ -240,7 +240,7 @@ export default {
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
         }).catch(() => {
-            this.$toasted.error('Service unavailable now. Can not load the chart data');
+            this.notifyError('Service unavailable now. Can not load the chart data');
         });
     },
     methods: {

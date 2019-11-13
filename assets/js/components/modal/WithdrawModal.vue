@@ -93,12 +93,12 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {MoneyFilterMixin} from '../../mixins';
+import {MoneyFilterMixin, NotificationMixin} from '../../mixins';
 import {addressLength, webSymbol, addressContain} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
-    mixins: [MoneyFilterMixin],
+    mixins: [MoneyFilterMixin, NotificationMixin],
     components: {
         Modal,
     },
@@ -173,12 +173,12 @@ export default {
         onWithdraw: function() {
             this.$v.$touch();
             if (this.$v.$error) {
-                this.$toasted.error('Correct your form fields');
+                this.notifyError('Correct your form fields');
                 return;
             }
 
             if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
-                this.$toasted.error('You don\'t have enough web to pay fee');
+                this.notifyError('You don\'t have enough web to pay fee');
                 return;
             }
 
@@ -191,11 +191,11 @@ export default {
                 'code': this.code || null,
             })
             .then((response) => {
-                this.$toasted.success('Confirmation email has been sent to your email. It will expire in 4 hours.');
+                this.notifySuccess('Confirmation email has been sent to your email. It will expire in 4 hours.');
                 this.closeModal();
             })
             .catch((error) => {
-                this.$toasted.error(error.response.data.message);
+                this.notifyError(error.response.data.message);
             })
             .then(() => this.withdrawing = false);
 

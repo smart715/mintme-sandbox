@@ -149,7 +149,7 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, FiltersMixin, MoneyFilterMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, NotificationMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
@@ -157,7 +157,7 @@ const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, NotificationMixin],
     components: {
         WithdrawModal,
         DepositModal,
@@ -256,24 +256,24 @@ export default {
                             id: parseInt(Math.random()),
                         }));
                     })
-                    .catch(() => this.$toasted.error(
+                    .catch(() => this.notifyError(
                         'Can not connect to internal services'
                     ));
             })
             .catch(() => {
-                this.$toasted.error('Can not update tokens now. Try again later.');
+                this.notifyError('Can not update tokens now. Try again later.');
             });
 
         this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
             .then((res) => this.depositAddresses = res.data)
             .catch(() => {
-                this.$toasted.error('Can not update deposit data now. Try again later.');
+                this.notifyError('Can not update deposit data now. Try again later.');
             });
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
             if (!this.twofa) {
-                this.$toasted.info('Please enable 2FA before withdrawing');
+                this.notifyInfo('Please enable 2FA before withdrawing');
                 return;
             }
             this.showModal = true;
@@ -307,7 +307,7 @@ export default {
                     undefined
                 )
                 .catch(() => {
-                    this.$toasted.error('Can not update deposit fee status. Try again later.');
+                    this.notifyError('Can not update deposit fee status. Try again later.');
                 });
 
             // TODO: Get rid of hardcoded WEB

@@ -24,11 +24,13 @@
 
 <script>
 import Autocomplete from 'v-autocomplete';
+import {NotificationMixin} from '../../mixins';
 
 const tokenRegEx = new RegExp('^[a-zA-Z0-9\\-\\s]*$');
 
 export default {
     name: 'TokenSearcher',
+    mixins: 'NotificationMixin',
     components: {
         Autocomplete,
     },
@@ -55,7 +57,7 @@ export default {
                     return token.name;
                 });
             }).catch((error) => {
-                this.$toasted.error('Service timeout');
+                this.notifyError('Service timeout');
             });
         },
         redirectToToken: function() {

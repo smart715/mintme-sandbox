@@ -40,11 +40,13 @@ import {
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
 } from '../../utils/constants';
+import {NotificationMixin} from '../../mixins';
 
 const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenChangeName',
+    mixins: [NotificationMixin],
     components: {
         TwoFactorModal,
     },
@@ -91,34 +93,34 @@ export default {
         editName: function() {
             this.$v.$touch();
             if (this.currentName === this.newName) {
-                this.$toasted.error('You didn\'t change the token name');
+                this.notifyError('You didn\'t change the token name');
                 return;
             } else if (this.isTokenExchanged) {
-                this.$toasted.error('You need all your tokens to change token\'s name');
+                this.notifyError('You need all your tokens to change token\'s name');
                 return;
             } else if (!this.isTokenNotDeployed) {
-                this.$toasted.error('Token is deploying or deployed.');
+                this.notifyError('Token is deploying or deployed.');
                 return;
             } else if (!this.newName) {
-                this.$toasted.error('Token name shouldn\'t be blank');
+                this.notifyError('Token name shouldn\'t be blank');
                 return;
             } else if (!this.$v.newName.validFirstChars) {
-                this.$toasted.error('Token name can not contain spaces or dashes in the beginning');
+                this.notifyError('Token name can not contain spaces or dashes in the beginning');
                 return;
             } else if (!this.$v.newName.validLastChars) {
-                this.$toasted.error('Token name can not contain spaces or dashes in the end');
+                this.notifyError('Token name can not contain spaces or dashes in the end');
                 return;
             } else if (!this.$v.newName.noSpaceBetweenDashes) {
-                this.$toasted.error('Token name can not contain space between dashes');
+                this.notifyError('Token name can not contain space between dashes');
                 return;
             } else if (!this.$v.newName.addressContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
+                this.notifyError('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
             } else if (!this.$v.newName.minLength) {
-                this.$toasted.error('Token name should have at least 4 symbols');
+                this.notifyError('Token name should have at least 4 symbols');
                 return;
             } else if (!this.$v.newName.maxLength) {
-                this.$toasted.error('Token name can not be longer than 60 characters');
+                this.notifyError('Token name can not be longer than 60 characters');
                 return;
             }
 
@@ -143,7 +145,7 @@ export default {
             .then((response) => {
                 if (response.status === HTTP_ACCEPTED) {
                     this.currentName = response.data['tokenName'];
-                    this.$toasted.success('Token\'s name changed successfully');
+                    this.notifySuccess('Token\'s name changed successfully');
 
                     this.showTwoFactorModal = false;
                     this.closeModal();
@@ -155,11 +157,11 @@ export default {
                 }
             }, (error) => {
                 if (!error.response) {
-                    this.$toasted.error('Network error');
+                    this.notifyError('Network error');
                 } else if (error.response.data.message) {
-                    this.$toasted.error(error.response.data.message);
+                    this.notifyError(error.response.data.message);
                 } else {
-                    this.$toasted.error('An error has occurred, please try again later');
+                    this.notifyError('An error has occurred, please try again later');
                 }
             })
             .then(() => {

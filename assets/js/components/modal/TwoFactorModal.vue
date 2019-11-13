@@ -36,9 +36,11 @@
 <script>
 import Modal from './Modal.vue';
 import {required} from 'vuelidate/lib/validators';
+import {NotificationMixin} from '../../mixins';
 
 export default {
     name: 'TwoFactorModal',
+    mixins: [NotificationMixin];
     components: {
         Modal,
     },
@@ -61,7 +63,7 @@ export default {
         onVerify: function() {
             this.$v.$touch();
             if (this.$v.$error) {
-                this.$toasted.error('Code is required');
+                this.notifyError('Code is required');
                 return;
             }
             this.$emit('verify', this.code);

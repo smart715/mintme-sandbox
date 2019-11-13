@@ -74,7 +74,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faDiscord} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin} from '../../mixins/';
+import {FiltersMixin, NotificationMixin} from '../../mixins/';
 import {isValidDiscordUrl} from '../../utils';
 
 library.add(faDiscord, faTimes);
@@ -91,7 +91,7 @@ export default {
     components: {
         FontAwesomeIcon,
     },
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, NotificationMixin],
     data() {
         return {
             editing: this.editingDiscord,
@@ -148,10 +148,10 @@ export default {
                         let state = this.newDiscord ? 'added' : 'removed';
                         this.$emit('saveDiscord', this.newDiscord);
                         this.newDiscord = this.newDiscord || 'https://discord.gg/';
-                        this.$toasted.success(`Discord invitation link ${state} successfully`);
+                        this.notifySuccess(`Discord invitation link ${state} successfully`);
                         this.editing = false;
                     } else {
-                        this.$toasted.error(response.data.message || 'Network error');
+                        this.notifyError(response.data.message || 'Network error');
                     }
                     this.submitting = false;
                 });

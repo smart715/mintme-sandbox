@@ -80,7 +80,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin} from '../../../mixins';
+import {FiltersMixin, NotificationMixin} from '../../../mixins';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
 
@@ -100,7 +100,7 @@ export default {
         Guide,
         Modal,
     },
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, NotificationMixin],
     created: function() {
         this.loadFacebookSdk();
     },
@@ -149,7 +149,7 @@ export default {
                 if (response.status === 'connected') {
                     FB.api('/me/accounts?type=page&fields=name,link', (accountsData) => {
                         if (accountsData.error) {
-                            this.$toasted.error('An error has ocurred, please try again later');
+                            this.notifyError('An error has ocurred, please try again later');
                             return;
                         }
                         this.pages = accountsData.data;
@@ -178,16 +178,16 @@ export default {
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
                         let state = this.selectedUrl ? `saved as ${this.selectedUrl}` : 'deleted';
-                        this.$toasted.success(`Facebook page ${state}`);
+                        this.notifySuccess(`Facebook page ${state}`);
                         this.$emit('saveFacebook', this.selectedUrl);
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.$toasted.error('Network error');
+                        this.notifyError('Network error');
                     } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
+                        this.notifyError(error.response.data.message);
                     } else {
-                        this.$toasted.error('An error has occurred, please try again later');
+                        this.notifyError('An error has occurred, please try again later');
                     }
                 })
                 .then(() => {

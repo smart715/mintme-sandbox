@@ -83,7 +83,7 @@
 
 <script>
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, NotificationMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -270,7 +270,7 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error('Can not update the markets data. Try again later.');
+                        this.notifyError('Can not update the markets data. Try again later.');
                         reject(err);
                     });
             });
@@ -482,7 +482,7 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
                         reject(err);
                     });
             });

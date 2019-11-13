@@ -84,11 +84,13 @@
 import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
+import {NotificationMixin} from '../../mixins';
 
 const DEFAULT_VALUE = '-';
 
 export default {
     name: 'TokenReleasePeriod',
+    mixins: [NotificationMixin],
     props: {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
@@ -124,7 +126,7 @@ export default {
             name: this.tokenName,
         }))
             .then((res) => this.releasePeriod = res.data.releasePeriod || this.releasePeriod)
-            .catch(() => this.$toasted.error('Can not load statistic data. Try again later'));
+            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -147,14 +149,14 @@ export default {
             }).then((response) => {
                 this.closeTwoFactorModal();
                 this.$emit('update', response);
-                this.$toasted.success('Release period updated.');
+                this.notifySuccess('Release period updated.');
             }).catch(({response}) => {
                 if (!response) {
-                    this.$toasted.error('Network error');
+                    this.notifyError('Network error');
                 } else if (response.data.message) {
-                    this.$toasted.error(response.data.message);
+                    this.notifyError(response.data.message);
                 } else {
-                    this.$toasted.error('An error has occurred, please try again later');
+                    this.notifyError('An error has occurred, please try again later');
                 }
             });
         },
