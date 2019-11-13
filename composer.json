@@ -20,6 +20,7 @@
         "fzaninotto/faker": "^1.8",
         "graze/guzzle-jsonrpc": "^3.2",
         "incenteev/composer-parameter-handler": "^2.1",
+        "jms/serializer-bundle": "2.4.4",
         "moneyphp/money": "^3.1",
         "nelmio/api-doc-bundle": "^3.4",
         "oro/doctrine-extensions": "^1.2",
