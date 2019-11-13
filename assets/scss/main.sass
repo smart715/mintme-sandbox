@@ -486,14 +486,27 @@ nav.top-navbar
 
 .alert
   &.alert-danger
-    border-color: $red
-    background-color: $red
-    color: $dark-white
+    border-color: $toast-error-bg
+    background-color: $toast-error-bg
+    color: $toast-error-text
 
   &.alert-success
-    border-color: $green
-    background-color: $green
-    color: $dark-white
+    border-color: $toast-success-bg
+    background-color: $toast-success-bg
+    color: $toast-success-text
+
+  &.alert-primary, &.alert-info
+    border-color: $toast-info-bg
+    background-color: $toast-info-bg
+    color: $toast-info-text
+
+  &.alert-warning
+    border-color: $toast-warning-bg
+    background-color: $toast-warning-bg
+    color: $toast-warning-text
+
+  font-size: 20px
+  padding: 6px 15px
 
 .empty-table
   .b-table-has-details
@@ -577,10 +590,11 @@ nav.top-navbar
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
 
-.toast
+.alert, .toast
   i
     margin-right: 15px
-  
+
+.toast
   &.toasted-primary
     &.error
       background: $toast-error-bg !important

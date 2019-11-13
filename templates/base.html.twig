@@ -24,8 +24,9 @@
                                 <div class="text-center {% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
-                                            <div class="d-block mb-3">
+                                            <div class="d-block">
                                                 <div class="d-inline-block mx-auto text-white text-center bg-{{ label }} alert alert-{{ label }}">
+                                                    <i class="icon-{{label}}"></i>
                                                     {{ message }}
                                                 </div>
                                             </div>
