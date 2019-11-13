@@ -1,19 +1,22 @@
 header::before
   content: none
 
+.text-monospaced
+  font-family: 'Consolas', sans-serif !important
+
 .swagger-ui
   .download-contents
     width: auto
 
   color: $dark-white
 
-  .response-col_description span
+  .response-col_description span .response-col_description div div
+    @extend .text-monospaced
     color: #3b4151
-    font-family: Consolas, sans-serif !important
 
   .curl, .request-url pre, .response-col_description .markdown, .opblock-body pre span
+    @extend .text-monospaced
     color: $dark-white !important
-    font-family: Consolas, sans-serif !important
 
   .curl
     -webkit-text-fill-color: $dark-white
@@ -25,10 +28,10 @@ header::before
     padding-right: 5px
 
   .response-undocumented i , .parameters-col_name div
-    font-family: Consolas, sans-serif
+    @extend .text-monospaced
 
   .false td , .false td span span span
-    font-family: Consolas, sans-serif !important
+    @extend .text-monospaced
 
   .scheme-container
     box-shadow: none
