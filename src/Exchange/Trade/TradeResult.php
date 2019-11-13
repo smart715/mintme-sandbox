@@ -15,7 +15,7 @@ class TradeResult
 
     private const MESSAGES = [
         self::SUCCESS =>
-            'ORDER CREATED',
+            'Order Created',
 
         self::FAILED =>
             'Order has failed. Try again later.',
