@@ -66,7 +66,7 @@ class ContractHandler implements ContractHandlerInterface
     public function deploy(Token $token): void
     {
         if (!$token->getLockIn()) {
-            $this->logger->error("Failed to deploy token '{$token->getName()}' because It has not a release period");
+            $this->logger->error("Failed to deploy token '{$token->getName()}' because it does not have a release period");
 
             throw new Exception('Token does not have a release period');
         }
@@ -78,10 +78,7 @@ class ContractHandler implements ContractHandlerInterface
                 'decimals' =>
                     $this->moneyWrapper->getRepository()->subunitFor(new Currency(MoneyWrapper::TOK_SYMBOL)),
                 'mintDestination' => $this->config->getMintmeAddress(),
-                'releasedAtCreation' =>
-                    $this->moneyWrapper
-                        ->parse($this->config->getTokenQuantity(), MoneyWrapper::TOK_SYMBOL)
-                        ->getAmount(),
+                'releasedAtCreation' => $token->getLockIn()->getReleasedAmount()->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
             ]
         );
