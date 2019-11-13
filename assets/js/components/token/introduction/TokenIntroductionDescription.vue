@@ -100,9 +100,6 @@ import LimitedTextarea from '../../LimitedTextarea';
 import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 
-const Entities = require('html-entities').XmlEntities;
-const entities = new Entities();
-
 library.add(faEdit);
 Vue.use(Toasted, {
     position: 'top-center',

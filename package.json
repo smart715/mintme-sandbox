@@ -29,7 +29,6 @@
     "form-serialize": "^0.7.2",
     "gapi": "0.0.3",
     "generate-password": "1.4.1",
-    "html-entities": "^1.2.1",
     "karma-es5-shim": "0.0.4",
     "karma-es6-shim": "^1.0.0",
     "locutus": "^2.0.10",
