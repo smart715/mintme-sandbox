@@ -7,6 +7,8 @@ use App\Consumers\MarketConsumer;
 use App\Exchange\Market;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
@@ -22,7 +24,8 @@ class MarketConsumerTest extends TestCase
             $this->mockLogger(),
             $this->mockStatusManager($this->once()),
             $this->mockMarketNameConverter(),
-            $this->mockMarketProducer($this->never())
+            $this->mockMarketProducer($this->never()),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -38,7 +41,8 @@ class MarketConsumerTest extends TestCase
             $this->mockLogger(),
             $this->mockStatusManager($this->never()),
             $this->mockMarketNameConverter(),
-            $this->mockMarketProducer($this->never())
+            $this->mockMarketProducer($this->never()),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -54,7 +58,8 @@ class MarketConsumerTest extends TestCase
             $this->mockLogger(),
             $this->mockStatusManager($this->never()),
             $this->mockMarketNameConverter(),
-            $this->mockMarketProducer($this->never())
+            $this->mockMarketProducer($this->never()),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -73,7 +78,8 @@ class MarketConsumerTest extends TestCase
             $this->mockLogger(),
             $sm,
             $this->mockMarketNameConverter(),
-            $this->mockMarketProducer($this->once())
+            $this->mockMarketProducer($this->once()),
+            $this->mockEM()
         );
 
         $this->assertTrue(
@@ -116,5 +122,15 @@ class MarketConsumerTest extends TestCase
         $producer->expects($invocation)->method('send');
 
         return $producer;
+    }
+
+    private function mockEM(): EntityManagerInterface
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getConnection')->willReturn(
+            $this->createMock(Connection::class)
+        );
+
+        return $em;
     }
 }

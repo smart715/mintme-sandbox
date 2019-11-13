@@ -71,6 +71,8 @@ class User extends BaseUser implements
      *     mode = "strict"
      * )
      * @AppAssert\IsNotBlacklisted(type="email", message="This domain is not allowed")
+     * @AppAssert\UserEmailSymbols()
+     * @AppAssert\GmailEmail()
      * @var string
      */
     protected $email;
@@ -216,6 +218,7 @@ class User extends BaseUser implements
      */
     public function setEmail($email)
     {
+        $email = strtolower($email);
         $this->username = $email;
 
         return parent::setEmail($email);

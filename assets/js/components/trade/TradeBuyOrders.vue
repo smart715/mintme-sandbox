@@ -24,7 +24,7 @@
                          :sort-desc.sync="sortDesc"
                          :items="tableData"
                          :fields="fields">
-                        <template slot="trader" slot-scope="row">
+                        <template v-slot:cell(trader)="row">
                         <a v-if="!row.item.isAnonymous" :href="row.item.traderUrl">
                                 <span v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
                                     {{ row.value }}
@@ -73,7 +73,7 @@ export default {
     props: {
         ordersList: [Array],
         tokenName: String,
-        fields: Object,
+        fields: Array,
         sortBy: String,
         sortDesc: Boolean,
         basePrecision: Number,

@@ -14,6 +14,7 @@ import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from './components/token/TokenSearcher';
 import AdminMenu from './components/AdminMenu';
+import {directive as onClickaway} from 'vue-clickaway';
 
 /*
     To enable passive listeners,
@@ -53,14 +54,30 @@ imagesContext.keys().forEach(imagesContext);
 
 new Vue({
     el: '#navbar',
+    directives: {
+        onClickaway,
+    },
     data() {
         return {
             items: [],
+            showNavbarMenu: false,
+            showProfileMenu: false,
         };
     },
     components: {
         TokenSearcher,
         AdminMenu,
+    },
+    methods: {
+        toggleNavbarMenu: function() {
+            this.showNavbarMenu = !this.showNavbarMenu;
+        },
+        toggleProfileMenu: function() {
+            this.showProfileMenu = !this.showProfileMenu;
+        },
+        hideProfileMenu: function() {
+            this.showProfileMenu = false;
+        },
     },
 });
 
