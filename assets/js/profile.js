@@ -3,7 +3,7 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
-import {minLength} from 'vuelidate/lib/validators';
+import {minLength, helpers} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {zipCodeAvailable, zipCodeValidate} from './utils/zipcodevalidator.js';
 
