@@ -9,9 +9,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class ZipCodeValidator extends ConstraintValidator
 {
-
-    /** @var strings[] */
-    private $patterns = [
+    private const PATTERNS = [
         'AD' => '[A-Z]{2}\\d{3}',
         'AF' => '\\d{4}',
         'AI' => '[A-Z]{2}-\\d{4}',
@@ -235,11 +233,11 @@ class ZipCodeValidator extends ConstraintValidator
         }
 
         // ignore if iso does not have codes
-        if (!in_array($iso, array_keys($this->patterns))) {
+        if (!in_array($iso, array_keys(self::PATTERNS))) {
             return;
         }
 
-        $pattern = $this->patterns[$iso];
+        $pattern = self::PATTERNS[$iso];
 
         if (!preg_match("/^{$pattern}$/", $value, $matches)) {
             $this->context->buildViolation($constraint->message)
