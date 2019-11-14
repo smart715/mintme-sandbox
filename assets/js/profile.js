@@ -1,25 +1,11 @@
 import _ from 'lodash';
-import LimitedTextarea from './components/LimitedTextarea.vue';
 import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
-import {minLength, helpers} from 'vuelidate/lib/validators';
-import {zipCodeContain} from './utils/constants.js';
+import LimitedTextarea from './components/LimitedTextarea.vue';
+import {minLength} from 'vuelidate/lib/validators';
+import {names, zipCodeContain} from './utils/constants.js';
 import {zipCodeAvailable, zipCodeValidate} from './utils/zipcodevalidator.js';
-
-const xRegExp = require('xregexp');
-const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
-
-const zipCodeValidation = (zipCode) => {
-    let countryCode = _.toString(document.getElementById('profile_country').value);
-    zipCode = _.toString(zipCode);
-
-    if ('' === countryCode || '' === zipCode || !zipCodeAvailable(countryCode)) {
-        return true;
-    }
-
-    return zipCodeValidate(countryCode, zipCode);
-};
 
 new Vue({
     el: '#profile',
@@ -96,7 +82,16 @@ new Vue({
         },
         zipCode: {
             zipCodeContain,
-            zipCodeValidation,
+            zipCodeValidation: function(zipCode) {
+                const countryCode = _.toString(this.country);
+                zipCode = _.toString(zipCode);
+
+                if ('' === countryCode || '' === zipCode || !zipCodeAvailable(countryCode)) {
+                    return true;
+                }
+
+                return zipCodeValidate(countryCode, zipCode);
+            },
         },
     },
 });
