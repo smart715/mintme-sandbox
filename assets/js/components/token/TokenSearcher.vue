@@ -30,7 +30,7 @@ const tokenRegEx = new RegExp('^[a-zA-Z0-9\\-\\s]*$');
 
 export default {
     name: 'TokenSearcher',
-    mixins: 'NotificationMixin',
+    mixins: [NotificationMixin],
     components: {
         Autocomplete,
     },

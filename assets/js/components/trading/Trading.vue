@@ -91,7 +91,7 @@ import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, NotificationMixin],
     props: {
         page: Number,
         tokensCount: Number,

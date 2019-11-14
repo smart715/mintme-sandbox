@@ -43,6 +43,7 @@ const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenDelete',
+    mixins: [NotificationMixin],
     props: {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
