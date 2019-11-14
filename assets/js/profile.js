@@ -4,8 +4,11 @@ import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
 import {minLength} from 'vuelidate/lib/validators';
-import {names, zipCodeContain} from './utils/constants.js';
+import {zipCodeContain} from './utils/constants.js';
 import {zipCodeAvailable, zipCodeValidate} from './utils/zipcodevalidator.js';
+
+const xRegExp = require('xregexp');
+const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
 new Vue({
     el: '#profile',
