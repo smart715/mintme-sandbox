@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 class ContractHandler implements ContractHandlerInterface
 {
     private const DEPLOY = 'deploy';
+    private const PENDING = 'pending';
     private const UPDATE_MIN_DESTINATION = 'update_mint_destination';
     private const DEPOSIT_CREDENTIAL = 'get_deposit_credential';
     private const TRANSFER = 'transfer';
@@ -77,6 +78,7 @@ class ContractHandler implements ContractHandlerInterface
                 'name' => $token->getName(),
                 'decimals' =>
                     $this->moneyWrapper->getRepository()->subunitFor(new Currency(MoneyWrapper::TOK_SYMBOL)),
+                'status' => self::PENDING,
                 'mintDestination' => $this->config->getMintmeAddress(),
                 'releasedAtCreation' => $token->getLockIn()->getReleasedAmount()->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
