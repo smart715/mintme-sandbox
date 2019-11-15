@@ -42,6 +42,8 @@ class MarketsUpdateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        $io = new SymfonyStyle($input, $output);
+        
         $markets = $this->marketFactory->createAll();
         $io->progressStart(count($markets));
 
