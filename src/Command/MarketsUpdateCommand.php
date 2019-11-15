@@ -26,7 +26,7 @@ class MarketsUpdateCommand extends Command
 
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
-        MarketFactoryInterface $marketFactory,
+        MarketFactoryInterface $marketFactory
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketFactory = $marketFactory;
@@ -49,7 +49,7 @@ class MarketsUpdateCommand extends Command
             $this->marketStatusManager->updateMarketStatus($market);
             $io->progressAdvance();
         }
-        
+
         $io->progressFinish();
         $io->success('Markets updated');
     }
