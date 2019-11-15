@@ -27,13 +27,9 @@ class MarketsUpdateCommand extends Command
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
         MarketFactoryInterface $marketFactory,
-        EntityManagerInterface $em,
-        MarketHandlerInterface $mh
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketFactory = $marketFactory;
-        $this->em = $em;
-        $this->mh = $mh;
         parent::__construct();
     }
 
@@ -46,9 +42,15 @@ class MarketsUpdateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        foreach ($this->marketFactory->createAll() as $market) {
-            $output->writeln("Currenly updating market: ".$market->getBase()->getSymbol()."/".$market->getQuote()->getSymbol());
+        $markets = $this->marketFactory->createAll();
+        $io->progressStart(count($markets));
+
+        foreach ($markets as $market) {
             $this->marketStatusManager->updateMarketStatus($market);
+            $io->progressAdvance();
         }
+        
+        $io->progressFinish();
+        $io->success('Markets updated');
     }
 }
