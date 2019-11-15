@@ -12,7 +12,6 @@
                     :disabled="loading">
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
-
         </div>
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
@@ -23,24 +22,27 @@
                     :sort-desc="true"
                     :sort-compare="sortCompare">
                     <template v-slot:[`head(${fields.volume.key})`]="data">
-                        {{ data.label }}
+                        <select-period
+                        :data-month-volume="dataMonthVolume"
+                        :data-day-volume="dataDayVolume"
+                        :show-month="showMonth"
+                        :toggle-month="toggleMonth"></select-period>
                         <guide>
                             <template slot="header">
-                                24h volume
+                                <span v-if="showMonth">
+                                    30d volume
+                                </span>
+                                <span v-else>
+                                    24h volume
+                                </span>
                             </template>
                             <template slot="body">
-                                The amount of crypto that has been traded in the last 24 hours.
-                            </template>
-                        </guide>
-                    </template>
-                    <template v-slot:[`head(${fields.monthVolume.key})`]="data">
-                        {{ data.label }}
-                        <guide>
-                            <template slot="header">
-                                30d volume
-                            </template>
-                            <template slot="body">
-                                The amount of crypto that has been traded in the last 30 days.
+                                <span v-if="showMonth">
+                                    The amount of crypto that has been traded in the last 30 days
+                                </span>
+                                <span v-else>
+                                    The amount of crypto that has been traded in the last 24 hours.
+                                </span>
                             </template>
                         </guide>
                     </template>
@@ -83,6 +85,7 @@
 
 <script>
 import Guide from '../Guide';
+import SelectPeriod from '../SelectPeriod';
 import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
@@ -103,6 +106,7 @@ export default {
     },
     components: {
         Guide,
+        SelectPeriod,
     },
     data() {
         return {
@@ -123,6 +127,9 @@ export default {
                 BTC: 0,
                 USD: 0,
             },
+            dataMonthVolume: '30d Volume',
+            dataDayVolume: '24H Volume',
+            showMonth: true,
         };
     },
     computed: {
@@ -146,7 +153,7 @@ export default {
             return this.markets !== null && !this.loading;
         },
         fields: function() {
-            return {
+            let mainFields = {
                 pair: {
                     key: 'pair',
                     label: 'Pair',
@@ -169,12 +176,6 @@ export default {
                     sortable: true,
                     formatter: formatMoney,
                 },
-                monthVolume: {
-                    label: '30d Volume',
-                    key: 'monthVolume' + ( this.showUsd ? USD.symbol : ''),
-                    sortable: true,
-                    formatter: formatMoney,
-                },
                 marketCap: {
                     label: 'Market Cap',
                     key: 'marketCap' + ( this.showUsd ? 'USD' : ''),
@@ -182,6 +183,22 @@ export default {
                     formatter: formatMoney,
                 },
             };
+            if (this.showMonth) {
+                mainFields['volume'] = {
+                    label: '30d Volume',
+                    key: 'monthVolume' + ( this.showUsd ? USD.symbol : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                };
+            } else {
+                mainFields['volume'] = {
+                    label: '24H Volume',
+                    key: 'volume' + ( this.showUsd ? USD.symbol : ''),
+                    sortable: true,
+                    formatter: formatMoney,
+                };
+            }
+            return mainFields;
         },
         fieldsArray: function() {
             return Object.values(this.fields);
@@ -514,6 +531,9 @@ export default {
                 .then((res) => {
                     this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 2);
                 });
+        },
+        toggleMonth: function(show) {
+            this.showMonth = show;
         },
     },
 };
