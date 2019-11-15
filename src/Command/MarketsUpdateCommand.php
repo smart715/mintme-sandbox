@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Command;
 
@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class MarketsUpdateCommand extends Command
 {
+    /** @var string */
     protected static $defaultName = 'app:markets:update';
 
     /** @var MarketStatusManagerInterface */
@@ -36,14 +37,14 @@ class MarketsUpdateCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Update markets with information from viabtc server')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         foreach ($this->marketFactory->createAll() as $market) {
             $output->writeln("Currenly updating market: ".$market->getBase()->getSymbol()."/".$market->getQuote()->getSymbol());
