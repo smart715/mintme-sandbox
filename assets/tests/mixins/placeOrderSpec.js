@@ -1,5 +1,8 @@
 import Vue from 'vue';
 import placeOrderMixin from '../../js/mixins/place_order';
+import Toasted from 'vue-toasted';
+
+Vue.use(Toasted);
 
 describe('placeOrderMixin', function() {
     const vm = new Vue({

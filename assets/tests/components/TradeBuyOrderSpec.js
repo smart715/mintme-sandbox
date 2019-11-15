@@ -67,6 +67,7 @@ describe('TradeBuyOrder', () => {
         wrapper.vm.buyPrice = 2;
         wrapper.vm.buyAmount = 2;
         wrapper.vm.placeOrder();
+        done();
     });
 
     describe('useMarketPrice', function() {
