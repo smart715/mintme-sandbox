@@ -34,6 +34,7 @@ class ContractHandlerTest extends TestCase
                 [
                     'name' => 'foo',
                     'decimals' => 4,
+                    'status' => 'pending',
                     'mintDestination' => 'foobarbaz',
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
@@ -82,6 +83,7 @@ class ContractHandlerTest extends TestCase
                 [
                     'name' => 'foo',
                     'decimals' => 4,
+                    'status' => 'pending',
                     'mintDestination' => 'foobarbaz',
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
