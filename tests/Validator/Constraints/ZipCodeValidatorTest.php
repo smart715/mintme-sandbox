@@ -51,7 +51,7 @@ class ZipCodeValidatorTest extends TestCase
             ['RU', '347430'],
             ['KE', '12345'],
             ['MU', '15325'],
-            ['NL', '1234AB'],
+            ['AZ', 'AZ 1234'],
             ['NL', '1234 AB'],
             ['PN', 'PCRN 1ZZ'],
             ['FOO', 'BAR BAZ'],
