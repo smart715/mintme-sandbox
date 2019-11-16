@@ -44,10 +44,10 @@ class MarketStatusTest extends TestCase
     public function gettersDataProvider(): array
     {
         return [
-            [$this->mockCrypto('FOO'), $this->mockCrypto('BAR'), $this->mockMarketInfo(1, 2, 3, 4), 'BAR'],
-            [$this->mockCrypto('FOO'), $this->mockCrypto('BAZ'), $this->mockMarketInfo(2, 2, 6, 6), 'BAZ'],
-            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(1, 2, 3, 4), MoneyWrapper::TOK_SYMBOL],
-            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(6, 5, 1, 2), MoneyWrapper::TOK_SYMBOL],
+            [$this->mockCrypto('FOO'), $this->mockCrypto('BAR'), $this->mockMarketInfo(1, 2, 3, 4), 'FOO'],
+            [$this->mockCrypto('FOO'), $this->mockCrypto('BAZ'), $this->mockMarketInfo(2, 2, 6, 6), 'FOO'],
+            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(1, 2, 3, 4), 'FOO'],
+            [$this->mockCrypto('FOO'), $this->mockToken(), $this->mockMarketInfo(6, 5, 1, 2), 'FOO'],
         ];
     }
 

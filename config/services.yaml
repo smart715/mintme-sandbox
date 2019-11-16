@@ -258,6 +258,13 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
+    contract_update_consumer:
+        class: 'App\Consumers\ContractUpdateConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
     wallet:
         class: 'App\Wallet\Wallet'
         arguments:
@@ -439,4 +446,8 @@ services:
         calls:
             - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]
 
-
+    App\Exchange\Market\MarketCapCalculator:
+        arguments:
+            $supplyLinks: { Webchain: '%webchain_supply%' }
+            $tokenSupply: "%token_quantity%"
+            $rpc: '@coinmarketcap.rest_rpc'
