@@ -95,6 +95,9 @@ new Vue({
 
                 return zipCodeValidate(countryCode, zipCode);
             },
+            zipCodeWrongChars: function(zipCode) {
+                return zipCode.replace(/\s/g, '').length > 0;
+            },
         },
     },
 });

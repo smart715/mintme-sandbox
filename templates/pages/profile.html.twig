@@ -138,6 +138,13 @@
                                     >
                                         Zip code is not valid for selected country
                                     </div>
+                                    <div
+                                        v-else-if="!$v.zipCode.zipCodeWrongChars"
+                                        v-cloak="$v.zipCode"
+                                        class="text-danger text-center"
+                                    >
+                                        Zip code cannot consist only of spaces
+                                    </div>
                                 </div>
                                 <div class="col-12 pt-3">
                                     <div>
