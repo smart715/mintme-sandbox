@@ -34,8 +34,9 @@ class ContractHandlerTest extends TestCase
                 [
                     'name' => 'foo',
                     'decimals' => 4,
+                    'status' => 'pending',
                     'mintDestination' => 'foobarbaz',
-                    'releasedAtCreation' => '1000000000000',
+                    'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                 ]
             )
@@ -82,8 +83,9 @@ class ContractHandlerTest extends TestCase
                 [
                     'name' => 'foo',
                     'decimals' => 4,
+                    'status' => 'pending',
                     'mintDestination' => 'foobarbaz',
-                    'releasedAtCreation' => '1000000000000',
+                    'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                 ]
             )
@@ -464,6 +466,9 @@ class ContractHandlerTest extends TestCase
         $moneyWrapper->method('parse')->willReturnCallback(function () {
             return new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL));
         });
+        $moneyWrapper->method('format')->willReturnCallback(function ($money) {
+            return $money->getAmount();
+        });
 
         return $moneyWrapper;
     }
@@ -487,6 +492,7 @@ class ContractHandlerTest extends TestCase
 
         $lockIn = $this->createMock(LockIn::class);
         $lockIn->method('getReleasePeriod')->willReturn(10);
+        $lockIn->method('getReleasedAmount')->willReturn(new Money('100000', new Currency(MoneyWrapper::TOK_SYMBOL)));
         $token->method('getLockIn')->willReturn($lockIn);
 
         return $token;
