@@ -19,7 +19,7 @@
                 <b-table
                     :items="tokens"
                     :fields="fieldsArray"
-                    sort-by="lastPrice"
+                    :sort-by="fields.monthVolume.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
                     <template v-slot:[`head(${fields.volume.key})`]="data">
@@ -325,17 +325,17 @@ export default {
 
             return {
                 pair: `${currency}/${token}`,
-                change: changePercentage.toFixed(2) + '%',
+                change: changePercentage.toFixed(0) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: toMoney(volume, subunit) + ' ' + currency,
-                monthVolume: toMoney(monthVolume, subunit) + ' ' + currency,
+                volume: toMoney(volume, 0) + ' ' + currency,
+                monthVolume: toMoney(monthVolume, 0) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
-                lastPriceUSD: this.toUSD(lastPrice, currency),
+                lastPriceUSD: this.toUSD(lastPrice, currency, true),
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
-                marketCap: toMoney(marketCap, subunit) + ' ' + currency,
+                marketCap: toMoney(marketCap, 0) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
             };
         },
@@ -416,7 +416,7 @@ export default {
             }, 0);
 
             let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = toMoney(monthVolume, marketPrecision) + ' ' + marketCurrency;
+            monthVolume = toMoney(monthVolume, 0) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
@@ -464,8 +464,8 @@ export default {
                 });
             });
         },
-        toUSD: function(amount, currency) {
-            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), USD.subunit) + ' ' + USD.symbol;
+        toUSD: function(amount, currency, subunit) {
+            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), subunit ? USD.subunit : 0) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
@@ -508,11 +508,11 @@ export default {
         fetchGlobalMarketCap: function() {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
-                    this.globalMarketCaps['BTC'] = toMoney(res.data.marketcap, 8);
+                    this.globalMarketCaps['BTC'] = toMoney(res.data.marketcap, 0);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
-                    this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 2);
+                    this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 0);
                 });
         },
     },
