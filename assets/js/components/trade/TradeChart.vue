@@ -1,8 +1,8 @@
 <template>
     <div v-if="loaded" class="card">
         <div class="card-body p-2">
-            <div class="row mx-2">
-                <div class="col text-left">
+            <div class="mx-2 d-flex flex-column flex-lg-row justify-content-between">
+                <div class="my-1 text-center text-lg-left">
                     <span>Last price: </span>
                     <guide>
                         <template slot="header">
@@ -15,7 +15,7 @@
                     <br>
                     {{ marketStatus.last | formatMoney }} {{ market.base.symbol }}
                 </div>
-                <div class="col text-center">
+                <div class="my-1 text-center">
                     <span>24h/30d change: </span>
                     <guide>
                         <template slot="header">
@@ -28,7 +28,7 @@
                     <br>
                     {{ marketStatus.change }}%/{{ marketStatus.monthChange }}%
                 </div>
-                <div class="col text-center">
+                <div class="my-1 text-center">
                     <span>24h/30d volume: </span>
                     <guide>
                         <template slot="header">
@@ -41,7 +41,7 @@
                     <br>
                     {{ marketStatus.volume | formatMoney }}/{{ marketStatus.monthVolume | formatMoney }} Tokens
                 </div>
-                <div class="col text-right">
+                <div class="my-1 text-center">
                     <span>24h/30d volume: </span>
                     <guide>
                         <template slot="header">
@@ -53,6 +53,19 @@
                     </guide>
                     <br>
                     {{ marketStatus.amount | formatMoney }}/{{ marketStatus.monthAmount | formatMoney }} {{ market.base.symbol }}
+                </div>
+                <div class="my-1 text-center text-lg-right">
+                    <span>Market Cap: </span>
+                    <guide>
+                        <template slot="header">
+                            Market Cap
+                        </template>
+                        <template slot="body">
+                            Market cap of {{ market.quote.symbol }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                        </template>
+                    </guide>
+                    <br>
+                    {{ marketStatus.marketCap | formatMoney }} {{ market.base.symbol }}
                 </div>
             </div>
             <div class="row">
@@ -90,6 +103,7 @@ export default {
     props: {
         websocketUrl: String,
         market: Object,
+        webchainSupplyUrl: String,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -145,11 +159,13 @@ export default {
                 monthVolume: '0',
                 monthChange: '0',
                 monthAmount: '0',
+                marketCap: '0',
             },
             stats: null,
             maxAvailableDays: 30,
             min,
             monthInfoRequestId: 0,
+            supply: 1e7,
         };
     },
     computed: {
@@ -196,6 +212,12 @@ export default {
     mounted() {
         window.addEventListener('resize', this.handleRightLabel);
         this.handleRightLabel();
+
+        if ('WEBBTC' === this.market.identifier) {
+            this.fetchWEBsupply().then(() => {
+                this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
+            });
+        }
 
         this.$axios.retry.get(this.$routing.generate('market_kline', {
             base: this.market.base.symbol,
@@ -256,12 +278,14 @@ export default {
             const marketAmount = parseFloat(marketInfo.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
+            const marketCap = marketLastPrice * this.supply;
 
             const marketStatus = {
                 change: changePercentage.toFixed(2),
                 last: toMoney(marketLastPrice, this.market.base.subunit),
                 volume: toMoney(marketVolume, this.market.quote.subunit),
                 amount: toMoney(marketAmount, this.market.base.subunit),
+                marketCap: toMoney(marketCap, this.market.base.subunit),
             };
 
             this.marketStatus = {...this.marketStatus, ...marketStatus};
@@ -310,6 +334,26 @@ export default {
         },
         handleRightLabel() {
             this.rightLabel = ['lg', 'xl'].includes(getBreakPoint());
+        },
+        fetchWEBsupply: function() {
+            return new Promise((resolve, reject) => {
+                let config = {
+                    transformRequest: function(data, headers) {
+                        headers.common = {};
+                        return data;
+                    },
+                };
+
+                this.$axios.retry.get(this.webchainSupplyUrl, config)
+                    .then((res) => {
+                        this.supply = parseFloat(res.data);
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.$toasted.error('Can not update WEB circulation supply. Market Cap might not be accurate.');
+                        reject(err);
+                    });
+            });
         },
     },
     components: {
