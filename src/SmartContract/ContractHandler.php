@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 class ContractHandler implements ContractHandlerInterface
 {
     private const DEPLOY = 'deploy';
+    private const PENDING = 'pending';
     private const UPDATE_MIN_DESTINATION = 'update_mint_destination';
     private const DEPOSIT_CREDENTIAL = 'get_deposit_credential';
     private const TRANSFER = 'transfer';
@@ -66,9 +67,9 @@ class ContractHandler implements ContractHandlerInterface
     public function deploy(Token $token): void
     {
         if (!$token->getLockIn()) {
-            $this->logger->error("Failed to deploy token '{$token->getName()}' because It has not a release period");
+            $this->logger->error("Failed to deploy token '{$token->getName()}' because it does not have a release period");
 
-            throw new Exception('Token dose not has release period');
+            throw new Exception('Token does not have a release period');
         }
 
         $response = $this->rpc->send(
@@ -77,11 +78,9 @@ class ContractHandler implements ContractHandlerInterface
                 'name' => $token->getName(),
                 'decimals' =>
                     $this->moneyWrapper->getRepository()->subunitFor(new Currency(MoneyWrapper::TOK_SYMBOL)),
+                'status' => self::PENDING,
                 'mintDestination' => $this->config->getMintmeAddress(),
-                'releasedAtCreation' =>
-                    $this->moneyWrapper
-                        ->parse($this->config->getTokenQuantity(), MoneyWrapper::TOK_SYMBOL)
-                        ->getAmount(),
+                'releasedAtCreation' => $token->getLockIn()->getReleasedAmount()->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
             ]
         );
@@ -93,25 +92,34 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function updateMinDestination(Token $token, string $address, bool $lock): void
+    public function updateMintDestination(Token $token, string $address, bool $lock): void
     {
-        if ($token->isMinDestinationLocked()) {
-            $this->logger->error("Failed to Update minDestination for '{$token->getName()}' because It is locked");
+        if (Token::DEPLOYED !== $token->deploymentStatus()) {
+            $this->logger->error(
+                "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
+            );
 
-            throw new Exception('Token dose not has release period');
+            throw new Exception('Token not deployed yet');
+        }
+
+        if ($token->isMintDestinationLocked()) {
+            $this->logger->error("Failed to update mintDestination for '{$token->getName()}' because it is locked");
+
+            throw new Exception('Token mintDestination is locked');
         }
 
         $response = $this->rpc->send(
             self::UPDATE_MIN_DESTINATION,
             [
-                'tokenContract' => $token->getAddress(),
+                'name' => $token->getName(),
+                'contractAddress' => $token->getAddress(),
                 'mintDestination' => $address,
                 'lock'=> $lock,
             ]
         );
 
         if ($response->hasError()) {
-            $this->logger->error("Failed to update minDestination for '{$token->getName()}'");
+            $this->logger->error("Failed to update mintDestination for '{$token->getName()}'");
 
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
@@ -134,7 +142,9 @@ class ContractHandler implements ContractHandlerInterface
     public function withdraw(User $user, Money $balance, string $address, Token $token): void
     {
         if (Token::DEPLOYED !== $token->deploymentStatus()) {
-            $this->logger->error("Failed to Update minDestination for '{$token->getName()}' because It is locked");
+            $this->logger->error(
+                "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
+            );
 
             throw new Exception('Token not deployed yet');
         }

@@ -320,7 +320,7 @@ class MarketHandler implements MarketHandlerInterface
             $market->getQuote()->getSymbol(),
             $this->moneyWrapper->parse(
                 $result['last'],
-                $this->getSymbol($market->getQuote())
+                $this->getSymbol($market->getBase())
             ),
             $this->moneyWrapper->parse(
                 $result['volume'],
@@ -328,27 +328,27 @@ class MarketHandler implements MarketHandlerInterface
             ),
             $this->moneyWrapper->parse(
                 $result['open'],
-                $this->getSymbol($market->getQuote())
+                $this->getSymbol($market->getBase())
             ),
             $this->moneyWrapper->parse(
                 $result['close'],
-                $this->getSymbol($market->getQuote())
+                $this->getSymbol($market->getBase())
             ),
             $this->moneyWrapper->parse(
                 $result['high'],
-                $this->getSymbol($market->getQuote())
+                $this->getSymbol($market->getBase())
             ),
             $this->moneyWrapper->parse(
                 $result['low'],
-                $this->getSymbol($market->getQuote())
+                $this->getSymbol($market->getBase())
             ),
             $this->moneyWrapper->parse(
                 $result['deal'],
-                $this->getSymbol($market->getQuote())
+                $this->getSymbol($market->getBase())
             ),
             $this->moneyWrapper->parse(
                 $monthResult['deal'],
-                $this->getSymbol($market->getQuote())
+                $this->getSymbol($market->getBase())
             )
         );
     }
