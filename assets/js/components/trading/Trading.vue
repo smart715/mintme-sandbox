@@ -408,7 +408,7 @@ export default {
             const marketName = this.klineQueriesIdsTokensMap.get(requestId);
             const marketCurrency = this.markets[marketName].base.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
-            const marketPrecision = this.markets[marketName].base.subunit;
+            //const marketPrecision = this.markets[marketName].base.subunit; I'll leave this here in any case we ever need it again
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
             let monthVolume = kline.reduce(function(acc, curr) {
