@@ -29,7 +29,7 @@
                                 <font-awesome-icon icon="edit" class="c-pointer ml-2  icon-edit" v-if="!showEditForm"></font-awesome-icon>
                             </a>
                         {%- endif -%}
-                        <div class="row" v-if="!showEditForm">
+                        <div v-if="!showEditForm">
                             <div class="col-12">
                                 <div class="pb-1">
                                     {% if profile.city is not empty %}
