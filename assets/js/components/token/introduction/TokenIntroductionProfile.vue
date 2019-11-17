@@ -16,7 +16,7 @@
                         />
                         <a :href="profileUrl">Visit token's creator profile</a>
                     </div>
-                    <div v-show="editingUrls" class="pb-1 pt-4 flex-frow-1 mb-2">
+                    <div v-show="editingUrls" class="pb-1 pt-4 flex-grow-1 mb-2">
                         <token-website-address
                             :currentWebsite="currentWebsite"
                             :editingWebsite="editingWebsite"
@@ -53,7 +53,7 @@
                             @toggleEdit="toggleEdit"
                         />
                     </div>
-                    <div v-show="!editingUrls" class="pb-1 pt-4 flex-frow-1 mb-2">
+                    <div v-show="!editingUrls" class="pb-1 pt-4 flex-grow-1 mb-2">
                         <token-website-address-view
                             v-if="currentWebsite"
                             :currentWebsite="currentWebsite"
