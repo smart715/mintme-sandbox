@@ -327,15 +327,15 @@ export default {
                 pair: `${currency}/${token}`,
                 change: changePercentage.toFixed(0) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: toMoney(volume, 0) + ' ' + currency,
-                monthVolume: toMoney(monthVolume, 0) + ' ' + currency,
+                volume: this.toMoney(volume) + ' ' + currency,
+                monthVolume: this.toMoney(monthVolume) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
                 lastPriceUSD: this.toUSD(lastPrice, currency, true),
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
-                marketCap: toMoney(marketCap, 0) + ' ' + currency,
+                marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
             };
         },
@@ -416,7 +416,7 @@ export default {
             }, 0);
 
             let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = toMoney(monthVolume, 0) + ' ' + marketCurrency;
+            monthVolume = this.toMoney(monthVolume) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
@@ -464,8 +464,17 @@ export default {
                 });
             });
         },
-        toUSD: function(amount, currency, subunit) {
-            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), subunit ? USD.subunit : 0) + ' ' + USD.symbol;
+        toUSD: function(amount, currency, subunit = false) {
+            amount = Decimal.mul(amount, this.conversionRates[currency]);
+            subunit = subunit
+                ? USD.subunit
+                : (
+                    amount.lessThan(100)
+                    ? 2
+                    : 0
+                    );
+
+            return toMoney(amount, subunit) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
@@ -508,12 +517,19 @@ export default {
         fetchGlobalMarketCap: function() {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
-                    this.globalMarketCaps['BTC'] = toMoney(res.data.marketcap, 0);
+                    this.globalMarketCaps['BTC'] = this.toMoney(res.data.marketcap);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
-                    this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 0);
+                    this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
                 });
+        },
+        toMoney: function(val) {
+            val = new Decimal(val);
+            let precision = val.lessThan(100)
+                ? 2
+                : 0;
+            return toMoney(val, precision);
         },
     },
 };

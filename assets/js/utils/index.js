@@ -101,9 +101,12 @@ function deepFlatten(object) {
 function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true) {
     Decimal.set({rounding: Decimal.ROUND_DOWN});
 
+    val = new Decimal(val);
+    precision = val.lessThan(1 / Math.pow(10, precision)) ? 0 : precision;
+
     return fixedPoint
-        ? new Decimal(val).toFixed(precision)
-        : new Decimal(val).toDP(precision);
+        ? val.toFixed(precision)
+        : val.toDP(precision);
 }
 
 /**
