@@ -105,15 +105,19 @@ function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true
     precision = val.lessThan(1 / Math.pow(10, precision)) ? 0 : precision;
 
     return fixedPoint
-        ? val.toFixed(precision)
-        : val.toDP(precision);
+        ? trimZeroes(val.toFixed(precision))
+        : val.toSD(precision);
 }
 
 /**
  * @param {string} str
  * @return {string}
  */
-function formatFee(str) {
+function trimZeroes(str) {
+    if(str.indexOf('.') === -1){
+        return str;
+    }
+    
     while (str[str.length-1] === '0') {
         str = str.substring(0, str.length-1);
     }
@@ -172,7 +176,7 @@ export {
     isValidDiscordUrl,
     deepFlatten,
     toMoney,
-    formatFee,
+    trimZeroes,
     formatMoney,
     Constants,
     EchartTheme,
