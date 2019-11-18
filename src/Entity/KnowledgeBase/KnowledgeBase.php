@@ -26,7 +26,7 @@ class KnowledgeBase
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\KnowledgeBase\Category")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=false)
      * @Assert\NotBlank
      * @var Category
      */
@@ -93,7 +93,7 @@ class KnowledgeBase
     }
 
     /**
-     * @return Category|string|null
+     * @return Category|string
      */
     public function getCategory()
     {
