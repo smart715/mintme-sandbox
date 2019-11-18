@@ -21,7 +21,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
-            ->add('category', null)
+            ->add('category')
             ->add('subcategory', null)
             ->add('title')
             ->add('url')
@@ -45,7 +45,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     protected function configureListFields(ListMapper $listMapper): void
     {
         $listMapper->addIdentifier('id', IntegerType::class)
-            ->add('category', null)
+            ->add('category')
             ->add('subcategory', null)
             ->addIdentifier('title', TextType::class)
             ->add('url', TextType::class)
