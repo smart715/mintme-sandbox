@@ -12,14 +12,14 @@ class Category
 {
     /**
      * @ORM\Id()
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @var int
      */
     protected $id;
 
     /**
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(type="string")
      * @var string
      */
     protected $name;
