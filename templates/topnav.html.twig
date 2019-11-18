@@ -157,4 +157,7 @@
             </ul>
         </div>
     </div>
+    {% if is_hacker_allowed and app.user %}
+        <admin-menu></admin-menu>
+    {% endif %}
 </nav>
