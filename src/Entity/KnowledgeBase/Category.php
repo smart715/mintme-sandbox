@@ -5,14 +5,14 @@ namespace App\Entity\KnowledgeBase;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="knowledge_base_category")
+ * @ORM\Table(name="knowledge_base_category", nullable=false)
  * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
  */
 class Category
 {
     /**
      * @ORM\Id()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=false)
      * @ORM\GeneratedValue(strategy="AUTO")
      * @var int
      */
