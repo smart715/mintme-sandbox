@@ -92,6 +92,9 @@ class KnowledgeBase
         $this->description = $description;
     }
 
+    /**
+     * @return Category
+     */
     public function getCategory()
     {
         return $this->category;
@@ -103,7 +106,7 @@ class KnowledgeBase
     }
 
     /**
-     * @return Subcategory|string|null
+     * @return Subcategory
      */
     public function getSubcategory()
     {
