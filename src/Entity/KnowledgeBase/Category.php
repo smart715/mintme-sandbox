@@ -12,7 +12,7 @@ class Category
 {
     /**
      * @ORM\Id()
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @var int
      */

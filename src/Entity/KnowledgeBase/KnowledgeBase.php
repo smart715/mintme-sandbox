@@ -93,7 +93,7 @@ class KnowledgeBase
     }
 
     /**
-     * @return Category|string
+     * @return Category|string|null
      */
     public function getCategory()
     {
