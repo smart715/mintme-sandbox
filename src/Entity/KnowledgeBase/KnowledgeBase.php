@@ -92,9 +92,6 @@ class KnowledgeBase
         $this->description = $description;
     }
 
-    /**
-     * @return Category|string
-     */
     public function getCategory()
     {
         return $this->category;
