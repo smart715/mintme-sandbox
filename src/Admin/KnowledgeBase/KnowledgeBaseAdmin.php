@@ -32,11 +32,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     {
         $form
             ->add('category', ModelListType::class, [
-                'placeholder' => 'No item selected',
+                'required' => true,
             ])
             ->add('subcategory', ModelListType::class, [
                 'required' => false,
-                'placeholder' => 'No item selected',
             ])
             ->add('title', TextType::class)
             ->add('url', TextType::class)
