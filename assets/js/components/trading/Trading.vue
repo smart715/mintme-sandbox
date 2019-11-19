@@ -322,10 +322,9 @@ export default {
             let hiddenName = this.findHiddenName(token);
 
             let marketCap = Decimal.mul(lastPrice, supply);
-
             return {
                 pair: `${currency}/${token}`,
-                change: changePercentage.toFixed(0) + '%',
+                change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 volume: this.toMoney(volume) + ' ' + currency,
                 monthVolume: this.toMoney(monthVolume) + ' ' + currency,
