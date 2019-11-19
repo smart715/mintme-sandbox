@@ -39,6 +39,8 @@
                                     youtube-channel-id="{{ token.youtubeChannelId }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
+                                    :deployment-status="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                    token-contract-address="{{ token.address }}"
                                     token-name="{{ market.quote.name }}"
                                     telegram-url="{{ token.telegramUrl }}"
                                     discord-url="{{ token.discordUrl }}"
@@ -54,8 +56,8 @@
                                     :precision="{{ precision }}">
                                 </token-introduction-statistics>
                                 <top-holders
-                                        class="col-12 mt-3"
-                                        :token-name="{{ market.quote.symbol | json_encode }}">
+                                    class="col-12 mt-3"
+                                    :token-name="{{ market.quote.symbol | json_encode }}">
                                 </top-holders>
                                 <token-introduction-description
                                     class="col-12 pt-3"
@@ -92,7 +94,7 @@
                                     :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                     websocket-url="{{ global_websocket_url }}"
                                     withdrawal-address="{{ token.mintDestination }}"
-                                    v-on:token-deploy-pending="setTokenPending"
+                                    @token-deploy-pending="setTokenPending"
                                 />
                             </div>
                         </li>
