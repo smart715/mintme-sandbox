@@ -97,8 +97,8 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.marketPrice = 5;
             wrapper.vm.balanceClicked();
 
-            expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
-            expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
+            expect(wrapper.vm.buyAmount).to.deep.equal('2');
+            expect(wrapper.vm.buyPrice).to.deep.equal('5');
         });
 
         it('shouldn\'t add price if the price edited manually', () => {
@@ -108,7 +108,7 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked();
 
-            expect(wrapper.vm.buyAmount).to.deep.equal('5.0000');
+            expect(wrapper.vm.buyAmount).to.deep.equal('5');
             expect(wrapper.vm.buyPrice).to.deep.equal(2);
         });
 
@@ -119,8 +119,8 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked();
 
-            expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
-            expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
+            expect(wrapper.vm.buyAmount).to.deep.equal('2');
+            expect(wrapper.vm.buyPrice).to.deep.equal('5');
         });
 
         it('should add price if the price edited manually but has null value', () => {
@@ -130,8 +130,8 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked();
 
-            expect(wrapper.vm.buyAmount).to.deep.equal('2.0000');
-            expect(wrapper.vm.buyPrice).to.deep.equal('5.00000000');
+            expect(wrapper.vm.buyAmount).to.deep.equal('2');
+            expect(wrapper.vm.buyPrice).to.deep.equal('5');
         });
     });
 });

@@ -31,10 +31,10 @@ describe('OrderClicked', function() {
             amount: 6,
         });
 
-        expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal('5.00000000');
-        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('5.00000000');
-        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('6.0000');
-        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('6.0000');
+        expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal('5');
+        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('5');
+        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('6');
+        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('6');
     });
 
     it('should decrease the amount of the offer if has less balance', () => {
@@ -43,20 +43,20 @@ describe('OrderClicked', function() {
             amount: 20,
         });
 
-        expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal('5.00000000');
-        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('5.00000000');
-        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('12.0000');
-        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('10.0000');
+        expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal('5');
+        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('5');
+        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('12');
+        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('10');
 
         wrapper.vm.orderClicked({
             price: 55,
             amount: 20,
         });
 
-        expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal('55.00000000');
-        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('55.00000000');
-        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('12.0000');
-        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('0.9090');
+        expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal('55');
+        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('55.');
+        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('12');
+        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('0.909');
     });
 
     it('should not update the price if marketPrice is selected', () => {
@@ -72,7 +72,7 @@ describe('OrderClicked', function() {
 
         expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal(20);
         expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal(20);
-        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('6.0000');
-        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('6.0000');
+        expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('6');
+        expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('6');
     });
 });
