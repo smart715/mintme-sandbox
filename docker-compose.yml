@@ -62,7 +62,7 @@ services:
       - middleend
 
   webchain-cli:
-    image: 22116/webchain-cli
+    image: lukaszmatczak/webchain-cli
     networks:
       - middleend
     ports:
@@ -72,7 +72,7 @@ services:
       - .docker/default/WEB:/data
 
   webchaind:
-    image: 22116/webchaind
+    build: .docker/webchaind
     ports:
       - 39573:39573 # debug
     networks:
