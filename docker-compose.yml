@@ -15,6 +15,19 @@ services:
     volumes:
       - .:/var/www/html/panel
 
+  contract:
+    build: .docker/contract/contract-gateway
+    depends_on:
+      - webchaind
+      - db
+      - rabbitmq
+    networks:
+      - middleend
+    volumes:
+      - .docker/contract.env:/src/.env
+      - .docker/contract.yaml:/src/config/default.yaml
+      - webchaind_root:/src/webchain_root
+
   withdraw:
     build: .docker/withdraw
     depends_on:
@@ -64,6 +77,7 @@ services:
       # Replace next paths with actuals on your system
       - .docker/default/WEB/password.txt:/data/password
       - .docker/default/WEB/private.txt:/data/private
+      - webchaind_root:/root/.webchain/mainnet
 
   nginx:
     image: nginx:latest
@@ -229,3 +243,6 @@ networks:
     driver: bridge
   backend:
     driver: bridge
+
+volumes:
+  webchaind_root: ~
