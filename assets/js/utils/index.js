@@ -99,33 +99,15 @@ function deepFlatten(object) {
  * @return {string}
  */
 function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true) {
-    Decimal.set({rounding: Decimal.ROUND_DOWN});
+    Decimal.set({rounding: Decimal.ROUND_DOWN, toExpNeg: -20});
 
     val = new Decimal(val);
     precision = val.lessThan(1 / Math.pow(10, precision)) ? 0 : precision;
+    val = val.toDP(precision);
 
     return fixedPoint
-        ? trimZeroes(val.toFixed(precision))
-        : val.toSD(precision);
-}
-
-/**
- * @param {string} str
- * @return {string}
- */
-function trimZeroes(str) {
-    if(str.indexOf('.') === -1){
-        return str;
-    }
-    
-    while (str[str.length-1] === '0') {
-        str = str.substring(0, str.length-1);
-    }
-    if (str[str.length-1] === '.') {
-        str = str.substring(0, str.length-1);
-    }
-
-    return str;
+        ? val.toString()
+        : val;
 }
 
 /**
@@ -176,7 +158,6 @@ export {
     isValidDiscordUrl,
     deepFlatten,
     toMoney,
-    trimZeroes,
     formatMoney,
     Constants,
     EchartTheme,

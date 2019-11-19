@@ -466,15 +466,7 @@ export default {
         },
         toUSD: function(amount, currency, subunit = false) {
             amount = Decimal.mul(amount, this.conversionRates[currency]);
-            subunit = subunit
-                ? USD.subunit
-                : (
-                    amount.lessThan(100)
-                    ? 2
-                    : 0
-                    );
-
-            return toMoney(amount, subunit) + ' ' + USD.symbol;
+            return (subunit ? toMoney(amount, USD.subunit) : this.toMoney(amount)) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
