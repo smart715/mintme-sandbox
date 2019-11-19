@@ -15,6 +15,7 @@ import Routing from './routing';
 import TokenSearcher from './components/token/TokenSearcher';
 import AdminMenu from './components/AdminMenu';
 import {directive as onClickaway} from 'vue-clickaway';
+import Notification from './components/Notification';
 
 /*
     To enable passive listeners,
@@ -80,6 +81,13 @@ new Vue({
         hideProfileMenu: function() {
             this.showProfileMenu = false;
         },
+    },
+});
+
+new Vue({
+    el: '#notifications',
+    components: {
+        Notification,
     },
 });
 
