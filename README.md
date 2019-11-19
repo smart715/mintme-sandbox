@@ -52,6 +52,7 @@ php bin/console rabbitmq:consumer market &
 ```
 to listen for new data in markets
 
+
 Development
 -----------
 
@@ -79,9 +80,35 @@ database_host: http://db:3306 # We are replacing actual ip with a service alias 
 
 ### Usage:
 
-1. Run `docker-compose up -d` to setup a services cluster.  
-2. Wait untill all services aren't started
+1. Run `sudo docker-compose up -d` to setup a services cluster in background, if you would like to see logs output then start it with `sudo docker-compose up`.  
+2. Wait until all services aren't started
 3. Check panel with `localhost` or docker-machine ip
+4. For checking logs type `docker-compose logs` in your repository folder , also you can see available containers with `sudo docker-compose ps` ,
+to check logs of specific container run `sudo docker logs container_name` where container_name is one of available containers 
+or `sudo docker-compose logs service_name` where service_name is one of available services which are described in `docker-compose.yml` 
+
+example output of available containers with `sudo docker-compose ps``
+```
+btc-kafka              start-kafka.sh                   Up      0.0.0.0:19092->9092/tcp                                                                                  
+btc-mysql              docker-entrypoint.sh mysqld      Up      0.0.0.0:13306->3306/tcp                                                                                  
+btc-redis-master       docker-entrypoint.sh redis ...   Up      0.0.0.0:16379->6379/tcp                                                                                  
+btc-redis-sentinel     /docker-entrypoint.sh            Up      0.0.0.0:26379->26379/tcp, 6379/tcp                                                                       
+btc-redis-slave        docker-entrypoint.sh redis ...   Up      0.0.0.0:16380->6379/tcp                                                                                  
+btc-service            docker-entrypoint.sh             Up      127.0.0.1:14444->4444/tcp, 127.0.0.1:17316->7316/tcp, 127.0.0.1:17317->7317/tcp,                         
+                                                                127.0.0.1:17416->7416/tcp, 127.0.0.1:17424->7424/tcp, 127.0.0.1:18080->8080/tcp,                         
+                                                                127.0.0.1:18081->8081/tcp, 127.0.0.1:18091->8091/tcp, 127.0.0.1:18364->8364/tcp                          
+btc-zookeeper          /bin/sh -c /usr/sbin/sshd  ...   Up      0.0.0.0:12181->2181/tcp, 22/tcp, 2888/tcp, 3888/tcp                                                      
+panel_db_1             docker-entrypoint.sh mysqld      Up      0.0.0.0:3306->3306/tcp                                                                                   
+panel_deposit_1        docker-entrypoint.sh             Up      0.0.0.0:3000->3000/tcp                                                                                   
+panel_electrum_1       docker-entrypoint.sh             Up      0.0.0.0:7777->7777/tcp                                                                                   
+panel_nginx_1          nginx-debug -g daemon off;       Up      0.0.0.0:16614->16614/tcp, 0.0.0.0:80->80/tcp, 0.0.0.0:8000->8000/tcp, 0.0.0.0:8008->8008/tcp             
+panel_panel_1          app-docker-entrypoint.sh         Up      9000/tcp                                                                                                 
+panel_rabbitmq_1       docker-entrypoint.sh rabbi ...   Up      15671/tcp, 0.0.0.0:15672->15672/tcp, 25672/tcp, 4369/tcp, 5671/tcp, 0.0.0.0:5672->5672/tcp               
+panel_webchain-cli_1   webchain-cli -v --base-pat ...   Up      0.0.0.0:1920->1920/tcp                                                                                   
+panel_webchaind_1      docker-entrypoint.sh             Up      31440/tcp, 31440/udp, 0.0.0.0:39573->39573/tcp                                                           
+panel_withdraw_1       app-docker-entrypoint.sh         Up      9000/tcp                                                                                                 
+```
+5. To stop services if they are running in foreground mode type `ctrl+c` or `sudo docker-compose stop` for background mode
 
 ### PS:
 
