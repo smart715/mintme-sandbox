@@ -54,7 +54,7 @@ describe('OrderClicked', function() {
         });
 
         expect(store.getters['makeOrder/getSellPriceInput']).to.deep.equal('55');
-        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('55.');
+        expect(store.getters['makeOrder/getBuyPriceInput']).to.deep.equal('55');
         expect(store.getters['makeOrder/getSellAmountInput']).to.deep.equal('12');
         expect(store.getters['makeOrder/getBuyAmountInput']).to.deep.equal('0.909');
     });
