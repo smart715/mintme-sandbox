@@ -16,7 +16,8 @@ fos_user:
             type: App\Form\ResettingType
         email:
             template: bundles/FOSUserBundle/Resetting/email.html.twig
-        token_ttl: 7200
+        token_ttl: '%password_reset_expiration_time%'
+        retry_ttl: '%password_reset_retry_time%'
     from_email:
         address: "%env(MAILER_USER)%"
         sender_name: "%env(MAILER_USER)%"
