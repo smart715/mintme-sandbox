@@ -1,16 +1,21 @@
 header::before
   content: none
 
+.text-monospaced
+  font-family: 'Consolas', sans-serif !important
+
 .swagger-ui
   .download-contents
     width: auto
 
   color: $dark-white
 
-  .response-col_description span
+  .response-col_description span .response-col_description div div
+    @extend .text-monospaced
     color: #3b4151
 
   .curl, .request-url pre, .response-col_description .markdown, .opblock-body pre span
+    @extend .text-monospaced
     color: $dark-white !important
 
   .curl
@@ -21,6 +26,9 @@ header::before
 
   .auth-wrapper
     padding-right: 5px
+
+  .response-undocumented i , .parameters-col_name div , .body-param__text ,  .false td , .false td span span span
+    @extend .text-monospaced
 
   .scheme-container
     box-shadow: none
@@ -48,6 +56,10 @@ header::before
   .opblock-tag-section
     background: $primary
     padding: 10px 10px 0 10px
+
+  .opblock-summary-path
+    .nostyle
+      @extend .text-monospaced
 
   .swagger-ui .info .description p
     color: $dark-white
