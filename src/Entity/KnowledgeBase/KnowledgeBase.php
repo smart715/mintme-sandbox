@@ -93,7 +93,7 @@ class KnowledgeBase
     }
 
     /**
-     * @return Category
+     * @return Category|string|null
      */
     public function getCategory()
     {
@@ -106,7 +106,7 @@ class KnowledgeBase
     }
 
     /**
-     * @return Subcategory
+     * @return Subcategory|string|null
      */
     public function getSubcategory()
     {
