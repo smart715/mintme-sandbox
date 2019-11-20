@@ -17,7 +17,6 @@
             this.type = this.type === 'primary' ? 'info' : this.type;
 
             this.sendNotification(this.$refs.content.innerHTML, this.type);
-            console.log("HOLA");
         },
-    }
+    };
 </script>
