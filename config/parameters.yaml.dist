@@ -91,3 +91,9 @@ parameters:
 
     # Path for all main documents
     docs_path: '/docs'
+
+    # Pasword reset link expiration time in seconds
+    password_reset_expiration_time: 3600
+
+    # Time that has to pass to be able to request password reset link again, in seconds
+    password_reset_retry_time: 3600 
