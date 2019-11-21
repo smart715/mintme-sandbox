@@ -8,7 +8,7 @@ _RPC_CORS=${RPC_CORS:="*"}
 _RPC_API=${RPC_API:="admin,debug,webchain,miner,eth,net,web3"}
 
 
-webchaind  --password ${_PASS} account import ${_ACCOUNT}
+#webchaind  --password ${_PASS} account import ${_ACCOUNT}
 webchaind $(if [ ${_IS_FAST} -eq 1 ]; then echo '--fast'; fi) \
     --maxpeers 0 \
     --rpc \
@@ -16,5 +16,5 @@ webchaind $(if [ ${_IS_FAST} -eq 1 ]; then echo '--fast'; fi) \
     --rpc-port "${_RPC_PORT}" \
     --rpc-cors-domain "${_RPC_CORS}" \
     --rpc-api "${_RPC_API}" \
-    --unlock 0 \
+    --unlock 0x9139413fe7247da35ae0797f9270271ba758d248 \
     --password ${_PASS}

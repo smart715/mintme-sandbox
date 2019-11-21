@@ -80,7 +80,8 @@ services:
     volumes:
       # Replace next paths with actuals on your system
       - .docker/default/WEB/password.txt:/data/password
-      - .docker/default/WEB/private.txt:/data/private
+#      - .docker/default/WEB/private.txt:/data/private
+      - .docker/default/WEB/account.json:/root/.webchain/mainnet/keystore/9139413fe7247da35ae0797f9270271ba758d248
       - webchaind_root:/root/.webchain/mainnet
 
   nginx:
@@ -161,6 +162,7 @@ services:
       - .docker/viabtc/btc/btc/matchengine/config.json:/btc/matchengine/config.json
       - .docker/viabtc/btc/btc/accesshttp/config.json:/btc/accesshttp/config.json
       - .docker/viabtc/btc/btc/marketprice/config.json:/btc/marketprice/config.json
+      - .docker/viabtc/btc/btc/marketprice/mp_message.c:/btc/marketprice/mp_message.c
       - .docker/viabtc/btc/btc/accessws/config.json:/btc/accessws/config.json
       - .docker/viabtc/btc/btc/alertcenter/config.json:/btc/alertcenter/config.json
       - .docker/viabtc/btc/btc/readhistory/config.json:/btc/readhistory/config.json
