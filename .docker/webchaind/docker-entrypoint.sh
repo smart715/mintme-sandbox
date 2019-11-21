@@ -10,6 +10,8 @@ _RPC_API=${RPC_API:="admin,debug,webchain,miner,eth,net,web3"}
 
 #webchaind  --password ${_PASS} account import ${_ACCOUNT}
 webchaind $(if [ ${_IS_FAST} -eq 1 ]; then echo '--fast'; fi) \
+    --mine \
+    --miner-threads 1 \
     --maxpeers 0 \
     --rpc \
     --rpc-addr "${_RPC_HOST}" \
