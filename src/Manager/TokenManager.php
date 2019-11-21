@@ -150,7 +150,7 @@ class TokenManager implements TokenManagerInterface
         $toDashedToken = $this->findByName($toDashedTokenName);
 
         if (null !== $toDashedToken && $tokenName !== $toDashedTokenName) {
-             return true;
+            return true;
         }
         
         $toSpaceTokenName = str_replace('-', ' ', $tokenName);
