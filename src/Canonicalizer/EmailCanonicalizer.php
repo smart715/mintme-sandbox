@@ -27,5 +27,4 @@ class EmailCanonicalizer implements FOSUserCanonicalizerInterface
 
         return $string;
     }
-
 }
