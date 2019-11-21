@@ -162,7 +162,7 @@ services:
       - .docker/viabtc/btc/btc/matchengine/config.json:/btc/matchengine/config.json
       - .docker/viabtc/btc/btc/accesshttp/config.json:/btc/accesshttp/config.json
       - .docker/viabtc/btc/btc/marketprice/config.json:/btc/marketprice/config.json
-      - .docker/viabtc/btc/btc/marketprice/mp_message.c:/btc/marketprice/mp_message.c
+#      - .docker/viabtc/btc/btc/marketprice/mp_message.c:/btc/marketprice/mp_message.c
       - .docker/viabtc/btc/btc/accessws/config.json:/btc/accessws/config.json
       - .docker/viabtc/btc/btc/alertcenter/config.json:/btc/alertcenter/config.json
       - .docker/viabtc/btc/btc/readhistory/config.json:/btc/readhistory/config.json
