@@ -31,7 +31,7 @@ wallets:
       mixin: 2
       priority: 1
   webchain:
-    wallet_address: '0x8f06fe5c631d2ea3ff22673fa15b2e0c829c386b'
+    wallet_address: '0x9139413fe7247da35ae0797f9270271ba758d248'
     rpc_url: http://webchaind:39573
     auth:
       type: digest
