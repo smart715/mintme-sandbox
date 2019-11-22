@@ -46,7 +46,7 @@ class KnowledgeBase
     protected $title;
 
     /**
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, nullable=false)
      * @var string
      */
     protected $url;
@@ -100,7 +100,7 @@ class KnowledgeBase
         return $this->category;
     }
 
-    public function setCategory(Category $category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }

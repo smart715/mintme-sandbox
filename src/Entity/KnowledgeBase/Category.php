@@ -19,7 +19,7 @@ class Category
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=false)
      * @var string
      */
     protected $name;

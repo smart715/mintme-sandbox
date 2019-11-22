@@ -31,9 +31,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $form): void
     {
         $form
-            ->add('category', ModelListType::class, [
-                'required' => true,
-            ])
+            ->add('category', ModelListType::class)
             ->add('subcategory', ModelListType::class, [
                 'required' => false,
             ])
