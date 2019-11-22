@@ -9,7 +9,7 @@ cryptos:
     vault_cli_host: 'http://webchain-cli:1920'
 
     # Address which will receive investment funds:
-    target_address: '0x8f06fe5c631d2ea3ff22673fa15b2e0c829c386b'
+    target_address: '0x9139413fe7247da35ae0797f9270271ba758d248'
 
     # Gas limit to pay for transactions
     gas_limit_wei: 21000
