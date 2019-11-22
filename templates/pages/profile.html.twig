@@ -119,7 +119,6 @@
                                             {
                                                 'v-model.trim': '$v.zipCode.$model',
                                                 'class': 'form-control',
-                                                'placeholder': (profile.country is empty ? 'Select the country for set up zip code' : ''),
                                                 'ref': 'zipCode'
                                             }
                                         }) }}
@@ -130,13 +129,6 @@
                                         class="text-danger text-center"
                                     >
                                         Zip code can contain only letters, numbers, spaces and dashes
-                                    </div>
-                                    <div
-                                        v-else-if="!$v.zipCode.zipCodeValidation"
-                                        v-cloak="$v.zipCode"
-                                        class="text-danger text-center"
-                                    >
-                                        Zip code is not valid for selected country
                                     </div>
                                     <div
                                         v-else-if="!$v.zipCode.zipCodeWrongChars"

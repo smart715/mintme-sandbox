@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ZipCodeValidator\Constraints\ZipCode;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
@@ -115,6 +116,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
+     * @ZipCode(getter="getCountry", ignoreEmpty=true, strict=false)
      * @var string|null
      */
     protected $zipCode;

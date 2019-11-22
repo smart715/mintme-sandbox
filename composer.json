@@ -10,6 +10,7 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-openssl": "*",
+        "barbieswimcrew/zip-code-validator": "^1.3",
         "cron/cron-bundle": "^2.0",
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "excelwebzone/recaptcha-bundle": "^1.5",
