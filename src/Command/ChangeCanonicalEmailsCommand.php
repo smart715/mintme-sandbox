@@ -91,7 +91,9 @@ class ChangeCanonicalEmailsCommand extends Command
             ->getQuery()
             ->execute();
 
-        if (0 == count($user)) return true;
+        if (0 == count($user)) {
+            return true;
+        }
 
         return false;
     }
