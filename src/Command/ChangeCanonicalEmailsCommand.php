@@ -93,7 +93,9 @@ class ChangeCanonicalEmailsCommand extends Command
 
         if (0 == count($user)) {
             return true;
-        } else if(0 != count($user)) {
+        }
+
+        if (0 != count($user)) {
             return false;
         }
     }
