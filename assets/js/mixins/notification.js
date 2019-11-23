@@ -13,7 +13,7 @@ export default {
             this.sendNotification(message, 'warning');
         },
         sendNotification: function(message, type) {
-            this.$toasted.show(`<span>${message}</span>`, {type, icon: `icon-${type}`});
+            this.$toasted.show(`<span class="toast-text">${message}</span>`, {type, icon: `icon-${type}`});
         },
     },
 };
