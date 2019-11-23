@@ -1,9 +1,14 @@
 .icon-success, .icon-warning, .icon-error, .icon-info, .icon-danger, .icon-primary
   display: inline-block
-  width: 32px
-  height: 32px
+  width: 16px
+  height: 16px
   background-size: contain
   background-repeat: no-repeat
+
+  @include media-breakpoint-up(sm)
+	  width: 32px
+	  height: 32px
+
 
 .icon-success
   background-image: url('../img/success-icon.svg')

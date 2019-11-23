@@ -610,8 +610,16 @@ nav.top-navbar
       background: $toast-warning-bg
       color: $toast-warning-text
 
-  font-size: 20px !important
+    > span
+      text-align: center
+      flex: 1
+  
+  justify-content: center !important
+  font-size: 16px !important
   padding: 6px 15px !important
+
+  @include media-breakpoint-up(md)
+    font-size: 20px !important
 
 .toasted-container
   align-items: center
