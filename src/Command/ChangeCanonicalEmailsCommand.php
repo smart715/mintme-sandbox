@@ -40,7 +40,7 @@ class ChangeCanonicalEmailsCommand extends Command
 
         foreach ($users as $user) {
             if ($this->checkCanonicalizedEmail($this->canonicalize($user->getEmail()))) {
-                 $this->userManager->updateUser($user)->getEmailCanonical();
+                 $this->userManager->updateUser($user);
                  $changeCount++;
             }
         }
