@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserToken;
+use App\Repository\UserRepository;
 
 interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterface
 {
@@ -25,4 +26,5 @@ interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterfac
      * @return UserToken[]
      */
     public function getUserCrypto(Crypto $crypto, array $userIds): array;
+    public function getRepository(): UserRepository;
 }

@@ -67,10 +67,6 @@ class ChangeCanonicalEmailsCommand extends Command
         return $merge;
     }
 
-    /**
-     * @param $email string
-     * @return string
-     */
     private function canonicalize(string $email): string
     {
         $name = strstr($email, '@', true);
@@ -79,10 +75,6 @@ class ChangeCanonicalEmailsCommand extends Command
         return $name.'@'.$this->gmailDomains[1];
     }
 
-    /**
-     * @param $email string
-     * @return bool
-     */
     private function checkCanonicalizedEmail(string $email): bool
     {
         $qr = $this->userManager->getRepository()->createQueryBuilder('qr');
