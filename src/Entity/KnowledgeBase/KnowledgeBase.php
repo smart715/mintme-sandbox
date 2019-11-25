@@ -100,7 +100,6 @@ class KnowledgeBase
         return $this->category;
     }
 
-
     public function setCategory(?Category $category): void
     {
         $this->category = $category;
