@@ -116,7 +116,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
-     * @ZipCode(getter="getCountry", ignoreEmpty=true, strict=false)
+     * @AppAssert\ZipCode(getter="getCountry")
      * @var string|null
      */
     protected $zipCode;

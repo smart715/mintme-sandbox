@@ -119,7 +119,9 @@
                                             {
                                                 'v-model.trim': '$v.zipCode.$model',
                                                 'class': 'form-control',
-                                                'ref': 'zipCode'
+                                                'ref': 'zipCode',
+                                                'v-on:input': 'zipCodeValidate',
+                                                'v-on:change': 'zipCodeValidate'
                                             }
                                         }) }}
                                     </div>
@@ -130,6 +132,14 @@
                                     >
                                         Zip code can contain only letters, numbers, spaces and dashes
                                     </div>
+                                    <div
+                                        v-else-if="!zipCodeValid"
+                                        v-cloak="$v.zipCode"
+                                        class="text-danger text-center"
+                                    >
+                                        Zip code is not valid for selected country
+                                    </div>
+
                                     <div
                                         v-else-if="!$v.zipCode.zipCodeWrongChars"
                                         v-cloak="$v.zipCode"
@@ -157,10 +167,10 @@
                             </div>
                             <div class="text-left">
                                 <input
-                                        type="submit"
-                                        :disabled="$v.$invalid || !(firstName && lastName)"
-                                        class="btn btn-primary"
-                                        value="Save">
+                                    type="submit"
+                                    :disabled="$v.$invalid || !(firstName && lastName) || !zipCodeValid || zipCodeProcessing"
+                                    class="btn btn-primary"
+                                    value="Save">
                                 <a href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}" @click="showEditForm = false" class="btn-cancel pl-3" >Cancel</a>
                             </div>
                             {{ form_end(form) }}

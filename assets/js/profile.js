@@ -7,6 +7,7 @@ import {zipCodeContain} from './utils/constants.js';
 
 const xRegExp = require('xregexp');
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
+const HTTP_ACCEPTED = 202;
 
 new Vue({
     el: '#profile',
@@ -21,13 +22,18 @@ new Vue({
             showEditForm: false,
             firstName: '',
             lastName: '',
+            country: '',
             city: '',
             zipCode: '',
+            zipCodeValid: true,
+            zipCodeVaidationPattern: false,
+            zipCodeProcessing: false,
         };
     },
     mounted: function() {
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
+        this.country = this.$refs.country.value;
         this.city = this.$refs.city.getAttribute('value');
         this.zipCode = this.$refs.zipCode.getAttribute('value');
         this.showEditForm = this.$refs.editFormShowFirst.value;
@@ -36,11 +42,44 @@ new Vue({
     },
     methods: {
         countryChanged: function() {
+            this.country = this.$refs.country.value;
             if ('' === this.$refs.country.value) {
                 this.$refs.zipCode.disabled = true;
                 this.zipCode = '';
             } else {
                 this.$refs.zipCode.disabled = false;
+            }
+
+            this.zipCodeProcessing = true;
+            this.$axios.single.post(this.$routing.generate('validate_zip_code'), {
+                country: this.country,
+            })
+                .then((response) => {
+                    if (response.status === HTTP_ACCEPTED) {
+                        this.zipCodeVaidationPattern = response.data.hasPattern
+                            ? response.data.pattern
+                            : false;
+                        this.zipCodeValidate();
+                    }
+                }, (error) => {
+                    if (!error.response) {
+                        this.$toasted.error('Network error');
+                    } else if (error.response.data.message) {
+                        this.$toasted.error(error.response.data.message);
+                    } else {
+                        this.$toasted.error('An error has occurred, please try again later');
+                    }
+                })
+                .then(() => {
+                    this.zipCodeProcessing = false;
+                });
+        },
+        zipCodeValidate: function() {
+            if (!this.zipCodeVaidationPattern || '' === this.zipCode) {
+                this.zipCodeValid = true;
+            } else {
+                let regex = new RegExp('^' + this.zipCodeVaidationPattern + '$', 'i');
+                this.zipCodeValid = regex.test(this.zipCode);
             }
         },
     },
