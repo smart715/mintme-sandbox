@@ -10,9 +10,14 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class ZipCodeValidatorTest extends TestCase
 {
-    public function setUp()
+    /** @var ZipCodeValidator */
+    protected $validator;
+    /** @var ExecutionContextInterface */
+    protected $contextMock;
+
+    public function setUp(): void
     {
-        $this->contextMock = $this->getMockBuilder(ExecutionContext::class)
+        $this->contextMock = $this->getMockBuilder(ExecutionContextInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->validator = new ZipCodeValidator();
@@ -21,11 +26,10 @@ class ZipCodeValidatorTest extends TestCase
     /**
      * @param string $isoCode
      * @param string $value
-     *
      * @dataProvider validZipCodes
      * @doesNotPerformAssertions
      */
-    public function testValidate($isoCode, $value): void
+    public function testValidate(string $isoCode, string $value): void
     {
         $this->validator->validate(
             $value,
@@ -36,7 +40,7 @@ class ZipCodeValidatorTest extends TestCase
     /**
      * @dataProvider
      */
-    public function validZipCodes()
+    public function validZipCodes(): array
     {
         return [
             ['CH', '3007'],
@@ -45,7 +49,7 @@ class ZipCodeValidatorTest extends TestCase
             ['RU', '153251'],
             ['NL', '1234AB'],
             ['NL', '1234 AB'],
-            ['PN', 'PCRN 1ZZ']
+            ['PN', 'PCRN 1ZZ'],
         ];
     }
 }

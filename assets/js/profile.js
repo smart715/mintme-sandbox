@@ -59,6 +59,14 @@ new Vue({
                         this.zipCodeVaidationPattern = response.data.hasPattern
                             ? response.data.pattern
                             : false;
+
+                        if (false === this.zipCodeVaidationPattern) {
+                            this.$refs.zipCode.disabled = true;
+                            this.zipCode = '';
+                        } else {
+                            this.$refs.zipCode.disabled = false;
+                        }
+
                         this.zipCodeValidate();
                     }
                 }, (error) => {
