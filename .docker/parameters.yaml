@@ -39,7 +39,7 @@ parameters:
     deploy_cost: 0
     deploy_rpc: 'http://deploytok:3001'
     deploy_response_timeout_seconds: 60
-    mintme_address: '0xf69a0cf26ac7cc8b516bfb1e7038f6756710e70f'
+    mintme_address: '0x9139413fe7247da35ae0797f9270271ba758d248'
     token_deletion_confirm_code_expiration_time: 60
     trusted_device_enabled: true
     trusted_device_cookie_lifetime: 604800
