@@ -13,7 +13,7 @@ class EmailCanonicalizer implements FOSUserCanonicalizerInterface
     public function canonicalize($string): string
     {
         if (!$string) {
-            $string = '';
+            return '';
         }
 
         $domain = substr($string, strrpos($string, '@') + 1);

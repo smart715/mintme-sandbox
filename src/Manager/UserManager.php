@@ -64,4 +64,19 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * @param $domains array
+     * @return array|null
+     */
+    public function getUsersByDomains(array $domains): ?array
+    {
+        $emailDomains = [];
+
+        foreach ($domains as $domain) {
+            $emailDomains = array_merge($emailDomains, $this->getRepository()->findByDomain($domain));
+        }
+
+        return $emailDomains;
+    }
 }

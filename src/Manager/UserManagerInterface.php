@@ -27,4 +27,5 @@ interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterfac
      */
     public function getUserCrypto(Crypto $crypto, array $userIds): array;
     public function getRepository(): UserRepository;
+    public function getUsersByDomains(array $domains): ?array;
 }

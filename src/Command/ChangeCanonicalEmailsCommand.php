@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\Entity\User;
 use App\Manager\UserManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,10 +10,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ChangeCanonicalEmailsCommand extends Command
 {
     /** @var mixed */
-    protected $gmailDomains = ['gmail.com', 'googlemail.com'];
+    private $gmailDomains = ['gmail.com', 'googlemail.com'];
 
     /** @var UserManagerInterface */
-    public $userManager;
+    private $userManager;
 
     public function __construct(UserManagerInterface $userManager)
     {
@@ -26,7 +25,7 @@ class ChangeCanonicalEmailsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('app:canonicalEmail:update')
+            ->setName('app:canonical-email:update')
             ->setDescription('Update user canonical emails')
             ->setHelp('This command updating user canonical emails');
     }
@@ -34,37 +33,19 @@ class ChangeCanonicalEmailsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln('Start Command');
-        $users = $this->getGmailUsers();
-        $output->writeln('Received '.count($users).' users with gmail domain');
         $changeCount = 0;
+        $users = $this->userManager->getUsersByDomains($this->gmailDomains);
 
         foreach ($users as $user) {
-            if ($this->checkCanonicalizedEmail($this->canonicalize($user->getEmail()))) {
-                 $this->userManager->updateUser($user);
-                 $changeCount++;
+            if (!$this->userManager->getRepository()
+                ->checkExistCanonicalEmail($this->canonicalize($user->getEmail()))
+            ) {
+                $this->userManager->updateUser($user);
+                $changeCount++;
             }
         }
 
         $output->writeln('Updated '.$changeCount.' accounts');
-    }
-
-    /** @return array */
-    private function getGmailUsers(): array
-    {
-        $qr = $this->userManager->getRepository()->createQueryBuilder('qr');
-        $merge = [];
-        $qr->select('u')->from(User::class, 'u');
-
-        foreach ($this->gmailDomains as $domain) {
-            $merge = array_merge(
-                $qr->Where("u.email LIKE '%@".$domain."'")
-                    ->getQuery()
-                    ->execute(),
-                $merge
-            );
-        }
-
-        return $merge;
     }
 
     private function canonicalize(string $email): string
@@ -73,22 +54,5 @@ class ChangeCanonicalEmailsCommand extends Command
         $name = str_replace('.', '', strval($name));
 
         return $name.'@'.$this->gmailDomains[1];
-    }
-
-    private function checkCanonicalizedEmail(string $email): bool
-    {
-        $qr = $this->userManager->getRepository()->createQueryBuilder('qr');
-        $qr->select('u')->from(User::class, 'u');
-        $user = $qr->Where("u.emailCanonical LIKE '".$email."'")
-            ->getQuery()
-            ->execute();
-
-        if (0 == count($user)) {
-            return true;
-        }
-
-        if (0 != count($user)) {
-            return false;
-        }
     }
 }
