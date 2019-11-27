@@ -38,7 +38,7 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 
         /** @var KnowledgeBase $kb */
         foreach ($knowledgeBases as $kb) {
-            $category = $kb->getCategory()->getId() ;
+            $category = $kb->getCategory()->getId();
             $subcategory = $kb->getSubcategory()
                 ? $kb->getSubcategory()->getId()
                 : null;
