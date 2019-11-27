@@ -153,11 +153,7 @@ import {WebSocketMixin, FiltersMixin, MoneyFilterMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
-<<<<<<< Updated upstream
 const WEB_SYMBOL = 'WEB';
-=======
-const MINTME_SYMBOL = 'MINTME';
->>>>>>> Stashed changes
 
 export default {
     name: 'Wallet',
