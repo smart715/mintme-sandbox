@@ -116,6 +116,9 @@ function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true
  */
 function formatMoney(str) {
     str = str ? str.toString() : '';
+    str = str.split(/ (.+)/);
+    let additional = str[1];
+    str = str[0];
     let regx = /(\d{1,3})(\d{3}(?:,|$))/;
     let currStr;
 
@@ -127,7 +130,7 @@ function formatMoney(str) {
         currStr.concat(`.`, str.split(`.`)[1]) :
         currStr;
 
-    return res.replace(/,/g, ' ');
+    return `${res.replace(/,/g, ' ')} ${additional}`;
 }
 
 /**
