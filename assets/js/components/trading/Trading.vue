@@ -92,7 +92,6 @@
 
 <script>
 import Guide from '../Guide';
-import SelectPeriod from '../SelectPeriod';
 import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
