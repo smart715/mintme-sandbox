@@ -18,29 +18,36 @@
                 <b-table
                     :items="tokens"
                     :fields="fieldsArray"
-                    sort-by="lastPrice"
+                    :sort-by="fields.volume.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
                     <template v-slot:[`head(${fields.volume.key})`]="data">
-                        <select-period
-                        :data-month-volume="dataMonthVolume"
-                        :data-day-volume="dataDayVolume"
-                        :show-month="showMonth"
-                        :toggle-month="toggleMonth"></select-period>
+                        <b-dropdown
+                            id="volume"
+                            variant="primary"
+                            :lazy="true"
+                        >
+                            <template slot="button-content">
+                                {{ data.label }}
+                            </template>
+                            <template>
+                                <b-dropdown-item @click="toggleMonth(false)">
+                                    24h Volume
+                                </b-dropdown-item>
+                                <b-dropdown-item @click="toggleMonth(true)">
+                                    30d Volume
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown>
                         <guide>
                             <template slot="header">
-                                <span v-if="showMonth">
-                                    30d volume
-                                </span>
-                                <span v-else>
-                                    24h volume
-                                </span>
+                                {{ data.label }}
                             </template>
                             <template slot="body">
-                                <span v-if="showMonth">
+                                <span v-show="showMonth">
                                     The amount of crypto that has been traded in the last 30 days
                                 </span>
-                                <span v-else>
+                                <span v-show="!showMonth">
                                     The amount of crypto that has been traded in the last 24 hours.
                                 </span>
                             </template>
@@ -127,8 +134,6 @@ export default {
                 BTC: 0,
                 USD: 0,
             },
-            dataMonthVolume: '30d Volume',
-            dataDayVolume: '24H Volume',
             showMonth: true,
         };
     },
@@ -153,7 +158,7 @@ export default {
             return this.markets !== null && !this.loading;
         },
         fields: function() {
-            let mainFields = {
+            return {
                 pair: {
                     key: 'pair',
                     label: 'Pair',
@@ -171,34 +176,18 @@ export default {
                     formatter: formatMoney,
                 },
                 volume: {
-                    label: '24H Volume',
-                    key: 'volume' + ( this.showUsd ? USD.symbol : ''),
+                    label: (this.showMonth ? '30d Volume' : '24h Volume'),
+                    key: (this.showMonth ? 'monthVolume' : 'volume') + (this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
                 marketCap: {
                     label: 'Market Cap',
-                    key: 'marketCap' + ( this.showUsd ? 'USD' : ''),
+                    key: 'marketCap' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
             };
-            if (this.showMonth) {
-                mainFields['volume'] = {
-                    label: '30d Volume',
-                    key: 'monthVolume' + ( this.showUsd ? USD.symbol : ''),
-                    sortable: true,
-                    formatter: formatMoney,
-                };
-            } else {
-                mainFields['volume'] = {
-                    label: '24H Volume',
-                    key: 'volume' + ( this.showUsd ? USD.symbol : ''),
-                    sortable: true,
-                    formatter: formatMoney,
-                };
-            }
-            return mainFields;
         },
         fieldsArray: function() {
             return Object.values(this.fields);
