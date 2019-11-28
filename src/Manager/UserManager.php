@@ -66,7 +66,7 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
     }
 
     /**
-     * @param $domains array
+     * @param array $domains
      * @return array|null
      */
     public function getUsersByDomains(array $domains): ?array

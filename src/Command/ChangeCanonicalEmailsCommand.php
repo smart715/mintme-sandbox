@@ -36,12 +36,14 @@ class ChangeCanonicalEmailsCommand extends Command
         $changeCount = 0;
         $users = $this->userManager->getUsersByDomains($this->gmailDomains);
 
-        foreach ($users as $user) {
-            if (!$this->userManager->getRepository()
-                ->checkExistCanonicalEmail($this->canonicalize($user->getEmail()))
-            ) {
-                $this->userManager->updateUser($user);
-                $changeCount++;
+        if ($users) {
+            foreach ($users as $user) {
+                if (!$this->userManager->getRepository()
+                    ->checkExistCanonicalEmail($this->canonicalize($user->getEmail()))
+                ) {
+                    $this->userManager->updateUser($user);
+                    $changeCount++;
+                }
             }
         }
 
