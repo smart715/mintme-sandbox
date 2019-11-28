@@ -112,7 +112,6 @@ export default {
     },
     components: {
         Guide,
-        SelectPeriod,
     },
     data() {
         return {
