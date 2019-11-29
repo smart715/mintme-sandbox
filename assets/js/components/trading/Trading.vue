@@ -20,7 +20,8 @@
                     :fields="fieldsArray"
                     :sort-by="fields.volume.key"
                     :sort-desc="true"
-                    :sort-compare="sortCompare">
+                    :sort-compare="sortCompare"
+                >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
                             id="volume"
@@ -31,11 +32,12 @@
                                 {{ data.label }}
                             </template>
                             <template>
-                                <b-dropdown-item @click="toggleMonth(false)">
-                                    24h Volume
-                                </b-dropdown-item>
-                                <b-dropdown-item @click="toggleMonth(true)">
-                                    30d Volume
+                                <b-dropdown-item
+                                    v-for="(volume, key) in volumes"
+                                    :key="key"
+                                    @click="toggleMonth(key)"
+                                >
+                                    {{ volume.label }}
                                 </b-dropdown-item>
                             </template>
                         </b-dropdown>
@@ -44,12 +46,7 @@
                                 {{ data.label }}
                             </template>
                             <template slot="body">
-                                <span v-show="showMonth">
-                                    The amount of crypto that has been traded in the last 30 days
-                                </span>
-                                <span v-show="!showMonth">
-                                    The amount of crypto that has been traded in the last 24 hours.
-                                </span>
+                                {{ data.field.help }}
                             </template>
                         </guide>
                     </template>
@@ -132,7 +129,19 @@ export default {
                 BTC: 0,
                 USD: 0,
             },
-            showMonth: true,
+            activeVolume: 'month',
+            volumes: {
+                day: {
+                    key: 'volume',
+                    label: '24H Volume',
+                    help: 'The amount of crypto that has been traded in the last 24 hours.',
+                },
+                month: {
+                    key: 'monthVolume',
+                    label: '30d Volume',
+                    help: 'The amount of crypto that has been traded in the last 30 days.',
+                },
+            },
         };
     },
     computed: {
@@ -174,8 +183,8 @@ export default {
                     formatter: formatMoney,
                 },
                 volume: {
-                    label: (this.showMonth ? '30d Volume' : '24h Volume'),
-                    key: (this.showMonth ? 'monthVolume' : 'volume') + (this.showUsd ? USD.symbol : ''),
+                    ...this.volumes[this.activeVolume],
+                    key: this.volumes[this.activeVolume].key + (this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
@@ -519,8 +528,8 @@ export default {
                     this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 2);
                 });
         },
-        toggleMonth: function(show) {
-            this.showMonth = show;
+        toggleMonth: function(volume) {
+            this.activeVolume = volume;
         },
     },
 };
