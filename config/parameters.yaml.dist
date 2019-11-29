@@ -65,7 +65,7 @@ parameters:
     webchain_supply: 'https://webchain.network/supply.txt'
 
     # the cost of deploying token to blockchain in USD
-    deploy_cost: 49
+    deploy_cost: 99
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
     mintme_address: '0xf69a0cf26ac7cc8b516bfb1e7038f6756710e70f'
