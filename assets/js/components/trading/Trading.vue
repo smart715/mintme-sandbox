@@ -35,7 +35,7 @@
                                 <b-dropdown-item
                                     v-for="(volume, key) in volumes"
                                     :key="key"
-                                    @click="toggleMonth(key)"
+                                    @click="toggleActiveVolume(key)"
                                 >
                                     {{ volume.label }}
                                 </b-dropdown-item>
@@ -528,7 +528,7 @@ export default {
                     this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 2);
                 });
         },
-        toggleMonth: function(volume) {
+        toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
         },
     },
