@@ -281,7 +281,7 @@ export default {
             const marketCap = marketLastPrice * this.supply;
 
             const marketStatus = {
-                change: changePercentage.toFixed(2),
+                change: toMoney(changePercentage, 2),
                 last: toMoney(marketLastPrice, this.market.base.subunit),
                 volume: toMoney(marketVolume, this.market.quote.subunit),
                 amount: toMoney(marketAmount, this.market.base.subunit),
@@ -315,7 +315,7 @@ export default {
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
 
             const monthInfo = {
-                monthChange: changePercentage.toFixed(2),
+                monthChange: toMoney(changePercentage, 2),
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
             };
