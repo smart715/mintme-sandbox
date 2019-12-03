@@ -71,7 +71,7 @@ Development
 ### Installation:
 
 1. Clone this repository and checkout needed branch;
-2. Pull submodule repositories with `git submodule update --init --recursive --remote`;
+2. Pull submodule repositories with `git submodule update --init --recursive` and `git submodule update --remote .docker/deposit`;
 
 You may need to replace `localhost` DNS with your docker-machine 
 ip address in case of using `docker-toolbox`.  

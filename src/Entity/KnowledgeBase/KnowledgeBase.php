@@ -28,7 +28,7 @@ class KnowledgeBase
      * @ORM\ManyToOne(targetEntity="App\Entity\KnowledgeBase\Category")
      * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
      * @Assert\NotBlank
-     * @var Category
+     * @var Category|null
      */
     protected $category;
 
@@ -100,7 +100,7 @@ class KnowledgeBase
         return $this->category;
     }
 
-    public function setCategory(Category $category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }

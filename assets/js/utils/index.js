@@ -99,26 +99,15 @@ function deepFlatten(object) {
  * @return {string}
  */
 function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true) {
-    Decimal.set({rounding: Decimal.ROUND_DOWN});
+    Decimal.set({rounding: Decimal.ROUND_DOWN, toExpNeg: -20});
+
+    val = new Decimal(val);
+    precision = val.lessThan(1 / Math.pow(10, precision)) ? 0 : precision;
+    val = val.toDP(precision);
 
     return fixedPoint
-        ? new Decimal(val).toFixed(precision)
-        : new Decimal(val).toDP(precision);
-}
-
-/**
- * @param {string} str
- * @return {string}
- */
-function formatFee(str) {
-    while (str[str.length-1] === '0') {
-        str = str.substring(0, str.length-1);
-    }
-    if (str[str.length-1] === '.') {
-        str = str.substring(0, str.length-1);
-    }
-
-    return str;
+        ? val.toString()
+        : val;
 }
 
 /**
@@ -127,6 +116,9 @@ function formatFee(str) {
  */
 function formatMoney(str) {
     str = str ? str.toString() : '';
+    str = str.split(/ (.+)/);
+    let additional = str[1] || '';
+    str = str[0];
     let regx = /(\d{1,3})(\d{3}(?:,|$))/;
     let currStr;
 
@@ -138,7 +130,7 @@ function formatMoney(str) {
         currStr.concat(`.`, str.split(`.`)[1]) :
         currStr;
 
-    return res.replace(/,/g, ' ');
+    return `${res.replace(/,/g, ' ')} ${additional}`;
 }
 
 /**
@@ -169,7 +161,6 @@ export {
     isValidDiscordUrl,
     deepFlatten,
     toMoney,
-    formatFee,
     formatMoney,
     Constants,
     EchartTheme,

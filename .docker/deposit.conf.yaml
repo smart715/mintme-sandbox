@@ -1,5 +1,5 @@
 cryptos:
-  network: mainnet #can be testnet
+  network: testnet #can be testnet
 
   webchain:
     # webchaind rpc server url
