@@ -14,7 +14,7 @@
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
                     <a :href="generateCoinUrl(data.item)" class="text-white">
-                        {{ data.item.fullname }} ({{ data.item.name }})
+                        {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                     </a>
                 </template>
                 <template v-slot:cell(available)="data">
@@ -149,7 +149,7 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, FiltersMixin, MoneyFilterMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
@@ -157,7 +157,7 @@ const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin],
     components: {
         WithdrawModal,
         DepositModal,

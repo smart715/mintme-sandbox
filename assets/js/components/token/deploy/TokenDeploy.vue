@@ -8,19 +8,21 @@
                 >
                     <p>
                         This is final step for token creation. After you pay for deploying token to blockchain
-                        you and others will be able to withdraw tokens from mintme to your Webchain wallet.
+                        you and others will be able to withdraw tokens from mintme to your MintMe Coin wallet.
                     </p>
                     <p class="bg-danger">
-                        WEB spent on mintMe, will be inaccessible by us (frozen) for 5 years. So you lower WEB circulating supply with each purchase and increase probability of WEB price going up.
+                        MINTME spent on mintMe, will be inaccessible by us (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.
                     </p>
                     <p class="bg-danger">
                         This process is irreversible, once confirm payment there is no going back.
                     </p>
                     <p class="mt-5">
-                        Your current balance: {{ balance | toMoney(precision) | formatMoney }} WEB coins <br>
+                        Your current balance: {{ balance | toMoney(precision) | formatMoney }} MINTME <br>
                         <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
                     </p>
-                    <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
+                    <p>
+                        Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }} MINTME
+                    </p>
                     <div class="pt-3">
                         <button
                             class="btn btn-primary"

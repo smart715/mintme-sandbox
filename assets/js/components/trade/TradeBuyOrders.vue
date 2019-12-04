@@ -4,13 +4,13 @@
             <div class="card-header">
                 Buy Orders
                 <span class="card-header-icon">
-                    Total: {{ total | formatMoney }} {{ tokenName }}
+                    Total: {{ total | formatMoney }} {{ tokenName|rebranding }}
                     <guide>
                         <template slot="header">
                             Buy Orders
                         </template>
                         <template slot="body">
-                            List of all active buy orders for {{ tokenName }}.
+                            List of all active buy orders for {{ tokenName|rebranding }}.
                         </template>
                     </guide>
                 </span>
@@ -65,11 +65,11 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin} from '../../mixins';
+import {LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin} from '../../mixins/';
 
 export default {
     name: 'TradeBuyOrders',
-    mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin],
+    mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
     props: {
         ordersList: [Array],
         tokenName: String,

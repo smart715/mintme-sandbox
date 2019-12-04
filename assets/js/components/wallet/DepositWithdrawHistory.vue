@@ -9,9 +9,9 @@
                 :class="{'empty-table': noHistory}"
             >
                 <template v-slot:cell(symbol)="data">
-                    <a :href="data.item.url" class="text-white">
-                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
-                            {{ data.item.symbol | truncate(15) }}
+                    <a :href="rebrandingFunc(data.item.url)" class="text-white">
+                        <span v-b-tooltip="{title: rebrandingFunc(data.item.symbol), boundary:'viewport'}">
+                            {{ data.item.symbol | rebranding | truncate(15) }}
                         </span>
                     </a>
                 </template>
@@ -44,13 +44,13 @@
 <script>
 import moment from 'moment';
 import {toMoney, formatMoney} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin} from '../../mixins';
+import {LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin} from '../../mixins/';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin, FiltersMixin],
+    mixins: [LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin],
     components: {CopyLink},
     data() {
         return {
@@ -165,7 +165,7 @@ export default {
         },
         generatePairUrl: function(quote) {
             if (quote.hasOwnProperty('exchangeble')) {
-                /** @TODO In future we need to use another solution and remove hardcoded BTC & WEB symbols **/
+                /** @TODO In future we need to use another solution and remove hardcoded BTC & MINTME symbols **/
                 let params = {
                     base: !quote.exchangeble ? quote.symbol : 'BTC',
                     quote: quote.exchangeble && quote.tradable ? quote.symbol : 'WEB',

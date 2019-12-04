@@ -63,9 +63,11 @@ import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
+import {RebrandingFilterMixin} from '../../mixins/';
 
 export default {
     name: 'TokenTradeOrders',
+    mixins: [RebrandingFilterMixin],
     components: {
         TradeBuyOrders,
         TradeSellOrders,
@@ -96,7 +98,7 @@ export default {
                 },
                 {
                     key: 'sum',
-                    label: 'Sum ' + this.market.base.symbol,
+                    label: 'Sum ' + this.rebrandingFunc(this.market.base.symbol),
                     formatter: formatMoney,
                 },
                 {

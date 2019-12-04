@@ -7,8 +7,10 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
-                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
+                        <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
+                                {{ row.value.truncate|rebranding }}
+                            </a>
                         </div>
                     </template>
                 </b-table>
@@ -33,11 +35,11 @@ import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
+import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin} from '../../mixins/';
 
 export default {
     name: 'TradingHistory',
-    mixins: [FiltersMixin, LazyScrollTableMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin],
     data() {
         return {
             tableData: null,

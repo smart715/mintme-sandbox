@@ -5,15 +5,15 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-b-tooltip="{title: tokenName, boundary:'viewport'}">
-                    {{ tokenName | truncate(7) }}
+                    <span v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
+                    {{ tokenName | rebranding | truncate(7) }}
                 </span>
                     <guide>
                         <template slot="header">
                             Sell Orders
                         </template>
                         <template slot="body">
-                            List of all active sell orders for {{ tokenName }}.
+                            List of all active sell orders for {{ tokenName|rebranding }}.
                         </template>
                     </guide>
                 </span>
@@ -68,11 +68,11 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, FiltersMixin, MoneyFilterMixin, OrderClickedMixin} from '../../mixins';
+import {LazyScrollTableMixin, FiltersMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin} from '../../mixins/';
 
 export default {
     name: 'TradeSellOrders',
-    mixins: [FiltersMixin, LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
     props: {
         ordersList: [Array],
         tokenName: String,

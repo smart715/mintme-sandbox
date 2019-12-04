@@ -10,7 +10,7 @@
                         </template>
                         <template slot="body">
                             Form used to create  an order so you can
-                            buy {{ market.base.symbol }} or make offer.
+                            buy {{ market.base.symbol|rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
@@ -20,15 +20,15 @@
                     <div v-if="immutableBalance"
                          class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your
-                        <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol }}:
+                        <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
                             <span class="text-white word-break">
                                 {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Your {{ market.base.symbol }}
+                                        Your {{ market.base.symbol|rebranding }}
                                     </template>
                                     <template slot="body">
-                                        Your {{ market.base.symbol }} balance.
+                                        Your {{ market.base.symbol|rebranding }} balance.
                                     </template>
                                 </guide>
                             </span>
@@ -56,7 +56,7 @@
                                     </template>
                                     <template slot="body">
                                         Checking this box fetches current best market price
-                                        for which you can buy {{ market.base.symbol }}.
+                                        for which you can buy {{ market.base.symbol|rebranding }}.
                                     </template>
                                 </guide>
                             </label>
@@ -66,13 +66,13 @@
                         <label
                             for="buy-price-input"
                             class="text-white">
-                            Price in {{ market.base.symbol }}:
+                            Price in {{ market.base.symbol|rebranding }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ market.base.symbol }}
+                                    Price in {{ market.base.symbol|rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to buy one {{ market.quote.symbol }}.
+                                    The price at which you want to buy one {{ market.quote.symbol|rebranding }}.
                                 </template>
                             </guide>
                         </label>
@@ -90,7 +90,7 @@
                         <label
                             for="buy-price-amount"
                             class="text-white">
-                            Amount in {{ market.quote.symbol }}:
+                            Amount in {{ market.quote.symbol|rebranding }}:
                         </label>
                         <input
                             v-model="buyAmount"
@@ -104,7 +104,7 @@
                     </div>
                     <div class="col-12 pt-2">
                         Total Price:
-                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol|rebranding }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -142,14 +142,14 @@
 <script>
 import Guide from '../Guide';
 import OrderModal from '../modal/OrderModal';
-import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin} from '../../mixins';
+import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin],
+    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
     components: {
         Guide,
         OrderModal,

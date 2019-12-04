@@ -8,8 +8,10 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
-                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
+                        <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
+                                {{ row.value.truncate|rebranding }}
+                            </a>
                         </div>
                     </template>
                     <template v-slot:cell(action)="row">
@@ -49,11 +51,11 @@ import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
+import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin, RebrandingFilterMixin} from '../../mixins/';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
+    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin],
     components: {
         ConfirmModal,
     },

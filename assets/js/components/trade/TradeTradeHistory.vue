@@ -9,7 +9,7 @@
                             Trade History
                         </template>
                         <template slot="body">
-                            List of last closed orders for {{ market.base.symbol }}.
+                            List of last closed orders for {{ market.base.symbol|rebranding }}.
                         </template>
                     </guide>
                 </span>
@@ -25,14 +25,14 @@
                             :fields="fields">
 
                             <template v-slot:head(pricePerQuote)="row">
-                                <span v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
-                                    Price per {{ market.quote.symbol | truncate(7) }}
+                                <span v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                    Price per {{ market.quote.symbol | rebranding | truncate(7) }}
                                 </span>
                             </template>
 
                             <template v-slot:head(quoteAmount)="row">
-                                <span v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
-                                    {{ market.quote.symbol | truncate(7) }} amount
+                                <span v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                    {{ market.quote.symbol | rebranding | truncate(7) }} amount
                                 </span>
                             </template>
 
@@ -97,11 +97,11 @@ import Guide from '../Guide';
 import {formatMoney, toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {WebSocketMixin, FiltersMixin, LazyScrollTableMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin} from '../../mixins/';
 
 export default {
     name: 'TradeTradeHistory',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
+    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin],
     props: {
         market: Object,
     },
@@ -133,7 +133,7 @@ export default {
                 },
                 {
                     key: 'baseAmount',
-                    label: this.market.base.symbol + ' amount',
+                    label: this.rebrandingFunc(this.market.base.symbol) + ' amount',
                     formatter: formatMoney,
                 },
                 {

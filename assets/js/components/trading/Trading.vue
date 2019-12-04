@@ -23,7 +23,7 @@
                     :sort-desc="true"
                     :sort-compare="sortCompare">
                     <template v-slot:[`head(${fields.volume.key})`]="data">
-                        {{ data.label }}
+                        {{ data.label|rebranding }}
                         <guide>
                             <template slot="header">
                                 24h volume
@@ -34,7 +34,7 @@
                         </guide>
                     </template>
                     <template v-slot:[`head(${fields.monthVolume.key})`]="data">
-                        {{ data.label }}
+                        {{ data.label|rebranding }}
                         <guide>
                             <template slot="header">
                                 30d volume
@@ -45,7 +45,7 @@
                         </guide>
                     </template>
                     <template v-slot:[`head(${fields.marketCap.key})`]="data">
-                        {{ data.label }}
+                        {{ data.label|rebranding }}
                         <guide>
                             <template slot="header">
                                 Market Cap
@@ -82,8 +82,9 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -91,7 +92,7 @@ import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin],
     props: {
         page: Number,
         tokensCount: Number,
@@ -115,7 +116,7 @@ export default {
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
-                {currency: 'BTC', token: 'WEB'},
+                {currency: 'BTC', token: 'MINTME'},
             ],
             klineQueriesIdsTokensMap: new Map(),
             conversionRates: {},
@@ -139,8 +140,14 @@ export default {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
             tokens.sort((first, second) => parseFloat(second.deal) - parseFloat(first.deal));
+            tokens = this.sanitizedMarketsOnTop.concat(tokens);
+            tokens = _.map(tokens, (token) => {
+                return _.mapValues(token, (item) => {
+                    return this.rebrandingFunc(item);
+                });
+            });
 
-            return this.sanitizedMarketsOnTop.concat(tokens);
+            return tokens;
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
