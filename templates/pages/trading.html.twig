@@ -15,7 +15,7 @@
                             id="currency"
                             variant="primary"
                             class="float-right"
-                            lazy="true">
+                            :lazy="true">
                             <template slot="button-content">
                                 Currency:
                                 <span v-if="showUsd">
@@ -44,7 +44,7 @@
                             :user-id="{{ app.user ? app.user.id : 0 }}"
                             :cryptos="{{ cryptos | json_encode }}"
                             :show-usd="showUsd"
-                            webchain-supply-url="{{ webchain_supply }}">
+                            mintme-supply-url="{{ mintme_supply }}">
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                         </trading>
                     </div>
