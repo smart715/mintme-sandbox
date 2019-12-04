@@ -28,10 +28,13 @@ class CoinController extends Controller
         $this->marketFactory = $marketFactory;
     }
 
-    /** @Route("/coin/{base}/{quote}", name="coin", defaults={"quote"="web"}, options={"expose"=true,"2fa_progress"=false}) */
+    /** @Route("/coin/{base}/{quote}", name="coin", defaults={"quote"="mintme"}, options={"expose"=true,"2fa_progress"=false}) */
     public function pair(string $base, string $quote): Response
     {
-        $base = $this->cryptoManager->findBySymbol(strtoupper($base));
+        $base = str_replace('MINTME', 'WEB', strtoupper($base));
+        $quote = str_replace('MINTME', 'WEB', strtoupper($quote));
+
+        $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol(strtoupper($quote));
 
         if (null === $base          ||
