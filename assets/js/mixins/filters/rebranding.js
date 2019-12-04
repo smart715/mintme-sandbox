@@ -14,7 +14,7 @@ let rebranding = (val) => {
     });
 
     return val;
-}
+};
 
 export default {
     filters: {
@@ -25,8 +25,6 @@ export default {
     methods: {
         rebrandingFunc: function(val) {
             return rebranding(val);
-        }
-    }
+        },
+    },
 };
-
-
