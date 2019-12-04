@@ -448,6 +448,6 @@ services:
 
     App\Exchange\Market\MarketCapCalculator:
         arguments:
-            $supplyLinks: { Webchain: '%webchain_supply%' }
+            $supplyLinks: { Webchain: '%mintme_supply%' }
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
