@@ -29,18 +29,18 @@
                     <div
                         v-if="!mintDestinationLocked"
                         class="row faq-block mx-0 border-bottom"
-                        ref="withdrawal-address"
+                        ref="release-address"
                     >
                         <faq-item>
                             <template slot="title">
-                                Modify token withdrawal address
+                                Modify token release address
                             </template>
                             <template slot="body">
-                                <token-withdrawal-address
+                                <token-release-address
                                     :is-token-deployed="isTokenDeployed"
+                                    :release-address="releaseAddress"
                                     :token-name="currentName"
                                     :twofa="twofa"
-                                    :withdrawal-address="withdrawalAddress"
                                 />
                             </template>
                         </faq-item>
@@ -109,8 +109,8 @@ import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
 import TokenDelete from '../token/TokenDelete';
 import TokenDeploy from '../token/deploy/TokenDeploy';
+import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
-import TokenWithdrawalAddress from '../token/TokenWithdrawalAddress';
 import TwoFactorModal from './TwoFactorModal';
 import {FiltersMixin} from '../../mixins';
 import {tokenDeploymentStatus} from '../../utils/constants';
@@ -125,7 +125,7 @@ export default {
         TokenDelete,
         TokenDeploy,
         TokenReleasePeriod,
-        TokenWithdrawalAddress,
+        TokenReleaseAddress,
         TwoFactorModal,
     },
     props: {
@@ -136,11 +136,11 @@ export default {
         noClose: Boolean,
         mintDestinationLocked: Boolean,
         precision: Number,
+        releaseAddress: String,
         statusProp: String,
         twofa: Boolean,
         visible: Boolean,
         websocketUrl: String,
-        withdrawalAddress: String,
     },
     mixins: [FiltersMixin],
     data() {

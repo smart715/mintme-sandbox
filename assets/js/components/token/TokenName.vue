@@ -14,7 +14,7 @@
                 :twofa="twofa"
                 :visible="showTokenEditModal"
                 :websocket-url="websocketUrl"
-                :withdrawal-address="withdrawalAddress"
+                :release-address="releaseAddress"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
             />
@@ -58,7 +58,7 @@ export default {
         statusProp: String,
         twofa: Boolean,
         websocketUrl: String,
-        withdrawalAddress: String,
+        releaseAddress: String,
     },
     components: {
         FontAwesomeIcon,

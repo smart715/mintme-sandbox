@@ -10,8 +10,8 @@ describe('TokenEditModal', () => {
             },
         });
 
-        expect(wrapper.find({ref: 'withdrawal-address'}).exists()).to.be.true;
+        expect(wrapper.find({ref: 'release-address'}).exists()).to.be.true;
         wrapper.vm.mintDestinationLocked = true;
-        expect(wrapper.find({ref: 'withdrawal-address'}).exists()).to.be.false;
+        expect(wrapper.find({ref: 'release-address'}).exists()).to.be.false;
     });
 });

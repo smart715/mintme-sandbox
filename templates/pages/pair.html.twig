@@ -91,7 +91,7 @@
                                     :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
                                     :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                     websocket-url="{{ global_websocket_url }}"
-                                    withdrawal-address="{{ token.mintDestination }}"
+                                    release-address="{{ token.address }}"
                                     @token-deploy-pending="setTokenPending"
                                 />
                             </div>

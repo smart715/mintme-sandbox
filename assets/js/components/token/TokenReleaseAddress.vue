@@ -1,6 +1,6 @@
 <template>
     <div v-if="canUpdate">
-        <div class="col-12 pb-0 px-0">
+        <div class="col-12 pb-3 px-0">
             <label for="address" class="d-block text-left">
                 New address:
             </label>
@@ -14,25 +14,8 @@
             <div v-if="$v.newAddress.$error" class="invalid-feedback">
                 Wrong address
             </div>
-            <label class="custom-control custom-checkbox pt-2">
-                <input
-                    v-model="locked"
-                    id="locked"
-                    type="checkbox"
-                    class="custom-control-input"
-                >
-                <label
-                    class="custom-control-label"
-                    for="locked"
-                >
-                    Prevent another edition of withdrawal address.
-                </label>
-            </label>
-            <p class="text-danger">
-                If you check this box and lose access to address it will be impossible to change it or recover rest of tokens.
-            </p>
         </div>
-        <div class="col-12 px-0 clearfix">
+        <div class="col-12 pt-2 px-0 clearfix">
             <button
                 class="btn btn-primary float-left"
                 :disabled="submitting"
@@ -72,7 +55,7 @@ import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {addressLength, addressContain} from '../../utils/constants';
 
 export default {
-    name: 'TokenWithdrawalAddress',
+    name: 'TokenReleaseAddress',
     components: {
         TwoFactorModal,
     },
@@ -80,13 +63,13 @@ export default {
         isTokenDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
-        withdrawalAddress: String,
+        releaseAddress: String,
     },
     data() {
         return {
-            currentAddress: this.withdrawalAddress,
+            currentAddress: this.releaseAddress,
             locked: false,
-            newAddress: this.withdrawalAddress,
+            newAddress: this.releaseAddress,
             showTwoFactorModal: false,
             submitting: false,
         };
@@ -118,13 +101,13 @@ export default {
                 this.closeModal();
                 return;
             } else if (!this.$v.newAddress.addressContain) {
-                this.$toasted.error('Withdrawal address can contain alphabets and numbers');
+                this.$toasted.error('Release address can contain alphabets and numbers');
                 return;
             } else if (!this.$v.newAddress.minLength) {
-                this.$toasted.error(`Withdrawal address should have at least ${addressLength.WEB.min} symbols`);
+                this.$toasted.error(`Release address should have at least ${addressLength.WEB.min} symbols`);
                 return;
             } else if (!this.$v.newAddress.maxLength) {
-                this.$toasted.error(`Withdrawal address can not be longer than ${addressLength.WEB.max} characters`);
+                this.$toasted.error(`Release address can not be longer than ${addressLength.WEB.max} characters`);
                 return;
             }
 
