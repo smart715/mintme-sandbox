@@ -100,7 +100,7 @@ export default {
         cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     components: {
         Guide,
@@ -483,13 +483,13 @@ export default {
                     },
                 };
 
-                this.$axios.retry.get(this.webchainSupplyUrl, config)
+                this.$axios.retry.get(this.mintmeSupplyUrl, config)
                     .then((res) => {
                         this.markets['WEBBTC'].supply = res.data;
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        this.$toasted.error('Can not update MINTME circulation supply. BTC/MINTME market cap might not be accurate.');
                         reject(err);
                     });
             });
