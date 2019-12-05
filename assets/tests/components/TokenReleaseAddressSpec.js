@@ -2,17 +2,17 @@ import Vue from 'vue';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
 import {mount} from '@vue/test-utils';
-import TokenWithdrawalAddress from '../../js/components/token/TokenWithdrawalAddress';
+import TokenReleaseAddress from '../../js/components/token/TokenReleaseAddress';
 Vue.use(Vuelidate);
 Vue.use(Toasted);
 
 const newAddress = '0x1111111111111111111111111111111111111111';
 
-describe('TokenWithdrawalAddress', () => {
+describe('TokenReleaseAddress', () => {
     it('renders correctly with assigned props', () => {
-        const wrapper = mount(TokenWithdrawalAddress, {
+        const wrapper = mount(TokenReleaseAddress, {
             propsData: {
-                withdrawalAddress: 'foobar',
+                releaseAddress: 'foobar',
                 isTokenDeployed: true,
                 twofa: false,
             },
@@ -21,9 +21,9 @@ describe('TokenWithdrawalAddress', () => {
     });
 
     it('can be edited if deployed only', () => {
-        const wrapper = mount(TokenWithdrawalAddress, {
+        const wrapper = mount(TokenReleaseAddress, {
             propsData: {
-                withdrawalAddress: 'foobar',
+                releaseAddress: 'foobar',
                 isTokenDeployed: false,
                 twofa: true,
             },
@@ -35,9 +35,9 @@ describe('TokenWithdrawalAddress', () => {
 
     describe('2fa modal', () => {
         it('is displayed after submit if 2fa is enabled', () => {
-            const wrapper = mount(TokenWithdrawalAddress, {
+            const wrapper = mount(TokenReleaseAddress, {
                 propsData: {
-                    withdrawalAddress: 'foobar',
+                    releaseAddress: 'foobar',
                     isTokenDeployed: true,
                     twofa: true,
                 },
@@ -49,9 +49,9 @@ describe('TokenWithdrawalAddress', () => {
         });
 
         it('is not displayed after submit if 2fa is disabled', () => {
-            const wrapper = mount(TokenWithdrawalAddress, {
+            const wrapper = mount(TokenReleaseAddress, {
                 propsData: {
-                    withdrawalAddress: 'foobar',
+                    releaseAddress: 'foobar',
                     isTokenDeployed: true,
                     twofa: false,
                 },
