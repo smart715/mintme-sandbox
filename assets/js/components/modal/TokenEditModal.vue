@@ -26,11 +26,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div
-                        v-if="!mintDestinationLocked"
-                        class="row faq-block mx-0 border-bottom"
-                        ref="release-address"
-                    >
+                    <div class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
                                 Modify token release address
@@ -134,7 +130,6 @@ export default {
         isOwner: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
-        mintDestinationLocked: Boolean,
         precision: Number,
         releaseAddress: String,
         statusProp: String,

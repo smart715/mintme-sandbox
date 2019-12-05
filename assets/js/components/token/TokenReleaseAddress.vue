@@ -68,7 +68,6 @@ export default {
     data() {
         return {
             currentAddress: this.releaseAddress,
-            locked: false,
             newAddress: this.releaseAddress,
             showTwoFactorModal: false,
             submitting: false,
@@ -127,7 +126,6 @@ export default {
                 name: this.tokenName,
             }), {
                 address: this.newAddress,
-                lock: this.locked,
                 code,
             })
             .then(() => {
