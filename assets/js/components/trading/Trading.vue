@@ -19,7 +19,7 @@
                 <b-table
                     :items="tokens"
                     :fields="fieldsArray"
-                    sort-by="lastPrice"
+                    :sort-by="fields.monthVolume.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare">
                     <template v-slot:[`head(${fields.volume.key})`]="data">
@@ -322,20 +322,19 @@ export default {
             let hiddenName = this.findHiddenName(token);
 
             let marketCap = Decimal.mul(lastPrice, supply);
-
             return {
                 pair: `${currency}/${token}`,
-                change: changePercentage.toFixed(2) + '%',
+                change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: toMoney(volume, subunit) + ' ' + currency,
-                monthVolume: toMoney(monthVolume, subunit) + ' ' + currency,
+                volume: this.toMoney(volume) + ' ' + currency,
+                monthVolume: this.toMoney(monthVolume) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
-                lastPriceUSD: this.toUSD(lastPrice, currency),
+                lastPriceUSD: this.toUSD(lastPrice, currency, true),
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
-                marketCap: toMoney(marketCap, subunit) + ' ' + currency,
+                marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
             };
         },
@@ -408,7 +407,7 @@ export default {
             const marketName = this.klineQueriesIdsTokensMap.get(requestId);
             const marketCurrency = this.markets[marketName].base.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
-            const marketPrecision = this.markets[marketName].base.subunit;
+            // const marketPrecision = this.markets[marketName].base.subunit; I'll leave this here in any case we ever need it again
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
             let monthVolume = kline.reduce(function(acc, curr) {
@@ -416,7 +415,7 @@ export default {
             }, 0);
 
             let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = toMoney(monthVolume, marketPrecision) + ' ' + marketCurrency;
+            monthVolume = this.toMoney(monthVolume) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
@@ -464,8 +463,9 @@ export default {
                 });
             });
         },
-        toUSD: function(amount, currency) {
-            return toMoney(Decimal.mul(amount, this.conversionRates[currency]), USD.subunit) + ' ' + USD.symbol;
+        toUSD: function(amount, currency, subunit = false) {
+            amount = Decimal.mul(amount, this.conversionRates[currency]);
+            return (subunit ? toMoney(amount, USD.subunit) : this.toMoney(amount)) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
@@ -508,12 +508,19 @@ export default {
         fetchGlobalMarketCap: function() {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
-                    this.globalMarketCaps['BTC'] = toMoney(res.data.marketcap, 8);
+                    this.globalMarketCaps['BTC'] = this.toMoney(res.data.marketcap);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
-                    this.globalMarketCaps['USD'] = toMoney(res.data.marketcap, 2);
+                    this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
                 });
+        },
+        toMoney: function(val) {
+            val = new Decimal(val);
+            let precision = val.lessThan(100)
+                ? 2
+                : 0;
+            return toMoney(val, precision);
         },
     },
 };

@@ -62,7 +62,7 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ feeAmount | formatFee }} {{ feeCurrency }}</span>
+                    <span class="float-right">{{ feeAmount }} {{ feeCurrency }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
