@@ -41,7 +41,7 @@
                                 </b-dropdown-item>
                             </template>
                         </b-dropdown>
-                        <guide>
+                        <guide class="ml-1 mr-4">
                             <template slot="header">
                                 {{ data.label }}
                             </template>
