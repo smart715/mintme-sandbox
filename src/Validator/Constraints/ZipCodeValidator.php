@@ -41,6 +41,11 @@ class ZipCodeValidator extends ConstraintValidator
             return;
         }
 
+        // ignore empty value
+        if (!$value) {
+            return;
+        }
+
         $validator = new PostalCodeValidator();
 
         // ignore if iso does not have codes
