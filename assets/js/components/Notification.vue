@@ -14,7 +14,7 @@
             duration: {
                 type: Number,
                 default: null,
-            }
+            },
         },
         mounted: function() {
             this.type = this.type === 'danger' ? 'error' : this.type;
