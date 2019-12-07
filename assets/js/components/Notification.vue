@@ -11,12 +11,16 @@
         mixins: [NotificationMixin],
         props: {
             type: String,
+            duration: {
+                type: Number,
+                default: null,
+            }
         },
         mounted: function() {
             this.type = this.type === 'danger' ? 'error' : this.type;
             this.type = this.type === 'primary' ? 'info' : this.type;
 
-            this.sendNotification(this.$refs.content.innerHTML, this.type);
+            this.sendNotification(this.$refs.content.innerHTML, this.type, this.duration);
         },
     };
 </script>

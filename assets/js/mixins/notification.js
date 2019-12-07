@@ -12,8 +12,15 @@ export default {
         notifyWarning: function(message) {
             this.sendNotification(message, 'warning');
         },
-        sendNotification: function(message, type) {
-            this.$toasted.show(`<span class="toast-text">${message}</span>`, {type, icon: `icon-${type}`});
+        sendNotification: function(message, type, duration = null) {
+            this.$toasted.show(
+                `<span class="toast-text">${message}</span>`,
+                {
+                    type,
+                    icon: `icon-${type}`,
+                    duration,
+                }
+            );
         },
     },
 };
