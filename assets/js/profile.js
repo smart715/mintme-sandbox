@@ -2,12 +2,9 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
-import {minLength, helpers} from 'vuelidate/lib/validators';
+import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
-
-const xRegExp = require('xregexp');
-const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
-const HTTP_ACCEPTED = 202;
+import {profileNameContain, HTTP_ACCEPTED} from './utils/constants.js';
 
 new Vue({
     el: '#profile',
@@ -37,17 +34,21 @@ new Vue({
         this.city = this.$refs.city.getAttribute('value');
         this.zipCode = this.$refs.zipCode.getAttribute('value');
         this.showEditForm = this.$refs.editFormShowFirst.value;
-        this.$refs.zipCode.disabled = this.notAvailZipCode;
+        this.toggleZipCodeInputDisabled(this.notAvailZipCode);
         this.countryChanged();
     },
     methods: {
+        toggleZipCodeInputDisabled: function(state) {
+            this.$refs.zipCode.disabled = state;
+        },
         countryChanged: function() {
             this.country = this.$refs.country.value;
-            if ('' === this.$refs.country.value) {
-                this.$refs.zipCode.disabled = true;
+
+            if ('' === this.country) {
+                this.toggleZipCodeInputDisabled(true);
                 this.zipCode = '';
             } else {
-                this.$refs.zipCode.disabled = false;
+                this.toggleZipCodeInputDisabled(false);
             }
 
             this.zipCodeProcessing = true;
@@ -61,10 +62,10 @@ new Vue({
                             : false;
 
                         if (false === this.zipCodeVaidationPattern) {
-                            this.$refs.zipCode.disabled = true;
+                            this.toggleZipCodeInputDisabled(true);
                             this.zipCode = '';
                         } else {
-                            this.$refs.zipCode.disabled = false;
+                            this.toggleZipCodeInputDisabled(false);
                         }
 
                         this.zipCodeValidate();
@@ -83,7 +84,7 @@ new Vue({
                 });
         },
         zipCodeValidate: function() {
-            if (!this.zipCodeVaidationPattern || '' === this.zipCode) {
+            if (!this.zipCodeVaidationPattern || !this.zipCode) {
                 this.zipCodeValid = true;
             } else {
                 let regex = new RegExp('^' + this.zipCodeVaidationPattern + '$', 'i');
@@ -93,15 +94,15 @@ new Vue({
     },
     validations: {
         firstName: {
-            helpers: names,
+            helpers: profileNameContain,
             minLength: minLength(2),
         },
         lastName: {
-            helpers: names,
+            helpers: profileNameContain,
             minLength: minLength(2),
         },
         city: {
-            helpers: names,
+            helpers: profileNameContain,
             minLength: minLength(2),
         },
         zipCode: {
