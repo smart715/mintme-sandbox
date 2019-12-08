@@ -1,4 +1,4 @@
-            import LazyScrollTableMixin from './lazy_scroll_table';
+import LazyScrollTableMixin from './lazy_scroll_table';
 import WebSocketMixin from './websocket';
 import PricePositionMixin from './price_position';
 import PlaceOrder from './place_order';

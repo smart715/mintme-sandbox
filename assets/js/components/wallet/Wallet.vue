@@ -13,7 +13,7 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="generateCoinUrl(data.item)" class="text-white">
+                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white">
                         {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                     </a>
                 </template>

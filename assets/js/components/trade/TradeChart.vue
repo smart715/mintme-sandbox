@@ -103,7 +103,7 @@ export default {
     props: {
         websocketUrl: String,
         market: Object,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -344,7 +344,7 @@ export default {
                     },
                 };
 
-                this.$axios.retry.get(this.webchainSupplyUrl, config)
+                this.$axios.retry.get(this.mintmeSupplyUrl, config)
                     .then((res) => {
                         this.supply = parseFloat(res.data);
                         resolve();

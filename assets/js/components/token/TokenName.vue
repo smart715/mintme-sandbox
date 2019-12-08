@@ -26,7 +26,7 @@
             />
         </template>
         <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
-            {{ currentName }}
+            {{ currentName|rebranding }}
         </span>
     </div>
 </template>
@@ -37,7 +37,7 @@ import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import {WebSocketMixin, FiltersMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, RebrandingFilterMixin} from '../../mixins/';
 import TokenEditModal from '../modal/TokenEditModal';
 
 library.add(faEdit);
@@ -64,7 +64,7 @@ export default {
         FontAwesomeIcon,
         TokenEditModal,
     },
-    mixins: [WebSocketMixin, FiltersMixin, clickaway],
+    mixins: [WebSocketMixin, FiltersMixin, RebrandingFilterMixin, clickaway],
     data() {
         return {
             currentName: this.name,
