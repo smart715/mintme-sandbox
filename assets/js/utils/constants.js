@@ -1,5 +1,4 @@
 import {helpers} from 'vuelidate/lib/validators';
-import xRegExp from 'xregexp';
 
 // validation for address
 export const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
@@ -7,7 +6,6 @@ export const zipCodeContain = helpers.regex('zipCode', /^[a-zA-Z0-9\-\s]+$/u);
 export const tokenValidFirstChars = !helpers.regex('firstChars', /^[-\s]+/u);
 export const tokenValidLastChars = !helpers.regex('lastChars', /[-\s]+$/u);
 export const tokenNoSpaceBetweenDashes = !helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
-export const profileNameContain = helpers.regex('profileNameContain', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
 export const HTTP_ACCEPTED = 202;
 

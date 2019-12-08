@@ -2,9 +2,12 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
-import {minLength} from 'vuelidate/lib/validators';
+import {minLength, helpers} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
-import {profileNameContain, HTTP_ACCEPTED} from './utils/constants.js';
+import {HTTP_ACCEPTED} from './utils/constants.js';
+import xRegExp from 'xregexp';
+
+const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
 new Vue({
     el: '#profile',
@@ -94,15 +97,15 @@ new Vue({
     },
     validations: {
         firstName: {
-            helpers: profileNameContain,
+            helpers: names,
             minLength: minLength(2),
         },
         lastName: {
-            helpers: profileNameContain,
+            helpers: names,
             minLength: minLength(2),
         },
         city: {
-            helpers: profileNameContain,
+            helpers: names,
             minLength: minLength(2),
         },
         zipCode: {
