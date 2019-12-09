@@ -21,6 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class HackerController extends AbstractController
 {
+    public const BTC_SYMBOL = 'BTC';
+
     /** @Route("/crypto/{crypto}", name="hacker-add-crypto", options={"expose"=true}) */
     public function addCrypto(
         string $crypto,
@@ -38,10 +40,13 @@ class HackerController extends AbstractController
             return $this->redirect($referer);
         }
 
+        $amount = self::BTC_SYMBOL === $crypto->getSymbol() ?
+            '0.001' : '100';
+
         $balanceHandler->deposit(
             $this->getUser(),
             Token::getFromCrypto($crypto),
-            $moneyWrapper->parse('100', $crypto->getSymbol())
+            $moneyWrapper->parse($amount, $crypto->getSymbol())
         );
 
         return $this->redirect($referer);
