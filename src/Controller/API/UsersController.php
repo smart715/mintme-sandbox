@@ -6,6 +6,7 @@ use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Logger\UserActionLogger;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -17,6 +18,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
  */
 class UsersController extends AbstractFOSRestController
 {
+    /** @var UserActionLogger */
+    private $userActionLogger;
+
+    public function __construct(UserActionLogger $userActionLogger)
+    {
+        $this->userActionLogger = $userActionLogger;
+    }
+
     /**
      * @Rest\View()
      * @Rest\Get("/keys", name="get_keys", options={"expose"=true})
@@ -43,8 +52,10 @@ class UsersController extends AbstractFOSRestController
         }
 
         $keys = ApiKey::fromNewUser($this->getUser());
+
         $this->getEm()->persist($keys);
         $this->getEm()->flush();
+        $this->userActionLogger->info('Created API keys');
 
         return $keys;
     }
@@ -64,6 +75,7 @@ class UsersController extends AbstractFOSRestController
 
         $this->getEm()->remove($keys);
         $this->getEm()->flush();
+        $this->userActionLogger->info('Deleted API keys');
     }
 
     private function getEm(): ObjectManager
