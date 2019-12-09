@@ -74,13 +74,7 @@ new Vue({
                         this.zipCodeValidate();
                     }
                 }, (error) => {
-                    if (!error.response) {
-                        this.$toasted.error('Network error');
-                    } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
-                    } else {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    }
+                    this.$toasted.error('An error has occurred, please try again later');
                 })
                 .then(() => {
                     this.zipCodeProcessing = false;
