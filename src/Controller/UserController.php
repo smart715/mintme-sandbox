@@ -145,7 +145,7 @@ class UserController extends AbstractController
 
         return $this->redirectToRoute(
             'two_factor_auth',
-            ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager, $user) ]
+            ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager) ]
         );
     }
 
@@ -190,6 +190,19 @@ class UserController extends AbstractController
         return $response;
     }
 
+    public function getBackupCodes(TwoFactorManagerInterface $twoFactorManager): array
+    {
+        $backupCodes = $twoFactorManager->generateBackupCodes();
+        $user = $this->getUser();
+        $user->setGoogleAuthenticatorBackupCodes($backupCodes);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+        $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
+
+        return $backupCodes;
+    }
+
     /** @Route("/settings/2fa/backupcodes/generate",
         name="generate_backup_codes",
         options={"2fa"="required"},
@@ -197,9 +210,9 @@ class UserController extends AbstractController
     )*/
     public function generateBackupCodes(TwoFactorManagerInterface $twoFactorManager): Response
     {
-        $this->turnOnAuthenticator($twoFactorManager, $this->getUser());
-        $this->container->get('session')->getFlashBag()->get('success');
+        $this->getBackupCodes($twoFactorManager);
         $this->addFlash('success', 'Downloading backup codes...');
+        $this->userActionLogger->info('Downloaded Two-Factor backup codes');
 
         return $this->redirectToRoute('settings');
     }
@@ -234,15 +247,10 @@ class UserController extends AbstractController
         ]);
     }
 
-    private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager, User $user): array
+    private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager): array
     {
-        $backupCodes = $twoFactorManager->generateBackupCodes();
-        $user->setGoogleAuthenticatorBackupCodes($backupCodes);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($user);
-        $entityManager->flush();
+        $backupCodes = $this->getBackupCodes($twoFactorManager);
         $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
-        $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
         $this->addFlash('success', 'Downloading backup codes...');
         $this->userActionLogger->info('Enable Two-Factor Authentication');
 
