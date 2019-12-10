@@ -60,8 +60,8 @@ export default {
                 }
 
                 if (/[A-Z]/.test(val)) {
-                    lowercase = 1;                
-                }                
+                    lowercase = 1;
+                }
 
                 if (number + uppercase + lowercase !== 3) {
                     this.strengthtext = 2;
