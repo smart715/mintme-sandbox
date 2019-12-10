@@ -60,9 +60,12 @@ export default {
                             continue;
                         }
 
-                        switch (character) {
-                            case character.toUpperCase(): uppercase = 1; break;
-                            case character.toLowerCase(): lowercase = 1; break;
+                        if (character.match(/[A-z]/)) {
+                            uppercase = 1;
+                        }
+
+                        if (character.match(/[A-Z]/)) {
+                            lowercase = 1;
                         }
                     }
                 }
