@@ -42,8 +42,14 @@
                                     {% endif %}
                                 </div>
                                 {% if token is not empty %}
-                                    <div class="pb-1">
-                                        Token: <a href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
+                                    <div class="pb-1 d-flex flex-row flex-nowrap justify-content-start w-100">
+                                        <span class="d-inline-block text-nowrap">Token:</span>
+                                        <a 
+                                            class="d-inline-block truncate-name ml-1" 
+                                            href="{{ path('token_show', {'name': token.getName()}) }}"
+                                        >
+                                            {{ token.name }}
+                                        </a>
                                     </div>
                                 {% endif %}
                             </div>

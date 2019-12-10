@@ -37,32 +37,46 @@
                             </template>
 
                             <template v-slot:cell(orderMaker)="row">
-                                <a v-if="!row.item.isMakerAnonymous" :href="row.item.makerUrl">
-                                    <span v-b-tooltip="{title: row.item.makerFullName, boundary:'viewport'}">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <span v-if="row.item.isMakerAnonymous" class="d-inline-block truncate-name flex-grow-1">
                                         {{ row.value }}
                                     </span>
-                                    <img
-                                        src="../../../img/avatar.png"
-                                        class="pl-3 pl-lg-0 float-lg-right"
-                                        alt="avatar">
-                                </a>
-                                <span v-else>{{ row.value }}</span>
+                                    <a v-else :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                            {{ row.value }}
+                                        </span>
+                                        <img
+                                            src="../../../img/avatar.png"
+                                            class="d-block flex-grow-0"
+                                            alt="avatar">
+                                    </a>
+                                    <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
+                                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                                    </a>
+                                </div>
                             </template>
                             <template v-slot:cell(orderTrader)="row">
-                                <a v-if="!row.item.isTakerAnonymous" :href="row.item.takerUrl">
-                                    <span v-b-tooltip="{title: row.item.takerFullName, boundary:'viewport'}">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <span v-if="row.item.isTakerAnonymous" class="d-inline-block truncate-name flex-grow-1">
                                         {{ row.value }}
                                     </span>
-                                    <img
-                                        src="../../../img/avatar.png"
-                                        class="pl-3 pl-lg-0 float-lg-right"
-                                        alt="avatar">
-                                </a>
-                                <span v-else>{{ row.value }}</span>
+                                    <a v-else :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                            {{ row.value }}
+                                        </span>
+                                        <img
+                                            src="../../../img/avatar.png"
+                                            class="d-block flex-grow-0"
+                                            alt="avatar">
+                                    </a>
+                                    <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
+                                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                                    </a>
+                                </div>
                             </template>
                             <template v-slot:cell(dateTime)="row">
-                                 <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                        {{ row.value | truncate(13) }}
+                                <span class="truncate-name" v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                    {{ row.value | truncate(11) }}
                                 </span>
                             </template>
                         </b-table>
@@ -110,7 +124,6 @@ export default {
     },
     data() {
         return {
-            windowWidth: window.innerWidth,
             fields: [
                 {
                     key: 'type',
@@ -153,16 +166,10 @@ export default {
                 return {
                     dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     orderMaker: order.maker && order.maker.profile && !order.maker.profile.anonymous
-                        ? this.truncateFullName(order.maker.profile)
+                        ? this.traderFullName(order.maker.profile)
                         : 'Anonymous',
                     orderTrader: order.taker && order.taker.profile && !order.taker.profile.anonymous
-                        ? this.truncateFullName(order.taker.profile)
-                        : 'Anonymous',
-                    makerFullName: order.maker && order.maker.profile && !order.maker.profile.anonymous
-                        ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
-                        : 'Anonymous',
-                    takerFullName: order.taker && order.taker.profile && !order.taker.profile.anonymous
-                        ? order.taker.profile.firstName + ' ' + order.taker.profile.lastName
+                        ? this.traderFullName(order.taker.profile)
                         : 'Anonymous',
                     makerUrl: order.maker && order.maker.profile && !order.maker.profile.anonymous
                         ? this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url})
@@ -220,16 +227,7 @@ export default {
             }, 'trade-tableData-update-deals');
         });
     },
-    created() {
-      window.addEventListener('resize', this.handleResize);
-    },
-    destroyed() {
-      window.removeEventListener('resize', this.handleResize);
-    },
     methods: {
-        handleResize: function() {
-            this.windowWidth = window.innerWidth;
-        },
         startScrollListeningOnce: function(val) {
             // Disable listener from mixin
         },
@@ -258,31 +256,9 @@ export default {
                 }).catch(reject);
             });
         },
-        truncateFullName: function(profile) {
-            let first = profile.firstName;
-            let second = profile.lastName;
-            if ((first + second).length > 11 && this.windowWidth >= 1250) {
-                return first.length > 11
-                    ? first.slice(0, 11) + '..'
-                    : first + ' ' + second.slice(0, 11 - first.length) + '...';
-            } else if ((first + second).length > 9 && this.windowWidth >= 1200 && this.windowWidth < 1250) {
-                return first.length > 9
-                    ? first.slice(0, 9) + '..'
-                    : first + ' ' + second.slice(0, 9 - first.length) + '...';
-            } else if ((first + second).length > 6 && this.windowWidth >= 990 && this.windowWidth < 1200) {
-                return first.length > 6
-                    ? first.slice(0, 6) + '..'
-                    : first + ' ' + second.slice(0, 6 - first.length) + '...';
-            } else if ((first + second).length > 3 && this.windowWidth < 990) {
-                return first.length > 3
-                    ? first.slice(0, 3) + '...'
-                    : first + ' ' + second.slice(0, 3 - first.length) + '...';
-            } else {
-                return first + ' ' + second;
-            }
+        traderFullName: function(profile) {
+            return profile.firstName + ' ' + profile.lastName;
         },
     },
 };
-
 </script>
-

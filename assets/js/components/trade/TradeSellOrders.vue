@@ -21,43 +21,48 @@
             <div class="card-body p-0">
                 <div class="table-responsive fixed-head-table">
                     <b-table v-if="hasOrders"
-                         ref="table"
-                         @row-clicked="orderClicked"
-                         :sort-by.sync="sortBy"
-                         :sort-desc.sync="sortDesc"
-                         :items="tableData"
-                         :fields="fields">
-                        <template slot="trader" slot-scope="row">
-                            <div class="row-orders">
-                                <div class="column-orders trader-slot">
-                                    <a v-if="!row.item.isAnonymous" :href="row.item.traderUrl">
-                                        <div class="row-orders">
-                                            <div class="column-orders">
-                                                <img
-                                                  src="../../../img/avatar.png"
-                                                  class="float-right"
-                                                  alt="avatar">
-                                            </div>
-                                            <div class="column-orders">
-                                                <span class="truncate-trader-name" v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
-                                                    {{ row.value }}
-                                                </span>
-                                            </div>
-
-                                        </div>
-                                    </a>
-                                    <span v-else>{{ row.value }}</span>
-                                </div>
-                                <div class="column-orders close-sign">
-                                    <a @click="removeOrderModal(row.item)"
-                                       v-if="row.item.owner">
-                                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                                    </a>
-                                </div>
+                        ref="table"
+                        @row-clicked="orderClicked"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :items="tableData"
+                        :fields="fields"
+                    >
+                        <template v-slot:cell(trader)="row">
+                            <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                <span
+                                    v-if="row.item.isAnonymous"
+                                    class="d-inline-block truncate-name flex-grow-1"
+                                >
+                                    {{ row.value }}
+                                </span>
+                                <a
+                                    v-else
+                                    :href="row.item.traderUrl"
+                                    class="d-flex flex-row flex-nowrap justify-content-between w-100"
+                                >
+                                    <span
+                                        class="d-inline-block truncate-name flex-grow-1"
+                                        v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}"
+                                    >
+                                        {{ row.value }}
+                                    </span>
+                                    <img
+                                        src="../../../img/avatar.png"
+                                        class="d-block flex-grow-0"
+                                        alt="avatar">
+                                </a>
+                                <a
+                                    v-if="row.item.owner"
+                                    class="d-inline-block flex-grow-0"
+                                    @click="removeOrderModal(row.item)"
+                                >
+                                    <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                                </a>
                             </div>
                         </template>
                     </b-table>
-                    <div v-if="!hasOrders">
+                    <div v-else>
                         <p class="text-center p-5">No order was added yet</p>
                     </div>
                 </div>
