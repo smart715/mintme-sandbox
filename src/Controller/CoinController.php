@@ -34,7 +34,7 @@ class CoinController extends Controller
         // rebranding
         if ('WEB' === mb_strtoupper($quote)) {
             return $this->redirectToRoute('coin', [
-                'base' => mb_strtoupper($base), 
+                'base' => mb_strtoupper($base),
                 'quote' => 'MINTME',
             ]);
         }
