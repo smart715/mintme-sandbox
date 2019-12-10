@@ -46,7 +46,7 @@ export default {
 
             if (val.length <= 7 && result.score >= 1) {
                 this.strengthtext = 1;
-            } else if (val.length >= 8 && result.score <= 5) {
+            } else if (val.length >= 8 && result.score <= 4) {
                 let number = 0;
                 let uppercase = 0;
                 let lowercase = 0;
