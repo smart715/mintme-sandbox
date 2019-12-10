@@ -101,6 +101,11 @@ class TokenController extends Controller
             return $this->redirectToRoute('token_show', ['name' => $dashedName]);
         }
 
+        //rebranding
+        if ('MINTME' === mb_strtoupper($name)) {
+            $name = 'WEB';
+        }
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {

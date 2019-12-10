@@ -31,8 +31,16 @@ class CoinController extends Controller
     /** @Route("/coin/{base}/{quote}", name="coin", defaults={"quote"="mintme"}, options={"expose"=true,"2fa_progress"=false}) */
     public function pair(string $base, string $quote): Response
     {
-        $base = str_replace('MINTME', 'WEB', strtoupper($base));
-        $quote = str_replace('MINTME', 'WEB', strtoupper($quote));
+        // rebranding
+        if ('WEB' === mb_strtoupper($quote)) {
+            return $this->redirectToRoute('coin', [
+                'base' => mb_strtoupper($base), 
+                'quote' => 'MINTME',
+            ]);
+        }
+
+        $base = str_replace('MINTME', 'WEB', mb_strtoupper($base));
+        $quote = str_replace('MINTME', 'WEB', mb_strtoupper($quote));
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol(strtoupper($quote));

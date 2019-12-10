@@ -106,7 +106,7 @@ export default {
         cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     components: {
         Guide,

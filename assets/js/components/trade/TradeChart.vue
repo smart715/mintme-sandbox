@@ -61,11 +61,11 @@
                             Market Cap
                         </template>
                         <template slot="body">
-                            Market cap of {{ market.quote.symbol }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.marketCap | formatMoney }} {{ market.base.symbol }}
+                    {{ marketStatus.marketCap | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
             </div>
             <div class="row">
