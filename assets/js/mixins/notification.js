@@ -12,7 +12,7 @@ export default {
         notifyWarning: function(message) {
             this.sendNotification(message, 'warning');
         },
-        sendNotification: function(message, type, duration = null) {
+        sendNotification: function(message, type, duration = 5000) {
             this.$toasted.show(
                 `<span class="toast-text">${message}</span>`,
                 {

@@ -13,7 +13,7 @@
             type: String,
             duration: {
                 type: Number,
-                default: null,
+                default: 5000,
             },
         },
         mounted: function() {
