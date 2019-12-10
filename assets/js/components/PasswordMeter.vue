@@ -51,14 +51,17 @@ export default {
                 let uppercase = 0;
                 let lowercase = 0;
 
-                if (/\d/.test(val))
+                if (/\d/.test(val)) {
                     number = 1;
+                }
 
-                if (/[A-z]/.test(val))
+                if (/[A-z]/.test(val)) {
                     uppercase = 1;
+                }
 
-                if (/[A-Z]/.test(val))
+                if (/[A-Z]/.test(val)) {
                     lowercase = 1;                
+                }                
 
                 if (number + uppercase + lowercase !== 3) {
                     this.strengthtext = 2;
