@@ -51,24 +51,14 @@ export default {
                 let uppercase = 0;
                 let lowercase = 0;
 
-                for (let i in val) {
-                    if (val.hasOwnProperty(i)) {
-                        const character = val[i];
+                if (/\d/.test(val))
+                    number = 1;
 
-                        if (!isNaN(character * 1)) {
-                            number = 1;
-                            continue;
-                        }
+                if (/[A-z]/.test(val))
+                    uppercase = 1;
 
-                        if (character.match(/[A-z]/)) {
-                            uppercase = 1;
-                        }
-
-                        if (character.match(/[A-Z]/)) {
-                            lowercase = 1;
-                        }
-                    }
-                }
+                if (/[A-Z]/.test(val))
+                    lowercase = 1;                
 
                 if (number + uppercase + lowercase !== 3) {
                     this.strengthtext = 2;
