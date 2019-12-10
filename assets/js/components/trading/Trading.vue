@@ -12,35 +12,41 @@
                     :disabled="loading">
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
-
         </div>
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
                     :fields="fieldsArray"
-                    :sort-by="fields.monthVolume.key"
+                    :sort-by="fields.volume.key"
                     :sort-desc="true"
-                    :sort-compare="sortCompare">
+                    :sort-compare="sortCompare"
+                >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
-                        {{ data.label }}
-                        <guide>
+                        <b-dropdown
+                            id="volume"
+                            variant="primary"
+                            :lazy="true"
+                        >
+                            <template slot="button-content">
+                                {{ data.label }}
+                            </template>
+                            <template>
+                                <b-dropdown-item
+                                    v-for="(volume, key) in volumes"
+                                    :key="key"
+                                    @click="toggleActiveVolume(key)"
+                                >
+                                    {{ volume.label }}
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown>
+                        <guide class="ml-1 mr-2">
                             <template slot="header">
-                                24h volume
+                                {{ data.label }}
                             </template>
                             <template slot="body">
-                                The amount of crypto that has been traded in the last 24 hours.
-                            </template>
-                        </guide>
-                    </template>
-                    <template v-slot:[`head(${fields.monthVolume.key})`]="data">
-                        {{ data.label }}
-                        <guide>
-                            <template slot="header">
-                                30d volume
-                            </template>
-                            <template slot="body">
-                                The amount of crypto that has been traded in the last 30 days.
+                                {{ data.field.help }}
                             </template>
                         </guide>
                     </template>
@@ -123,6 +129,19 @@ export default {
                 BTC: 0,
                 USD: 0,
             },
+            activeVolume: 'month',
+            volumes: {
+                day: {
+                    key: 'volume',
+                    label: '24H Volume',
+                    help: 'The amount of crypto that has been traded in the last 24 hours.',
+                },
+                month: {
+                    key: 'monthVolume',
+                    label: '30d Volume',
+                    help: 'The amount of crypto that has been traded in the last 30 days.',
+                },
+            },
         };
     },
     computed: {
@@ -164,20 +183,14 @@ export default {
                     formatter: formatMoney,
                 },
                 volume: {
-                    label: '24H Volume',
-                    key: 'volume' + ( this.showUsd ? USD.symbol : ''),
-                    sortable: true,
-                    formatter: formatMoney,
-                },
-                monthVolume: {
-                    label: '30d Volume',
-                    key: 'monthVolume' + ( this.showUsd ? USD.symbol : ''),
+                    ...this.volumes[this.activeVolume],
+                    key: this.volumes[this.activeVolume].key + (this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
                 marketCap: {
                     label: 'Market Cap',
-                    key: 'marketCap' + ( this.showUsd ? 'USD' : ''),
+                    key: 'marketCap' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
                 },
@@ -521,6 +534,9 @@ export default {
                 ? 2
                 : 0;
             return toMoney(val, precision);
+        },
+        toggleActiveVolume: function(volume) {
+            this.activeVolume = volume;
         },
     },
 };
