@@ -11,72 +11,72 @@
             <div class="col-md-10" v-cloak>
                 {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                 <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
-                    <b-tab title="Trade" {% if tab|default and tab == 'trade' %} {{ 'active' }} {% endif %}>
-                        <trade
-                            websocket-url="{{ global_websocket_url }}"
-                            hash="{{ hash }}"
-                            login-url="{{ path('fos_user_security_login') }}"
-                            signup-url="{{ path('fos_user_registration_register') }}"
-                            :market="{{ market | json_encode }}"
-                            :logged-in="{{ app.user ? 'true' : 'false' }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                            :precision="{{ precision }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}"
-                            webchain-supply-url="{{ webchain_supply }}">
-                        </trade>
-                    </b-tab>
-                    {% if showIntro %}
-                        <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
-                            <div class="row">
-                                <trade-chart
-                                    class="col mb-3"
-                                    websocket-url="{{ global_websocket_url }}"
-                                    :market="{{ market | json_encode }}"
-                                    webchain-supply-url="{{ webchain_supply }}">
-                                </trade-chart>
-                            </div>
-                            <div class="row">
-                                <token-introduction-profile
-                                    class="col-12 col-lg-6 pr-lg-2"
-                                    youtube-client-id="{{ global_youtube_client_id }}"
-                                    facebook-app-id="{{ global_facebook_app_id }}"
-                                    profile-name="{{ profile.firstName }} {{ profile.lastName }}"
-                                    website-url="{{ token.websiteUrl }}"
-                                    facebook-url="{{ token.facebookUrl }}"
-                                    youtube-channel-id="{{ token.youtubeChannelId }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
-                                    :deployment-status="getTokenStatus({{ token.deploymentStatus | json_encode }})"
-                                    token-contract-address="{{ token.address }}"
-                                    token-name="{{ market.quote.name }}"
-                                    telegram-url="{{ token.telegramUrl }}"
-                                    discord-url="{{ token.discordUrl }}"
-                                >
-                                </token-introduction-profile>
-                                <token-introduction-statistics
-                                    class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
-                                    :market="{{ market | json_encode }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
-                                    twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
-                                    token-created="{{ token.getCreated().format('d M Y') }}"
-                                    :precision="{{ precision }}">
-                                </token-introduction-statistics>
-                                <top-holders
-                                    class="col-12 mt-3"
-                                    :token-name="{{ market.quote.symbol | json_encode }}">
-                                </top-holders>
-                                <token-introduction-description
-                                    class="col-12 pt-3"
+                    <b-tab title="Introduction" {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}>
+                        <div class="row">
+                            <trade-chart
+                                class="col pb-3"
+                                websocket-url="{{ global_websocket_url }}"
+                                :market="{{ market | json_encode }}"
+                                webchain-supply-url="{{ webchain_supply }}">
+                            </trade-chart>
+                        </div>
+                        <div class="row">
+                            <token-introduction-description
+                                    class="col-12 pb-3"
                                     name="{{ token.name }}"
                                     :description="tokenDescription"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     @updated="descriptionUpdated"
-                                ></token-introduction-description>
-                            </div>
-                        </b-tab>
-                    {% endif %}
+                            ></token-introduction-description>
+                            <token-introduction-profile
+                                class="col-12 col-lg-6 pr-lg-2"
+                                youtube-client-id="{{ global_youtube_client_id }}"
+                                facebook-app-id="{{ global_facebook_app_id }}"
+                                profile-name="{{ profile.firstName }} {{ profile.lastName }}"
+                                website-url="{{ token.websiteUrl }}"
+                                facebook-url="{{ token.facebookUrl }}"
+                                youtube-channel-id="{{ token.youtubeChannelId }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}"
+                                profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
+                                :deployment-status="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                token-contract-address="{{ token.address }}"
+                                token-name="{{ market.quote.name }}"
+                                telegram-url="{{ token.telegramUrl }}"
+                                discord-url="{{ token.discordUrl }}"
+                            >
+                            </token-introduction-profile>
+                            <token-introduction-statistics
+                                class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
+                                :market="{{ market | json_encode }}"
+                                :editable="{{ isOwner ? 'true' : 'false' }}"
+                                release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
+                                token-created="{{ token.getCreated().format('d M Y') }}"
+                                :precision="{{ precision }}">
+                            </token-introduction-statistics>
+                            <top-holders
+                                class="col-12 mt-3"
+                                :token-name="{{ market.quote.symbol | json_encode }}">
+                            </top-holders>
+                        </div>
+                    </b-tab>
+                {% if showTrade %}
+                <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
+                    <trade
+                        websocket-url="{{ global_websocket_url }}"
+                        hash="{{ hash }}"
+                        login-url="{{ path('fos_user_security_login') }}"
+                        signup-url="{{ path('fos_user_registration_register') }}"
+                        :market="{{ market | json_encode }}"
+                        :logged-in="{{ app.user ? 'true' : 'false' }}"
+                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                        :precision="{{ precision }}"
+                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                        :user-id="{{ app.user ? app.user.id : 0 }}"
+                        webchain-supply-url="{{ webchain_supply }}">
+                    </trade>
+                </b-tab>
+                {% endif %}
                     <template slot="tabs-end">
                         {% if token is defined %}
                             <li class="nav-item">

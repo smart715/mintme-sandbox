@@ -83,7 +83,7 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/{tab}",
      *     name="token_show",
-     *     defaults={"tab" = "trade"},
+     *     defaults={"tab" = "intro"},
      *     methods={"GET"},
      *     requirements={"tab" = "trade|intro"},
      *     options={"expose"=true,"2fa_progress"=false}
@@ -129,7 +129,7 @@ class TokenController extends Controller
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
-            'showIntro' => true,
+            'showTrade' => true,
             'market' => $this->normalize($market),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
@@ -146,7 +146,7 @@ class TokenController extends Controller
         MarketStatusManagerInterface $marketStatusManager
     ): Response {
         if ($this->isTokenCreated()) {
-            return $this->redirectToOwnToken('trade');
+            return $this->redirectToOwnToken('intro');
         }
 
         $token = new Token();

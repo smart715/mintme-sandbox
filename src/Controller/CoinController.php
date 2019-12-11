@@ -48,7 +48,7 @@ class CoinController extends Controller
         return $this->render('pages/pair.html.twig', [
             'market' => $this->normalize($market),
             'isOwner' => false,
-            'showIntro' => false,
+            'showTrade' => false,
             'hash' => $this->getUser() ?
                 $this->getUser()->getHash() :
                 '',
