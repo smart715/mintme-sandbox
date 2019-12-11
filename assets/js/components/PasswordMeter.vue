@@ -55,12 +55,12 @@ export default {
                     number = 1;
                 }
 
-                if (/[A-z]/.test(val)) {
-                    uppercase = 1;
+                if (/[a-z]/.test(val)) {
+                    lowercase = 1;
                 }
 
                 if (/[A-Z]/.test(val)) {
-                    lowercase = 1;
+                    uppercase = 1;
                 }
 
                 if (number + uppercase + lowercase !== 3) {
