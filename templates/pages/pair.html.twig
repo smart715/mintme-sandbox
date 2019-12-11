@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block head %}
+    <meta name="description" content="{{ tokenDescription }}">
+{% endblock %}
+
 {% block title %}
     {% if tab|default == 'intro' %}Information about {% endif %}
     {% if token|default %} {{ token.name }} {% else %} {{ market.base.symbol }}/{{ market.quote.symbol }} {% endif %} | mintMe
