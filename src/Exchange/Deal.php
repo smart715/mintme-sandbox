@@ -67,4 +67,14 @@ class Deal extends AbstractOrder
     {
         return $this->role;
     }
+
+    public function getMarket(): Market
+    {
+        return $this->market;
+    }
+
+    public function setMarket(Market $market): void
+    {
+        $this->market = $market;
+    }
 }

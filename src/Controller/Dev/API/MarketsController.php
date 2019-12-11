@@ -5,18 +5,21 @@ namespace App\Controller\Dev\API;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\MarketInfo;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route(path="/dev/api/v1/markets")
  * @Security(expression="is_granted('prelaunch')")
- * @Cache(smaxage=15, mustRevalidate=true)
  */
 class MarketsController extends AbstractFOSRestController
 {
@@ -26,12 +29,27 @@ class MarketsController extends AbstractFOSRestController
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     public function __construct(
         MarketStatusManagerInterface $marketManager,
-        MarketHandlerInterface $marketHandler
+        MarketHandlerInterface $marketHandler,
+        RebrandingConverterInterface $rebrandingConverter,
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ) {
         $this->marketManager = $marketManager;
         $this->marketHandler = $marketHandler;
+        $this->rebrandingConverter = $rebrandingConverter;
+        $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -53,12 +71,24 @@ class MarketsController extends AbstractFOSRestController
      */
     public function getMarkets(ParamFetcherInterface $fetcher): array
     {
-        return array_values(
+        $markets = array_values(
             $this->marketManager->getMarketsInfo(
                 (int)$fetcher->get('offset'),
                 (int)$fetcher->get('limit')
             )
         );
+
+        foreach ($markets as &$market) {
+            $base = $market->getCrypto();
+            $base->setName($this->rebrandingConverter->convert($base->getName()));
+            $base->setSymbol($this->rebrandingConverter->convert($base->getSymbol()));
+            $market->setCrypto($base);
+            $quote = $market->getQuote();
+            $quote->setName($this->rebrandingConverter->convert($quote->getName()));
+            $quote->setSymbol($this->rebrandingConverter->convert($quote->getSymbol()));
+        }
+
+        return $markets;
     }
 
     /**
@@ -85,7 +115,7 @@ class MarketsController extends AbstractFOSRestController
      * @SWG\Parameter(name="quote", in="path", description="Quote name", type="string")
      * @SWG\Tag(name="Markets")
      */
-    public function getMarket(Market $market, ParamFetcherInterface $fetcher): MarketInfo
+    public function getMarket(string $base, string $quote, ParamFetcherInterface $fetcher): MarketInfo
     {
         $periods = [
             '1h'   => 3600,
@@ -93,9 +123,24 @@ class MarketsController extends AbstractFOSRestController
             '7d'   => 604800,
         ];
 
-        return $this->marketHandler->getMarketInfo(
-            $market,
+        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($base));
+        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($quote));
+
+        $base = $this->cryptoManager->findBySymbol($base);
+        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        if (is_null($base) || is_null($quote)) {
+            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $market = $this->marketHandler->getMarketInfo(
+            new Market($base, $quote),
             $periods[$fetcher->get('interval')]
         );
+
+        $market->setCryptoSymbol($this->rebrandingConverter->convert($market->getCryptoSymbol()));
+        $market->setTokenName($this->rebrandingConverter->convert($market->getTokenName()));
+
+        return $market;
     }
 }
