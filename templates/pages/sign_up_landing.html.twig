@@ -7,43 +7,47 @@
 {% block content %}
     <div class="container px-5" id="sign-up-langing">
         <div class="row py-5 pl-5">
-            <div class="col-4 pr-0">
-                {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
-                {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
-                <div>
-                    <passwordmeter :password="password" @toggle-error="toggleError">
-                <span @click="togglePassword()" class="show-password">
-                    <i class="far fa-eye"></i>
-                </span>
-                        {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
-                    </passwordmeter>
-                </div>
-                <div class="py-2">
-                    {{ form_row(form.recaptcha, { 'inline': false }) }}
-                </div>
-                <div class="text-left">
-                    <input type="submit" :disabled="disabled" class="btn btn-primary" value="Sign Up">
-                    <span class="px-3">or</span>
-                    <a class="btn-cancel" href="{{ path('fos_user_security_login') }}">Log In</a>
-                </div>
-                <p class="text-left pt-3">
-                    By clicking Sign Up, you accept <br><a target="_blank" href="{{ path('terms_of_service') }}">Terms of Service</a> and <a target="_blank" href="{{ path('privacy_policy') }}">Privacy policy</a>
-                </p>
-                {{ form_end(form) }}
-                {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
+            <div class="col-xl-4 col-sm-12 pr-0">
+                <div class="card">
+                    <div class="card-header">
+                        {{ formHeader }}
+                    </div>
+                    <div class="card-body py-2">
+                        {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
+                        {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
+                        <div>
+                            <passwordmeter :password="password" @toggle-error="toggleError">
+                                <span @click="togglePassword()" class="show-password">
+                                    <i class="far fa-eye"></i>
+                                </span>
+                                {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
+                            </passwordmeter>
+                        </div>
+                        <div class="py-2">
+                            {{ form_row(form.recaptcha, { 'inline': false }) }}
+                        </div>
+                        <div class="text-left">
+                            <input type="submit" :disabled="disabled" class="btn btn-primary" value="Sign Up">
+                            <span class="px-3">or</span>
+                            <a class="btn-cancel" href="{{ path('fos_user_security_login') }}">Log In</a>
+                        </div>
+                        <p class="text-left pt-3">
+                            By clicking Sign Up, you accept <br>
+                            <a target="_blank" href="{{ path('terms_of_service') }}">
+                                Terms of Service</a> and
+                            <a target="_blank" href="{{ path('privacy_policy') }}">Privacy policy</a>
+                        </p>
+                        {{ form_end(form) }}
+                        {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
+                    </div>
                 </div>
             </div>
-            <div class="col-5 pl-0">
-                <div class="landing-logo">
-                    <img id="web" src="{{ asset('build/images/landing-web.png') }}">
-                    <img id="logo" src="{{ asset('build/images/favicon.png') }}">
-                </div>
+            <div class="col-xl-5 col-sm-12 pl-0">
+                    <img id="web" class="mw-100" src="{{ asset('build/images/landing-web.png') }}">
             </div>
-            <div class="col-3">
-                <span id="intro-text">
-                    <span class="title text-white h2">We will PAY YOU</span><br>
-                    <span class="float-right">if you register NOW!</span>
-                </span>
+            <div class="col-xl-3 col-sm-12">
+                <span class="title text-white h2">We will PAY YOU</span><br>
+                <span class="">if you register NOW!</span>
             </div>
         </div>
         <div class="row py-5 justify-content-center">
@@ -100,8 +104,10 @@
                 <img class="w-100" src="{{ asset('build/images/diagram.png') }}">
             </div>
             <div class="col-8 text-center">
-                WEB will show up immediately on your <b><i>mintMe</i></b> account and you can withdraw it if you want.<br>
-                Webchain is native blockchain currency for <b><i>mintMe</i></b> exchange, on which all tokens will be based.<br>
+                WEB will show up immediately on your
+                <b><i>mintMe</i></b> account and you can withdraw it if you want.<br>
+                Webchain is native blockchain currency for <b><i>mintMe</i></b>
+                exchange, on which all tokens will be based.<br>
                 If mintme succeeds, 5 WEB can be worth a lot more than now.
                 <b>Can you imagine having opportunity to get 5 BTC for free and not doing it back in 2010 when it wasn't
                     worth much?</b>
