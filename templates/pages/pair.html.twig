@@ -29,6 +29,14 @@
                     {% if showIntro %}
                         <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
                             <div class="row">
+                                <trade-chart
+                                    class="col mb-3"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    :market="{{ market | json_encode }}"
+                                    webchain-supply-url="{{ webchain_supply }}">
+                                </trade-chart>
+                            </div>
+                            <div class="row">
                                 <token-introduction-profile
                                     class="col-12 col-lg-6 pr-lg-2"
                                     youtube-client-id="{{ global_youtube_client_id }}"

@@ -1,4 +1,5 @@
 import Trade from './components/trade/Trade';
+import TradeChart from './components/trade/TradeChart';
 import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
@@ -21,6 +22,7 @@ new Vue({
   },
   components: {
     Trade,
+    TradeChart,
     TokenIntroductionProfile,
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
