@@ -18,7 +18,7 @@
         <div class="col-12 pt-2 px-0 clearfix">
             <button
                 class="btn btn-primary float-left"
-                :disabled="submitting"
+                :disabled="submitting || sameAddress"
                 @click="editAddress"
             >
                 Save
@@ -77,6 +77,9 @@ export default {
         canUpdate: function() {
             return this.isTokenDeployed && '0x' !== this.currentAddress;
         },
+        sameAddress: function() {
+            return this.currentAddress === this.newAddress;
+        }
     },
     methods: {
         closeTwoFactorModal: function() {
