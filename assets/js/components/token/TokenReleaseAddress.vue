@@ -79,7 +79,7 @@ export default {
         },
         sameAddress: function() {
             return this.currentAddress === this.newAddress;
-        }
+        },
     },
     methods: {
         closeTwoFactorModal: function() {
