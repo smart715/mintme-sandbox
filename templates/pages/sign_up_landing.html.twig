@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="container px-5" id="sign-up-langing">
-        <div class="row flex-xl-row justify-content-center flex-sm-column-reverse align-items-center py-5">
+        <div class="row flex-xl-row justify-content-center flex-column-reverse align-items-center py-5">
             <div class="col-xl-4 col-sm-12 col-lg-8 pr-0">
                 <div class="card">
                     <div class="card-header">
@@ -42,92 +42,86 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-5 col-sm-12 pl-0">
+            <div class="col-xl-4 col-sm-12 col-lg-8 pl-0">
                     <img class="mw-100" src="{{ asset('build/images/logo-with-web.png') }}">
             </div>
-            <div class="col-xl-3 col-sm-12 align-self-end">
+            <div class="col-xl-4 col-sm-12 col-lg-8 align-self-end">
                 <span class="title text-white h2">We will PAY YOU</span><br>
                 <span class="">if you register NOW!</span>
             </div>
         </div>
         <div class="row py-5 justify-content-center">
-            <div class="col-5 what-is text-center">
+            <div class="col-xl-5 col-lg-12 col-sm-12 what-is text-center">
                 <span>What is <i>mintMe?</i></span> <br>
-                <span class="">It's new innovative crowdfunding platform where both sides can earn!</span>
+                <span>It's new innovative crowdfunding platform where both sides can earn!</span>
             </div>
         </div>
         <div class="row steps py-5 mx-5 justify-content-center">
             <div class="col-xl-4 col-md-12 py-2">
-                <img src="{{ asset('build/images/number-one.png') }}">
-                <div class="d-inline-block py-2">
-                    <span>Content creator issues his own tokens</span>
-                </div>
+                <img class="img-fluid" src="{{ asset('build/images/number-one.png') }}">
+                <span>Content creator issues his own tokens</span>
             </div>
             <div class="col-xl-4 col-md-12 py-2">
                 <img src="{{ asset('build/images/number-two.png') }}">
-                <div class="d-inline-block py-2">
-                    <span>Person supporting buys such tokens and if project suceeds</span>
-                </div>
+                <span>Person supporting buys such tokens and if project suceeds</span>
             </div>
             <div class="col-xl-4 col-md-12">
                 <img src="{{ asset('build/images/number-three.png') }}">
-                <div class="d-inline-block py-2 ">
-                    <span>Such tokens gain in value and can be sold for more money!</span>
-                </div>
+                <span>Such tokens gain in value and can be sold for more money!</span>
             </div>
         </div>
-        <div class="row feature-row border border-white m-5 py-3">
-            <div class="col-3 text-center">
-                <img class="hand-coin" src="{{ asset('build/images/hand-coin.png') }}">
-            </div>
-            <div class="col-6 text-center">
-                <span class="title text-white h2">
-                    So you invest in some idea <br>
-                    not just give money to support it! <br>
-                </span>
-                <a href="{{ path('fos_user_registration_register') }}"
-                   class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 ml-5 py-2 pl-3 float-left">
-                    REGISTER NOW
-                </a>
-                <span>
-                    To encourage you to our new service,
-                    we give you <b>5 WEB</b> (Webchain) coins
-                    if you <b>register now<b>. For free
-                </span>
-            </div>
-            <div class="col-3 text-center">
-                <img class="lamp" src="{{ asset('build/images/lamp.png') }}">
-            </div>
-        </div>
-        <div class="row m-5 py-5">
-            <div class="col-2">
-                <img class="w-100" src="{{ asset('build/images/diagram.png') }}">
-            </div>
-            <div class="col-8 text-center">
-                WEB will show up immediately on your
-                <b><i>mintMe</i></b> account and you can withdraw it if you want.<br>
-                Webchain is native blockchain currency for <b><i>mintMe</i></b>
-                exchange, on which all tokens will be based.<br>
-                If mintme succeeds, 5 WEB can be worth a lot more than now.
-                <b>Can you imagine having opportunity to get 5 BTC for free and not doing it back in 2010 when it wasn't
-                    worth much?</b>
-            </div>
-            <div class="col-2">
-                <img class="w-100" src="{{ asset('build/images/diagram-2.png') }}">
-            </div>
-        </div>
-        <div class="row feature-row border border-white m-5 py-3">
-            <div class="col-xl-4 col-md-12 p-4">
-                <img class="w-70" src="{{ asset('build/images/webchain-graphic.png') }}">
-            </div>
-            <div class="col-xl-8 col-md-12 pl-2 pt-4 text-center">
-                <h1>Can you afford not to try?</h1>
-                <span>
-                    We do not demand any personal data from you. Just registration. We hope you can get interested
-                    after you register and spread the word about <i>mintMe.com</i>
-                </span>
-            </div>
-        </div>
+{#        <div class="row feature-row border border-white m-5 py-3">#}
+{#            <div class="col-3 text-center">#}
+{#                <img class="hand-coin" src="{{ asset('build/images/hand-coin.png') }}">#}
+{#            </div>#}
+{#            <div class="col-6 text-center">#}
+{#                <span class="title text-white h2">#}
+{#                    So you invest in some idea <br>#}
+{#                    not just give money to support it! <br>#}
+{#                </span>#}
+{#                <a href="{{ path('fos_user_registration_register') }}"#}
+{#                   class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 ml-5 py-2 pl-3 float-left">#}
+{#                    REGISTER NOW#}
+{#                </a>#}
+{#                <span>#}
+{#                    To encourage you to our new service,#}
+{#                    we give you <b>5 WEB</b> (Webchain) coins#}
+{#                    if you <b>register now<b>. For free#}
+{#                </span>#}
+{#            </div>#}
+{#            <div class="col-3 text-center">#}
+{#                <img class="lamp" src="{{ asset('build/images/lamp.png') }}">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="row m-5 py-5">#}
+{#            <div class="col-2">#}
+{#                <img class="w-100" src="{{ asset('build/images/diagram.png') }}">#}
+{#            </div>#}
+{#            <div class="col-8 text-center">#}
+{#                WEB will show up immediately on your#}
+{#                <b><i>mintMe</i></b> account and you can withdraw it if you want.<br>#}
+{#                Webchain is native blockchain currency for <b><i>mintMe</i></b>#}
+{#                exchange, on which all tokens will be based.<br>#}
+{#                If mintme succeeds, 5 WEB can be worth a lot more than now.#}
+{#                <b>Can you imagine having opportunity to get 5 BTC for free and not doing it back in 2010 when it wasn't#}
+{#                    worth much?</b>#}
+{#            </div>#}
+{#            <div class="col-2">#}
+{#                <img class="w-100" src="{{ asset('build/images/diagram-2.png') }}">#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="row feature-row border border-white m-5 py-3">#}
+{#            <div class="col-xl-4 col-md-12 p-4">#}
+{#                <img class="w-70" src="{{ asset('build/images/webchain-graphic.png') }}">#}
+{#            </div>#}
+{#            <div class="col-xl-8 col-md-12 pl-2 pt-4 text-center">#}
+{#                <h1>Can you afford not to try?</h1>#}
+{#                <span>#}
+{#                    We do not demand any personal data from you. Just registration. We hope you can get interested#}
+{#                    after you register and spread the word about <i>mintMe.com</i>#}
+{#                </span>#}
+{#            </div>#}
+{#        </div>#}
     </div>
 {% endblock %}
 
