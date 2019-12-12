@@ -24,6 +24,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentConsumer implements ConsumerInterface
 {
+    private const STATUS_OK = 'ok';
+
+    private const STATUS_FAIL = 'fail';
+
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
@@ -111,7 +115,7 @@ class PaymentConsumer implements ConsumerInterface
             return true;
         }
 
-        if ('fail' === $clbResult->getStatus()) {
+        if (self::STATUS_FAIL === $clbResult->getStatus()) {
             try {
                 $strategy = $tradable instanceof Token
                     ? new PaymentTokenStrategy($this->balanceHandler, $this->cryptoManager)
@@ -131,7 +135,7 @@ class PaymentConsumer implements ConsumerInterface
 
                 return false;
             }
-        } elseif ('ok' === $clbResult->getStatus()) {
+        } elseif (self::STATUS_OK === $clbResult->getStatus()) {
             $this->eventDispatcher->dispatch(
                 WithdrawCompletedEvent::NAME,
                 new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount())
