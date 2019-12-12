@@ -6,8 +6,8 @@
 
 {% block content %}
     <div class="container px-5" id="sign-up-langing">
-        <div class="row py-5 pl-5">
-            <div class="col-xl-4 col-sm-12 pr-0">
+        <div class="row flex-xl-row justify-content-center flex-sm-column-reverse align-items-center py-5">
+            <div class="col-xl-4 col-sm-12 col-lg-8 pr-0">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
@@ -43,9 +43,9 @@
                 </div>
             </div>
             <div class="col-xl-5 col-sm-12 pl-0">
-                    <img id="web" class="mw-100" src="{{ asset('build/images/landing-web.png') }}">
+                    <img class="mw-100" src="{{ asset('build/images/logo-with-web.png') }}">
             </div>
-            <div class="col-xl-3 col-sm-12">
+            <div class="col-xl-3 col-sm-12 align-self-end">
                 <span class="title text-white h2">We will PAY YOU</span><br>
                 <span class="">if you register NOW!</span>
             </div>
