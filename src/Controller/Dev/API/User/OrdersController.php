@@ -165,7 +165,7 @@ class OrdersController extends AbstractFOSRestController
      *      format="application/json",
      *      @SWG\Schema(
      *          type="object",
-     *          @SWG\Property(property="base", type="string", example="WEB", description="Base name"),
+     *          @SWG\Property(property="base", type="string", example="MINTME", description="Base name"),
      *          @SWG\Property(property="quote", type="string", example="MY_TOKEN", description="Quote name"),
      *          @SWG\Property(property="priceInput", type="string", example="5", description="Price to place"),
      *          @SWG\Property(property="amountInput", type="string", example="12.33", description="Amount to order"),
