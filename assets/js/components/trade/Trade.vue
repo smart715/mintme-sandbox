@@ -2,7 +2,7 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
-                class="col pb-3"
+                class="col"
                 :websocket-url="websocketUrl"
                 :market="market"
                 :webchain-supply-url="webchainSupplyUrl">
