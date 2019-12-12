@@ -70,7 +70,7 @@ new Vue({
                 country: this.country,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (HTTP_ACCEPTED === response.status) {
                         this.zipCodeVaidationPattern = response.data.hasPattern
                             ? response.data.pattern
                             : false;
