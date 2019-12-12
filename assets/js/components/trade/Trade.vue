@@ -1,6 +1,14 @@
 <template>
     <div class="container-fluid px-0">
         <div class="row">
+            <trade-chart
+                class="col pb-3"
+                :websocket-url="websocketUrl"
+                :market="market"
+                :webchain-supply-url="webchainSupplyUrl">
+            </trade-chart>
+        </div>
+        <div class="row">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
                         v-if="balanceLoaded"
@@ -64,6 +72,7 @@
 <script>
 import TradeBuyOrder from './TradeBuyOrder';
 import TradeSellOrder from './TradeSellOrder';
+import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
@@ -79,6 +88,7 @@ export default {
     components: {
         TradeBuyOrder,
         TradeSellOrder,
+        TradeChart,
         TradeOrders,
         TradeTradeHistory,
         OrderModal,

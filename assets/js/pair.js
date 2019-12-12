@@ -1,5 +1,4 @@
 import Trade from './components/trade/Trade';
-import TradeChart from './components/trade/TradeChart';
 import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
@@ -22,7 +21,6 @@ new Vue({
   },
   components: {
     Trade,
-    TradeChart,
     TokenIntroductionProfile,
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
@@ -40,7 +38,7 @@ new Vue({
         window.history.replaceState(
             {}, document.title, this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: i ? 'intro' : 'trade',
+              tab: i ? 'trade' : 'intro',
             })
         );
         document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';

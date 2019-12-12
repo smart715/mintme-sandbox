@@ -17,14 +17,6 @@
                 <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
                     <b-tab title="Introduction" {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
-                            <trade-chart
-                                class="col pb-3"
-                                websocket-url="{{ global_websocket_url }}"
-                                :market="{{ market | json_encode }}"
-                                webchain-supply-url="{{ webchain_supply }}">
-                            </trade-chart>
-                        </div>
-                        <div class="row">
                             <token-introduction-description
                                     class="col-12 pb-3"
                                     name="{{ token.name }}"
