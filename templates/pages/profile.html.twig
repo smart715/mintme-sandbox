@@ -5,7 +5,7 @@
         Create your profile | mintMe
     {% else %}
         {{ profile.firstName }} {{ profile.lastName }}
-        {{ profile.city is empty ? '' : ' (from ' ~ profile.city ~ ')' }} profile | mintMe
+        {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }} profile | mintMe
     {% endif %}
 {% endblock %}
 
@@ -36,16 +36,18 @@
                                         Country: {{ profile.getCountryFullName() }}
                                     {% endif %}
                                 </div>
-                                <div class="pb-1">
-                                    {% if profile.city is not empty %}
-                                        City: {{ profile.city }}
-                                    {% endif %}
-                                </div>
-                                <div class="pb-1">
-                                    {% if profile.zipCode is not empty %}
-                                        ZIP code: {{ profile.zipCode }}
-                                    {% endif %}
-                                </div>
+                                {% if show_full_data_in_profile %}
+                                    <div class="pb-1">
+                                        {% if profile.city is not empty %}
+                                            City: {{ profile.city }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="pb-1">
+                                        {% if profile.zipCode is not empty %}
+                                            ZIP code: {{ profile.zipCode }}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                                 {% if token is not empty %}
                                     <div class="pb-1">
                                         Token: <a href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
@@ -99,54 +101,56 @@
                                             }
                                         }) }}
                                     </div>
-                                    <div class="pb-1">
-                                        {{ form_row(form.city, {'attr':
-                                            {
-                                                'v-model.trim': '$v.city.$model',
-                                                'class': 'form-control',
-                                                'ref': 'city'
-                                            }
-                                        }) }}
-                                    </div>
-                                    <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
-                                        City can contain alphabets and -
-                                    </div>
-                                    <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
-                                        City must have at least 2 letters
-                                    </div>
-                                    <div class="pb-1">
-                                        {{ form_row(form.zipCode, {'attr':
-                                            {
-                                                'v-model.trim': '$v.zipCode.$model',
-                                                'class': 'form-control',
-                                                'ref': 'zipCode',
-                                                'v-on:input': 'zipCodeValidate',
-                                                'v-on:change': 'zipCodeValidate'
-                                            }
-                                        }) }}
-                                    </div>
-                                    <div
-                                        v-if="!$v.zipCode.zipCodeContain"
-                                        v-cloak="$v.zipCode"
-                                        class="text-danger text-center"
-                                    >
-                                        Zip code can contain only letters, numbers, spaces and dashes
-                                    </div>
-                                    <div
-                                        v-else-if="!zipCodeValid"
-                                        v-cloak="$v.zipCode"
-                                        class="text-danger text-center"
-                                    >
-                                        Zip code is not valid for selected country
-                                    </div>
+                                    {% if show_full_data_in_profile %}
+                                        <div class="pb-1">
+                                            {{ form_row(form.city, {'attr':
+                                                {
+                                                    'v-model.trim': '$v.city.$model',
+                                                    'class': 'form-control',
+                                                    'ref': 'city'
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
+                                            City can contain alphabets and -
+                                        </div>
+                                        <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
+                                            City must have at least 2 letters
+                                        </div>
+                                        <div class="pb-1">
+                                            {{ form_row(form.zipCode, {'attr':
+                                                {
+                                                    'v-model.trim': '$v.zipCode.$model',
+                                                    'class': 'form-control',
+                                                    'ref': 'zipCode',
+                                                    'v-on:input': 'zipCodeValidate',
+                                                    'v-on:change': 'zipCodeValidate'
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div
+                                            v-if="!$v.zipCode.zipCodeContain"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            Zip code can contain only letters, numbers, spaces and dashes
+                                        </div>
+                                        <div
+                                            v-else-if="!zipCodeValid"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            Zip code is not valid for selected country
+                                        </div>
 
-                                    <div
-                                        v-else-if="!$v.zipCode.zipCodeWrongChars"
-                                        v-cloak="$v.zipCode"
-                                        class="text-danger text-center"
-                                    >
-                                        Zip code cannot consist only of spaces
-                                    </div>
+                                        <div
+                                            v-else-if="!$v.zipCode.zipCodeWrongChars"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            Zip code cannot consist only of spaces
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-12 pt-3">
                                     <div>

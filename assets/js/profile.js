@@ -34,17 +34,30 @@ new Vue({
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.country = this.$refs.country.value;
-        this.city = this.$refs.city.getAttribute('value');
-        this.zipCode = this.$refs.zipCode.getAttribute('value');
+
+        if (this.$refs.city) {
+            this.city = this.$refs.city.getAttribute('value');
+        }
+
+        if (this.$refs.zipCode) {
+            this.zipCode = this.$refs.zipCode.getAttribute('value');
+        }
+
         this.showEditForm = this.$refs.editFormShowFirst.value;
         this.toggleZipCodeInputDisabled(this.notAvailZipCode);
         this.countryChanged();
     },
     methods: {
         toggleZipCodeInputDisabled: function(state) {
-            this.$refs.zipCode.disabled = state;
+            if (this.$refs.zipCode) {
+                this.$refs.zipCode.disabled = state;
+            }
         },
         countryChanged: function() {
+            if (!this.$refs.zipCode) {
+                return;
+            }
+
             this.country = this.$refs.country.value;
 
             this.toggleZipCodeInputDisabled(true);
