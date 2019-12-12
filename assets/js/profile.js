@@ -47,11 +47,9 @@ new Vue({
         countryChanged: function() {
             this.country = this.$refs.country.value;
 
+            this.toggleZipCodeInputDisabled(true);
             if ('' === this.country) {
-                this.toggleZipCodeInputDisabled(true);
                 this.zipCode = '';
-            } else {
-                this.toggleZipCodeInputDisabled(false);
             }
 
             this.zipCodeProcessing = true;
