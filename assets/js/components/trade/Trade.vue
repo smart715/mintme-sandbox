@@ -5,8 +5,8 @@
                 class="col"
                 :websocket-url="websocketUrl"
                 :market="market"
-                :webchain-supply-url="webchainSupplyUrl">
-            </trade-chart>
+                :webchain-supply-url="webchainSupplyUrl"
+            />
         </div>
         <div class="row">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
