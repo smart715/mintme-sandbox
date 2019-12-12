@@ -91,26 +91,13 @@ class OrdersController extends AbstractFOSRestController
             ? 'getPendingBuyOrders'
             : 'getPendingSellOrders';
 
-        $orders = $this->marketHandler->$method(
+        return array_map(function ($order) {
+            return $this->rebrandingConverter->convertOrder($order);
+        }, $this->marketHandler->$method(
             $market,
             (int)$fetcher->get('offset'),
             (int)$fetcher->get('limit')
-        );
-
-        foreach ($orders as &$order) {
-            $market = $order->getMarket();
-            $base = $market->getBase();
-            $base->setName($this->rebrandingConverter->convert($base->getName()));
-            $base->setSymbol($this->rebrandingConverter->convert($base->getSymbol()));
-            $market->setBase($base);
-            $quote = $market->getQuote();
-            $quote->setName($this->rebrandingConverter->convert($quote->getName()));
-            $quote->setSymbol($this->rebrandingConverter->convert($quote->getSymbol()));
-            $market->setQuote($quote);
-            $order->setMarket($market);
-        }
-
-        return $orders;
+        ));
     }
 
     /**
@@ -150,26 +137,12 @@ class OrdersController extends AbstractFOSRestController
             throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
         }
 
-        $market = new Market($base, $quote);
-        $orders = $this->marketHandler->getExecutedOrders(
-            $market,
+        return array_map(function ($order) {
+            return $this->rebrandingConverter->convertOrder($order);
+        }, $this->marketHandler->getExecutedOrders(
+            new Market($base, $quote),
             (int)$fetcher->get('lastId'),
             (int)$fetcher->get('limit')
-        );
-
-        foreach ($orders as &$order) {
-            $market = $order->getMarket();
-            $base = $market->getBase();
-            $base->setName($this->rebrandingConverter->convert($base->getName()));
-            $base->setSymbol($this->rebrandingConverter->convert($base->getSymbol()));
-            $market->setBase($base);
-            $quote = $market->getQuote();
-            $quote->setName($this->rebrandingConverter->convert($quote->getName()));
-            $quote->setSymbol($this->rebrandingConverter->convert($quote->getSymbol()));
-            $market->setQuote($quote);
-            $order->setMarket($market);
-        }
-
-        return $orders;
+        ));
     }
 }

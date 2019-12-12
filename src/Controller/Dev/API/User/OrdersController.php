@@ -96,27 +96,14 @@ class OrdersController extends AbstractFOSRestController
             return [];
         }
 
-        $orders = $this->marketHandler->getPendingOrdersByUser(
+        return array_map(function ($order) {
+            return $this->rebrandingConverter->convertOrder($order);
+        }, $this->marketHandler->getPendingOrdersByUser(
             $user,
             $markets,
             (int)$fetcher->get('offset'),
             (int)$fetcher->get('limit')
-        );
-
-        foreach ($orders as &$order) {
-            $market = $order->getMarket();
-            $base = $market->getBase();
-            $base->setName($this->rebrandingConverter->convert($base->getName()));
-            $base->setSymbol($this->rebrandingConverter->convert($base->getSymbol()));
-            $market->setBase($base);
-            $quote = $market->getQuote();
-            $quote->setName($this->rebrandingConverter->convert($quote->getName()));
-            $quote->setSymbol($this->rebrandingConverter->convert($quote->getSymbol()));
-            $market->setQuote($quote);
-            $order->setMarket($market);
-        }
-
-        return $orders;
+        ));
     }
 
     /**
@@ -149,27 +136,14 @@ class OrdersController extends AbstractFOSRestController
             return [];
         }
 
-        $orders = $this->marketHandler->getUserExecutedHistory(
+        return array_map(function ($order) {
+            return $this->rebrandingConverter->convertOrder($order);
+        }, $this->marketHandler->getUserExecutedHistory(
             $user,
             $markets,
             (int)$fetcher->get('offset'),
             (int)$fetcher->get('limit')
-        );
-
-        foreach ($orders as &$order) {
-            $market = $order->getMarket();
-            $base = $market->getBase();
-            $base->setName($this->rebrandingConverter->convert($base->getName()));
-            $base->setSymbol($this->rebrandingConverter->convert($base->getSymbol()));
-            $market->setBase($base);
-            $quote = $market->getQuote();
-            $quote->setName($this->rebrandingConverter->convert($quote->getName()));
-            $quote->setSymbol($this->rebrandingConverter->convert($quote->getSymbol()));
-            $market->setQuote($quote);
-            $order->setMarket($market);
-        }
-
-        return $orders;
+        ));
     }
 
     /**

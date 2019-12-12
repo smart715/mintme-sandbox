@@ -71,24 +71,14 @@ class MarketsController extends AbstractFOSRestController
      */
     public function getMarkets(ParamFetcherInterface $fetcher): array
     {
-        $markets = array_values(
+        return array_map(function ($market) {
+            return $this->rebrandingConverter->convertMarketStatus($market);
+        }, array_values(
             $this->marketManager->getMarketsInfo(
                 (int)$fetcher->get('offset'),
                 (int)$fetcher->get('limit')
             )
-        );
-
-        foreach ($markets as &$market) {
-            $base = $market->getCrypto();
-            $base->setName($this->rebrandingConverter->convert($base->getName()));
-            $base->setSymbol($this->rebrandingConverter->convert($base->getSymbol()));
-            $market->setCrypto($base);
-            $quote = $market->getQuote();
-            $quote->setName($this->rebrandingConverter->convert($quote->getName()));
-            $quote->setSymbol($this->rebrandingConverter->convert($quote->getSymbol()));
-        }
-
-        return $markets;
+        ));
     }
 
     /**
@@ -133,14 +123,9 @@ class MarketsController extends AbstractFOSRestController
             throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
         }
 
-        $market = $this->marketHandler->getMarketInfo(
+        return $this->rebrandingConverter->convertMarketInfo($this->marketHandler->getMarketInfo(
             new Market($base, $quote),
             $periods[$fetcher->get('interval')]
-        );
-
-        $market->setCryptoSymbol($this->rebrandingConverter->convert($market->getCryptoSymbol()));
-        $market->setTokenName($this->rebrandingConverter->convert($market->getTokenName()));
-
-        return $market;
+        ));
     }
 }
