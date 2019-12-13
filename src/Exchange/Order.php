@@ -74,16 +74,6 @@ class Order extends AbstractOrder
         return $this->referralId;
     }
 
-    public function getMarket(): Market
-    {
-        return $this->market;
-    }
-
-    public function setMarket(Market $market): void
-    {
-        $this->market = $market;
-    }
-
     public static function createCancelOrder(int $id, User $user, Market $market): self
     {
         return new self(

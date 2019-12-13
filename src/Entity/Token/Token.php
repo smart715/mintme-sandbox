@@ -174,11 +174,6 @@ class Token implements TradebleInterface
         return $this->getName();
     }
 
-    public function setSymbol(string $symbol): self
-    {
-        return $this->setName($symbol);
-    }
-
     public function getCrypto(): ?Crypto
     {
         return $this->crypto;

@@ -152,11 +152,6 @@ class MarketInfo
         return $this->cryptoSymbol;
     }
 
-    public function setCryptoSymbol(string $cryptoSymbol): void
-    {
-        $this->cryptoSymbol = $cryptoSymbol;
-    }
-
     /**
      * @SerializedName("quote")
      * @Groups({"Default", "API", "dev"})

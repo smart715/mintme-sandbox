@@ -26,20 +26,10 @@ class Market
         return $this->base;
     }
 
-    public function setBase(TradebleInterface $base): void
-    {
-        $this->base = $base;
-    }
-
     /** @Groups({"Default", "API", "dev"}) */
     public function getQuote(): TradebleInterface
     {
         return $this->quote;
-    }
-
-    public function setQuote(TradebleInterface $quote): void
-    {
-        $this->quote = $quote;
     }
 
     public function isTokenMarket(): bool
