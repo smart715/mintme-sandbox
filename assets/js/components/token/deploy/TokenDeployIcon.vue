@@ -3,7 +3,7 @@
         <div v-if="deployed" class="deployed-icon">
             <guide>
                 <template slot="icon">
-                    <img class="h-100" src="../../../../img/mintmecoin_W1.png" alt="deployed">
+                    <img class="h-100" src="../../../../img/mintmecoin_W.png" alt="deployed">
                 </template>
                 <template slot="body">
                     This token exists on blockchain.
@@ -16,7 +16,7 @@
         <div v-else-if="notDeployed" class="not-deployed-icon">
             <guide>
                 <template slot="icon">
-                    <img class="h-100" src="../../../../img/mintmecoin_W1.png" alt="not-deployed">
+                    <img class="h-100" src="../../../../img/mintmecoin_W.png" alt="not-deployed">
                 </template>
                 <template slot="body">
                     This token does not exist on blockchain. Token creator can create it on blockchain in token general settings.
