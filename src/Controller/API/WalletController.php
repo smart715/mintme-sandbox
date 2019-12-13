@@ -101,8 +101,7 @@ class WalletController extends AbstractFOSRestController
             );
         } catch (Throwable $exception) {
             return $this->view([
-                /* !!! ATTENTION: TO BE CHANGED 'withdrawl failed' BEFORE MERGING !!! */
-                'error' => 'Error: '.$exception->getMessage().' File: '.$exception->getFile().' Line: '.$exception->getLine(),
+                'error' => 'Withdrawal failed',
             ], Response::HTTP_BAD_GATEWAY);
         }
 
