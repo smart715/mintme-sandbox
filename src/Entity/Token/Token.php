@@ -310,9 +310,9 @@ class Token implements TradebleInterface
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
-        return $this->description ?? '';
+        return $this->description;
     }
 
     public function setDescription(?string $description): self
