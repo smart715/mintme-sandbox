@@ -121,11 +121,11 @@ class TokenController extends Controller
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
-        $tokenDescription = html_entity_decode($token->getDescription());
+        $tokenDescription = preg_replace('~\[([a-z]+)[^]]*].*?\[/\1]~s', '', $token->getDescription());
 
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
-            'tokenDescription' => substr(strip_tags($tokenDescription), 0, 200),
+            'tokenDescription' => substr($tokenDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
