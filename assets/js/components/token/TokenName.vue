@@ -25,7 +25,7 @@
                 @click="editToken"
             />
         </template>
-        <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
+        <span v-b-tooltip="{title: rebrandingFunc(currentName), boundary:'viewport'}">
             {{ currentName|rebranding }}
         </span>
     </div>
