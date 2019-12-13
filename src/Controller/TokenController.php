@@ -121,7 +121,11 @@ class TokenController extends Controller
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
-        $tokenDescription = preg_replace('|[[\/\!](.*)[^\[\]]*?]|si', '', $token->getDescription() ?? '');
+        $tokenDescription = preg_replace(
+            '/\[(\w+)(?!\w)[^\]]*\]((?:(?!\[\/\1).)*?)\[\/\1\]/',
+            '\2',
+            $token->getDescription() ?? ''
+        );
 
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
