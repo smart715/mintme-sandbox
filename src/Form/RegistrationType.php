@@ -7,6 +7,7 @@ use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /** @codeCoverageIgnore  */
 class RegistrationType extends AbstractType
@@ -33,6 +34,16 @@ class RegistrationType extends AbstractType
                 'label' => 'Password:',
             ])
         ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            "allow_extra_fields" => true
+        ));
     }
 
     public function getParent(): string
