@@ -124,7 +124,7 @@ class TokenController extends Controller
 
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
-            'tokenDescription' => substr(strip_tags($token->getDescription()), 0, 200),
+            'tokenDescription' => strip_tags(substr($token->getDescription(), 0, 200)),
             'currency' => Token::WEB_SYMBOL,
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
