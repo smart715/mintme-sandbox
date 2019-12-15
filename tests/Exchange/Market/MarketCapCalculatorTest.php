@@ -2,6 +2,7 @@
 
 namespace App\Tests\Exchange\Market;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Communications\RestRpcInterface;
 use App\Entity\Crypto;
 use App\Entity\MarketStatus;
@@ -44,7 +45,8 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc()
+            $this->mockRpc(),
+            $this->mockCryptoRatesFetcher()
         );
 
         $this->assertEquals('11000', $marketCapCalculator->calculate());
@@ -92,7 +94,8 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc()
+            $this->mockRpc(),
+            $this->mockCryptoRatesFetcher()
         );
 
         $this->assertEquals('412800', $marketCapCalculator->calculate());
@@ -120,7 +123,8 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc()
+            $this->mockRpc(),
+            $this->mockCryptoRatesFetcher()
         );
 
         $this->assertEquals('20000', $marketCapCalculator->calculate('USD'));
@@ -148,7 +152,8 @@ class MarketCapCalculatorTest extends TestCase
             100,
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
-            $this->mockRpc()
+            $this->mockRpc(),
+            $this->mockCryptoRatesFetcher()
         );
 
         $this->expectException(\Throwable::class);
@@ -239,18 +244,7 @@ class MarketCapCalculatorTest extends TestCase
     {
         $rpc = $this->createMock(RestRpcInterface::class);
         $rpc->method('send')->willReturnCallback(function ($url) {
-            if ('simple/price?ids=webchain,bitcoin&vs_currencies=usd,btc' === $url) {
-                return json_encode([
-                    'bitcoin' => [
-                        'usd' => 10,
-                        'btc' => 1,
-                    ],
-                    'webchain' => [
-                        'usd' => 10,
-                        'btc' => 10,
-                    ],
-                ]);
-            } elseif (preg_match('/coins\/markets/', $url)) {
+            if (preg_match('/coins\/markets/', $url)) {
                 $matches = [];
                 preg_match('/(?<=ids=).+(?=&order)/', $url, $matches);
 
@@ -266,5 +260,23 @@ class MarketCapCalculatorTest extends TestCase
         });
 
         return $rpc;
+    }
+
+    private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
+    {
+        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
+
+        $crf->method('get')->willReturn([
+            'WEB' => [
+                'USD' => 10,
+                'BTC' => 10,
+            ],
+            'BTC' => [
+                'USD' => 10,
+                'BTC' => 1,
+            ],
+        ]);
+
+        return $crf;
     }
 }
