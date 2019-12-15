@@ -49,15 +49,18 @@ class CryptoRatesFetcher
 
         $response = json_decode($response, true);
 
-        array_walk($response, function (&$value, &$index) use ($cryptos): void {
-            $index = $cryptos[ucfirst($index)]->getSymbol();
+        $keys = array_map(function ($key) use ($cryptos) {
+            return $cryptos[ucfirst($key)]->getSymbol();
+        }, array_keys($response));
 
-            array_walk($value, function (&$value, &$index): void {
-                $index = strtoupper($index);
-            });
-        });
+        $values = array_map(function ($value) {
+            return array_combine(
+                array_map('strtoupper', array_keys($value)),
+                array_values($value)
+            );
+        }, array_values($response));
 
-        return $response;
+        return array_combine($keys, $values);
     }
 
     public function get(): array
