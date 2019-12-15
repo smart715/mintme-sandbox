@@ -27,10 +27,11 @@ class CryptoManager implements CryptoManagerInterface
         return $this->repository->findAll();
     }
 
-    public function findAllIndexed(string $index): array
+    public function findAllIndexed(string $index, bool $array = false): array
     {
-        return $this->repository->createQueryBuilder('c', "c.{$index}")
-            ->getQuery()
-            ->getArrayResult();
+        $query = $this->repository->createQueryBuilder('c', "c.{$index}")
+            ->getQuery();
+
+        return $array ? $query->getArrayResult() : $query->getResult();
     }
 }

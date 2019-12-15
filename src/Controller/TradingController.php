@@ -46,7 +46,7 @@ class TradingController extends Controller
         return $this->render('pages/trading.html.twig', [
             'tokensCount' => $this->getTokenRepository()->count([]),
             'page' => $page,
-            'cryptos' => $this->normalize($this->cryptoManager->findAllIndexed('name')),
+            'cryptos' => $this->normalize($this->cryptoManager->findAllIndexed('name', true)),
         ]);
     }
 
