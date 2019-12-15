@@ -451,3 +451,7 @@ services:
             $supplyLinks: { Webchain: '%webchain_supply%' }
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CryptoRatesFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
