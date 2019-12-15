@@ -2,7 +2,7 @@
 
 namespace App\Controller\API;
 
-use App\Communications\CryptoRatesFetcher;
+use App\Communications\CryptoRatesFetcherInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -17,7 +17,7 @@ class CryptosController extends APIController
      * @Rest\View()
      * @Rest\Get("/rates", name="exchange_rates", options={"expose"=true})
      */
-    public function getRates(CryptoRatesFetcher $cryptoRatesFetcher): View
+    public function getRates(CryptoRatesFetcherInterface $cryptoRatesFetcher): View
     {
         return $this->view($cryptoRatesFetcher->get());
     }

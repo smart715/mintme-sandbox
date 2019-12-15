@@ -455,3 +455,5 @@ services:
     App\Communications\CryptoRatesFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CryptoRatesFetcher'
