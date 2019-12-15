@@ -11,5 +11,5 @@ interface CryptoManagerInterface
     /** @return Crypto[] */
     public function findAll(): array;
 
-    public function findAllIndexed(string $index, bool $array): array;
+    public function findAllIndexed(string $index, bool $array = false): array;
 }

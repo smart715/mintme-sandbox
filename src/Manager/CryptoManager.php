@@ -32,6 +32,8 @@ class CryptoManager implements CryptoManagerInterface
         $query = $this->repository->createQueryBuilder('c', "c.{$index}")
             ->getQuery();
 
-        return $array ? $query->getArrayResult() : $query->getResult();
+        return $array
+            ? $query->getArrayResult()
+            : $query->getResult();
     }
 }

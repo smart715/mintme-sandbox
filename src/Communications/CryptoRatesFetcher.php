@@ -60,7 +60,7 @@ class CryptoRatesFetcher
             );
         }, array_values($response));
 
-        return array_combine($keys, $values);
+        return array_combine($keys, $values) ?: [];
     }
 
     public function get(): array
