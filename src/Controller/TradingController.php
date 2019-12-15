@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Token\Token;
 use App\Exchange\Market;
-use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Repository\TokenRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -18,14 +17,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class TradingController extends Controller
 {
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
 
     public function __construct(
-        CryptoManagerInterface $cryptoManager,
         NormalizerInterface $normalizer
     ) {
-        $this->cryptoManager = $cryptoManager;
 
         parent::__construct($normalizer);
     }
@@ -46,7 +41,6 @@ class TradingController extends Controller
         return $this->render('pages/trading.html.twig', [
             'tokensCount' => $this->getTokenRepository()->count([]),
             'page' => $page,
-            'cryptos' => $this->normalize($this->cryptoManager->findAllIndexed('name', true)),
         ]);
     }
 

@@ -102,7 +102,6 @@ export default {
         page: Number,
         tokensCount: Number,
         userId: Number,
-        cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
         webchainSupplyUrl: String,
@@ -454,21 +453,12 @@ export default {
             this.klineQueriesIdsTokensMap.set(id, market);
         },
         fetchConversionRates: function() {
-            let ids = Object.keys(this.cryptos).map((name) => name.toLowerCase()).join();
-
-            let config = {
-                params: {
-                    ids,
-                    vs_currencies: USD.symbol.toLowerCase(),
-                },
-            };
 
             return new Promise((resolve, reject) => {
-                this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
+                this.$axios.retry.get(this.$routing.generate('exchange_rates'))
                 .then((res) => {
-                    Object.keys(res.data).map((name) => {
-                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name][USD.symbol.toLowerCase()];
-                    });
+
+                    this.conversionRates = res.data;
                     resolve();
                 })
                 .catch((err) => {
@@ -477,7 +467,7 @@ export default {
             });
         },
         toUSD: function(amount, currency, subunit = false) {
-            amount = Decimal.mul(amount, this.conversionRates[currency]);
+            amount = Decimal.mul(amount, this.conversionRates[currency][USD.symbol]);
             return (subunit ? toMoney(amount, USD.subunit) : this.toMoney(amount)) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
