@@ -6,7 +6,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use Symfony\Component\HttpFoundation\Request;
 
-class CryptoRatesFetcher
+class CryptoRatesFetcher implements CryptoRatesFetcherInterface
 {
     /** @var CryptoManagerInterface */
     private $cryptoManager;
