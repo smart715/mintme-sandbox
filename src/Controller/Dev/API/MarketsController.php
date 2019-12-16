@@ -5,13 +5,17 @@ namespace App\Controller\Dev\API;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\MarketInfo;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route(path="/dev/api/v1/markets")
@@ -26,12 +30,27 @@ class MarketsController extends AbstractFOSRestController
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     public function __construct(
         MarketStatusManagerInterface $marketManager,
-        MarketHandlerInterface $marketHandler
+        MarketHandlerInterface $marketHandler,
+        RebrandingConverterInterface $rebrandingConverter,
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ) {
         $this->marketManager = $marketManager;
         $this->marketHandler = $marketHandler;
+        $this->rebrandingConverter = $rebrandingConverter;
+        $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -53,12 +72,14 @@ class MarketsController extends AbstractFOSRestController
      */
     public function getMarkets(ParamFetcherInterface $fetcher): array
     {
-        return array_values(
+        return array_map(function ($market) {
+            return $this->rebrandingConverter->convertMarketStatus($market);
+        }, array_values(
             $this->marketManager->getMarketsInfo(
                 (int)$fetcher->get('offset'),
                 (int)$fetcher->get('limit')
             )
-        );
+        ));
     }
 
     /**
@@ -85,17 +106,38 @@ class MarketsController extends AbstractFOSRestController
      * @SWG\Parameter(name="quote", in="path", description="Quote name", type="string")
      * @SWG\Tag(name="Markets")
      */
-    public function getMarket(Market $market, ParamFetcherInterface $fetcher): MarketInfo
+    public function getMarket(string $base, string $quote, ParamFetcherInterface $fetcher): MarketInfo
     {
+        $this->checkForDisallowedValues($base, $quote);
+
         $periods = [
             '1h'   => 3600,
             '1d'   => 86400,
             '7d'   => 604800,
         ];
 
-        return $this->marketHandler->getMarketInfo(
-            $market,
+        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($base));
+        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($quote));
+
+        $base = $this->cryptoManager->findBySymbol($base);
+        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        if (is_null($base) || is_null($quote)) {
+            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->rebrandingConverter->convertMarketInfo($this->marketHandler->getMarketInfo(
+            new Market($base, $quote),
             $periods[$fetcher->get('interval')]
-        );
+        ));
+    }
+
+    private function checkForDisallowedValues(string $base, string $quote): void
+    {
+        $disallowedValues = ['web'];
+
+        if (in_array(mb_strtolower($base), $disallowedValues) || in_array(mb_strtolower($quote), $disallowedValues)) {
+            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+        }
     }
 }
