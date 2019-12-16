@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Throwable;
 
@@ -143,7 +144,8 @@ class RegistrationController extends FOSRegistrationController
 
                 $this->userManager->updateUser($user);
 
-                if ($form->has('bonus')) {
+                if ($this->generateUrl('sign_up', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                    === $request->headers->get('referer')) {
                     $bonus = new Bonus($user, Bonus::PENDING_STATUS, Bonus::BONUS_WEB);
                     $this->em->persist($bonus);
                     $this->em->flush();
