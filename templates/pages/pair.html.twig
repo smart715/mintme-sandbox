@@ -1,7 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block head %}
+{% block metaDescription %}
     {% if isTokenPage %}
+        <meta property="og:description" content="{{ tokenDescription }}">
         <meta name="description" content="{{ tokenDescription }}">
     {% endif %}
 {% endblock %}
