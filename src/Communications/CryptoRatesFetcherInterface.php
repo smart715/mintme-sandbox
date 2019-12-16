@@ -4,5 +4,5 @@ namespace App\Communications;
 
 interface CryptoRatesFetcherInterface
 {
-    public function get(): array;
+    public function fetch(): array;
 }

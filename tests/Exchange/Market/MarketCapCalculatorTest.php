@@ -266,7 +266,7 @@ class MarketCapCalculatorTest extends TestCase
     {
         $crf = $this->createMock(CryptoRatesFetcherInterface::class);
 
-        $crf->method('get')->willReturn([
+        $crf->method('fetch')->willReturn([
             'WEB' => [
                 'USD' => 10,
                 'BTC' => 10,

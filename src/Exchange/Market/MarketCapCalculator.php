@@ -160,7 +160,7 @@ class MarketCapCalculator
             return $this->exchange;
         }
 
-        $rates = $this->cryptoRatesFetcher->get();
+        $rates = $this->cryptoRatesFetcher->fetch();
         $rates[Token::WEB_SYMBOL][Token::WEB_SYMBOL] = 1;
 
         return $this->exchange = new FixedExchange($rates);

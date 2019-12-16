@@ -19,6 +19,6 @@ class CryptosController extends APIController
      */
     public function getRates(CryptoRatesFetcherInterface $cryptoRatesFetcher): View
     {
-        return $this->view($cryptoRatesFetcher->get());
+        return $this->view($cryptoRatesFetcher->fetch());
     }
 }

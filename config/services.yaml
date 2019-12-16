@@ -452,8 +452,8 @@ services:
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
 
-    App\Communications\CryptoRatesFetcher:
+    App\Communications\CachedCryptoRatesFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
 
-    App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CryptoRatesFetcher'
+    App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
