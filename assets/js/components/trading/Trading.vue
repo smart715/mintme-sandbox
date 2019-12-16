@@ -93,7 +93,6 @@ import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
