@@ -142,9 +142,6 @@ export default {
                 } else {
                     this.$toasted.error('An error has occurred, please try again later');
                 }
-            })
-            .then(() => {
-                this.submitting = false;
             });
         },
     },
