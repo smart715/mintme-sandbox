@@ -83,7 +83,7 @@ class RegistrationController extends FOSRegistrationController
      */
     public function signUpLanding(Request $request): Response
     {
-        $form = $this->formFactory->createForm()->add('bonus', HiddenType::class);
+        $form = $this->formFactory->createForm();
 
         if ($this->bonusManager->isLimitReached($this->getParameter('landing_web_bonus_limit'))) {
             return $this->redirectToRoute('homepage');
