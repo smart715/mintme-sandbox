@@ -453,11 +453,9 @@ export default {
             this.klineQueriesIdsTokensMap.set(id, market);
         },
         fetchConversionRates: function() {
-
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('exchange_rates'))
                 .then((res) => {
-
                     this.conversionRates = res.data;
                     resolve();
                 })
