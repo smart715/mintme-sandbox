@@ -141,6 +141,7 @@ class TokenController extends Controller
                 $tokenNameConverter->convert($token) :
                 '',
             'precision' => $this->getParameter('token_precision'),
+            'isTokenPage' => true,
         ]);
     }
 
