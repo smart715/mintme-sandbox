@@ -6,6 +6,7 @@ use App\Communications\CryptoRatesFetcherInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/cryptos")
@@ -19,6 +20,12 @@ class CryptosController extends APIController
      */
     public function getRates(CryptoRatesFetcherInterface $cryptoRatesFetcher): View
     {
-        return $this->view($cryptoRatesFetcher->fetch());
+        try {
+            return $this->view($cryptoRatesFetcher->fetch());
+        } catch (\Throwable $e) {
+            return $this->view([
+                'error' => 'Rates could not be fetched.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

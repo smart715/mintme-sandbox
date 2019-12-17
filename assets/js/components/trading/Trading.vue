@@ -209,7 +209,7 @@ export default {
         let conversionRatesPromise = this.fetchConversionRates();
         this.fetchGlobalMarketCap();
 
-        Promise.all([updateDataPromise, conversionRatesPromise])
+        Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
             .then(() => {
                 this.updateDataWithMarkets();
                 this.loading = false;
@@ -455,16 +455,22 @@ export default {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('exchange_rates'))
                 .then((res) => {
+                    if (!(res.data && Object.keys(res.data).length)) {
+                        return Promise.reject();
+                    }
+
                     this.conversionRates = res.data;
                     resolve();
                 })
                 .catch((err) => {
+                    this.$emit('disable-usd');
+                    this.$toasted.error('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
                     reject();
                 });
             });
         },
         toUSD: function(amount, currency, subunit = false) {
-            amount = Decimal.mul(amount, this.conversionRates[currency][USD.symbol]);
+            amount = Decimal.mul(amount, ((this.conversionRates[currency] || [])[USD.symbol] || 1));
             return (subunit ? toMoney(amount, USD.subunit) : this.toMoney(amount)) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
