@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Token\Token;
 use App\Exception\NotFoundPairException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\CryptoManagerInterface;
