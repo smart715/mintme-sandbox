@@ -5,6 +5,7 @@ namespace App\Consumers;
 use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\DepositCompletedEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\DepositCryptoStrategy;
@@ -20,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DepositConsumer implements ConsumerInterface
 {
@@ -50,6 +52,9 @@ class DepositConsumer implements ConsumerInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -59,7 +64,8 @@ class DepositConsumer implements ConsumerInterface
         MoneyWrapperInterface $moneyWrapper,
         ClockInterface $clock,
         WalletInterface $depositCommunicator,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -70,6 +76,7 @@ class DepositConsumer implements ConsumerInterface
         $this->clock = $clock;
         $this->depositCommunicator = $depositCommunicator;
         $this->em = $em;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
@@ -123,6 +130,11 @@ class DepositConsumer implements ConsumerInterface
 
             $balanceContext = new BalanceContext($strategy);
             $balanceContext->doDeposit($tradable, $user, $clbResult->getAmount());
+
+            $this->eventDispatcher->dispatch(
+                DepositCompletedEvent::NAME,
+                new DepositCompletedEvent($tradable, $user, $clbResult->getAmount())
+            );
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
