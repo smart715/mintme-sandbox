@@ -314,6 +314,12 @@ services:
 
     App\Mailer\MailerInterface: "@app.mailer"
 
+    app.instant.mailer:
+        class: App\Mailer\Mailer
+        arguments:
+            $mail: "%env(MAILER_USER)%"
+            $mailer: '@swiftmailer.mailer.instant_mailer'
+
     App\Exchange\Balance\Factory\BalanceViewFactory:
         arguments:
             $tokenSubunit: "%token_precision%"
@@ -451,3 +457,7 @@ services:
             $supplyLinks: { Webchain: '%mintme_supply%' }
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\EventSubscriber\TransactionSubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
