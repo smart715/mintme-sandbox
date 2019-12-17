@@ -7,7 +7,9 @@
             @close="$emit('close')"
         >
             <template slot="header">
-                <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
+                <span class="modal-title py-2 pl-4 d-inline-block truncate-name w-100">
+                    {{ currentName }}
+                </span>
             </template>
             <template slot="body">
                 <div class="token-edit p-0">
