@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dev\API;
 
+use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -152,10 +153,10 @@ class OrdersController extends AbstractFOSRestController
 
     private function checkForDisallowedValues(ParamFetcherInterface $request): void
     {
-        $disallowedValues = ['web'];
+        $disallowedValues = [Token::WEB_SYMBOL];
 
-        if (in_array(mb_strtolower($request->get('base')), $disallowedValues)
-            || in_array(mb_strtolower($request->get('quote')), $disallowedValues)) {
+        if (in_array(mb_strtoupper($request->get('base')), $disallowedValues)
+            || in_array(mb_strtoupper($request->get('quote')), $disallowedValues)) {
             throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
         }
     }

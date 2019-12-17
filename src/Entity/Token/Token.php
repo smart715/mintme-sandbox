@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Token implements TradebleInterface
 {
+    public const MINTME_SYMBOL = "MINTME";
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
     public const NAME_MIN_LENGTH = 4;

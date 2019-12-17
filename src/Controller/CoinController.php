@@ -32,15 +32,15 @@ class CoinController extends Controller
     public function pair(string $base, string $quote): Response
     {
         // rebranding
-        if ('WEB' === mb_strtoupper($quote)) {
+        if (Token::WEB_SYMBOL === mb_strtoupper($quote)) {
             return $this->redirectToRoute('coin', [
                 'base' => mb_strtoupper($base),
-                'quote' => 'MINTME',
+                'quote' => Token::MINTME_SYMBOL,
             ]);
         }
 
-        $base = str_replace('MINTME', 'WEB', mb_strtoupper($base));
-        $quote = str_replace('MINTME', 'WEB', mb_strtoupper($quote));
+        $base = str_replace(Token::MINTME_SYMBOL, Token::WEB_SYMBOL, mb_strtoupper($base));
+        $quote = str_replace(Token::MINTME_SYMBOL, Token::WEB_SYMBOL, mb_strtoupper($quote));
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol(strtoupper($quote));

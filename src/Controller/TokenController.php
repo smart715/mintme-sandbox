@@ -102,8 +102,8 @@ class TokenController extends Controller
         }
 
         //rebranding
-        if ('MINTME' === mb_strtoupper($name)) {
-            $name = 'WEB';
+        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
+            $name = Token::WEB_SYMBOL;
         }
 
         $token = $this->tokenManager->findByName($name);
