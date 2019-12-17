@@ -147,9 +147,9 @@ class RegistrationController extends FOSRegistrationController
                 if ($this->generateUrl('sign_up', [], UrlGeneratorInterface::ABSOLUTE_URL)
                     === $request->headers->get('referer')) {
                     $bonus = new Bonus($user, Bonus::PENDING_STATUS, Bonus::BONUS_WEB);
+                    $user->setBonus($bonus);
                     $this->em->persist($bonus);
                     $this->em->flush();
-                    $user->setBonus($bonus);
                 }
 
                 if (null === $event->getResponse()) {
