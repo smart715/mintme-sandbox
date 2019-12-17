@@ -5,6 +5,7 @@ namespace App\Consumers;
 use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\WithdrawCompletedEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\PaymentCryptoStrategy;
@@ -19,9 +20,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentConsumer implements ConsumerInterface
 {
+    private const STATUS_OK = 'ok';
+
+    private const STATUS_FAIL = 'fail';
+
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
@@ -46,6 +52,9 @@ class PaymentConsumer implements ConsumerInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -54,7 +63,8 @@ class PaymentConsumer implements ConsumerInterface
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
         ClockInterface $clock,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -64,6 +74,7 @@ class PaymentConsumer implements ConsumerInterface
         $this->moneyWrapper = $moneyWrapper;
         $this->clock = $clock;
         $this->em = $em;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
@@ -95,17 +106,17 @@ class PaymentConsumer implements ConsumerInterface
             return true;
         }
 
-        if ('fail' === $clbResult->getStatus()) {
+        $tradable = $this->cryptoManager->findBySymbol($clbResult->getCrypto())
+            ?? $this->tokenManager->findByName($clbResult->getCrypto());
+
+        if (!$tradable) {
+            $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
+
+            return true;
+        }
+
+        if (self::STATUS_FAIL === $clbResult->getStatus()) {
             try {
-                $tradable = $this->cryptoManager->findBySymbol($clbResult->getCrypto())
-                    ?? $this->tokenManager->findByName($clbResult->getCrypto());
-
-                if (!$tradable) {
-                    $this->logger->info('[payment-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
-
-                    return true;
-                }
-
                 $strategy = $tradable instanceof Token
                     ? new PaymentTokenStrategy($this->balanceHandler, $this->cryptoManager)
                     : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
@@ -124,6 +135,11 @@ class PaymentConsumer implements ConsumerInterface
 
                 return false;
             }
+        } elseif (self::STATUS_OK === $clbResult->getStatus()) {
+            $this->eventDispatcher->dispatch(
+                WithdrawCompletedEvent::NAME,
+                new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount())
+            );
         }
 
         return true;
