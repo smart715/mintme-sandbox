@@ -1,9 +1,20 @@
 swiftmailer:
-    transport: '%env(MAILER_TRANSPORT)%'
-    host: '%env(MAILER_HOST)%'
-    username: '%env(MAILER_USER)%'
-    password: '%env(MAILER_PASSWORD)%'
-    port: '%env(MAILER_PORT)%'
-    auth_mode: '%env(MAILER_AUTH_MODE)%'
-    encryption: '%env(MAILER_ENCRYPTION)%'
-    spool: { type: 'memory' }
+  default_mailer: spool_mailer
+  mailers:
+    spool_mailer:
+      transport: '%env(MAILER_TRANSPORT)%'
+      host: '%env(MAILER_HOST)%'
+      username: '%env(MAILER_USER)%'
+      password: '%env(MAILER_PASSWORD)%'
+      port: '%env(MAILER_PORT)%'
+      auth_mode: '%env(MAILER_AUTH_MODE)%'
+      encryption: '%env(MAILER_ENCRYPTION)%'
+      spool: { type: 'memory' }
+    instant_mailer:
+      transport: '%env(MAILER_TRANSPORT)%'
+      host: '%env(MAILER_HOST)%'
+      username: '%env(MAILER_USER)%'
+      password: '%env(MAILER_PASSWORD)%'
+      port: '%env(MAILER_PORT)%'
+      auth_mode: '%env(MAILER_AUTH_MODE)%'
+      encryption: '%env(MAILER_ENCRYPTION)%'
