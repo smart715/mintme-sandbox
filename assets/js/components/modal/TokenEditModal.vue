@@ -37,6 +37,7 @@
                                     :release-address="releaseAddress"
                                     :token-name="currentName"
                                     :twofa="twofa"
+                                    @update-release-address="$emit('update-release-address')"
                                 />
                             </template>
                         </faq-item>

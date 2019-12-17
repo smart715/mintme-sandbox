@@ -16,6 +16,7 @@
                 :release-address="releaseAddress"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
+                @update-release-address="updateReleaseAddress"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -104,6 +105,9 @@ export default {
             }
 
             this.showTokenEditModal = true;
+        },
+        updateReleaseAddress: function() {
+            this.releaseAddress = '0x';
         },
     },
 };
