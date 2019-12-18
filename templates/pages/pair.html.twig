@@ -2,8 +2,12 @@
 
 {% block metaDescription %}
     {% if isTokenPage %}
-        <meta property="og:description" content="{{ tokenDescription }}">
-        <meta name="description" content="{{ tokenDescription }}">
+        {% if tokenDescription is defined %}
+            <meta property="og:description" content="{{ tokenDescription }}">
+            <meta name="description" content="{{ tokenDescription }}">
+        {% else %}
+            {{ parent() }}
+        {% endif %}
     {% else %}
         {{ parent() }}
     {% endif %}
