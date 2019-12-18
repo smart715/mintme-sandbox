@@ -21,6 +21,7 @@
                     :sort-by="fields.volume.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare"
+                    sort-direction="desc"
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
