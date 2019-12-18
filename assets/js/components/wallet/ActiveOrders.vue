@@ -49,11 +49,11 @@ import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
+import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin, NotificationMixin} from '../../mixins';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
+    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, NotificationMixin],
     components: {
         ConfirmModal,
     },
@@ -162,7 +162,7 @@ export default {
                     }
                 }, 'active-tableData-update');
             })
-            .catch(() => this.$toasted.error('Can not update order list now. Try again later'));
+            .catch(() => this.notifyError('Can not update order list now. Try again later'));
     },
     methods: {
         updateTableData: function() {
@@ -186,7 +186,7 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch(() => {
-                        this.$toasted.error('Can not update orders history. Try again later.');
+                        this.notifyError('Can not update orders history. Try again later.');
                         reject([]);
                     });
             });
@@ -208,7 +208,7 @@ export default {
         removeOrder: function() {
             this.$axios.single.post(this.actionUrl, {'orderData': [this.currentRow.id]})
                 .catch(() => {
-                    this.$toasted.show('Service unavailable, try again later');
+                    this.notifyError('Service unavailable, try again later');
                 });
         },
         getMarketFromName: function(name) {

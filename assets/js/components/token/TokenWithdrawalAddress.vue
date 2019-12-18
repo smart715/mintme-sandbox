@@ -70,9 +70,11 @@
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {addressLength, addressContain} from '../../utils/constants';
+import {NotificationMixin} from '../../mixins';
 
 export default {
     name: 'TokenWithdrawalAddress',
+    mixins: [NotificationMixin],
     components: {
         TwoFactorModal,
     },
@@ -118,13 +120,13 @@ export default {
                 this.closeModal();
                 return;
             } else if (!this.$v.newAddress.addressContain) {
-                this.$toasted.error('Withdrawal address can contain alphabets and numbers');
+                this.notifyError('Withdrawal address can contain alphabets and numbers');
                 return;
             } else if (!this.$v.newAddress.minLength) {
-                this.$toasted.error(`Withdrawal address should have at least ${addressLength.WEB.min} symbols`);
+                this.notifyError(`Withdrawal address should have at least ${addressLength.WEB.min} symbols`);
                 return;
             } else if (!this.$v.newAddress.maxLength) {
-                this.$toasted.error(`Withdrawal address can not be longer than ${addressLength.WEB.max} characters`);
+                this.notifyError(`Withdrawal address can not be longer than ${addressLength.WEB.max} characters`);
                 return;
             }
 
@@ -149,14 +151,14 @@ export default {
             })
             .then(() => {
                 this.setUpdatingState();
-                this.$toasted.success('Updating address is pending.');
+                this.notifySuccess('Updating address is pending.');
             }, (error) => {
                 if (!error.response) {
-                    this.$toasted.error('Network error');
+                    this.notifyError('Network error');
                 } else if (error.response.data.message) {
-                    this.$toasted.error(error.response.data.message);
+                    this.notifyError(error.response.data.message);
                 } else {
-                    this.$toasted.error('An error has occurred, please try again later');
+                    this.notifyError('An error has occurred, please try again later');
                 }
             })
             .then(() => {
