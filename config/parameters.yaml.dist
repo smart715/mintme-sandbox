@@ -97,3 +97,6 @@ parameters:
 
     # Time that has to pass to be able to request password reset link again, in seconds
     password_reset_retry_time: 3600 
+
+    # Switch hide or show personal data in profile page (like city and zip code)
+    show_full_data_in_profile: false
