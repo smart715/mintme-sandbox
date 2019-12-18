@@ -467,6 +467,11 @@ services:
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
 
+    app.profile.form:
+        class: App\Form\ProfileType
+        arguments:
+            $showFullDataInProfile: '%show_full_data_in_profile%'
+
     App\EventSubscriber\TransactionSubscriber:
         arguments:
             $mailer: '@app.instant.mailer'
