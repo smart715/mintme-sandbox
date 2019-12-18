@@ -37,7 +37,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faYoutubeSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin} from '../../../mixins';
+import {FiltersMixin, NotificationMixin} from '../../../mixins';
 import gapi from 'gapi';
 import Guide from '../../Guide';
 
@@ -59,7 +59,7 @@ export default {
         FontAwesomeIcon,
         Guide,
     },
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, NotificationMixin],
     created: function() {
         if (this.editable) {
             this.loadYoutubeClient();
@@ -101,7 +101,7 @@ export default {
                     .then((channelId) => {
                         this.saveYoutubeChannel(channelId);
                     }), (error) => {
-                        this.$toasted.info('Operation canceled');
+                        this.notifyInfo('Operation canceled');
                     });
         },
         deleteChannel: function() {
@@ -122,17 +122,17 @@ export default {
                         let message = channelId
                             ? `Youtube channel saved as ${this.buildYoutubeUrl(channelId)}`
                             : 'Youtube channel deleted';
-                        this.$toasted.success(message);
+                        this.notifySuccess(message);
                         this.currentChannelId = channelId;
                         this.$emit('saveYoutube', channelId);
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.$toasted.error('Network error');
+                        this.notifyError('Network error');
                     } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
+                        this.notifyError(error.response.data.message);
                     } else {
-                        this.$toasted.error('An error has occurred, please try again later');
+                        this.notifyError('An error has occurred, please try again later');
                     }
                 })
                 .then(() => {

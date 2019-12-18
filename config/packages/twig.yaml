@@ -20,3 +20,4 @@ twig:
         trusted_device_enabled: '%trusted_device_enabled%'
         trusted_device_cookie_lifetime: '%trusted_device_cookie_lifetime%'
         mintme_supply: '%mintme_supply%'
+        show_full_data_in_profile: '%show_full_data_in_profile%'
