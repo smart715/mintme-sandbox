@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block metaDescription %}
-    {% if isTokenPage %}
+{% if isTokenPage %}
+    {% block metaDescription %}
         <meta property="og:description" content="{{ tokenDescription }}">
         <meta name="description" content="{{ tokenDescription }}">
-    {% endif %}
-{% endblock %}
+    {% endblock %}
+{% endif %}
 
 {% block title %}
     {% if tab|default == 'intro' %}Information about {% endif %}
