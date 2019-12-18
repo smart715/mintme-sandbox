@@ -35,16 +35,11 @@
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import {WebSocketMixin, FiltersMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, NotificationMixin} from '../../mixins';
 import TokenEditModal from '../modal/TokenEditModal';
 
 library.add(faEdit);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 export default {
     name: 'TokenName',
@@ -64,7 +59,7 @@ export default {
         FontAwesomeIcon,
         TokenEditModal,
     },
-    mixins: [WebSocketMixin, FiltersMixin, clickaway],
+    mixins: [WebSocketMixin, FiltersMixin, clickaway, NotificationMixin],
     data() {
         return {
             currentName: this.name,
@@ -98,7 +93,7 @@ export default {
                 name: this.currentName,
             }))
             .then((res) => this.isTokenExchanged = res.data)
-            .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
+            .catch(() => this.notifyError('Can not fetch token data now. Try later'));
         },
         editToken: function() {
             if (!this.editable) {

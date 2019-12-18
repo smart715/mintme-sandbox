@@ -80,7 +80,7 @@
 <script>
 import TwoFactorModal from '../../modal/TwoFactorModal';
 import {toMoney, formatMoney} from '../../../utils';
-import {WebSocketMixin} from '../../../mixins';
+import {WebSocketMixin, NotificationMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
 import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
 
@@ -89,7 +89,7 @@ export default {
     components: {
         TwoFactorModal,
     },
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, NotificationMixin],
     props: {
         twofa: Boolean,
         hasReleasePeriod: Boolean,
@@ -163,15 +163,15 @@ export default {
             .then(() => {
                 this.status = tokenDeploymentStatus.pending;
                 this.$emit('pending');
-                this.$toasted.success('Process in pending status and it will take some minutes to be done.');
+                this.notifySuccess('Process in pending status and it will take some minutes to be done.');
             })
             .catch(({response}) => {
                 if (!response) {
-                    this.$toasted.error('Network error');
+                    this.notifyError('Network error');
                 } else if (response.data.message) {
-                    this.$toasted.error(response.data.message);
+                    this.notifyError(response.data.message);
                 } else {
-                    this.$toasted.error('An error has occurred, please try again later');
+                    this.notifyError('An error has occurred, please try again later');
                 }
             })
             .then(() => this.deploying = false);
