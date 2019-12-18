@@ -117,6 +117,7 @@ services:
     volumes:
       - .docker/sql:/docker-entrypoint-initdb.d
       - .docker/my.cnf:/etc/mysql/my.cnf
+      - .docker/db:/var/lib/mysql
 
   rabbitmq:
     image: rabbitmq:3-management
