@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Profile;
 use App\Form\DataTransformer\NameTransformer;
 use App\Form\DataTransformer\XSSProtectionTransformer;
+use App\Form\DataTransformer\ZipCodeTransformer;
 use App\Form\Type\BbcodeEditorType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -22,12 +23,22 @@ class ProfileType extends AbstractType
     /** @var XSSProtectionTransformer */
     private $xssProtectionTransformer;
 
+    /** @var ZipCodeTransformer */
+    private $zipCodeTransformer;
+
+    /** @var bool */
+    private $showFullDataInProfile;
+
     public function __construct(
         NameTransformer $nameTransformer,
-        XSSProtectionTransformer $xssProtectionTransformer
+        XSSProtectionTransformer $xssProtectionTransformer,
+        ZipCodeTransformer $zipCodeTransformer,
+        bool $showFullDataInProfile
     ) {
         $this->nameTransformer = $nameTransformer;
         $this->xssProtectionTransformer = $xssProtectionTransformer;
+        $this->zipCodeTransformer = $zipCodeTransformer;
+        $this->showFullDataInProfile = $showFullDataInProfile;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -42,14 +53,6 @@ class ProfileType extends AbstractType
             ])
             ->add('lastName', TextType::class, [
                 'label' => 'Last name:',
-                'attr' => [
-                    'minlength' => 2,
-                    'maxlength' => 30,
-                ],
-            ])
-            ->add('city', TextType::class, [
-                'label' => 'City:',
-                'required' => false,
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -76,17 +79,38 @@ class ProfileType extends AbstractType
                 'label_attr' => ['class' => 'custom-control-label'],
             ]);
 
+        if ($this->showFullDataInProfile) {
+            $builder
+                ->add('city', TextType::class, [
+                    'label' => 'City:',
+                    'required' => false,
+                    'attr' => [
+                        'minlength' => 2,
+                        'maxlength' => 30,
+                    ],
+                ])
+                ->add('zipCode', TextType::class, [
+                    'label' => 'ZIP code:',
+                    'required' => false,
+                ]);
+        }
+
         $builder->get('firstName')
             ->addModelTransformer($this->nameTransformer);
 
         $builder->get('lastName')
             ->addModelTransformer($this->nameTransformer);
 
-        $builder->get('city')
-            ->addModelTransformer($this->nameTransformer);
-
         $builder->get('description')
             ->addModelTransformer($this->xssProtectionTransformer);
+
+        if ($this->showFullDataInProfile) {
+            $builder->get('city')
+                ->addModelTransformer($this->nameTransformer);
+
+            $builder->get('zipCode')
+                ->addModelTransformer($this->zipCodeTransformer);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
