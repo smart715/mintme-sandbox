@@ -1,11 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% if isTokenPage %}
-    {% block metaDescription %}
+{% block metaDescription %}
+    {% if isTokenPage %}
         <meta property="og:description" content="{{ tokenDescription }}">
         <meta name="description" content="{{ tokenDescription }}">
-    {% endblock %}
-{% endif %}
+    {% else %}
+        <meta property="og:description" content="MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.">
+        <meta name="description" content="MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.">
+    {% endif %}
+{% endblock %}
 
 {% block title %}
     {% if tab|default == 'intro' %}Information about {% endif %}
