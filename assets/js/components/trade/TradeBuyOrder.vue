@@ -133,18 +133,11 @@
                 </div>
             </div>
         </div>
-        <order-modal
-            :type="modalSuccess"
-            :title="modalTitle"
-            :visible="showModal"
-            @close="showModal = false"
-        />
     </div>
 </template>
 
 <script>
 import Guide from '../Guide';
-import OrderModal from '../modal/OrderModal';
 import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -155,7 +148,6 @@ export default {
     mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin],
     components: {
         Guide,
-        OrderModal,
     },
     props: {
         loginUrl: String,
@@ -186,7 +178,7 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
-                    this.showModalAction({
+                    this.showNotification({
                         result: 2,
                         message: `Total amount has to be at least ${this.minTotalPrice} ${this.market.base.symbol}`,
                     });
@@ -209,7 +201,7 @@ export default {
                         if (data.result === 1) {
                             this.resetOrder();
                         }
-                        this.showModalAction(data);
+                        this.showNotification(data);
                         this.placingOrder = false;
                     })
                     .catch((error) => this.handleOrderError(error))

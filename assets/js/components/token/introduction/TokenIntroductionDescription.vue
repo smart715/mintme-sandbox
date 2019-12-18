@@ -97,17 +97,14 @@ import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
 import BbcodeView from '../../bbcode/BbcodeView';
 import LimitedTextarea from '../../LimitedTextarea';
-import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {NotificationMixin} from '../../../mixins';
 
 library.add(faEdit);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 export default {
     name: 'TokenIntroductionDescription',
+    mixins: [NotificationMixin],
     props: {
         description: String,
         editable: Boolean,
@@ -149,9 +146,9 @@ export default {
             this.readyToSave = false;
             if (this.$v.$invalid) {
                 if (!this.$v.newDescription.minLength || !this.$v.newDescription.required) {
-                    this.$toasted.error('Token Description must be more than one character');
+                    this.notifyError('Token Description must be more than one character');
                 } else if (!this.$v.newDescription.maxLength) {
-                    this.$toasted.error(`Token Description must be less than ${this.maxDescriptionLength} characters`);
+                    this.notifyError(`Token Description must be less than ${this.maxDescriptionLength} characters`);
                 }
                 return;
             }
@@ -166,11 +163,11 @@ export default {
                 }, (error) => {
                     this.readyToSave = true;
                     if (!error.response) {
-                        this.$toasted.error('Network error');
+                        this.notifyError('Network error');
                     } else if (error.response.data.message) {
-                        this.$toasted.error(error.response.data.message);
+                        this.notifyError(error.response.data.message);
                     } else {
-                        this.$toasted.error('An error has occurred, please try again later');
+                        this.notifyError('An error has occurred, please try again later');
                     }
                 })
                 .then(() => {

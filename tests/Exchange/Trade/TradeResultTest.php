@@ -11,7 +11,7 @@ class TradeResultTest extends TestCase
     {
         $tradeResult = new TradeResult(1);
         $this->assertEquals(1, $tradeResult->getResult());
-        $this->assertEquals('ORDER CREATED', $tradeResult->getMessage());
+        $this->assertEquals('Order Created', $tradeResult->getMessage());
     }
 
     public function testException(): void

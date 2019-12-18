@@ -63,9 +63,11 @@ import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
+import {NotificationMixin} from '../../mixins';
 
 export default {
     name: 'TokenTradeOrders',
+    mixins: [NotificationMixin],
     components: {
         TradeBuyOrders,
         TradeSellOrders,
@@ -203,7 +205,7 @@ export default {
             });
             this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
                 .catch(() => {
-                    this.$toasted.error('Service unavailable, try again later');
+                    this.notifyError('Service unavailable, try again later');
                 });
         },
         switchConfirmModal: function(val) {

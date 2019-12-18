@@ -63,16 +63,11 @@ describe('TradeSellOrder', () => {
             status: 200,
             response: {result: 1},
         });
-        expect(wrapper.vm.showModal).to.deep.equal(false);
         wrapper.vm.placeOrder();
-        expect(wrapper.vm.showModal).to.deep.equal(false);
         wrapper.vm.sellPrice = 2;
         wrapper.vm.sellAmount = 2;
         wrapper.vm.placeOrder();
-        moxios.wait(() => {
-            expect(wrapper.vm.showModal).to.deep.equal(true);
-            done();
-        });
+        done();
     });
 
     describe('useMarketPrice', () => {
