@@ -13,8 +13,6 @@ use FOS\UserBundle\Model\UserInterface;
  */
 class Bonus
 {
-    public const BONUS_WEB = 5;
-
     public const PENDING_STATUS = 'pending';
 
     public const PAID_STATUS = 'paid';

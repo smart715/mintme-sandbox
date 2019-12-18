@@ -8,8 +8,8 @@ use Doctrine\ORM\EntityRepository;
 class BonusRepository extends EntityRepository
 {
     /** @codeCoverageIgnore */
-    public function getPaidCount(): int
+    public function getPaidCount(int $bonusAmount): int
     {
-        return $this->count(['status' => Bonus::PAID_STATUS, 'quantityWeb' => Bonus::BONUS_WEB]);
+        return $this->count(['status' => Bonus::PAID_STATUS, 'quantityWeb' => $bonusAmount]);
     }
 }

@@ -85,7 +85,10 @@ class RegistrationController extends FOSRegistrationController
     {
         $form = $this->formFactory->createForm();
 
-        if ($this->bonusManager->isLimitReached($this->getParameter('landing_web_bonus_limit'))) {
+        if ($this->bonusManager->isLimitReached(
+            $this->getParameter('landing_web_bonus_limit'),
+            $this->getParameter('landing_web_bonus')
+        )) {
             return $this->redirectToRoute('homepage');
         }
 
@@ -146,7 +149,11 @@ class RegistrationController extends FOSRegistrationController
 
                 if ($this->generateUrl('sign_up', [], UrlGeneratorInterface::ABSOLUTE_URL)
                     === $request->headers->get('referer')) {
-                    $bonus = new Bonus($user, Bonus::PENDING_STATUS, Bonus::BONUS_WEB);
+                    $bonus = new Bonus(
+                        $user,
+                        Bonus::PENDING_STATUS,
+                        $this->getParameter('landing_web_bonus')
+                    );
                     $user->setBonus($bonus);
                     $this->em->persist($bonus);
                     $this->em->flush();
@@ -198,7 +205,7 @@ class RegistrationController extends FOSRegistrationController
                     $user,
                     Token::getFromCrypto($crypto),
                     $this->moneyWrapper->parse(
-                        (string)Bonus::BONUS_WEB,
+                        (string)$this->getParameter('landing_web_bonus'),
                         $crypto->getSymbol()
                     )
                 );

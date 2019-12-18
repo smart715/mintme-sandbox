@@ -104,3 +104,7 @@ parameters:
     # WEB limit for landing page bonus
     landing_web_bonus_limit: 50000
 
+    # How much user receive for registration
+    landing_web_bonus: 5
+
+

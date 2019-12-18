@@ -4,5 +4,5 @@ namespace App\Manager;
 
 interface BonusManagerInterface
 {
-    public function isLimitReached(int $limit): bool;
+    public function isLimitReached(int $limit, int $bonusAmount): bool;
 }

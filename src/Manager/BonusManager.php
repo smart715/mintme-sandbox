@@ -16,8 +16,8 @@ class BonusManager implements BonusManagerInterface
         $this->bonusRepo = $entityManager->getRepository(Bonus::class);
     }
 
-    public function isLimitReached(int $limit): bool
+    public function isLimitReached(int $limit, int $bonusAmount): bool
     {
-        return $limit <= Bonus::BONUS_WEB * $this->bonusRepo->getPaidCount();
+        return $limit <= $bonusAmount * $this->bonusRepo->getPaidCount($bonusAmount);
     }
 }
