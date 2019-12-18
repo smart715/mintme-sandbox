@@ -2,7 +2,6 @@
 
 namespace App\Controller\Dev\API;
 
-use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\MarketInfo;
@@ -10,7 +9,6 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -23,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @Security(expression="is_granted('prelaunch')")
  * @Cache(smaxage=15, mustRevalidate=true)
  */
-class MarketsController extends AbstractFOSRestController
+class MarketsController extends DevApiController
 {
     /** @var MarketStatusManagerInterface */
     private $marketManager;
@@ -71,14 +69,14 @@ class MarketsController extends AbstractFOSRestController
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Markets")
      */
-    public function getMarkets(ParamFetcherInterface $fetcher): array
+    public function getMarkets(ParamFetcherInterface $request): array
     {
         return array_map(function ($market) {
             return $this->rebrandingConverter->convertMarketStatus($market);
         }, array_values(
             $this->marketManager->getMarketsInfo(
-                (int)$fetcher->get('offset'),
-                (int)$fetcher->get('limit')
+                (int)$request->get('offset'),
+                (int)$request->get('limit')
             )
         ));
     }
@@ -107,7 +105,7 @@ class MarketsController extends AbstractFOSRestController
      * @SWG\Parameter(name="quote", in="path", description="Quote name", type="string")
      * @SWG\Tag(name="Markets")
      */
-    public function getMarket(string $base, string $quote, ParamFetcherInterface $fetcher): MarketInfo
+    public function getMarket(string $base, string $quote, ParamFetcherInterface $request): MarketInfo
     {
         $this->checkForDisallowedValues($base, $quote);
 
@@ -129,16 +127,7 @@ class MarketsController extends AbstractFOSRestController
 
         return $this->rebrandingConverter->convertMarketInfo($this->marketHandler->getMarketInfo(
             new Market($base, $quote),
-            $periods[$fetcher->get('interval')]
+            $periods[$request->get('interval')]
         ));
-    }
-
-    private function checkForDisallowedValues(string $base, string $quote): void
-    {
-        $disallowedValues = [Token::WEB_SYMBOL];
-
-        if (in_array(mb_strtoupper($base), $disallowedValues) || in_array(mb_strtoupper($quote), $disallowedValues)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
-        }
     }
 }

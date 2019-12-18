@@ -2,14 +2,12 @@
 
 namespace App\Controller\Dev\API;
 
-use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -22,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @Rest\Route(path="/dev/api/v1/orders")
  * @Security(expression="is_granted('prelaunch')")
  */
-class OrdersController extends AbstractFOSRestController
+class OrdersController extends DevApiController
 {
     /** @var MarketHandlerInterface */
     private $marketHandler;
@@ -75,12 +73,12 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Parameter(name="side", in="query", type="string", description="Order side (sell|buy)")
      * @SWG\Tag(name="Orders")
      */
-    public function getActiveOrders(ParamFetcherInterface $fetcher): array
+    public function getActiveOrders(ParamFetcherInterface $request): array
     {
-        $this->checkForDisallowedValues($fetcher);
+        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
 
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($fetcher->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($fetcher->get('quote')));
+        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
+        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
@@ -90,7 +88,7 @@ class OrdersController extends AbstractFOSRestController
         }
 
         $market = new Market($base, $quote);
-        $method = Order::BUY_SIDE === Order::SIDE_MAP[$fetcher->get('side')]
+        $method = Order::BUY_SIDE === Order::SIDE_MAP[$request->get('side')]
             ? 'getPendingBuyOrders'
             : 'getPendingSellOrders';
 
@@ -98,8 +96,8 @@ class OrdersController extends AbstractFOSRestController
             return $this->rebrandingConverter->convertOrder($order);
         }, $this->marketHandler->$method(
             $market,
-            (int)$fetcher->get('offset'),
-            (int)$fetcher->get('limit')
+            (int)$request->get('offset'),
+            (int)$request->get('limit')
         ));
     }
 
@@ -128,12 +126,12 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Orders")
      */
-    public function getFinishedOrders(ParamFetcherInterface $fetcher): array
+    public function getFinishedOrders(ParamFetcherInterface $request): array
     {
-        $this->checkForDisallowedValues($fetcher);
+        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
 
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($fetcher->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($fetcher->get('quote')));
+        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
+        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
@@ -146,18 +144,8 @@ class OrdersController extends AbstractFOSRestController
             return $this->rebrandingConverter->convertOrder($order);
         }, $this->marketHandler->getExecutedOrders(
             new Market($base, $quote),
-            (int)$fetcher->get('lastId'),
-            (int)$fetcher->get('limit')
+            (int)$request->get('lastId'),
+            (int)$request->get('limit')
         ));
-    }
-
-    private function checkForDisallowedValues(ParamFetcherInterface $request): void
-    {
-        $disallowedValues = [Token::WEB_SYMBOL];
-
-        if (in_array(mb_strtoupper($request->get('base')), $disallowedValues)
-            || in_array(mb_strtoupper($request->get('quote')), $disallowedValues)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
-        }
     }
 }

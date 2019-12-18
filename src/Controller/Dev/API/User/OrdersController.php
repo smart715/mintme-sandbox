@@ -2,7 +2,7 @@
 
 namespace App\Controller\Dev\API\User;
 
-use App\Entity\Token\Token;
+use App\Controller\Dev\API\DevApiController;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -13,7 +13,6 @@ use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -26,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @Rest\Route(path="/dev/api/v1/user/orders")
  * @Security(expression="is_granted('prelaunch')")
  */
-class OrdersController extends AbstractFOSRestController
+class OrdersController extends DevApiController
 {
     /** @var MarketFactoryInterface */
     private $marketFactory;
@@ -88,7 +87,7 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
-    public function getActiveOrders(ParamFetcherInterface $fetcher): array
+    public function getActiveOrders(ParamFetcherInterface $request): array
     {
         $user = $this->getUser();
         $markets = $this->marketFactory->createUserRelated($user);
@@ -102,8 +101,8 @@ class OrdersController extends AbstractFOSRestController
         }, $this->marketHandler->getPendingOrdersByUser(
             $user,
             $markets,
-            (int)$fetcher->get('offset'),
-            (int)$fetcher->get('limit')
+            (int)$request->get('offset'),
+            (int)$request->get('limit')
         ));
     }
 
@@ -128,7 +127,7 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
-    public function getFinishedOrders(ParamFetcherInterface $fetcher): array
+    public function getFinishedOrders(ParamFetcherInterface $request): array
     {
         $user = $this->getUser();
         $markets = $this->marketFactory->createUserRelated($user);
@@ -142,8 +141,8 @@ class OrdersController extends AbstractFOSRestController
         }, $this->marketHandler->getUserExecutedHistory(
             $user,
             $markets,
-            (int)$fetcher->get('offset'),
-            (int)$fetcher->get('limit')
+            (int)$request->get('offset'),
+            (int)$request->get('limit')
         ));
     }
 
@@ -183,7 +182,7 @@ class OrdersController extends AbstractFOSRestController
      */
     public function placeOrder(ParamFetcherInterface $request, ExchangerInterface $exchanger): View
     {
-        $this->checkForDisallowedValues($request);
+        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
 
         $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
         $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
@@ -228,7 +227,7 @@ class OrdersController extends AbstractFOSRestController
      */
     public function cancelOrder(ParamFetcherInterface $request, int $id): View
     {
-        $this->checkForDisallowedValues($request);
+        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
 
         $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
         $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
@@ -246,15 +245,5 @@ class OrdersController extends AbstractFOSRestController
         $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
 
         return $this->view(Response::HTTP_OK);
-    }
-
-    private function checkForDisallowedValues(ParamFetcherInterface $request): void
-    {
-        $disallowedValues = [Token::WEB_SYMBOL];
-
-        if (in_array(mb_strtoupper($request->get('base')), $disallowedValues)
-            || in_array(mb_strtoupper($request->get('quote')), $disallowedValues)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
-        }
     }
 }
