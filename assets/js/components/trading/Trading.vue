@@ -464,7 +464,7 @@ export default {
                 })
                 .catch((err) => {
                     this.$emit('disable-usd');
-                    this.$toasted.error('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                    this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
                     reject();
                 });
             });
