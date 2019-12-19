@@ -7,7 +7,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class DevApiController extends AbstractFOSRestController
+abstract class DevApiController extends AbstractFOSRestController
 {
     private const DISALLOWED_VALUES = [
         Token::WEB_SYMBOL,
