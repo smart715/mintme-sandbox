@@ -552,7 +552,6 @@ class TokensController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="address", allowBlank=false)
-     * @Rest\RequestParam(name="lock", allowBlank=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */
     public function contractUpdate(
@@ -566,16 +565,12 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        if ($token->isMintDestinationLocked()) {
-            throw new ApiBadRequestException('Can\'t change the address');
-        }
-
         if (!$this->isGranted('edit', $token)) {
             throw new ApiUnauthorizedException('Unauthorized');
         }
 
         try {
-            $contractHandler->updateMintDestination($token, $request->get('address'), (bool) $request->get('lock'));
+            $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 
             $this->em->persist($token);
