@@ -93,7 +93,6 @@ import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, NotificationMixin} from 
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
@@ -102,7 +101,6 @@ export default {
         page: Number,
         tokensCount: Number,
         userId: Number,
-        cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
         webchainSupplyUrl: String,
@@ -211,7 +209,7 @@ export default {
         let conversionRatesPromise = this.fetchConversionRates();
         this.fetchGlobalMarketCap();
 
-        Promise.all([updateDataPromise, conversionRatesPromise])
+        Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
             .then(() => {
                 this.updateDataWithMarkets();
                 this.loading = false;
@@ -454,30 +452,25 @@ export default {
             this.klineQueriesIdsTokensMap.set(id, market);
         },
         fetchConversionRates: function() {
-            let ids = Object.keys(this.cryptos).map((name) => name.toLowerCase()).join();
-
-            let config = {
-                params: {
-                    ids,
-                    vs_currencies: USD.symbol.toLowerCase(),
-                },
-            };
-
             return new Promise((resolve, reject) => {
-                this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
+                this.$axios.retry.get(this.$routing.generate('exchange_rates'))
                 .then((res) => {
-                    Object.keys(res.data).map((name) => {
-                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name][USD.symbol.toLowerCase()];
-                    });
+                    if (!(res.data && Object.keys(res.data).length)) {
+                        return Promise.reject();
+                    }
+
+                    this.conversionRates = res.data;
                     resolve();
                 })
                 .catch((err) => {
+                    this.$emit('disable-usd');
+                    this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
                     reject();
                 });
             });
         },
         toUSD: function(amount, currency, subunit = false) {
-            amount = Decimal.mul(amount, this.conversionRates[currency]);
+            amount = Decimal.mul(amount, ((this.conversionRates[currency] || [])[USD.symbol] || 1));
             return (subunit ? toMoney(amount, USD.subunit) : this.toMoney(amount)) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
