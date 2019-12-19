@@ -72,12 +72,6 @@ class Token implements TradebleInterface
     protected $mintDestination;
 
     /**
-     * @ORM\Column(type="boolean", options={"default": 0})
-     * @var bool
-     */
-    protected $mintDestinationLocked = false;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
      * @Groups({"API_TOK"})
@@ -264,18 +258,6 @@ class Token implements TradebleInterface
     public function setMintDestination(string $mintDestination): self
     {
         $this->mintDestination = $mintDestination;
-
-        return $this;
-    }
-
-    public function isMintDestinationLocked(): bool
-    {
-        return $this->mintDestinationLocked;
-    }
-
-    public function lockMintDestination(): self
-    {
-        $this->mintDestinationLocked = true;
 
         return $this;
     }
