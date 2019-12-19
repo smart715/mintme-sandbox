@@ -56,10 +56,6 @@ class ContractUpdateConsumer implements ConsumerInterface
 
             $token->setMintDestination($clbResult->getMintDestination());
 
-            if ($clbResult->getLock()) {
-                $token->lockMintDestination();
-            }
-
             $this->em->persist($token);
             $this->em->flush();
         } catch (\Throwable $exception) {
