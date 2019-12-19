@@ -9,14 +9,14 @@
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
-                :mint-destination-locked="mintDestinationLocked"
                 :status-prop="statusProp"
                 :twofa="twofa"
                 :visible="showTokenEditModal"
                 :websocket-url="websocketUrl"
-                :withdrawal-address="withdrawalAddress"
+                :release-address="releaseAddress"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
+                @update-release-address="updateReleaseAddress"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -48,12 +48,11 @@ export default {
         hasReleasePeriodProp: Boolean,
         identifier: String,
         name: String,
-        mintDestinationLocked: Boolean,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
         websocketUrl: String,
-        withdrawalAddress: String,
+        releaseAddress: String,
     },
     components: {
         FontAwesomeIcon,
@@ -101,6 +100,9 @@ export default {
             }
 
             this.showTokenEditModal = true;
+        },
+        updateReleaseAddress: function() {
+            this.releaseAddress = '0x';
         },
     },
 };
