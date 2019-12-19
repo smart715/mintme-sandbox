@@ -1,4 +1,4 @@
-version: "3.3"
+version: "2.2"
 services:
   # APP
   panel:
@@ -75,6 +75,7 @@ services:
 
   webchaind:
     build: .docker/webchaind
+    cpus: 0.30
     ports:
       - 39573:39573 # debug
     networks:
