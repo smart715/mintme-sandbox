@@ -115,7 +115,6 @@ class ContractHandlerTest extends TestCase
                     'name' => 'foo',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
-                    'lock'=> false,
                 ]
             );
 
@@ -129,9 +128,8 @@ class ContractHandlerTest extends TestCase
         );
 
         $handler->updateMintDestination(
-            $this->mockToken(true, '0x123', false, 'deployed'),
-            '0x456',
-            false
+            $this->mockToken(true, '0x123', 'deployed'),
+            '0x456'
         );
     }
 
@@ -153,33 +151,8 @@ class ContractHandlerTest extends TestCase
         $this->expectException(\Throwable::class);
 
         $handler->updateMintDestination(
-            $this->mockToken(true, '0x123', true, 'not-deployed'),
-            '0x456',
-            false
-        );
-    }
-
-    public function testUpdateMintDestinationWithLocked(): void
-    {
-        $rpc = $this->mockRpc();
-        $rpc
-            ->expects($this->never())->method('send');
-
-        $handler = new ContractHandler(
-            $rpc,
-            $this->mockConfig(),
-            $this->mockLoggerInterface(),
-            $this->mockMoneyWrapper(),
-            $this->mockCryptoManager(),
-            $this->mockTokenManager()
-        );
-
-        $this->expectException(\Throwable::class);
-
-        $handler->updateMintDestination(
-            $this->mockToken(true, '0x123', true, 'deployed'),
-            '0x456',
-            false
+            $this->mockToken(true, '0x123', 'not-deployed'),
+            '0x456'
         );
     }
 
@@ -187,13 +160,12 @@ class ContractHandlerTest extends TestCase
     {
         $rpc = $this->mockRpc();
         $rpc
-            ->expects($this->never())->method('send')->with(
+            ->expects($this->once())->method('send')->with(
                 'update_mint_destination',
                 [
                     'name' => 'foo',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
-                    'lock'=> false,
                 ]
             )
             ->willReturn($this->mockResponse(true));
@@ -209,7 +181,10 @@ class ContractHandlerTest extends TestCase
 
         $this->expectException(\Throwable::class);
 
-        $handler->updateMintDestination($this->mockToken(true, '0x123', false), '0x456', false);
+        $handler->updateMintDestination(
+            $this->mockToken(true, '0x123', 'deployed'),
+            '0x456'
+        );
     }
 
     public function testWithdraw(): void
@@ -239,7 +214,7 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Token::WEB_SYMBOL)),
             '0x123',
-            $this->mockToken(true, '0x123', false, 'deployed')
+            $this->mockToken(true, '0x123', 'deployed')
         );
     }
 
@@ -264,7 +239,7 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Token::WEB_SYMBOL)),
             '0x123',
-            $this->mockToken(true, '0x123', false, 'not-deployed')
+            $this->mockToken(true, '0x123', 'not-deployed')
         );
     }
 
@@ -297,7 +272,7 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Token::WEB_SYMBOL)),
             '0x123',
-            $this->mockToken(true, '0x123', false, 'deployed')
+            $this->mockToken(true, '0x123', 'deployed')
         );
     }
 
@@ -477,13 +452,11 @@ class ContractHandlerTest extends TestCase
     private function mockToken(
         bool $hasReleasePeriod,
         string $address = '0x123',
-        bool $minLocked = false,
         string $status = 'not-deployed'
     ): Token {
         $token = $this->createMock(Token::class);
         $token->method('getName')->willReturn('foo');
         $token->method('getAddress')->willReturn($address);
-        $token->method('isMintDestinationLocked')->willReturn($minLocked);
         $token->method('deploymentStatus')->willReturn($status);
 
         if (!$hasReleasePeriod) {
