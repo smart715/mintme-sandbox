@@ -475,3 +475,9 @@ services:
     App\EventSubscriber\TransactionSubscriber:
         arguments:
             $mailer: '@app.instant.mailer'
+
+    App\Communications\CachedCryptoRatesFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
