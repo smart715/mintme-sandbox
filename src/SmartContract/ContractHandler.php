@@ -92,7 +92,7 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function updateMintDestination(Token $token, string $address, bool $lock): void
+    public function updateMintDestination(Token $token, string $address): void
     {
         if (Token::DEPLOYED !== $token->deploymentStatus()) {
             $this->logger->error(
@@ -102,19 +102,12 @@ class ContractHandler implements ContractHandlerInterface
             throw new Exception('Token not deployed yet');
         }
 
-        if ($token->isMintDestinationLocked()) {
-            $this->logger->error("Failed to update mintDestination for '{$token->getName()}' because it is locked");
-
-            throw new Exception('Token mintDestination is locked');
-        }
-
         $response = $this->rpc->send(
             self::UPDATE_MIN_DESTINATION,
             [
                 'name' => $token->getName(),
                 'contractAddress' => $token->getAddress(),
                 'mintDestination' => $address,
-                'lock'=> $lock,
             ]
         );
 
