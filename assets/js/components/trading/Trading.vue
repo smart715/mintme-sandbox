@@ -168,7 +168,7 @@ export default {
                     key: 'pair',
                     label: 'Pair',
                     sortable: true,
-                    class: 'trading-pair-cell',
+                    class: 'pair-cell',
                 },
                 change: {
                     key: 'change',
