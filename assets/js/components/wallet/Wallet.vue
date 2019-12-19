@@ -13,7 +13,7 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="generateCoinUrl(data.item)" class="text-white">
+                    <a :href="generateCoinUrl(data.item)" class="text-white truncate-name">
                         {{ data.item.fullname }} ({{ data.item.name }})
                     </a>
                 </template>
@@ -60,11 +60,11 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="generatePairUrl(data.item)" class="text-white">
-                        <span v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
-                            {{ data.item.name | truncate(100) }}
-                        </span>
-                    </a>
+                    <div class="truncate-name w-100" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                        <a :href="generatePairUrl(data.item)" class="text-white">
+                            {{ data.item.name }}
+                        </a>
+                    </div>
                 </template>
                 <template v-slot:cell(available)="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -187,12 +187,12 @@ export default {
                 delay: [100, 200],
             },
             predefinedTokenFields: [
-                {key: 'name', label: 'Name'},
+                {key: 'name', label: 'Name', class: 'pair-cell'},
                 {key: 'available', label: 'Amount'},
                 {key: 'action', label: 'Actions', sortable: false},
             ],
             tokenFields: [
-                {key: 'name', label: 'Name'},
+                {key: 'name', label: 'Name', class: 'pair-cell'},
                 {key: 'available', label: 'Amount'},
                 {key: 'action', label: 'Actions', sortable: false},
             ],
