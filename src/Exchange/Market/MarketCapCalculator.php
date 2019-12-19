@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Market;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Communications\RestRpcInterface;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
@@ -35,18 +36,23 @@ class MarketCapCalculator
     /** @var FixedExchange */
     private $exchange;
 
+    /** @var cryptoRatesFetcherInterface */
+    private $cryptoRatesFetcher;
+
     public function __construct(
         array $supplyLinks,
         int $tokenSupply,
         EntityManagerInterface $em,
         MoneyWrapperInterface $moneyWrapper,
-        RestRpcInterface $rpc
+        RestRpcInterface $rpc,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
     ) {
         $this->supplyLinks = $supplyLinks;
         $this->tokenSupply = $tokenSupply;
         $this->moneyWrapper = $moneyWrapper;
         $this->rpc = $rpc;
         $this->repository = $em->getRepository(MarketStatus::class);
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
     public function calculate(string $base = Token::BTC_SYMBOL): string
@@ -154,19 +160,10 @@ class MarketCapCalculator
             return $this->exchange;
         }
 
-        $response = $this->rpc->send('simple/price?ids=webchain,bitcoin&vs_currencies=usd,btc', Request::METHOD_GET);
-        $response = json_decode($response, true);
+        $rates = $this->cryptoRatesFetcher->fetch();
+        $rates[Token::WEB_SYMBOL][Token::WEB_SYMBOL] = 1;
 
-        return $this->exchange = new FixedExchange([
-            Token::BTC_SYMBOL => [
-                MoneyWrapper::USD_SYMBOL => $response['bitcoin']['usd'],
-            ],
-            Token::WEB_SYMBOL => [
-                MoneyWrapper::USD_SYMBOL => $response['webchain']['usd'],
-                Token::BTC_SYMBOL => $response['webchain']['btc'],
-                Token::WEB_SYMBOL => 1,
-            ],
-        ]);
+        return $this->exchange = new FixedExchange($rates);
     }
 
     private function format(Money $money): string
