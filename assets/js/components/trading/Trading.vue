@@ -21,6 +21,7 @@
                     :sort-by="fields.volume.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare"
+                    sort-direction="desc"
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
@@ -245,9 +246,11 @@ export default {
                         pair = true;
                     }
                 });
-                return pair ? 0 : a[key].localeCompare(b[key], undefined, {
-                    numeric: true,
-                });
+                let numeric = key !== this.fields.pair.key;
+                let comparison = a[key].localeCompare(b[key], undefined, {numeric});
+
+                // So that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
+                return pair ? 0 : (numeric ? comparison : -comparison);
             }
         },
         updateData: function(page) {
