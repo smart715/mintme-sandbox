@@ -1,4 +1,4 @@
-version: "3.3"
+version: "2.2"
 services:
   # APP
   panel:
@@ -75,6 +75,7 @@ services:
 
   webchaind:
     build: .docker/webchaind
+    cpus: 0.30
     ports:
       - 39573:39573 # debug
     networks:
@@ -82,7 +83,6 @@ services:
     volumes:
       # Replace next paths with actuals on your system
       - .docker/default/WEB/password.txt:/data/password
-#      - .docker/default/WEB/private.txt:/data/private
       - .docker/default/WEB/account.json:/root/.webchain/morden/keystore/9139413fe7247da35ae0797f9270271ba758d248
       - webchaind_root:/root/.webchain/mainnet
 
@@ -110,14 +110,15 @@ services:
     image: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: withdraw
     ports:
       - 3306:3306
     networks:
       - middleend
+      - backend
     volumes:
-      - .docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - .docker/sql:/docker-entrypoint-initdb.d
       - .docker/my.cnf:/etc/mysql/my.cnf
+      - .docker/db:/var/lib/mysql
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -165,37 +166,27 @@ services:
       - .docker/viabtc/btc/btc/matchengine/config.json:/btc/matchengine/config.json
       - .docker/viabtc/btc/btc/accesshttp/config.json:/btc/accesshttp/config.json
       - .docker/viabtc/btc/btc/marketprice/config.json:/btc/marketprice/config.json
-#      - .docker/viabtc/btc/btc/marketprice/mp_message.c:/btc/marketprice/mp_message.c
       - .docker/viabtc/btc/btc/accessws/config.json:/btc/accessws/config.json
       - .docker/viabtc/btc/btc/alertcenter/config.json:/btc/alertcenter/config.json
       - .docker/viabtc/btc/btc/readhistory/config.json:/btc/readhistory/config.json
     depends_on:
-      - mysql
+      - db
       - mq
       - redis_sentinel
-      - redis_slave
       - redis_master
-    links:
-      - mysql:db
     networks:
       - backend
       - backward
 
   redis_master:
     container_name: btc-redis-master
-    image: redis:4.0.2-alpine
+    build: .docker/redis
     ports:
       - 16379:6379
     networks:
       - backend
-
-  redis_slave:
-    container_name: btc-redis-slave
-    image: redis:4.0.2-alpine
-    ports:
-      - 16380:6379
-    networks:
-      - backend
+    volumes:
+      - .docker/redis.conf:/usr/local/etc/redis/redis.conf
 
   redis_sentinel:
     container_name: btc-redis-sentinel
@@ -205,21 +196,12 @@ services:
       - MASTER_NAME=mymaster
       - QUORUM=1
       - MASTER=redis_master
-      - SLAVES=redis_slave
     depends_on:
       - redis_master
     networks:
       - backend
     ports:
       - 26379:26379
-
-  mysql:
-    container_name: btc-mysql
-    build: .docker/viabtc/db/
-    ports:
-      - 13306:3306
-    networks:
-      - backend
 
   zookeeper:
     container_name: btc-zookeeper
