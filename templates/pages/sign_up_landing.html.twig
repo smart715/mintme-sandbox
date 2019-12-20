@@ -5,9 +5,9 @@
 {% set formHeader = "Sign Up" %}
 
 {% block content %}
-    <div class="container px-5" id="sign-up-langing">
-        <div class="row flex-xl-row justify-content-center flex-column-reverse align-items-center py-5">
-            <div class="col-xl-4 col-sm-12 col-lg-8 pr-0">
+    <div class="container" id="sign-up-langing">
+        <div class="row flex-xl-row justify-content-center flex-column-reverse align-items-center py-5 px-xl-5">
+            <div class="col-xl-3 col-sm-12 col-lg-8 pr-0">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
@@ -17,9 +17,9 @@
                         {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
                         <div>
                             <passwordmeter :password="password" @toggle-error="toggleError">
-                                <span @click="togglePassword()" class="show-password">
-                                    <i class="far fa-eye"></i>
-                                </span>
+                                    <span @click="togglePassword()" class="show-password">
+                                        <i class="far fa-eye"></i>
+                                    </span>
                                 {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
                             </passwordmeter>
                         </div>
@@ -42,21 +42,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-5 col-sm-12 col-lg-8 pl-0">
+            <div class="col-xl-6 col-sm-12 col-lg-8 pl-0">
                 <img class="mw-100" src="{{ asset('build/images/logo-with-web.png') }}">
             </div>
-            <div class="col-xl-3 col-sm-12 col-lg-8 align-self-end">
-                <span class="title text-white h2">We will PAY YOU</span><br>
-                <span class="">if you register NOW!</span>
+            <div class="col-xl-3 col-sm-12 col-lg-8 p-0 align-self-end">
+                <span class="title text-white h1">We will PAY YOU</span><br>
+                <span class="landing-font">if you register NOW!</span>
             </div>
         </div>
         <div class="row py-5 justify-content-center">
-            <div class="col-xl-5 col-lg-12 col-sm-12 what-is text-center">
+            <div class="col-xl-6 col-lg-12 col-sm-12 what-is landing-font text-center">
                 <span>What is <i>mintMe?</i></span> <br>
                 <span>It's new innovative crowdfunding platform where both sides can earn!</span>
             </div>
         </div>
-        <div class="row steps py-5 mx-5 justify-content-center text-center">
+        <div class="row steps py-5 mx-0 landing-font justify-content-center text-center">
             <div class="col-xl-4 col-md-12 col-sm-12 py-2">
                 <img class="arrows" src="{{ asset('build/images/number-one.png') }}">
                 <div class="arr-text d-inline-block align-middle text-center">
@@ -77,11 +77,11 @@
             </div>
         </div>
         <div class="row feature-row border border-white m-5 py-3">
-            <div class="col-lg-12 col-xl-2 py-2 text-center">
+            <div class="col-lg-12 col-xl-3 py-2 text-center">
                 <img class="hand-and-lamp" src="{{ asset('build/images/hand-coin.png') }}">
             </div>
-            <div class="col-lg-12 col-xl-8 text-center">
-                <div class="pt-4">
+            <div class="col-lg-12 col-xl-6 text-center">
+                <div class="pt-5">
                     <span class="title text-white h2">
                     So you invest in some idea <br>
                     not just give money to support it! <br>
@@ -99,7 +99,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 col-xl-2 py-2 text-center">
+            <div class="col-lg-12 col-xl-3 py-2 text-center">
                 <img class="hand-and-lamp" src="{{ asset('build/images/lamp.png') }}">
             </div>
 
@@ -108,7 +108,7 @@
             <div class="col-lg-12 col-xl-2 py-2 text-center">
                 <img src="{{ asset('build/images/diagram.png') }}">
             </div>
-            <div class="col-lg-8 col-xl-8 mx-auto pt-3 text-center">
+            <div class="col-lg-8 col-xl-8 mx-auto pt-3 landing-font text-center">
                 MintMe coins will show up immediately on your
                 <b><i>mintMe</i></b> account and you can withdraw it if you want.<br>
                 MINTME is native blockchain currency for <b><i>mintMe</i></b>
@@ -127,7 +127,7 @@
             </div>
             <div class="col-md-8 col-xl-8 py-2 text-center pl-2 text-center my-auto">
                 <h1>Can you afford not to try?</h1>
-                <span>
+                <span class="letter-space landing-font">
                     We do not demand any personal data from you. Just registration. We hope you can get interested
                     after you register and spread the word about <i>mintMe.com</i>
                 </span>
