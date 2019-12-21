@@ -7,7 +7,7 @@
 {% block content %}
     <div class="container" id="sign-up-langing">
         <div class="row flex-md-row justify-content-center flex-column-reverse align-items-center py-5 px-xl-5">
-            <div class="col-sm-12 col-md-5 col-lg-3 pr-0">
+            <div class="col-sm-10 col-md-5 col-lg-3 pr-xs-2 pr-md-0">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
@@ -42,11 +42,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-12 col-md-7 col-lg-9 px-0">
-                <div class="logo-div">
+            <div class="logo-text col-sm-12 col-md-7 col-lg-9 px-0">
+                <div class="logo-div order-2">
                     <img id="logo-web" class="w-70" src="{{ asset('build/images/logo-with-web.png') }}">
                 </div>
-                <div class="we-will-pay d-inline-block pr-3">
+                <div class="we-will-pay d-inline-block pr-3 order-1">
                     <span class="letter-space title text-white h1">We will PAY YOU</span><br>
                     <span class="letter-space landing-font float-right">if you register NOW!</span>
                 </div>
@@ -58,27 +58,27 @@
                 <span>It's new innovative crowdfunding platform where both sides can earn!</span>
             </div>
         </div>
-        <div class="row steps py-5 mx-0 landing-font justify-content-center text-center">
-            <div class="col-xl-4 col-md-12 col-sm-12 py-2">
+        <div class="row steps py-3 pb-5 mx-0 landing-font justify-content-center text-center">
+            <div class="col-xl-4 col-md-12 col-sm-12 px-0 py-2">
                 <img class="arrows" src="{{ asset('build/images/number-one.png') }}">
                 <div class="arr-text d-inline-block align-middle text-center">
                     <span>Content creator issues his own tokens</span>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-12 py-2">
+            <div class="col-xl-4 col-md-12 px-0 py-3 py-md-2">
                 <img class="arrows" src="{{ asset('build/images/number-two.png') }}">
                 <div class="arr-text d-inline-block align-middle text-center">
                     <span>Person supporting buys such tokens and if project suceeds</span>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-12">
+            <div class="col-xl-4 col-md-12 px-0">
                 <img class="arrows" src="{{ asset('build/images/number-three.png') }}">
                 <div class="arr-text d-inline-block align-middle text-center">
                     <span>Such tokens gain in value and can be sold for more money!</span>
                 </div>
             </div>
         </div>
-        <div class="row feature-row border border-white m-5 py-3">
+        <div class="row feature-row border border-white m-5 px-0 py-3">
             <div class="col-md-6 col-lg-3 py-2 order-md-0 text-center">
                 <img class="hand-and-lamp" src="{{ asset('build/images/hand-coin.png') }}">
             </div>
@@ -119,7 +119,7 @@
         <div class="diagrams row justify-content-center m-5 py-5">
             <div class="col-md-3 col-lg-2 py-2 text-center">
                 <img class="pb-4" src="{{ asset('build/images/diagram.png') }}">
-                <img class="d-md-block d-lg-none mt-5 pt-5" src="{{ asset('build/images/diagram-2.png') }}">
+                <img class="d-md-block d-none d-lg-none mt-5 pt-5" src="{{ asset('build/images/diagram-2.png') }}">
             </div>
             <div class="col-md-8 col-lg-8 mx-auto pl-md-5 pt-3 landing-font text-center">
                 MintMe coins will show up immediately on your
@@ -136,10 +136,11 @@
         </div>
         <div class="row feature-row border border-white m-5 py-3">
             <div class="col-md-5 col-xl-4 py-2 text-center p-4 my-auto">
-                <img class="img-fluid" src="{{ asset('build/images/webchain-graphic.png') }}">
+                <h1 class="d-block d-md-none px-0 font-weight-bold">Can you afford not to try?</h1>
+                <img class="web-chain" src="{{ asset('build/images/webchain-graphic.png') }}">
             </div>
             <div class="col-md-7 col-xl-8 py-2 text-center pl-2 text-center my-auto">
-                <h1 class="px-5 font-weight-bold">Can you afford not to try?</h1>
+                <h1 class="d-none d-md-block px-5 font-weight-bold">Can you afford not to try?</h1>
                 <span class="not-demand letter-space landing-font">
                     We do not demand any personal data from you. Just registration. We hope you can get interested
                     after you register and spread the word about <i>mintMe.com</i>

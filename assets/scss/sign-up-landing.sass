@@ -10,13 +10,15 @@
 
 .content-wrapper
   background: $index-description-bg
-  width: 100%
+  width: 100% !important
 
 @include media-breakpoint-down(xl)
   .we-will-pay
     position: absolute
     bottom: 0
     right: 0
+  .web-chain
+    width: 100% !important
 
 @include media-breakpoint-down(md)
   .xl-text
@@ -40,6 +42,26 @@
     float: right
     bottom: 30px
 
+@include media-breakpoint-down(sm)
+  #logo-web
+    width: 100% !important
+  .arrows
+    width: 120px !important
+  .logo-text
+    display: flex
+    flex-wrap: wrap
+    margin-right: -15px
+    margin-left: -15px
+  .we-will-pay
+    margin: 0 auto
+    position: relative
+    .h1
+      font-size: 2rem
+    .landing-font
+      font-size: 17px
+  .landing-font
+    font-size: 17px !important
+
 .title
   font-family: $concord-font
   line-height: 1.1
@@ -62,7 +84,7 @@
     font-size: 13px
 
 .arr-text
-  width: 60%
+  width: 50%
 
 .arrows
   width: 150px

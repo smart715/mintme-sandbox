@@ -27,7 +27,7 @@
         "pragmarx/random": "^0.2.2",
         "presta/sitemap-bundle": "^1.7",
         "ramsey/uuid": "^3.8",
-        "scheb/two-factor-bundle": "^3.12",
+        "scheb/two-factor-bundle": "^4.11",
         "sensio/framework-extra-bundle": "^5.2",
         "sensiolabs/security-checker": "^5.0",
         "sirprize/postal-code-validator": "^1.3",
