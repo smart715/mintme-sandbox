@@ -7,7 +7,7 @@
 {% block content %}
     <div class="container" id="sign-up-langing">
         <div class="row flex-md-row justify-content-center flex-column-reverse align-items-center py-5 px-xl-5">
-            <div class="col-sm-12 col-md-4 col-xl-3 pr-0">
+            <div class="col-sm-12 col-md-5 col-lg-3 pr-0">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
@@ -42,10 +42,14 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-12 col-md-5 col-xl-6 pl-0 we-will-pay align-self-end">
-                <img class="mw-100" src="{{ asset('build/images/logo-with-web.png') }}">
-                <span class="title text-white h1">We will PAY YOU</span><br>
-                <span class="landing-font">if you register NOW!</span>
+            <div class="col-sm-12 col-md-7 col-lg-9 px-0">
+                <div class="logo-div">
+                    <img id="logo-web" class="w-70" src="{{ asset('build/images/logo-with-web.png') }}">
+                </div>
+                <div class="we-will-pay d-inline-block pr-3">
+                    <span class="letter-space title text-white h1">We will PAY YOU</span><br>
+                    <span class="letter-space landing-font float-right">if you register NOW!</span>
+                </div>
             </div>
         </div>
         <div class="row py-5 justify-content-center">
@@ -75,32 +79,42 @@
             </div>
         </div>
         <div class="row feature-row border border-white m-5 py-3">
-            <div class="col-lg-12 col-xl-3 py-2 text-center">
+            <div class="col-md-6 col-lg-3 py-2 order-md-0 text-center">
                 <img class="hand-and-lamp" src="{{ asset('build/images/hand-coin.png') }}">
             </div>
-            <div class="col-lg-12 col-xl-6 text-center">
+            <div class="col-md-6 col-lg-6 order-md-1 text-center">
                 <div class="pt-5">
                     <span class="title text-white h2">
                     So you invest in some idea <br>
                     not just give money to support it! <br>
                     </span>
                 </div>
-                <div class="pt-2 w-70 mx-auto">
+                <div class="xl-text pt-2 w-80 mx-auto">
                     <a href="{{ path('fos_user_registration_register') }}"
                        class="text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
                         REGISTER NOW
                     </a>
-                    <div class="d-inline-block small-text">
+                    <div class="xl-text d-inline-block small-text">
                         To encourage you to our new service,
                         we give you <b>5 MINTME</b> (MintMe coins)
                         if you <b>register now</b>. For free
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 col-xl-3 py-2 text-center">
+            <div class="col-md-6 col-lg-3 py-2 order-md-3 text-center">
                 <img class="hand-and-lamp" src="{{ asset('build/images/lamp.png') }}">
             </div>
-
+            <div class="md-text col-md-6 pt-5 w-80 order-md-2 mx-auto text-center d-none">
+                <a href="{{ path('fos_user_registration_register') }}"
+                   class="text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
+                    REGISTER NOW
+                </a>
+                <div class="d-inline-block small-text">
+                    To encourage you to our new service,
+                    we give you <b>5 MINTME</b> (MintMe coins)
+                    if you <b>register now</b>. For free
+                </div>
+            </div>
         </div>
         <div class="diagrams row flex-xl-row justify-content-center flex-column-reverse m-5 py-5">
             <div class="col-lg-12 col-xl-2 py-2 text-center">

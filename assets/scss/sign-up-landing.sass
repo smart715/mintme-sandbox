@@ -2,11 +2,6 @@
   .container
     max-width: 1500px
 
-@media (min-width: 950px) and (max-width: 1000px)
-  .we-will-pay
-    position: absolute !important
-    right: 100px !important
-
 .landing-font
   font-size: 20px
 
@@ -15,6 +10,35 @@
 
 .content-wrapper
   background: $index-description-bg
+  width: 100%
+
+@include media-breakpoint-down(xl)
+  .we-will-pay
+    position: absolute
+    bottom: 0
+    right: 0
+
+@include media-breakpoint-down(md)
+  .xl-text
+    display: none !important
+  .md-text
+    display: block !important
+
+@include media-breakpoint-only(md)
+  .g-recaptcha
+    transform: scale(0.65) !important
+    transform-origin: 0 0 !important
+  .logo-div
+    position: relative
+    width: 450px
+    overflow: hidden
+  #logo-web
+    width: 550px !important
+    margin-left: -60px
+  .we-will-pay
+    position: relative
+    float: right
+    bottom: 30px
 
 .title
   font-family: $concord-font
