@@ -28,11 +28,11 @@
                         <b-tab title="Introduction" {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}>
                             <div class="row">
                                 <token-introduction-description
-                                        class="col-12 pb-3"
-                                        name="{{ token.name }}"
-                                        :description="tokenDescription"
-                                        :editable="{{ isOwner ? 'true' : 'false' }}"
-                                        @updated="descriptionUpdated"
+                                    class="col-12 pb-3"
+                                    name="{{ token.name }}"
+                                    :description="tokenDescription"
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    @updated="descriptionUpdated"
                                 ></token-introduction-description>
                                 <token-introduction-profile
                                     class="col-12 col-lg-6 pr-lg-2"
