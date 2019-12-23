@@ -68,21 +68,21 @@
                         </b-tab>
                     {% endif %}
                 {% if showTrade %}
-                <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
-                    <trade
-                        websocket-url="{{ global_websocket_url }}"
-                        hash="{{ hash }}"
-                        login-url="{{ path('fos_user_security_login') }}"
-                        signup-url="{{ path('fos_user_registration_register') }}"
-                        :market="{{ market | json_encode }}"
-                        :logged-in="{{ app.user ? 'true' : 'false' }}"
-                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                        :precision="{{ precision }}"
-                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                        :user-id="{{ app.user ? app.user.id : 0 }}"
-                        webchain-supply-url="{{ webchain_supply }}">
-                    </trade>
-                </b-tab>
+                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
+                        <trade
+                            websocket-url="{{ global_websocket_url }}"
+                            hash="{{ hash }}"
+                            login-url="{{ path('fos_user_security_login') }}"
+                            signup-url="{{ path('fos_user_registration_register') }}"
+                            :market="{{ market | json_encode }}"
+                            :logged-in="{{ app.user ? 'true' : 'false' }}"
+                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                            :precision="{{ precision }}"
+                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            webchain-supply-url="{{ webchain_supply }}">
+                        </trade>
+                    </b-tab>
                 {% endif %}
                     {% if isTokenPage %}
                         <template slot="tabs-end">
@@ -113,10 +113,26 @@
                                     />
                                 </div>
                             </li>
-                            <div class="clearfix"></div>
-                        </template>
-                    </b-tabs>
-                </div>
+                        {% endif %}
+                        <li class="nav-item-token">
+                            <div class="nav-link-token">
+                                <token-name
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                                    identifier="{{ market.quote.identifier }}"
+                                    name="{{ market.quote.name }}"
+                                    :precision="{{ precision }}"
+                                    :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                    :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    release-address="{{ token.mintDestination }}"
+                                    @token-deploy-pending="setTokenPending"
+                                />
+                            </div>
+                        </li>
+                        <div class="clearfix"></div>
+                    </template>
+                </b-tabs>
             </div>
             {% if token|default %}
                 <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}" />

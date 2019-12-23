@@ -157,20 +157,14 @@
 </template>
 
 <script>
-import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faGlobe, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin} from '../../../mixins/';
+import {FiltersMixin, NotificationMixin} from '../../../mixins/';
 import {isValidUrl} from '../../../utils';
 import Modal from '../../modal/Modal';
 
 library.add(faGlobe, faTimes);
-
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
 
 export default {
     name: 'TokenWebsiteAddress',
@@ -183,7 +177,7 @@ export default {
         FontAwesomeIcon,
         Modal,
     },
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, NotificationMixin],
     data() {
         return {
             confirmWebsiteFileUrl: this.$routing.generate('token_website_confirmation', {
@@ -265,21 +259,21 @@ export default {
                     if (response.data.verified) {
                         this.$emit('saveWebsite', this.newWebsite);
                         this.newWebsite = this.newWebsite || 'https://';
-                        this.$toasted.success(response.data.message);
+                        this.notifySuccess(response.data.message);
                         this.showConfirmWebsiteModal = false;
                         this.editing = false;
                         this.clearFileError();
                     } else if (response.data.errors.fileError) {
                         this.fileError = response.data.errors.fileError;
                     } else if (response.data.errors.length) {
-                        response.data.errors.forEach((error) => this.$toasted.error(error));
+                        response.data.errors.forEach((error) => this.notifyError(error));
                         this.clearFileError();
                     } else {
                         this.clearFileError();
                         return Promise.reject({response: 'error'});
                     }
                 })
-                .catch(({response}) => this.$toasted.error(!response ? 'Network error' : response.statusText))
+                .catch(({response}) => this.notifyError(!response ? 'Network error' : response.statusText))
                 .then(() => this.submitting = false);
         },
         closeFileErrorModal: function() {
