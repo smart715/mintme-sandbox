@@ -83,7 +83,7 @@ class TwoFactorManagerTest extends TestCase
     ): GoogleAuthenticatorInterface {
         /** @var GoogleAuthenticatorInterface|MockObject $googleAuth */
         $googleAuth = $this->createMock(GoogleAuthenticatorInterface::class);
-        $googleAuth->method('getUrl')->willReturn($url);
+        $googleAuth->method('getQRContent')->willReturn($url);
         $googleAuth->method('checkCode')->willReturn($bool);
         $googleAuth->method('generateSecret')->willReturn($secret);
 
