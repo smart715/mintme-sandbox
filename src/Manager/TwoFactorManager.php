@@ -64,7 +64,7 @@ class TwoFactorManager implements TwoFactorManagerInterface
 
     public function generateUrl(User $user): string
     {
-        return $this->authenticator->getUrl($user);
+        return $this->authenticator->getQRContent($user);
     }
 
     public function getGoogleAuthEntry(int $userId): GoogleAuthenticatorEntry
