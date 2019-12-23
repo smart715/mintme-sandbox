@@ -265,6 +265,7 @@ class UserController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($googleAuth);
         $entityManager->flush();
+        $this->container->get('session')->remove('googleSecreteCode');
         $this->addFlash('success', 'You have disabled two-factor authentication!');
         $this->userActionLogger->info('Disable Two-Factor Authentication');
     }
