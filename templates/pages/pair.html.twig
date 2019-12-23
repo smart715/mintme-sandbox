@@ -67,25 +67,25 @@
                             </div>
                         </b-tab>
                     {% endif %}
-                {% if showTrade %}
-                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
-                        <trade
-                            websocket-url="{{ global_websocket_url }}"
-                            hash="{{ hash }}"
-                            login-url="{{ path('fos_user_security_login') }}"
-                            signup-url="{{ path('fos_user_registration_register') }}"
-                            :market="{{ market | json_encode }}"
-                            :logged-in="{{ app.user ? 'true' : 'false' }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                            :precision="{{ precision }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}"
-                            webchain-supply-url="{{ webchain_supply }}">
-                        </trade>
-                    </b-tab>
-                {% endif %}
-                    {% if isTokenPage %}
-                        <template slot="tabs-end">
+                    {% if showTrade %}
+                        <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
+                            <trade
+                                websocket-url="{{ global_websocket_url }}"
+                                hash="{{ hash }}"
+                                login-url="{{ path('fos_user_security_login') }}"
+                                signup-url="{{ path('fos_user_registration_register') }}"
+                                :market="{{ market | json_encode }}"
+                                :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                :precision="{{ precision }}"
+                                :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                :user-id="{{ app.user ? app.user.id : 0 }}"
+                                webchain-supply-url="{{ webchain_supply }}">
+                            </trade>
+                        </b-tab>
+                    {% endif %}
+                    <template slot="tabs-end">
+                        {% if isTokenPage %}
                             {% if token is defined %}
                                 <li class="nav-item">
                                     <div class="nav-link pr-md-0">
@@ -96,24 +96,6 @@
                                     </div>
                                 </li>
                             {% endif %}
-                            <li class="nav-item-token">
-                                <div class="nav-link-token">
-                                    <token-name
-                                        :editable="{{ isOwner ? 'true' : 'false' }}"
-                                        :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
-                                        identifier="{{ market.quote.identifier }}"
-                                        name="{{ market.quote.name }}"
-                                        :precision="{{ precision }}"
-                                        :mint-destination-locked="{{ token.mintDestinationLocked ? 'true' : 'false' }}"
-                                        :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
-                                        :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                                        websocket-url="{{ global_websocket_url }}"
-                                        withdrawal-address="{{ token.mintDestination }}"
-                                        @token-deploy-pending="setTokenPending"
-                                    />
-                                </div>
-                            </li>
-                        {% endif %}
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <token-name
@@ -130,6 +112,17 @@
                                 />
                             </div>
                         </li>
+                        {% else %}
+                            <li class="nav-item-token">
+                                <div class="nav-link-token">
+                                    <div class="truncate-token">
+                                        <span v-b-tooltip="{title: {{ market.quote.name }}, boundary:'viewport'}">
+                                            {{ market.quote.name }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
                         <div class="clearfix"></div>
                     </template>
                 </b-tabs>
@@ -141,7 +134,6 @@
         </div>
 
         <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
-    {% endif %}
 {% endblock %}
 
 {% block pagescripts %}
