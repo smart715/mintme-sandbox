@@ -1,4 +1,7 @@
 {
+    "bacon/bacon-qr-code": {
+        "version": "2.0.0"
+    },
     "beberlei/assert": {
         "version": "v3.2.7"
     },
@@ -16,6 +19,9 @@
     },
     "cron/cron-bundle": {
         "version": "2.0.2"
+    },
+    "dasprid/enum": {
+        "version": "1.0.0"
     },
     "doctrine/annotations": {
         "version": "1.0",
@@ -97,6 +103,15 @@
     },
     "egulias/email-validator": {
         "version": "2.1.4"
+    },
+    "endroid/installer": {
+        "version": "1.1.6"
+    },
+    "endroid/qr-code": {
+        "version": "3.7.5"
+    },
+    "endroid/qr-code-bundle": {
+        "version": "3.4.1"
     },
     "excelwebzone/recaptcha-bundle": {
         "version": "v1.5.11"
@@ -185,6 +200,9 @@
             "ref": "fe60ce509ef04a3f40da96e3979bc8d9b13b2372"
         }
     },
+    "khanamiryan/qrcode-detector-decoder": {
+        "version": "1.0.2"
+    },
     "knplabs/gaufrette": {
         "version": "v0.6.0"
     },
@@ -214,6 +232,9 @@
     },
     "monolog/monolog": {
         "version": "1.23.0"
+    },
+    "myclabs/php-enum": {
+        "version": "1.7.2"
     },
     "nelmio/api-doc-bundle": {
         "version": "3.0",
