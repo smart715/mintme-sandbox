@@ -122,7 +122,7 @@ class TokenController extends Controller
             ? $this->marketManager->create($webCrypto, $token)
             : null;
         $tokenDescription = preg_replace(
-            '/\[\/?(?:b|i|u|url|quote|code|img|color|size)*?.*?\]/',
+            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
             '\2',
             $token->getDescription() ?? ''
         );
