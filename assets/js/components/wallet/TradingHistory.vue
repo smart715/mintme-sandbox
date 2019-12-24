@@ -7,8 +7,10 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
-                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
+                        <div class="truncate-name w-100" v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value }}
+                            </a>
                         </div>
                     </template>
                 </b-table>
@@ -49,12 +51,7 @@ export default {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
-                    formatter: (name) => {
-                        return {
-                            full: name,
-                            truncate: this.truncateFunc(name, 15),
-                        };
-                    },
+                    class: 'pair-cell',
                 },
                 {
                     key: 'amount',
