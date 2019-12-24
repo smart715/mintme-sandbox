@@ -30,7 +30,7 @@
                             :lazy="true"
                         >
                             <template slot="button-content">
-                                {{ data.label }}
+                                {{ data.label|rebranding }}
                             </template>
                             <template>
                                 <b-dropdown-item
@@ -38,21 +38,21 @@
                                     :key="key"
                                     @click="toggleActiveVolume(key)"
                                 >
-                                    {{ volume.label }}
+                                    {{ volume.label|rebranding }}
                                 </b-dropdown-item>
                             </template>
                         </b-dropdown>
                         <guide class="ml-1 mr-2">
                             <template slot="header">
-                                {{ data.label }}
+                                {{ data.label|rebranding }}
                             </template>
                             <template slot="body">
-                                {{ data.field.help }}
+                                {{ data.field.help|rebranding}}
                             </template>
                         </guide>
                     </template>
                     <template v-slot:[`head(${fields.marketCap.key})`]="data">
-                        {{ data.label }}
+                        {{ data.label|rebranding }}
                         <guide>
                             <template slot="header">
                                 Market Cap
@@ -89,22 +89,23 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, NotificationMixin} from '../../mixins';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
     props: {
         page: Number,
         tokensCount: Number,
         userId: Number,
         coinbaseUrl: String,
         showUsd: Boolean,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     components: {
         Guide,
@@ -157,8 +158,14 @@ export default {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
             tokens.sort((first, second) => parseFloat(second.deal) - parseFloat(first.deal));
+            tokens = this.sanitizedMarketsOnTop.concat(tokens);
+            tokens = _.map(tokens, (token) => {
+                return _.mapValues(token, (item) => {
+                    return this.rebrandingFunc(item);
+                });
+            });
 
-            return this.sanitizedMarketsOnTop.concat(tokens);
+            return tokens;
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
@@ -486,7 +493,7 @@ export default {
                     },
                 };
 
-                this.$axios.retry.get(this.webchainSupplyUrl, config)
+                this.$axios.retry.get(this.mintmeSupplyUrl, config)
                     .then((res) => {
                         this.markets['WEBBTC'].supply = res.data;
                         resolve();

@@ -5,7 +5,7 @@
                     class="col"
                     :websocket-url="websocketUrl"
                     :market="market"
-                    :webchain-supply-url="webchainSupplyUrl"
+                    :mintme-supply-url="mintmeSupplyUrl"
             />
         </div>
         <div class="row">
@@ -104,7 +104,7 @@ export default {
         isOwner: Boolean,
         userId: Number,
         precision: Number,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     data() {
         return {

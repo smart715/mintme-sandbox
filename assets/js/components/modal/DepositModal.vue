@@ -21,13 +21,15 @@
                     <b-row>
                         <b-col>
                             <p class="text-center mt-2">
-                                {{ description }}
+                                {{ description|rebranding }}
                             </p>
                         </b-col>
                     </b-row>
                     <b-row>
-                        <b-col v-if="min" cols="auto" class="text-left">Minimal value: {{ min }} {{ currency }}</b-col>
-                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ feeCurrency }}</b-col>
+                        <b-col v-if="min" cols="auto" class="text-left">
+                            Minimal value: {{ min }} {{ currency|rebranding }}
+                        </b-col>
+                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ feeCurrency|rebranding }}</b-col>
                     </b-row>
                 </div>
                 <div class="pt-2 text-center">
@@ -45,12 +47,12 @@
 <script>
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
-import {MoneyFilterMixin} from '../../mixins';
+import {MoneyFilterMixin, RebrandingFilterMixin} from '../../mixins';
 import {webSymbol} from '../../utils/constants';
 
 export default {
     name: 'DepositModal',
-    mixins: [MoneyFilterMixin],
+    mixins: [MoneyFilterMixin, RebrandingFilterMixin],
     components: {
         Modal,
         CopyLink,

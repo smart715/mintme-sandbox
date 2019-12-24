@@ -9,7 +9,7 @@
                             Sell Order
                         </template>
                         <template slot="body">
-                            Form used to create  an order so you can sell {{ market.quote.symbol }} or make offer.
+                            Form used to create  an order so you can sell {{ market.quote.symbol|rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
@@ -21,8 +21,8 @@
                         >
                         Your
                         <span class="c-pointer" @click="balanceClicked"
-                              v-b-tooltip="{title: market.quote.symbol, boundary:'viewport'}">
-                            {{ market.quote.symbol | truncate(7) }}:
+                              v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                            {{ market.quote.symbol|rebranding | truncate(7) }}:
                             <span class="text-white  word-break">
                                 {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                 <guide>
@@ -30,7 +30,7 @@
                                         Your Tokens
                                     </template>
                                     <template slot="body">
-                                        Your {{ market.quote.symbol }} balance.
+                                        Your {{ market.quote.symbol|rebranding }} balance.
                                     </template>
                                 </guide>
                             </span>
@@ -56,7 +56,7 @@
                                     </template>
                                     <template slot="body">
                                         Checking this box fetches current best market price
-                                        for which you can sell {{ market.quote.symbol }}.
+                                        for which you can sell {{ market.quote.symbol|rebranding }}.
                                     </template>
                                 </guide>
                             </label>
@@ -66,13 +66,13 @@
                         <label
                             for="sell-price-input"
                             class="text-white">
-                            Price in {{ market.base.symbol }}:
+                            Price in {{ market.base.symbol|rebranding }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ market.base.symbol }}
+                                    Price in {{ market.base.symbol|rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {{ market.quote.symbol }}.
+                                    The price at which you want to sell one {{ market.quote.symbol|rebranding }}.
                                 </template>
                             </guide>
                         </label>
@@ -92,7 +92,7 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-100"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol }}</span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol|rebranding }}</span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <input
@@ -100,14 +100,14 @@
                             type="text"
                             id="sell-price-amount"
                             class="form-control"
+                            :disabled="!loggedIn"
                             @keypress="checkAmountInput"
                             @paste="checkAmountInput"
-                            :disabled="!loggedIn"
                         >
                     </div>
                     <div class="col-12 pt-2">
                         Total Price:
-                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol|rebranding }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -140,7 +140,7 @@
 
 <script>
 import Guide from '../Guide';
-import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin, PricePositionMixin} from '../../mixins';
+import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
@@ -150,7 +150,7 @@ export default {
     components: {
         Guide,
     },
-    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin],
+    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
