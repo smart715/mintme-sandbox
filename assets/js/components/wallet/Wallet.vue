@@ -13,16 +13,15 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="generateCoinUrl(data.item)" class="text-white truncate-name">
-                        {{ data.item.fullname }} ({{ data.item.name }})
+                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                        {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                     </a>
                 </template>
                 <template v-slot:cell(available)="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
                 <template v-slot:cell(action)="data">
-                    <div
-                        class="row">
+                    <div class="row">
                         <div class="d-flex flex-row c-pointer pl-2"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
@@ -38,10 +37,10 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                                <div><i class="icon-withdraw"></i></div>
-                                <div>
-                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
-                                </div>
+                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -89,10 +88,10 @@
                                         data.item.subunit,
                                         true)"
                         >
-                                <div><i class="icon-withdraw"></i></div>
-                                <div>
-                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
-                                </div>
+                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -149,7 +148,7 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, NotificationMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
@@ -157,7 +156,7 @@ const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
     components: {
         WithdrawModal,
         DepositModal,

@@ -3,16 +3,17 @@ import WebSocketMixin from './websocket';
 import PricePositionMixin from './price_position';
 import PlaceOrder from './place_order';
 import OrderClickedMixin from './order_clicked';
-import {MoneyFilterMixin, TruncateFilterMixin as FiltersMixin} from './filters';
+import {MoneyFilterMixin, RebrandingFilterMixin, TruncateFilterMixin as FiltersMixin} from './filters';
 import NotificationMixin from './notification';
 
 export {
-    LazyScrollTableMixin,
-    WebSocketMixin,
     FiltersMixin,
+    LazyScrollTableMixin,
     MoneyFilterMixin,
-    PricePositionMixin,
-    PlaceOrder,
-    OrderClickedMixin,
     NotificationMixin,
+    OrderClickedMixin,
+    PlaceOrder,
+    PricePositionMixin,
+    RebrandingFilterMixin,
+    WebSocketMixin,
 };
