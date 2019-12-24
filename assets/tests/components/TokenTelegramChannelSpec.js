@@ -104,6 +104,6 @@ describe('TokenTelegramChannel', () => {
                 editingTelegram: false,
             },
         });
-        expect(wrapper.find('#telegram-link').text()).to.equal('https://t.me/joinchat/newtelegram00..');
+        expect(wrapper.find('#telegram-link').text()).to.equal('https://t.me/joinchat/newtelegram00...');
     });
 });

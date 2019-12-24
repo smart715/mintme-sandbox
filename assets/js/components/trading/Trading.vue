@@ -63,11 +63,11 @@
                         </guide>
                     </template>
                     <template v-slot:cell(pair)="row">
-                        <a class="d-block text-truncate truncate-responsive text-white"
-                            v-b-tooltip:title="row.value"
-                            :href="row.item.tokenUrl">
-                            {{ row.value }}
-                        </a>
+                        <div class="truncate-name w-100">
+                            <a :href="row.item.tokenUrl" class="text-white" v-b-tooltip:title="row.value">
+                                {{ row.value }}
+                            </a>
+                        </div>
                     </template>
                 </b-table>
             </div>
@@ -169,6 +169,7 @@ export default {
                     key: 'pair',
                     label: 'Pair',
                     sortable: true,
+                    class: 'pair-cell',
                 },
                 change: {
                     key: 'change',
