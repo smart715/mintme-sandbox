@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="card h-100">
-            <div class="card-header">
+            <div class="card-header truncate-name">
                 {{ profileName }}
             </div>
             <div class="card-body">
