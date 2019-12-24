@@ -1,6 +1,6 @@
 /* eslint-disable valid-jsdoc */
 
-const DARK_WHITE = '#e1e1e1';
+const DARK_WHITE = '#ebebeb';
 
 /**
  * @param {Number} precision
