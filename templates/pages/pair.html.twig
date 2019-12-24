@@ -1,13 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block metaDescription %}
-    {% if isTokenPage %}
-        {% if tokenDescription is defined %}
-            <meta property="og:description" content="{{ tokenDescription }}">
-            <meta name="description" content="{{ tokenDescription }}">
-        {% else %}
-            {{ parent() }}
-        {% endif %}
+    {% if isTokenPage and tokenDescription is defined %}
+        <meta property="og:description" content="{{ tokenDescription }}">
+        <meta name="description" content="{{ tokenDescription }}">
     {% else %}
         {{ parent() }}
     {% endif %}
