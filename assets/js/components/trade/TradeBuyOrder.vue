@@ -35,8 +35,9 @@
                         </span>
                     </div>
                     <div
-                    class="col-12 col-sm-4 col-md-12 col-xl-4
-                    text-md-left" :class="marketPricePositionClass">
+                        class="col-12 col-sm-4 col-md-12 col-xl-4 text-md-left"
+                        :class="marketPricePositionClass"
+                    >
                         <label class="custom-control custom-checkbox">
                             <input
                                 v-model="useMarketPrice"
@@ -81,25 +82,28 @@
                             type="text"
                             id="buy-price-input"
                             class="form-control"
+                            :disabled="useMarketPrice || !loggedIn"
                             @keypress="checkPriceInput"
                             @paste="checkPriceInput"
-                            :disabled="useMarketPrice || !loggedIn"
                         >
                     </div>
                     <div class="col-12 pt-2">
                         <label
                             for="buy-price-amount"
-                            class="text-white">
-                            Amount in {{ market.quote.symbol|rebranding }}:
+                            class="d-flex flex-row flex-nowrap justify-content-start w-100"
+                        >
+                            <span class="d-inline-block text-nowrap">Amount in </span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol|rebranding }}</span>
+                            <span class="d-inline-block">:</span>
                         </label>
                         <input
                             v-model="buyAmount"
                             type="text"
                             id="buy-price-amount"
-                            @keypress="checkAmountInput"
-                            @paste="checkAmountInput"
                             class="form-control"
                             :disabled="!loggedIn"
+                            @keypress="checkAmountInput"
+                            @paste="checkAmountInput"
                         >
                     </div>
                     <div class="col-12 pt-2">

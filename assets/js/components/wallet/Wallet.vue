@@ -13,7 +13,7 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white">
+                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
                         {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                     </a>
                 </template>
@@ -21,8 +21,7 @@
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
                 <template v-slot:cell(action)="data">
-                    <div
-                        class="row">
+                    <div class="row">
                         <div class="d-flex flex-row c-pointer pl-2"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
@@ -38,10 +37,10 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                                <div><i class="icon-withdraw"></i></div>
-                                <div>
-                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
-                                </div>
+                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -60,11 +59,11 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="generatePairUrl(data.item)" class="text-white">
-                        <span v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
-                            {{ data.item.name | truncate(15) }}
-                        </span>
-                    </a>
+                    <div class="truncate-name w-100" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                        <a :href="generatePairUrl(data.item)" class="text-white">
+                            {{ data.item.name }}
+                        </a>
+                    </div>
                 </template>
                 <template v-slot:cell(available)="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -89,10 +88,10 @@
                                         data.item.subunit,
                                         true)"
                         >
-                                <div><i class="icon-withdraw"></i></div>
-                                <div>
-                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
-                                </div>
+                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -187,12 +186,12 @@ export default {
                 delay: [100, 200],
             },
             predefinedTokenFields: [
-                {key: 'name', label: 'Name'},
+                {key: 'name', label: 'Name', class: 'pair-cell'},
                 {key: 'available', label: 'Amount'},
                 {key: 'action', label: 'Actions', sortable: false},
             ],
             tokenFields: [
-                {key: 'name', label: 'Name'},
+                {key: 'name', label: 'Name', class: 'pair-cell'},
                 {key: 'available', label: 'Amount'},
                 {key: 'action', label: 'Actions', sortable: false},
             ],

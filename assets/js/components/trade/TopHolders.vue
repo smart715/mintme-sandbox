@@ -11,15 +11,19 @@
                     :items="traders"
                     :fields="fields">
                     <template v-slot:cell(trader)="row">
-                        <a :href="row.item.url">
-                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                {{ row.value | truncate(15) }}
-                            </span>
-                        </a>
-                        <img
-                            src="../../../img/avatar.png"
-                            class="float-right"
-                            alt="avatar">
+                        <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                            <a
+                                :href="row.item.url"
+                                class="d-inline-block truncate-name w-100 mr-1"
+                                v-b-tooltip="{title: row.value, boundary:'viewport'}"
+                            >
+                                {{ row.value }}
+                            </a>
+                            <img
+                                src="../../../img/avatar.png"
+                                class="d-block"
+                                alt="avatar">
+                        </div>
                     </template>
                 </b-table>
                     <div v-else>

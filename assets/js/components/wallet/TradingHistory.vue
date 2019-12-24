@@ -7,9 +7,12 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                        <div
+                            class="truncate-name w-100"
+                            v-b-tooltip="{title: rebrandingFunc(row.value), boundary:'viewport'}"
+                        >
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.truncate|rebranding }}
+                                {{ row.value }}
                             </a>
                         </div>
                     </template>
@@ -51,12 +54,7 @@ export default {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
-                    formatter: (name) => {
-                        return {
-                            full: name,
-                            truncate: this.truncateFunc(name, 15),
-                        };
-                    },
+                    class: 'pair-cell',
                 },
                 {
                     key: 'amount',
