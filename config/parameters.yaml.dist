@@ -92,11 +92,19 @@ parameters:
     # Path for all main documents
     docs_path: '/docs'
 
-    # Pasword reset link expiration time in seconds
+    # Password reset link expiration time in seconds
     password_reset_expiration_time: 3600
 
     # Time that has to pass to be able to request password reset link again, in seconds
-    password_reset_retry_time: 3600 
+    password_reset_retry_time: 3600
 
     # Switch hide or show personal data in profile page (like city and zip code)
     show_full_data_in_profile: false
+
+    # WEB limit for landing page bonus
+    landing_web_bonus_limit: 50000
+
+    # How much user receive for registration
+    landing_web_bonus: 5
+
+
