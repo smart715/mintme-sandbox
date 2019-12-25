@@ -66,17 +66,17 @@
                 {% if showTrade %}
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
                         <trade
-                                websocket-url="{{ global_websocket_url }}"
-                                hash="{{ hash }}"
-                                login-url="{{ path('fos_user_security_login') }}"
-                                signup-url="{{ path('fos_user_registration_register') }}"
-                                :market="{{ market | json_encode }}"
-                                :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                :precision="{{ precision }}"
-                                :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                :user-id="{{ app.user ? app.user.id : 0 }}"
-                                webchain-supply-url="{{ webchain_supply }}">
+                            websocket-url="{{ global_websocket_url }}"
+                            hash="{{ hash }}"
+                            login-url="{{ path('fos_user_security_login') }}"
+                            signup-url="{{ path('fos_user_registration_register') }}"
+                            :market="{{ market | json_encode }}"
+                            :logged-in="{{ app.user ? 'true' : 'false' }}"
+                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                            :precision="{{ precision }}"
+                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            mintme-supply-url="{{ mintme_supply }}">
                         </trade>
                     </b-tab>
                 {% endif %}
@@ -112,8 +112,8 @@
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <div class="truncate-token">
-                                    <span v-b-tooltip="{title: '{{ market.quote.name }}', boundary:'viewport'}">
-                                        {{ market.quote.name }}
+                                    <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
+                                        {{ market.quote.name | rebranding }}
                                     </span>
                                 </div>
                             </div>
