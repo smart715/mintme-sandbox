@@ -26,10 +26,10 @@
                     <div class="card-body">
                         {%- if (canEdit == true) -%}
                             <a @click="showEditForm = true" class="float-right">
-                                <font-awesome-icon icon="edit" class="c-pointer ml-2  icon-edit" v-if="!showEditForm"></font-awesome-icon>
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-edit" v-if="!showEditForm"></font-awesome-icon>
                             </a>
                         {%- endif -%}
-                        <div v-if="!showEditForm">
+                        <div v-if="!showEditForm" class="row">
                             <div class="col-12">
                                 <div class="pb-1">
                                     {% if profile.country is not empty %}
