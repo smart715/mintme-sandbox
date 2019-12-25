@@ -137,7 +137,6 @@ class TokenController extends Controller
         );
         $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
 
-
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
