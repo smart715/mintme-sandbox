@@ -8,8 +8,13 @@ use Doctrine\ORM\EntityRepository;
 class BonusRepository extends EntityRepository
 {
     /** @codeCoverageIgnore */
-    public function getPaidCount(int $bonusAmount): int
+    public function getPaidSum(string $type): int
     {
-        return $this->count(['status' => Bonus::PAID_STATUS, 'quantityWeb' => $bonusAmount]);
+        return (int)$this->createQueryBuilder('bonus')
+            ->select('SUM(bonus.quantityWeb)')
+            ->where('bonus.type = :type')
+            ->setParameter('type', $type)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

@@ -87,7 +87,7 @@ class RegistrationController extends FOSRegistrationController
 
         if ($this->bonusManager->isLimitReached(
             $this->getParameter('landing_web_bonus_limit'),
-            $this->getParameter('landing_web_bonus')
+            Bonus::SIGN_UP_TYPE
         )) {
             return $this->redirectToRoute('homepage');
         }
@@ -113,9 +113,9 @@ class RegistrationController extends FOSRegistrationController
             return $response;
         }
 
-        return $this->render('@FOSUser/Registration/register.html.twig', array(
+        return $this->render('@FOSUser/Registration/register.html.twig', [
             'form' => $form->createView(),
-        ));
+        ]);
     }
 
     /**
@@ -152,7 +152,8 @@ class RegistrationController extends FOSRegistrationController
                     $bonus = new Bonus(
                         $user,
                         Bonus::PENDING_STATUS,
-                        $this->getParameter('landing_web_bonus')
+                        $this->getParameter('landing_web_bonus'),
+                        Bonus::SIGN_UP_TYPE
                     );
                     $user->setBonus($bonus);
                     $this->em->persist($bonus);
@@ -189,7 +190,9 @@ class RegistrationController extends FOSRegistrationController
         $user = $this->getUser();
         $bonus = $user->getBonus();
 
-        if ($bonus && Bonus::PENDING_STATUS === $user->getBonus()->getStatus()) {
+        if ($bonus &&
+            Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&
+            Bonus::SIGN_UP_TYPE === $user->getBonus()->getType()) {
             $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
             if (!$crypto) {

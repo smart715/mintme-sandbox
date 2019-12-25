@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\UserInterface;
+use Sonata\FormatterBundle\Validator\Constraints\Formatter;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BonusRepository")
@@ -16,6 +17,8 @@ class Bonus
     public const PENDING_STATUS = 'pending';
 
     public const PAID_STATUS = 'paid';
+
+    public const SIGN_UP_TYPE = 'sign-up';
 
     /**
      * @ORM\Id()
@@ -44,11 +47,18 @@ class Bonus
      */
     private $quantityWeb;
 
-    public function __construct(UserInterface $user, string $status, int $quantityWeb)
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    private $type;
+
+    public function __construct(UserInterface $user, string $status, int $quantityWeb, string $type)
     {
         $this->user = $user;
         $this->status = $status;
         $this->quantityWeb = $quantityWeb;
+        $this->type = $type;
     }
 
     public function getId(): int
@@ -84,5 +94,10 @@ class Bonus
     public function setQuantityWeb(int $quantityWeb): void
     {
         $this->quantityWeb = $quantityWeb;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 }
