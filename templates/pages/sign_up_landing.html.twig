@@ -7,7 +7,7 @@
 {% block content %}
     <div class="container" id="sign-up-langing">
         <div class="row flex-md-row justify-content-center flex-column-reverse align-items-center py-5 px-xl-5">
-            <div class="col-sm-10 col-md-5 col-lg-3 pr-xs-2 pr-md-0">
+            <div id="form" class="col-sm-10 col-md-5 col-lg-3 pr-xs-2 pr-md-0">
                 <div class="card">
                     <div class="card-header">
                         {{ formHeader }}
@@ -90,7 +90,7 @@
                     </span>
                 </div>
                 <div class="xl-text pt-2 w-80 mx-auto">
-                    <a href="{{ path('fos_user_registration_register') }}"
+                    <a href="#form"
                        class="text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
                         REGISTER NOW
                     </a>
@@ -105,7 +105,7 @@
                 <img class="hand-and-lamp" src="{{ asset('build/images/lamp.png') }}">
             </div>
             <div class="md-text col-md-6 pt-5 w-80 order-md-2 mx-auto text-center d-none">
-                <a href="{{ path('fos_user_registration_register') }}"
+                <a href="#form"
                    class="text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
                     REGISTER NOW
                 </a>
@@ -137,7 +137,7 @@
         <div class="row feature-row border border-white m-5 py-3">
             <div class="col-md-5 col-xl-4 py-2 text-center p-4 my-auto">
                 <h1 class="d-block d-md-none px-0 font-weight-bold">Can you afford not to try?</h1>
-                <img class="web-chain" src="{{ asset('build/images/webchain-graphic.png') }}">
+                <img class="web-chain" src="{{ asset('build/images/mintme-coin-graphic.png') }}">
             </div>
             <div class="col-md-7 col-xl-8 py-2 text-center pl-2 text-center my-auto">
                 <h1 class="d-none d-md-block px-5 font-weight-bold">Can you afford not to try?</h1>
