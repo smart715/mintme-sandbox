@@ -466,3 +466,7 @@ services:
     App\EventSubscriber\TransactionSubscriber:
         arguments:
             $mailer: '@app.instant.mailer'
+
+    App\Controller\API\UsersController:
+         arguments:
+            $clientManager: '@fos_oauth_server.client_manager.default'

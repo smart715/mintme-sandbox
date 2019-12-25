@@ -53,6 +53,7 @@
                             <div v-cloak>
                                 {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                                 <api-keys class="mb-2" :api-keys="{{ keys | json_encode }}" v-cloak></api-keys>
+                                <api-clients class="mb-2" :api-clients="{{ clients | json_encode }}" v-cloak></api-clients>
                             </div>
                             <p>
                                 Check <a href="{{ path('nelmio_api_doc.swagger_ui') }}">documentation</a> for more information

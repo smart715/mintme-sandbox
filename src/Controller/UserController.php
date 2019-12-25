@@ -67,9 +67,12 @@ class UserController extends AbstractController
         $keys = $user
             ? $user->getApiKey()
             : null;
+        $clients = $user
+            ? $user->getApiClients()
+            : null;
         $passwordForm = $this->getPasswordForm($request, $keys);
 
-        return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys));
+        return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys, $clients));
     }
 
     /**
@@ -229,17 +232,20 @@ class UserController extends AbstractController
             $this->addFlash('success', 'Password was updated successfully');
             $this->eventDispatcher->dispatch(
                 FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
-                new FilterUserResponseEvent($user, $request, $this->renderSettings($passwordForm, $apiKey))
+                new FilterUserResponseEvent($user, $request, $this->renderSettings($passwordForm, $user->GetApiClients()))
             );
         }
 
         return $passwordForm;
     }
 
-    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey): Response
+    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, array $clients): Response
     {
         return $this->render('pages/settings.html.twig', [
             'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
+                "groups" => ["API"],
+            ]),
+            'clients' => $this->normalizer->normalize($clients ?? [], null, [
                 "groups" => ["API"],
             ]),
             'passwordForm' => $passwordForm->createView(),

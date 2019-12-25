@@ -11,6 +11,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use FOS\OAuthServerBundle\Entity\ClientManager;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 
 /**
  * @Rest\Route("/api/users")
@@ -20,10 +22,12 @@ class UsersController extends AbstractFOSRestController
 {
     /** @var UserActionLogger */
     private $userActionLogger;
+    private $clientManager;
 
-    public function __construct(UserActionLogger $userActionLogger)
+    public function __construct(UserActionLogger $userActionLogger, ClientManager $clientManager)
     {
         $this->userActionLogger = $userActionLogger;
+        $this->clientManager = $clientManager;
     }
 
     /**
@@ -76,6 +80,63 @@ class UsersController extends AbstractFOSRestController
         $this->getEm()->remove($keys);
         $this->getEm()->flush();
         $this->userActionLogger->info('Deleted API keys');
+    }
+
+    /**
+     * @Rest\View(statusCode=201)
+     * @Rest\Post("/clients", name="post_client", options={"expose"=true})
+     */
+    public function createApiClient(): array
+    {
+        /* App\Entity\Api\Client $client */
+        $user = $this->getUser();
+        $client = $this->clientManager->createClient();
+        $client->setAllowedGrantTypes(array('token'));
+        $client->setUser($user);
+        $this->clientManager->updateClient($client);
+
+        $clients = $user->GetApiClients();
+
+        // add secret only to new created client
+        // for other it will be hidden
+        foreach ($clients as $key=>$val){
+            if ($val['id'] ==  $client->getRandomId()){
+                $clients[$key]['secret'] =  $client->getSecret();
+            }
+        }
+
+        return $clients;
+    }
+
+    /**
+     * @Rest\View(statusCode=203)
+     * @Rest\Delete("/clients", name="delete_client", options={"expose"=true})
+     * @Rest\QueryParam(name="id", allowBlank=false, description="client id to delete")
+     * @param ParamFetcherInterface $request
+     * @return array []Client
+     * @throws ApiNotFoundException
+     */
+    public function deleteApiClient(ParamFetcherInterface $request): array
+    {
+
+        $id = (string)$request->get('id');
+        if (empty($id)) {
+            throw new ApiNotFoundException("Client ID required");
+        }
+
+        $user = $this->getUser();
+        $client = $this->clientManager->findClientBy(['user' => $user, 'randomId' => $id]);
+
+        if (!($client instanceof \App\Entity\Api\Client)) {
+            throw new ApiNotFoundException("No clients attached to the account");
+        }
+
+        $this->clientManager->deleteClient($client);
+        $this->userActionLogger->info('Deleted API Client');
+
+        $clients = $user->GetApiClients();
+
+        return $clients;
     }
 
     private function getEm(): ObjectManager

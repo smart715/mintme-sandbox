@@ -116,6 +116,12 @@
             "ref": "370bcf99b04c0dfd0b545745aad622d757af5e1b"
         }
     },
+    "friendsofsymfony/oauth-server-bundle": {
+        "version": "1.6.2"
+    },
+    "friendsofsymfony/oauth2-php": {
+        "version": "1.2.3"
+    },
     "friendsofsymfony/rest-bundle": {
         "version": "2.2",
         "recipe": {
@@ -266,6 +272,9 @@
     },
     "paragonie/random_compat": {
         "version": "v2.0.17"
+    },
+    "php": {
+        "version": "7.2"
     },
     "php-amqplib/php-amqplib": {
         "version": "v2.7.2"

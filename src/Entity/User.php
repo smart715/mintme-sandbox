@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Api\Client;
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -156,11 +157,29 @@ class User extends BaseUser implements
      */
     protected $apiKey;
 
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Api\Client", mappedBy="user", cascade={"remove", "persist"})
+     * @var Client
+     */
+    protected $clients;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
         return $this->apiKey;
     }
+
+    /** @codeCoverageIgnore
+     * @return Client[]
+     */
+    public function getApiClients(): array
+    {
+        return array_map(function (Client $client) {
+            return $client->getClient();
+        }, $this->clients->toArray());
+    }
+
 
     /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
