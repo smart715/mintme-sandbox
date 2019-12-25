@@ -90,10 +90,14 @@ class TokenController extends Controller
      * )
      */
     public function show(
+        Request $request,
         string $name,
         ?string $tab,
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
+        if (preg_match('/(intro)/', $request->getPathInfo())) {
+            return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
 
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
