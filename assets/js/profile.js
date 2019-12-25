@@ -43,7 +43,7 @@ new Vue({
             this.zipCode = this.$refs.zipCode.getAttribute('value');
         }
 
-        this.showEditForm = this.$refs.editFormShowFirst.value;
+        this.showEditForm = !!this.$refs.editFormShowFirst.value;
         this.toggleZipCodeInputDisabled(this.notAvailZipCode);
         this.countryChanged();
     },
