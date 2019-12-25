@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign Up Landing | mintMe{% endblock %}
+
+{% set formHeader = "Sign Up" %}
+
+{% block content %}
+    <div class="container" id="sign-up-langing">
+        <div class="row flex-md-row justify-content-center flex-column-reverse align-items-center py-5 px-xl-5">
+            <div id="form" class="col-sm-10 col-md-5 col-lg-3 pr-xs-2 pr-md-0">
+                <div class="card">
+                    <div class="card-header">
+                        {{ formHeader }}
+                    </div>
+                    <div class="card-body py-2">
+                        {{ form_start(form, {'method': 'post', 'action': path('sign_up'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
+                        {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
+                        <div>
+                            <passwordmeter :password="password" @toggle-error="toggleError">
+                                    <span @click="togglePassword()" class="show-password">
+                                        <i class="far fa-eye"></i>
+                                    </span>
+                                {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
+                            </passwordmeter>
+                        </div>
+                        <div class="py-2">
+                            {{ form_row(form.recaptcha, { 'inline': false }) }}
+                        </div>
+                        <div class="text-left">
+                            <input type="submit" :disabled="disabled" class="btn btn-primary" value="Sign Up">
+                            <span class="px-3">or</span>
+                            <a class="btn-cancel" href="{{ path('fos_user_security_login') }}">Log In</a>
+                        </div>
+                        <p class="text-left pt-3">
+                            By clicking Sign Up, you accept <br>
+                            <a target="_blank" href="{{ path('terms_of_service') }}">
+                                Terms of Service</a> and
+                            <a target="_blank" href="{{ path('privacy_policy') }}">Privacy policy</a>
+                        </p>
+                        {{ form_end(form) }}
+                        {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
+                    </div>
+                </div>
+            </div>
+            <div class="logo-text col-sm-12 col-md-7 col-lg-9 px-0">
+                <div class="logo-div order-2">
+                    <img class="logo-web w-70" src="{{ asset('build/images/logo-with-web.png') }}">
+                </div>
+                <div class="we-will-pay d-inline-block pr-3 order-1">
+                    <span class="letter-space title text-white h1">We will PAY YOU</span><br>
+                    <span class="letter-space landing-font float-right">if you register NOW!</span>
+                </div>
+            </div>
+        </div>
+        <div class="row py-5 justify-content-center">
+            <div class="col-xl-6 col-lg-12 col-sm-12 what-is landing-font text-center">
+                <span>What is <i>mintMe?</i></span> <br>
+                <span>It's new innovative crowdfunding platform where both sides can earn!</span>
+            </div>
+        </div>
+        <div class="row steps py-3 pb-5 px-5 mx-0 landing-font justify-content-center text-center">
+            <div class="col-lg-4 col-md-12 col-sm-12 px-0 py-2">
+                <img class="arrows" src="{{ asset('build/images/number-one.png') }}">
+                <div class="arr-text d-inline-block align-middle text-center">
+                    <span>Content creator issues his own tokens</span>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 px-0 py-3 py-md-2">
+                <img class="arrows" src="{{ asset('build/images/number-two.png') }}">
+                <div class="arr-text d-inline-block align-middle text-center">
+                    <span>Person supporting buys such tokens and if project suceeds</span>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 px-0">
+                <img class="arrows" src="{{ asset('build/images/number-three.png') }}">
+                <div class="arr-text d-inline-block align-middle text-center">
+                    <span>Such tokens gain in value and can be sold for more money!</span>
+                </div>
+            </div>
+        </div>
+        <div class="row feature-row border border-white m-5 px-0 py-3">
+            <div class="col-md-6 col-lg-3 py-2 order-md-0 text-center">
+                <img class="hand-and-lamp" src="{{ asset('build/images/hand-coin.png') }}">
+            </div>
+            <div class="col-md-6 col-lg-6 order-md-1 text-center">
+                <div class="pt-5">
+                    <span class="title text-white h2">
+                    So you invest in some idea <br>
+                    not just give money to support it! <br>
+                    </span>
+                </div>
+                <div class="xl-text pt-2 w-80 mx-auto">
+                    <a href="#form"
+                       class="text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
+                        REGISTER NOW
+                    </a>
+                    <div class="xl-text d-inline-block small-text">
+                        To encourage you to our new service,
+                        we give you <b>5 MINTME</b> (MintMe coins)
+                        if you <b>register now</b>. For free
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 py-2 order-md-3 text-center">
+                <img class="hand-and-lamp" src="{{ asset('build/images/lamp.png') }}">
+            </div>
+            <div class="md-text col-md-6 pt-5 w-80 order-md-2 mx-auto text-center d-none">
+                <a href="#form"
+                   class="text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
+                    REGISTER NOW
+                </a>
+                <div class="d-inline-block small-text">
+                    To encourage you to our new service,
+                    we give you <b>5 MINTME</b> (MintMe coins)
+                    if you <b>register now</b>. For free
+                </div>
+            </div>
+        </div>
+        <div class="diagrams row justify-content-center m-5 py-5">
+            <div class="col-md-3 col-lg-2 py-2 text-center">
+                <img class="pb-4" src="{{ asset('build/images/diagram.png') }}">
+                <img class="d-md-block d-none d-lg-none mt-5 pt-5" src="{{ asset('build/images/diagram-2.png') }}">
+            </div>
+            <div class="col-md-8 col-lg-8 mx-auto pl-md-5 pt-3 landing-font text-center">
+                MintMe coins will show up immediately on your
+                <b><i>mintMe</i></b> account and you can withdraw it if you want.<br>
+                MINTME is native blockchain currency for <b><i>mintMe</i></b>
+                exchange, on which all tokens will be based.<br>
+                If mintme succeeds, 5 MINTME can be worth a lot more than now.<br>
+                <b>Can you imagine having opportunity to get 5 BTC for free and not doing it back in 2010 when it wasn't
+                    worth much?</b>
+            </div>
+            <div class="d-lg-block d-md-none col-lg-2 py-2 text-center">
+                <img src="{{ asset('build/images/diagram-2.png') }}">
+            </div>
+        </div>
+        <div class="row feature-row border border-white m-5 py-3">
+            <div class="col-md-5 col-xl-4 py-2 text-center p-4 my-auto">
+                <h1 class="d-block d-md-none px-0 font-weight-bold">Can you afford not to try?</h1>
+                <img class="web-chain" src="{{ asset('build/images/mintme-coin-graphic.png') }}">
+            </div>
+            <div class="col-md-7 col-xl-8 py-2 text-center pl-2 text-center my-auto">
+                <h1 class="d-none d-md-block px-5 font-weight-bold">Can you afford not to try?</h1>
+                <span class="not-demand letter-space landing-font">
+                    We do not demand any personal data from you. Just registration. We hope you can get interested
+                    after you register and spread the word about <i>mintMe.com</i>
+                </span>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/register.js') }}"></script>
+{% endblock %}
