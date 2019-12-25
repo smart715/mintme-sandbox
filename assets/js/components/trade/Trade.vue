@@ -2,10 +2,10 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
-                    class="col"
-                    :websocket-url="websocketUrl"
-                    :market="market"
-                    :mintme-supply-url="mintmeSupplyUrl"
+                class="col"
+                :websocket-url="websocketUrl"
+                :market="market"
+                :mintme-supply-url="mintmeSupplyUrl"
             />
         </div>
         <div class="row">
