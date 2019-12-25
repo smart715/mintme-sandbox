@@ -44,7 +44,7 @@
                             :tokens-count="{{ tokensCount }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}"
                             :show-usd="showUsd"
-                            webchain-supply-url="{{ webchain_supply }}"
+                            mintme-supply-url="{{ mintme_supply }}"
                             @disable-usd="disableUsd"
                         >
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}

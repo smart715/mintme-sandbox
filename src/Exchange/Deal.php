@@ -12,7 +12,7 @@ class Deal extends AbstractOrder
 
     /** @var int|null */
     private $userId;
-    
+
     /** @var int */
     private $role;
 
@@ -66,5 +66,15 @@ class Deal extends AbstractOrder
     public function getRole(): int
     {
         return $this->role;
+    }
+
+    public function getMarket(): Market
+    {
+        return $this->market;
+    }
+
+    public function setMarket(Market $market): void
+    {
+        $this->market = $market;
     }
 }

@@ -26,6 +26,16 @@ class Market
         return $this->base;
     }
 
+    public function setBase(TradebleInterface $base): void
+    {
+        $this->base = $base;
+    }
+
+    public function setQuote(TradebleInterface $quote): void
+    {
+        $this->quote = $quote;
+    }
+
     /** @Groups({"Default", "API", "dev"}) */
     public function getQuote(): TradebleInterface
     {
