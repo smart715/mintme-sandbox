@@ -38,10 +38,9 @@ new Vue({
         window.history.replaceState(
             {}, document.title, this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: i ? 'intro' : 'trade',
+              tab: i ? 'trade' : 'intro',
             })
         );
-        document.title = (i ? 'Information about ' : '') + this.tokenName + ' token | mintMe';
       }
     },
     setTokenPending: function() {
