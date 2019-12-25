@@ -131,12 +131,12 @@ class TokenController extends Controller
             '\2',
             $token->getDescription() ?? ''
         );
-        $metaDescription = str_replace("\n", " ", $tokenDescription);
+        $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
 
 
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
-            'tokenDescription' => substr($metaDescription ?? '', 0, 200),
+            'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
