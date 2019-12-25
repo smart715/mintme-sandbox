@@ -10,8 +10,7 @@
 {% endblock %}
 
 {% block title %}
-    {% if tab|default == 'intro' %}Information about {% endif %}
-    {% if token|default %} {{ token.name }} {% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
+    {% if token|default %} {{ token.name + ' token'}} {% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
 {% endblock %}
 
 {% block content %}

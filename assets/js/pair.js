@@ -41,7 +41,6 @@ new Vue({
               tab: i ? 'trade' : 'intro',
             })
         );
-        document.title = this.tokenName + ' token | mintMe';
       }
     },
     setTokenPending: function() {
