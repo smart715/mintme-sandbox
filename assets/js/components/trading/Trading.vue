@@ -174,9 +174,9 @@ export default {
             return {
                 pair: {
                     key: 'pair',
-                    label: 'Pair',
+                    label: 'Market',
                     sortable: true,
-                    class: 'pair-cell',
+                    class: 'pair-cell-trading',
                 },
                 change: {
                     key: 'change',
