@@ -191,6 +191,9 @@ class Token implements TradebleInterface
         return $this->id;
     }
 
+    /**
+     * @Groups({"API", "dev"})
+     */
     public function getLockIn(): ?LockIn
     {
         return $this->lockIn;
