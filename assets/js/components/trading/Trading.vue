@@ -345,7 +345,7 @@ export default {
 
             let marketCap = Decimal.mul(lastPrice, supply);
             return {
-                pair: `${currency}/${token}`,
+                pair: currency === 'BTC' ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 volume: this.toMoney(volume) + ' ' + currency,
