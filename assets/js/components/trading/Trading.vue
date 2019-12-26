@@ -67,6 +67,7 @@
                             <a :href="row.item.tokenUrl" class="text-white" v-b-tooltip:title="row.value">
                                 {{ row.value }}
                             </a>
+                            <img v-if="row.item.tokenized" src="../../../img/mintmecoin_W.png" alt="tokenized">
                         </div>
                     </template>
                 </b-table>
@@ -324,7 +325,8 @@ export default {
                 parseFloat(marketInfo.deal),
                 monthVolume,
                 supply,
-                marketPrecision
+                marketPrecision,
+                !!this.markets[marketName].lockIn
             );
 
             if (marketOnTopIndex > -1) {
@@ -340,7 +342,7 @@ export default {
                 dayVolume: marketInfo.deal,
             };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
             let hiddenName = this.findHiddenName(token);
 
             let marketCap = Decimal.mul(lastPrice, supply);
@@ -358,6 +360,7 @@ export default {
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
                 marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
+                tokenized: tokenized,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -380,6 +383,7 @@ export default {
                     const cryptoSymbol = this.markets[market].base.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
+
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
                         tokenName,
@@ -391,9 +395,9 @@ export default {
                         parseFloat(this.markets[market].dayVolume),
                         parseFloat(this.markets[market].monthVolume),
                         this.markets[market].supply,
-                        this.markets[market].base.subunit
+                        this.markets[market].base.subunit,
+                        this.markets[market].lockIn
                     );
-
                     if (marketOnTopIndex > -1) {
                         Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
                     } else {
@@ -517,7 +521,8 @@ export default {
                 parseFloat(market.dayVolume),
                 parseFloat(market.monthVolume),
                 market.supply,
-                market.base.subunit
+                market.base.subunit,
+                false
             );
 
             Vue.set(this.sanitizedMarketsOnTop, 0, market);

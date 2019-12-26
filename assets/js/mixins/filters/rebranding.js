@@ -10,6 +10,9 @@ let rebranding = (val) => {
         {regexp: /(web)/g, replacer: 'MINTME'},
     ];
     brandDict.forEach((item) => {
+        if (typeof val !== 'string') {
+            return;
+        }
         val = val.replace(item.regexp, item.replacer);
     });
 
