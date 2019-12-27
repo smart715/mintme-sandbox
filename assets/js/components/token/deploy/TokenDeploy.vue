@@ -8,19 +8,21 @@
                 >
                     <p>
                         This is final step for token creation. After you pay for deploying token to blockchain
-                        you and others will be able to withdraw tokens from mintme to your Webchain wallet.
+                        you and others will be able to withdraw tokens from mintme to your MintMe Coin wallet.
                     </p>
                     <p class="bg-danger">
-                        WEB spent on mintMe, will be inaccessible by us (frozen) for 5 years. So you lower WEB circulating supply with each purchase and increase probability of WEB price going up.
+                        MINTME spent on mintMe, will be inaccessible by us (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.
                     </p>
                     <p class="bg-danger">
                         This process is irreversible, once confirm payment there is no going back.
                     </p>
                     <p class="mt-5">
-                        Your current balance: {{ balance | toMoney(precision) | formatMoney }} WEB coins <br>
+                        Your current balance: {{ balance | toMoney(precision) | formatMoney }} MINTME <br>
                         <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
                     </p>
-                    <p>Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }}</p>
+                    <p>
+                        Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }} MINTME
+                    </p>
                     <div class="pt-3">
                         <button
                             class="btn btn-primary"
@@ -80,7 +82,7 @@
 <script>
 import TwoFactorModal from '../../modal/TwoFactorModal';
 import {toMoney, formatMoney} from '../../../utils';
-import {WebSocketMixin} from '../../../mixins';
+import {WebSocketMixin, NotificationMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
 import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
 
@@ -89,7 +91,7 @@ export default {
     components: {
         TwoFactorModal,
     },
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, NotificationMixin],
     props: {
         twofa: Boolean,
         hasReleasePeriod: Boolean,
@@ -163,15 +165,15 @@ export default {
             .then(() => {
                 this.status = tokenDeploymentStatus.pending;
                 this.$emit('pending');
-                this.$toasted.success('Process in pending status and it will take some minutes to be done.');
+                this.notifySuccess('Process in pending status and it will take some minutes to be done.');
             })
             .catch(({response}) => {
                 if (!response) {
-                    this.$toasted.error('Network error');
+                    this.notifyError('Network error');
                 } else if (response.data.message) {
-                    this.$toasted.error(response.data.message);
+                    this.notifyError(response.data.message);
                 } else {
-                    this.$toasted.error('An error has occurred, please try again later');
+                    this.notifyError('An error has occurred, please try again later');
                 }
             })
             .then(() => this.deploying = false);

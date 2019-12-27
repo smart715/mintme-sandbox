@@ -1,6 +1,6 @@
 <template>
     <div v-if="canUpdate">
-        <div class="col-12 pb-0 px-0">
+        <div class="col-12 pb-3 px-0">
             <label for="address" class="d-block text-left">
                 New address:
             </label>
@@ -14,28 +14,11 @@
             <div v-if="$v.newAddress.$error" class="invalid-feedback">
                 Wrong address
             </div>
-            <label class="custom-control custom-checkbox pt-2">
-                <input
-                    v-model="locked"
-                    id="locked"
-                    type="checkbox"
-                    class="custom-control-input"
-                >
-                <label
-                    class="custom-control-label"
-                    for="locked"
-                >
-                    Prevent another edition of withdrawal address.
-                </label>
-            </label>
-            <p class="text-danger">
-                If you check this box and lose access to address it will be impossible to change it or recover rest of tokens.
-            </p>
         </div>
-        <div class="col-12 px-0 clearfix">
+        <div class="col-12 pt-2 px-0 clearfix">
             <button
                 class="btn btn-primary float-left"
-                :disabled="submitting"
+                :disabled="submitting || sameAddress"
                 @click="editAddress"
             >
                 Save
@@ -70,9 +53,11 @@
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {addressLength, addressContain} from '../../utils/constants';
+import {NotificationMixin} from '../../mixins';
 
 export default {
-    name: 'TokenWithdrawalAddress',
+    name: 'TokenReleaseAddress',
+    mixins: [NotificationMixin],
     components: {
         TwoFactorModal,
     },
@@ -80,13 +65,12 @@ export default {
         isTokenDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
-        withdrawalAddress: String,
+        releaseAddress: String,
     },
     data() {
         return {
-            currentAddress: this.withdrawalAddress,
-            locked: false,
-            newAddress: this.withdrawalAddress,
+            currentAddress: this.releaseAddress,
+            newAddress: this.releaseAddress,
             showTwoFactorModal: false,
             submitting: false,
         };
@@ -94,6 +78,9 @@ export default {
     computed: {
         canUpdate: function() {
             return this.isTokenDeployed && '0x' !== this.currentAddress;
+        },
+        sameAddress: function() {
+            return this.currentAddress === this.newAddress;
         },
     },
     methods: {
@@ -105,6 +92,7 @@ export default {
         },
         setUpdatingState: function() {
             this.currentAddress = '0x';
+            this.$emit('update-release-address');
         },
         cancelEditingMode: function() {
             if (!this.showTwoFactorModal) {
@@ -118,13 +106,13 @@ export default {
                 this.closeModal();
                 return;
             } else if (!this.$v.newAddress.addressContain) {
-                this.$toasted.error('Withdrawal address can contain alphabets and numbers');
+                this.notifyError('Release address can contain alphabets and numbers');
                 return;
             } else if (!this.$v.newAddress.minLength) {
-                this.$toasted.error(`Withdrawal address should have at least ${addressLength.WEB.min} symbols`);
+                this.notifyError(`Release address should have at least ${addressLength.WEB.min} symbols`);
                 return;
             } else if (!this.$v.newAddress.maxLength) {
-                this.$toasted.error(`Withdrawal address can not be longer than ${addressLength.WEB.max} characters`);
+                this.notifyError(`Release address can not be longer than ${addressLength.WEB.max} characters`);
                 return;
             }
 
@@ -144,23 +132,19 @@ export default {
                 name: this.tokenName,
             }), {
                 address: this.newAddress,
-                lock: this.locked,
                 code,
             })
             .then(() => {
                 this.setUpdatingState();
-                this.$toasted.success('Updating address is pending.');
+                this.notifySuccess('Updating address is pending.');
             }, (error) => {
                 if (!error.response) {
-                    this.$toasted.error('Network error');
+                    this.notifyError('Network error');
                 } else if (error.response.data.message) {
-                    this.$toasted.error(error.response.data.message);
+                    this.notifyError(error.response.data.message);
                 } else {
-                    this.$toasted.error('An error has occurred, please try again later');
+                    this.notifyError('An error has occurred, please try again later');
                 }
-            })
-            .then(() => {
-                this.submitting = false;
             });
         },
     },

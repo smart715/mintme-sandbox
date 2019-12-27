@@ -70,20 +70,14 @@
 </template>
 
 <script>
-import Toasted from 'vue-toasted';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faTelegram} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin} from '../../mixins/';
+import {FiltersMixin, NotificationMixin} from '../../mixins/';
 import {isValidTelegramUrl} from '../../utils';
 
 library.add(faTelegram, faTimes);
-
-Vue.use(Toasted, {
-    duration: 5000,
-    position: 'top-center',
-});
 
 const HTTP_ACCEPTED = 202;
 
@@ -97,7 +91,7 @@ export default {
     components: {
         FontAwesomeIcon,
     },
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, NotificationMixin],
     data() {
         return {
             editing: this.editingTelegram,
@@ -154,10 +148,10 @@ export default {
                         let state = this.newTelegram ? 'added' : 'removed';
                         this.$emit('saveTelegram', this.newTelegram);
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
-                        this.$toasted.success(`Telegram invitation link ${state} successfully`);
+                        this.notifySuccess(`Telegram invitation link ${state} successfully`);
                         this.editing = false;
                     } else {
-                        this.$toasted.error(response.data.message || 'Network error');
+                        this.notifyError(response.data.message || 'Network error');
                     }
                     this.submitting = false;
                 });

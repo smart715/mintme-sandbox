@@ -43,7 +43,7 @@ export default {
                     child: [
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'web'}),
-                            title: 'Add 100 WEB',
+                            title: 'Add 100 MINTME',
                         },
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'btc'}),

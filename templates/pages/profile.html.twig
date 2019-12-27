@@ -5,7 +5,7 @@
         Create your profile | mintMe
     {% else %}
         {{ profile.firstName }} {{ profile.lastName }}
-        {{ profile.city is empty ? '' : ' (from ' ~ profile.city ~ ')' }} profile | mintMe
+        {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }} profile | mintMe
     {% endif %}
 {% endblock %}
 
@@ -26,21 +26,28 @@
                     <div class="card-body">
                         {%- if (canEdit == true) -%}
                             <a @click="showEditForm = true" class="float-right">
-                                <font-awesome-icon icon="edit" class="c-pointer ml-2  icon-edit" v-if="!showEditForm"></font-awesome-icon>
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-edit" v-if="!showEditForm"></font-awesome-icon>
                             </a>
                         {%- endif -%}
-                        <div class="row" v-if="!showEditForm">
+                        <div v-if="!showEditForm" class="row">
                             <div class="col-12">
-                                <div class="pb-1">
-                                    {% if profile.city is not empty %}
-                                        City: {{ profile.city }}
-                                    {% endif %}
-                                </div>
                                 <div class="pb-1">
                                     {% if profile.country is not empty %}
                                         Country: {{ profile.getCountryFullName() }}
                                     {% endif %}
                                 </div>
+                                {% if show_full_data_in_profile %}
+                                    <div class="pb-1">
+                                        {% if profile.city is not empty %}
+                                            City: {{ profile.city }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="pb-1">
+                                        {% if profile.zipCode is not empty %}
+                                            ZIP code: {{ profile.zipCode }}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                                 {% if token is not empty %}
                                     <div class="pb-1">
                                         Token: <a href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
@@ -87,23 +94,63 @@
                                         Last name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_row(form.city, {'attr':
+                                        {{ form_row(form.country, {'attr':
                                             {
-                                                'v-model.trim': '$v.city.$model',
-                                                'class': 'form-control',
-                                                'ref': 'city'
+                                                'ref': 'country',
+                                                'v-on:change': 'countryChanged'
                                             }
                                         }) }}
                                     </div>
-                                    <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
-                                        City can contain alphabets and -
-                                    </div>
-                                    <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
-                                        City must have at least 2 letters
-                                    </div>
-                                    <div class="pb-1">
-                                        {{ form_row(form.country) }}
-                                    </div>
+                                    {% if show_full_data_in_profile %}
+                                        <div class="pb-1">
+                                            {{ form_row(form.city, {'attr':
+                                                {
+                                                    'v-model.trim': '$v.city.$model',
+                                                    'class': 'form-control',
+                                                    'ref': 'city'
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
+                                            City can contain alphabets and -
+                                        </div>
+                                        <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
+                                            City must have at least 2 letters
+                                        </div>
+                                        <div class="pb-1">
+                                            {{ form_row(form.zipCode, {'attr':
+                                                {
+                                                    'v-model.trim': '$v.zipCode.$model',
+                                                    'class': 'form-control',
+                                                    'ref': 'zipCode',
+                                                    'v-on:input': 'zipCodeValidate',
+                                                    'v-on:change': 'zipCodeValidate'
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div
+                                            v-if="!$v.zipCode.zipCodeContain"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            Zip code can contain only letters, numbers, spaces and dashes
+                                        </div>
+                                        <div
+                                            v-else-if="!zipCodeValid"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            Zip code is not valid for selected country
+                                        </div>
+
+                                        <div
+                                            v-else-if="!$v.zipCode.zipCodeWrongChars"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            Zip code cannot consist only of spaces
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-12 pt-3">
                                     <div>
@@ -124,10 +171,10 @@
                             </div>
                             <div class="text-left">
                                 <input
-                                        type="submit"
-                                        :disabled="$v.$anyError || !(firstName && lastName)"
-                                        class="btn btn-primary"
-                                        value="Save">
+                                    type="submit"
+                                    :disabled="$v.$invalid || !(firstName && lastName) || !zipCodeValid || zipCodeProcessing"
+                                    class="btn btn-primary"
+                                    value="Save">
                                 <a href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}" @click="showEditForm = false" class="btn-cancel pl-3" >Cancel</a>
                             </div>
                             {{ form_end(form) }}

@@ -162,6 +162,13 @@ class User extends BaseUser implements
         return $this->apiKey;
     }
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Bonus")
+     * @ORM\JoinColumn(name="bonus_id", referencedColumnName="id")
+     * @var Bonus|null
+     */
+    private $bonus;
+
     /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
     {
@@ -403,5 +410,15 @@ class User extends BaseUser implements
         $this->trustedTokenVersion = $trustedTokenVersion;
 
         return $this;
+    }
+
+    public function getBonus(): ?Bonus
+    {
+        return $this->bonus;
+    }
+
+    public function setBonus(?Bonus $bonus): void
+    {
+        $this->bonus= $bonus;
     }
 }

@@ -30,7 +30,7 @@
                                 <b-dropdown-item @click="toggleUsd(false)">
                                     Crypto
                                 </b-dropdown-item>
-                                <b-dropdown-item @click="toggleUsd(true)">
+                                <b-dropdown-item :disabled="!enableUsd" @click="toggleUsd(true)">
                                     USD
                                 </b-dropdown-item>
                             </template>
@@ -43,9 +43,10 @@
                             :page="{{ page }}"
                             :tokens-count="{{ tokensCount }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}"
-                            :cryptos="{{ cryptos | json_encode }}"
                             :show-usd="showUsd"
-                            webchain-supply-url="{{ webchain_supply }}">
+                            mintme-supply-url="{{ mintme_supply }}"
+                            @disable-usd="disableUsd"
+                        >
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                         </trading>
                     </div>

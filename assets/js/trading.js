@@ -6,6 +6,7 @@ new Vue({
   data() {
     return {
         showUsd: false,
+        enableUsd: true,
     };
   },
   components: {
@@ -15,6 +16,10 @@ new Vue({
   methods: {
     toggleUsd: function(show) {
       this.showUsd = show;
+    },
+    disableUsd: function() {
+      this.showUsd = false;
+      this.enableUsd = false;
     },
   },
 });

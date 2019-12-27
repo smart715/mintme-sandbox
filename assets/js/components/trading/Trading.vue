@@ -21,6 +21,7 @@
                     :sort-by="fields.volume.key"
                     :sort-desc="true"
                     :sort-compare="sortCompare"
+                    sort-direction="desc"
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
@@ -29,7 +30,7 @@
                             :lazy="true"
                         >
                             <template slot="button-content">
-                                {{ data.label }}
+                                {{ data.label|rebranding }}
                             </template>
                             <template>
                                 <b-dropdown-item
@@ -37,21 +38,21 @@
                                     :key="key"
                                     @click="toggleActiveVolume(key)"
                                 >
-                                    {{ volume.label }}
+                                    {{ volume.label|rebranding }}
                                 </b-dropdown-item>
                             </template>
                         </b-dropdown>
                         <guide class="ml-1 mr-2">
                             <template slot="header">
-                                {{ data.label }}
+                                {{ data.label|rebranding }}
                             </template>
                             <template slot="body">
-                                {{ data.field.help }}
+                                {{ data.field.help|rebranding}}
                             </template>
                         </guide>
                     </template>
                     <template v-slot:[`head(${fields.marketCap.key})`]="data">
-                        {{ data.label }}
+                        {{ data.label|rebranding }}
                         <guide>
                             <template slot="header">
                                 Market Cap
@@ -62,11 +63,11 @@
                         </guide>
                     </template>
                     <template v-slot:cell(pair)="row">
-                        <a class="d-block text-truncate truncate-responsive text-white"
-                            v-b-tooltip:title="row.value"
-                            :href="row.item.tokenUrl">
-                            {{ row.value }}
-                        </a>
+                        <div class="truncate-name w-100">
+                            <a :href="row.item.tokenUrl" class="text-white" v-b-tooltip:title="row.value">
+                                {{ row.value }}
+                            </a>
+                        </div>
                     </template>
                 </b-table>
             </div>
@@ -88,24 +89,23 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import capitalize from 'lodash/capitalize';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
     props: {
         page: Number,
         tokensCount: Number,
         userId: Number,
-        cryptos: Object,
         coinbaseUrl: String,
         showUsd: Boolean,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     components: {
         Guide,
@@ -158,8 +158,14 @@ export default {
                 tokens.push(this.sanitizedMarkets[marketName]);
             });
             tokens.sort((first, second) => parseFloat(second.deal) - parseFloat(first.deal));
+            tokens = this.sanitizedMarketsOnTop.concat(tokens);
+            tokens = _.map(tokens, (token) => {
+                return _.mapValues(token, (item) => {
+                    return this.rebrandingFunc(item);
+                });
+            });
 
-            return this.sanitizedMarketsOnTop.concat(tokens);
+            return tokens;
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
@@ -168,8 +174,9 @@ export default {
             return {
                 pair: {
                     key: 'pair',
-                    label: 'Pair',
+                    label: 'Market',
                     sortable: true,
+                    class: 'pair-cell-trading',
                 },
                 change: {
                     key: 'change',
@@ -211,7 +218,7 @@ export default {
         let conversionRatesPromise = this.fetchConversionRates();
         this.fetchGlobalMarketCap();
 
-        Promise.all([updateDataPromise, conversionRatesPromise])
+        Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
             .then(() => {
                 this.updateDataWithMarkets();
                 this.loading = false;
@@ -235,14 +242,19 @@ export default {
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             } else {
                 this.marketsOnTop.forEach((market)=> {
-                    if (b.pair === market.currency + '/' + market.token ||
-                        a.pair === market.currency + '/' + market.token) {
+                    let currency = this.rebrandingFunc(market.currency);
+                    let token = this.rebrandingFunc(market.token);
+
+                    if (b.pair === currency + '/' + token || a.pair === currency + '/' + token) {
                         pair = true;
                     }
                 });
-                return pair ? 0 : a[key].localeCompare(b[key], undefined, {
-                    numeric: true,
-                });
+
+                let numeric = key !== this.fields.pair.key;
+                let comparison = a[key].localeCompare(b[key], undefined, {numeric});
+
+                // So that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
+                return pair ? 0 : (numeric ? comparison : -comparison);
             }
         },
         updateData: function(page) {
@@ -283,7 +295,7 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error('Can not update the markets data. Try again later.');
+                        this.notifyError('Can not update the markets data. Try again later.');
                         reject(err);
                     });
             });
@@ -336,7 +348,7 @@ export default {
 
             let marketCap = Decimal.mul(lastPrice, supply);
             return {
-                pair: `${currency}/${token}`,
+                pair: currency === 'BTC' ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 volume: this.toMoney(volume) + ' ' + currency,
@@ -454,30 +466,25 @@ export default {
             this.klineQueriesIdsTokensMap.set(id, market);
         },
         fetchConversionRates: function() {
-            let ids = Object.keys(this.cryptos).map((name) => name.toLowerCase()).join();
-
-            let config = {
-                params: {
-                    ids,
-                    vs_currencies: USD.symbol.toLowerCase(),
-                },
-            };
-
             return new Promise((resolve, reject) => {
-                this.$axios.retry.get(`${this.coinbaseUrl}/simple/price/`, config)
+                this.$axios.retry.get(this.$routing.generate('exchange_rates'))
                 .then((res) => {
-                    Object.keys(res.data).map((name) => {
-                        this.conversionRates[this.cryptos[capitalize(name)].symbol] = res.data[name][USD.symbol.toLowerCase()];
-                    });
+                    if (!(res.data && Object.keys(res.data).length)) {
+                        return Promise.reject();
+                    }
+
+                    this.conversionRates = res.data;
                     resolve();
                 })
                 .catch((err) => {
+                    this.$emit('disable-usd');
+                    this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
                     reject();
                 });
             });
         },
         toUSD: function(amount, currency, subunit = false) {
-            amount = Decimal.mul(amount, this.conversionRates[currency]);
+            amount = Decimal.mul(amount, ((this.conversionRates[currency] || [])[USD.symbol] || 1));
             return (subunit ? toMoney(amount, USD.subunit) : this.toMoney(amount)) + ' ' + USD.symbol;
         },
         fetchWEBsupply: function() {
@@ -489,13 +496,13 @@ export default {
                     },
                 };
 
-                this.$axios.retry.get(this.webchainSupplyUrl, config)
+                this.$axios.retry.get(this.mintmeSupplyUrl, config)
                     .then((res) => {
                         this.markets['WEBBTC'].supply = res.data;
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
                         reject(err);
                     });
             });

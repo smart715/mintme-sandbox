@@ -2,10 +2,10 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
-                    class="col"
-                    :websocket-url="websocketUrl"
-                    :market="market"
-                    :webchain-supply-url="webchainSupplyUrl"
+                class="col"
+                :websocket-url="websocketUrl"
+                :market="market"
+                :mintme-supply-url="mintmeSupplyUrl"
             />
         </div>
         <div class="row">
@@ -77,14 +77,14 @@ import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
-import {WebSocketMixin} from '../../mixins';
+import {WebSocketMixin, NotificationMixin} from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
 const WSAPI = Constants.WSAPI;
 
 export default {
     name: 'Trade',
-    mixins: [WebSocketMixin],
+    mixins: [WebSocketMixin, NotificationMixin],
     components: {
         TradeBuyOrder,
         TradeSellOrder,
@@ -104,7 +104,7 @@ export default {
         isOwner: Boolean,
         userId: Number,
         precision: Number,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     data() {
         return {
@@ -246,7 +246,7 @@ export default {
                             }));
                         })
                         .catch(() => {
-                            this.$toasted.error(
+                            this.notifyError(
                                 'Can not connect to internal services'
                             );
                         });
@@ -255,7 +255,7 @@ export default {
                     if (!isRetryableError(err)) {
                         this.balances = false;
                     } else {
-                        this.$toasted.error('Can not load current balance. Try again later.');
+                        this.notifyError('Can not load current balance. Try again later.');
                     }
                 });
         },
@@ -280,7 +280,7 @@ export default {
                         });
                         this.saveOrders(orders, isSell);
                     })
-                    .catch(() => this.$toasted.error('Something went wrong. Can not update orders.'));
+                    .catch(() => this.notifyError('Something went wrong. Can not update orders.'));
                     break;
                 case WSAPI.order.status.UPDATE:
                     if (typeof order === 'undefined') {

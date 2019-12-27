@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Token\Token;
 use App\Exception\NotFoundPairException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\CryptoManagerInterface;
@@ -28,10 +29,21 @@ class CoinController extends Controller
         $this->marketFactory = $marketFactory;
     }
 
-    /** @Route("/coin/{base}/{quote}", name="coin", defaults={"quote"="web"}, options={"expose"=true,"2fa_progress"=false}) */
+    /** @Route("/coin/{base}/{quote}", name="coin", defaults={"quote"="mintme"}, options={"expose"=true,"2fa_progress"=false}) */
     public function pair(string $base, string $quote): Response
     {
-        $base = $this->cryptoManager->findBySymbol(strtoupper($base));
+        // rebranding
+        if (Token::WEB_SYMBOL === mb_strtoupper($quote)) {
+            return $this->redirectToRoute('coin', [
+                'base' => mb_strtoupper($base),
+                'quote' => Token::MINTME_SYMBOL,
+            ]);
+        }
+
+        $base = str_replace(Token::MINTME_SYMBOL, Token::WEB_SYMBOL, mb_strtoupper($base));
+        $quote = str_replace(Token::MINTME_SYMBOL, Token::WEB_SYMBOL, mb_strtoupper($quote));
+
+        $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol(strtoupper($quote));
 
         if (null === $base          ||
@@ -48,11 +60,13 @@ class CoinController extends Controller
         return $this->render('pages/pair.html.twig', [
             'market' => $this->normalize($market),
             'isOwner' => false,
-            'showIntro' => false,
+            'showTrade' => true,
             'hash' => $this->getUser() ?
                 $this->getUser()->getHash() :
                 '',
             'precision' => $quote->getShowSubunit(),
+            'isTokenPage' => false,
+            'tab' => 'trade',
         ]);
     }
 }

@@ -87,4 +87,14 @@ class Order extends AbstractOrder
             ""
         );
     }
+
+    public function getMarket(): Market
+    {
+        return $this->market;
+    }
+
+    public function setMarket(Market $market): void
+    {
+        $this->market = $market;
+    }
 }

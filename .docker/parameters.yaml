@@ -35,7 +35,7 @@ parameters:
     is_hacker_allowed: true
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
-    webchain_supply: 'https://webchain.network/supply.txt'
+    mintme_supply: 'https://mintme.com/coin/supply.txt'
     deploy_cost: 0
     deploy_rpc: 'http://deploytok:3001'
     deploy_response_timeout_seconds: 60

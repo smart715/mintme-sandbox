@@ -5,7 +5,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3 class="modal-title">WITHDRAW({{ currency }})</h3>
+                <h3 class="modal-title">WITHDRAW({{ currency|rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
                         Address:
@@ -39,10 +39,10 @@
                             All
                         </button>
                         <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
-                            You don't have enough {{ currency }}
+                            You don't have enough {{ currency|rebranding }}
                         </div>
                         <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center">
-                            Minimum withdraw amount is {{ minAmount }} {{ currency }}
+                            Minimum withdraw amount is {{ minAmount }} {{ currency|rebranding }}
                         </div>
                         <div v-if="!$v.amount.decimal" class="invalid-feedback text-center">
                             Invalid amount.
@@ -62,13 +62,13 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ feeAmount }} {{ feeCurrency }}</span>
+                    <span class="float-right">{{ feeAmount }} {{ feeCurrency|rebranding }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney(subunit) }} {{currency}}</span>
+                    <span class="float-right">{{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}</span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
@@ -93,12 +93,12 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {MoneyFilterMixin} from '../../mixins';
+import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
 import {addressLength, webSymbol, addressContain} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
-    mixins: [MoneyFilterMixin],
+    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
     components: {
         Modal,
     },
@@ -173,12 +173,12 @@ export default {
         onWithdraw: function() {
             this.$v.$touch();
             if (this.$v.$error) {
-                this.$toasted.error('Correct your form fields');
+                this.notifyError('Correct your form fields');
                 return;
             }
 
             if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
-                this.$toasted.error('You don\'t have enough web to pay fee');
+                this.notifyError('You don\'t have enough web to pay fee');
                 return;
             }
 
@@ -191,11 +191,11 @@ export default {
                 'code': this.code || null,
             })
             .then((response) => {
-                this.$toasted.success('Confirmation email has been sent to your email. It will expire in 4 hours.');
+                this.notifySuccess('Confirmation email has been sent to your email. It will expire in 4 hours.');
                 this.closeModal();
             })
             .catch((error) => {
-                this.$toasted.error(error.response.data.message);
+                this.notifyError(error.response.data.message);
             })
             .then(() => this.withdrawing = false);
 
