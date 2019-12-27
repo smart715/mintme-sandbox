@@ -10,6 +10,7 @@ use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -191,9 +192,6 @@ class Token implements TradebleInterface
         return $this->id;
     }
 
-    /**
-     * @Groups({"API", "dev"})
-     */
     public function getLockIn(): ?LockIn
     {
         return $this->lockIn;
@@ -337,7 +335,10 @@ class Token implements TradebleInterface
         return $this->profile;
     }
 
-    public function deploymentStatus(): string
+    /**
+     * @Groups({"API", "dev"})
+     */
+    public function getDeploymentStatus(): string
     {
         return !$this->address
             ? self::NOT_DEPLOYED

@@ -96,6 +96,7 @@ import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, N
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
+import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
@@ -320,6 +321,8 @@ export default {
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
+            const tokenized = this.markets[marketName].quote.deployedStatus === tokenDeploymentStatus.deployed;
+
             const market = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
@@ -329,7 +332,7 @@ export default {
                 monthVolume,
                 supply,
                 marketPrecision,
-                !!this.markets[marketName].lockIn
+                tokenized
             );
 
             if (marketOnTopIndex > -1) {
@@ -386,6 +389,7 @@ export default {
                     const cryptoSymbol = this.markets[market].base.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
+                    const tokenized = this.markets[market].quote.deployedStatus === tokenDeploymentStatus.deployed;
 
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
@@ -399,7 +403,7 @@ export default {
                         parseFloat(this.markets[market].monthVolume),
                         this.markets[market].supply,
                         this.markets[market].base.subunit,
-                        this.markets[market].lockIn
+                        tokenized
                     );
                     if (marketOnTopIndex > -1) {
                         Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);

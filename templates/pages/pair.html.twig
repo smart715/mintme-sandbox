@@ -39,7 +39,7 @@
                                     youtube-channel-id="{{ token.youtubeChannelId }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
-                                    :deployment-status="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                    :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     token-contract-address="{{ token.address }}"
                                     token-name="{{ market.quote.name }}"
                                     telegram-url="{{ token.telegramUrl }}"
@@ -86,7 +86,7 @@
                                 <div class="nav-link pr-md-0">
                                     <token-deploy-icon
                                             :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                            :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                            :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     />
                                 </div>
                             </li>
@@ -99,7 +99,7 @@
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
                                         :precision="{{ precision }}"
-                                        :status-prop="getTokenStatus({{ token.deploymentStatus | json_encode }})"
+                                        :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                         :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                         websocket-url="{{ global_websocket_url }}"
                                         release-address="{{ token.mintDestination }}"

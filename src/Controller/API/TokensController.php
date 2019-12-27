@@ -105,7 +105,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiBadRequestException('You need all your tokens to change token\'s name');
         }
 
-        if ($request->get('name') && Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+        if ($request->get('name') && Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
@@ -222,7 +222,7 @@ class TokensController extends AbstractFOSRestController
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        if (Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
@@ -380,7 +380,7 @@ class TokensController extends AbstractFOSRestController
         }
 
         return $this->view(
-            Token::NOT_DEPLOYED === $token->deploymentStatus()
+            Token::NOT_DEPLOYED === $token->getDeploymentStatus()
         );
     }
 
@@ -404,7 +404,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        if (Token::NOT_DEPLOYED !== $token->deploymentStatus()) {
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 

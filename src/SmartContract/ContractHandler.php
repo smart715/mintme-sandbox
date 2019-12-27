@@ -94,7 +94,7 @@ class ContractHandler implements ContractHandlerInterface
 
     public function updateMintDestination(Token $token, string $address): void
     {
-        if (Token::DEPLOYED !== $token->deploymentStatus()) {
+        if (Token::DEPLOYED !== $token->getDeploymentStatus()) {
             $this->logger->error(
                 "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
             );
@@ -134,7 +134,7 @@ class ContractHandler implements ContractHandlerInterface
 
     public function withdraw(User $user, Money $balance, string $address, Token $token): void
     {
-        if (Token::DEPLOYED !== $token->deploymentStatus()) {
+        if (Token::DEPLOYED !== $token->getDeploymentStatus()) {
             $this->logger->error(
                 "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
             );
