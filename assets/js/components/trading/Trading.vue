@@ -242,11 +242,14 @@ export default {
                 return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
             } else {
                 this.marketsOnTop.forEach((market)=> {
-                    if (b.pair === market.currency + '/' + market.token ||
-                        a.pair === market.currency + '/' + market.token) {
+                    let currency = this.rebrandingFunc(market.currency);
+                    let token = this.rebrandingFunc(market.token);
+
+                    if (b.pair === currency + '/' + token || a.pair === currency + '/' + token) {
                         pair = true;
                     }
                 });
+
                 let numeric = key !== this.fields.pair.key;
                 let comparison = a[key].localeCompare(b[key], undefined, {numeric});
 
