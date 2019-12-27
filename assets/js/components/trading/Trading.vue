@@ -18,8 +18,6 @@
                 <b-table
                     :items="tokens"
                     :fields="fieldsArray"
-                    :sort-by="fields.volume.key"
-                    :sort-desc="true"
                     :sort-compare="sortCompare"
                     sort-direction="desc"
                 >
@@ -157,9 +155,19 @@ export default {
         tokens: function() {
             let tokens = [];
             Object.keys(this.sanitizedMarkets).forEach((marketName) => {
-                tokens.push(this.sanitizedMarkets[marketName]);
+                let token = {
+                    ...this.sanitizedMarkets[marketName],
+                    deal: this.markets[marketName].monthVolume,
+                };
+                tokens.push(token);
             });
-            tokens.sort((first, second) => parseFloat(second.deal) - parseFloat(first.deal));
+
+            tokens.sort((first, second) => {
+                if (first.tokenized !== second.tokenized) {
+                    return first.tokenized ? -1 : 1;
+                }
+                return parseFloat(first.deal) - parseFloat(second.deal);
+            });
             tokens = this.sanitizedMarketsOnTop.concat(tokens);
             tokens = _.map(tokens, (token) => {
                 return _.mapValues(token, (item) => {
@@ -321,7 +329,7 @@ export default {
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
-            const tokenized = this.markets[marketName].quote.deployedStatus === tokenDeploymentStatus.deployed;
+            const tokenized = this.markets[marketName].quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
             const market = this.getSanitizedMarket(
                 marketCurrency,
