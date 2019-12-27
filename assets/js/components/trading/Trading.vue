@@ -397,7 +397,7 @@ export default {
                     const cryptoSymbol = this.markets[market].base.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
-                    const tokenized = this.markets[market].quote.deployedStatus === tokenDeploymentStatus.deployed;
+                    const tokenized = this.markets[market].quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
