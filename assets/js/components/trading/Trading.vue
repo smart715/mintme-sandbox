@@ -65,7 +65,17 @@
                             <a :href="row.item.tokenUrl" class="text-white" v-b-tooltip:title="row.value">
                                 {{ row.value }}
                             </a>
-                            <img v-if="row.item.tokenized" src="../../../img/mintmecoin_W.png" alt="tokenized">
+                            <guide
+                                placement="top"
+                                max-width="150px"
+                                v-if="row.item.tokenized">
+                                <template slot="icon">
+                                    <img src="../../../img/mintmecoin_W.png" alt="deployed">
+                                </template>
+                                <template slot="body">
+                                    This token exists on blockchain.
+                                </template>
+                            </guide>
                         </div>
                     </template>
                 </b-table>
