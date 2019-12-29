@@ -19,7 +19,7 @@
                     <img class="h-100" src="../../../../img/mintmecoin_W.png" alt="not-deployed">
                 </template>
                 <template slot="body">
-                    This token does not exist on blockchain. Token creator can create it on blockchain in token general settings.
+                    This token does not exist on blockchain. Tokens on blockchain allow withdrawals to user wallet and are promoted on trading page. Token creator can activate it by clicking on edit icon on this page.
                 </template>
             </guide>
         </div>
