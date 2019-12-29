@@ -47,7 +47,7 @@
             </b-table>
         </div>
         <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-            Web tokens you own
+            Tokens you own
         </div>
         <div class="text-center p-5" v-if="showLoadingIcon">
             <font-awesome-icon
