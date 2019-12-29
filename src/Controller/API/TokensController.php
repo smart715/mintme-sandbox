@@ -458,7 +458,7 @@ class TokensController extends AbstractFOSRestController
                 'Your code to confirm token deletion:',
                 $user
             );
-            $message = "Code for confirmation of token deletion was send to email.";
+            $message = "Code to confirm token deletion was sent to your email.";
         }
 
         return $this->view(['message' => $message], Response::HTTP_ACCEPTED);
