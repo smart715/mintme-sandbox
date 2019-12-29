@@ -163,20 +163,12 @@ export default {
             return Object.keys(this.markets);
         },
         tokens: function() {
-            let tokens = [];
-            Object.keys(this.sanitizedMarkets).forEach((marketName) => {
-                let token = {
-                    ...this.sanitizedMarkets[marketName],
-                    deal: this.markets[marketName].monthVolume,
-                };
-                tokens.push(token);
-            });
-
+            let tokens = Object.values(this.sanitizedMarkets);
             tokens.sort((first, second) => {
                 if (first.tokenized !== second.tokenized) {
                     return first.tokenized ? -1 : 1;
                 }
-                return parseFloat(first.deal) - parseFloat(second.deal);
+                return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
             });
             tokens = this.sanitizedMarketsOnTop.concat(tokens);
             tokens = _.map(tokens, (token) => {
@@ -256,26 +248,27 @@ export default {
     methods: {
         sortCompare: function(a, b, key) {
             let pair = false;
+            this.marketsOnTop.forEach((market)=> {
+                let currency = this.rebrandingFunc(market.currency);
+                let token = this.rebrandingFunc(market.token);
 
-            if (typeof a[key] === 'number' && typeof b[key] === 'number') {
+                if (b.pair === currency + '/' + token || a.pair === currency + '/' + token) {
+                    pair = true;
+                }
+            });
+            let numeric = key !== this.fields.pair.key;
+
+            if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 // If both compared fields are native numbers
-                return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
-            } else {
-                this.marketsOnTop.forEach((market)=> {
-                    let currency = this.rebrandingFunc(market.currency);
-                    let token = this.rebrandingFunc(market.token);
+                let first = parseFloat(a[key]);
+                let second = parseFloat(b[key]);
 
-                    if (b.pair === currency + '/' + token || a.pair === currency + '/' + token) {
-                        pair = true;
-                    }
-                });
-
-                let numeric = key !== this.fields.pair.key;
-                let comparison = a[key].localeCompare(b[key], undefined, {numeric});
-
-                // So that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
-                return pair ? 0 : (numeric ? comparison : -comparison);
+                return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
             }
+
+            // If the value is not numeric, currently only pair column
+            // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
+            return pair ? 0 : b[key].localeCompare(a[key]);
         },
         updateData: function(page) {
             return new Promise((resolve, reject) => {
