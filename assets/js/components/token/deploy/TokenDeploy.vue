@@ -11,7 +11,7 @@
                         you and others will be able to withdraw tokens from mintme to your MintMe Coin wallet.
                     </p>
                     <p class="bg-danger">
-                        MINTME spent on mintMe, will be inaccessible by us (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.
+                        MINTME spent here will be inaccessible to anyone (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.
                     </p>
                     <p class="bg-danger">
                         This process is irreversible, once confirm payment there is no going back.
