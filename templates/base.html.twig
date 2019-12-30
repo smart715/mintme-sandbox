@@ -6,6 +6,10 @@
             {% block pagestyles %}{% endblock %}
         {% endblock %}
         {% block head %}{% endblock %}
+        {% block tokenDescription %}
+            <meta name="description" content="MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.">
+            <meta property="og:description" content="MintMe is blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents success of your project.">
+        {% endblock %}
         {% include 'head.html.twig' %}
         <title>
             {% block title %}mintMe{% endblock %}
@@ -21,14 +25,12 @@
                     {% block main %}
                         {% block messageContainer %}
                             {% if app.session.flashbag.peekAll() is not empty %}
-                                <div class="text-center {% block messageClass %}{% endblock %}">
+                                <div id="notifications" class="text-center {% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
-                                            <div class="d-block mb-3">
-                                                <div class="d-inline-block mx-auto text-white text-center bg-{{ label }} alert alert-{{ label }}">
-                                                    {{ message }}
-                                                </div>
-                                            </div>
+                                            <notification type="{{ label }}" class="d-none">
+                                                {{ message }}
+                                            </notification>
                                         {% endfor %}
                                     {% endfor %}
                                 </div>

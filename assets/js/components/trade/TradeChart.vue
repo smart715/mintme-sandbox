@@ -9,11 +9,11 @@
                             Last price
                         </template>
                         <template slot="body">
-                            Price per one {{ market.quote.symbol }} for last transaction.
+                            Price per one {{ market.quote.symbol|rebranding }} for last transaction.
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.last | formatMoney }} {{ market.base.symbol }}
+                    {{ marketStatus.last | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
                 <div class="my-1 text-center">
                     <span>24h/30d change: </span>
@@ -35,7 +35,7 @@
                             24h/30d volume
                         </template>
                         <template slot="body">
-                            The amount of {{ market.quote.symbol }} that has been traded in the last 24 hours and the last 30 days.
+                            The amount of {{ market.quote.symbol|rebranding }} that has been traded in the last 24 hours and the last 30 days.
                         </template>
                     </guide>
                     <br>
@@ -48,11 +48,11 @@
                             24h/30d volume
                         </template>
                         <template slot="body">
-                            The amount of {{ market.base.symbol }} that has been traded in the last 24 hours and the last 30 days.
+                            The amount of {{ market.base.symbol|rebranding }} that has been traded in the last 24 hours and the last 30 days.
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.amount | formatMoney }}/{{ marketStatus.monthAmount | formatMoney }} {{ market.base.symbol }}
+                    {{ marketStatus.amount | formatMoney }}/{{ marketStatus.monthAmount | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
                 <div class="my-1 text-center text-lg-right">
                     <span>Market Cap: </span>
@@ -61,11 +61,11 @@
                             Market Cap
                         </template>
                         <template slot="body">
-                            Market cap of {{ market.quote.symbol }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.marketCap | formatMoney }} {{ market.base.symbol }}
+                    {{ marketStatus.marketCap | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
             </div>
             <div class="row">
@@ -92,18 +92,18 @@
 <script>
 import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
-import {WebSocketMixin, MoneyFilterMixin} from '../../../js/mixins';
+import {WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../../js/mixins/';
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
 
 export default {
     name: 'TradeChart',
-    mixins: [WebSocketMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
     props: {
         websocketUrl: String,
         market: Object,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -262,7 +262,7 @@ export default {
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
         }).catch(() => {
-            this.$toasted.error('Service unavailable now. Can not load the chart data');
+            this.notifyError('Service unavailable now. Can not load the chart data');
         });
     },
     methods: {
@@ -344,7 +344,7 @@ export default {
                     },
                 };
 
-                this.$axios.retry.get(this.webchainSupplyUrl, config)
+                this.$axios.retry.get(this.mintmeSupplyUrl, config)
                     .then((res) => {
                         this.supply = parseFloat(res.data);
                         resolve();

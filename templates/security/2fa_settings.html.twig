@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row  pt-5 justify-content-center">
-        <div class="col-lg-4 col-md-6">
+        <div class="col-lg-6 col-md-8">
             <div class="card">
                 {% if not isTwoFactor %}
                     <div class="card-header">
@@ -14,7 +14,7 @@
                                 <a class="text-blue" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
                             </div>
                             <div class="col-12 pb-2 text-center">
-                                <img src="{{ imgUrl }}" alt="QR Code" class="img-thumbnail img-fluid img-barcode">
+                                <img src="{{ qr_code_data_uri(imgUrl) }}" alt="QR Code" class="img-thumbnail img-fluid img-barcode">
                             </div>
                             <div class="col-12">
                                 <div class="text-center text-white pb-2">
@@ -71,7 +71,10 @@
                             {% block formBody %}
                                     {{ form_start(form) }}
                                         <div class="form-group">
-                                            {{ form_label(form.code, '', { 'label_attr': { 'class': isTwoFactor ? 'float-left' : '' } }) }}
+                                            <div class="clearfix">
+                                                {{ form_label(form.code, '', { 'label_attr': { 'class': isTwoFactor ? 'float-left' : '' } }) }}
+                                            </div>
+                                            {{ form_errors(form.code) }}
                                             {{ form_widget(form.code) }}
                                         </div>
                                         <div class="form-group">

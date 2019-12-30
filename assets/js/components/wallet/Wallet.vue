@@ -13,16 +13,15 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="generateCoinUrl(data.item)" class="text-white">
-                        {{ data.item.fullname }} ({{ data.item.name }})
+                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                        {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                     </a>
                 </template>
                 <template v-slot:cell(available)="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
                 <template v-slot:cell(action)="data">
-                    <div
-                        class="row">
+                    <div class="row">
                         <div class="d-flex flex-row c-pointer pl-2"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
@@ -38,17 +37,17 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                                <div><i class="icon-withdraw"></i></div>
-                                <div>
-                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
-                                </div>
+                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                            </div>
                         </div>
                     </div>
                 </template>
             </b-table>
         </div>
         <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-            Web tokens you own
+            Tokens you own
         </div>
         <div class="text-center p-5" v-if="showLoadingIcon">
             <font-awesome-icon
@@ -60,11 +59,11 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="generatePairUrl(data.item)" class="text-white">
-                        <span v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
-                            {{ data.item.name | truncate(15) }}
-                        </span>
-                    </a>
+                    <div class="truncate-name w-100" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                        <a :href="generatePairUrl(data.item)" class="text-white">
+                            {{ data.item.name }}
+                        </a>
+                    </div>
                 </template>
                 <template v-slot:cell(available)="data">
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
@@ -89,10 +88,10 @@
                                         data.item.subunit,
                                         true)"
                         >
-                                <div><i class="icon-withdraw"></i></div>
-                                <div>
-                                    <span class="pl-2 text-xs align-middle">Withdraw</span>
-                                </div>
+                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -149,7 +148,7 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, FiltersMixin, MoneyFilterMixin} from '../../mixins';
+import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
@@ -157,7 +156,7 @@ const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
     components: {
         WithdrawModal,
         DepositModal,
@@ -187,12 +186,12 @@ export default {
                 delay: [100, 200],
             },
             predefinedTokenFields: [
-                {key: 'name', label: 'Name'},
+                {key: 'name', label: 'Name', class: 'pair-cell'},
                 {key: 'available', label: 'Amount'},
                 {key: 'action', label: 'Actions', sortable: false},
             ],
             tokenFields: [
-                {key: 'name', label: 'Name'},
+                {key: 'name', label: 'Name', class: 'pair-cell'},
                 {key: 'available', label: 'Amount'},
                 {key: 'action', label: 'Actions', sortable: false},
             ],
@@ -256,24 +255,24 @@ export default {
                             id: parseInt(Math.random()),
                         }));
                     })
-                    .catch(() => this.$toasted.error(
+                    .catch(() => this.notifyError(
                         'Can not connect to internal services'
                     ));
             })
             .catch(() => {
-                this.$toasted.error('Can not update tokens now. Try again later.');
+                this.notifyError('Can not update tokens now. Try again later.');
             });
 
         this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
             .then((res) => this.depositAddresses = res.data)
             .catch(() => {
-                this.$toasted.error('Can not update deposit data now. Try again later.');
+                this.notifyError('Can not update deposit data now. Try again later.');
             });
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
             if (!this.twofa) {
-                this.$toasted.info('Please enable 2FA before withdrawing');
+                this.notifyInfo('Please enable 2FA before withdrawing');
                 return;
             }
             this.showModal = true;
@@ -307,7 +306,7 @@ export default {
                     undefined
                 )
                 .catch(() => {
-                    this.$toasted.error('Can not update deposit fee status. Try again later.');
+                    this.notifyError('Can not update deposit fee status. Try again later.');
                 });
 
             // TODO: Get rid of hardcoded WEB

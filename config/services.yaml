@@ -314,6 +314,12 @@ services:
 
     App\Mailer\MailerInterface: "@app.mailer"
 
+    app.instant.mailer:
+        class: App\Mailer\Mailer
+        arguments:
+            $mail: "%env(MAILER_USER)%"
+            $mailer: '@swiftmailer.mailer.instant_mailer'
+
     App\Exchange\Balance\Factory\BalanceViewFactory:
         arguments:
             $tokenSubunit: "%token_precision%"
@@ -332,6 +338,15 @@ services:
             - '@fos_user.util.token_generator'
             - '@fos_user.mailer'
             - '%fos_user.resetting.retry_ttl%'
+
+    App\Controller\RegistrationController:
+        decorates: fos_user.registration.controller
+        public: true
+        arguments:
+            $eventDispatcher: '@event_dispatcher'
+            $formFactory: '@fos_user.registration.form.factory'
+            $userManager: '@fos_user.user_manager'
+            $tokenStorage: '@security.token_storage'
 
     App\Exchange\Config\Config:
         arguments:
@@ -448,10 +463,25 @@ services:
 
     App\Exchange\Market\MarketCapCalculator:
         arguments:
-            $supplyLinks: { Webchain: '%webchain_supply%' }
+            $supplyLinks: { Webchain: '%mintme_supply%' }
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
 
+    app.profile.form:
+        class: App\Form\ProfileType
+        arguments:
+            $showFullDataInProfile: '%show_full_data_in_profile%'
+
+    App\EventSubscriber\TransactionSubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
+
+    App\Communications\CachedCryptoRatesFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
+    
     app.emailCanonicalizer:
         class: App\Canonicalizer\EmailCanonicalizer
-        public: false
+        public: false    

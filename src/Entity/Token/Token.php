@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Token implements TradebleInterface
 {
+    public const MINTME_SYMBOL = "MINTME";
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
     public const NAME_MIN_LENGTH = 4;
@@ -69,12 +70,6 @@ class Token implements TradebleInterface
      * @var string|null
      */
     protected $mintDestination;
-
-    /**
-     * @ORM\Column(type="boolean", options={"default": 0})
-     * @var bool
-     */
-    protected $mintDestinationLocked = false;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -174,6 +169,11 @@ class Token implements TradebleInterface
         return $this->getName();
     }
 
+    public function setSymbol(string $symbol): self
+    {
+        return $this->setName($symbol);
+    }
+
     public function getCrypto(): ?Crypto
     {
         return $this->crypto;
@@ -258,18 +258,6 @@ class Token implements TradebleInterface
     public function setMintDestination(string $mintDestination): self
     {
         $this->mintDestination = $mintDestination;
-
-        return $this;
-    }
-
-    public function isMintDestinationLocked(): bool
-    {
-        return $this->mintDestinationLocked;
-    }
-
-    public function lockMintDestination(): self
-    {
-        $this->mintDestinationLocked = true;
 
         return $this;
     }

@@ -7,8 +7,13 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
-                            <a :href="row.item.pairUrl" class="text-white">{{ row.value.truncate }}</a>
+                        <div
+                            class="truncate-name w-100"
+                            v-b-tooltip="{title: rebrandingFunc(row.value), boundary:'viewport'}"
+                        >
+                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
+                                {{ row.value }}
+                            </a>
                         </div>
                     </template>
                 </b-table>
@@ -33,11 +38,11 @@ import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
+import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
 
 export default {
     name: 'TradingHistory',
-    mixins: [FiltersMixin, LazyScrollTableMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin],
     data() {
         return {
             tableData: null,
@@ -49,12 +54,7 @@ export default {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
-                    formatter: (name) => {
-                        return {
-                            full: name,
-                            truncate: this.truncateFunc(name, 15),
-                        };
-                    },
+                    class: 'pair-cell',
                 },
                 {
                     key: 'amount',
@@ -125,7 +125,7 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch(() => {
-                        this.$toasted.error('Can not update trading history. Try again later.');
+                        this.notifyError('Can not update trading history. Try again later.');
                         reject([]);
                     });
             });

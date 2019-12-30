@@ -6,9 +6,7 @@
             :without-padding="true"
             @close="$emit('close')"
         >
-            <template slot="header">
-                <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
-            </template>
+            <template slot="header">{{ currentName }}</template>
             <template slot="body">
                 <div class="token-edit p-0">
                     <div class="row faq-block mx-0 border-bottom border-top">
@@ -26,21 +24,18 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div
-                        v-if="!mintDestinationLocked"
-                        class="row faq-block mx-0 border-bottom"
-                        ref="withdrawal-address"
-                    >
+                    <div class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
-                                Modify token withdrawal address
+                                Modify token release address
                             </template>
                             <template slot="body">
-                                <token-withdrawal-address
+                                <token-release-address
                                     :is-token-deployed="isTokenDeployed"
+                                    :release-address="releaseAddress"
                                     :token-name="currentName"
                                     :twofa="twofa"
-                                    :withdrawal-address="withdrawalAddress"
+                                    @update-release-address="$emit('update-release-address')"
                                 />
                             </template>
                         </faq-item>
@@ -109,8 +104,8 @@ import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
 import TokenDelete from '../token/TokenDelete';
 import TokenDeploy from '../token/deploy/TokenDeploy';
+import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
-import TokenWithdrawalAddress from '../token/TokenWithdrawalAddress';
 import TwoFactorModal from './TwoFactorModal';
 import {FiltersMixin} from '../../mixins';
 import {tokenDeploymentStatus} from '../../utils/constants';
@@ -125,7 +120,7 @@ export default {
         TokenDelete,
         TokenDeploy,
         TokenReleasePeriod,
-        TokenWithdrawalAddress,
+        TokenReleaseAddress,
         TwoFactorModal,
     },
     props: {
@@ -134,13 +129,12 @@ export default {
         isOwner: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
-        mintDestinationLocked: Boolean,
         precision: Number,
+        releaseAddress: String,
         statusProp: String,
         twofa: Boolean,
         visible: Boolean,
         websocketUrl: String,
-        withdrawalAddress: String,
     },
     mixins: [FiltersMixin],
     data() {
