@@ -49,12 +49,6 @@ class UserRepository extends EntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        if (0 == count($user)) {
-            return false;
-        }
-
-        if (0 != count($user)) {
-            return true;
-        }
+            return 0 != count($user);
     }
 }
