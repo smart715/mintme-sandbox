@@ -99,7 +99,7 @@ export default {
     },
     data() {
         return {
-            currentPeriod: this.period,
+            currentPeriod: this.releasedDisabled ? this.releasePeriod : 10,
             released: 10,
             releasePeriod: DEFAULT_VALUE,
             showTwoFactorModal: false,
@@ -116,9 +116,6 @@ export default {
         },
         currentPeriodDisabled: function() {
             return !this.isTokenNotDeployed;
-        },
-        period: function() {
-            return this.releasedDisabled ? this.releasePeriod : 10;
         },
     },
     mounted: function() {
