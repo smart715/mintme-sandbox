@@ -46,6 +46,13 @@
     .title
       font-family: $concord-font
       line-height: 1.1
+      font-size: 1em
+
+      @include media-breakpoint-down(md)
+        font-size: 2rem
+
+      @include media-breakpoint-down(xs)
+        font-size: 3rem
 
     .tip
       display: inline-block
