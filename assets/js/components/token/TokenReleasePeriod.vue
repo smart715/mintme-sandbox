@@ -60,14 +60,14 @@
                 <div class="text-left">
                     <b-button
                         type="submit"
-                        class="px-4"
+                        class="px-4 mr-1"
                         variant="primary"
-                        :disabled="currentPeriodDisabled"
+                        :disabled="currentPeriodDisabled || loading"
                         @click="saveReleasePeriod"
                     >
                         Save
                     </b-button>
-
+                    <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
                 </div>
             </b-col>
         </b-row>
@@ -85,6 +85,7 @@ import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {NotificationMixin} from '../../mixins';
+import {HTTP_OK} from '../../utils/constants.js';
 
 const DEFAULT_VALUE = '-';
 
@@ -99,8 +100,9 @@ export default {
     },
     data() {
         return {
-            currentPeriod: this.releasedDisabled ? this.releasePeriod : 10,
-            released: 10,
+            currentPeriod: 0,
+            loading: true,
+            released: 0,
             releasePeriod: DEFAULT_VALUE,
             showTwoFactorModal: false,
         };
@@ -122,7 +124,17 @@ export default {
         this.$axios.retry.get(this.$routing.generate('lock-period', {
             name: this.tokenName,
         }))
-            .then((res) => this.releasePeriod = res.data.releasePeriod || this.releasePeriod)
+            .then((res) => {
+                if (HTTP_OK === res.status) {
+                    this.releasePeriod = res.data.releasePeriod;
+                    this.currentPeriod = this.releasedDisabled ? this.releasePeriod : 10;
+
+                    let allTokens = parseFloat(res.data.frozenAmount) + parseFloat(res.data.releasedAmount);
+                    this.released = parseInt((parseFloat(res.data.releasedAmount)/allTokens)*100);
+
+                    this.loading = false;
+                }
+            })
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
     },
     methods: {
