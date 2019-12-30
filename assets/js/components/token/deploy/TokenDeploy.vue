@@ -10,10 +10,10 @@
                         This is final step for token creation. After you pay for deploying token to blockchain
                         you and others will be able to withdraw tokens from mintme to your MintMe Coin wallet.
                     </p>
-                    <p class="bg-danger">
+                    <p class="bg-info px-2">
                         MINTME spent here will be inaccessible to anyone (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.
                     </p>
-                    <p class="bg-danger">
+                    <p class="bg-info px-2">
                         This process is irreversible, once confirm payment there is no going back.
                     </p>
                     <p class="mt-5">
@@ -205,4 +205,3 @@ export default {
     },
 };
 </script>
-
