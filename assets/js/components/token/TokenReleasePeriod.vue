@@ -81,6 +81,7 @@
 </template>
 
 <script>
+import Decimal from 'decimal.js';
 import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
@@ -129,8 +130,9 @@ export default {
                     this.releasePeriod = res.data.releasePeriod;
                     this.currentPeriod = this.releasedDisabled ? this.releasePeriod : 10;
 
-                    let allTokens = parseFloat(res.data.frozenAmount) + parseFloat(res.data.releasedAmount);
-                    this.released = parseInt((parseFloat(res.data.releasedAmount)/allTokens)*100);
+                    let allTokens = new Decimal(res.data.frozenAmount).add(res.data.releasedAmount);
+                    let percent = new Decimal(res.data.releasedAmount).div(allTokens.toString()).mul(100).floor();
+                    this.released = percent.toString();
 
                     this.loading = false;
                 }
