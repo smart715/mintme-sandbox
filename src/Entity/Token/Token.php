@@ -334,7 +334,10 @@ class Token implements TradebleInterface
         return $this->profile;
     }
 
-    public function deploymentStatus(): string
+    /**
+     * @Groups({"API", "dev"})
+     */
+    public function getDeploymentStatus(): string
     {
         return !$this->address
             ? self::NOT_DEPLOYED

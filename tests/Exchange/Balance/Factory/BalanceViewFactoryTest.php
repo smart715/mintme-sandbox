@@ -126,7 +126,7 @@ class BalanceViewFactoryTest extends TestCase
 
         $tok->method('getLockIn')->willReturn($hasLockIn ? $lockIn : null);
 
-        $tok->method('deploymentStatus')->willReturn($status);
+        $tok->method('getDeploymentStatus')->willReturn($status);
 
         return $tok;
     }
