@@ -400,10 +400,10 @@ export default {
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const tokenized = this.markets[market].quote.deploymentStatus === tokenDeploymentStatus.deployed;
-                    const WebBtcOnTop = this.marketsOnTop[0];
+                    const webBtcOnTop = this.marketsOnTop[0];
                     if (marketOnTopIndex > -1 &&
-                        cryptoSymbol === WebBtcOnTop.currency &&
-                        tokenName === WebBtcOnTop.token) {
+                        cryptoSymbol === webBtcOnTop.currency &&
+                        tokenName === webBtcOnTop.token) {
                         this.fetchWEBsupply().then((supply) => {
                             this.markets[market].supply = supply;
                         });
