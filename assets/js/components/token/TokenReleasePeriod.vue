@@ -86,7 +86,7 @@ import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {NotificationMixin} from '../../mixins';
-import {HTTP_OK} from '../../utils/constants.js';
+import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
 
 const DEFAULT_VALUE = '-';
 
@@ -134,6 +134,10 @@ export default {
                     let percent = new Decimal(res.data.releasedAmount).div(allTokens.toString()).mul(100).floor();
                     this.released = percent.toString();
 
+                    this.loading = false;
+                } else if (HTTP_NO_CONTENT === res.status) {
+                    this.currentPeriod = 10;
+                    this.released = 10;
                     this.loading = false;
                 }
             })
