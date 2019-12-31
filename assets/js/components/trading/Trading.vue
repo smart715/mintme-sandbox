@@ -403,11 +403,24 @@ export default {
             this.sanitizedMarkets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
-                    this.markets[market].supply = 1e7;
                     const cryptoSymbol = this.markets[market].base.symbol;
                     const tokenName = this.markets[market].quote.symbol;
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const tokenized = this.markets[market].quote.deploymentStatus === tokenDeploymentStatus.deployed;
+                    const webBtcOnTop = this.marketsOnTop[0];
+                    if (marketOnTopIndex > -1 &&
+                        cryptoSymbol === webBtcOnTop.currency &&
+                        tokenName === webBtcOnTop.token) {
+                        this.fetchWEBsupply().then((supply) => {
+                            this.markets[market].supply = supply;
+                        });
+                        if ('undefined' === typeof this.markets[market].supply) {
+                            this.notifyError('Can not update market cap for BTC/MINTME.');
+                            this.markets[market].supply = 0;
+                        }
+                    } else {
+                        this.markets[market].supply = 1e7;
+                    }
 
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
@@ -525,7 +538,7 @@ export default {
                 this.$axios.retry.get(this.mintmeSupplyUrl, config)
                     .then((res) => {
                         this.markets['WEBBTC'].supply = res.data;
-                        resolve();
+                        resolve(res.data);
                     })
                     .catch((err) => {
                         this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
@@ -549,7 +562,6 @@ export default {
                 market.base.subunit,
                 false
             );
-
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
         },
         fetchGlobalMarketCap: function() {
