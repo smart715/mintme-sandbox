@@ -408,7 +408,7 @@ export default {
                             this.markets[market].supply = supply;
                         });
                         if ('undefined' === typeof this.markets[market].supply) {
-                            this.notifyError('Can not update market supply for BTC/MINTME.');
+                            this.notifyError('Can not update market cap for BTC/MINTME.');
                             this.markets[market].supply = 0;
                         }
                     } else {
