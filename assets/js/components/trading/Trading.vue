@@ -225,7 +225,7 @@ export default {
             return this.globalMarketCaps['BTC'] + ' BTC';
         },
     },
-    mounted() {
+    mounted: function() {
         this.fetchData();
     },
     methods: {
