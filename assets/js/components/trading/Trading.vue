@@ -82,7 +82,7 @@
             </div>
             <div class="row justify-content-center">
                 <b-pagination
-                    @change="updateData"
+                    @change="fetchData"
                     :total-rows="totalRows"
                     :per-page="perPage"
                     v-model="currentPage"
