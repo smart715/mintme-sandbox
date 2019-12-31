@@ -9,6 +9,7 @@ export const tokenNoSpaceBetweenDashes = !helpers.regex('spaceBetweenDashes', /-
 
 export const HTTP_OK = 200;
 export const HTTP_ACCEPTED = 202;
+export const HTTP_NO_CONTENT = 204;
 
 export const GENERAL = {
     precision: 8,
