@@ -29,6 +29,16 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         ]);
     }
 
+    public function findByDomain(string $domain): array
+    {
+        return $this->getRepository()->findByDomain($domain);
+    }
+
+    public function checkExistCanonicalEmail(string $email): bool
+    {
+        return $this->getRepository()->checkExistCanonicalEmail($email);
+    }
+
     /** @inheritDoc */
     public function getUserToken(Token $token, array $userIds): array
     {
@@ -66,27 +76,17 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
     }
 
     /**
-     * @param array|null $domains
+     * @param array $domains
      * @return array|null
      */
-    public function getUsersByDomains(?array $domains): ?array
+    public function getUsersByDomains(array $domains): ?array
     {
-        $qr = $this->getRepository()->createQueryBuilder('qr');
-        $merge = [];
-        $qr->select('u')
-            ->from(User::class, 'u');
+        $emailDomains = [];
 
-        if ($domains) {
-            foreach ($domains as $domain) {
-                $merge = array_merge(
-                    $qr->orWhere("u.email LIKE '%@".$domain."'")
-                        ->getQuery()
-                        ->execute(),
-                    $merge
-                );
-            }
+        foreach ($domains as $domain) {
+            $emailDomains = array_merge($emailDomains, $this->getRepository()->findByDomain($domain));
         }
 
-        return $merge ?? null;
+        return $emailDomains;
     }
 }

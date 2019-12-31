@@ -72,7 +72,6 @@ class User extends BaseUser implements
      * )
      * @AppAssert\IsNotBlacklisted(type="email", message="This domain is not allowed")
      * @AppAssert\UserEmailSymbols()
-     * @AppAssert\GmailEmail()
      * @var string
      */
     protected $email;
