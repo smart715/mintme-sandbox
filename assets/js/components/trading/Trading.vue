@@ -8,7 +8,7 @@
                     class="custom-control-input"
                     id="checkbox"
                     v-model="userTokensEnabled"
-                    @change="updateData(1)"
+                    @change="fetchData(1)"
                     :disabled="loading">
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
@@ -82,7 +82,7 @@
             </div>
             <div class="row justify-content-center">
                 <b-pagination
-                    @change="updateData"
+                    @change="fetchData"
                     :total-rows="totalRows"
                     :per-page="perPage"
                     v-model="currentPage"
@@ -225,27 +225,34 @@ export default {
             return this.globalMarketCaps['BTC'] + ' BTC';
         },
     },
-    mounted: function() {
-        let updateDataPromise = this.updateData(this.currentPage);
-        let conversionRatesPromise = this.fetchConversionRates();
-        this.fetchGlobalMarketCap();
-
-        Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
-            .then(() => {
-                this.updateDataWithMarkets();
-                this.loading = false;
-
-                this.addMessageHandler((result) => {
-                    if ('state.update' === result.method) {
-                        this.sanitizeMarket(result);
-                        this.requestKline(result.params[0]);
-                    } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
-                        this.updateMonthVolume(result.id, result.result);
-                    }
-                });
-            });
+    mounted() {
+        this.fetchData();
     },
     methods: {
+        fetchData: function(page = false) {
+            if (page) {
+                this.currentPage = page;
+            }
+
+            let updateDataPromise = this.updateData(this.currentPage);
+            let conversionRatesPromise = this.fetchConversionRates();
+            this.fetchGlobalMarketCap();
+
+            Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
+                .then(() => {
+                    this.updateDataWithMarkets();
+                    this.loading = false;
+
+                    this.addMessageHandler((result) => {
+                        if ('state.update' === result.method) {
+                            this.sanitizeMarket(result);
+                            this.requestKline(result.params[0]);
+                        } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                            this.updateMonthVolume(result.id, result.result);
+                        }
+                    });
+                });
+        },
         sortCompare: function(a, b, key) {
             let pair = false;
             this.marketsOnTop.forEach((market)=> {
