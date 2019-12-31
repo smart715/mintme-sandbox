@@ -30,4 +30,25 @@ class UserRepository extends EntityRepository
     {
         return $this->findBy([ 'referencerId' => $userId ]);
     }
+
+    /** @codeCoverageIgnore */
+    public function findByDomain(string $domain): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.email LIKE :domain')
+            ->setParameter('domain', '%@'.$domain)
+            ->getQuery()
+            ->execute();
+    }
+
+    /** @codeCoverageIgnore */
+    public function checkExistCanonicalEmail(string $email): bool
+    {
+        $user = $this->createQueryBuilder('u')
+            ->Where("u.emailCanonical LIKE '".$email."'")
+            ->getQuery()
+            ->getArrayResult();
+
+            return 0 != count($user);
+    }
 }

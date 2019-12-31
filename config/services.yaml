@@ -481,3 +481,7 @@ services:
             $rpc: '@coinmarketcap.rest_rpc'
 
     App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
+    
+    app.emailCanonicalizer:
+        class: App\Canonicalizer\EmailCanonicalizer
+        public: false    
