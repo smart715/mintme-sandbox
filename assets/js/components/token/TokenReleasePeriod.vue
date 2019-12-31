@@ -112,7 +112,7 @@ export default {
     },
     computed: {
         releasedDisabled: function() {
-            return (10 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
+            return (0 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
         },
         releasePeriodDisabled: function() {
             return !this.isTokenNotDeployed;
