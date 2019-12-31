@@ -8,7 +8,7 @@
                     class="custom-control-input"
                     id="checkbox"
                     v-model="userTokensEnabled"
-                    @change="updateData(1)"
+                    @change="fetchData(1)"
                     :disabled="loading">
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
@@ -225,7 +225,7 @@ export default {
             return this.globalMarketCaps['BTC'] + ' BTC';
         },
     },
-    mounted: function() {
+    mounted() {
         this.fetchData();
     },
     methods: {
