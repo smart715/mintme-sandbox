@@ -35,7 +35,7 @@
                 </b-row>
             </b-col>
             <b-col cols="12">
-                <div>Time needed to unlock all tokens: {{ currentPeriod }} years</div>
+                <div>Time needed to unlock all tokens: {{ releasePeriod }} years</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
@@ -43,8 +43,8 @@
                     <b-col class="p-0">
                         <vue-slider
                             ref="release-period-slider"
-                            :disabled="currentPeriodDisabled"
-                            v-model="currentPeriod"
+                            :disabled="releasePeriodDisabled"
+                            v-model="releasePeriod"
                             :data="[1,2,3,5,10,15,20,30,40,50]"
                             :interval="10"
                             :tooltip="false"
@@ -62,7 +62,7 @@
                         type="submit"
                         class="px-4 mr-1"
                         variant="primary"
-                        :disabled="currentPeriodDisabled || loading"
+                        :disabled="releasePeriodDisabled || loading"
                         @click="saveReleasePeriod"
                     >
                         Save
@@ -88,8 +88,6 @@ import TwoFactorModal from '../modal/TwoFactorModal';
 import {NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
 
-const DEFAULT_VALUE = '-';
-
 export default {
     name: 'TokenReleasePeriod',
     mixins: [NotificationMixin],
@@ -101,10 +99,9 @@ export default {
     },
     data() {
         return {
-            currentPeriod: 0,
             loading: true,
             released: 0,
-            releasePeriod: DEFAULT_VALUE,
+            releasePeriod: 0,
             showTwoFactorModal: false,
         };
     },
@@ -115,9 +112,9 @@ export default {
     },
     computed: {
         releasedDisabled: function() {
-            return (this.releasePeriod !== DEFAULT_VALUE && this.isTokenExchanged) || !this.isTokenNotDeployed;
+            return (10 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
         },
-        currentPeriodDisabled: function() {
+        releasePeriodDisabled: function() {
             return !this.isTokenNotDeployed;
         },
     },
@@ -128,7 +125,6 @@ export default {
             .then((res) => {
                 if (HTTP_OK === res.status) {
                     this.releasePeriod = res.data.releasePeriod;
-                    this.currentPeriod = this.releasedDisabled ? this.releasePeriod : 10;
 
                     let allTokens = new Decimal(res.data.frozenAmount).add(res.data.releasedAmount);
                     let percent = new Decimal(res.data.releasedAmount).div(allTokens.toString()).mul(100).floor();
@@ -136,7 +132,7 @@ export default {
 
                     this.loading = false;
                 } else if (HTTP_NO_CONTENT === res.status) {
-                    this.currentPeriod = 10;
+                    this.releasePeriod = 10;
                     this.released = 10;
                     this.loading = false;
                 }
@@ -159,7 +155,7 @@ export default {
                 name: this.tokenName,
             }), {
                 released: this.released,
-                releasePeriod: this.currentPeriod,
+                releasePeriod: this.releasePeriod,
                 code,
             }).then((response) => {
                 this.closeTwoFactorModal();
