@@ -100,7 +100,7 @@
 <script>
 import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -108,7 +108,7 @@ import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         page: Number,
         tokensCount: Number,
@@ -542,13 +542,7 @@ export default {
                     })
                     .catch((err) => {
                         this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
-                        this.$axios.retry.post(
-                            this.$routing.generate('send_logs'),
-                            {
-                                msg: 'Can not update WEB circulation supply.',
-                                error: err,
-                            }
-                        );
+                        this.sendLogs('Can not update WEB circulation supply.', err);
                         reject(err);
                     });
             });
