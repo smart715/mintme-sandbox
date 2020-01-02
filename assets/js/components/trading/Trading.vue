@@ -542,6 +542,13 @@ export default {
                     })
                     .catch((err) => {
                         this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        this.$axios.retry.post(
+                            this.$routing.generate('send_logs'),
+                            {
+                                msg: 'Can not update WEB circulation supply.',
+                                error: err,
+                            }
+                        );
                         reject(err);
                     });
             });
