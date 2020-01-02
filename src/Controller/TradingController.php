@@ -4,12 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Token\Token;
 use App\Exchange\Market;
-use App\Logger\UserActionLogger;
 use App\Manager\TokenManagerInterface;
 use App\Repository\TokenRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -19,16 +17,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class TradingController extends Controller
 {
-    /** @var UserActionLogger  */
-    private $userActionLogger;
 
     public function __construct(
-        NormalizerInterface $normalizer,
-        UserActionLogger $userActionLogger
+        NormalizerInterface $normalizer
     ) {
 
         parent::__construct($normalizer);
-        $this->userActionLogger = $userActionLogger;
     }
 
     /**
@@ -53,24 +47,5 @@ class TradingController extends Controller
     private function getTokenRepository(): TokenRepository
     {
         return $this->getDoctrine()->getManager()->getRepository(Token::class);
-    }
-
-    /**
-     * @Route(
-     *     path="/sendLogs",
-     *     name="send_logs",
-     *     methods={"POST"},
-     *     options={"expose"=true}
-     *     )
-     */
-    public function getLogsFromClientSide(Request $request): Response
-    {
-        $response = new Response();
-        $message = $request->get('msg');
-        $error = $request->get('error');
-
-        $this->userActionLogger->error($message, $error);
-
-        return $response->send();
     }
 }
