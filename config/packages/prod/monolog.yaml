@@ -53,7 +53,7 @@ monolog:
             level: debug
             channels: ['user_action']
             formatter: monolog.formatter.user_action
-         front_end:
+        front_end:
             type: stream
             path: "%kernel.logs_dir%/front_end.log"
             level: debug
