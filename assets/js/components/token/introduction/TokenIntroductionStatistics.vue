@@ -120,8 +120,7 @@
                                         Already released
                                     </template>
                                     <template slot="body">
-                                        The amount of token units released to token creator
-                                        at the moment of token creation.
+                                        The amount of tokens released to token creator
                                     </template>
                                 </guide>
                             </div>
