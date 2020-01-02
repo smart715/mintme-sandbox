@@ -71,6 +71,6 @@ class TradingController extends Controller
 
         $this->userActionLogger->error($message, $error);
 
-        return $response->send($message);
+        return $response->send();
     }
 }

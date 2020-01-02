@@ -1,6 +1,6 @@
 export default {
     methods: {
-        sendLogs: function (message, data) {
+        sendLogs: function(message, data) {
             this.$axios.retry.post(
                 this.$routing.generate('send_logs'),
                 {
@@ -8,6 +8,6 @@ export default {
                     data: data,
                 }
             );
-        }
-    }
-}
+        },
+    },
+};
