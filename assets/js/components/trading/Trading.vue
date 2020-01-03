@@ -316,6 +316,7 @@ export default {
                     })
                     .catch((err) => {
                         this.notifyError('Can not update the markets data. Try again later.');
+                        this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
             });
@@ -416,6 +417,7 @@ export default {
                         });
                         if ('undefined' === typeof this.markets[market].supply) {
                             this.notifyError('Can not update market cap for BTC/MINTME.');
+                            this.sendLogs('error', 'Can not update market cap for BTC/MINTME', this.markets[market].supply);
                             this.markets[market].supply = 0;
                         }
                     } else {
@@ -518,6 +520,7 @@ export default {
                 .catch((err) => {
                     this.$emit('disable-usd');
                     this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                    this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                     reject();
                 });
             });
@@ -541,8 +544,8 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
-                        this.sendLogs('Can not update WEB circulation supply.', err);
+                        this.notifyError('Can not update MINTME circulation supply. BTC/MINTME market cap might not be accurate.');
+                        this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });
             });

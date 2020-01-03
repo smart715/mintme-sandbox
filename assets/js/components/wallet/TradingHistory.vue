@@ -38,11 +38,11 @@ import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 
 export default {
     name: 'TradingHistory',
-    mixins: [FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     data() {
         return {
             tableData: null,
@@ -124,8 +124,9 @@ export default {
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.notifyError('Can not update trading history. Try again later.');
+                        this.sendLogs('error', 'Service unavailable. Can not update trading history', err);
                         reject([]);
                     });
             });

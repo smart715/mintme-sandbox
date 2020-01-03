@@ -160,13 +160,13 @@ import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
 import {WSAPI} from '../../../utils/constants';
-import {MoneyFilterMixin, NotificationMixin} from '../../../mixins';
+import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
 
 const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
-    mixins: [MoneyFilterMixin, NotificationMixin],
+    mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Guide,
     },
@@ -193,29 +193,44 @@ export default {
     mounted: function() {
         this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
             .then((res) => this.isTokenExchanged = res.data)
-            .catch(() => this.notifyError('Can not load token data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load token data. Try again later');
+                this.sendLogs('error', 'Can not load token data', err.response.message, err);
+            });
 
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
             .then((res) => this.stats = res.data || this.stats)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+            });
 
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+            });
 
         this.$axios.retry.get(this.$routing.generate('executed_orders', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
         }))
             .then((res) => this.executedOrders = res.data)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+            });
 
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
         }))
             .then((res) => this.pendingSellOrders = res.data.sell)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+            });
     },
     computed: {
         loaded: function() {

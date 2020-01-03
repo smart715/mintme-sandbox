@@ -40,13 +40,13 @@ import {
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
 } from '../../utils/constants';
-import {NotificationMixin} from '../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../mixins';
 
 const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenChangeName',
-    mixins: [NotificationMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     components: {
         TwoFactorModal,
     },
@@ -158,10 +158,13 @@ export default {
             }, (error) => {
                 if (!error.response) {
                     this.notifyError('Network error');
+                    this.sendLogs('error', 'Edit name network error', error.response.data.message, error);
                 } else if (error.response.data.message) {
                     this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not edit name', error.response.data.message, error);
                 } else {
                     this.notifyError('An error has occurred, please try again later');
+                    this.sendLogs('error', 'An error has occurred, please try again later', error);
                 }
             })
             .then(() => {

@@ -160,7 +160,7 @@
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faGlobe, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin, NotificationMixin} from '../../../mixins/';
+import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins/';
 import {isValidUrl} from '../../../utils';
 import Modal from '../../modal/Modal';
 
@@ -177,7 +177,7 @@ export default {
         FontAwesomeIcon,
         Modal,
     },
-    mixins: [FiltersMixin, NotificationMixin],
+    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
     data() {
         return {
             confirmWebsiteFileUrl: this.$routing.generate('token_website_confirmation', {
@@ -266,14 +266,20 @@ export default {
                     } else if (response.data.errors.fileError) {
                         this.fileError = response.data.errors.fileError;
                     } else if (response.data.errors.length) {
-                        response.data.errors.forEach((error) => this.notifyError(error));
+                        response.data.errors.forEach((error) => {
+                            this.notifyError(error);
+                            this.sendLogs('error', 'Save website response data error', error);
+                        });
                         this.clearFileError();
                     } else {
                         this.clearFileError();
                         return Promise.reject({response: 'error'});
                     }
                 })
-                .catch(({response}) => this.notifyError(!response ? 'Network error' : response.statusText))
+                .catch(({response}) => {
+                    this.notifyError(!response ? 'Network error' : response.statusText);
+                    this.sendLogs('error', 'Save website network error', response.statusText, response);
+                })
                 .then(() => this.submitting = false);
         },
         closeFileErrorModal: function() {

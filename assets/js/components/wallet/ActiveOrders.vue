@@ -51,11 +51,18 @@ import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    WebSocketMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin
+} from '../../mixins/';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         ConfirmModal,
     },
@@ -164,7 +171,10 @@ export default {
                     }
                 }, 'active-tableData-update');
             })
-            .catch(() => this.notifyError('Can not update order list now. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not update order list now. Try again later');
+                this.sendLogs('error', 'Service unavailable. Can not update order list now', err);
+            });
     },
     methods: {
         updateTableData: function() {
@@ -187,8 +197,9 @@ export default {
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.notifyError('Can not update orders history. Try again later.');
+                        this.sendLogs('error', 'Service unavailable. Can not update orders history', err);
                         reject([]);
                     });
             });
@@ -209,8 +220,9 @@ export default {
         },
         removeOrder: function() {
             this.$axios.single.post(this.actionUrl, {'orderData': [this.currentRow.id]})
-                .catch(() => {
+                .catch((err) => {
                     this.notifyError('Service unavailable, try again later');
+                    this.sendLogs('error', 'Service unavailable. Can not remove orders', err);
                 });
         },
         getMarketFromName: function(name) {

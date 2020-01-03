@@ -148,7 +148,14 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins';
+import {
+    WebSocketMixin,
+    FiltersMixin,
+    MoneyFilterMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin
+} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 const TOK_SYMBOL = 'TOK';
@@ -156,7 +163,7 @@ const WEB_SYMBOL = 'WEB';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         WithdrawModal,
         DepositModal,
@@ -255,18 +262,23 @@ export default {
                             id: parseInt(Math.random()),
                         }));
                     })
-                    .catch(() => this.notifyError(
-                        'Can not connect to internal services'
-                    ));
+                    .catch((err) => {
+                        this.notifyError(
+                            'Can not connect to internal services'
+                        );
+                        this.sendLogs('error', 'Can not connect to internal services', err);
+                    });
             })
-            .catch(() => {
+            .catch((err) => {
                 this.notifyError('Can not update tokens now. Try again later.');
+                this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
             .then((res) => this.depositAddresses = res.data)
-            .catch(() => {
+            .catch((err) => {
                 this.notifyError('Can not update deposit data now. Try again later.');
+                this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
             });
     },
     methods: {
@@ -305,8 +317,9 @@ export default {
                     toMoney(res.data, subunit) :
                     undefined
                 )
-                .catch(() => {
+                .catch((err) => {
                     this.notifyError('Can not update deposit fee status. Try again later.');
+                    this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
             // TODO: Get rid of hardcoded WEB

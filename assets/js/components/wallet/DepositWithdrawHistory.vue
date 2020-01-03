@@ -134,6 +134,7 @@ export default {
                     })
                     .catch(() => {
                         this.notifyError('Can not update payment history. Try again later.');
+
                         reject([]);
                     });
             });

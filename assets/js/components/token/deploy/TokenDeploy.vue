@@ -82,7 +82,7 @@
 <script>
 import TwoFactorModal from '../../modal/TwoFactorModal';
 import {toMoney, formatMoney} from '../../../utils';
-import {WebSocketMixin, NotificationMixin} from '../../../mixins';
+import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
 import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
 
@@ -91,7 +91,7 @@ export default {
     components: {
         TwoFactorModal,
     },
-    mixins: [WebSocketMixin, NotificationMixin],
+    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     props: {
         twofa: Boolean,
         hasReleasePeriod: Boolean,
@@ -170,10 +170,13 @@ export default {
             .catch(({response}) => {
                 if (!response) {
                     this.notifyError('Network error');
+                    this.sendLogs('error', 'Token deploy network error', response);
                 } else if (response.data.message) {
                     this.notifyError(response.data.message);
+                    this.sendLogs('error', 'Error of deploying token', response.data.message, response);
                 } else {
                     this.notifyError('An error has occurred, please try again later');
+                    this.sendLogs('error', 'An error has occurred, please try again later', response.data.message, response);
                 }
             })
             .then(() => this.deploying = false);

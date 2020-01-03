@@ -77,14 +77,14 @@ import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
-import {WebSocketMixin, NotificationMixin} from '../../mixins';
+import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
 const WSAPI = Constants.WSAPI;
 
 export default {
     name: 'Trade',
-    mixins: [WebSocketMixin, NotificationMixin],
+    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     components: {
         TradeBuyOrder,
         TradeSellOrder,
@@ -245,10 +245,11 @@ export default {
                                 id: parseInt(Math.random().toString().replace('0.', '')),
                             }));
                         })
-                        .catch(() => {
+                        .catch((err) => {
                             this.notifyError(
                                 'Can not connect to internal services'
                             );
+                            this.sendLogs('error', 'Can not connect to internal services', err);
                         });
                 })
                 .catch((err) => {
@@ -256,6 +257,7 @@ export default {
                         this.balances = false;
                     } else {
                         this.notifyError('Can not load current balance. Try again later.');
+                        this.sendLogs('error', 'Can not load current balance', err);
                     }
                 });
         },
@@ -280,7 +282,10 @@ export default {
                         });
                         this.saveOrders(orders, isSell);
                     })
-                    .catch(() => this.notifyError('Something went wrong. Can not update orders.'));
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Can not update orders.');
+                        this.sendLogs('error', 'Can not update orders', err);
+                    });
                     break;
                 case WSAPI.order.status.UPDATE:
                     if (typeof order === 'undefined') {
