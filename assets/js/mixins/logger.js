@@ -4,9 +4,7 @@ export default {
             this.$axios.retry.post(this.$routing.generate('log'), {
                 level: level,
                 message: message,
-                context: JSON.stringify({
-                    'log': data,
-                }),
+                context: JSON.stringify(data),
             });
         },
     },
