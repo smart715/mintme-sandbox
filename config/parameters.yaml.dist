@@ -107,4 +107,6 @@ parameters:
     # How much user receive for registration
     landing_web_bonus: 5
 
+    # Quick Registration Default Password for Hacker Menu -> Qucik Registration.
+    quick_registration_password: 'blockchaincrowdfunding'
 
