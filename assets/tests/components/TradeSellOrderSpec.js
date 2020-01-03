@@ -70,6 +70,14 @@ describe('TradeSellOrder', () => {
         done();
     });
 
+    it('show deposit more link if logged in', () => {
+        wrapper.vm.loggedIn = false;
+        expect(wrapper.vm.showDepositMoreLink).to.be.false;
+
+        wrapper.vm.loggedIn = true;
+        expect(wrapper.vm.showDepositMoreLink).to.be.true;
+    });
+
     describe('useMarketPrice', () => {
         it('should be disabled if marketPrice not greater than zero', () => {
             wrapper.vm.marketPrice = 0;
