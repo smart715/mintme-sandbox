@@ -151,8 +151,7 @@ import DepositModal from '../modal/DepositModal';
 import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-const TOK_SYMBOL = 'TOK';
-const WEB_SYMBOL = 'WEB';
+import {TOK_IDENTIFIER, BTC_IDENTIFIER, WEB_IDENTIFIER} from '../../utils/constants';
 
 export default {
     name: 'Wallet',
@@ -165,6 +164,7 @@ export default {
         withdrawUrl: {type: String, required: true},
         createTokenUrl: String,
         tradingUrl: String,
+        depositMore: String,
         twofa: String,
     },
     data() {
@@ -234,40 +234,46 @@ export default {
         },
     },
     mounted: function() {
-        this.$axios.retry.get(this.$routing.generate('tokens'))
-            .then((res) => {
-                let tokensData = res.data;
-                this.tokens = tokensData.common;
-                this.predefinedTokens = tokensData.predefined;
-            })
-            .then(() => {
-                this.authorize()
-                    .then(() => {
-                        this.addMessageHandler((response) => {
-                            if ('asset.update' === response.method) {
-                                this.updateBalances(response.params[0]);
-                            }
-                        }, 'wallet-asset-update');
+        Promise.all([
+            this.$axios.retry.get(this.$routing.generate('tokens'))
+                .then((res) => {
+                    let tokensData = res.data;
+                    this.tokens = tokensData.common;
+                    this.predefinedTokens = tokensData.predefined;
+                })
+                .then(() => {
+                    this.authorize()
+                        .then(() => {
+                            this.addMessageHandler((response) => {
+                                if ('asset.update' === response.method) {
+                                    this.updateBalances(response.params[0]);
+                                }
+                            }, 'wallet-asset-update');
 
-                        this.sendMessage(JSON.stringify({
-                            method: 'asset.subscribe',
-                            params: this.allTokensName,
-                            id: parseInt(Math.random()),
-                        }));
-                    })
-                    .catch(() => this.notifyError(
-                        'Can not connect to internal services'
-                    ));
-            })
-            .catch(() => {
-                this.notifyError('Can not update tokens now. Try again later.');
-            });
+                            this.sendMessage(JSON.stringify({
+                                method: 'asset.subscribe',
+                                params: this.allTokensName,
+                                id: parseInt(Math.random()),
+                            }));
+                        })
+                        .catch(() => this.notifyError(
+                            'Can not connect to internal services'
+                        ));
+                })
+                .catch(() => {
+                    this.notifyError('Can not update tokens now. Try again later.');
+                }),
 
-        this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
-            .then((res) => this.depositAddresses = res.data)
-            .catch(() => {
-                this.notifyError('Can not update deposit data now. Try again later.');
-            });
+            this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
+                .then((res) => this.depositAddresses = res.data)
+                .catch(() => {
+                    this.notifyError('Can not update deposit data now. Try again later.');
+                }),
+        ])
+        .then(() => {
+            this.openDepositMore();
+        })
+        .catch(() => this.notifyError('Can not load Wallet data. Try again later.'));
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
@@ -280,10 +286,10 @@ export default {
             this.isTokenModal = isToken;
             this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
             this.withdraw.webFee = toMoney(
-                isToken || WEB_SYMBOL === currency ? this.predefinedTokens[WEB_SYMBOL].fee : 0,
+                isToken || WEB_IDENTIFIER === currency ? this.predefinedTokens[WEB_IDENTIFIER].fee : 0,
                 subunit
             );
-            this.withdraw.availableWeb = this.predefinedTokens[WEB_SYMBOL].available;
+            this.withdraw.availableWeb = this.predefinedTokens[WEB_IDENTIFIER].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
@@ -291,7 +297,7 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency, subunit, isToken = false) {
-            this.depositAddress = (isToken ? this.depositAddresses[TOK_SYMBOL] : this.depositAddresses[currency])
+            this.depositAddress = (isToken ? this.depositAddresses[TOK_IDENTIFIER] : this.depositAddresses[currency])
                 || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
@@ -299,7 +305,7 @@ export default {
             this.isTokenModal = isToken;
 
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
-                    crypto: isToken ? WEB_SYMBOL : currency,
+                    crypto: isToken ? WEB_IDENTIFIER : currency,
                 }))
                 .then((res) => this.deposit.fee = res.data && parseFloat(res.data) !== 0.0 ?
                     toMoney(res.data, subunit) :
@@ -315,6 +321,19 @@ export default {
         },
         closeDeposit: function() {
             this.showDepositModal = false;
+        },
+        openDepositMore: function () {
+            if (
+                [WEB_IDENTIFIER, BTC_IDENTIFIER].includes(this.depositMore) &&
+                this.predefinedTokens !== null &&
+                this.predefinedTokens.hasOwnProperty(this.depositMore) &&
+                this.depositAddresses.hasOwnProperty(this.depositMore)
+            ) {
+                this.openDeposit(
+                    this.depositMore,
+                    this.predefinedTokens[this.depositMore].subunit
+                );
+            }
         },
         updateBalances: function(data) {
             Object.keys(data).forEach((oTokenName) => {
