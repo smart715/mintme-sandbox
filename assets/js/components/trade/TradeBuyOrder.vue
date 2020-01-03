@@ -46,6 +46,11 @@
                                 <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
                                     <span class="text-white word-break">
                                         {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                        <a
+                                            v-if="showDepositMoreLink"
+                                            :href="getDepositMoreLink()"
+                                            target="_blank"
+                                        >Deposit more</a>
                                         <guide>
                                             <template slot="header">
                                                 Your {{ market.base.symbol|rebranding }}
@@ -141,14 +146,14 @@
 
 <script>
 import Guide from '../Guide';
-import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins/';
+import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, DepositMixin} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, DepositMixin],
     components: {
         Guide,
     },

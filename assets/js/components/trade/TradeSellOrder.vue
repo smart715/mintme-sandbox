@@ -45,6 +45,11 @@
                                 <span class="c-pointer" @click="balanceClicked"
                                       v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
                                     {{ market.quote.symbol|rebranding | truncate(7) }}:
+                                    <a
+                                        v-if="showDepositMoreLink"
+                                        :href="getDepositMoreLink()"
+                                        target="_blank"
+                                    >Deposit more</a>
                                     <span class="text-white  word-break">
                                         {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                         <guide>
@@ -143,7 +148,7 @@
 
 <script>
 import Guide from '../Guide';
-import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins/';
+import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, DepositMixin} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
@@ -153,7 +158,7 @@ export default {
     components: {
         Guide,
     },
-    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, DepositMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
