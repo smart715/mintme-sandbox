@@ -66,7 +66,7 @@ export default {
                     icon: 'fa fa-sign-in-alt',
                     child: [
                         {
-                            href: '',//this.$routing.generate('quick-registration'),
+                            href: this.$routing.generate('quick-registration'),
                             title: 'Quick registration',
                         },
                     ],
