@@ -196,7 +196,7 @@ export default {
             })
             .catch((error) => {
                 this.notifyError(error.response.data.message);
-                this.sendLogs('error', 'Withdraw response error', error.response.data.message);
+                this.sendLogs('error', 'Withdraw response error', error);
             })
             .then(() => this.withdrawing = false);
 

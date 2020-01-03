@@ -150,7 +150,7 @@ export default {
                     FB.api('/me/accounts?type=page&fields=name,link', (accountsData) => {
                         if (accountsData.error) {
                             this.notifyError('An error has ocurred, please try again later');
-                            this.sendLogs('error', 'An error has occurred, please try again later', accountsData.error, accountsData);
+                            this.sendLogs('error', 'An error has occurred, please try again later', accountsData.error);
                             return;
                         }
                         this.pages = accountsData.data;
@@ -185,13 +185,13 @@ export default {
                 }, (error) => {
                     if (!error.response) {
                         this.notifyError('Network error');
-                        this.sendLogs('error', 'Save facebook address network error', error.response, error);
+                        this.sendLogs('error', 'Save facebook address network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not save facebook', error.response, error);
+                        this.sendLogs('error', 'Can not save facebook', error);
                     } else {
                         this.notifyError('An error has occurred, please try again later');
-                        this.sendLogs('error', 'An error has occurred, please try again later', error.response, error);
+                        this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 })
                 .then(() => {

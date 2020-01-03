@@ -195,21 +195,21 @@ export default {
             .then((res) => this.isTokenExchanged = res.data)
             .catch((err) => {
                 this.notifyError('Can not load token data. Try again later');
-                this.sendLogs('error', 'Can not load token data', err.response.message, err);
+                this.sendLogs('error', 'Can not load token data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
             .then((res) => this.stats = res.data || this.stats)
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
-                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+                this.sendLogs('error', 'Can not load statistic data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
-                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+                this.sendLogs('error', 'Can not load statistic data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('executed_orders', {
@@ -219,7 +219,7 @@ export default {
             .then((res) => this.executedOrders = res.data)
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
-                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+                this.sendLogs('error', 'Can not load statistic data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
@@ -229,7 +229,7 @@ export default {
             .then((res) => this.pendingSellOrders = res.data.sell)
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
-                this.sendLogs('error', 'Can not load statistic data', err.response.message, err);
+                this.sendLogs('error', 'Can not load statistic data', err);
             });
     },
     computed: {

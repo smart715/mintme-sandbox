@@ -158,10 +158,10 @@ export default {
             }, (error) => {
                 if (!error.response) {
                     this.notifyError('Network error');
-                    this.sendLogs('error', 'Edit name network error', error.response.data.message, error);
+                    this.sendLogs('error', 'Edit name network error', error);
                 } else if (error.response.data.message) {
                     this.notifyError(error.response.data.message);
-                    this.sendLogs('error', 'Can not edit name', error.response.data.message, error);
+                    this.sendLogs('error', 'Can not edit name', error);
                 } else {
                     this.notifyError('An error has occurred, please try again later');
                     this.sendLogs('error', 'An error has occurred, please try again later', error);

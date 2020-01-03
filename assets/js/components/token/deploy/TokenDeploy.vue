@@ -173,10 +173,10 @@ export default {
                     this.sendLogs('error', 'Token deploy network error', response);
                 } else if (response.data.message) {
                     this.notifyError(response.data.message);
-                    this.sendLogs('error', 'Error of deploying token', response.data.message, response);
+                    this.sendLogs('error', 'Error of deploying token', response);
                 } else {
                     this.notifyError('An error has occurred, please try again later');
-                    this.sendLogs('error', 'An error has occurred, please try again later', response.data.message, response);
+                    this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             })
             .then(() => this.deploying = false);

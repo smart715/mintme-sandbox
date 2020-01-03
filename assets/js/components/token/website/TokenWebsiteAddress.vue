@@ -278,7 +278,7 @@ export default {
                 })
                 .catch(({response}) => {
                     this.notifyError(!response ? 'Network error' : response.statusText);
-                    this.sendLogs('error', 'Save website network error', response.statusText, response);
+                    this.sendLogs('error', 'Save website network error', response);
                 })
                 .then(() => this.submitting = false);
         },
