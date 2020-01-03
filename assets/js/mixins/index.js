@@ -5,6 +5,7 @@ import PlaceOrder from './place_order';
 import OrderClickedMixin from './order_clicked';
 import {MoneyFilterMixin, RebrandingFilterMixin, TruncateFilterMixin as FiltersMixin} from './filters';
 import NotificationMixin from './notification';
+import DepositMixin from './deposit';
 
 export {
     FiltersMixin,
@@ -16,4 +17,5 @@ export {
     PricePositionMixin,
     RebrandingFilterMixin,
     WebSocketMixin,
+    DepositMixin,
 };
