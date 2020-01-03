@@ -1,9 +1,10 @@
 <template>
     <sidebar-menu
-            @collapse="isClicked = true"
-            :class="clickedStyles"
-            :width="!isClicked ? '30px' : '350px'"
-            :menu="menu" />
+        :class="clickedStyles"
+        :menu="menu"
+        :width="menuWidth"
+        @collapse="isClicked = true"
+    />
 </template>
 
 <script>
@@ -15,10 +16,13 @@ Vue.use(VueSidebarMenu);
 
 export default {
     name: 'AdminMenu',
+    props: {
+        isUserLogged: Boolean,
+    },
     data() {
         return {
             isClicked: false,
-            menu: [
+            authorizedMenu: [
                 {
                     header: true,
                     title: 'HACKER MENU',
@@ -52,11 +56,33 @@ export default {
                     ],
                 },
             ],
+            nonAuthorizedMenu: [
+                {
+                    header: true,
+                    title: 'HACKER MENU',
+                },
+                {
+                    title: 'Quick Menu',
+                    icon: 'fa fa-sign-in-alt',
+                    child: [
+                        {
+                            href: '',//this.$routing.generate('quick-registration'),
+                            title: 'Quick registration',
+                        },
+                    ],
+                },
+            ],
         };
     },
     computed: {
         clickedStyles: function() {
             return !this.isClicked ? 'v-sidebar-menu vsm-collapsed' : '';
+        },
+        menu: function() {
+            return this.isUserLogged ? this.authorizedMenu : this.nonAuthorizedMenu;
+        },
+        menuWidth: function() {
+            return this.isClicked ? '350px' : '30px';
         },
     },
     watch: {
