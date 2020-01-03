@@ -13,7 +13,11 @@ export const GENERAL = {
     precision: 8,
     dateFormat: 'DD.MM.YYYY hh:mm:ss',
 };
-export const webSymbol = 'web';
+
+export const WEB_IDENTIFIER = 'WEB';
+export const BTC_IDENTIFIER = 'BTC';
+export const TOK_IDENTIFIER = 'TOK';
+
 export const tokenDeploymentStatus = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
 export const addressLength = {
     WEB: {

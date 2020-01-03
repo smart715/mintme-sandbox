@@ -84,7 +84,7 @@ import TwoFactorModal from '../../modal/TwoFactorModal';
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
+import {tokenDeploymentStatus, WEB_IDENTIFIER} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
@@ -185,9 +185,9 @@ export default {
             this.addMessageHandler((response) => {
                 if (
                     'asset.update' === response.method &&
-                    response.params[0].hasOwnProperty(webSymbol)
+                    response.params[0].hasOwnProperty(WEB_IDENTIFIER)
                 ) {
-                    this.balance = response.params[0][webSymbol].available;
+                    this.balance = response.params[0][WEB_IDENTIFIER].available;
                 }
             }, 'trade-buy-order-asset');
         } else {

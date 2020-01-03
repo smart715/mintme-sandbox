@@ -94,7 +94,7 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
-import {addressLength, webSymbol, addressContain} from '../../utils/constants';
+import {addressLength, WEB_IDENTIFIER, addressContain} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
@@ -143,7 +143,7 @@ export default {
             return this.isToken ? this.webFee : this.fee;
         },
         feeCurrency: function() {
-            return this.isToken ? webSymbol : this.currency;
+            return this.isToken ? WEB_IDENTIFIER : this.currency;
         },
     },
     methods: {
