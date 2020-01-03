@@ -57,7 +57,7 @@ import {
     WebSocketMixin,
     RebrandingFilterMixin,
     NotificationMixin,
-    LoggerMixin
+    LoggerMixin,
 } from '../../mixins/';
 
 export default {

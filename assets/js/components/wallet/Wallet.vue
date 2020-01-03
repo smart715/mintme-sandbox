@@ -154,7 +154,7 @@ import {
     MoneyFilterMixin,
     RebrandingFilterMixin,
     NotificationMixin,
-    LoggerMixin
+    LoggerMixin,
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';

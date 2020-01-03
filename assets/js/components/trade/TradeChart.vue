@@ -97,7 +97,7 @@ import {
     MoneyFilterMixin,
     RebrandingFilterMixin,
     NotificationMixin,
-    LoggerMixin
+    LoggerMixin,
 } from '../../../js/mixins/';
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
