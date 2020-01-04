@@ -45,13 +45,12 @@
                                 <span class="c-pointer" @click="balanceClicked"
                                       v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
                                     {{ market.quote.symbol|rebranding | truncate(7) }}:
-                                    <a
-                                        v-if="showDepositMoreLink"
-                                        :href="getDepositMoreLink()"
-                                        target="_blank"
-                                    >Deposit more</a>
                                     <span class="text-white  word-break">
                                         {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
+                                        <a
+                                            v-if="showDepositMoreLink"
+                                            :href="getDepositMoreLink()"
+                                        >Deposit more</a>
                                         <guide>
                                             <template slot="header">
                                                 Your Tokens

@@ -49,7 +49,6 @@
                                         <a
                                             v-if="showDepositMoreLink"
                                             :href="getDepositMoreLink()"
-                                            target="_blank"
                                         >Deposit more</a>
                                         <guide>
                                             <template slot="header">
