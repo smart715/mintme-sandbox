@@ -25,9 +25,6 @@ class ResettingController extends FOSResettingController
     /** @var UserManagerInterface */
     private $userManager;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
@@ -79,14 +76,13 @@ class ResettingController extends FOSResettingController
         $resettingForm->handleRequest($request);
 
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
-           
-            $this->userManager->updatePassword($user);            
+            $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
             $this->addFlash(
-                'success', 
+                'success',
                 'The password has been reset successfully.'
             );
-           
+
             return $this->redirectToRoute('fos_user_security_login', [], 301);
         }
 
