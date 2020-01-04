@@ -79,20 +79,14 @@ class ResettingController extends FOSResettingController
         $resettingForm->handleRequest($request);
 
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
-            $this->userManager->updatePassword($user);
+           
+            $this->userManager->updatePassword($user);            
             $this->userManager->updateUser($user);
-            $this->eventDispatcher->dispatch(
-                FOSUserEvents::RESETTING_RESET_COMPLETED,
-                new FilterUserResponseEvent(
-                    $user,
-                    $request,
-                    $this->render('bundles/FOSUserBundle/Resetting/reset.html.twig', [
-                    'token' => $token,
-                    'resettingForm' => $resettingForm->createView(),
-                    ])
-                )
+            $this->addFlash(
+                'success', 
+                'The password has been reset successfully.'
             );
-
+           
             return $this->redirectToRoute('fos_user_security_login', [], 301);
         }
 
