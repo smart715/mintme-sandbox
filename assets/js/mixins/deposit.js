@@ -2,19 +2,19 @@ import {WEB_IDENTIFIER, BTC_IDENTIFIER} from '../utils/constants';
 
 export default {
     computed: {
-        showDepositMoreLink:  function() {
+        showDepositMoreLink: function() {
             return this.loggedIn && this.isMarketBTCOrWEB();
         },
     },
     methods: {
-        getDepositMoreLink: function () {
+        getDepositMoreLink: function() {
             if (this.isMarketBTCOrWEB()) {
                 return this.$routing.generate('wallet', {
                     depositMore: this.getMarketIdentifier(),
                 });
             }
         },
-        getMarketIdentifier: function () {
+        getMarketIdentifier: function() {
             if (this.action === 'buy') {
                 return this.market.base.identifier;
             }
@@ -25,7 +25,7 @@ export default {
 
             return '';
         },
-        isMarketBTCOrWEB: function () {
+        isMarketBTCOrWEB: function() {
             return [WEB_IDENTIFIER, BTC_IDENTIFIER].includes(this.getMarketIdentifier());
         },
     },

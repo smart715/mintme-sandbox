@@ -322,7 +322,7 @@ export default {
         closeDeposit: function() {
             this.showDepositModal = false;
         },
-        openDepositMore: function () {
+        openDepositMore: function() {
             if (
                 [WEB_IDENTIFIER, BTC_IDENTIFIER].includes(this.depositMore) &&
                 this.predefinedTokens !== null &&
