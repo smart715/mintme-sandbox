@@ -56,7 +56,7 @@
                                 Market Cap
                             </template>
                             <template slot=body>
-                                Market cap based on max supply of 10 million tokens. 
+                                Market cap based on max supply of 10 million tokens.
                             </template>
                         </guide>
                     </template>
