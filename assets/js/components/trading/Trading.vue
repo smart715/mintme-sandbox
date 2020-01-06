@@ -56,7 +56,7 @@
                                 Market Cap
                             </template>
                             <template slot=body>
-                                Market cap of each token based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                                Market cap based on max supply of 10 million tokens.
                             </template>
                         </guide>
                     </template>
