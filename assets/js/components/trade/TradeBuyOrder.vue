@@ -44,7 +44,7 @@
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
                                 <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
-                                    <span class="text-white word-break">
+                                    <span class="text-white">
                                         {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
                                         <guide>
                                             <template slot="header">
