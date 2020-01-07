@@ -45,7 +45,7 @@
                                 <span class="c-pointer" @click="balanceClicked"
                                       v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
                                     {{ market.quote.symbol|rebranding | truncate(7) }}:
-                                    <span class="text-white  word-break">
+                                    <span class="text-white">
                                         {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                         <a
                                             v-if="showDepositMoreLink"
@@ -85,7 +85,7 @@
                             >
 
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
-                                <label class="custom-control custom-checkbox">
+                                <label class="custom-control custom-checkbox pb-0">
                                     <input
                                         v-model.number="useMarketPrice"
                                         step="0.00000001"
@@ -95,7 +95,7 @@
                                         :disabled="disabledMarketPrice"
                                     >
                                     <label
-                                        class="custom-control-label"
+                                        class="custom-control-label pb-0"
                                         for="sell-price">
                                         Market Price
                                         <guide>
