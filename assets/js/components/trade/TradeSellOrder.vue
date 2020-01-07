@@ -46,19 +46,23 @@
                                       v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
                                     {{ market.quote.symbol|rebranding | truncate(7) }}:
                                     <span class="text-white">
-                                        {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
-                                        <a
-                                            v-if="showDepositMoreLink"
-                                            :href="getDepositMoreLink()"
-                                        >Deposit more</a>
-                                        <guide>
-                                            <template slot="header">
-                                                Your Tokens
-                                            </template>
-                                            <template slot="body">
-                                                Your {{ market.quote.symbol|rebranding }} balance.
-                                            </template>
-                                        </guide>
+                                        <span class="text-nowrap">
+                                            {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
+                                        </span>
+                                        <span class="text-nowrap">
+                                            <a
+                                                v-if="showDepositMoreLink"
+                                                :href="getDepositMoreLink()"
+                                            >Deposit more</a>
+                                            <guide>
+                                                <template slot="header">
+                                                    Your Tokens
+                                                </template>
+                                                <template slot="body">
+                                                    Your {{ market.quote.symbol|rebranding }} balance.
+                                                </template>
+                                            </guide>
+                                        </span>
                                     </span>
                                 </span>
                             </div>

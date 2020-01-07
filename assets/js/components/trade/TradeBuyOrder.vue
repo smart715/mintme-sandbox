@@ -45,19 +45,23 @@
                                 Your
                                 <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
                                     <span class="text-white">
-                                        {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                        <a
-                                            v-if="showDepositMoreLink"
-                                            :href="getDepositMoreLink()"
-                                        >Deposit more</a>
-                                        <guide>
-                                            <template slot="header">
-                                                Your {{ market.base.symbol|rebranding }}
-                                            </template>
-                                            <template slot="body">
-                                                Your {{ market.base.symbol|rebranding }} balance.
-                                            </template>
-                                        </guide>
+                                        <span class="text-nowrap">
+                                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                        </span>
+                                        <span class="text-nowrap">
+                                            <a
+                                                v-if="showDepositMoreLink"
+                                                :href="getDepositMoreLink()"
+                                            >Deposit more</a>
+                                            <guide>
+                                                <template slot="header">
+                                                    Your {{ market.base.symbol|rebranding }}
+                                                </template>
+                                                <template slot="body">
+                                                    Your {{ market.base.symbol|rebranding }} balance.
+                                                </template>
+                                            </guide>
+                                        </span>
                                     </span>
                                 </span>
                             </div>
