@@ -14,6 +14,7 @@ class LockInTest extends TestCase
     public function testGetHourlyRate(): void
     {
         $li = new LockIn($this->mockToken());
+        $li->setDeployedValue();
 
         $this->assertEquals('0', $li->getHourlyRate()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
@@ -25,6 +26,7 @@ class LockInTest extends TestCase
     public function testGetReleasedAmount(): void
     {
         $li = new LockIn($this->mockToken());
+        $li->setDeployedValue();
 
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
@@ -38,7 +40,9 @@ class LockInTest extends TestCase
     {
         $li = new LockIn($this->mockToken());
 
-        $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)))
+        $li
+            ->setDeployedValue()
+            ->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)))
             ->setReleasedAtStart(1000000)
             ->updateFrozenAmount();
 
