@@ -36,7 +36,6 @@ class ResettingController extends FOSResettingController
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->userManager = $userManager;
-        $this->eventDispatcher = $eventDispatcher;
         parent::__construct(
             $eventDispatcher,
             $formFactory,
