@@ -53,6 +53,12 @@ class LockIn
      */
     protected $token;
 
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     * @var \DateTimeImmutable
+     */
+    private $deployed;
+
     public function __construct(Token $token)
     {
         $this->token = $token;
@@ -88,19 +94,25 @@ class LockIn
      */
     public function getReleasedAmount(): Money
     {
-        $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
         $releasedAtStart = new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        return $money->subtract($this->getFrozenAmount())->add($releasedAtStart);
+        return $releasedAtStart->add($this->getEarnedMoneyFromDeploy());
     }
 
     /**
      * @Groups({"Default", "API"})
      * @codeCoverageIgnore
+     * @return Money|string
      */
-    public function getFrozenAmount(): Money
+    public function getFrozenAmount()
     {
-        return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $notReleasedAtStart = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
+        $greaterThan = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+        return $frozenAmount->greaterThan($greaterThan)
+            ? $frozenAmount
+            : '0';
     }
 
     /** @codeCoverageIgnore */
@@ -135,5 +147,33 @@ class LockIn
             : $this->getFrozenAmount()->subtract($this->getHourlyRate())->getAmount();
 
         return $this;
+    }
+
+    public function getDeployed(): ?\DateTimeImmutable
+    {
+        return $this->deployed;
+    }
+
+    /** @ORM\PrePersist() */
+    public function setDeployedValue(): self
+    {
+        $this->deployed = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    /**
+     * Get amount of hours that passed since token was deployed to blockchain.
+     *
+     * @return float
+     */
+    public function getCountHoursFromDeploy(): float
+    {
+        return round((strtotime('now') - strtotime($this->deployed->format('Y-m-d H:i:s'))) / 3600, 1);
+    }
+
+    public function getEarnedMoneyFromDeploy(): Money
+    {
+        return $this->getHourlyRate()->multiply($this->getCountHoursFromDeploy());
     }
 }
