@@ -265,7 +265,7 @@ export default {
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
         },
-        buyInputClass: function () {
+        buyInputClass: function() {
             return this.loggedIn ? 'w-50' : 'w-100';
         },
         ...mapGetters('makeOrder', [
