@@ -5,6 +5,9 @@ export default {
         showDepositMoreLink: function() {
             return this.loggedIn && this.isMarketBTCOrWEB();
         },
+        orderInputClass: function() {
+            return this.loggedIn ? 'w-50' : 'w-100';
+        },
     },
     methods: {
         getDepositMoreLink: function() {

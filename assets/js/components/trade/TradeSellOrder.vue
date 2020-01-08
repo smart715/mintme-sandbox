@@ -36,7 +36,7 @@
                                 type="text"
                                 id="sell-price-input"
                                 class="form-control"
-                                :class="sellInputClass"
+                                :class="orderInputClass"
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
@@ -84,7 +84,7 @@
                                 type="text"
                                 id="sell-price-amount"
                                 class="form-control"
-                                :class="sellInputClass"
+                                :class="orderInputClass"
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
@@ -270,9 +270,6 @@ export default {
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
-        },
-        sellInputClass: function() {
-            return this.loggedIn ? 'w-50' : 'w-100';
         },
         ...mapGetters('makeOrder', [
             'getSellPriceInput',

@@ -70,12 +70,22 @@ describe('TradeBuyOrder', () => {
         done();
     });
 
-    it('show deposit more link if logged in', () => {
-        wrapper.vm.loggedIn = false;
-        expect(wrapper.vm.showDepositMoreLink).to.be.false;
+    describe('Deposit more link', function() {
+        it('show deposit more link if logged in', () => {
+            wrapper.vm.loggedIn = false;
+            expect(wrapper.vm.showDepositMoreLink).to.be.false;
 
-        wrapper.vm.loggedIn = true;
-        expect(wrapper.vm.showDepositMoreLink).to.be.true;
+            wrapper.vm.loggedIn = true;
+            expect(wrapper.vm.showDepositMoreLink).to.be.true;
+        });
+
+        it('check order input class for not logged/logged in', () => {
+            wrapper.vm.loggedIn = false;
+            expect(wrapper.vm.orderInputClass).to.deep.equal('w-100');
+
+            wrapper.vm.loggedIn = true;
+            expect(wrapper.vm.orderInputClass).to.deep.equal('w-50');
+        });
     });
 
     describe('useMarketPrice', function() {
