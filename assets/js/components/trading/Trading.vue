@@ -374,8 +374,8 @@ export default {
                 pair: currency === 'BTC' ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: this.toMoney(volume) + ' ' + currency,
-                monthVolume: this.toMoney(monthVolume) + ' ' + currency,
+                volume: this.toMoney(volume, currency === 'BTC' ? 4 : 2) + ' ' + currency,
+                monthVolume: this.toMoney(monthVolume, currency === 'BTC' ? 4 : 2) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
@@ -479,7 +479,7 @@ export default {
             }, 0);
 
             let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = this.toMoney(monthVolume) + ' ' + marketCurrency;
+            monthVolume = this.toMoney(monthVolume, marketCurrency === 'BTC' ? 4 : 2) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
@@ -574,10 +574,10 @@ export default {
                     this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
                 });
         },
-        toMoney: function(val) {
+        toMoney: function(val, subunit = 2) {
             val = new Decimal(val);
             let precision = val.lessThan(100)
-                ? 2
+                ? subunit
                 : 0;
             return toMoney(val, precision);
         },
