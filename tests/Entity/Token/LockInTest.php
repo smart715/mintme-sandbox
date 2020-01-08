@@ -46,13 +46,19 @@ class LockInTest extends TestCase
             ->setReleasedAtStart(1000000)
             ->updateFrozenAmount();
 
-        $this->assertEquals('2141553', $li->getReleasedAmount()->getAmount());
+        $releasedAtStart = new Money($li->getReleasedAtStart(), new Currency(MoneyWrapper::TOK_SYMBOL));
+        $money = $releasedAtStart->add($li->getEarnedMoneyFromDeploy());
+
+        $this->assertEquals($money->getAmount(), $li->getReleasedAmount()->getAmount());
 
         array_map(function () use (&$li): void {
             $li->updateFrozenAmount();
         }, range(1, 8765)); // 8760 hours in year
 
-        $this->assertEquals('10001000000', $li->getReleasedAmount()->getAmount());
+        $releasedAtStart = new Money($li->getReleasedAtStart(), new Currency(MoneyWrapper::TOK_SYMBOL));
+        $money = $releasedAtStart->add($li->getEarnedMoneyFromDeploy());
+
+        $this->assertEquals($money->getAmount(), $li->getReleasedAmount()->getAmount());
     }
 
     private function mockToken(): Token

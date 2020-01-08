@@ -116,6 +116,12 @@ class LockIn
     }
 
     /** @codeCoverageIgnore */
+    public function getReleasedAtStart(): string
+    {
+        return $this->releasedAtStart;
+    }
+
+    /** @codeCoverageIgnore */
     public function setReleasedAtStart(int $releasedAtStart): self
     {
         $this->releasedAtStart = (string)$releasedAtStart;
