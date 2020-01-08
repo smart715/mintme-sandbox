@@ -35,7 +35,8 @@
                                 v-model="sellPrice"
                                 type="text"
                                 id="sell-price-input"
-                                class="form-control w-50"
+                                class="form-control"
+                                :class="sellInputClass"
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
@@ -82,7 +83,8 @@
                                 v-model="sellAmount"
                                 type="text"
                                 id="sell-price-amount"
-                                class="form-control w-50"
+                                class="form-control"
+                                :class="sellInputClass"
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
@@ -268,6 +270,9 @@ export default {
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
+        },
+        sellInputClass: function () {
+            return this.loggedIn ? 'w-50' : 'w-100';
         },
         ...mapGetters('makeOrder', [
             'getSellPriceInput',
