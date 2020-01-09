@@ -346,6 +346,11 @@ class Token implements TradebleInterface
                 : self::DEPLOYED);
     }
 
+    public function isTokenDeployed(): bool
+    {
+        return self::DEPLOYED === $this->getDeploymentStatus();
+    }
+
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());

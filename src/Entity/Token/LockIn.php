@@ -96,23 +96,29 @@ class LockIn
     {
         $releasedAtStart = new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        return $releasedAtStart->add($this->getEarnedMoneyFromDeploy());
+        return $this->token->isTokenDeployed()
+            ? $releasedAtStart->add($this->getEarnedMoneyFromDeploy())
+            : $releasedAtStart;
     }
 
     /**
      * @Groups({"Default", "API"})
      * @codeCoverageIgnore
-     * @return Money|string
      */
-    public function getFrozenAmount()
+    public function getFrozenAmount(): Money
     {
         $notReleasedAtStart = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
-        $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
-        $greaterThan = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        return $frozenAmount->greaterThan($greaterThan)
-            ? $frozenAmount
-            : '0';
+        if ($this->token->isTokenDeployed()) {
+            $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
+            $greaterThan = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+            return $frozenAmount->greaterThan($greaterThan)
+                ? $frozenAmount
+                : $greaterThan;
+        } else {
+            return $notReleasedAtStart;
+        }
     }
 
     /** @codeCoverageIgnore */
@@ -155,15 +161,16 @@ class LockIn
         return $this;
     }
 
+    /** @codeCoverageIgnore */
     public function getDeployed(): ?\DateTimeImmutable
     {
         return $this->deployed;
     }
 
-    /** @ORM\PrePersist() */
-    public function setDeployed(?\DateTimeImmutable $deployed = null): self
+    /** @codeCoverageIgnore */
+    public function setDeployed(\DateTimeImmutable $deployed): self
     {
-        $this->deployed = $deployed ?: new \DateTimeImmutable();
+        $this->deployed = $deployed;
 
         return $this;
     }
