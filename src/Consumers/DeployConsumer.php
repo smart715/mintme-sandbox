@@ -54,7 +54,6 @@ class DeployConsumer implements ConsumerInterface
 
         try {
             $repo = $this->em->getRepository(Token::class);
-            /** @var Token $token */
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
             if (!$token) {
