@@ -54,6 +54,7 @@ class DeployConsumer implements ConsumerInterface
 
         try {
             $repo = $this->em->getRepository(Token::class);
+            /** @var Token $token */
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
             if (!$token) {
@@ -74,6 +75,7 @@ class DeployConsumer implements ConsumerInterface
             }
 
             $token->setAddress($clbResult->getAddress());
+            $token->getLockIn()->setDeployed(new \DateTimeImmutable());
 
             $this->em->persist($token);
             $this->em->flush();
