@@ -14,7 +14,7 @@ class LockInTest extends TestCase
     public function testGetHourlyRate(): void
     {
         $li = new LockIn($this->mockToken());
-        $li->setDeployedValue();
+        $li->setDeployed();
 
         $this->assertEquals('0', $li->getHourlyRate()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
@@ -26,7 +26,7 @@ class LockInTest extends TestCase
     public function testGetReleasedAmount(): void
     {
         $li = new LockIn($this->mockToken());
-        $li->setDeployedValue();
+        $li->setDeployed();
 
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
@@ -35,27 +35,27 @@ class LockInTest extends TestCase
         $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
     }
 
-    /** @runInSeparateProcess */
     public function testUpdateFrozenAmount(): void
     {
         $li = new LockIn($this->mockToken());
+        $initialAmount = 1000000;
+        $amountToRelease = 9000000;
 
         $li
-            ->setDeployedValue()
-            ->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)))
-            ->setReleasedAtStart(1000000)
+            ->setDeployed()
+            ->setAmountToRelease(new Money($amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setReleasedAtStart($initialAmount)
             ->updateFrozenAmount();
 
-        $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
+        $this->assertEquals($initialAmount, (int)$li->getReleasedAmount()->getAmount());
 
-        array_map(function () use (&$li): void {
-            $li->updateFrozenAmount();
-        }, range(1, 8765)); // 8760 hours in year
+        $li
+            ->setDeployed((new \DateTimeImmutable())->add(new \DateInterval('P5D')))
+            ->updateFrozenAmount();
 
-        $releasedAtStart = new Money($li->getReleasedAtStart(), new Currency(MoneyWrapper::TOK_SYMBOL));
-        $money = $releasedAtStart->add($li->getEarnedMoneyFromDeploy());
-
-        $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
+        $this->assertEquals(5 * 24, $li->getCountHoursFromDeploy());
+        $this->assertGreaterThan($initialAmount, $li->getReleasedAmount()->getAmount());
+        $this->assertLessThan($amountToRelease, $li->getFrozenAmount()->getAmount());
     }
 
     private function mockToken(): Token

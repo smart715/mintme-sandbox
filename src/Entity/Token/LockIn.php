@@ -161,9 +161,9 @@ class LockIn
     }
 
     /** @ORM\PrePersist() */
-    public function setDeployedValue(): self
+    public function setDeployed(\DateTimeImmutable $deployed = null): self
     {
-        $this->deployed = new \DateTimeImmutable();
+        $this->deployed = $deployed ?: new \DateTimeImmutable();
 
         return $this;
     }
@@ -175,7 +175,7 @@ class LockIn
      */
     public function getCountHoursFromDeploy(): float
     {
-        return round((strtotime('now') - strtotime($this->deployed->format('Y-m-d H:i:s'))) / 3600, 1);
+        return abs(round((strtotime('now') - strtotime($this->deployed->format('Y-m-d H:i:s'))) / 3600, 1));
     }
 
     public function getEarnedMoneyFromDeploy(): Money
