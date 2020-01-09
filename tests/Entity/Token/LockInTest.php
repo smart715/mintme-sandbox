@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Wallet\Money\MoneyWrapper;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class LockInTest extends TestCase
@@ -14,7 +15,6 @@ class LockInTest extends TestCase
     public function testGetHourlyRate(): void
     {
         $li = new LockIn($this->mockToken());
-        $li->setDeployed();
 
         $this->assertEquals('0', $li->getHourlyRate()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
@@ -26,7 +26,6 @@ class LockInTest extends TestCase
     public function testGetReleasedAmount(): void
     {
         $li = new LockIn($this->mockToken());
-        $li->setDeployed();
 
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
@@ -37,12 +36,16 @@ class LockInTest extends TestCase
 
     public function testUpdateFrozenAmount(): void
     {
-        $li = new LockIn($this->mockToken());
+        /** @var Token|MockObject $token */
+        $token = $this->mockToken();
+        $li = new LockIn($token);
+        $li->setDeployed(new \DateTimeImmutable());
         $initialAmount = 1000000;
         $amountToRelease = 9000000;
 
+        $token->expects($this->any())->method('isTokenDeployed')->willReturn(true);
+
         $li
-            ->setDeployed()
             ->setAmountToRelease(new Money($amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL)))
             ->setReleasedAtStart($initialAmount)
             ->updateFrozenAmount();
