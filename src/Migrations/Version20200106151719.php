@@ -15,7 +15,10 @@ final class Version20200106151719 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE lock_in ADD deployed DATETIME NOT NULL DEFAULT NOW() COMMENT \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('ALTER TABLE lock_in ADD deployed DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('UPDATE lock_in li
+                            LEFT JOIN token t ON li.token_id = t.id
+                            SET li.deployed = NOW() WHERE t.address IS NOT NULL AND t.address <> \'\' AND t.address <> "0x"');
     }
 
     public function down(Schema $schema) : void
