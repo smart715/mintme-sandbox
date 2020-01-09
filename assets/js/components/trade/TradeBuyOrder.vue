@@ -16,9 +16,8 @@
                 </span>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div v-if="immutableBalance"
-                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
+                <div v-if="immutableBalance"  class="row">                    
+                    <div class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your
                         <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
                             <span class="text-white word-break">
@@ -132,7 +131,13 @@
                         </template>
                     </div>
                 </div>
-            </div>
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+
+            </div>            
         </div>
     </div>
 </template>
@@ -307,22 +312,23 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
-    },
-    mounted: function() {
-        this.immutableBalance = this.balance;
+        balance: function(newBalance) {
+            if (newBalance){                
+                this.immutableBalance = this.balance;        
 
-        if (!this.balance) {
-            return;
-        }
-
-        this.addMessageHandler((response) => {
-            if (
-                'asset.update' === response.method &&
-                response.params[0].hasOwnProperty(this.market.base.identifier)
-            ) {
-                this.immutableBalance = response.params[0][this.market.base.identifier].available;
+                this.addMessageHandler((response) => {
+                    if (
+                        'asset.update' === response.method &&
+                        response.params[0].hasOwnProperty(this.market.base.identifier)
+                    ) {
+                        this.immutableBalance = response.params[0][this.market.base.identifier].available;
+                    }
+                }, 'trade-buy-order-asset');
             }
-        }, 'trade-buy-order-asset');
+        }
+    },
+    mounted: function() {        
+        
     },
 };
 </script>

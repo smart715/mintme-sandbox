@@ -161,7 +161,7 @@ export default {
                 monthAmount: '0',
                 marketCap: '0',
             },
-            stats: null,
+            stats: [],
             maxAvailableDays: 30,
             min,
             monthInfoRequestId: 0,

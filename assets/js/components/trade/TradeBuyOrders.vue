@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table">
+                <div v-if="ordersLoaded" class="table-responsive fixed-head-table">                    
                     <b-table v-if="hasOrders"
                         ref="table"
                         @row-clicked="orderClicked"
@@ -49,6 +49,11 @@
                         <p class="text-center p-5">No order was added yet</p>
                     </div>
                 </div>
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
                 <div class="text-center pb-2" v-if="showDownArrow && !loading">
                     <img
                         src="../../../img/down-arrows.png"
@@ -74,13 +79,14 @@ export default {
     name: 'TradeBuyOrders',
     mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
     props: {
-        ordersList: [Array],
+        ordersList: Array,
         tokenName: String,
         fields: Array,
         sortBy: String,
         sortDesc: Boolean,
         basePrecision: Number,
         loggedIn: Boolean,
+        ordersLoaded:Boolean
     },
     data() {
         return {

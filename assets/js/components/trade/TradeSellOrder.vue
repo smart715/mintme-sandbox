@@ -15,10 +15,8 @@
                 </span>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div v-if="immutableBalance"
-                        class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
-                        >
+                <div v-if="immutableBalance" class="row">
+                    <div class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all">
                         Your
                         <span class="c-pointer" @click="balanceClicked"
                               v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
@@ -133,6 +131,11 @@
                         </template>
                     </div>
                 </div>
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -304,30 +307,31 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
+        balance: function(newBalance) {
+            if (newBalance) {
+                this.immutableBalance = this.balance;  
+                  
+                this.addMessageHandler((response) => {
+                    if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.quote.identifier)) {
+                        if (!this.isOwner || this.market.quote.identifier.slice(0, 3) !== 'TOK') {
+                            this.immutableBalance = response.params[0][this.market.quote.identifier].available;
+                            return;
+                        }
+
+                        this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
+                            .then((res) => this.immutableBalance = res.data ?
+                                new Decimal(response.params[0][this.market.quote.identifier].available).sub(
+                                    res.data.frozenAmount
+                                ) : response.params[0][this.market.quote.identifier].available
+                            )
+                            .catch(() => {});
+                    }
+                }, 'trade-sell-order-asset');
+            }           
+        }
     },
     mounted: function() {
-        this.immutableBalance = this.balance;
-
-        if (!this.balance) {
-            return;
-        }
-
-        this.addMessageHandler((response) => {
-            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.quote.identifier)) {
-                if (!this.isOwner || this.market.quote.identifier.slice(0, 3) !== 'TOK') {
-                    this.immutableBalance = response.params[0][this.market.quote.identifier].available;
-                    return;
-                }
-
-                this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
-                    .then((res) => this.immutableBalance = res.data ?
-                        new Decimal(response.params[0][this.market.quote.identifier].available).sub(
-                            res.data.frozenAmount
-                        ) : response.params[0][this.market.quote.identifier].available
-                    )
-                    .catch(() => {});
-            }
-        }, 'trade-sell-order-asset');
+       
     },
     filters: {
         toMoney: function(val, precision) {

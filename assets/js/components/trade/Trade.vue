@@ -10,43 +10,31 @@
         </div>
         <div class="row">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
-                <trade-buy-order
-                        v-if="balanceLoaded"
-                        :websocket-url="websocketUrl"
-                        :hash="hash"
-                        :login-url="loginUrl"
-                        :signup-url="signupUrl"
-                        :logged-in="loggedIn"
-                        :market="market"
-                        :market-price="marketPriceBuy"
-                        :balance="baseBalance"
-                        @check-input="checkInput"
+                <trade-buy-order                       
+                    :websocket-url="websocketUrl"
+                    :hash="hash"
+                    :login-url="loginUrl"
+                    :signup-url="signupUrl"
+                    :logged-in="loggedIn"
+                    :market="market"
+                    :market-price="marketPriceBuy"
+                    :balance="baseBalance"
+                    @check-input="checkInput"
                 />
-                <template v-else>
-                    <div class="p-5 text-center text-white">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                </template>
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
-                <trade-sell-order
-                        v-if="balanceLoaded"
-                        :websocket-url="websocketUrl"
-                        :hash="hash"
-                        :login-url="loginUrl"
-                        :signup-url="signupUrl"
-                        :logged-in="loggedIn"
-                        :market="market"
-                        :market-price="marketPriceSell"
-                        :balance="quoteBalance"
-                        :is-owner="isOwner"
-                        @check-input="checkInput"
+                <trade-sell-order                       
+                    :websocket-url="websocketUrl"
+                    :hash="hash"
+                    :login-url="loginUrl"
+                    :signup-url="signupUrl"
+                    :logged-in="loggedIn"
+                    :market="market"
+                    :market-price="marketPriceSell"
+                    :balance="quoteBalance"
+                    :is-owner="isOwner"
+                    @check-input="checkInput"
                 />
-                <template v-else>
-                    <div class="p-5 text-center text-white">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                </template>
             </div>
         </div>
         <div class="row">
@@ -113,17 +101,11 @@ export default {
             balances: null,
             sellPage: 2,
             buyPage: 2,
+            baseBalance: null,
+            quoteBalance: null
         };
     },
     computed: {
-        baseBalance: function() {
-            return this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
-                : false;
-        },
-        quoteBalance: function() {
-            return this.balances[this.market.quote.symbol] ? this.balances[this.market.quote.symbol].available
-                : false;
-        },
         balanceLoaded: function() {
             return this.balances !== null;
         },
@@ -311,6 +293,14 @@ export default {
                 this.buyOrders = orders;
             }
         },
+    },
+    watch: {
+        balanceLoaded(loaded) {
+            if (loaded){
+                this.baseBalance = this.balances[this.market.base.symbol].available
+                this.quoteBalance = this.balances[this.market.quote.symbol].available
+            }
+        }
     },
 };
 </script>

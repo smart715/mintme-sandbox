@@ -2,42 +2,32 @@
     <div class="container p-0 m-0">
         <div class="row p-0 m-0">
             <div class="col-12 col-xl-6 pr-xl-2 mt-3">
-                <trade-buy-orders
-                        v-if="ordersLoaded"
-                        @update-data="updateBuyOrders"
-                        :orders-list="filteredBuyOrders"
-                        :token-name="market.base.symbol"
-                        :fields="fields"
-                        sort-by="price"
-                        :sort-desc="true"
-                        :basePrecision="market.base.subunit"
-                        :quotePrecision="market.quote.subunit"
-                        :logged-in="loggedIn"
-                        @modal="removeOrderModal"/>
-                <template v-else>
-                    <div class="p-5 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
-                    </div>
-                </template>
+                <trade-buy-orders                    
+                    @update-data="updateBuyOrders"
+                    :orders-list="filteredBuyOrders"
+                    :orders-loaded="buyOrdersLoaded"
+                    :token-name="market.base.symbol"
+                    :fields="fields"
+                    sort-by="price"
+                    :sort-desc="true"
+                    :basePrecision="market.base.subunit"
+                    :quotePrecision="market.quote.subunit"
+                    :logged-in="loggedIn"
+                    @modal="removeOrderModal"/>
             </div>
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
-                <trade-sell-orders
-                        v-if="ordersLoaded"
-                        @update-data="updateSellOrders"
-                        :orders-list="filteredSellOrders"
-                        :token-name="market.quote.symbol"
-                        :fields="fields"
-                        sort-by="price"
-                        :sort-desc="false"
-                        :basePrecision="market.base.subunit"
-                        :quotePrecision="market.quote.subunit"
-                        :logged-in="loggedIn"
-                        @modal="removeOrderModal"/>
-                <template v-else>
-                    <div class="p-5 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
-                    </div>
-                </template>
+                <trade-sell-orders                    
+                    @update-data="updateSellOrders"
+                    :orders-list="filteredSellOrders"
+                    :orders-loaded="sellOrdersLoaded"
+                    :token-name="market.quote.symbol"
+                    :fields="fields"
+                    sort-by="price"
+                    :sort-desc="false"
+                    :basePrecision="market.base.subunit"
+                    :quotePrecision="market.quote.subunit"
+                    :logged-in="loggedIn"
+                    @modal="removeOrderModal"/>                
             </div>
         </div>
         <confirm-modal
@@ -79,7 +69,7 @@ export default {
         sellOrders: [Array, Object],
         market: Object,
         userId: Number,
-        loggedIn: Boolean,
+        loggedIn: Boolean            
     },
     data() {
         return {
@@ -109,11 +99,21 @@ export default {
         };
     },
     computed: {
+        buyOrdersLoaded: function() {
+            return this.buyOrders ? true : false; 
+        },
+        sellOrdersLoaded: function() {
+            return this.sellOrders ? true: false;
+        },        
         filteredBuyOrders: function() {
-            return this.ordersList(this.groupByPrice(this.buyOrders));
+            return this.buyOrders ?
+                this.ordersList(this.groupByPrice(this.buyOrders)) :
+                    [];
         },
         filteredSellOrders: function() {
-            return this.ordersList(this.groupByPrice(this.sellOrders));
+            return this.sellOrders ?
+                this.ordersList(this.groupByPrice(this.sellOrders)) : 
+                    [];
         },
     },
     methods: {
