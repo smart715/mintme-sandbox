@@ -161,7 +161,7 @@ class LockIn
     }
 
     /** @ORM\PrePersist() */
-    public function setDeployed(\DateTimeImmutable $deployed = null): self
+    public function setDeployed(?\DateTimeImmutable $deployed = null): self
     {
         $this->deployed = $deployed ?: new \DateTimeImmutable();
 
