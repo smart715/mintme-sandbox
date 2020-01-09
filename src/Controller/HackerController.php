@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/hacker")
+ * @Security(expression="is_granted('hacker')")
  * @codeCoverageIgnore
  */
 class HackerController extends AbstractController
@@ -45,7 +46,6 @@ class HackerController extends AbstractController
 
     /**
      * @Route("/crypto/{crypto}", name="hacker-add-crypto", options={"expose"=true})
-     * @Security(expression="is_granted('hacker')")
      */
     public function addCrypto(
         string $crypto,
@@ -79,7 +79,6 @@ class HackerController extends AbstractController
      * @Route(
      *     "/role/{role}", name="hacker-set-role", requirements={"role"="(user|admin)"}, options={"expose"=true}
      *     )
-     * @Security(expression="is_granted('hacker')")
      */
     public function setRole(
         string $role,
