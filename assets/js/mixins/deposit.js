@@ -18,11 +18,11 @@ export default {
             }
         },
         getMarketIdentifier: function() {
-            if (this.action === 'buy') {
+            if ('buy' === this.action) {
                 return this.market.base.identifier;
             }
 
-            if (this.action === 'sell') {
+            if ('sell' === this.action) {
                 return this.market.quote.identifier;
             }
 

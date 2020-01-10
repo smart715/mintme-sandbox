@@ -307,7 +307,7 @@ export default {
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
                     crypto: isToken ? WEB_IDENTIFIER : currency,
                 }))
-                .then((res) => this.deposit.fee = res.data && parseFloat(res.data) !== 0.0 ?
+                .then((res) => this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
                     toMoney(res.data, subunit) :
                     undefined
                 )
@@ -325,7 +325,7 @@ export default {
         openDepositMore: function() {
             if (
                 [WEB_IDENTIFIER, BTC_IDENTIFIER].includes(this.depositMore) &&
-                this.predefinedTokens !== null &&
+                null !== this.predefinedTokens &&
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
                 this.depositAddresses.hasOwnProperty(this.depositMore)
             ) {
