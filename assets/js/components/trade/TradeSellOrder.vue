@@ -89,7 +89,6 @@
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
                             >
-
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
                                 <label class="custom-control custom-checkbox pb-0">
                                     <input
