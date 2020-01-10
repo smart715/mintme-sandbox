@@ -33,8 +33,15 @@ class LoggerController extends APIController
             throw new ApiBadRequestException('Undefined log level');
         }
 
+        $cutHeaders = $this->getParameter('front_end_logs_cut_headers');
         $message = $fetcher->get('message');
         $context = json_decode($fetcher->get('context') ?? '', true);
+
+        if ($cutHeaders && is_array($context)) {
+            unset($context['config']['headers']);
+            unset($context['response']['headers']);
+            unset($context['response']['config']['headers']);
+        }
 
         $logger->{$logLevel}($message, is_array($context) ? $context : []);
 

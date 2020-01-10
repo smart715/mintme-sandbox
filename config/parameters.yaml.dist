@@ -108,4 +108,7 @@ parameters:
     # How much user receive for registration
     landing_web_bonus: 5
 
+    # If true, then it will cut headers for front end logging
+    front_end_logs_cut_headers: true
+
 
