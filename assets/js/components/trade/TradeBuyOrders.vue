@@ -30,8 +30,13 @@
                                 <span v-if="row.item.isAnonymous" class="d-inline-block truncate-name flex-grow-1">
                                     {{ row.value }}
                                 </span>
-                                <a v-else :href="row.item.traderUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
+                                <a
+                                    v-else
+                                    :href="row.item.traderUrl"
+                                    class="d-flex flex-row flex-nowrap justify-content-between w-100"
+                                    v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}"
+                                >
+                                    <span class="d-inline-block truncate-name flex-grow-1">
                                         {{ row.value }}
                                     </span>
                                     <img
