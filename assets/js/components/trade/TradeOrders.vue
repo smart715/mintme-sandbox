@@ -2,7 +2,7 @@
     <div class="container p-0 m-0">
         <div class="row p-0 m-0">
             <div class="col-12 col-xl-6 pr-xl-2 mt-3">
-                <trade-buy-orders                    
+                <trade-buy-orders
                     @update-data="updateBuyOrders"
                     :orders-list="filteredBuyOrders"
                     :orders-loaded="buyOrdersLoaded"
@@ -16,7 +16,7 @@
                     @modal="removeOrderModal"/>
             </div>
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
-                <trade-sell-orders                    
+                <trade-sell-orders
                     @update-data="updateSellOrders"
                     :orders-list="filteredSellOrders"
                     :orders-loaded="sellOrdersLoaded"
@@ -27,7 +27,7 @@
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
-                    @modal="removeOrderModal"/>                
+                    @modal="removeOrderModal"/>
             </div>
         </div>
         <confirm-modal
@@ -69,7 +69,7 @@ export default {
         sellOrders: [Array, Object],
         market: Object,
         userId: Number,
-        loggedIn: Boolean            
+        loggedIn: Boolean,
     },
     data() {
         return {
@@ -100,11 +100,11 @@ export default {
     },
     computed: {
         buyOrdersLoaded: function() {
-            return this.buyOrders ? true : false; 
+            return this.buyOrders ? true : false;
         },
         sellOrdersLoaded: function() {
             return this.sellOrders ? true: false;
-        },        
+        },
         filteredBuyOrders: function() {
             return this.buyOrders ?
                 this.ordersList(this.groupByPrice(this.buyOrders)) :
@@ -112,7 +112,7 @@ export default {
         },
         filteredSellOrders: function() {
             return this.sellOrders ?
-                this.ordersList(this.groupByPrice(this.sellOrders)) : 
+                this.ordersList(this.groupByPrice(this.sellOrders)) :
                     [];
         },
     },

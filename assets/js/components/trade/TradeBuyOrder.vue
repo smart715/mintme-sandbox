@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body">
-                <div v-if="immutableBalance"  class="row">                    
+                <div v-if="immutableBalance"  class="row">
                     <div class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
                         Your
                         <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
@@ -136,8 +136,7 @@
                         <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                     </div>
                 </template>
-
-            </div>            
+            </div>
         </div>
     </div>
 </template>
@@ -313,9 +312,8 @@ export default {
             this.updateMarketPrice();
         },
         balance: function(newBalance) {
-            if (newBalance){                
-                this.immutableBalance = this.balance;        
-
+            if (newBalance) {
+                this.immutableBalance = this.balance;
                 this.addMessageHandler((response) => {
                     if (
                         'asset.update' === response.method &&
@@ -325,10 +323,7 @@ export default {
                     }
                 }, 'trade-buy-order-asset');
             }
-        }
-    },
-    mounted: function() {        
-        
+        },
     },
 };
 </script>

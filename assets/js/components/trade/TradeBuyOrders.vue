@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div v-if="ordersLoaded" class="table-responsive fixed-head-table">                    
+                <div v-if="ordersLoaded" class="table-responsive fixed-head-table">
                     <b-table v-if="hasOrders"
                         ref="table"
                         @row-clicked="orderClicked"
@@ -86,7 +86,7 @@ export default {
         sortDesc: Boolean,
         basePrecision: Number,
         loggedIn: Boolean,
-        ordersLoaded:Boolean
+        ordersLoaded: Boolean,
     },
     data() {
         return {

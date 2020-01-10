@@ -10,7 +10,7 @@
         </div>
         <div class="row">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
-                <trade-buy-order                       
+                <trade-buy-order
                     :websocket-url="websocketUrl"
                     :hash="hash"
                     :login-url="loginUrl"
@@ -23,7 +23,7 @@
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
-                <trade-sell-order                       
+                <trade-sell-order
                     :websocket-url="websocketUrl"
                     :hash="hash"
                     :login-url="loginUrl"
@@ -102,7 +102,7 @@ export default {
             sellPage: 2,
             buyPage: 2,
             baseBalance: null,
-            quoteBalance: null
+            quoteBalance: null,
         };
     },
     computed: {
@@ -296,11 +296,11 @@ export default {
     },
     watch: {
         balanceLoaded(loaded) {
-            if (loaded){
-                this.baseBalance = this.balances[this.market.base.symbol].available
-                this.quoteBalance = this.balances[this.market.quote.symbol].available
+            if (loaded) {
+                this.baseBalance = this.balances[this.market.base.symbol].available;
+                this.quoteBalance = this.balances[this.market.quote.symbol].available;
             }
-        }
+        },
     },
 };
 </script>

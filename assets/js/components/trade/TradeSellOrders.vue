@@ -103,7 +103,7 @@ export default {
         sortDesc: Boolean,
         basePrecision: Number,
         loggedIn: Boolean,
-        ordersLoaded: Boolean
+        ordersLoaded: Boolean,
     },
     data() {
         return {

@@ -309,8 +309,7 @@ export default {
         },
         balance: function(newBalance) {
             if (newBalance) {
-                this.immutableBalance = this.balance;  
-                  
+                this.immutableBalance = this.balance;
                 this.addMessageHandler((response) => {
                     if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.quote.identifier)) {
                         if (!this.isOwner || this.market.quote.identifier.slice(0, 3) !== 'TOK') {
@@ -327,11 +326,8 @@ export default {
                             .catch(() => {});
                     }
                 }, 'trade-sell-order-asset');
-            }           
-        }
-    },
-    mounted: function() {
-       
+            }
+        },
     },
     filters: {
         toMoney: function(val, precision) {
