@@ -112,6 +112,16 @@ a
   p
     margin: 0
 
+.blue-question
+  background: $color-tooltip
+  padding: .125rem
+  font-size: .875em
+  vertical-align: middle
+
+  &.square
+    width: 1em
+    height: 1em
+
 .tooltip-static
   background: white
   height: auto
@@ -204,6 +214,28 @@ a
     >.card-header
       background-color: $dark-white
       color: inherit
+
+.row
+  &.trade-orders
+    .card
+      .card-body
+        line-height: 1 !important
+
+      .d-flex
+        .w-50
+          .c-pointer
+            >.text-white
+              white-space: nowrap
+
+          .custom-checkbox
+            min-height: 1rem !important
+
+            >.custom-control-label
+              &:before, &:after
+                top: 0 !important
+
+              .blue-question
+                vertical-align: bottom
 
 .btn-primary
   color: $white
@@ -550,16 +582,6 @@ nav.top-navbar
   padding: 2px 4px 2px 2px
   word-spacing: 7px
   text-align: left
-
-.blue-question
-  background: $color-tooltip
-  padding: .125rem
-  font-size: .875em
-  vertical-align: middle
-
-  &.square
-    width: 1em
-    height: 1em
 
 .icon
   width: 18px
