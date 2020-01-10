@@ -69,7 +69,6 @@
                             <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol|rebranding }}</span>
                             <span class="d-inline-block">:</span>
                         </label>
-
                         <div class="d-flex">
                             <input
                                 v-model="buyAmount"
@@ -81,7 +80,6 @@
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
                             >
-
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
                                 <label class="custom-control custom-checkbox pb-0">
                                     <input
