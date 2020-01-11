@@ -61,22 +61,6 @@ describe('TradeOrders', () => {
         owner: false,
     };
 
-    it('hide order components and show loading if not loaded', () => {
-        wrapper.vm.ordersLoaded = false;
-
-        expect(wrapper.find('font-awesome-icon').exists()).to.deep.equal(true);
-        expect(wrapper.find('trade-sell-orders-stub').exists()).to.deep.equal(false);
-        expect(wrapper.find('trade-buy-orders-stub').exists()).to.deep.equal(false);
-
-        wrapper.vm.sellOrders = Array(2).fill(order);
-        wrapper.vm.buyOrders = Array(2).fill(order);
-        wrapper.vm.ordersLoaded = true;
-
-        expect(wrapper.find('font-awesome-icon').exists()).to.deep.equal(false);
-        expect(wrapper.find('trade-sell-orders-stub').exists()).to.deep.equal(true);
-        expect(wrapper.find('trade-buy-orders-stub').exists()).to.deep.equal(true);
-    });
-
     describe('truncate FullName correctly', function() {
         wrapper.vm.sellOrders = Array(2).fill(order);
         wrapper.vm.ordersLoaded = true;

@@ -20,7 +20,7 @@
             </div>
             <div class="card-body p-0">
                 <div v-if="ordersLoaded" class="table-responsive fixed-head-table">
-                    <b-table v-if="hasOrders"
+                    <b-table v-if="loggedIn && hasOrders"
                         ref="table"
                         @row-clicked="orderClicked"
                         :sort-by.sync="sortBy"

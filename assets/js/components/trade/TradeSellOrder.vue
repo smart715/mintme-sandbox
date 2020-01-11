@@ -15,7 +15,7 @@
                 </span>
             </div>
             <div class="card-body">
-                <div v-if="immutableBalance" class="row">
+                <div v-if="balanceLoaded" class="row">
                     <div class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all">
                         Your
                         <span class="c-pointer" @click="balanceClicked"
@@ -161,6 +161,7 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
+        balanceLoaded: [String, Boolean],
         isOwner: Boolean,
     },
     data() {

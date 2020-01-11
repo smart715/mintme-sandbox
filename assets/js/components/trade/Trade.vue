@@ -6,6 +6,7 @@
                 :websocket-url="websocketUrl"
                 :market="market"
                 :mintme-supply-url="mintmeSupplyUrl"
+                :logged-in="loggedIn"
             />
         </div>
         <div class="row">
@@ -18,6 +19,7 @@
                     :logged-in="loggedIn"
                     :market="market"
                     :market-price="marketPriceBuy"
+                    :balance-loaded="balanceLoaded"
                     :balance="baseBalance"
                     @check-input="checkInput"
                 />
@@ -32,6 +34,7 @@
                     :market="market"
                     :market-price="marketPriceSell"
                     :balance="quoteBalance"
+                    :balance-loaded="balanceLoaded"
                     :is-owner="isOwner"
                     @check-input="checkInput"
                 />
@@ -51,6 +54,7 @@
             <trade-trade-history
                 class="col"
                 :hash="hash"
+                :logged-in="loggedIn"
                 :websocket-url="websocketUrl"
                 :market="market" />
         </div>
@@ -101,13 +105,14 @@ export default {
             balances: null,
             sellPage: 2,
             buyPage: 2,
-            baseBalance: null,
-            quoteBalance: null,
+            baseBalance: false,
+            quoteBalance: false,
         };
     },
     computed: {
         balanceLoaded: function() {
-            return this.balances !== null;
+            return this.balances !== null ? true
+                : false;
         },
         ordersLoaded: function() {
             return this.buyOrders !== null && this.sellOrders !== null;
@@ -294,9 +299,9 @@ export default {
             }
         },
     },
-    watch: {
-        balanceLoaded(loaded) {
-            if (loaded) {
+      watch: {
+        balances: function() {
+             if (this.balances[this.market.base.symbol]) {
                 this.baseBalance = this.balances[this.market.base.symbol].available;
                 this.quoteBalance = this.balances[this.market.quote.symbol].available;
             }
