@@ -62,7 +62,7 @@ parameters:
 
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
-    mintme_supply: 'https://mintme.com/coin/supply.txt'
+    mintme_supply: 'https://www.mintme.com/coin/supply.txt'
     mintme_coin: 'MintMe Coin'
     mintme_coin_link: 'https://www.mintme.com/coin/'
 
@@ -79,8 +79,8 @@ parameters:
     # If the trusted device feature should be enabled
     trusted_device_enabled: true
 
-    # Lifetime of the trusted device token (default 7 days)
-    trusted_device_cookie_lifetime: 604800
+    # Lifetime of the trusted device token (default 30 days)
+    trusted_device_cookie_lifetime: 2592000
 
     # Automatically extend lifetime of the trusted cookie on re-login
     trusted_device_extend_lifetime: true
@@ -95,10 +95,10 @@ parameters:
     docs_path: '/docs'
 
     # Password reset link expiration time in seconds
-    password_reset_expiration_time: 3600
+    password_reset_expiration_time: 7200
 
     # Time that has to pass to be able to request password reset link again, in seconds
-    password_reset_retry_time: 3600
+    password_reset_retry_time: 1800
 
     # Switch hide or show personal data in profile page (like city and zip code)
     show_full_data_in_profile: false

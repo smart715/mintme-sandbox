@@ -25,9 +25,6 @@ class ResettingController extends FOSResettingController
     /** @var UserManagerInterface */
     private $userManager;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
@@ -39,7 +36,6 @@ class ResettingController extends FOSResettingController
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->userManager = $userManager;
-        $this->eventDispatcher = $eventDispatcher;
         parent::__construct(
             $eventDispatcher,
             $formFactory,
@@ -81,16 +77,9 @@ class ResettingController extends FOSResettingController
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
-            $this->eventDispatcher->dispatch(
-                FOSUserEvents::RESETTING_RESET_COMPLETED,
-                new FilterUserResponseEvent(
-                    $user,
-                    $request,
-                    $this->render('bundles/FOSUserBundle/Resetting/reset.html.twig', [
-                    'token' => $token,
-                    'resettingForm' => $resettingForm->createView(),
-                    ])
-                )
+            $this->addFlash(
+                'success',
+                'The password has been reset successfully.'
             );
 
             return $this->redirectToRoute('fos_user_security_login', [], 301);
