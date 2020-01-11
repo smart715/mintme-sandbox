@@ -22,3 +22,4 @@ twig:
         mintme_supply: '%mintme_supply%'
         show_full_data_in_profile: '%show_full_data_in_profile%'
         mintme_coin: '%mintme_coin%'
+        mintme_coin_link: '%mintme_coin_link%'
