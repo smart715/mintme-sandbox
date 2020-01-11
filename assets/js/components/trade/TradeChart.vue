@@ -39,7 +39,7 @@
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.volume | formatMoney }}/{{ marketStatus.monthVolume | formatMoney }} Tokens
+                    {{ marketStatus.volume | formatMoney }}/{{ marketStatus.monthVolume | formatMoney }} {{ volumeSymbol }}
                 </div>
                 <div class="my-1 text-center">
                     <span>24h/30d volume: </span>
@@ -96,6 +96,7 @@ import {WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMix
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
+import {webSymbol} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
@@ -167,6 +168,9 @@ export default {
             min,
             monthInfoRequestId: 0,
             supply: 1e7,
+            volumeSymbol: webSymbol.toUpperCase() === this.market.quote.symbol.toUpperCase()
+                ? 'MINTME'
+                : 'Tokens',
         };
     },
     computed: {

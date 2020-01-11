@@ -76,34 +76,82 @@
                                 </template>
                             </guide>
                         </label>
-                        <input
-                            v-model="buyPrice"
-                            type="text"
-                            id="buy-price-input"
-                            class="form-control"
-                            :disabled="useMarketPrice || !loggedIn"
-                            @keypress="checkPriceInput"
-                            @paste="checkPriceInput"
-                        >
+                        <div class="d-flex">
+                            <input
+                                v-model="buyPrice"
+                                type="text"
+                                id="buy-price-input"
+                                class="form-control"
+                                :class="buyInputClass"
+                                :disabled="useMarketPrice || !loggedIn"
+                                @keypress="checkPriceInput"
+                                @paste="checkPriceInput"
+                            >
+                            <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
+                                Your
+                                <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
+                                    <span class="text-white">
+                                        {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                        <guide>
+                                            <template slot="header">
+                                                Your {{ market.base.symbol|rebranding }}
+                                            </template>
+                                            <template slot="body">
+                                                Your {{ market.base.symbol|rebranding }} balance.
+                                            </template>
+                                        </guide>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         <label
                             for="buy-price-amount"
-                            class="d-flex flex-row flex-nowrap justify-content-start w-100"
+                            class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
                             <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol|rebranding }}</span>
                             <span class="d-inline-block">:</span>
                         </label>
-                        <input
-                            v-model="buyAmount"
-                            type="text"
-                            id="buy-price-amount"
-                            class="form-control"
-                            :disabled="!loggedIn"
-                            @keypress="checkAmountInput"
-                            @paste="checkAmountInput"
-                        >
+                        <div class="d-flex">
+                            <input
+                                v-model="buyAmount"
+                                type="text"
+                                id="buy-price-amount"
+                                class="form-control"
+                                :class="buyInputClass"
+                                :disabled="!loggedIn"
+                                @keypress="checkAmountInput"
+                                @paste="checkAmountInput"
+                            >
+                            <div v-if="loggedIn" class="w-50 m-auto pl-4">
+                                <label class="custom-control custom-checkbox pb-0">
+                                    <input
+                                        v-model="useMarketPrice"
+                                        step="0.00000001"
+                                        type="checkbox"
+                                        id="buy-price"
+                                        class="custom-control-input"
+                                        :disabled="disabledMarketPrice"
+                                    >
+                                    <label
+                                        class="custom-control-label pb-0"
+                                        for="buy-price">
+                                        Market Price
+                                        <guide>
+                                            <template slot="header">
+                                                Market Price
+                                            </template>
+                                            <template slot="body">
+                                                Checking this box fetches current best market price
+                                                for which you can buy {{ market.base.symbol|rebranding }}.
+                                            </template>
+                                        </guide>
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         Total Price:
@@ -265,6 +313,9 @@ export default {
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
+        },
+        buyInputClass: function() {
+            return this.loggedIn ? 'w-50' : 'w-100';
         },
         ...mapGetters('makeOrder', [
             'getBuyPriceInput',

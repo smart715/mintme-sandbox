@@ -9,7 +9,7 @@
                 :logged-in="loggedIn"
             />
         </div>
-        <div class="row">
+        <div class="row trade-orders">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
                     :websocket-url="websocketUrl"
