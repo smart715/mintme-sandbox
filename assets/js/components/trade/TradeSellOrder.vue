@@ -16,7 +16,55 @@
             </div>
             <div class="card-body">
                 <div v-if="balanceLoaded" class="row">
+<<<<<<< HEAD
                     <div class="col-12">
+=======
+                    <div class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all">
+                        Your
+                        <span class="c-pointer" @click="balanceClicked"
+                              v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                            {{ market.quote.symbol|rebranding | truncate(7) }}:
+                            <span class="text-white  word-break">
+                                {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
+                                <guide>
+                                    <template slot="header">
+                                        Your Tokens
+                                    </template>
+                                    <template slot="body">
+                                        Your {{ market.quote.symbol|rebranding }} balance.
+                                    </template>
+                                </guide>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-md-left" :class="marketPricePositionClass">
+                        <label class="custom-control custom-checkbox">
+                            <input
+                                v-model.number="useMarketPrice"
+                                step="0.00000001"
+                                type="checkbox"
+                                id="sell-price"
+                                class="custom-control-input"
+                                :disabled="disabledMarketPrice"
+                            >
+                            <label
+                                class="custom-control-label"
+                                for="sell-price">
+                                Market Price
+                                <guide>
+                                    <template slot="header">
+                                        Market Price
+                                    </template>
+                                    <template slot="body">
+                                        Checking this box fetches current best market price
+                                        for which you can sell {{ market.quote.symbol|rebranding }}.
+                                    </template>
+                                </guide>
+                            </label>
+                        </label>
+                    </div>
+                    <div class="col-12 pt-2">
+>>>>>>> 7e348b6d470db1ba64d1a060dc5a0442c52a812c
                         <label
                             for="sell-price-input"
                             class="text-white">
@@ -167,6 +215,7 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
+        balanceLoaded: [String, Boolean],
         isOwner: Boolean,
         balanceLoaded: Boolean,
     },
@@ -317,6 +366,7 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
+<<<<<<< HEAD
         balance: function() {
             this.immutableBalance = this.balance;
             if (!this.balance) {
@@ -331,16 +381,29 @@ export default {
                     this.immutableBalance = response.params[0][this.market.quote.identifier].available;
                     return;
                 }
+=======
+        balance: function(newBalance) {
+            if (newBalance) {
+                this.immutableBalance = this.balance;
+                this.addMessageHandler((response) => {
+                    if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.quote.identifier)) {
+                        if (!this.isOwner || this.market.quote.identifier.slice(0, 3) !== 'TOK') {
+                            this.immutableBalance = response.params[0][this.market.quote.identifier].available;
+                            return;
+                        }
+>>>>>>> 7e348b6d470db1ba64d1a060dc5a0442c52a812c
 
-                this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
-                    .then((res) => this.immutableBalance = res.data ?
-                        new Decimal(response.params[0][this.market.quote.identifier].available).sub(
-                            res.data.frozenAmount
-                        ) : response.params[0][this.market.quote.identifier].available
-                    )
-                    .catch(() => {});
+                        this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
+                            .then((res) => this.immutableBalance = res.data ?
+                                new Decimal(response.params[0][this.market.quote.identifier].available).sub(
+                                    res.data.frozenAmount
+                                ) : response.params[0][this.market.quote.identifier].available
+                            )
+                            .catch(() => {});
+                    }
+                }, 'trade-sell-order-asset');
             }
-        }, 'trade-sell-order-asset');
+        },
     },
     filters: {
         toMoney: function(val, precision) {

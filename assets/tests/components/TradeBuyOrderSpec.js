@@ -59,7 +59,6 @@ describe('TradeBuyOrder', () => {
         expect(wrapper.find('div.card-body > div.row').exists()).to.deep.equal(true);
     });
 
-
     it('show login & logout buttons if not logged in', () => {
         expect(wrapper.find('a[href="loginUrl"]').exists()).to.deep.equal(true);
         expect(wrapper.find('a[href="signupUrl"]').exists()).to.deep.equal(true);

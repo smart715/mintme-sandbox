@@ -81,7 +81,7 @@ export default {
     name: 'TradeBuyOrders',
     mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
     props: {
-        ordersList: [Array],
+        ordersList: Array,
         tokenName: String,
         fields: Array,
         sortBy: String,

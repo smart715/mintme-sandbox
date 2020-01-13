@@ -99,6 +99,12 @@ export default {
         };
     },
     computed: {
+        buyOrdersLoaded: function() {
+            return this.buyOrders ? true : false;
+        },
+        sellOrdersLoaded: function() {
+            return this.sellOrders ? true: false;
+        },
         filteredBuyOrders: function() {
             return this.buyOrders ? this.ordersList(this.groupByPrice(this.buyOrders)) : [];
         },

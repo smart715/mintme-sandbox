@@ -6,6 +6,8 @@ describe('TradeBuyOrders', () => {
     const wrapper = shallowMount(TradeBuyOrders, {
         propsData: {
             ordersList: [],
+            ordersLoaded: true,
+            loggedIn: true,
             tokenName: 'TOK1',
             ordersLoaded: true,
             fields: {

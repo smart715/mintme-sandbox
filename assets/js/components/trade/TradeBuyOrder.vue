@@ -164,7 +164,11 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
+<<<<<<< HEAD
         balanceLoaded: [String, Boolean],
+=======
+        balanceLoaded: Boolean,
+>>>>>>> 7e348b6d470db1ba64d1a060dc5a0442c52a812c
     },
     data() {
         return {
@@ -318,6 +322,7 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
+<<<<<<< HEAD
         balance: function() {
             this.immutableBalance = this.balance;
             if (!this.balance) {
@@ -332,8 +337,21 @@ export default {
                 response.params[0].hasOwnProperty(this.market.base.identifier)
             ) {
                 this.immutableBalance = response.params[0][this.market.base.identifier].available;
+=======
+        balance: function(newBalance) {
+            if (newBalance) {
+                this.immutableBalance = this.balance;
+                this.addMessageHandler((response) => {
+                    if (
+                        'asset.update' === response.method &&
+                        response.params[0].hasOwnProperty(this.market.base.identifier)
+                    ) {
+                        this.immutableBalance = response.params[0][this.market.base.identifier].available;
+                    }
+                }, 'trade-buy-order-asset');
+>>>>>>> 7e348b6d470db1ba64d1a060dc5a0442c52a812c
             }
-        }, 'trade-buy-order-asset');
+        },
     },
 };
 </script>
