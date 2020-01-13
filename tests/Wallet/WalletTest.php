@@ -369,7 +369,7 @@ class WalletTest extends TestCase
 
         $tokenWithdrawSum = $wallet->getTokenWithdrawnSum($token, $user);
 
-        $this->assertEquals(-50000, $tokenWithdrawSum);
+        $this->assertEquals('-50000', $tokenWithdrawSum->getAmount());
     }
 
     private function mockPendingWithdraw(string $amount): PendingWithdraw
