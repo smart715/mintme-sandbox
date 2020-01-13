@@ -48,7 +48,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             64 != strlen($private)
         )) {
             $credentials = new ApiKeyCredentials($public, $private);
-        }elseif (null != $token = $this->oauth->getBearerToken($request, true)) {
+        } elseif (null != $token = $this->oauth->getBearerToken($request, true)) {
             // check maybe it Oauth token
             $credentials = new OAuthCredentials($token);
         } else {
@@ -96,7 +96,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             }
 
             $username = $userProvider->getUsernameForApiKey($credentials->getPublic());
-        }elseif ($credentials instanceof OAuthCredentials) {
+        } elseif ($credentials instanceof OAuthCredentials) {
             // this is OAuth authentication
             /** @var OauthCredentials $credentials */
 

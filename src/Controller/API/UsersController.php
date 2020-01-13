@@ -98,9 +98,9 @@ class UsersController extends AbstractFOSRestController
 
         // add secret only to new created client
         // for other it will be hidden
-        foreach ($clients as $key=>$val){
-            if ($val['id'] ==  $client->getPublicId()){
-                $clients[$key]['secret'] =  $client->getSecret();
+        foreach ($clients as $key => $val){
+            if ($val['id'] ===  $client->getPublicId()){
+                $clients[$key]['secret'] = $client->getSecret();
             }
         }
 
@@ -118,7 +118,7 @@ class UsersController extends AbstractFOSRestController
     public function deleteApiClient(ParamFetcherInterface $request): array
     {
 
-        $id = (string)$request->get('id');
+        $id = $request->get('id');
         if (empty($id)) {
             throw new ApiNotFoundException("Client ID required");
         }
