@@ -95,8 +95,10 @@ class MarketCapCalculator
     private function calculateTokenMarketCap(): Money
     {
         $tokenMarkets = $this->repository->getTokenWEBMarkets();
-
-        return array_reduce($tokenMarkets, function ($marketCap, $market) {
+        // do not show market cap for markets with 30d volume of value less than 100 000 MINTME
+        $minWebCap = 100000;
+        return array_reduce($tokenMarkets, function ($marketCap, $market) use ($minWebCap) {
+            if ($market->getMonthVolume()->getAmount() < $minWebCap) return $marketCap;
             return $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Token::WEB_SYMBOL));
     }

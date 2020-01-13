@@ -56,7 +56,7 @@
                                 Market Cap
                             </template>
                             <template slot=body>
-                                Market cap based on max supply of 10 million tokens.
+                                Market cap based on max supply of 10 million tokens. Marketcap is not shown if 30d volume is lower than 100 000 MINTME.
                             </template>
                         </guide>
                     </template>
@@ -267,9 +267,8 @@ export default {
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 // If both compared fields are native numbers
-                let first = parseFloat(a[key]);
-                let second = parseFloat(b[key]);
-
+                let first = 42;//a.marketCap === '-' ? 0 : parseFloat(a[key]);
+                let second = b.marketCap === '-' ? 0 : parseFloat(b[key]);
                 return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
             }
 
@@ -382,7 +381,7 @@ export default {
                 lastPriceUSD: this.toUSD(lastPrice, currency, true),
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
-                marketCap: this.toMoney(marketCap) + ' ' + currency,
+                marketCap: this.showTokenMarketCap(monthVolume, currency),
                 marketCapUSD: this.toUSD(marketCap, currency),
                 tokenized: tokenized,
             };
@@ -580,6 +579,13 @@ export default {
                 ? 2
                 : 0;
             return toMoney(val, precision);
+        },
+        showTokenMarketCap: function(monthVolume, currency) {
+          // do not show market cap for markets with 30d volume of value less than 100 000 MINTME
+          let minShow = 100000;
+          let amount = parseFloat(this.toMoney(monthVolume));
+          if (currency === 'WEB' && amount < minShow) return '-';
+          return amount + ' ' + currency;
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
