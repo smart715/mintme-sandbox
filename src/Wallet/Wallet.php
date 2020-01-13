@@ -33,6 +33,9 @@ use Throwable;
 
 class Wallet implements WalletInterface
 {
+    private const TOKEN_TRANSACTIONS_OFFSET = 0;
+    private const TOKEN_TRANSACTIONS_LIMIT = 1500;
+
     /** @var WithdrawGatewayInterface */
     private $withdrawGateway;
 
@@ -270,8 +273,8 @@ class Wallet implements WalletInterface
         if (Token::DEPLOYED === $token->getDeploymentStatus()) {
             $transactions = $this->getWithdrawDepositHistory(
                 $user,
-                0,
-                1000
+                self::TOKEN_TRANSACTIONS_OFFSET,
+                self::TOKEN_TRANSACTIONS_LIMIT
             );
 
             foreach ($transactions as $transaction) {
