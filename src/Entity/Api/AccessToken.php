@@ -21,7 +21,7 @@ class AccessToken extends BaseAccessToken
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Api\Client")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     protected $client;
 
@@ -30,5 +30,13 @@ class AccessToken extends BaseAccessToken
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $user;
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
 }

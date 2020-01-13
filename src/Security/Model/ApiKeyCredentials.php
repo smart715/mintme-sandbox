@@ -21,6 +21,11 @@ class ApiKeyCredentials
         return $this->public;
     }
 
+    public function getToken(): string
+    {
+        return $this->public;
+    }
+
     public function getPrivate(): string
     {
         return $this->private;

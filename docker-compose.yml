@@ -17,6 +17,9 @@ services:
       - .:/var/www/html/panel
       - .docker/panel.env:/var/www/html/panel/.env
       - .docker/parameters.yaml:/var/www/html/panel/config/parameters.yaml
+    environment:
+        XDEBUG_CONFIG: remote_host=192.168.1.39
+        PHP_IDE_CONFIG: serverName=my.local
 
   withdraw:
     build: .docker/withdraw
@@ -111,7 +114,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - 3306:3306
+      - 3307:3306
     networks:
       - middleend
       - backend

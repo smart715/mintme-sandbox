@@ -489,3 +489,7 @@ services:
     App\Controller\API\UsersController:
          arguments:
             $clientManager: '@fos_oauth_server.client_manager.default'
+
+    App\Security\ApiKeyAuthenticator:
+         arguments:
+            $oAuthStorage: '@fos_oauth_server.storage.default'

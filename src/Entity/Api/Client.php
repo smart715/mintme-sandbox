@@ -25,6 +25,15 @@ class Client extends BaseClient
      */
     protected $user;
 
+    /**
+     * @codeCoverageIgnore
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
     public function __construct()
     {
         parent::__construct();
@@ -43,7 +52,7 @@ class Client extends BaseClient
      */
     public function getClient()
     {
-        return ['id' => $this->getRandomId()];
+        return ['id' => $this->getPublicId()];
     }
 
 

@@ -88,10 +88,9 @@ class UsersController extends AbstractFOSRestController
      */
     public function createApiClient(): array
     {
-        /* App\Entity\Api\Client $client */
         $user = $this->getUser();
         $client = $this->clientManager->createClient();
-        $client->setAllowedGrantTypes(array('token'));
+        $client->setAllowedGrantTypes(array('client_credentials'));
         $client->setUser($user);
         $this->clientManager->updateClient($client);
 
@@ -100,7 +99,7 @@ class UsersController extends AbstractFOSRestController
         // add secret only to new created client
         // for other it will be hidden
         foreach ($clients as $key=>$val){
-            if ($val['id'] ==  $client->getRandomId()){
+            if ($val['id'] ==  $client->getPublicId()){
                 $clients[$key]['secret'] =  $client->getSecret();
             }
         }
@@ -124,8 +123,14 @@ class UsersController extends AbstractFOSRestController
             throw new ApiNotFoundException("Client ID required");
         }
 
+        $ids = explode('_', $id);
+
+        if (count($ids) < 2) {
+            throw new ApiNotFoundException("Wrong Client ID");
+        }
+
         $user = $this->getUser();
-        $client = $this->clientManager->findClientBy(['user' => $user, 'randomId' => $id]);
+        $client = $this->clientManager->findClientBy(['user' => $user, 'randomId' => $ids[1], 'id' => $ids[0]]);
 
         if (!($client instanceof \App\Entity\Api\Client)) {
             throw new ApiNotFoundException("No clients attached to the account");

@@ -5,7 +5,9 @@ namespace App\Security;
 use App\Entity\User;
 use App\Manager\ApiKeyManagerInterface;
 use App\Security\Model\ApiKeyCredentials;
+use App\Security\Model\OAuthCredentials;
 use InvalidArgumentException;
+use OAuth2\IOAuth2Storage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
@@ -22,9 +24,13 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
     /** @var ApiKeyManagerInterface */
     private $keyManager;
 
-    public function __construct(ApiKeyManagerInterface $keyManager)
+    /** @var OAuth2 */
+    private $oauth;
+
+    public function __construct(ApiKeyManagerInterface $keyManager, IOAuth2Storage $oAuthStorage)
     {
         $this->keyManager = $keyManager;
+        $this->oauth = new OAuth2($oAuthStorage);
     }
 
     /** {@inheritdoc} */
@@ -33,19 +39,25 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
         $public = $request->headers->get('X-API-ID');
         $private = $request->headers->get('X-API-KEY');
 
-        if (!$public ||
+        $credentials = null;
+        if (!(!$public ||
             !$private ||
             !is_string($public) ||
             !is_string($private) ||
             64 != strlen($public) ||
             64 != strlen($private)
-        ) {
+        )) {
+            $credentials = new ApiKeyCredentials($public, $private);
+        }elseif (null != $token = $this->oauth->getBearerToken($request, true)) {
+            // check maybe it Oauth token
+            $credentials = new OAuthCredentials($token);
+        } else {
             throw new BadCredentialsException();
         }
 
         return new PreAuthenticatedToken(
             'anon.',
-            new ApiKeyCredentials($public, $private),
+            $credentials,
             $providerKey
         );
     }
@@ -71,20 +83,33 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             );
         }
 
-        /** @var ApiKeyCredentials $credentials */
+        $username = null;
         $credentials = $token->getCredentials();
+        if ($credentials instanceof ApiKeyCredentials) {
+            // this is Api Key authentication
+             /** @var ApiKeyCredentials $credentials */
 
-        $key = $this->keyManager->findApiKey($credentials->getPublic());
+            $key = $this->keyManager->findApiKey($credentials->getPublic());
 
-        if (is_null($key) || !password_verify($credentials->getPrivate(), $key->getPrivateKey())) {
-            throw new BadCredentialsException();
+            if (is_null($key) || !password_verify($credentials->getPrivate(), $key->getPrivateKey())) {
+                throw new BadCredentialsException();
+            }
+
+            $username = $userProvider->getUsernameForApiKey($credentials->getPublic());
+        }elseif ($credentials instanceof OAuthCredentials) {
+            // this is OAuth authentication
+            /** @var OauthCredentials $credentials */
+
+            $this->oauth->verifyAccessToken($credentials->getToken());
+
+            //if haven't exception then token is correct
+            $username = $this->oauth->getUsernameForToken($credentials->getToken());
+
         }
-
-        $username = $userProvider->getUsernameForApiKey($credentials->getPublic());
 
         if (!$username) {
             throw new CustomUserMessageAuthenticationException(
-                sprintf('API Key "%s" does not exist.', $credentials->getPublic()),
+                sprintf('API Key or Token "%s" does not exist.', $credentials->getToken()),
                 [],
                 400
             );
@@ -98,7 +123,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
 
         return new PreAuthenticatedToken(
             $user,
-            $credentials->getPublic(),
+            $credentials->getToken(),
             $providerKey,
             [User::ROLE_API]
         );
