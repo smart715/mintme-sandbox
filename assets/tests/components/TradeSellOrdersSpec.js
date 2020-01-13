@@ -7,6 +7,7 @@ describe('TradeSellOrders', () => {
         propsData: {
             ordersList: [],
             tokenName: 'TOK1',
+            ordersLoaded: true,
             fields: {
                 price: {
                     label: 'Price',

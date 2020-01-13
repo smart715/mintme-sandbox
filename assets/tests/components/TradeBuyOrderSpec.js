@@ -31,6 +31,7 @@ describe('TradeBuyOrder', () => {
             loginUrl: 'loginUrl',
             signupUrl: 'signupUrl',
             loggedIn: false,
+            balanceLoaded: true,
             market: {
                 base: {
                     name: 'Betcoin',
@@ -49,6 +50,15 @@ describe('TradeBuyOrder', () => {
             isOwner: false,
         },
     });
+    it('hide buy order  contents and show loading instead', () => {
+        wrapper.vm.balanceLoaded = false;
+        expect(wrapper.find('font-awesome-icon').exists()).to.deep.equal(true);
+        expect(wrapper.find('div.card-body > div.row').exists()).to.deep.equal(false);
+        wrapper.vm.balanceLoaded = true;
+        expect(wrapper.find('font-awesome-icon').exists()).to.deep.equal(false);
+        expect(wrapper.find('div.card-body > div.row').exists()).to.deep.equal(true);
+    });
+
 
     it('show login & logout buttons if not logged in', () => {
         expect(wrapper.find('a[href="loginUrl"]').exists()).to.deep.equal(true);
