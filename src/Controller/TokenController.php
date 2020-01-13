@@ -83,22 +83,31 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/{tab}",
      *     name="token_show",
-     *     defaults={"tab" = "trade"},
+     *     defaults={"tab" = "intro"},
      *     methods={"GET"},
      *     requirements={"tab" = "trade|intro"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
     public function show(
+        Request $request,
         string $name,
         ?string $tab,
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
+        if (preg_match('/(intro)/', $request->getPathInfo())) {
+            return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
 
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
             return $this->redirectToRoute('token_show', ['name' => $dashedName]);
+        }
+
+        //rebranding
+        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
+            $name = Token::WEB_SYMBOL;
         }
 
         $token = $this->tokenManager->findByName($name);
@@ -121,20 +130,28 @@ class TokenController extends Controller
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
+        $tokenDescription = preg_replace(
+            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+            '\2',
+            $token->getDescription() ?? ''
+        );
+        $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
 
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
+            'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
-            'showIntro' => true,
+            'showTrade' => true,
             'market' => $this->normalize($market),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
             'precision' => $this->getParameter('token_precision'),
+            'isTokenPage' => true,
         ]);
     }
 
@@ -146,7 +163,7 @@ class TokenController extends Controller
         MarketStatusManagerInterface $marketStatusManager
     ): Response {
         if ($this->isTokenCreated()) {
-            return $this->redirectToOwnToken('trade');
+            return $this->redirectToOwnToken('intro');
         }
 
         $token = new Token();

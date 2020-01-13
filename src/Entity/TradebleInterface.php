@@ -14,4 +14,16 @@ interface TradebleInterface
 
     /** @Groups({"Default", "API", "dev"}) */
     public function getSymbol(): string;
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function setName(string $name);
+
+    /**
+     * @param string $symbol
+     * @return mixed
+     */
+    public function setSymbol(string $symbol);
 }

@@ -10,101 +10,107 @@
                         </template>
                         <template slot="body">
                             Form used to create  an order so you can
-                            buy {{ market.base.symbol }} or make offer.
+                            buy {{ market.base.symbol|rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div v-if="immutableBalance"
-                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
-                        Your
-                        <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol }}:
-                            <span class="text-white word-break">
-                                {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        Your {{ market.base.symbol }}
-                                    </template>
-                                    <template slot="body">
-                                        Your {{ market.base.symbol }} balance.
-                                    </template>
-                                </guide>
-                            </span>
-                        </span>
-                    </div>
-                    <div
-                    class="col-12 col-sm-4 col-md-12 col-xl-4
-                    text-md-left" :class="marketPricePositionClass">
-                        <label class="custom-control custom-checkbox">
-                            <input
-                                v-model="useMarketPrice"
-                                step="0.00000001"
-                                type="checkbox"
-                                id="buy-price"
-                                class="custom-control-input"
-                                :disabled="disabledMarketPrice"
-                            >
-                            <label
-                                class="custom-control-label"
-                                for="buy-price">
-                                Market Price
-                                <guide>
-                                    <template slot="header">
-                                        Market Price
-                                    </template>
-                                    <template slot="body">
-                                        Checking this box fetches current best market price
-                                        for which you can buy {{ market.base.symbol }}.
-                                    </template>
-                                </guide>
-                            </label>
-                        </label>
-                    </div>
-                    <div class="col-12 pt-2">
+                    <div class="col-12">
                         <label
                             for="buy-price-input"
                             class="text-white">
-                            Price in {{ market.base.symbol }}:
+                            Price in {{ market.base.symbol|rebranding }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ market.base.symbol }}
+                                    Price in {{ market.base.symbol|rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to buy one {{ market.quote.symbol }}.
+                                    The price at which you want to buy one {{ market.quote.symbol|rebranding }}.
                                 </template>
                             </guide>
                         </label>
-                        <input
-                            v-model="buyPrice"
-                            type="text"
-                            id="buy-price-input"
-                            class="form-control"
-                            @keypress="checkPriceInput"
-                            @paste="checkPriceInput"
-                            :disabled="useMarketPrice || !loggedIn"
-                        >
+                        <div class="d-flex">
+                            <input
+                                v-model="buyPrice"
+                                type="text"
+                                id="buy-price-input"
+                                class="form-control"
+                                :class="buyInputClass"
+                                :disabled="useMarketPrice || !loggedIn"
+                                @keypress="checkPriceInput"
+                                @paste="checkPriceInput"
+                            >
+                            <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
+                                Your
+                                <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol|rebranding }}:
+                                    <span class="text-white">
+                                        {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                        <guide>
+                                            <template slot="header">
+                                                Your {{ market.base.symbol|rebranding }}
+                                            </template>
+                                            <template slot="body">
+                                                Your {{ market.base.symbol|rebranding }} balance.
+                                            </template>
+                                        </guide>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         <label
                             for="buy-price-amount"
-                            class="text-white">
-                            Amount in {{ market.quote.symbol }}:
-                        </label>
-                        <input
-                            v-model="buyAmount"
-                            type="text"
-                            id="buy-price-amount"
-                            @keypress="checkAmountInput"
-                            @paste="checkAmountInput"
-                            class="form-control"
-                            :disabled="!loggedIn"
+                            class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
+                            <span class="d-inline-block text-nowrap">Amount in </span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol|rebranding }}</span>
+                            <span class="d-inline-block">:</span>
+                        </label>
+                        <div class="d-flex">
+                            <input
+                                v-model="buyAmount"
+                                type="text"
+                                id="buy-price-amount"
+                                class="form-control"
+                                :class="buyInputClass"
+                                :disabled="!loggedIn"
+                                @keypress="checkAmountInput"
+                                @paste="checkAmountInput"
+                            >
+                            <div v-if="loggedIn" class="w-50 m-auto pl-4">
+                                <label class="custom-control custom-checkbox pb-0">
+                                    <input
+                                        v-model="useMarketPrice"
+                                        step="0.00000001"
+                                        type="checkbox"
+                                        id="buy-price"
+                                        class="custom-control-input"
+                                        :disabled="disabledMarketPrice"
+                                    >
+                                    <label
+                                        class="custom-control-label pb-0"
+                                        for="buy-price">
+                                        Market Price
+                                        <guide>
+                                            <template slot="header">
+                                                Market Price
+                                            </template>
+                                            <template slot="body">
+                                                Checking this box fetches current best market price
+                                                for which you can buy {{ market.base.symbol|rebranding }}.
+                                            </template>
+                                        </guide>
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         Total Price:
-                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol|rebranding }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -135,14 +141,14 @@
 
 <script>
 import Guide from '../Guide';
-import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin} from '../../mixins';
+import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin],
+    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
     components: {
         Guide,
     },
@@ -256,6 +262,9 @@ export default {
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
+        },
+        buyInputClass: function() {
+            return this.loggedIn ? 'w-50' : 'w-100';
         },
         ...mapGetters('makeOrder', [
             'getBuyPriceInput',

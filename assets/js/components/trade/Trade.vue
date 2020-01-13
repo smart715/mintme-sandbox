@@ -2,13 +2,13 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
-                    class="col"
-                    :websocket-url="websocketUrl"
-                    :market="market"
-                    :webchain-supply-url="webchainSupplyUrl"
+                class="col"
+                :websocket-url="websocketUrl"
+                :market="market"
+                :mintme-supply-url="mintmeSupplyUrl"
             />
         </div>
-        <div class="row">
+        <div class="row trade-orders">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
                         v-if="balanceLoaded"
@@ -104,7 +104,7 @@ export default {
         isOwner: Boolean,
         userId: Number,
         precision: Number,
-        webchainSupplyUrl: String,
+        mintmeSupplyUrl: String,
     },
     data() {
         return {

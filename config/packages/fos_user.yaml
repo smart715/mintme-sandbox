@@ -24,5 +24,6 @@ fos_user:
     service:
         mailer: fos_user.mailer.twig_swift
         user_manager: App\Manager\UserManagerInterface
+        email_canonicalizer: app.emailCanonicalizer
     group:
         group_class: Sonata\UserBundle\Entity\BaseGroup

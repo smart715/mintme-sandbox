@@ -21,6 +21,7 @@
 @import 'knowledge-base'
 @import 'doc'
 @import 'icons'
+@import 'sign-up-landing'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
@@ -110,6 +111,16 @@ a
 
   p
     margin: 0
+
+.blue-question
+  background: $color-tooltip
+  padding: .125rem
+  font-size: .875em
+  vertical-align: middle
+
+  &.square
+    width: 1em
+    height: 1em
 
 .tooltip-static
   background: white
@@ -203,6 +214,28 @@ a
     >.card-header
       background-color: $dark-white
       color: inherit
+
+.row
+  &.trade-orders
+    .card
+      .card-body
+        line-height: 1 !important
+
+      .d-flex
+        .w-50
+          .c-pointer
+            >.text-white
+              white-space: nowrap
+
+          .custom-checkbox
+            min-height: 1rem !important
+
+            >.custom-control-label
+              &:before, &:after
+                top: 0 !important
+
+              .blue-question
+                vertical-align: bottom
 
 .btn-primary
   color: $white
@@ -550,16 +583,6 @@ nav.top-navbar
   word-spacing: 7px
   text-align: left
 
-.blue-question
-  background: $color-tooltip
-  padding: .125rem
-  font-size: .875em
-  vertical-align: middle
-
-  &.square
-    width: 1em
-    height: 1em
-
 .icon
   width: 18px
   height: 18px
@@ -609,7 +632,7 @@ nav.top-navbar
     &.warning
       background: $toast-warning-bg
       color: $toast-warning-text
-  
+
   justify-content: center !important
   font-size: 20px !important
   padding: 6px 15px !important
@@ -695,6 +718,11 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
   @extend .show-password
   color: $color-toggle-password-hover
 
+.truncate-name
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
 .truncate-token
   width: 100%
   white-space: nowrap
@@ -709,3 +737,23 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
+
+.pair-cell
+  max-width: 200px
+
+.pair-cell-trading
+  max-width: 260px
+  min-width: 260px
+
+.card-fixed-small
+  width: 100%
+  max-width: 450px
+
+.card-fixed-large
+  width: 100%
+  max-width: 981px
+
+@include media-breakpoint-up(lg)
+  .card-two-divs-fixed-large
+    width: 100%
+    max-width: calc(981px / 2)

@@ -66,6 +66,11 @@ abstract class AbstractOrder
         return $this->market;
     }
 
+    public function setMarket(Market $market): void
+    {
+        $this->market = $market;
+    }
+
     /** @Groups({"Default", "API", "dev"}) */
     public function getAmount(): Money
     {

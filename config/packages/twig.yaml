@@ -19,5 +19,6 @@ twig:
         is_hacker_allowed: '%is_hacker_allowed%'
         trusted_device_enabled: '%trusted_device_enabled%'
         trusted_device_cookie_lifetime: '%trusted_device_cookie_lifetime%'
-        webchain_supply: '%webchain_supply%'
+        mintme_supply: '%mintme_supply%'
         show_full_data_in_profile: '%show_full_data_in_profile%'
+        mintme_coin: '%mintme_coin%'

@@ -5,15 +5,15 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-b-tooltip="{title: tokenName, boundary:'viewport'}">
-                    {{ tokenName | truncate(7) }}
+                    <span v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
+                    {{ tokenName | rebranding | truncate(7) }}
                 </span>
                     <guide>
                         <template slot="header">
                             Sell Orders
                         </template>
                         <template slot="body">
-                            List of all active sell orders for {{ tokenName }}.
+                            List of all active sell orders for {{ tokenName|rebranding }}.
                         </template>
                     </guide>
                 </span>
@@ -21,31 +21,48 @@
             <div class="card-body p-0">
                 <div class="table-responsive fixed-head-table">
                     <b-table v-if="hasOrders"
-                         ref="table"
-                         @row-clicked="orderClicked"
-                         :sort-by.sync="sortBy"
-                         :sort-desc.sync="sortDesc"
-                         :items="tableData"
-                         :fields="fields">
+                        ref="table"
+                        @row-clicked="orderClicked"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :items="tableData"
+                        :fields="fields"
+                    >
                         <template v-slot:cell(trader)="row">
-                        <a v-if="!row.item.isAnonymous" :href="row.item.traderUrl">
-                            <span v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
-                                {{ row.value }}
-                            </span>
-                            <img
-                                src="../../../img/avatar.png"
-                                class="float-right"
-                                alt="avatar">
-                        </a>
-                        <span v-else>{{ row.value }}</span>
-
-                        <a @click="removeOrderModal(row.item)"
-                           v-if="row.item.owner">
-                            <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                        </a>
+                            <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                <span
+                                    v-if="row.item.isAnonymous"
+                                    class="d-inline-block truncate-name flex-grow-1"
+                                >
+                                    {{ row.value }}
+                                </span>
+                                <a
+                                    v-else
+                                    :href="row.item.traderUrl"
+                                    class="d-flex flex-row flex-nowrap justify-content-between w-100"
+                                >
+                                    <span
+                                        class="d-inline-block truncate-name flex-grow-1"
+                                        v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}"
+                                    >
+                                        {{ row.value }}
+                                    </span>
+                                    <img
+                                        src="../../../img/avatar.png"
+                                        class="d-block flex-grow-0"
+                                        alt="avatar">
+                                </a>
+                                <a
+                                    v-if="row.item.owner"
+                                    class="d-inline-block flex-grow-0"
+                                    @click="removeOrderModal(row.item)"
+                                >
+                                    <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                                </a>
+                            </div>
                         </template>
                     </b-table>
-                    <div v-if="!hasOrders">
+                    <div v-else>
                         <p class="text-center p-5">No order was added yet</p>
                     </div>
                 </div>
@@ -68,11 +85,11 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, FiltersMixin, MoneyFilterMixin, OrderClickedMixin} from '../../mixins';
+import {LazyScrollTableMixin, FiltersMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin} from '../../mixins/';
 
 export default {
     name: 'TradeSellOrders',
-    mixins: [FiltersMixin, LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
     props: {
         ordersList: [Array],
         tokenName: String,

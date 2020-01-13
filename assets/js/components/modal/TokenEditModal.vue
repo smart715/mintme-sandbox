@@ -6,43 +6,10 @@
             :without-padding="true"
             @close="$emit('close')"
         >
-            <template slot="header">
-                <span class="modal-title py-2 pl-4 d-inline-block">{{ currentName | truncate(25) }}</span>
-            </template>
+            <template slot="header">{{ currentName }}</template>
             <template slot="body">
                 <div class="token-edit p-0">
                     <div class="row faq-block mx-0 border-bottom border-top">
-                        <faq-item>
-                            <template slot="title">
-                                Change token name
-                            </template>
-                            <template slot="body">
-                                <token-change-name
-                                    :is-token-exchanged="isTokenExchanged"
-                                    :is-token-not-deployed="isTokenNotDeployed"
-                                    :current-name="currentName"
-                                    :twofa="twofa"
-                                />
-                            </template>
-                        </faq-item>
-                    </div>
-                    <div class="row faq-block mx-0 border-bottom">
-                        <faq-item>
-                            <template slot="title">
-                                Modify token release address
-                            </template>
-                            <template slot="body">
-                                <token-release-address
-                                    :is-token-deployed="isTokenDeployed"
-                                    :release-address="releaseAddress"
-                                    :token-name="currentName"
-                                    :twofa="twofa"
-                                    @update-release-address="$emit('update-release-address')"
-                                />
-                            </template>
-                        </faq-item>
-                    </div>
-                    <div class="row faq-block mx-0 border-bottom">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
                                 Token release period
@@ -74,6 +41,37 @@
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item>
+                            <template slot="title">
+                                Change token name
+                            </template>
+                            <template slot="body">
+                                <token-change-name
+                                    :is-token-exchanged="isTokenExchanged"
+                                    :is-token-not-deployed="isTokenNotDeployed"
+                                    :current-name="currentName"
+                                    :twofa="twofa"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item>
+                            <template slot="title">
+                                Modify token release address
+                            </template>
+                            <template slot="body">
+                                <token-release-address
+                                    :is-token-deployed="isTokenDeployed"
+                                    :release-address="releaseAddress"
+                                    :token-name="currentName"
+                                    :twofa="twofa"
+                                    @update-release-address="$emit('update-release-address')"
                                 />
                             </template>
                         </faq-item>
@@ -163,4 +161,3 @@ export default {
     },
 };
 </script>
-

@@ -457,7 +457,7 @@ class ContractHandlerTest extends TestCase
         $token = $this->createMock(Token::class);
         $token->method('getName')->willReturn('foo');
         $token->method('getAddress')->willReturn($address);
-        $token->method('deploymentStatus')->willReturn($status);
+        $token->method('getDeploymentStatus')->willReturn($status);
 
         if (!$hasReleasePeriod) {
             $token->method('getLockIn')->willReturn(null);

@@ -10,9 +10,5 @@ describe('pricePosition', function() {
         },
     });
 
-    it('triggers place position class correctly', function() {
-        expect(wrapper.vm.marketPricePositionClass).to.deep.equals('text-xl-left');
-        wrapper.vm.loggedIn = true;
-        expect(wrapper.vm.marketPricePositionClass).to.deep.equals('text-sm-right text-xl-right');
-    });
+    expect(wrapper.vm.loggedIn).to.be.false;
 });

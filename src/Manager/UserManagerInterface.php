@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserToken;
+use App\Repository\UserRepository;
 
 interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterface
 {
@@ -25,10 +26,8 @@ interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterfac
      * @return UserToken[]
      */
     public function getUserCrypto(Crypto $crypto, array $userIds): array;
-
-    /**
-     * @param array|null $domains
-     * @return array|null
-     */
-    public function getUsersByDomains(?array $domains): ?array;
+    public function getRepository(): UserRepository;
+    public function getUsersByDomains(array $domains): ?array;
+    public function findByDomain(string $domain): array;
+    public function checkExistCanonicalEmail(string $email): bool;
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dev\API\User;
 
+use App\Controller\Dev\API\DevApiController;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -9,7 +10,9 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -22,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @Rest\Route(path="/dev/api/v1/user/orders")
  * @Security(expression="is_granted('prelaunch')")
  */
-class OrdersController extends AbstractFOSRestController
+class OrdersController extends DevApiController
 {
     /** @var MarketFactoryInterface */
     private $marketFactory;
@@ -36,16 +39,31 @@ class OrdersController extends AbstractFOSRestController
     /** @var TraderInterface */
     private $trader;
 
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     public function __construct(
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler,
         UserActionLogger $userActionLogger,
-        TraderInterface $trader
+        TraderInterface $trader,
+        RebrandingConverterInterface $rebrandingConverter,
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ) {
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
         $this->userActionLogger = $userActionLogger;
         $this->trader = $trader;
+        $this->rebrandingConverter = $rebrandingConverter;
+        $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -69,7 +87,7 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
-    public function getActiveOrders(ParamFetcherInterface $fetcher): array
+    public function getActiveOrders(ParamFetcherInterface $request): array
     {
         $user = $this->getUser();
         $markets = $this->marketFactory->createUserRelated($user);
@@ -78,12 +96,14 @@ class OrdersController extends AbstractFOSRestController
             return [];
         }
 
-        return $this->marketHandler->getPendingOrdersByUser(
+        return array_map(function ($order) {
+            return $this->rebrandingConverter->convertOrder($order);
+        }, $this->marketHandler->getPendingOrdersByUser(
             $user,
             $markets,
-            (int)$fetcher->get('offset'),
-            (int)$fetcher->get('limit')
-        );
+            (int)$request->get('offset'),
+            (int)$request->get('limit')
+        ));
     }
 
     /**
@@ -107,7 +127,7 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
-    public function getFinishedOrders(ParamFetcherInterface $fetcher): array
+    public function getFinishedOrders(ParamFetcherInterface $request): array
     {
         $user = $this->getUser();
         $markets = $this->marketFactory->createUserRelated($user);
@@ -116,12 +136,14 @@ class OrdersController extends AbstractFOSRestController
             return [];
         }
 
-        return $this->marketHandler->getUserExecutedHistory(
+        return array_map(function ($order) {
+            return $this->rebrandingConverter->convertOrder($order);
+        }, $this->marketHandler->getUserExecutedHistory(
             $user,
             $markets,
-            (int)$fetcher->get('offset'),
-            (int)$fetcher->get('limit')
-        );
+            (int)$request->get('offset'),
+            (int)$request->get('limit')
+        ));
     }
 
     /**
@@ -143,7 +165,7 @@ class OrdersController extends AbstractFOSRestController
      *      format="application/json",
      *      @SWG\Schema(
      *          type="object",
-     *          @SWG\Property(property="base", type="string", example="WEB", description="Base name"),
+     *          @SWG\Property(property="base", type="string", example="MINTME", description="Base name"),
      *          @SWG\Property(property="quote", type="string", example="MY_TOKEN", description="Quote name"),
      *          @SWG\Property(property="priceInput", type="string", example="5", description="Price to place"),
      *          @SWG\Property(property="amountInput", type="string", example="12.33", description="Amount to order"),
@@ -158,11 +180,21 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="User Orders")
      */
-    public function placeOrder(
-        Market $market,
-        ParamFetcherInterface $request,
-        ExchangerInterface $exchanger
-    ): View {
+    public function placeOrder(ParamFetcherInterface $request, ExchangerInterface $exchanger): View
+    {
+        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
+
+        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
+        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
+
+        $base = $this->cryptoManager->findBySymbol($base);
+        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        if (is_null($base) || is_null($quote)) {
+            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $market = new Market($base, $quote);
         $tradeResult = $exchanger->placeOrder(
             $this->getUser(),
             $market,
@@ -193,9 +225,21 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Parameter(name="id", in="path", description="Order identifier", type="integer")
      * @SWG\Tag(name="User Orders")
      */
-    public function cancelOrder(int $id, Market $market): View
+    public function cancelOrder(ParamFetcherInterface $request, int $id): View
     {
-        $order = Order::createCancelOrder($id, $this->getUser(), $market);
+        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
+
+        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
+        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
+
+        $base = $this->cryptoManager->findBySymbol($base);
+        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        if (is_null($base) || is_null($quote)) {
+            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $order = Order::createCancelOrder($id, $this->getUser(), new Market($base, $quote));
 
         $this->trader->cancelOrder($order);
         $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);

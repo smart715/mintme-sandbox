@@ -13,9 +13,9 @@
 
 {% block content %}
     <div id="profile" class="container">
-        <div class="row  pt-5 justify-content-center">
-            <div class="col-12 col-lg-4 col-md-6">
-                <div class="card">
+        <div class="row pt-5 justify-content-center">
+            <div class="col-12">
+                <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
                         {% if profile.firstName is empty %}
                             Create your profile
@@ -26,10 +26,10 @@
                     <div class="card-body">
                         {%- if (canEdit == true) -%}
                             <a @click="showEditForm = true" class="float-right">
-                                <font-awesome-icon icon="edit" class="c-pointer ml-2  icon-edit" v-if="!showEditForm"></font-awesome-icon>
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-edit" v-if="!showEditForm"></font-awesome-icon>
                             </a>
                         {%- endif -%}
-                        <div class="row" v-if="!showEditForm">
+                        <div v-if="!showEditForm" class="row">
                             <div class="col-12">
                                 <div class="pb-1">
                                     {% if profile.country is not empty %}
