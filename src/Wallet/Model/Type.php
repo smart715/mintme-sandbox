@@ -11,7 +11,7 @@ class Type
     public const WITHDRAW = 'withdraw';
 
     /** @var string[] */
-    protected static $available = [
+    public static $available = [
         self::DEPOSIT, self::WITHDRAW,
     ];
 
