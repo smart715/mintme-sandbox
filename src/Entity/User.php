@@ -177,7 +177,7 @@ class User extends BaseUser implements
     private $bonus;
 
     /** @codeCoverageIgnore
-     * @return Client[]
+     * @return array
      */
     public function getApiClients(): array
     {
