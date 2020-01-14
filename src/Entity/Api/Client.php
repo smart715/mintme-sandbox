@@ -46,16 +46,16 @@ class Client extends BaseClient
      * @codeCoverageIgnore
      * @param $user User
      */
-    public function setUser($user): void
+    public function setUser($user)
     {
         $this->user = $user;
     }
 
     /**
      * @codeCoverageIgnore
-     * @return string
+     * @return array
      */
-    public function getClient(): string
+    public function getClient(): array
     {
         return ['id' => $this->getPublicId()];
     }
