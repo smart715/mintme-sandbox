@@ -21,16 +21,16 @@ class RefreshToken extends BaseRefreshToken
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Api\Client")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE"))
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      * @var User
      */
     protected $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Api\Client")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE"))
+     * @var Client
+     */
+    protected $client;
 }

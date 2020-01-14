@@ -46,7 +46,7 @@ class Client extends BaseClient
      * @codeCoverageIgnore
      * @param $user User
      */
-    public function setUser(User $user)
+    public function setUser($user): void
     {
         $this->user = $user;
     }
