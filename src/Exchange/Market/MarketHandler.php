@@ -24,6 +24,8 @@ class MarketHandler implements MarketHandlerInterface
     public const SELL = 1;
     public const BUY = 2;
 
+    private const MONTH_PERIOD = 2592000;
+
     /** @var MarketFetcherInterface */
     private $marketFetcher;
 
@@ -311,7 +313,7 @@ class MarketHandler implements MarketHandlerInterface
         );
         $monthResult = $this->marketFetcher->getMarketInfo(
             $this->marketNameConverter->convert($market),
-            2592000
+            self::MONTH_PERIOD
         );
 
         if (!$result) {
