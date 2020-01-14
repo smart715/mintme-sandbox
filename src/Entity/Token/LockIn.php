@@ -182,7 +182,11 @@ class LockIn
      */
     public function getCountHoursFromDeploy(): float
     {
-        return abs(round((strtotime('now') - strtotime($this->deployed->format('Y-m-d H:i:s'))) / 3600, 1));
+        if ($this->deployed instanceof \DateTimeImmutable) {
+            return abs(round((strtotime('now') - strtotime($this->deployed->format('Y-m-d H:i:s'))) / 3600, 2));
+        }
+
+        return floatval(0);
     }
 
     public function getEarnedMoneyFromDeploy(): Money
