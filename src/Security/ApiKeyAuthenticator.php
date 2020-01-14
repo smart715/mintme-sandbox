@@ -40,6 +40,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
         $private = $request->headers->get('X-API-KEY');
 
         $credentials = null;
+
         if (!(!$public ||
             !$private ||
             !is_string($public) ||
@@ -85,10 +86,9 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
 
         $username = null;
         $credentials = $token->getCredentials();
+
         if ($credentials instanceof ApiKeyCredentials) {
             // this is Api Key authentication
-             /** @var ApiKeyCredentials $credentials */
-
             $key = $this->keyManager->findApiKey($credentials->getPublic());
 
             if (is_null($key) || !password_verify($credentials->getPrivate(), $key->getPrivateKey())) {
@@ -98,13 +98,10 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             $username = $userProvider->getUsernameForApiKey($credentials->getPublic());
         } elseif ($credentials instanceof OAuthCredentials) {
             // this is OAuth authentication
-            /** @var OauthCredentials $credentials */
-
             $this->oauth->verifyAccessToken($credentials->getToken());
 
             //if haven't exception then token is correct
             $username = $this->oauth->getUsernameForToken($credentials->getToken());
-
         }
 
         if (!$username) {

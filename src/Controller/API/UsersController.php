@@ -8,11 +8,11 @@ use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Logger\UserActionLogger;
 use Doctrine\Common\Persistence\ObjectManager;
+use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Rest\Route("/api/users")
@@ -22,6 +22,8 @@ class UsersController extends AbstractFOSRestController
 {
     /** @var UserActionLogger */
     private $userActionLogger;
+
+    /** @var ClientManager */
     private $clientManager;
 
     public function __construct(UserActionLogger $userActionLogger, ClientManager $clientManager)
@@ -98,8 +100,8 @@ class UsersController extends AbstractFOSRestController
 
         // add secret only to new created client
         // for other it will be hidden
-        foreach ($clients as $key => $val){
-            if ($val['id'] ===  $client->getPublicId()){
+        foreach ($clients as $key => $val) {
+            if ($val['id'] ===  $client->getPublicId()) {
                 $clients[$key]['secret'] = $client->getSecret();
             }
         }
@@ -119,6 +121,7 @@ class UsersController extends AbstractFOSRestController
     {
 
         $id = $request->get('id');
+
         if (empty($id)) {
             throw new ApiNotFoundException("Client ID required");
         }
@@ -139,9 +142,7 @@ class UsersController extends AbstractFOSRestController
         $this->clientManager->deleteClient($client);
         $this->userActionLogger->info('Deleted API Client');
 
-        $clients = $user->GetApiClients();
-
-        return $clients;
+        return $user->GetApiClients();
     }
 
     private function getEm(): ObjectManager

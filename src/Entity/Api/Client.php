@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Entity\Api;
 
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Entity\Client as BaseClient;
 
@@ -15,6 +16,7 @@ class Client extends BaseClient
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @var int
      */
     protected $id;
 
@@ -22,6 +24,7 @@ class Client extends BaseClient
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="clients", cascade={"persist"})
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var User
      */
     protected $user;
 
@@ -29,7 +32,7 @@ class Client extends BaseClient
      * @codeCoverageIgnore
      * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -41,6 +44,7 @@ class Client extends BaseClient
 
     /**
      * @codeCoverageIgnore
+     * @param $user User
      */
     public function setUser($user): void
     {
@@ -49,11 +53,10 @@ class Client extends BaseClient
 
     /**
      * @codeCoverageIgnore
+     * @return string
      */
-    public function getClient()
+    public function getClient(): string
     {
         return ['id' => $this->getPublicId()];
     }
-
-
 }

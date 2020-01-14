@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Repository\Api;
 
@@ -18,5 +18,4 @@ class ClientRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Client::class);
     }
-
 }

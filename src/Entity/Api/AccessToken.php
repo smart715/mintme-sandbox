@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace App\Entity\Api;
 
@@ -16,27 +16,30 @@ class AccessToken extends BaseAccessToken
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @var int
      */
     protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Api\Client")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @var Client
      */
     protected $client;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var User
      */
     protected $user;
 
     /**
-     * @return mixed
+     * @codeCoverageIgnore
+     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
-
 }
