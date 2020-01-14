@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Entity\Api\Client;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
@@ -91,6 +92,7 @@ class UsersController extends AbstractFOSRestController
     public function createApiClient(): array
     {
         $user = $this->getUser();
+        /** @var Client $client */
         $client = $this->clientManager->createClient();
         $client->setAllowedGrantTypes(array('client_credentials'));
         $client->setUser($user);
@@ -114,7 +116,7 @@ class UsersController extends AbstractFOSRestController
      * @Rest\Delete("/clients", name="delete_client", options={"expose"=true})
      * @Rest\QueryParam(name="id", allowBlank=false, description="client id to delete")
      * @param ParamFetcherInterface $request
-     * @return array []Client
+     * @return array Client[]
      * @throws ApiNotFoundException
      */
     public function deleteApiClient(ParamFetcherInterface $request): array

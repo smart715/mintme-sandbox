@@ -44,7 +44,7 @@ class Client extends BaseClient
 
     /**
      * @codeCoverageIgnore
-     * @param $user User
+     * @param User $user
      */
     public function setUser(User $user): void
     {

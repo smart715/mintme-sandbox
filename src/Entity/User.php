@@ -159,7 +159,7 @@ class User extends BaseUser implements
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Api\Client", mappedBy="user", cascade={"remove", "persist"})
-     * @var Client
+     * @var ArrayCollection
      */
     protected $clients;
 
