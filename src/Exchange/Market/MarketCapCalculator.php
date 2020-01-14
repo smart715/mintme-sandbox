@@ -55,7 +55,7 @@ class MarketCapCalculator
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
-    public function calculate(string $base = Token::BTC_SYMBOL): string
+    public function calculate(string $base = Token::BTC_SYMBOL, float $minWebCap = 0.0): string
     {
         if (MoneyWrapper::USD_SYMBOL === $base) {
             # We'll calculate it as if it was BTC, and will convert the final amount to USD. Pretty nice hack, not so obvious, but I liked it
@@ -65,7 +65,7 @@ class MarketCapCalculator
         }
 
         # Calculate MarketCap for WEB/token markets
-        $tokenMarketCap = $this->calculateTokenMarketCap();
+        $tokenMarketCap = $this->calculateTokenMarketCap($minWebCap);
 
         # Convert to Base
         $tokenMarketCap = $this->moneyWrapper->convert(
@@ -92,14 +92,15 @@ class MarketCapCalculator
         return $this->format($marketCap);
     }
 
-    private function calculateTokenMarketCap(): Money
+    private function calculateTokenMarketCap(float $minWebCap = 0.0): Money
     {
         $tokenMarkets = $this->repository->getTokenWEBMarkets();
-        // do not show market cap for markets with 30d volume of value less than 100 000 MINTME
-        $minWebCap = 100000;
+        // do not show market cap for markets with 30d volume of value less than min_web_cap MINTME
+
         return array_reduce($tokenMarkets, function ($marketCap, $market) use ($minWebCap) {
-            if ($market->getMonthVolume()->getAmount() < $minWebCap) return $marketCap;
-            return $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
+            return $market->getMonthVolume()->getAmount() < $minWebCap ?
+                $marketCap :
+                $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Token::WEB_SYMBOL));
     }
 

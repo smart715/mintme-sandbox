@@ -108,4 +108,5 @@ parameters:
     # How much user receive for registration
     landing_web_bonus: 5
 
-
+    # 30d min value for token to be added to market cap total on trading page
+    min_web_cap: 100000

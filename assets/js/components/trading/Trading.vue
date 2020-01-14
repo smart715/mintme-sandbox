@@ -127,6 +127,7 @@ export default {
             perPage: 25,
             totalRows: 25,
             loading: false,
+            minWebCap: 0,
             userTokensEnabled: false,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
@@ -267,7 +268,8 @@ export default {
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 // If both compared fields are native numbers
-                let first = 42;//a.marketCap === '-' ? 0 : parseFloat(a[key]);
+                // marketCap is '-' if it is less than minWebCap
+                let first = a.marketCap === '-' ? 0 : parseFloat(a[key]);
                 let second = b.marketCap === '-' ? 0 : parseFloat(b[key]);
                 return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
             }
@@ -301,6 +303,7 @@ export default {
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
+                        this.minWebCap = res.data.min_web_cap;
 
                         if (window.history.replaceState) {
                             // prevents browser from storing history with each change:
@@ -581,11 +584,11 @@ export default {
             return toMoney(val, precision);
         },
         showTokenMarketCap: function(monthVolume, currency) {
-          // do not show market cap for markets with 30d volume of value less than 100 000 MINTME
-          let minShow = 100000;
+          // do not show market cap for markets with 30d volume of value less than minWebCap MINTME
           let amount = parseFloat(this.toMoney(monthVolume));
-          if (currency === 'WEB' && amount < minShow) return '-';
-          return amount + ' ' + currency;
+          return currency === 'WEB' && amount < this.minWebCap
+              ? '-'
+              : amount + ' ' + currency;
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;

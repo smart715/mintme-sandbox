@@ -63,6 +63,7 @@ class MarketsController extends APIController
             'markets' => $markets['markets'] ?? $markets,
             'rows' => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
             'limit' => self::OFFSET,
+            'min_web_cap' => $this->getParameter('min_web_cap'),
         ]);
     }
 
@@ -95,7 +96,7 @@ class MarketsController extends APIController
         $marketCap = $cache->get("marketcap_{$base}", function (ItemInterface $item) use ($marketCapCalculator, $base) {
             $item->expiresAfter(3600);
 
-            return $marketCapCalculator->calculate($base);
+            return $marketCapCalculator->calculate($base, $this->getParameter('min_web_cap'));
         });
 
         return $this->view([
