@@ -6,7 +6,6 @@
                 :websocket-url="websocketUrl"
                 :market="market"
                 :mintme-supply-url="mintmeSupplyUrl"
-                :logged-in="loggedIn"
             />
         </div>
         <div class="row trade-orders">
@@ -25,7 +24,7 @@
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
-                <trade-sell-order
+                 <trade-sell-order
                     :websocket-url="websocketUrl"
                     :hash="hash"
                     :login-url="loginUrl"
@@ -54,7 +53,6 @@
             <trade-trade-history
                 class="col"
                 :hash="hash"
-                :logged-in="loggedIn"
                 :websocket-url="websocketUrl"
                 :market="market" />
         </div>
@@ -105,8 +103,6 @@ export default {
             balances: null,
             sellPage: 2,
             buyPage: 2,
-            baseBalance: false,
-            quoteBalance: false,
         };
     },
     computed: {
@@ -119,8 +115,7 @@ export default {
                 : false;
         },
         balanceLoaded: function() {
-            return this.balances !== null ? true
-                : false;
+            return this.balances !== null;
         },
         ordersLoaded: function() {
             return this.buyOrders !== null && this.sellOrders !== null;
@@ -304,14 +299,6 @@ export default {
                 this.sellOrders = orders;
             } else {
                 this.buyOrders = orders;
-            }
-        },
-    },
-      watch: {
-        balances: function() {
-             if (this.balances[this.market.base.symbol]) {
-                this.baseBalance = this.balances[this.market.base.symbol].available;
-                this.quoteBalance = this.balances[this.market.quote.symbol].available;
             }
         },
     },

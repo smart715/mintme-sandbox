@@ -60,10 +60,6 @@ describe('TradeOrders', () => {
         side: 1,
         owner: false,
     };
-<<<<<<< HEAD
-=======
-
->>>>>>> 7e348b6d470db1ba64d1a060dc5a0442c52a812c
     describe('truncate FullName correctly', function() {
         wrapper.vm.sellOrders = Array(2).fill(order);
         wrapper.vm.ordersLoaded = true;

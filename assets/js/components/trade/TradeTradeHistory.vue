@@ -18,7 +18,7 @@
                 <div class="table-responsive fixed-head-table" ref="tableData">
                     <template v-if="loaded">
                         <b-table
-                            v-if="loggedIn && hasOrders"
+                            v-if="hasOrders"
                             class="w-100"
                             ref="table"
                             :items="ordersList"
@@ -80,7 +80,7 @@
                                 </span>
                             </template>
                         </b-table>
-                        <div v-else>
+                        <div v-if="!hasOrders">
                             <p class="text-center p-5">No deal was made yet</p>
                         </div>
                         <div v-if="loading" class="p-1 text-center">
@@ -92,6 +92,13 @@
                             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                         </div>
                     </template>
+                </div>
+                <div class="text-center pb-2" v-if="showDownArrow">
+                    <img
+                        src="../../../img/down-arrows.png"
+                        class="icon-arrows-down c-pointer"
+                        alt="arrow down"
+                        @click="scrollDown">
                 </div>
             </div>
         </div>
@@ -111,7 +118,6 @@ export default {
     mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin],
     props: {
         market: Object,
-        loggedIn: Boolean,
     },
     components: {
         Guide,

@@ -102,7 +102,6 @@ export default {
         websocketUrl: String,
         market: Object,
         mintmeSupplyUrl: String,
-        loggedIn: Boolean,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -175,7 +174,7 @@ export default {
             return this.chartRows.length === 0;
         },
         chartRows: function() {
-            if ( (!this.stats || !this.stats.length) || !this.loggedIn ) {
+            if (!this.stats || !this.stats.length) {
                 return [[new Date().toISOString().slice(0, 10), 0, 0, 0, 0, 0]];
             }
 
@@ -226,7 +225,7 @@ export default {
             this.chartSettings.start = this.getStartTradingPeriod();
 
             this.addMessageHandler((result) => {
-                if (result.method === 'state.update' && this.loggedIn) {
+                if (result.method === 'state.update') {
                     this.updateMarketData(result);
                 }
                 if (result.method === 'kline.update') {
