@@ -4,7 +4,6 @@ namespace App\Wallet;
 
 use App\Entity\Crypto;
 use App\Entity\PendingWithdrawInterface;
-use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Wallet\Exception\NotEnoughAmountException;
@@ -43,6 +42,4 @@ interface WalletInterface
     public function getDepositCredential(User $user, Crypto $crypto): Address;
 
     public function getFee(TradebleInterface $tradable): Money;
-
-    public function getTokenWithdrawnSum(Token $token, User $user): Money;
 }

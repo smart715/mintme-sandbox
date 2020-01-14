@@ -217,10 +217,6 @@ export default {
         }))
             .then((res) => this.pendingSellOrders = res.data.sell)
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
-
-        this.$axios.retry.get(this.$routing.generate('token_withdraw_sum', {name: this.market.quote.symbol}))
-            .then((res) => this.tokenWithdrawSum = res.data)
-            .catch(() => this.notifyError('Can not load token withdraw. Try again later.'));
     },
     computed: {
         loaded: function() {

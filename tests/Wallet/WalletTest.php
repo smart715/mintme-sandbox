@@ -19,7 +19,6 @@ use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;
@@ -30,7 +29,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -333,45 +331,6 @@ class WalletTest extends TestCase
         $wallet->withdrawCommit($this->mockPendingTokenWithdraw('1000000000000'));
     }
 
-    public function testGetTokenWithdrawnSum(): void
-    {
-        $tokenName = 'TOK';
-        $depositTransactions = [
-            $this->mockTransaction(9876441, $tokenName, 'deposit', 75000),
-            $this->mockTransaction(9876441, $tokenName, 'deposit', 1000, Status::PENDING),
-            $this->mockTransaction(9876441, $tokenName, 'deposit', 15000, Status::ERROR),
-            $this->mockTransaction(9876441, 'BTC', 'deposit'),
-        ];
-        $withdrawTransactions = [
-            $this->mockTransaction(9876341, 'ETH', 'withdraw'),
-            $this->mockTransaction(9876341, $tokenName, 'withdraw', 25000),
-            $this->mockTransaction(9876341, $tokenName, 'withdraw', 25000, Status::PENDING),
-        ];
-
-        $wallet = new Wallet(
-            $this->mockWithdrawGatewayInterface($withdrawTransactions),
-            $this->mockBalanceHandler(),
-            $this->mockDepositCommunicator($depositTransactions),
-            $this->mockPendingManager($this->never()),
-            $this->createMock(EntityManagerInterface::class),
-            $this->mockCryptoManager(),
-            $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
-        );
-
-        /** @var Token|MockObject $token */
-        $token = $this->mockToken();
-        $token->method('getDeploymentStatus')->willReturn(Token::DEPLOYED);
-        $token->method('getName')->willReturn($tokenName);
-
-        /** @var User|MockObject $user */
-        $user = $this->mockUser();
-
-        $tokenWithdrawSum = $wallet->getTokenWithdrawnSum($token, $user);
-
-        $this->assertEquals('-50000', $tokenWithdrawSum->getAmount());
-    }
-
     private function mockPendingWithdraw(string $amount): PendingWithdraw
     {
         $amountMock = $this->createMock(Amount::class);
@@ -487,7 +446,7 @@ class WalletTest extends TestCase
         return $handler;
     }
 
-    private function mockTransaction(int $timestamp, string $crypto, string $type, int $amount = 1000, string $status = Status::PAID): Transaction
+    private function mockTransaction(int $timestamp, string $crypto, string $type): Transaction
     {
         $transactionMock = $this->createMock(Transaction::class);
         $transactionMock
@@ -501,16 +460,6 @@ class WalletTest extends TestCase
         $transactionMock
             ->method('getType')
             ->willReturn($this->mockType($type))
-        ;
-        $transactionMock
-            ->method('getStatus')
-            ->willReturn($this->mockStatus($status))
-        ;
-        $transactionMock
-            ->method('getAmount')
-            ->willReturn(
-                new Money($amount, new Currency($crypto))
-            )
         ;
 
         return $transactionMock;
@@ -527,17 +476,6 @@ class WalletTest extends TestCase
         return $typeMock;
     }
 
-    private function mockStatus(string $status): Status
-    {
-        $typeMock = $this->createMock(Status::class);
-        $typeMock
-            ->method('getStatusCode')
-            ->willReturn($status)
-        ;
-
-        return $typeMock;
-    }
-
     private function mockCrypto(string $symbol): Crypto
     {
         $cryptoMock = $this->createMock(Crypto::class);
@@ -548,10 +486,6 @@ class WalletTest extends TestCase
             );
         $cryptoMock
             ->method('getSymbol')
-            ->willReturn($symbol)
-        ;
-        $cryptoMock
-            ->method('getName')
             ->willReturn($symbol)
         ;
 

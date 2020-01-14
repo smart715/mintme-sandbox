@@ -24,7 +24,6 @@ use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
-use App\Wallet\WalletInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -583,19 +582,5 @@ class TokensController extends AbstractFOSRestController
         $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * @Rest\View()
-     * @Rest\Get("/{name}/withdraw-sum", name="token_withdraw_sum", options={"expose"=true})
-     */
-    public function getTokenWithdrawSum(Token $token, WalletInterface $wallet): View
-    {
-        $tokenWithdrawSum = $wallet->getTokenWithdrawnSum(
-            $token,
-            $this->getUser()
-        );
-
-        return $this->view($tokenWithdrawSum, Response::HTTP_OK);
     }
 }

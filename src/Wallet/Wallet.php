@@ -19,9 +19,7 @@ use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
-use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,9 +31,6 @@ use Throwable;
 
 class Wallet implements WalletInterface
 {
-    private const TOKEN_TRANSACTIONS_OFFSET = 0;
-    private const TOKEN_TRANSACTIONS_LIMIT = 1500;
-
     /** @var WithdrawGatewayInterface */
     private $withdrawGateway;
 
@@ -264,39 +259,5 @@ class Wallet implements WalletInterface
         }
 
         return true;
-    }
-
-    public function getTokenWithdrawnSum(Token $token, User $user): Money
-    {
-        $tokenWithdrawSum = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
-
-        if (Token::DEPLOYED === $token->getDeploymentStatus()) {
-            $transactions = $this->getWithdrawDepositHistory(
-                $user,
-                self::TOKEN_TRANSACTIONS_OFFSET,
-                self::TOKEN_TRANSACTIONS_LIMIT
-            );
-
-            foreach ($transactions as $transaction) {
-                $transactionTypeCode = $transaction->getType()->getTypeCode();
-
-                if (Status::PAID === $transaction->getStatus()->getStatusCode()
-                    && $token->getName() === $transaction->getTradable()->getName()
-                    && in_array($transactionTypeCode, Type::$available, true)
-                ) {
-                    $transactionAmount = $transaction->getAmount();
-
-                    if (Type::WITHDRAW === $transactionTypeCode) {
-                        $tokenWithdrawSum = $tokenWithdrawSum->add($transactionAmount);
-                    }
-
-                    if (Type::DEPOSIT === $transactionTypeCode) {
-                        $tokenWithdrawSum = $tokenWithdrawSum->subtract($transactionAmount);
-                    }
-                }
-            }
-        }
-
-        return $tokenWithdrawSum;
     }
 }
