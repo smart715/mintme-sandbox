@@ -1,5 +1,32 @@
 <template>
     <div class="trading">
+        <div class="card-header">
+            <span>Trading</span>
+                <b-dropdown
+                    id="currency"
+                    variant="primary"
+                    class="float-right"
+                    :lazy="true"
+                >
+                <template slot="button-content">
+                    Currency:
+                <span v-if="showUsd">
+                    USD
+                </span>
+                <span v-else>
+                    Crypto
+                </span>
+                </template>
+                <template>
+                    <b-dropdown-item @click="toggleUsd(false)">
+                        Crypto
+                    </b-dropdown-item>
+                    <b-dropdown-item :disabled="!enableUsd" @click="toggleUsd(true)">
+                        USD
+                    </b-dropdown-item>
+                </template>
+            </b-dropdown>
+        </div>
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
@@ -13,7 +40,7 @@
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
         </div>
-        <template v-if="loaded">
+        <template v-if="loaded" >
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
@@ -90,7 +117,7 @@
             </div>
         </template>
         <template v-else>
-            <div class="p-5 text-center">
+            <div class="p-5 text-center text-white">
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
         </template>
@@ -114,7 +141,6 @@ export default {
         tokensCount: Number,
         userId: Number,
         coinbaseUrl: String,
-        showUsd: Boolean,
         mintmeSupplyUrl: String,
     },
     components: {
@@ -133,6 +159,8 @@ export default {
             marketsOnTop: [
                 {currency: 'BTC', token: 'WEB'},
             ],
+            showUsd: false,
+            enableUsd: true,
             klineQueriesIdsTokensMap: new Map(),
             conversionRates: {},
             globalMarketCaps: {
@@ -229,6 +257,13 @@ export default {
         this.fetchData();
     },
     methods: {
+        toggleUsd: function(show) {
+            this.showUsd = show;
+        },
+        disableUsd: function() {
+            this.showUsd = false;
+            this.enableUsd = false;
+        },
         fetchData: function(page = false) {
             if (page) {
                 this.currentPage = page;
