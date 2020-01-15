@@ -26,7 +26,6 @@ class Token implements TradebleInterface
     public const MINTME_SYMBOL = "MINTME";
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
-    public const ETH_SYMBOL = "ETH";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
     public const NOT_DEPLOYED = 'not-deployed';
