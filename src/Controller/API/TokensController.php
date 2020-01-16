@@ -365,9 +365,7 @@ class TokensController extends AbstractFOSRestController
             $withdrawn = $token->getWithdrawn();
         }
 
-        $withdrawn = new Money($withdrawn, new Currency(MoneyWrapper::TOK_SYMBOL));
-
-        return $this->view($withdrawn);
+        return $this->view(new Money($withdrawn, new Currency(MoneyWrapper::TOK_SYMBOL)));
     }
 
     /**
