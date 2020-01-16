@@ -3,6 +3,7 @@
 namespace App\Tests\EventSubscriber;
 
 use App\Entity\Crypto;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -10,6 +11,7 @@ use App\Events\TransactionCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +24,8 @@ class TransactionSubscriberTest extends TestCase
         $subscriber = new TransactionSubscriber(
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
-            $this->mockLogger()
+            $this->mockLogger(),
+            $this->mockEntityManager()
         );
 
         $tradable = $this->createMock(Crypto::class);
@@ -40,10 +43,16 @@ class TransactionSubscriberTest extends TestCase
         $subscriber = new TransactionSubscriber(
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
-            $this->mockLogger()
+            $this->mockLogger(),
+            $this->mockEntityManager()
         );
 
         $tradable = $this->createMock(Token::class);
+        $user = $this->createMock(User::class);
+        $profile = $this->createMock(Profile::class);
+
+        $tradable->method('getProfile')->willReturn($profile);
+        $profile->method('getUser')->willReturn($user);
 
         $subscriber->sendTransactionCompletedMail(
             $this->mockTransactionCompletedEvent($tradable, '1')
@@ -85,5 +94,10 @@ class TransactionSubscriberTest extends TestCase
     private function mockLogger(): LoggerInterface
     {
         return $this->createMock(LoggerInterface::class);
+    }
+
+    private function mockEntityManager(): EntityManagerInterface
+    {
+        return $this->createMock(EntityManagerInterface::class);
     }
 }
