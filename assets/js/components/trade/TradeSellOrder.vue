@@ -234,7 +234,12 @@ export default {
                 this.useMarketPrice = false;
             }
         },
-        balanceClicked: function() {
+        balanceClicked: function(event) {
+            // Skip "Deposit more" link
+            if ('a' === event.target.tagName.toLowerCase()) {
+                return;
+            }
+
             if (!this.balanceManuallyEdited || !parseFloat(this.sellPrice)) {
                 this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
                 this.setBalanceManuallyEdited(false);
