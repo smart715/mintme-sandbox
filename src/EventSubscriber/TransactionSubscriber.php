@@ -3,13 +3,17 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Crypto;
+use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
-use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -24,14 +28,19 @@ class TransactionSubscriber implements EventSubscriberInterface
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(
         MailerInterface $mailer,
         MoneyWrapperInterface $moneyWrapper,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        EntityManagerInterface $em
     ) {
         $this->mailer = $mailer;
         $this->moneyWrapper = $moneyWrapper;
         $this->logger = $logger;
+        $this->em = $em;
     }
 
     public static function getSubscribedEvents(): array
@@ -51,9 +60,17 @@ class TransactionSubscriber implements EventSubscriberInterface
             ? $tradable->getSymbol()
             : MoneyWrapper::TOK_SYMBOL;
 
-        $amount = $this->moneyWrapper->format(
-            $this->moneyWrapper->parse($event->getAmount(), $symbol)
-        );
+        $amountObj = $this->moneyWrapper->parse($event->getAmount(), $symbol);
+        $amount = $this->moneyWrapper->format($amountObj);
+
+        if ($tradable instanceof Token) {
+            $this->updateTokenWithdraw(
+                $tradable,
+                $user,
+                $event,
+                $amountObj
+            );
+        }
 
         try {
             $this->mailer->checkConnection();
@@ -61,6 +78,37 @@ class TransactionSubscriber implements EventSubscriberInterface
             $this->logger->info("Sent ".$event::TYPE." completed e-mail to user {$user->getEmail()}");
         } catch (\Throwable $e) {
             $this->logger->error("Couldn't send ".$event::TYPE." completed e-mail to user {$user->getEmail()}. Reason: {$e->getMessage()}");
+        }
+    }
+
+    private function updateTokenWithdraw(Token $tradable, User $user, TransactionCompletedEvent $event, Money $amount): void
+    {
+        $tradableWithdrawn = $tradable->getWithdrawn() ?: '0';
+        $withdrawnObj = new Money($tradableWithdrawn, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+        if ($user->getId() === $tradable->getProfile()->getUser()->getId()
+            && !$amount->isZero()
+        ) {
+            if ($event instanceof DepositCompletedEvent) {
+                $withdrawnObj = $withdrawnObj->subtract($amount);
+            }
+
+            if ($event instanceof WithdrawCompletedEvent) {
+                $withdrawnObj = $withdrawnObj->add($amount);
+            }
+
+            try {
+                $tradable->setWithdrawn($withdrawnObj->getAmount());
+                $this->em->persist($tradable);
+                $this->em->flush();
+
+                $this->logger->info("[transaction-subscriber] Success token update withdrawn operation.", [
+                    'tokenName' => $tradable->getName(),
+                    'tokenWithdrawn' => $tradable->getWithdrawn(),
+                ]);
+            } catch (\Throwable $exception) {
+                $this->logger->error("[transaction-subscriber] Failed to update token withdrawn. Reason: {$exception->getMessage()}");
+            }
         }
     }
 }

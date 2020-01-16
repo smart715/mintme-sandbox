@@ -182,7 +182,7 @@ export default {
             executedOrders: null,
             isTokenExchanged: true,
             defaultValue: defaultValue,
-            tokenWithdrawSum: 0,
+            tokenWithdrawn: 0,
             stats: {
                 releasePeriod: defaultValue,
                 hourlyRate: defaultValue,
@@ -203,6 +203,10 @@ export default {
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+
+        this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
+            .then((res) => this.tokenWithdrawn = res.data)
+            .catch(() => this.notifyError('Can not load token withdrawn statistic data. Try again later'));
 
         this.$axios.retry.get(this.$routing.generate('executed_orders', {
             base: this.market.base.symbol,
@@ -236,7 +240,7 @@ export default {
             return toMoney(sum.toString());
         },
         withdrawBalance: function() {
-            return toMoney(this.tokenWithdrawSum);
+            return toMoney(this.tokenWithdrawn);
         },
         soldOrdersSum: function() {
             let sum = new Decimal(0);

@@ -24,11 +24,14 @@ use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
+use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Money\Currency;
+use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
@@ -348,6 +351,23 @@ class TokensController extends AbstractFOSRestController
         }
 
         return $this->view($balance);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/withdrawn", name="token_withdrawn", options={"expose"=true})
+     */
+    public function getTokenWithdrawn(Token $token): View
+    {
+        $withdrawn = 0;
+
+        if (Token::DEPLOYED === $token->getDeploymentStatus()) {
+            $withdrawn = $token->getWithdrawn();
+        }
+
+        $withdrawn = new Money($withdrawn, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+        return $this->view($withdrawn);
     }
 
     /**
