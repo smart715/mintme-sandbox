@@ -183,7 +183,12 @@ class LockIn
     public function getCountHoursFromDeploy(): float
     {
         if ($this->deployed instanceof \DateTimeImmutable) {
-            return abs(round((strtotime('now') - strtotime($this->deployed->format('Y-m-d H:i:s'))) / 3600, 2));
+            $timezone = new \DateTimeZone('UTC');
+            $deployedTimestamp = $this->deployed->setTimezone($timezone)->getTimestamp();
+            $currentTimestamp = (new \DateTimeImmutable())->setTimezone($timezone)->getTimestamp();
+            $timestampDiff = abs($currentTimestamp - $deployedTimestamp);
+
+            return round(($timestampDiff / 3600), 2);
         }
 
         return floatval(0);
