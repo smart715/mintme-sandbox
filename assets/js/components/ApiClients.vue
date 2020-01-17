@@ -62,7 +62,7 @@
                 clients: this.apiClients,
                 invalidateModal: false,
                 clientId: '',
-                fields: [{key:'id', label: ''}],
+                fields: [{key: 'id', label: ''}],
             };
         },
         computed: {
