@@ -157,7 +157,7 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\Column(type="string")
-     * @var string|null
+     * @var string
      */
     protected $withdrawn = '0';
 
