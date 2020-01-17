@@ -17,7 +17,7 @@ final class Version20200114144653 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE token ADD withdrawn VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE token ADD withdrawn VARCHAR(255) NOT NULL DEFAULT \'0\'');
     }
 
     public function down(Schema $schema) : void

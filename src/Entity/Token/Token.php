@@ -156,7 +156,7 @@ class Token implements TradebleInterface
     protected $users;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      * @var string|null
      */
     protected $withdrawn = '0';
@@ -399,12 +399,12 @@ class Token implements TradebleInterface
         return $this;
     }
 
-    public function getWithdrawn(): ?string
+    public function getWithdrawn(): string
     {
         return $this->withdrawn;
     }
 
-    public function setWithdrawn(?string $withdrawn): self
+    public function setWithdrawn(string $withdrawn): self
     {
         $this->withdrawn = $withdrawn;
 

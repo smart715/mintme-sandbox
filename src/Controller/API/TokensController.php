@@ -362,7 +362,7 @@ class TokensController extends AbstractFOSRestController
         $withdrawn = 0;
 
         if (Token::DEPLOYED === $token->getDeploymentStatus()) {
-            $withdrawn = $token->getWithdrawn() ?: 0;
+            $withdrawn = $token->getWithdrawn();
         }
 
         return $this->view(new Money($withdrawn, new Currency(MoneyWrapper::TOK_SYMBOL)));
