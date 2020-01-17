@@ -4,7 +4,6 @@ namespace App\EventSubscriber;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\User;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
@@ -46,8 +45,8 @@ class TransactionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-           DepositCompletedEvent::NAME => 'sendTransactionCompletedMail',
-           WithdrawCompletedEvent::NAME => 'sendTransactionCompletedMail',
+           DepositCompletedEvent::NAME => ['sendTransactionCompletedMail', 'updateTokenWithdraw'],
+           WithdrawCompletedEvent::NAME => ['sendTransactionCompletedMail', 'updateTokenWithdraw'],
         ];
     }
 
@@ -60,17 +59,9 @@ class TransactionSubscriber implements EventSubscriberInterface
             ? $tradable->getSymbol()
             : MoneyWrapper::TOK_SYMBOL;
 
-        $amountObj = $this->moneyWrapper->parse($event->getAmount(), $symbol);
-        $amount = $this->moneyWrapper->format($amountObj);
-
-        if ($tradable instanceof Token) {
-            $this->updateTokenWithdraw(
-                $tradable,
-                $user,
-                $event,
-                $amountObj
-            );
-        }
+        $amount = $this->moneyWrapper->format(
+            $this->moneyWrapper->parse($event->getAmount(), $symbol)
+        );
 
         try {
             $this->mailer->checkConnection();
@@ -81,34 +72,46 @@ class TransactionSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function updateTokenWithdraw(Token $tradable, User $user, TransactionCompletedEvent $event, Money $amount): void
+    public function updateTokenWithdraw(TransactionCompletedEvent $event): void
     {
-        $tradableWithdrawn = $tradable->getWithdrawn() ?: '0';
-        $withdrawnObj = new Money($tradableWithdrawn, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $tradable = $event->getTradable();
+        $user = $event->getUser();
+        $amount = $this->moneyWrapper->parse($event->getAmount(), MoneyWrapper::TOK_SYMBOL);
 
-        if ($user->getId() === $tradable->getProfile()->getUser()->getId()
-            && !$amount->isZero()
+        if (!$tradable instanceof Token
+            || $user->getId() !== $tradable->getProfile()->getUser()->getId()
+            || $amount->isZero()
         ) {
-            if ($event instanceof DepositCompletedEvent) {
-                $withdrawnObj = $withdrawnObj->subtract($amount);
-            }
+            return;
+        }
 
-            if ($event instanceof WithdrawCompletedEvent) {
-                $withdrawnObj = $withdrawnObj->add($amount);
-            }
+        $withdrawnObj = new Money(
+            $tradable->getWithdrawn(),
+            new Currency(MoneyWrapper::TOK_SYMBOL)
+        );
 
-            try {
-                $tradable->setWithdrawn($withdrawnObj->getAmount());
-                $this->em->persist($tradable);
-                $this->em->flush();
+        if ($event instanceof DepositCompletedEvent) {
+            $withdrawnObj = $withdrawnObj->subtract($amount);
+        }
 
-                $this->logger->info("[transaction-subscriber] Success token update withdrawn operation.", [
+        if ($event instanceof WithdrawCompletedEvent) {
+            $withdrawnObj = $withdrawnObj->add($amount);
+        }
+
+        try {
+            $tradable->setWithdrawn($withdrawnObj->getAmount());
+            $this->em->persist($tradable);
+            $this->em->flush();
+
+            $this->logger->info(
+                "[transaction-subscriber] Success token update withdrawn operation.",
+                [
                     'tokenName' => $tradable->getName(),
                     'tokenWithdrawn' => $tradable->getWithdrawn(),
-                ]);
-            } catch (\Throwable $exception) {
-                $this->logger->error("[transaction-subscriber] Failed to update token withdrawn. Reason: {$exception->getMessage()}");
-            }
+                ]
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->error("[transaction-subscriber] Failed to update token withdrawn. Reason: {$exception->getMessage()}");
         }
     }
 }
