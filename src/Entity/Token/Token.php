@@ -159,7 +159,7 @@ class Token implements TradebleInterface
      * @ORM\Column(type="string")
      * @var string
      */
-    protected $withdrawn = '0';
+    protected $withdrawn;
 
     /** @return User[] */
     public function getUsers(): array
