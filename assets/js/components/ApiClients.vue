@@ -1,36 +1,37 @@
 <template>
     <div>
-        <div class="card-header">Clients for OAuth access to API:</div>
         <b-table small
                  v-if="hasClients"
                  ref="table"
                  :items="clients"
-                 :fields="fields">
+                 :fields="fields"
+                 :striped="striped">
             <template v-slot:cell(id)="row">
-                <div class="text-nowrap">
-                    <span class="text-danger">{{ row.item.id }}</span>
-                    <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
-                        <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                    </copy-link>
-                    <a @click="toggleInvalidateModal(true, row.item.id)">
-                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                    </a>
+                <div class="text-center">
+                    <div class="text-left d-inline-block">
+                        ID<br />
+                        <span class="text-danger">{{ row.item.id }}</span>
+                        <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
+                            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                        </copy-link>
+                        <a @click="toggleInvalidateModal(true, row.item.id)">
+                            <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                        </a><br />
+                        Secret<br />
+                        <template v-if="row.item.secret">
+                            <span class="text-danger">{{ row.item.secret }}</span>
+                            <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">
+                                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                            </copy-link>
+                            <div class="text-center small">
+                                (Copy this secret, you will not able to see it again after reload)
+                            </div>
+                        </template>
+                        <template v-else>
+                            <span class="text-white-50">** hidden **</span>
+                        </template>
+                    </div>
                 </div>
-            </template>
-            <template v-slot:cell(secret)="row">
-                <template v-if="row.item.secret">
-                <div class="text-nowrap">
-                    <span class="text-danger">{{ row.item.secret }}</span>
-                    <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">
-                        <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                    </copy-link>
-                    <br />
-                    (Copy this secret, you will not able to see it again after reload)
-                </div>
-                </template>
-                <template v-else>
-                    ** hidden **
-                </template>
             </template>
         </b-table>
         <p>Create New Client for OAuth:</p>
@@ -61,7 +62,7 @@
                 clients: this.apiClients,
                 invalidateModal: false,
                 clientId: '',
-                fields: ['id', 'secret'],
+                fields: [{key:'id', label: ''}],
             };
         },
         computed: {
