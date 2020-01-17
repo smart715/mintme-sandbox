@@ -33,6 +33,7 @@ html
   min-height: 100vh
   box-sizing: border-box
   overflow-y: scroll
+  font-display: swap // Ensure text remains visible during webfont load https://web.dev/avoid-invisible-text
 
 body
   @include font-scale(sm)
@@ -244,16 +245,16 @@ a
   border-color: #007DC0
 
 .circle
-    background: #51677F
-    border-radius: 200px
-    height: 200px
-    width: 200px
-    display: table
+  background: #51677F
+  border-radius: 200px
+  height: 200px
+  width: 200px
+  display: table
 
-    img
-      vertical-align: middle
-      display: table-cell
-      width: 120px
+  img
+    vertical-align: middle
+    display: table-cell
+    width: 120px
 
 .custom-scrollbar
   scrollbar-color: $primary-light $dark-white
@@ -442,22 +443,22 @@ a
         overflow: visible
 
         .nav-link
-            color: inherit
-            position: relative
+          color: inherit
+          position: relative
 
-            @include font-scale(md)
+          @include font-scale(md)
 
-            &.active
-              color: $color-link
+          &.active
+            color: $color-link
 
-            &.active::after
-              content: ' '
-              position: absolute
-              bottom: .75rem
-              left: 1.5rem
-              height: .125rem
-              background-color: unset
-              width: calc(100% - 3rem)
+          &.active::after
+            content: ' '
+            position: absolute
+            bottom: .75rem
+            left: 1.5rem
+            height: .125rem
+            background-color: unset
+            width: calc(100% - 3rem)
 
       .edit-token-profile
         position: absolute
@@ -490,11 +491,11 @@ a
     @include font-scale(md)
 
 nav.top-navbar
-    .navbar-toggler-icon
+  .navbar-toggler-icon
+    outline: none
+    background-image: $navbar-toogler
+    &:focus
       outline: none
-      background-image: $navbar-toogler
-      &:focus
-        outline: none
 
 .input-custom-padding
   padding-right: 75px
