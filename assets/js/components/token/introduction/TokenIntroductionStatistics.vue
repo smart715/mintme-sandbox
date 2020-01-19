@@ -90,7 +90,7 @@
                             <div class="pb-1">
                                 Release period: <br>
                                 {{ stats.releasePeriod }}
-                                <template v-if="stats.releasePeriod !== defaultValue">years</template>
+                                <template v-if="stats.releasePeriod !== defaultValue">year(s)</template>
                                 <guide>
                                     <template slot="header">
                                         Release period
