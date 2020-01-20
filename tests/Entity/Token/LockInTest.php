@@ -30,7 +30,7 @@ class LockInTest extends TestCase
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
-        $li->setReleasedAtStart(1000000);
+        $li->setReleasedAtStart('1000000');
         $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
     }
 
@@ -40,7 +40,7 @@ class LockInTest extends TestCase
         $token = $this->mockToken();
         $li = new LockIn($token);
         $li->setDeployed(new \DateTimeImmutable());
-        $initialAmount = 1000000;
+        $initialAmount = '1000000';
         $amountToRelease = 9000000;
 
         $token->expects($this->any())->method('isTokenDeployed')->willReturn(true);

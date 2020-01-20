@@ -128,9 +128,9 @@ class LockIn
     }
 
     /** @codeCoverageIgnore */
-    public function setReleasedAtStart(int $releasedAtStart): self
+    public function setReleasedAtStart(string $releasedAtStart): self
     {
-        $this->releasedAtStart = (string)$releasedAtStart;
+        $this->releasedAtStart = $releasedAtStart;
 
         return $this;
     }
