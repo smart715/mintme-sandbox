@@ -45,8 +45,14 @@ class TransactionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-           DepositCompletedEvent::NAME => ['sendTransactionCompletedMail', 'updateTokenWithdraw'],
-           WithdrawCompletedEvent::NAME => ['sendTransactionCompletedMail', 'updateTokenWithdraw'],
+           DepositCompletedEvent::NAME => [
+               ['sendTransactionCompletedMail'],
+               ['updateTokenWithdraw'],
+           ],
+           WithdrawCompletedEvent::NAME => [
+               ['sendTransactionCompletedMail'],
+               ['updateTokenWithdraw'],
+           ],
         ];
     }
 
