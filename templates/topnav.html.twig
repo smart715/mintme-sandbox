@@ -7,11 +7,13 @@
                 <div class="badge">BETA</div>
             {% endif %}
             <img
-                {% if is_beta_version %} class="ml-3 ml-lg-0 mintme-logo" {% endif %}
+                {% if is_beta_version %}
+                    class="ml-3 ml-lg-0 mintme-logo"
+                {% else %}
+                    class="mintme-logo"
+                {% endif %}
                 src="{{ asset('build/images/logo.png') }}"
                 alt="mintMe"
-                width="222"
-                heihgt="75"
             >
         </a>
         <button
