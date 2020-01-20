@@ -257,7 +257,7 @@ class TokensController extends AbstractFOSRestController
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
             $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount))
-                ->setReleasedAtStart((int)$releasedAmount->getAmount());
+                ->setReleasedAtStart($releasedAmount->getAmount());
         }
 
         $this->em->persist($lock);
