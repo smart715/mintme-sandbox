@@ -10,7 +10,7 @@
                 <div class="text-center">
                     <div class="text-left d-inline-block">
                         ID<br />
-                        <span class="text-danger">{{ row.item.id }}</span>
+                        <span class="text-danger word-break">{{ row.item.id }}</span>
                         <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
                             <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                         </copy-link>
@@ -19,7 +19,7 @@
                         </a><br />
                         Secret<br />
                         <template v-if="row.item.secret">
-                            <span class="text-danger">{{ row.item.secret }}</span>
+                            <span class="text-danger word-break">{{ row.item.secret }}</span>
                             <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">
                                 <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                             </copy-link>
