@@ -29,7 +29,7 @@ class LockInTest extends TestCase
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
-        $li->setReleasedAtStart(1000000);
+        $li->setReleasedAtStart('1000000');
         $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
     }
 
@@ -39,7 +39,7 @@ class LockInTest extends TestCase
         $li = new LockIn($this->mockToken());
 
         $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)))
-            ->setReleasedAtStart(1000000)
+            ->setReleasedAtStart('1000000')
             ->updateFrozenAmount();
 
         $this->assertEquals('2141553', $li->getReleasedAmount()->getAmount());
