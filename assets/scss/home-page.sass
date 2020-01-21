@@ -9,7 +9,7 @@
     background-position-y: 30px
 
     @include media-breakpoint-up(lg)
-      position: absolute
+      //position: absolute
       top: 0
       left: 0
       width: 100%
@@ -32,11 +32,8 @@
       font-size: 3rem
 
   #top-showcase
-    background: $body-background-sm
-
     @include media-breakpoint-up(sm)
-      background: url("../img/hero_image.jpg")
-      background-size: 100% 100%
+    margin-top: 160px
 
     // To fix chrome display issue
     .h-100
@@ -75,12 +72,8 @@
       color: $primary !important
 
   #description
-    margin-top: -120px
-    background: $index-description-bg
-    background-position-y: 120px
-
+    margin-top: 430px
     @include media-breakpoint-down(sm)
-      margin-top: 0
       background-position-y: 0
 
     .countdown
