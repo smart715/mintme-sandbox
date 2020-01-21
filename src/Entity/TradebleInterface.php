@@ -15,6 +15,9 @@ interface TradebleInterface
     /** @Groups({"Default", "API", "dev"}) */
     public function getSymbol(): string;
 
+    /** @Groups({"Default", "API"}) */
+    public function getOwnerId(): ?int;
+
     /**
      * @param string $name
      * @return mixed

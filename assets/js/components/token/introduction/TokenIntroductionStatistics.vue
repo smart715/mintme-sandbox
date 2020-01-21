@@ -238,17 +238,25 @@ export default {
             return toMoney(0);
         },
         soldOrdersSum: function() {
-            let sum = new Decimal(0);
-            for (let key in this.executedOrders) {
-                if (
-                        this.executedOrders.hasOwnProperty(key) &&
-                        WSAPI.order.type.SELL === parseInt(this.executedOrders[key]['side'])
-                ) {
-                    let amount = new Decimal(this.executedOrders[key]['amount']);
-                    sum = sum.plus(amount);
-                }
-            }
-            return toMoney(sum.toString());
+            return toMoney(
+                this.executedOrders
+                    .reduce(
+                        (a, order) => this.orderIncreaseSold(order)
+                            ? a.plus(new Decimal(order['amount']))
+                            : a.minus(new Decimal(order['amount'])),
+                        new Decimal(0)
+                    )
+                    .toString()
+            );
+        },
+    },
+    methods: {
+        orderIncreaseSold: function(order) {
+            let tokenOwnerId = order.market.quote.ownerId;
+            return tokenOwnerId && (
+                order.maker.id === tokenOwnerId && WSAPI.order.type.BUY === parseInt(order['side'])
+                || order.taker.id === tokenOwnerId && WSAPI.order.type.SELL === parseInt(order['side'])
+            );
         },
     },
     filters: {
