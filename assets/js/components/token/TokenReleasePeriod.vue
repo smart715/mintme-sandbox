@@ -85,6 +85,7 @@ import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
+import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TokenReleasePeriod',
@@ -115,6 +116,44 @@ export default {
         releasePeriodDisabled: function() {
             return !this.isTokenNotDeployed;
         },
+        ...mapGetters('tokenStatics', [
+            'getReleasePeriod',
+            'getHourlyRate',
+            'getReleasedAmount',
+            'getFrozenAmount',
+        ]),
+        tokenReleasePeriod: {
+            get() {
+                return this.getReleasePeriod;
+            },
+            set(val) {
+                this.setReleasePeriod(val);
+            },
+        },
+        tokenHourlyRate: {
+            get() {
+                return this.getHourlyRate;
+            },
+            set(val) {
+                this.setHourlyRate(val);
+            },
+        },
+        tokenReleasedAmount: {
+            get() {
+                return this.getReleaseAmount;
+            },
+            set(val) {
+                this.setReleasedAmount(val);
+            },
+        },
+        tokenFrozenAmount: {
+            get() {
+                return this.getFrozenAmount;
+            },
+            set(val) {
+                this.setFrozenAmount(val);
+            },
+        },
     },
     mounted: function() {
         this.$axios.retry.get(this.$routing.generate('lock-period', {
@@ -138,6 +177,12 @@ export default {
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
     },
     methods: {
+        updateTokenStatics: function(newTokenStatics) {
+            this.tokenReleasePeriod = newTokenStatics.releasePeriod;
+            this.tokenHourlyRate = newTokenStatics.hourlyRate;
+            this.tokenReleasedAmount = newTokenStatics.releasedAmount;
+            this.tokenFrozenAmount = newTokenStatics.frozenAmount;
+        },
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
         },
@@ -158,6 +203,7 @@ export default {
             }).then((response) => {
                 this.closeTwoFactorModal();
                 this.$emit('update', response);
+                this.updateTokenStatics(response.data);
                 this.notifySuccess('Release period updated.');
             }).catch(({response}) => {
                 if (!response) {
@@ -169,6 +215,12 @@ export default {
                 }
             });
         },
+        ...mapMutations('tokenStatics', [
+            'setReleasePeriod',
+            'setHourlyRate',
+            'setReleasedAmount',
+            'setFrozenAmount',
+        ]),
     },
 };
 </script>

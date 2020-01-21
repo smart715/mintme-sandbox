@@ -89,7 +89,7 @@
                             </div>
                             <div class="pb-1">
                                 Release period: <br>
-                                {{ stats.releasePeriod }}
+                                {{ releasePeriod !== null ? releasePeriod : stats.releasePeriod }}
                                 <template v-if="stats.releasePeriod !== defaultValue">year(s)</template>
                                 <guide>
                                     <template slot="header">
@@ -102,7 +102,7 @@
                             </div>
                             <div class="pb-1">
                                 Hourly installment: <br>
-                                {{ stats.hourlyRate | toMoney(precision, false) | formatMoney }}
+                                {{ hourlyRate !== null ? hourlyRate : stats.hourlyRate | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Hourly installment
@@ -114,7 +114,7 @@
                             </div>
                             <div class="pb-1">
                                 Already released: <br>
-                                {{ stats.releasedAmount | toMoney(precision, false) | formatMoney }}
+                                {{ releasedAmount !== null ? releasedAmount : stats.releasedAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Already released
@@ -127,7 +127,7 @@
                             </div>
                             <div class="pb-1">
                                 Not yet released: <br>
-                                {{ stats.frozenAmount | toMoney(precision, false) | formatMoney }}
+                                {{ frozenAmount !== null ? frozenAmount :  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Not yet released
@@ -161,6 +161,8 @@ import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
 import {WSAPI} from '../../../utils/constants';
 import {MoneyFilterMixin, NotificationMixin} from '../../../mixins';
+import {mapGetters} from 'vuex';
+
 
 const defaultValue = '-';
 
@@ -194,11 +196,9 @@ export default {
         this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
             .then((res) => this.isTokenExchanged = res.data)
             .catch(() => this.notifyError('Can not load token data. Try again later'));
-
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
             .then((res) => this.stats = res.data || this.stats)
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
-
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
@@ -249,6 +249,32 @@ export default {
                 }
             }
             return toMoney(sum.toString());
+        },
+        ...mapGetters('tokenStatics', [
+            'getReleasePeriod',
+            'getHourlyRate',
+            'getReleasedAmount',
+            'getFrozenAmount',
+        ]),
+        releasePeriod: {
+            get() {
+                return this.getReleasePeriod;
+            },
+        },
+        hourlyRate: {
+            get() {
+                return this.getHourlyRate;
+            },
+        },
+        releasedAmount: {
+            get() {
+                return this.getReleasedAmount;
+            },
+        },
+        frozenAmount: {
+            get() {
+                return this.getFrozenAmount;
+            },
         },
     },
     filters: {
