@@ -135,7 +135,7 @@ export default {
             marketsOnTop: [
                 {currency: 'BTC', token: 'WEB'},
             ],
-            klineQueriesIdsTokensMap: new Map(),
+            stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
             sortBy: '',
             sortDesc: true,
@@ -250,8 +250,8 @@ export default {
                     this.addMessageHandler((result) => {
                         if ('state.update' === result.method) {
                             this.sanitizeMarket(result);
-                            this.requestKline(result.params[0]);
-                        } else if (Array.from(this.klineQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                            this.requestMonthInfo(result.params[0]);
+                        } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
                             this.updateMonthVolume(result.id, result.result);
                         }
                     });
@@ -471,17 +471,14 @@ export default {
 
             return result;
         },
-        updateMonthVolume: function(requestId, kline) {
-            const marketName = this.klineQueriesIdsTokensMap.get(requestId);
+        updateMonthVolume: function(requestId, marketInfo) {
+            const marketName = this.stateQueriesIdsTokensMap.get(requestId);
             const marketCurrency = this.markets[marketName].base.symbol;
             const marketToken = this.markets[marketName].quote.symbol;
             // const marketPrecision = this.markets[marketName].base.subunit; I'll leave this here in any case we ever need it again
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
-            let monthVolume = kline.reduce(function(acc, curr) {
-                return Decimal.add(acc, curr[6]);
-            }, 0);
-
+            let monthVolume = marketInfo.deal;
             let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
             monthVolume = this.toMoney(monthVolume) + ' ' + marketCurrency;
 
@@ -493,20 +490,18 @@ export default {
                 this.sanitizedMarkets[marketName].monthVolumeUSD = monthVolumeUSD;
             }
         },
-        requestKline: function(market) {
+        requestMonthInfo: function(market) {
             let id = parseInt(Math.random().toString().replace('0.', ''));
             this.sendMessage(JSON.stringify({
-                method: 'kline.query',
+                method: 'state.query',
                 params: [
                     market,
-                    Math.round(Date.now() / 1000) - 30 * 24 * 60 * 60,
-                    Math.round(Date.now() / 1000),
-                    7 * 24 * 60 * 60,
+                    30 * 24 * 60 * 60,
                 ],
                 id,
             }));
 
-            this.klineQueriesIdsTokensMap.set(id, market);
+            this.stateQueriesIdsTokensMap.set(id, market);
         },
         fetchConversionRates: function() {
             return new Promise((resolve, reject) => {
