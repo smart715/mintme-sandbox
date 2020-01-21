@@ -11,7 +11,7 @@
                 </div>
             </b-col>
             <b-col cols="12">
-                <div>Amount released at beginning: {{ released }}%</div>
+                <div>Amount released during creation: {{ released }}%</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <b>0%</b>
@@ -33,7 +33,7 @@
                 </b-row>
             </b-col>
             <b-col v-bind:class="{invisible: !showAreaUnlockedTokens}" cols="12">
-                <div>Time needed to unlock all tokens: {{ releasePeriod }} year(s)</div>
+                <div>Token release period for the rest: {{ releasePeriod }} year(s)</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
