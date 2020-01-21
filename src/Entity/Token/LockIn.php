@@ -23,7 +23,7 @@ class LockIn
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\Regex(pattern="/^([1-3]|5|15|[1-5]0)$/")
+     * @Assert\Regex(pattern="/^([0-3]|5|15|[0-5]0)$/")
      * @GreaterThanPrevious(message="Release period can be prolonged only.", groups={"Exchanged"})
      * @var int
      */
@@ -80,7 +80,9 @@ class LockIn
     {
         $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        return $money->divide($this->releasePeriod)->divide(365 * 24);
+        return 0 === $this->releasePeriod
+            ? $money
+            : $money->divide($this->releasePeriod)->divide(365 * 24);
     }
 
     /**
