@@ -34,7 +34,7 @@ class UserActionProcessor
         return $record;
     }
 
-    public function getUsername(): string
+    protected function getUsername(): string
     {
         $token = $this->tokenStorage->getToken();
 
