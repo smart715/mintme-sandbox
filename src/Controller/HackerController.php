@@ -137,21 +137,13 @@ class HackerController extends AbstractController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @param FormInterface $form
-     * @param UserManagerInterface $userManager
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param string $email
-     * @return RedirectResponse $response
-     */
     private function doQuickRegistration(
         Request $request,
         FormInterface $form,
         UserManagerInterface $userManager,
         UserPasswordEncoderInterface $passwordEncoder,
         string $email
-    ): RedirectResponse {
+    ): Response {
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setPassword(
