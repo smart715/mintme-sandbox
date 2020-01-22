@@ -44,7 +44,7 @@ class User extends BaseUser implements
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
-     * @Groups({"Default", "API"})
+     * @Groups({"API"})
      */
     protected $id;
 

@@ -207,7 +207,7 @@ export default {
             name: this.market.quote.symbol,
         }))
             .then((res) => this.soldOnMarket = res.data)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch(() => this.notifyError('Can not load soldOnMarket value. Try again later'));
 
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
