@@ -28,6 +28,10 @@ class MarketFetcher implements MarketFetcherInterface
         $this->config = $config;
     }
 
+    /**
+     * @param int $period Either 86400 for daily or 2592000 for monthly. No other values work.
+     */
+
     public function getMarketInfo(string $market, int $period = 86400): array
     {
         $response = $this->jsonRpc->send(self::MARKET_STATUS, [
