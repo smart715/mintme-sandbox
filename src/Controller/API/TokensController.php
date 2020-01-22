@@ -394,6 +394,7 @@ class TokensController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
+        MailerInterface $mailer,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -425,6 +426,10 @@ class TokensController extends AbstractFOSRestController
 
         $this->em->remove($token);
         $this->em->flush();
+
+        $this->addFlash('success', "Token {$token->getName()} was successfully deleted.");
+
+        $mailer->sendTokenDeletedMail($token, $user);
 
         $this->userActionLogger->info('Delete token', $request->all());
 

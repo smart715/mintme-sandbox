@@ -3,6 +3,7 @@
 namespace App\Mailer;
 
 use App\Entity\PendingWithdrawInterface;
+use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
@@ -133,5 +134,26 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             $transport->stop();
             $transport->start();
         }
+    }
+
+    public function sendTokenDeletedMail(Token $token, User $user): void
+    {
+        $body = $this->twigEngine->render("mail/token_deleted.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/token_deleted.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+        ]);
+
+        $msg = (new Swift_Message("Token Deleted"))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
     }
 }
