@@ -296,25 +296,19 @@ export default {
 
             this.monthInfoRequestId = parseInt(Math.random().toString().replace('0.', ''));
             this.sendMessage(JSON.stringify({
-                method: 'kline.query',
+                method: 'state.query',
                 params: [
                     this.market.identifier,
-                    Math.round(Date.now() / 1000) - 30 * 24 * 60 * 60,
-                    Math.round(Date.now() / 1000),
-                    7 * 24 * 60 * 60,
+                    30 * 24 * 60 * 60,
                 ],
                 id: this.monthInfoRequestId,
             }));
         },
         updateMonthMarketData: function(marketData) {
-            const marketOpenPrice = marketData[0] ? marketData[0][1] || 0 : 0;
-            const marketLastPrice = marketData[marketData.length -1] ? marketData[marketData.length -1][2] || 0 : 0;
-            const marketVolume = marketData.reduce(function(acc, cur) {
-                return Decimal.add(acc, cur[5]);
-            }, 0);
-            const marketAmount = marketData.reduce(function(acc, cur) {
-                return Decimal.add(acc, cur[6]);
-            }, 0);
+            const marketOpenPrice = parseFloat(marketData.open);
+            const marketLastPrice = parseFloat(marketData.last);
+            const marketVolume = parseFloat(marketData.volume);
+            const marketAmount = parseFloat(marketData.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
 
