@@ -334,13 +334,9 @@ class Token implements TradebleInterface
         return $this->profile;
     }
 
-    public function getOwnerId(): ?int
-    {
-        return $this->profile
-            ? $this->profile->getUser()->getId()
-            : null;
-    }
-
+    /**
+     * @Groups({"API", "dev"})
+     */
     public function getDeploymentStatus(): string
     {
         return !$this->address

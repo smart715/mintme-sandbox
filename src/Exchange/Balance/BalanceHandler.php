@@ -15,6 +15,7 @@ use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
+use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -125,6 +126,22 @@ class BalanceHandler implements BalanceHandlerInterface
         $balance = $this->moneyWrapper->parse((string)$amount, $available->getCurrency()->getCode());
 
         return $available->equals($balance);
+    }
+
+    /** @inheritDoc */
+    public function soldOnMarket(Token $token, int $amount, array $ownPendingOrders): Money
+    {
+        $available = $this->balance($token->getProfile()->getUser(), $token)->getAvailable();
+        $balance = $this->moneyWrapper->parse((string)$amount, $available->getCurrency()->getCode());
+
+        /** @var Order $order */
+        foreach ($ownPendingOrders as $order) {
+            if (Order::SELL_SIDE === $order->getSide()) {
+                $balance = $balance->subtract($order->getAmount());
+            }
+        }
+
+        return $balance->subtract($available);
     }
 
     /**

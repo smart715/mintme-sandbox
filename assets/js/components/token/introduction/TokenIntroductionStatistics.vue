@@ -61,7 +61,7 @@
                             </div>
                             <div class="pb-1">
                                 Sold on the market: <br>
-                                {{ soldOrdersSum | toMoney(precision, false) | formatMoney }}
+                                {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Sold on the market
@@ -179,7 +179,7 @@ export default {
         return {
             tokenExchangeAmount: null,
             pendingSellOrders: null,
-            executedOrders: null,
+            soldOnMarket: null,
             isTokenExchanged: true,
             defaultValue: defaultValue,
             stats: {
@@ -203,11 +203,10 @@ export default {
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
 
-        this.$axios.retry.get(this.$routing.generate('executed_orders', {
-            base: this.market.base.symbol,
-            quote: this.market.quote.symbol,
+        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
+            name: this.market.quote.symbol,
         }))
-            .then((res) => this.executedOrders = res.data)
+            .then((res) => this.soldOnMarket = res.data)
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
 
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
@@ -219,7 +218,7 @@ export default {
     },
     computed: {
         loaded: function() {
-            return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.executedOrders !== null;
+            return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
@@ -236,27 +235,6 @@ export default {
         },
         withdrawBalance: function() {
             return toMoney(0);
-        },
-        soldOrdersSum: function() {
-            return toMoney(
-                this.executedOrders
-                    .reduce(
-                        (a, order) => this.orderIncreaseSold(order)
-                            ? a.plus(new Decimal(order['amount']))
-                            : a.minus(new Decimal(order['amount'])),
-                        new Decimal(0)
-                    )
-                    .toString()
-            );
-        },
-    },
-    methods: {
-        orderIncreaseSold: function(order) {
-            let tokenOwnerId = order.market.quote.ownerId;
-            return tokenOwnerId && (
-                order.maker.id === tokenOwnerId && WSAPI.order.type.BUY === parseInt(order['side'])
-                || order.taker.id === tokenOwnerId && WSAPI.order.type.SELL === parseInt(order['side'])
-            );
         },
     },
     filters: {
