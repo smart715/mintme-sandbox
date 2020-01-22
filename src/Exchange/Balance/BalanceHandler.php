@@ -134,7 +134,6 @@ class BalanceHandler implements BalanceHandlerInterface
         $available = $this->balance($token->getProfile()->getUser(), $token)->getAvailable();
         $balance = $this->moneyWrapper->parse((string)$amount, $available->getCurrency()->getCode());
 
-        /** @var Order $order */
         foreach ($ownPendingOrders as $order) {
             if (Order::SELL_SIDE === $order->getSide()) {
                 $balance = $balance->subtract($order->getAmount());
