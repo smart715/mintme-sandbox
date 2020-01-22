@@ -208,7 +208,7 @@ class TokensController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
-     * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
+     * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[0-9][0-9]?$|^100$")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
@@ -254,7 +254,7 @@ class TokensController extends AbstractFOSRestController
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
             $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount))
-                ->setReleasedAtStart((int)$releasedAmount->getAmount());
+                ->setReleasedAtStart($releasedAmount->getAmount());
         }
 
         $this->em->persist($lock);
