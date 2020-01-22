@@ -10,11 +10,13 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\FOSUserEvents;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +25,6 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/hacker")
- * @Security(expression="is_granted('hacker')")
  * @codeCoverageIgnore
  */
 class HackerController extends AbstractController
@@ -125,7 +126,7 @@ class HackerController extends AbstractController
             if ($userManager->findUserByEmail($email)) {
                 $this->addFlash('danger', 'Email already used');
             } else {
-                return $this->doQuickRegistration($request, $userManager, $passwordEncoder, $email);
+                return $this->doQuickRegistration($request, $form, $userManager, $passwordEncoder, $email);
             }
         }
 
@@ -137,6 +138,7 @@ class HackerController extends AbstractController
 
     /**
      * @param Request $request
+     * @param FormInterface $form
      * @param UserManagerInterface $userManager
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param string $email
@@ -144,11 +146,12 @@ class HackerController extends AbstractController
      */
     private function doQuickRegistration(
         Request $request,
+        FormInterface $form,
         UserManagerInterface $userManager,
         UserPasswordEncoderInterface $passwordEncoder,
         string $email
     ): RedirectResponse {
-        $user = new User();
+        $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setPassword(
             $passwordEncoder->encodePassword(
@@ -157,18 +160,21 @@ class HackerController extends AbstractController
             )
         );
         $user->setEnabled(true);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($user);
-        $em->flush();
-        $this->addFlash('success', 'Your account has been created successfully.');
 
         $event = new GetResponseUserEvent($user, $request);
         $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
+
+        $event = new FormEvent($form, $request);
         $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
         $userManager->updateUser($user);
-        $response = new RedirectResponse(
-            $this->generateUrl('fos_user_registration_confirmed')
-        );
+
+        if (null === $event->getResponse()) {
+            $url = $this->generateUrl('fos_user_registration_confirmed');
+            $response = new RedirectResponse($url);
+        } else {
+            $response = $event->getResponse();
+        }
+
         $this->eventDispatcher->dispatch(
             FOSUserEvents::REGISTRATION_COMPLETED,
             new FilterUserResponseEvent($user, $request, $response)
