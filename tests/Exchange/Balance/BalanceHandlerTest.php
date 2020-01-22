@@ -578,7 +578,7 @@ class BalanceHandlerTest extends TestCase
         return $this->createMock(DateTimeImmutable::class);
     }
 
-    private function mockOrder($side, $amount): Order
+    private function mockOrder(int $side, int $amount): Order
     {
         $order = $this->createMock(Order::class);
         $order->method('getSide')->willReturn($side);
