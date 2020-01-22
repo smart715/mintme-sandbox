@@ -4,7 +4,7 @@ import Actions from './actions';
 import websocket from './modules/websocket';
 import makeOrder from './modules/make_order';
 import interval from '../utils/interval';
-import tokenStatics from './modules/token_statics';
+import tokenStatistics from './modules/token_statistics';
 
 Vue.use(Vuex);
 
@@ -17,6 +17,6 @@ export default new Vuex.Store({
     modules: {
         websocket,
         makeOrder,
-        tokenStatics,
+        tokenStatistics,
     },
 });

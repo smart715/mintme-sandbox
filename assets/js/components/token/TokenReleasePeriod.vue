@@ -119,7 +119,7 @@ export default {
         releasePeriodDisabled: function() {
             return !this.isTokenNotDeployed;
         },
-        ...mapGetters('tokenStatics', [
+        ...mapGetters('tokenStatistics', [
             'getReleasePeriod',
             'getHourlyRate',
             'getReleasedAmount',
@@ -183,11 +183,11 @@ export default {
             });
     },
     methods: {
-        updateTokenStatics: function(newTokenStatics) {
-            this.tokenReleasePeriod = newTokenStatics.releasePeriod;
-            this.tokenHourlyRate = newTokenStatics.hourlyRate;
-            this.tokenReleasedAmount = newTokenStatics.releasedAmount;
-            this.tokenFrozenAmount = newTokenStatics.frozenAmount;
+        updateTokenStatistics: function(newTokenStatistics) {
+            this.tokenReleasePeriod = newTokenStatistics.releasePeriod;
+            this.tokenHourlyRate = newTokenStatistics.hourlyRate;
+            this.tokenReleasedAmount = newTokenStatistics.releasedAmount;
+            this.tokenFrozenAmount = newTokenStatistics.frozenAmount;
         },
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
@@ -209,7 +209,7 @@ export default {
             }).then((response) => {
                 this.closeTwoFactorModal();
                 this.$emit('update', response);
-                this.updateTokenStatics(response.data);
+                this.updateTokenStatistics(response.data);
                 this.notifySuccess('Release period updated.');
             }).catch(({response}) => {
                 if (!response) {
@@ -224,7 +224,7 @@ export default {
                 }
             });
         },
-        ...mapMutations('tokenStatics', [
+        ...mapMutations('tokenStatistics', [
             'setReleasePeriod',
             'setHourlyRate',
             'setReleasedAmount',
