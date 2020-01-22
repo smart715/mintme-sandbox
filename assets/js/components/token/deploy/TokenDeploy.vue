@@ -145,7 +145,7 @@ export default {
                 this.webCost = data.webCost;
             }).catch((err) => {
                 this.sendLogs('error', 'Can not get token deploy balances', err);
-            })
+            });
         },
         deploy: function() {
             if (this.twofa) {
