@@ -1,5 +1,5 @@
 import Modal from './components/modal/Modal';
-import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
     tokenNameValidChars,
     tokenValidFirstChars,
