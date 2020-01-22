@@ -319,9 +319,6 @@ export default {
         },
         balance: function() {
             this.immutableBalance = this.balance;
-            if (!this.balance) {
-                return;
-            }
         },
     },
     mounted: function() {

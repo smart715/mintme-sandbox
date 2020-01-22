@@ -17,7 +17,7 @@
             </div>
             <div class="card-body">
                 <div v-if="balanceLoaded" class="row">
-                    <div  class="col-12">
+                    <div class="col-12">
                         <label
                             for="buy-price-input"
                             class="text-white">

@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div v-if="ordersLoaded">
+                <template v-if="ordersLoaded">
                     <div class="table-responsive fixed-head-table">
                         <b-table v-if="hasOrders"
                             ref="table"
@@ -60,7 +60,7 @@
                     <div v-if="loading" class="p-1 text-center">
                             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                     </div>
-                </div>
+                </template>
                 <template v-else>
                     <div class="p-5 text-center">
                         <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
@@ -88,7 +88,7 @@ export default {
         sortDesc: Boolean,
         basePrecision: Number,
         loggedIn: Boolean,
-        ordersLoaded: [String, Boolean],
+        ordersLoaded: Boolean,
     },
     data() {
         return {

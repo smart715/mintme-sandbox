@@ -21,7 +21,7 @@
                     <b-dropdown-item @click="toggleUsd(false)">
                         Crypto
                     </b-dropdown-item>
-                    <b-dropdown-item :disabled="!enableUsd" @click="toggleUsd(true)">
+                    <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
                         USD
                     </b-dropdown-item>
                 </template>
@@ -40,7 +40,7 @@
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
         </div>
-        <template v-if="loaded" >
+        <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
                     :items="tokens"
