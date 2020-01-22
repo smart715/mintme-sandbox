@@ -96,7 +96,9 @@
                                         Release period
                                     </template>
                                     <template slot="body">
-                                        Total amount of time it will take to release 100% of the token.
+                                        Total amount of time it will take to release all tokens.
+                                        If the release period is 0 years, it means that the creator
+                                        released 100% of the tokens during creation.
                                     </template>
                                 </guide>
                             </div>
