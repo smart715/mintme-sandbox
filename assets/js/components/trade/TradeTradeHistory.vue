@@ -222,9 +222,13 @@ export default {
                         if (this.tableData.findIndex((item) => item.id === res.data.id) === -1) {
                             this.tableData.unshift(res.data);
                         }
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not get executed order details', err);
                     });
                 }
             }, 'trade-tableData-update-deals');
+        }).catch((err) => {
+            this.sendLogs('error', 'Can not update table data', err);
         });
     },
     methods: {

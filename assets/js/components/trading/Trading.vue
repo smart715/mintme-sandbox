@@ -567,10 +567,16 @@ export default {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
                     this.globalMarketCaps['BTC'] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch BTC from global market cap', err);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
                     this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch USD from global market cap', err);
                 });
         },
         toMoney: function(val, subunit = 2) {

@@ -351,7 +351,9 @@ export default {
                                 this.tokens[token].available = res.data ?
                                     new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
                             )
-                            .catch(() => {});
+                            .catch((err) => {
+                                this.sendLogs('error', 'Can not get lock-period', err);
+                            });
                     }
                 });
             });

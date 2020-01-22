@@ -192,7 +192,10 @@ export default {
                         this.buyOrders = result.data.buy;
                         this.sellOrders = result.data.sell;
                         resolve();
-                    }).catch(reject);
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not update orders', err);
+                        reject();
+                    });
                 } else {
                     this.$axios.retry.get(this.$routing.generate('pending_orders', {
                         base: this.market.base.symbol,
@@ -219,7 +222,10 @@ export default {
 
                         context.resolve();
                         resolve(result.data);
-                    }).catch(reject);
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not update orders', err);
+                        reject();
+                    });
                 }
             });
         },
