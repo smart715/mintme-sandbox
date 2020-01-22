@@ -16,53 +16,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div v-if="immutableBalance"
-                        class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
-                        >
-                        Your
-                        <span class="c-pointer" @click="balanceClicked"
-                              v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
-                            {{ market.quote.symbol|rebranding | truncate(7) }}:
-                            <span class="text-white  word-break">
-                                {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        Your Tokens
-                                    </template>
-                                    <template slot="body">
-                                        Your {{ market.quote.symbol|rebranding }} balance.
-                                    </template>
-                                </guide>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-md-left" :class="marketPricePositionClass">
-                        <label class="custom-control custom-checkbox">
-                            <input
-                                v-model.number="useMarketPrice"
-                                step="0.00000001"
-                                type="checkbox"
-                                id="sell-price"
-                                class="custom-control-input"
-                                :disabled="disabledMarketPrice"
-                            >
-                            <label
-                                class="custom-control-label"
-                                for="sell-price">
-                                Market Price
-                                <guide>
-                                    <template slot="header">
-                                        Market Price
-                                    </template>
-                                    <template slot="body">
-                                        Checking this box fetches current best market price
-                                        for which you can sell {{ market.quote.symbol|rebranding }}.
-                                    </template>
-                                </guide>
-                            </label>
-                        </label>
-                    </div>
-                    <div class="col-12 pt-2">
+                    <div class="col-12">
                         <label
                             for="sell-price-input"
                             class="text-white">
@@ -76,34 +30,84 @@
                                 </template>
                             </guide>
                         </label>
-                        <input
-                            v-model="sellPrice"
-                            type="text"
-                            id="sell-price-input"
-                            class="form-control"
-                            :disabled="useMarketPrice || !loggedIn"
-                            @keypress="checkPriceInput"
-                            @paste="checkPriceInput"
-                        >
+                        <div class="d-flex">
+                            <input
+                                v-model="sellPrice"
+                                type="text"
+                                id="sell-price-input"
+                                class="form-control"
+                                :class="sellInputClass"
+                                :disabled="useMarketPrice || !loggedIn"
+                                @keypress="checkPriceInput"
+                                @paste="checkPriceInput"
+                            >
+                            <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
+                                Your
+                                <span class="c-pointer" @click="balanceClicked"
+                                      v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                    {{ market.quote.symbol|rebranding | truncate(7) }}:
+                                    <span class="text-white">
+                                        {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
+                                        <guide>
+                                            <template slot="header">
+                                                Your Tokens
+                                            </template>
+                                            <template slot="body">
+                                                Your {{ market.quote.symbol|rebranding }} balance.
+                                            </template>
+                                        </guide>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         <label
                             for="sell-price-amount"
-                            class="d-flex flex-row flex-nowrap justify-content-start w-100"
+                            class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
                             <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol|rebranding }}</span>
                             <span class="d-inline-block">:</span>
                         </label>
-                        <input
-                            v-model="sellAmount"
-                            type="text"
-                            id="sell-price-amount"
-                            class="form-control"
-                            :disabled="!loggedIn"
-                            @keypress="checkAmountInput"
-                            @paste="checkAmountInput"
-                        >
+                        <div class="d-flex">
+                            <input
+                                v-model="sellAmount"
+                                type="text"
+                                id="sell-price-amount"
+                                class="form-control"
+                                :class="sellInputClass"
+                                :disabled="!loggedIn"
+                                @keypress="checkAmountInput"
+                                @paste="checkAmountInput"
+                            >
+                            <div v-if="loggedIn" class="w-50 m-auto pl-4">
+                                <label class="custom-control custom-checkbox pb-0">
+                                    <input
+                                        v-model.number="useMarketPrice"
+                                        step="0.00000001"
+                                        type="checkbox"
+                                        id="sell-price"
+                                        class="custom-control-input"
+                                        :disabled="disabledMarketPrice"
+                                    >
+                                    <label
+                                        class="custom-control-label pb-0"
+                                        for="sell-price">
+                                        Market Price
+                                        <guide>
+                                            <template slot="header">
+                                                Market Price
+                                            </template>
+                                            <template slot="body">
+                                                Checking this box fetches current best market price
+                                                for which you can sell {{ market.quote.symbol|rebranding }}.
+                                            </template>
+                                        </guide>
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         Total Price:
@@ -268,6 +272,9 @@ export default {
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
+        },
+        sellInputClass: function() {
+            return this.loggedIn ? 'w-50' : 'w-100';
         },
         ...mapGetters('makeOrder', [
             'getSellPriceInput',

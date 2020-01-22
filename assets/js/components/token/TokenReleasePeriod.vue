@@ -6,14 +6,12 @@
                     Token release period:
                 </div>
                 <div class="text-xs">
-                    Period it will take for the full release of your newly created token,
-                    something similar to escrow. Mintme acts as 3rd party that ensure you won’t
-                    flood market with all of your tokens which could lower price significantly,
-                    because unlocking all tokens take time.
+                    Period it will take for the full release of all your tokens not released during creation. Tokens are slowly released over selected time to make sure you won't flood the market.
+                    If you choose to release 100% of your tokens immediately this feature will be off and all 10 millions will be accessible by you right now.
                 </div>
             </b-col>
             <b-col cols="12">
-                <div>Amount released at beginning: {{ released }}%</div>
+                <div>Amount released during creation: {{ released }}%</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <b>0%</b>
@@ -34,8 +32,8 @@
                     </b-col>
                 </b-row>
             </b-col>
-            <b-col cols="12">
-                <div>Time needed to unlock all tokens: {{ releasePeriod }} years</div>
+            <b-col v-bind:class="{invisible: !showAreaUnlockedTokens}" cols="12">
+                <div>Token release period for the rest: {{ releasePeriod }} year(s)</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
@@ -43,7 +41,7 @@
                     <b-col class="p-0">
                         <vue-slider
                             ref="release-period-slider"
-                            :disabled="releasePeriodDisabled"
+                            :disabled="releasePeriodDisabled || !showAreaUnlockedTokens"
                             v-model="releasePeriod"
                             :data="[1,2,3,5,10,15,20,30,40,50]"
                             :interval="10"
@@ -111,6 +109,9 @@ export default {
         TwoFactorModal,
     },
     computed: {
+        showAreaUnlockedTokens: function() {
+            return 100 !== this.released;
+        },
         releasedDisabled: function() {
             return (0 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
         },
@@ -128,7 +129,7 @@ export default {
 
                     let allTokens = new Decimal(res.data.frozenAmount).add(res.data.releasedAmount);
                     let percent = new Decimal(res.data.releasedAmount).div(allTokens.toString()).mul(100).floor();
-                    this.released = percent.toString();
+                    this.released = percent.toNumber();
 
                     this.loading = false;
                 } else if (HTTP_NO_CONTENT === res.status) {
@@ -158,7 +159,7 @@ export default {
                 name: this.tokenName,
             }), {
                 released: this.released,
-                releasePeriod: this.releasePeriod,
+                releasePeriod: !this.showAreaUnlockedTokens ? 0 : this.releasePeriod,
                 code,
             }).then((response) => {
                 this.closeTwoFactorModal();

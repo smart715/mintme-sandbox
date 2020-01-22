@@ -6,7 +6,7 @@
                     <img class="h-100" src="../../../../img/mintmecoin_W.png" alt="deployed">
                 </template>
                 <template slot="body">
-                    This token exists on blockchain.
+                    This token exists on the blockchain.
                 </template>
             </guide>
         </div>
@@ -19,7 +19,7 @@
                     <img class="h-100" src="../../../../img/mintmecoin_W.png" alt="not-deployed">
                 </template>
                 <template slot="body">
-                    This token does not exist on blockchain. Tokens on blockchain allow withdrawals to user wallet and are promoted on trading page. Token creator can activate it by clicking on edit icon on this page.
+                    This token does not exist on the blockchain. Tokens on a blockchain allow withdrawals to user wallet and are promoted on trading page. Token creator can activate it by clicking on edit icon on this page.
                 </template>
             </guide>
         </div>

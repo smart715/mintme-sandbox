@@ -15,7 +15,7 @@
             </autocomplete>
         </div>
         <div class="input-group-append">
-            <span class="input-group-text text-white pl-2">
+            <span class="input-group-text text-white ml-2">
                 <font-awesome-icon class="c-pointer" @click="redirectToToken" icon="search"></font-awesome-icon>
             </span>
         </div>
