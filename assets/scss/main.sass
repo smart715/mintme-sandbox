@@ -68,9 +68,12 @@ body
 
 .index-bg
   min-height: 100vh
+  margin-top: -6%
+  padding-top: 6%
   background: url("../img/hero_image.jpg") no-repeat, linear-gradient(#102238 50%, transparent)
   background-size: 100% auto
-  background-position-y: 1em
+  @include media-breakpoint-down(xs)
+    background: linear-gradient(#102238 50%, transparent)
 
 a
   color: $color-link

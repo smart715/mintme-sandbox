@@ -5,8 +5,8 @@
 .homepage
   nav
     position: relative
-    background: $navbar-sm-background
-    background-position-y: 30px
+    //background: $navbar-sm-background
+    //background-position-y: 30px
 
     @include media-breakpoint-up(lg)
       //position: absolute
@@ -32,8 +32,11 @@
       font-size: 3rem
 
   #top-showcase
-    @include media-breakpoint-up(sm)
-    margin-top: 160px
+    margin-top: 12%
+
+    @include media-breakpoint-down(xs)
+      margin-top: 0
+      background-color: #183d63
 
     // To fix chrome display issue
     .h-100
@@ -72,9 +75,9 @@
       color: $primary !important
 
   #description
-    margin-top: 430px
+    margin-top: 28%
     @include media-breakpoint-down(sm)
-      background-position-y: 0
+      margin-top: 0
 
     .countdown
       border: $ghost-light solid 2px

@@ -17,11 +17,11 @@
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div onload="document.body.classList.remove('hidden')" class="content-wrapper {% block bgclass %}{% endblock %} hidden d-flex flex-column {% block contentclass %}{% endblock %}">
+            <div onload="document.body.classList.remove('hidden')" class="content-wrapper hidden d-flex flex-column {% block contentclass %}{% endblock %}">
                 {% block header %}
                     {% include 'topnav.html.twig' %}
                 {% endblock %}
-                <main class="flex-fill content">
+                <main class="flex-fill content {% block bgclass %}{% endblock %}">
                     {% block main %}
                         {% block messageContainer %}
                             {% if app.session.flashbag.peekAll() is not empty %}
