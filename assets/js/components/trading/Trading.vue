@@ -583,6 +583,7 @@ export default {
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
             this.sortBy = this.volumes[this.activeVolume].key;
+            this.sortDesc = true;
         },
     },
 };
