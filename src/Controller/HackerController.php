@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/hacker")
+ * @Security(expression="is_granted('hacker')")
  * @codeCoverageIgnore
  */
 class HackerController extends AbstractController
