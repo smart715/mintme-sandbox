@@ -250,7 +250,7 @@ export default {
             }
             return toMoney(sum.toString());
         },
-        ...mapGetters('tokenStatics', [
+        ...mapGetters('tokenStatistics', [
             'getReleasePeriod',
             'getHourlyRate',
             'getReleasedAmount',
