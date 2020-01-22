@@ -159,7 +159,6 @@
 import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
-import {WSAPI} from '../../../utils/constants';
 import {MoneyFilterMixin, NotificationMixin} from '../../../mixins';
 
 const defaultValue = '-';
