@@ -35,7 +35,7 @@
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
-    zipCodeContain,
+    tokenNameValidChars,
     tokenValidFirstChars,
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
@@ -176,7 +176,7 @@ export default {
                 validFirstChars: (value) => !tokenValidFirstChars(value),
                 validLastChars: (value) => !tokenValidLastChars(value),
                 noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
-                validChars: zipCodeContain,
+                validChars: tokenNameValidChars,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),
             },
