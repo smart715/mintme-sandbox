@@ -29,7 +29,7 @@
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validChars" class="text-danger text-center">
                             Token name can contain only alphabets, numbers, spaces and dashes
                         </div>
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validFirstChars || !this.$v.tokenName.validLastChars || !this.$v.tokenName.noSpaceBetweenDashes" class="text-danger text-center">
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validFirstChars || !$v.tokenName.validLastChars || !$v.tokenName.noSpaceBetweenDashes" class="text-danger text-center">
                             Token name can't start or end with a dash, or have spaces between dashes
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
