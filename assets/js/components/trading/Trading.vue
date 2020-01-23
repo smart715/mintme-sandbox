@@ -20,6 +20,8 @@
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"
                     sort-direction="desc"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
@@ -135,6 +137,8 @@ export default {
             ],
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
+            sortBy: '',
+            sortDesc: true,
             globalMarketCaps: {
                 BTC: 0,
                 USD: 0,
@@ -578,6 +582,8 @@ export default {
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
+            this.sortBy = this.volumes[this.activeVolume].key;
+            this.sortDesc = true;
         },
     },
 };
