@@ -1,8 +1,8 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import LoggerMixin from '../../js/mixins/logger';
 import moxios from 'moxios';
-import axiosPlugin from '../../js/axios';
 import axios from 'axios';
+import Vue from "vue";
 
 /**
  * @return {Wrapper<Vue>}
@@ -10,7 +10,6 @@ import axios from 'axios';
 function mockVue() {
     const localVue = createLocalVue();
 
-    localVue.use(axiosPlugin);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -21,7 +20,7 @@ function mockVue() {
     return localVue;
 }
 
-describe('logger', function() {
+describe('logger', function () {
     beforeEach(() => {
         moxios.install();
     });
@@ -30,29 +29,20 @@ describe('logger', function() {
         moxios.uninstall();
     });
 
-    const data = {
-        data: 'test',
-        number: 5,
-        array: ['test', '123', '555'],
-    };
+    const Component = Vue.component('foo', {mixins: [LoggerMixin]});
+    const wrapper = mount(Component, {
+        localVue: mockVue(),
+    });
 
-    it('triggers logs correctly', (done) => {
-        const localVue = mockVue();
-        const wrapper = mount(LoggerMixin, {
-            localVue,
-            mixins: [LoggerMixin],
-        });
-
-        moxios.stubRequest('log', {
-            status: 200,
-            level: 'info',
-            message: 'Test log',
-            context: JSON.stringify(data),
-        });
+    it('triggers sendLogs correctly', (done) => {
+        wrapper.vm.sendLogs('info', 'Test log', {});
 
         moxios.wait(() => {
-            wrapper.vm.sendLogs('info', 'Test log', data);
-            done();
+            let request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 200,
+                response: {},
+            }).then(() => done());
         });
     });
 });
