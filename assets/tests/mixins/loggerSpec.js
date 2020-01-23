@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import {createLocalVue, mount} from '@vue/test-utils';
 import LoggerMixin from '../../js/mixins/logger';
 import moxios from 'moxios';
 import axiosPlugin from '../../js/axios';
@@ -43,7 +43,7 @@ describe('logger', function() {
             mixins: [LoggerMixin],
         });
 
-        moxios.stubRequest(this.$routing.generate('log'), {
+        moxios.stubRequest('log', {
             status: 200,
             level: 'info',
             message: 'Test log',
