@@ -159,7 +159,7 @@ import {
     MoneyFilterMixin,
     PricePositionMixin,
     RebrandingFilterMixin,
-    DepositMixin
+    DepositMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -177,7 +177,7 @@ export default {
         MoneyFilterMixin,
         PricePositionMixin,
         RebrandingFilterMixin,
-        DepositMixin
+        DepositMixin,
     ],
     props: {
         loginUrl: String,
