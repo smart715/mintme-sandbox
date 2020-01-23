@@ -13,7 +13,7 @@ describe('logger', function() {
         array: ['test', '123', '555'],
     };
 
-    it('triggers logs correctly', async () => {
+    it('triggers logs correctly', async function() {
         await vm.sendLogs('info', 'Info message', data);
         await vm.sendLogs('alert', 'Alert message', data);
         await vm.sendLogs('warning', 'Warning message', data);
