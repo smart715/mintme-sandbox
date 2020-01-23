@@ -2,7 +2,7 @@ import {createLocalVue, mount} from '@vue/test-utils';
 import LoggerMixin from '../../js/mixins/logger';
 import moxios from 'moxios';
 import axios from 'axios';
-import Vue from "vue";
+import Vue from 'vue';
 
 /**
  * @return {Wrapper<Vue>}
@@ -20,7 +20,7 @@ function mockVue() {
     return localVue;
 }
 
-describe('logger', function () {
+describe('logger', () => {
     beforeEach(() => {
         moxios.install();
     });
