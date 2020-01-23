@@ -151,7 +151,7 @@ import DepositModal from '../modal/DepositModal';
 import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {TOK_IDENTIFIER, BTC_IDENTIFIER, WEB_IDENTIFIER} from '../../utils/constants';
+import {tokSymbol, btcSymbol, webSymbol} from '../../utils/constants';
 
 export default {
     name: 'Wallet',
@@ -286,10 +286,10 @@ export default {
             this.isTokenModal = isToken;
             this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
             this.withdraw.webFee = toMoney(
-                isToken || WEB_IDENTIFIER === currency ? this.predefinedTokens[WEB_IDENTIFIER].fee : 0,
+                isToken || webSymbol === currency ? this.predefinedTokens[webSymbol].fee : 0,
                 subunit
             );
-            this.withdraw.availableWeb = this.predefinedTokens[WEB_IDENTIFIER].available;
+            this.withdraw.availableWeb = this.predefinedTokens[webSymbol].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
@@ -297,7 +297,7 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency, subunit, isToken = false) {
-            this.depositAddress = (isToken ? this.depositAddresses[TOK_IDENTIFIER] : this.depositAddresses[currency])
+            this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
                 || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
@@ -305,7 +305,7 @@ export default {
             this.isTokenModal = isToken;
 
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
-                    crypto: isToken ? WEB_IDENTIFIER : currency,
+                    crypto: isToken ? webSymbol : currency,
                 }))
                 .then((res) => this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
                     toMoney(res.data, subunit) :
@@ -324,7 +324,7 @@ export default {
         },
         openDepositMore: function() {
             if (
-                [WEB_IDENTIFIER, BTC_IDENTIFIER].includes(this.depositMore) &&
+                [webSymbol, btcSymbol].includes(this.depositMore) &&
                 null !== this.predefinedTokens &&
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
                 this.depositAddresses.hasOwnProperty(this.depositMore)

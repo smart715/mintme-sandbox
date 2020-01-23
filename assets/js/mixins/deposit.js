@@ -1,4 +1,4 @@
-import {WEB_IDENTIFIER, BTC_IDENTIFIER} from '../utils/constants';
+import {webSymbol, btcSymbol} from '../utils/constants';
 
 export default {
     computed: {
@@ -29,7 +29,7 @@ export default {
             return '';
         },
         isMarketBTCOrWEB: function() {
-            return [WEB_IDENTIFIER, BTC_IDENTIFIER].includes(this.getMarketIdentifier());
+            return [webSymbol, btcSymbol].includes(this.getMarketIdentifier());
         },
     },
 };
