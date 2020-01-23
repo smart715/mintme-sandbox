@@ -13,7 +13,8 @@ describe('TradeBuyOrder', () => {
         moxios.uninstall();
     });
 
-    const $routing = {generate: () => 'URL'};
+    const $url = 'URL';
+    const $routing = {generate: () => $url};
     const localVue = createLocalVue();
     localVue.use(Axios);
     localVue.use(Vuex);
@@ -85,6 +86,39 @@ describe('TradeBuyOrder', () => {
 
             wrapper.vm.loggedIn = true;
             expect(wrapper.vm.orderInputClass).to.deep.equal('w-50');
+        });
+
+        it('depositMoreLink', () => {
+            wrapper.vm.action = 'buy';
+            expect(wrapper.vm.depositMoreLink).to.deep.equal($url);
+
+            wrapper.vm.action = 'exchange';
+            expect(wrapper.vm.depositMoreLink).to.deep.equal(undefined);
+
+            wrapper.vm.action = 'sell';
+            expect(wrapper.vm.depositMoreLink).to.deep.equal($url);
+        });
+
+        it('marketIdentifier', () => {
+            wrapper.vm.action = 'buy';
+            expect(wrapper.vm.marketIdentifier).to.deep.equal(wrapper.vm.market.base.identifier);
+
+            wrapper.vm.action = 'exchange';
+            expect(wrapper.vm.marketIdentifier).to.deep.equal('');
+
+            wrapper.vm.action = 'sell';
+            expect(wrapper.vm.marketIdentifier).to.deep.equal(wrapper.vm.market.quote.identifier);
+        });
+
+        it('isMarketBTCOrWEB', () => {
+            wrapper.vm.action = 'buy';
+            expect(wrapper.vm.isMarketBTCOrWEB).to.be.true;
+
+            wrapper.vm.action = 'exchange';
+            expect(wrapper.vm.isMarketBTCOrWEB).to.be.false;
+
+            wrapper.vm.action = 'sell';
+            expect(wrapper.vm.isMarketBTCOrWEB).to.be.true;
         });
     });
 

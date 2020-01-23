@@ -11,11 +11,11 @@ export default {
         depositMoreLink: function() {
             if (this.isMarketBTCOrWEB) {
                 return this.$routing.generate('wallet', {
-                    depositMore: this.getMarketIdentifier,
+                    depositMore: this.marketIdentifier,
                 });
             }
         },
-        getMarketIdentifier: function() {
+        marketIdentifier: function() {
             if ('buy' === this.action) {
                 return this.market.base.identifier;
             }
@@ -27,7 +27,7 @@ export default {
             return '';
         },
         isMarketBTCOrWEB: function() {
-            return [webSymbol, btcSymbol].includes(this.getMarketIdentifier);
+            return [webSymbol, btcSymbol].includes(this.marketIdentifier);
         },
     },
 };
