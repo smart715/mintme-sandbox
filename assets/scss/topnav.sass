@@ -28,8 +28,8 @@
     height: 75px
 
   .search
-    @include media-breakpoint-down(md)
-      width: 100%
+    @include media-breakpoint-down(lg)
+      min-width: 17rem
 
   .search-input
     background-color: $grey-dark
@@ -137,7 +137,9 @@
     background-image: url('../img/token-sprite.png')
     @extend .icon
 
-  .menu-token
+  .menu-token    
+    @include media-breakpoint-down(lg)
+    min-width: 7rem
     &:hover
       .icon-token
          background-position: -18px 0
