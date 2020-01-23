@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import LoggerMixin from '../../js/mixins/logger';
 
-jest.mock('axios');
-
 describe('logger', function() {
     const vm = new Vue({
         mixins: [LoggerMixin],
