@@ -3,17 +3,15 @@ import {webSymbol, btcSymbol} from '../utils/constants';
 export default {
     computed: {
         showDepositMoreLink: function() {
-            return this.loggedIn && this.isMarketBTCOrWEB();
+            return this.loggedIn && this.isMarketBTCOrWEB;
         },
         orderInputClass: function() {
             return this.loggedIn ? 'w-50' : 'w-100';
         },
-    },
-    methods: {
-        getDepositMoreLink: function() {
-            if (this.isMarketBTCOrWEB()) {
+        depositMoreLink: function() {
+            if (this.isMarketBTCOrWEB) {
                 return this.$routing.generate('wallet', {
-                    depositMore: this.getMarketIdentifier(),
+                    depositMore: this.getMarketIdentifier,
                 });
             }
         },
@@ -29,7 +27,7 @@ export default {
             return '';
         },
         isMarketBTCOrWEB: function() {
-            return [webSymbol, btcSymbol].includes(this.getMarketIdentifier());
+            return [webSymbol, btcSymbol].includes(this.getMarketIdentifier);
         },
     },
 };
