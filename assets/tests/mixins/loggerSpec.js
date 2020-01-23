@@ -1,20 +1,11 @@
 import Vue from 'vue';
 import LoggerMixin from '../../js/mixins/logger';
-import axios from "../../js/axios";
 
 jest.mock('axios');
 
 describe('logger', function() {
-    const client = axios.create();
-
     const vm = new Vue({
         mixins: [LoggerMixin],
-        install(Vue, options) {
-            Vue.prototype.$axios = {
-                retry: client,
-                single: axios,
-            };
-        },
     });
 
     const data = {
