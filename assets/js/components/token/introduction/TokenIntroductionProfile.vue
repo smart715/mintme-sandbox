@@ -117,7 +117,7 @@
                                 </social-sharing>
                             </b-dropdown>
                             <div class="tooltip-static tooltip-static-left">
-                                Do you want to help the token creator? Spread the word!
+                                Do you want this token to grow? Spread the word!
                             </div>
                         </div>
                         <div class="row">
