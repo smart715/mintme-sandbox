@@ -13,6 +13,8 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -208,7 +210,7 @@ class TokensController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
-     * @Rest\RequestParam(name="released", allowBlank=false, requirements="(\d?[1-9]|[1-9]0)")
+     * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[0-9][0-9]?$|^100$")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
@@ -582,5 +584,32 @@ class TokensController extends AbstractFOSRestController
         $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/sold", name="token_sold_on_market", options={"expose"=true})
+     */
+    public function soldOnMarket(
+        string $name,
+        BalanceHandlerInterface $balanceHandler,
+        MarketHandlerInterface $marketHandler
+    ): View {
+        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $crypto || null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        $ownerPendingOrders = $marketHandler->getPendingOrdersByUser(
+            $token->getProfile()->getUser(),
+            [new Market($crypto, $token)]
+        );
+
+        return $this->view(
+            $balanceHandler->soldOnMarket($token, $this->getParameter('token_quantity'), $ownerPendingOrders),
+            Response::HTTP_OK
+        );
     }
 }

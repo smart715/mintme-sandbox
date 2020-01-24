@@ -61,7 +61,7 @@
                             </div>
                             <div class="pb-1">
                                 Sold on the market: <br>
-                                {{ soldOrdersSum | toMoney(precision, false) | formatMoney }}
+                                {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Sold on the market
@@ -96,7 +96,9 @@
                                         Release period
                                     </template>
                                     <template slot="body">
-                                        Total amount of time it will take to release 100% of the token.
+                                        Total amount of time it will take to release all tokens.
+                                        If the release period is 0 years, it means that the creator
+                                        released 100% of the tokens during creation.
                                     </template>
                                 </guide>
                             </div>
@@ -159,7 +161,6 @@
 import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
-import {WSAPI} from '../../../utils/constants';
 import {MoneyFilterMixin, NotificationMixin} from '../../../mixins';
 
 const defaultValue = '-';
@@ -179,7 +180,7 @@ export default {
         return {
             tokenExchangeAmount: null,
             pendingSellOrders: null,
-            executedOrders: null,
+            soldOnMarket: null,
             isTokenExchanged: true,
             defaultValue: defaultValue,
             stats: {
@@ -203,12 +204,11 @@ export default {
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
 
-        this.$axios.retry.get(this.$routing.generate('executed_orders', {
-            base: this.market.base.symbol,
-            quote: this.market.quote.symbol,
+        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
+            name: this.market.quote.symbol,
         }))
-            .then((res) => this.executedOrders = res.data)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .then((res) => this.soldOnMarket = res.data)
+            .catch(() => this.notifyError('Can not load soldOnMarket value. Try again later'));
 
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
@@ -219,7 +219,7 @@ export default {
     },
     computed: {
         loaded: function() {
-            return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.executedOrders !== null;
+            return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
@@ -236,19 +236,6 @@ export default {
         },
         withdrawBalance: function() {
             return toMoney(0);
-        },
-        soldOrdersSum: function() {
-            let sum = new Decimal(0);
-            for (let key in this.executedOrders) {
-                if (
-                        this.executedOrders.hasOwnProperty(key) &&
-                        WSAPI.order.type.SELL === parseInt(this.executedOrders[key]['side'])
-                ) {
-                    let amount = new Decimal(this.executedOrders[key]['amount']);
-                    sum = sum.plus(amount);
-                }
-            }
-            return toMoney(sum.toString());
         },
     },
     filters: {

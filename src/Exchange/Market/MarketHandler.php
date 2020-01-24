@@ -24,6 +24,8 @@ class MarketHandler implements MarketHandlerInterface
     public const SELL = 1;
     public const BUY = 2;
 
+    private const MONTH_PERIOD = 2592000;
+
     /** @var MarketFetcherInterface */
     private $marketFetcher;
 
@@ -339,7 +341,10 @@ class MarketHandler implements MarketHandlerInterface
             $this->marketNameConverter->convert($market),
             $period
         );
-        $monthResult = $this->getMonthlyMarketInfo($market);
+        $monthResult = $this->marketFetcher->getMarketInfo(
+            $this->marketNameConverter->convert($market),
+            self::MONTH_PERIOD
+        );
 
         if (!$result) {
             throw new InvalidArgumentException();
@@ -381,42 +386,6 @@ class MarketHandler implements MarketHandlerInterface
                 $this->getSymbol($market->getBase())
             )
         );
-    }
-
-    public function getMonthlyMarketInfo(Market $market): array
-    {
-        $name = $this->marketNameConverter->convert($market);
-        $end = (new \DateTimeImmutable())->getTimestamp();
-        $interval = 7 * 24 * 60 * 60;
-        $start = $end - 30 * 24 * 60 * 60;
-
-        $results = $this->marketFetcher->getKLineStat($name, $start, $end, $interval);
-
-        $high = 0;
-        $low = INF;
-        $volume = 0;
-        $deal = 0;
-
-        foreach ($results as $result) {
-            $high = max($high, floatval($result[3]));
-            $low = min($low, floatval($result[4]));
-            $volume += floatval($result[5]) ;
-            $deal += floatval($result[6]);
-        }
-
-        $low = INF === $low
-            ? 0
-            : $low;
-
-        return [
-            "period" => 30 * 24 * 60 * 60,
-            "open" => $results[0][1] ?? '0',
-            "close" => end($results)[2] ?? '0',
-            "high" => strval($high),
-            "low" => strval($low),
-            "volume" => strval($volume),
-            "deal" => strval($deal),
-        ];
     }
 
     private function getSymbol(TradebleInterface $tradeble): string
