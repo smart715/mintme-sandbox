@@ -8,7 +8,7 @@
             <div class="text-center">
                 <h3 class="modal-title">DEPOSIT</h3>
                 <div class="col-12 pt-2">
-                    <code class="wallet-code" id="walletaddress">
+                    <code class="wallet-code text-blue" id="walletaddress">
                         <span>
                             {{ address }}
                         </span>
