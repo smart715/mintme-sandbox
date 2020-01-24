@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\QuickRegistrationType;
+use App\Form\RegistrationType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -127,7 +128,7 @@ class HackerController extends AbstractController
             if ($userManager->findUserByEmail($email)) {
                 $this->addFlash('danger', 'Email already used');
             } else {
-                return $this->doQuickRegistration($request, $form, $userManager, $passwordEncoder, $email);
+                return $this->doQuickRegistration($request, $userManager, $passwordEncoder, $email);
             }
         }
 
@@ -137,13 +138,19 @@ class HackerController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param UserManagerInterface $userManager
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param string $email
+     * @return RedirectResponse $response
+     */
     private function doQuickRegistration(
         Request $request,
-        FormInterface $form,
         UserManagerInterface $userManager,
         UserPasswordEncoderInterface $passwordEncoder,
         string $email
-    ): Response {
+    ): RedirectResponse {
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setPassword(
@@ -152,24 +159,33 @@ class HackerController extends AbstractController
                 $this->quickRegistrationPassword
             )
         );
-        $user->setEnabled(true);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        $url = $this->generateUrl('fos_user_registration_confirmed');
+        $response = new RedirectResponse($url);
 
         $event = new GetResponseUserEvent($user, $request);
         $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
 
-        $event = new FormEvent($form, $request);
+        $event = new FormEvent($this->createForm(RegistrationType::class, $user), $request);
         $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
-        $userManager->updateUser($user);
-
-        if (null === $event->getResponse()) {
-            $url = $this->generateUrl('fos_user_registration_confirmed');
-            $response = new RedirectResponse($url);
-        } else {
-            $response = $event->getResponse();
-        }
 
         $this->eventDispatcher->dispatch(
             FOSUserEvents::REGISTRATION_COMPLETED,
+            new FilterUserResponseEvent($user, $request, $response)
+        );
+
+        $user->setEnabled(true);
+        $user->setConfirmationToken(null);
+
+        $event = new GetResponseUserEvent($user, $request);
+        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_CONFIRM, $event);
+        $userManager->updateUser($user);
+
+        $this->eventDispatcher->dispatch(
+            FOSUserEvents::REGISTRATION_CONFIRMED,
             new FilterUserResponseEvent($user, $request, $response)
         );
 
