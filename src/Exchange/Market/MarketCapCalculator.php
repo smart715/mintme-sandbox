@@ -39,13 +39,17 @@ class MarketCapCalculator
     /** @var cryptoRatesFetcherInterface */
     private $cryptoRatesFetcher;
 
+    /** @var int */
+    private $minimumVolumeForMarketcap;
+
     public function __construct(
         array $supplyLinks,
         int $tokenSupply,
         EntityManagerInterface $em,
         MoneyWrapperInterface $moneyWrapper,
         RestRpcInterface $rpc,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        CryptoRatesFetcherInterface $cryptoRatesFetcher,
+        int $minimumVolumeForMarketcap
     ) {
         $this->supplyLinks = $supplyLinks;
         $this->tokenSupply = $tokenSupply;
@@ -53,9 +57,10 @@ class MarketCapCalculator
         $this->rpc = $rpc;
         $this->repository = $em->getRepository(MarketStatus::class);
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
+        $this->minimumVolumeForMarketcap = $minimumVolumeForMarketcap;
     }
 
-    public function calculate(string $base = Token::BTC_SYMBOL, float $minWebCap = 0.0): string
+    public function calculate(string $base = Token::BTC_SYMBOL): string
     {
         if (MoneyWrapper::USD_SYMBOL === $base) {
             # We'll calculate it as if it was BTC, and will convert the final amount to USD. Pretty nice hack, not so obvious, but I liked it
@@ -65,7 +70,7 @@ class MarketCapCalculator
         }
 
         # Calculate MarketCap for WEB/token markets
-        $tokenMarketCap = $this->calculateTokenMarketCap($minWebCap);
+        $tokenMarketCap = $this->calculateTokenMarketCap();
 
         # Convert to Base
         $tokenMarketCap = $this->moneyWrapper->convert(
@@ -92,15 +97,15 @@ class MarketCapCalculator
         return $this->format($marketCap);
     }
 
-    private function calculateTokenMarketCap(float $minWebCap = 0.0): Money
+    private function calculateTokenMarketCap(): Money
     {
         $tokenMarkets = $this->repository->getTokenWEBMarkets();
         // do not show market cap for markets with 30d volume of value less than min_web_cap MINTME
 
-        return array_reduce($tokenMarkets, function ($marketCap, $market) use ($minWebCap) {
-            return $market->getMonthVolume()->getAmount() < $minWebCap ?
-                $marketCap :
-                $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
+        return array_reduce($tokenMarkets, function ($marketCap, $market) {
+            return $market->getMonthVolume()->getAmount() < $this->minimumVolumeForMarketcap
+                ? $marketCap
+                : $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Token::WEB_SYMBOL));
     }
 

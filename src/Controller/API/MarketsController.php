@@ -95,7 +95,7 @@ class MarketsController extends APIController
         $marketCap = $cache->get("marketcap_{$base}", function (ItemInterface $item) use ($marketCapCalculator, $base) {
             $item->expiresAfter(3600);
 
-            return $marketCapCalculator->calculate($base, $this->getParameter('minimum_volume_for_marketcap'));
+            return $marketCapCalculator->calculate($base));
         });
 
         return $this->view([
