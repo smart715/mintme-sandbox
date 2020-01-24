@@ -13,6 +13,8 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -587,5 +589,32 @@ class TokensController extends AbstractFOSRestController
         $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/sold", name="token_sold_on_market", options={"expose"=true})
+     */
+    public function soldOnMarket(
+        string $name,
+        BalanceHandlerInterface $balanceHandler,
+        MarketHandlerInterface $marketHandler
+    ): View {
+        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $crypto || null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        $ownerPendingOrders = $marketHandler->getPendingOrdersByUser(
+            $token->getProfile()->getUser(),
+            [new Market($crypto, $token)]
+        );
+
+        return $this->view(
+            $balanceHandler->soldOnMarket($token, $this->getParameter('token_quantity'), $ownerPendingOrders),
+            Response::HTTP_OK
+        );
     }
 }
