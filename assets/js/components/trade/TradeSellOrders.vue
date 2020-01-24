@@ -39,8 +39,14 @@
                                 <a
                                     v-else
                                     :href="row.item.traderUrl"
-                                    class="d-flex flex-row flex-nowrap justify-content-between w-100"
-                                    v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}"
+                                    class="d-flex flex-row flex-nowrap justify-content-between w-100 buy-orders-tooltip"
+                                    v-b-tooltip="popoverConfig"
+                                    v-on:mouseover="mouseover"
+                                    :id="'side_' + row.item.side + '_order_' + row.item.orderId"
+                                    :data-order-id="row.item.orderId"
+                                    :data-owner-id="row.item.ownerId"
+                                    :data-side="row.item.side"
+                                    :data-price="row.item.price"
                                 >
                                     <span class="d-inline-block truncate-name flex-grow-1">
                                         {{ row.value }}
@@ -76,6 +82,7 @@
                 </div>
             </div>
         </div>
+        <div id="sell-traiders-tooltip-container"></div>
     </div>
 </template>
 
@@ -100,6 +107,7 @@ export default {
     data() {
         return {
             tableData: this.ordersList,
+            tooltip: 'Loading...',
         };
     },
     components: {
@@ -107,8 +115,22 @@ export default {
     },
     mounted: function() {
         this.startScrollListeningOnce(this.ordersList);
+
+        this.$root.$on('bv::tooltip::hidden', () => {
+            this.tooltip = 'Loading...';
+        });
     },
     computed: {
+        popoverConfig() {
+            return {
+                title: this.tooltipContent,
+                html: true,
+                boundary:'viewport',
+                show: 300,
+                hide: 100,
+                id: 'sell-traiders-tooltip-container'
+            }
+        },
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
                 new Decimal(order.amount).add(sum), 0), this.quotePrecision
@@ -119,6 +141,27 @@ export default {
         },
     },
     methods: {
+        mouseover: function(){
+            let target = event.target;
+
+            if ('a' !== target.tagName.toLowerCase()) {
+                target = target.parentElement;
+            }
+
+            let orderId = target.getAttribute('data-order-id'),
+                ownerId = target.getAttribute('data-owner-id'),
+                side = target.getAttribute('data-side'),
+                price = target.getAttribute('data-price');
+
+            let data = {
+                orderId,
+                ownerId,
+                side,
+                price
+            };
+
+            this.orderTraderHovered(data);
+        },
         removeOrderModal: function(row) {
             this.$emit('modal', row);
         },
