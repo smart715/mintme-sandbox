@@ -89,4 +89,9 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
 
         return $emailDomains;
     }
+
+    public function getTraidersData(array $users): array
+    {
+        return $this->getRepository()->getTraidersData($users);
+    }
 }

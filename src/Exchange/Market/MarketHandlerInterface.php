@@ -39,4 +39,5 @@ interface MarketHandlerInterface
 
     public function getExecutedOrder(Market $market, int $id, int $limit = 100): Order;
     public function getPendingOrder(Market $market, int $id): Order;
+    public function getTradersByOrderPrice(Market $market, array $params = [], int $limit = 100): array;
 }

@@ -184,6 +184,36 @@ class MarketHandler implements MarketHandlerInterface
         }, $stats);
     }
 
+    public function getTradersByOrderPrice(Market $market, array $params = [], int $limit = 100): array
+    {
+        $returnData = [];
+        $side = (int)$params['side'];
+        $user = (int)$params['ownerId'];
+        $price = $params['price'];
+        $pendingOrders = $this->marketFetcher->getPendingOrders(
+            $this->marketNameConverter->convert($market),
+            0,
+            $limit,
+            $side
+        );
+
+        $filteredOrders = array_filter($pendingOrders, function (array $orderData) use ($price, $user) {
+            return $price === $orderData['price'] && $user !== $orderData['user'];
+        });
+
+        uasort($filteredOrders, function (array $lOrder, array $rOrder) {
+            return $lOrder['mtime'] < $rOrder['mtime'];
+        });
+
+        $usersIds = array_column($filteredOrders, 'user');
+        $traidersData = $this->userManager->getTraidersData($usersIds);
+        $traidersCount = count($traidersData);
+        $returnData['moreCount'] = $traidersCount > 5 ? $traidersCount - 5 : 0;
+        $returnData['traidersData'] = array_slice($traidersData, 0, 5, true);
+
+        return $returnData;
+    }
+
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
