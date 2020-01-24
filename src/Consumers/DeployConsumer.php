@@ -74,7 +74,7 @@ class DeployConsumer implements ConsumerInterface
             }
 
             $token->setAddress($clbResult->getAddress());
-            $token->getLockIn()->setDeployed(new \DateTimeImmutable());
+            $token->setDeployed(new \DateTimeImmutable());
 
             $this->em->persist($token);
             $this->em->flush();

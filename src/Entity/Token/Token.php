@@ -155,6 +155,12 @@ class Token implements TradebleInterface
      */
     protected $users;
 
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable|null
+     */
+    private $deployed;
+
     /** @return User[] */
     public function getUsers(): array
     {
@@ -394,6 +400,20 @@ class Token implements TradebleInterface
     public function setDiscordUrl(?string $url): self
     {
         $this->discordUrl = $url;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getDeployed(): ?\DateTimeImmutable
+    {
+        return $this->deployed;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setDeployed(?\DateTimeImmutable $deployed): self
+    {
+        $this->deployed = $deployed;
 
         return $this;
     }

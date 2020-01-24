@@ -53,12 +53,6 @@ class LockIn
      */
     protected $token;
 
-    /**
-     * @ORM\Column(type="datetime_immutable")
-     * @var \DateTimeImmutable
-     */
-    private $deployed;
-
     public function __construct(Token $token)
     {
         $this->token = $token;
@@ -113,11 +107,11 @@ class LockIn
 
         if ($this->token->isTokenDeployed()) {
             $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
-            $greaterThan = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-            return $frozenAmount->greaterThan($greaterThan)
+            return $frozenAmount->greaterThan($zeroValue)
                 ? $frozenAmount
-                : $greaterThan;
+                : $zeroValue;
         } else {
             return $notReleasedAtStart;
         }
@@ -163,20 +157,6 @@ class LockIn
         return $this;
     }
 
-    /** @codeCoverageIgnore */
-    public function getDeployed(): ?\DateTimeImmutable
-    {
-        return $this->deployed;
-    }
-
-    /** @codeCoverageIgnore */
-    public function setDeployed(\DateTimeImmutable $deployed): self
-    {
-        $this->deployed = $deployed;
-
-        return $this;
-    }
-
     /**
      * Get amount of hours that passed since token was deployed to blockchain.
      *
@@ -184,10 +164,10 @@ class LockIn
      */
     public function getCountHoursFromDeploy(): float
     {
-        if ($this->deployed instanceof \DateTimeImmutable) {
+        if ($this->token->getDeployed() instanceof \DateTimeImmutable) {
             $timezone = date_default_timezone_get();
             date_default_timezone_set('UTC');
-            $deployedTimestamp = strtotime($this->deployed->format('Y-m-d H:i:s'));
+            $deployedTimestamp = strtotime($this->token->getDeployed()->format('Y-m-d H:i:s'));
             $currentTimestamp = strtotime('now');
             $timestampDiff = abs($currentTimestamp - $deployedTimestamp);
             date_default_timezone_set($timezone);
@@ -195,7 +175,7 @@ class LockIn
             return round(($timestampDiff / 3600), 2);
         }
 
-        return floatval(0);
+        return 0;
     }
 
     public function getEarnedMoneyFromDeploy(): Money

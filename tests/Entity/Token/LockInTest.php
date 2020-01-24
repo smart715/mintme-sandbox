@@ -39,7 +39,6 @@ class LockInTest extends TestCase
         /** @var Token|MockObject $token */
         $token = $this->mockToken();
         $li = new LockIn($token);
-        $li->setDeployed(new \DateTimeImmutable());
         $initialAmount = '1000000';
         $amountToRelease = 9000000;
 
@@ -52,9 +51,9 @@ class LockInTest extends TestCase
 
         $this->assertEquals($initialAmount, (int)$li->getReleasedAmount()->getAmount());
 
-        $li
-            ->setDeployed((new \DateTimeImmutable())->add(new \DateInterval('P5D')))
-            ->updateFrozenAmount();
+        date_default_timezone_set('UTC');
+        $token->expects($this->atLeast(2))->method('getDeployed')->willReturn((new \DateTimeImmutable())->add(new \DateInterval('P5D')));
+        $li->updateFrozenAmount();
 
         $this->assertEquals(5 * 24, $li->getCountHoursFromDeploy());
         $this->assertGreaterThan($initialAmount, $li->getReleasedAmount()->getAmount());
