@@ -118,6 +118,7 @@ export default {
         coinbaseUrl: String,
         showUsd: Boolean,
         mintmeSupplyUrl: String,
+        minimumVolumeForMarketcap: Number,
     },
     components: {
         Guide,
@@ -129,7 +130,6 @@ export default {
             perPage: 25,
             totalRows: 25,
             loading: false,
-            minWebCap: 0,
             userTokensEnabled: false,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
@@ -272,7 +272,7 @@ export default {
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 // If both compared fields are native numbers
-                // marketCap is '-' if it is less than minWebCap
+                // marketCap is '-' if it is less than minimumVolumeForMarketcap
                 let first = a.marketCap === '-' ? 0 : parseFloat(a[key]);
                 let second = b.marketCap === '-' ? 0 : parseFloat(b[key]);
                 return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
@@ -307,7 +307,6 @@ export default {
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
-                        this.minWebCap = res.data.min_web_cap;
 
                         if (window.history.replaceState) {
                             // prevents browser from storing history with each change:
@@ -583,9 +582,9 @@ export default {
             return toMoney(val, precision);
         },
         showTokenMarketCap: function(monthVolume, currency) {
-          // do not show market cap for markets with 30d volume of value less than minWebCap MINTME
+          // do not show market cap for markets with 30d volume of value less than minimumVolumeForMarketcap MINTME
           let amount = parseFloat(this.toMoney(monthVolume));
-          return currency === 'WEB' && amount < this.minWebCap
+          return currency === 'WEB' && amount < this.minimumVolumeForMarketcap
               ? '-'
               : amount + ' ' + currency;
         },
