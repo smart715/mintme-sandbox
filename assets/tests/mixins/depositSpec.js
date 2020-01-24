@@ -25,15 +25,9 @@ describe('depositMixin', function() {
             loggedIn: false,
             market: {
                 base: {
-                    name: 'Betcoin',
-                    symbol: 'BTC',
-                    subunit: 8,
                     identifier: 'BTC',
                 },
                 quote: {
-                    name: 'Webchain',
-                    symbol: 'WEB',
-                    subunit: 4,
                     identifier: 'WEB',
                 },
             },
