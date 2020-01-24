@@ -13,6 +13,7 @@ use App\Exchange\Balance\Factory\BalancesArrayFactoryInterface;
 use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -278,6 +279,41 @@ class BalanceHandlerTest extends TestCase
         );
     }
 
+    public function testSoldOnMarket(): void
+    {
+        $converter = $this->mockTokenNameConverter();
+//        $converter->expects($this->exactly(2))->method('convert');
+
+        $res = $this->mockBalanceResult();
+        $res->method('getAvailable')->willReturn(new Money(2, new Currency('FOO')));
+
+        $resContainer = $this->mockBalanceResultContainer();
+        $resContainer->method('get')->willReturn($res);
+
+        $fetcher = $this->mockBalanceFetcher();
+        $fetcher->expects($this->once())->method('balance')->with(5, [
+            'fooFOO',
+        ])->willReturn($resContainer);
+
+        $handler = new BalanceHandler(
+            $converter,
+            $fetcher,
+            $this->mockEm(),
+            $this->mockUserManager([]),
+            $this->mockBalancesArrayFactory(),
+            $this->mockMoneyWrapper(),
+            $this->mockTraderBalanceViewFactory(),
+            $this->mockLogger()
+        );
+
+        $ownPendingOrders = [$this->mockOrder(1, 1), $this->mockOrder(2, 1)];
+
+        $this->assertEquals(
+            $handler->soldOnMarket($this->mockToken('foo'), 5, $ownPendingOrders)->getAmount(),
+            '2'
+        );
+    }
+
     public function testDeposit(): void
     {
         $converter = $this->mockTokenNameConverter();
@@ -540,5 +576,14 @@ class BalanceHandlerTest extends TestCase
     private function mockDate(): DateTimeImmutable
     {
         return $this->createMock(DateTimeImmutable::class);
+    }
+
+    private function mockOrder(int $side, int $amount): Order
+    {
+        $order = $this->createMock(Order::class);
+        $order->method('getSide')->willReturn($side);
+        $order->method('getAmount')->willReturn(new Money($amount, new Currency('FOO')));
+
+        return $order;
     }
 }
