@@ -46,7 +46,8 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->assertEquals('11000', $marketCapCalculator->calculate());
@@ -95,7 +96,8 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->assertEquals('412800', $marketCapCalculator->calculate());
@@ -124,7 +126,8 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->assertEquals('20000', $marketCapCalculator->calculate('USD'));
@@ -153,7 +156,8 @@ class MarketCapCalculatorTest extends TestCase
             $this->mockEntityManager($repo),
             $this->mockMoneyWrapper(),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->expectException(\Throwable::class);
