@@ -391,9 +391,11 @@ export default {
                 lastPriceUSD: this.toUSD(lastPrice, currency, true),
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
-                marketCap: marketCap,
+                marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
                 tokenized: tokenized,
+                base: currency,
+                quote: token,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -588,7 +590,7 @@ export default {
         marketCapFormatter: function(value, key, item) {
           // do not show market cap for markets with 30d volume of value less than minimumVolumeForMarketcap MINTME
           let amount = parseFloat(item.monthVolume);
-          return WEB.symbol === item.base.symbol && amount < this.minimumVolumeForMarketcap
+          return WEB.symbol === item.base && amount < this.minimumVolumeForMarketcap
               ? '-'
               : value;
         },

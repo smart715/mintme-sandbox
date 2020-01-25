@@ -45,7 +45,7 @@
                             :user-id="{{ app.user ? app.user.id : 0 }}"
                             :show-usd="showUsd"
                             mintme-supply-url="{{ mintme_supply }}"
-                            minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
                             @disable-usd="disableUsd"
                         >
                             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
