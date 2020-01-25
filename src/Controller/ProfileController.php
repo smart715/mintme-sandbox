@@ -41,6 +41,7 @@ class ProfileController extends Controller
         }
 
         $profileClone = clone $profile;
+        $profileDescription = $profile->getDescription() ?? '';
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
@@ -48,6 +49,7 @@ class ProfileController extends Controller
             return $this->render('pages/profile.html.twig', [
                 'token' => $profile->getToken(),
                 'profile' => $profileClone,
+                'profileDescription' => substr($profileDescription, 0, 200),
                 'form' =>  $form->createView(),
                 'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
                 'editFormShowFirst' => !! $form->getErrors(true)->count(),
