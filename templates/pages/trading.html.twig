@@ -8,46 +8,16 @@
     <div id="trading" class="container-fluid">
         <div class="row pt-5 justify-content-center">
             <div class="col-12">
-                <div class="card card-fixed-large mx-auto">
-                    <div class="card-header">
-                        <span>Trading</span>
-                        <b-dropdown
-                            id="currency"
-                            variant="primary"
-                            class="float-right"
-                            :lazy="true"
-                        >
-                            <template slot="button-content">
-                                Currency:
-                                <span v-if="showUsd">
-                                    USD
-                                </span>
-                                <span v-else>
-                                    Crypto
-                                </span>
-                            </template>
-                            <template>
-                                <b-dropdown-item @click="toggleUsd(false)">
-                                    Crypto
-                                </b-dropdown-item>
-                                <b-dropdown-item :disabled="!enableUsd" @click="toggleUsd(true)">
-                                    USD
-                                </b-dropdown-item>
-                            </template>
-                        </b-dropdown>
-                    </div>
-                    <div class="card-body p-0">
-                        <trading
-                            websocket-url="{{ global_websocket_url }}" v-cloak
+                <div class="card card-fixed-large mx-auto">                    
+                    <div class="card-body p-0">                                      
+                        <trading                                        
+                            websocket-url="{{ global_websocket_url }}" 
                             coinbase-url="{{ global_coinbase_url }}"
                             :page="{{ page }}"
                             :tokens-count="{{ tokensCount }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}"
-                            :show-usd="showUsd"
-                            mintme-supply-url="{{ mintme_supply }}"
-                            @disable-usd="disableUsd"
-                        >
-                            {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
+                            mintme-supply-url="{{ mintme_supply }}"                            
+                        >                            
                         </trading>
                     </div>
                 </div>
