@@ -104,7 +104,7 @@ import _ from 'lodash';
 import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
-import {USD} from '../../utils/constants.js';
+import {USD, WEB} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
@@ -216,7 +216,7 @@ export default {
                     label: 'Market Cap',
                     key: 'marketCap' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
-                    formatter: formatMoney,
+                    formatter: (value, key, item) => formatMoney(this.marketCapFormatter(value, key, item)),
                 },
             };
         },
@@ -273,8 +273,10 @@ export default {
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 // If both compared fields are native numbers
                 // marketCap is '-' if it is less than minimumVolumeForMarketcap
-                let first = a.marketCap === '-' ? 0 : parseFloat(a[key]);
-                let second = b.marketCap === '-' ? 0 : parseFloat(b[key]);
+
+                let first = parseFloat(a[key]);
+                let second = parseFloat(b[key]);
+
                 return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
             }
 
@@ -374,7 +376,9 @@ export default {
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
             let hiddenName = this.findHiddenName(token);
 
-            let marketCap = Decimal.mul(lastPrice, supply);
+            let marketCap = monthVolume > this.minimumVolumeForMarketcap 
+                ? Decimal.mul(lastPrice, supply)
+                : 0;
             return {
                 pair: 'BTC' === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
@@ -387,7 +391,7 @@ export default {
                 lastPriceUSD: this.toUSD(lastPrice, currency, true),
                 volumeUSD: this.toUSD(volume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
-                marketCap: this.showTokenMarketCap(monthVolume, currency),
+                marketCap: marketCap,
                 marketCapUSD: this.toUSD(marketCap, currency),
                 tokenized: tokenized,
             };
@@ -581,12 +585,12 @@ export default {
                 : 0;
             return toMoney(val, precision);
         },
-        showTokenMarketCap: function(monthVolume, currency) {
+        marketCapFormatter: function(value, key, item) {
           // do not show market cap for markets with 30d volume of value less than minimumVolumeForMarketcap MINTME
-          let amount = parseFloat(this.toMoney(monthVolume));
-          return currency === 'WEB' && amount < this.minimumVolumeForMarketcap
+          let amount = parseFloat(item.monthVolume);
+          return WEB.symbol === item.base.symbol && amount < this.minimumVolumeForMarketcap
               ? '-'
-              : amount + ' ' + currency;
+              : value;
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;

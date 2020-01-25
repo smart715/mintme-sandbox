@@ -46,3 +46,8 @@ export const USD = {
     symbol: 'USD',
     subunit: 4,
 };
+
+export const WEB = {
+    symbol: 'WEB',
+    subunit: 4,
+}
