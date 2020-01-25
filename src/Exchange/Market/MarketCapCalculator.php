@@ -103,7 +103,7 @@ class MarketCapCalculator
         // do not show market cap for markets with 30d volume of value less than min_web_cap MINTME
 
         return array_reduce($tokenMarkets, function ($marketCap, $market) {
-            return $market->getMonthVolume()->getAmount() < $this->minimumVolumeForMarketcap
+            return $market->getMonthVolume()->lessThan($this->getMinimumMonthVolume())
                 ? $marketCap
                 : $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Token::WEB_SYMBOL));
@@ -177,5 +177,13 @@ class MarketCapCalculator
     private function format(Money $money): string
     {
         return $this->moneyWrapper->format($money);
+    }
+
+    private function getMinimumMonthVolume(): Money
+    {
+        $currency = new Currency(Token::WEB_SYMBOL);
+        $amount = $this->minimumVolumeForMarketcap * $this->moneyWrapper->getRepository()->subunitFor($currency);
+
+        return new Money($amount, $currency);
     }
 }
