@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loaded" class="card">
+    <div class="card">
         <div class="card-body p-2">
             <div class="mx-2 d-flex flex-column flex-lg-row justify-content-between">
                 <div class="my-1 text-center text-lg-left">
@@ -84,9 +84,6 @@
             </div>
         </div>
     </div>
-    <div v-else class="p-5 text-center text-white">
-        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-    </div>
 </template>
 
 <script>
@@ -168,7 +165,7 @@ export default {
                 monthAmount: '0',
                 marketCap: '0',
             },
-            stats: null,
+            stats: [],
             maxAvailableDays: 30,
             min,
             monthInfoRequestId: 0,
@@ -203,9 +200,6 @@ export default {
                 columns: ['date', 'open', 'close', 'highest', 'lowest', 'vol'],
                 rows: this.chartRows,
             };
-        },
-        loaded: function() {
-            return this.stats !== null;
         },
     },
     watch: {

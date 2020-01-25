@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div v-if="balanceLoaded" class="row">
                     <div class="col-12">
                         <label
                             for="buy-price-input"
@@ -134,6 +134,11 @@
                         </template>
                     </div>
                 </div>
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -166,6 +171,7 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
+        balanceLoaded: [String, Boolean],
     },
     data() {
         return {
@@ -322,14 +328,14 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
+        balance: function() {
+            this.immutableBalance = this.balance;
+            if (!this.balance) {
+                return;
+            }
+        },
     },
     mounted: function() {
-        this.immutableBalance = this.balance;
-
-        if (!this.balance) {
-            return;
-        }
-
         this.addMessageHandler((response) => {
             if (
                 'asset.update' === response.method &&
