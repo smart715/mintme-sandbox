@@ -85,7 +85,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('  newName');
             wrapper.vm.editName();
             wrapper.vm.$v.$touch();
-            expect(!!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
+            expect(!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
         });
 
         it('when token name has dashes in the beginning', () => {
@@ -95,7 +95,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('----newName');
             wrapper.vm.editName();
             wrapper.vm.$v.$touch();
-            expect(!!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
+            expect(!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
         });
 
         it('when token name has spaces in the end', () => {
@@ -105,7 +105,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('newName  ');
             wrapper.vm.editName();
             wrapper.vm.$v.$touch();
-            expect(!!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
+            expect(!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
         });
 
         it('when token name has dashes in the end', () => {
@@ -115,7 +115,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('newName----');
             wrapper.vm.editName();
             wrapper.vm.$v.$touch();
-            expect(!!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
+            expect(!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
         });
 
         it('when token name has spaces between dashes', () => {
@@ -125,7 +125,17 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('new--- ---Name');
             wrapper.vm.editName();
             wrapper.vm.$v.$touch();
-            expect(!!wrapper.vm.$v.newName.noSpaceBetweenDashes).to.deep.equal(true);
+            expect(!wrapper.vm.$v.newName.noSpaceBetweenDashes).to.deep.equal(true);
+        });
+
+        it('when token name has chars outside of alphabet, numbers, - and spaces', () => {
+            const wrapper = mount(TokenChangeName, {
+                propsData: {currentName: 'foobar'},
+            });
+            wrapper.find('input').setValue('new$Name!');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
+            expect(!wrapper.vm.$v.newName.validChars).to.deep.equal(true);
         });
     });
 });
