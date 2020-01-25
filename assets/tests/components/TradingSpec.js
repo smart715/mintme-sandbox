@@ -1,12 +1,40 @@
 import '../../js/main';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import {mount} from '../testHelper';
 import Trading from '../../js/components/trading/Trading';
 import {BPagination, BTable} from 'bootstrap-vue';
+import moxios from 'moxios';
+import Axios from '../../js/axios';
 
 Vue.component('b-pagination', BPagination);
 Vue.component('b-table', BTable);
 
 describe('Trading', () => {
+    beforeEach(() => {
+        moxios.install();
+    });
+    afterEach(() => {
+        moxios.uninstall();
+    });
+    const $routing = {generate: () => 'URL'};
+
+    const localVue = createLocalVue();
+    localVue.use(Axios);
+
+
+    const wrapper = shallowMount(Trading, {
+        localVue,
+        mocks: {
+            $routing,
+        },
+        propsData: {
+            enableUsd: true,
+        },
+    });
+    it('Show USD in dropdown option if enableUSD is true', () => {
+        expect(wrapper.find('.usdOption').exists()).to.deep.equal(true);
+    });
+
     describe('data field', () => {
         describe(':tokens', () => {
             context('when fetch markets from server', () => {
