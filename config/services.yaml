@@ -405,6 +405,22 @@ services:
         tags:
             - { name: monolog.logger, channel: user_action }
 
+    App\Logger\FrontEndProcessor:
+        autowire: true
+        tags:
+            - { name: monolog.processor, channel: front_end }
+
+    monolog.formatter.front_end:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%extra.url%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
+    App\Logger\FrontEndLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: front_end }
+
     logout_listner:
         class: App\EventListener\LogoutListener
 

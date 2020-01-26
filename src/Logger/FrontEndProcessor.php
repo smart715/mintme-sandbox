@@ -2,44 +2,37 @@
 
 namespace App\Logger;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * Invokable class which adds remote IP address and username to the log entry.
- *
  * @codeCoverageIgnore
  */
-class UserActionProcessor
+class FrontEndProcessor extends UserActionProcessor
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
     /** @var RequestStack */
     private $requestStack;
+
 
     public function __construct(
         TokenStorageInterface $tokenStorage,
         RequestStack $requestStack
     ) {
-        $this->tokenStorage = $tokenStorage;
         $this->requestStack = $requestStack;
+
+        parent::__construct($tokenStorage, $requestStack);
     }
 
     public function __invoke(array $record): array
     {
+        /** @var Request $request */
+        $request = $this->requestStack->getCurrentRequest();
+
         $record['extra']['username'] = $this->getUsername();
-        $record['extra']['ip_address'] = $this->requestStack->getCurrentRequest()->getClientIp();
+        $record['extra']['ip_address'] = $request->getClientIp();
+        $record['extra']['url'] = $request->headers->get('referer');
 
         return $record;
-    }
-
-    protected function getUsername(): string
-    {
-        $token = $this->tokenStorage->getToken();
-
-        return $token
-            ? $token->getUsername()
-            : '';
     }
 }

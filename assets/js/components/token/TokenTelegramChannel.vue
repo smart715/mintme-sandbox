@@ -74,7 +74,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faTelegram} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
 import {isValidTelegramUrl} from '../../utils';
 
 library.add(faTelegram, faTimes);
@@ -91,7 +91,7 @@ export default {
     components: {
         FontAwesomeIcon,
     },
-    mixins: [FiltersMixin, NotificationMixin],
+    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
     data() {
         return {
             editing: this.editingTelegram,
@@ -152,6 +152,7 @@ export default {
                         this.editing = false;
                     } else {
                         this.notifyError(response.data.message || 'Network error');
+                        this.sendLogs('error', 'Can not save telegram', response);
                     }
                     this.submitting = false;
                 });
