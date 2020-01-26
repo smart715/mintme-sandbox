@@ -44,7 +44,13 @@
 <script>
 import moment from 'moment';
 import {toMoney, formatMoney} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
