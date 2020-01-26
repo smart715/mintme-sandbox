@@ -53,11 +53,11 @@
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {addressLength, addressContain} from '../../utils/constants';
-import {NotificationMixin} from '../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../mixins';
 
 export default {
     name: 'TokenReleaseAddress',
-    mixins: [NotificationMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     components: {
         TwoFactorModal,
     },
@@ -140,10 +140,13 @@ export default {
             }, (error) => {
                 if (!error.response) {
                     this.notifyError('Network error');
+                    this.sendLogs('error', 'Edit address network error', error);
                 } else if (error.response.data.message) {
                     this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not edit address', error);
                 } else {
                     this.notifyError('An error has occurred, please try again later');
+                    this.sendLogs('error', 'An error has occurred, please try again later', error);
                 }
             });
         },
