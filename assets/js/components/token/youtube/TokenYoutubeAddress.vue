@@ -37,7 +37,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faYoutubeSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin, NotificationMixin} from '../../../mixins';
+import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
 import gapi from 'gapi';
 import Guide from '../../Guide';
 
@@ -59,7 +59,7 @@ export default {
         FontAwesomeIcon,
         Guide,
     },
-    mixins: [FiltersMixin, NotificationMixin],
+    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
     created: function() {
         if (this.editable) {
             this.loadYoutubeClient();
@@ -129,10 +129,13 @@ export default {
                 }, (error) => {
                     if (!error.response) {
                         this.notifyError('Network error');
+                        this.sendLogs('error', 'Save YouTube channel network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
+                        this.sendLogs('error', 'Can not save YouTube channel', error);
                     } else {
                         this.notifyError('An error has occurred, please try again later');
+                        this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 })
                 .then(() => {
