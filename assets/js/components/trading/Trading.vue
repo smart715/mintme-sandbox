@@ -164,7 +164,7 @@ export default {
             ],
             showUsd: false,
             enableUsd: true,
-            klineQueriesIdsTokensMap: new Map(),
+            stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
             sortBy: '',
             sortDesc: true,
