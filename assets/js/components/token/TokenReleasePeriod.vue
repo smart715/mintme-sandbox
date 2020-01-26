@@ -33,7 +33,7 @@
                 </b-row>
             </b-col>
             <b-col v-bind:class="{invisible: !showAreaUnlockedTokens}" cols="12">
-                <div>Token release period for the rest: {{ releasePeriod }} year(s)</div>
+                <div>Release period for the rest: {{ releasePeriod }} year(s)</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
