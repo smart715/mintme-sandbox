@@ -307,7 +307,6 @@ export default {
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 // If both compared fields are native numbers
-                // marketCap is '-' if it is less than minimumVolumeForMarketcap
 
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
