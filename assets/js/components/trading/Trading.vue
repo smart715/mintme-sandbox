@@ -85,7 +85,7 @@
                                 Market Cap
                             </template>
                             <template slot=body>
-                                Market cap based on max supply of 10 million tokens. Marketcap is not shown if 30d volume is lower than 100 000 MINTME.
+                                Market cap based on max supply of 10 million tokens. Market cap is not shown if 30d volume is lower than {{ `${minimumVolumeForMarketcap} MINTME` | formatMoney }}.
                             </template>
                         </guide>
                     </template>
@@ -307,7 +307,6 @@ export default {
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 // If both compared fields are native numbers
-                // marketCap is '-' if it is less than minimumVolumeForMarketcap
 
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
