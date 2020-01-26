@@ -306,7 +306,6 @@ export default {
             let numeric = key !== this.fields.pair.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
-                
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
