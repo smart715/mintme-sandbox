@@ -98,13 +98,13 @@ import BbcodeHelp from '../../bbcode/BbcodeHelp';
 import BbcodeView from '../../bbcode/BbcodeView';
 import LimitedTextarea from '../../LimitedTextarea';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
-import {NotificationMixin} from '../../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../../mixins';
 
 library.add(faEdit);
 
 export default {
     name: 'TokenIntroductionDescription',
-    mixins: [NotificationMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     props: {
         description: String,
         editable: Boolean,
@@ -164,10 +164,13 @@ export default {
                     this.readyToSave = true;
                     if (!error.response) {
                         this.notifyError('Network error');
+                        this.sendLogs('error', 'Edit description network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
+                        this.sendLogs('error', 'Can not edit description', error);
                     } else {
                         this.notifyError('An error has occurred, please try again later');
+                        this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 })
                 .then(() => {

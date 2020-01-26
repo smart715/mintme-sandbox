@@ -39,11 +39,11 @@
 <script>
     import ConfirmModal from './modal/ConfirmModal';
     import CopyLink from './CopyLink';
-    import {NotificationMixin} from '../mixins';
+    import {LoggerMixin, NotificationMixin} from '../mixins';
 
     export default {
         name: 'ApiKeys',
-        mixins: [NotificationMixin],
+        mixins: [NotificationMixin, LoggerMixin],
         components: {ConfirmModal, CopyLink},
         props: {
             apiKeys: {type: [Object, Array], required: true},
@@ -63,7 +63,10 @@
             generate: function() {
                 return this.$axios.single.post(this.$routing.generate('post_keys'))
                     .then((res) => this.keys = res.data)
-                    .catch(() => this.notifyError('Something went wrong. Try to reload the page.'));
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not generate API Keys', err);
+                    });
             },
             invalidate: function() {
                 return this.$axios.single.delete(this.$routing.generate('delete_keys'))
@@ -71,7 +74,10 @@
                         this.keys = {};
                         this.toggleInvalidateModal(false);
                     })
-                    .catch(() => this.notifyError('Something went wrong. Try to reload the page.'));
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not invalidate API Keys', err);
+                    });
             },
             toggleInvalidateModal: function(on) {
                 this.invalidateModal = on;

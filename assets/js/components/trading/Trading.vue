@@ -129,7 +129,7 @@
 <script>
 import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -137,7 +137,7 @@ import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         page: Number,
         tokensCount: Number,
@@ -355,6 +355,7 @@ export default {
                     })
                     .catch((err) => {
                         this.notifyError('Can not update the markets data. Try again later.');
+                        this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
             });
@@ -455,6 +456,7 @@ export default {
                         });
                         if ('undefined' === typeof this.markets[market].supply) {
                             this.notifyError('Can not update market cap for BTC/MINTME.');
+                            this.sendLogs('error', 'Can not update market cap for BTC/MINTME', 'markets supply === undefined');
                             this.markets[market].supply = 0;
                         }
                     } else {
@@ -552,6 +554,7 @@ export default {
                 .catch((err) => {
                     this.$emit('disable-usd');
                     this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                    this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                     reject();
                 });
             });
@@ -575,7 +578,8 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        this.notifyError('Can not update MINTME circulation supply. BTC/MINTME market cap might not be accurate.');
+                        this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });
             });
@@ -602,10 +606,16 @@ export default {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
                     this.globalMarketCaps['BTC'] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch BTC from global market cap', err);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
                     this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch USD from global market cap', err);
                 });
         },
         toMoney: function(val, subunit = 2) {
