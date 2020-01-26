@@ -37,13 +37,13 @@
 <script>
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
-import {NotificationMixin} from '../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../mixins';
 
 const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenDelete',
-    mixins: [NotificationMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     props: {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
@@ -101,13 +101,16 @@ export default {
                 }, (error) => {
                     if (!error.response) {
                         this.notifyError('Network error');
+                        this.sendLogs('error', 'Delete token network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
+                        this.sendLogs('error', 'Can not delete token', error);
                         if ('2fa code is expired' === error.response.data.message) {
                             this.sendConfirmCode();
                         }
                     } else {
                         this.notifyError('An error has occurred, please try again later');
+                        this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 });
         },
@@ -128,10 +131,13 @@ export default {
                 }, (error) => {
                     if (!error.response) {
                         this.notifyError('Network error');
+                        this.sendLogs('error', 'Send confirm code network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
+                        this.sendLogs('error', 'Can not send confirm code', error);
                     } else {
                         this.notifyError('An error has occurred, please try again later');
+                        this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 });
         },
