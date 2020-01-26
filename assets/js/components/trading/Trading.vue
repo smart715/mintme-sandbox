@@ -85,7 +85,9 @@
                                 Market Cap
                             </template>
                             <template slot=body>
-                                Market cap based on max supply of 10 million tokens. Market cap is not shown if 30d volume is lower than {{ `${minimumVolumeForMarketcap} MINTME` | formatMoney }}.
+                                Market cap based on max supply of 10 million tokens.
+                                Market cap is not shown if 30d volume is lower than
+                                {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
                             </template>
                         </guide>
                     </template>

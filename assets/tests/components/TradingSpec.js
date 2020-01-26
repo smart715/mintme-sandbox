@@ -35,6 +35,59 @@ describe('Trading', () => {
         expect(wrapper.find('.usdOption').exists()).to.deep.equal(true);
     });
 
+    describe('marketCapFormatter() function should return ', () => {
+        it('dash(-) if market is for token and monthVolume less than minimumVolumeForMarketcap', () => {
+            const wrapper = shallowMount(Trading, {
+                mocks: {
+                    $routing,
+                },
+                propsData: {
+                    minimumVolumeForMarketcap: 10,
+                },
+            });
+            let item = {
+                base: 'MINTME',
+                monthVolume: 9,
+
+            };
+            expect(wrapper.vm.marketCapFormatter('9', 0, item)).deep.equal('-');
+        });
+
+        it('value if market is not for token', () => {
+            const wrapper = shallowMount(Trading, {
+                mocks: {
+                    $routing,
+                },
+                propsData: {
+                    minimumVolumeForMarketcap: 10,
+                },
+            });
+            let item = {
+                base: 'foo',
+                monthVolume: 10,
+
+            };
+            expect(wrapper.vm.marketCapFormatter('10', 0, item)).deep.equal('10');
+        });
+
+        it('value if monthVolume not less than minimumVolumeForMarketcap', () => {
+            const wrapper = shallowMount(Trading, {
+                mocks: {
+                    $routing,
+                },
+                propsData: {
+                    minimumVolumeForMarketcap: 10,
+                },
+            });
+            let item = {
+                base: 'MINTME',
+                monthVolume: 10,
+
+            };
+            expect(wrapper.vm.marketCapFormatter('9', 0, item)).deep.equal('9');
+        });
+    });
+
     describe('data field', () => {
         describe(':tokens', () => {
             context('when fetch markets from server', () => {
