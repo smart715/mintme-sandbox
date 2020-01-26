@@ -51,14 +51,14 @@ export const USD = {
 export const WEB = {
     symbol: 'WEB',
     subunit: 4,
-}
+};
 
 export const BTC = {
     symbol: 'BTC',
     subunit: 8,
-}
+};
 
 export const MINTME = {
     symbol: 'MINTME',
     subunit: 4,
-}
+};

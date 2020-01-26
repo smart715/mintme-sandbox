@@ -411,7 +411,7 @@ export default {
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
             let hiddenName = this.findHiddenName(token);
 
-            let marketCap = monthVolume > this.minimumVolumeForMarketcap 
+            let marketCap = monthVolume > this.minimumVolumeForMarketcap
                 ? Decimal.mul(lastPrice, supply)
                 : 0;
             return {
