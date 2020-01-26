@@ -149,7 +149,15 @@
 
 <script>
 import Guide from '../Guide';
-import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins/';
+import {
+    FiltersMixin,
+    PlaceOrder,
+    WebSocketMixin,
+    MoneyFilterMixin,
+    PricePositionMixin,
+    RebrandingFilterMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
@@ -159,7 +167,7 @@ export default {
     components: {
         Guide,
     },
-    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, LoggerMixin],
     props: {
         loginUrl: String,
         signupUrl: String,
@@ -216,7 +224,10 @@ export default {
                         this.showNotification(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error))
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.sendLogs('error', 'Can not get place order', error);
+                    })
                     .then(() => this.placingOrder = false);
             }
         },
@@ -335,7 +346,9 @@ export default {
                             res.data.frozenAmount
                         ) : response.params[0][this.market.quote.identifier].available
                     )
-                    .catch(() => {});
+                    .catch((err) => {
+                        this.sendLogs('error', 'Can not get immutable balance', err);
+                    });
             }
         }, 'trade-sell-order-asset');
     },
