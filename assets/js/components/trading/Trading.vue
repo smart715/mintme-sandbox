@@ -306,8 +306,7 @@ export default {
             let numeric = key !== this.fields.pair.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
-                // If both compared fields are native numbers
-
+                
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
@@ -410,9 +409,9 @@ export default {
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
             let hiddenName = this.findHiddenName(token);
 
-            let marketCap = monthVolume > this.minimumVolumeForMarketcap
-                ? Decimal.mul(lastPrice, supply)
-                : 0;
+            let marketCap = parseFloat(monthVolume) < this.minimumVolumeForMarketcap
+                ? 0
+                : Decimal.mul(lastPrice, supply);
             return {
                 pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
