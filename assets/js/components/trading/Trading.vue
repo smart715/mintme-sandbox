@@ -131,7 +131,7 @@ import _ from 'lodash';
 import Guide from '../Guide';
 import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
-import {USD, WEB} from '../../utils/constants.js';
+import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
@@ -160,7 +160,7 @@ export default {
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
-                {currency: 'BTC', token: 'WEB'},
+                {currency: BTC.symbol, token: WEB.symbol},
             ],
             showUsd: false,
             enableUsd: true,
@@ -253,9 +253,9 @@ export default {
         },
         globalMarketCap: function() {
             if (this.showUsd) {
-                return this.globalMarketCaps['USD'] + ' USD';
+                return this.globalMarketCaps[USD.symbol] + USD.symbol;
             }
-            return this.globalMarketCaps['BTC'] + ' BTC';
+            return this.globalMarketCaps[BTC.symbol] + BTC.symbol;
         },
     },
     mounted() {
@@ -415,11 +415,11 @@ export default {
                 ? Decimal.mul(lastPrice, supply)
                 : 0;
             return {
-                pair: 'BTC' === currency ? `${currency}/${token}` : `${token}`,
+                pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: this.toMoney(volume, 'BTC' === currency ? 4 : 2) + ' ' + currency,
-                monthVolume: this.toMoney(monthVolume, 'BTC' === currency ? 4 : 2) + ' ' + currency,
+                volume: this.toMoney(volume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
+                monthVolume: this.toMoney(monthVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
@@ -522,7 +522,7 @@ export default {
 
             let monthVolume = marketInfo.deal;
             let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = this.toMoney(monthVolume, 'BTC' === marketCurrency ? 4 : 2) + ' ' + marketCurrency;
+            monthVolume = this.toMoney(monthVolume, BTC.symbol === marketCurrency ? 4 : 2) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
@@ -608,11 +608,11 @@ export default {
         fetchGlobalMarketCap: function() {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
-                    this.globalMarketCaps['BTC'] = this.toMoney(res.data.marketcap);
+                    this.globalMarketCaps[BTC.symbol] = this.toMoney(res.data.marketcap);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
-                    this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
+                    this.globalMarketCaps[USD.symbol] = this.toMoney(res.data.marketcap);
                 });
         },
         toMoney: function(val, subunit = 2) {
@@ -624,8 +624,7 @@ export default {
         },
         marketCapFormatter: function(value, key, item) {
           // do not show market cap for markets with 30d volume of value less than minimumVolumeForMarketcap MINTME
-          let amount = parseFloat(item.monthVolume);
-          return WEB.symbol === item.base && amount < this.minimumVolumeForMarketcap
+          return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
               ? '-'
               : value;
         },

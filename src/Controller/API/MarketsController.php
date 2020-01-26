@@ -92,6 +92,12 @@ class MarketsController extends APIController
      */
     public function getMarketCap(MarketCapCalculator $marketCapCalculator, CacheInterface $cache, string $base = Token::BTC_SYMBOL): View
     {
+        $marketCap = $marketCapCalculator->calculate($base);
+
+        return $this->view([
+            'marketcap' => $marketCap,
+        ]);
+
         $marketCap = $cache->get("marketcap_{$base}", function (ItemInterface $item) use ($marketCapCalculator, $base) {
             $item->expiresAfter(3600);
 
