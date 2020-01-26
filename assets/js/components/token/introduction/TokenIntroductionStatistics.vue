@@ -218,7 +218,7 @@ export default {
         }))
             .then((res) => this.soldOnMarket = res.data)
             .catch((err) => {
-                this.notifyError('Can not load soldOnMarket value. Try again later')
+                this.notifyError('Can not load soldOnMarket value. Try again later');
                 this.sendLogs('error', 'Can not load soldOnMarket value', err);
             });
 
