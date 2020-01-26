@@ -181,9 +181,6 @@ class MarketCapCalculator
 
     private function getMinimumMonthVolume(): Money
     {
-        $currency = new Currency(Token::WEB_SYMBOL);
-        $amount = strval($this->minimumVolumeForMarketcap) . str_repeat("0", $this->moneyWrapper->getRepository()->subunitFor($currency));
-
-        return new Money($amount, $currency);
+        return $this->moneyWrapper->parse((string)$this->minimumVolumeForMarketcap, Token::WEB_SYMBOL);
     }
 }
