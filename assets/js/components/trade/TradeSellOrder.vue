@@ -165,6 +165,7 @@ import {
     PricePositionMixin,
     RebrandingFilterMixin,
     DepositMixin,
+    LoggerMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -183,6 +184,7 @@ export default {
         PricePositionMixin,
         RebrandingFilterMixin,
         DepositMixin,
+        LoggerMixin,
     ],
     props: {
         loginUrl: String,
@@ -240,7 +242,10 @@ export default {
                         this.showNotification(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error))
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.sendLogs('error', 'Can not get place order', error);
+                    })
                     .then(() => this.placingOrder = false);
             }
         },
@@ -361,7 +366,9 @@ export default {
                             res.data.frozenAmount
                         ) : response.params[0][this.market.quote.identifier].available
                     )
-                    .catch(() => {});
+                    .catch((err) => {
+                        this.sendLogs('error', 'Can not get immutable balance', err);
+                    });
             }
         }, 'trade-sell-order-asset');
     },

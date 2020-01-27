@@ -33,7 +33,7 @@
                 </b-row>
             </b-col>
             <b-col v-bind:class="{invisible: !showAreaUnlockedTokens}" cols="12">
-                <div>Token release period for the rest: {{ releasePeriod }} year(s)</div>
+                <div>Release period for the rest: {{ releasePeriod }} year(s)</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
@@ -83,12 +83,12 @@ import Decimal from 'decimal.js';
 import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
-import {NotificationMixin} from '../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
 
 export default {
     name: 'TokenReleasePeriod',
-    mixins: [NotificationMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     props: {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
@@ -138,7 +138,10 @@ export default {
                     this.loading = false;
                 }
             })
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err);
+            });
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -165,10 +168,13 @@ export default {
             }).catch(({response}) => {
                 if (!response) {
                     this.notifyError('Network error');
+                    this.sendLogs('error', 'Save release period network error', response);
                 } else if (response.data.message) {
                     this.notifyError(response.data.message);
+                    this.sendLogs('error', 'Can not save release period', response);
                 } else {
                     this.notifyError('An error has occurred, please try again later');
+                    this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             });
         },

@@ -44,13 +44,19 @@
 <script>
 import moment from 'moment';
 import {toMoney, formatMoney} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {CopyLink},
     data() {
         return {
@@ -132,8 +138,9 @@ export default {
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.notifyError('Can not update payment history. Try again later.');
+                        this.sendLogs('error', 'Can not update payment history', err);
                         reject([]);
                     });
             });

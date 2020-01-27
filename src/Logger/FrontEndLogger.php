@@ -3,6 +3,6 @@
 namespace App\Logger;
 
 /** @codeCoverageIgnore */
-class UserActionLogger extends BaseLogger
+class FrontEndLogger extends BaseLogger
 {
 }

@@ -74,7 +74,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faDiscord} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {FiltersMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
 import {isValidDiscordUrl} from '../../utils';
 
 library.add(faDiscord, faTimes);
@@ -91,7 +91,7 @@ export default {
     components: {
         FontAwesomeIcon,
     },
-    mixins: [FiltersMixin, NotificationMixin],
+    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
     data() {
         return {
             editing: this.editingDiscord,
@@ -152,6 +152,7 @@ export default {
                         this.editing = false;
                     } else {
                         this.notifyError(response.data.message || 'Network error');
+                        this.sendLogs('error', 'Save discord network error', response);
                     }
                     this.submitting = false;
                 });

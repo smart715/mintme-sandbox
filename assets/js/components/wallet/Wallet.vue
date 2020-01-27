@@ -148,14 +148,28 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins';
+import {
+    WebSocketMixin,
+    FiltersMixin,
+    MoneyFilterMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 import {tokSymbol, btcSymbol, webSymbol} from '../../utils/constants';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     components: {
         WithdrawModal,
         DepositModal,
@@ -256,24 +270,33 @@ export default {
                                 id: parseInt(Math.random()),
                             }));
                         })
-                        .catch(() => this.notifyError(
-                            'Can not connect to internal services'
-                        ));
+                        .catch((err) => {
+                            this.notifyError(
+                                'Can not connect to internal services'
+                            );
+                            this.sendLogs('error', 'Can not connect to internal services', err);
+                        });
+
                 })
-                .catch(() => {
+                .catch((err) => {
                     this.notifyError('Can not update tokens now. Try again later.');
+                    this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
                 }),
 
             this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
                 .then((res) => this.depositAddresses = res.data)
-                .catch(() => {
+                .catch((err) => {
                     this.notifyError('Can not update deposit data now. Try again later.');
+                    this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
                 }),
         ])
         .then(() => {
             this.openDepositMore();
         })
-        .catch(() => this.notifyError('Can not load Wallet data. Try again later.'));
+        .catch((err) => {
+            this.notifyError('Can not load Wallet data. Try again later.');
+            this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
+        });
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
@@ -311,8 +334,9 @@ export default {
                     toMoney(res.data, subunit) :
                     undefined
                 )
-                .catch(() => {
+                .catch((err) => {
                     this.notifyError('Can not update deposit fee status. Try again later.');
+                    this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
             // TODO: Get rid of hardcoded WEB
@@ -357,7 +381,9 @@ export default {
                                 this.tokens[token].available = res.data ?
                                     new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
                             )
-                            .catch(() => {});
+                            .catch((err) => {
+                                this.sendLogs('error', 'Can not get lock-period', err);
+                            });
                     }
                 });
             });

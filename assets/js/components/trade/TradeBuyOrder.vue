@@ -161,6 +161,7 @@ import {
     PricePositionMixin,
     RebrandingFilterMixin,
     DepositMixin,
+    LoggerMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -175,6 +176,7 @@ export default {
         PricePositionMixin,
         RebrandingFilterMixin,
         DepositMixin,
+        LoggerMixin,
     ],
     components: {
         Guide,
@@ -235,7 +237,10 @@ export default {
                         this.showNotification(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error))
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.sendLogs('error', 'Can not get place order', error);
+                    })
                     .then(() => this.hasOrderPlaced = false);
             }
         },
