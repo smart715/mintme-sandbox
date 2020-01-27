@@ -1,5 +1,32 @@
 <template>
     <div class="trading">
+        <div class="card-header">
+            <span>Trading</span>
+                <b-dropdown
+                    id="currency"
+                    variant="primary"
+                    class="float-right"
+                    :lazy="true"
+                >
+                <template slot="button-content">
+                    Currency:
+                <span v-if="showUsd">
+                    USD
+                </span>
+                <span v-else>
+                    Crypto
+                </span>
+                </template>
+                <template>
+                    <b-dropdown-item @click="toggleUsd(false)">
+                        Crypto
+                    </b-dropdown-item>
+                    <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
+                        USD
+                    </b-dropdown-item>
+                </template>
+            </b-dropdown>
+        </div>
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
@@ -20,6 +47,8 @@
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"
                     sort-direction="desc"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
@@ -90,7 +119,7 @@
             </div>
         </template>
         <template v-else>
-            <div class="p-5 text-center">
+            <div class="p-5 text-center text-white">
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
         </template>
@@ -100,7 +129,7 @@
 <script>
 import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -108,13 +137,12 @@ import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         page: Number,
         tokensCount: Number,
         userId: Number,
         coinbaseUrl: String,
-        showUsd: Boolean,
         mintmeSupplyUrl: String,
     },
     components: {
@@ -133,8 +161,12 @@ export default {
             marketsOnTop: [
                 {currency: 'BTC', token: 'WEB'},
             ],
+            showUsd: false,
+            enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
+            sortBy: '',
+            sortDesc: true,
             globalMarketCaps: {
                 BTC: 0,
                 USD: 0,
@@ -229,6 +261,13 @@ export default {
         this.fetchData();
     },
     methods: {
+        toggleUsd: function(show) {
+            this.showUsd = show;
+        },
+        disableUsd: function() {
+            this.showUsd = false;
+            this.enableUsd = false;
+        },
         fetchData: function(page = false) {
             if (page) {
                 this.currentPage = page;
@@ -316,6 +355,7 @@ export default {
                     })
                     .catch((err) => {
                         this.notifyError('Can not update the markets data. Try again later.');
+                        this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
             });
@@ -416,6 +456,7 @@ export default {
                         });
                         if ('undefined' === typeof this.markets[market].supply) {
                             this.notifyError('Can not update market cap for BTC/MINTME.');
+                            this.sendLogs('error', 'Can not update market cap for BTC/MINTME', 'markets supply === undefined');
                             this.markets[market].supply = 0;
                         }
                     } else {
@@ -513,6 +554,7 @@ export default {
                 .catch((err) => {
                     this.$emit('disable-usd');
                     this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                    this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                     reject();
                 });
             });
@@ -536,7 +578,8 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        this.notifyError('Can not update MINTME circulation supply. BTC/MINTME market cap might not be accurate.');
+                        this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });
             });
@@ -563,10 +606,16 @@ export default {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
                     this.globalMarketCaps['BTC'] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch BTC from global market cap', err);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
                     this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch USD from global market cap', err);
                 });
         },
         toMoney: function(val, subunit = 2) {
@@ -578,6 +627,8 @@ export default {
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
+            this.sortBy = this.volumes[this.activeVolume].key;
+            this.sortDesc = true;
         },
     },
 };

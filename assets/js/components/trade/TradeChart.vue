@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loaded" class="card">
+    <div class="card">
         <div class="card-body p-2">
             <div class="mx-2 d-flex flex-column flex-lg-row justify-content-between">
                 <div class="my-1 text-center text-lg-left">
@@ -84,15 +84,18 @@
             </div>
         </div>
     </div>
-    <div v-else class="p-5 text-center text-white">
-        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-    </div>
 </template>
 
 <script>
 import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
-import {WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../../js/mixins/';
+import {
+    WebSocketMixin,
+    MoneyFilterMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../../js/mixins/';
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
@@ -100,7 +103,7 @@ import {webSymbol} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
-    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         websocketUrl: String,
         market: Object,
@@ -162,7 +165,7 @@ export default {
                 monthAmount: '0',
                 marketCap: '0',
             },
-            stats: null,
+            stats: [],
             maxAvailableDays: 30,
             min,
             monthInfoRequestId: 0,
@@ -197,9 +200,6 @@ export default {
                 columns: ['date', 'open', 'close', 'highest', 'lowest', 'vol'],
                 rows: this.chartRows,
             };
-        },
-        loaded: function() {
-            return this.stats !== null;
         },
     },
     watch: {
@@ -265,8 +265,9 @@ export default {
                 params: [this.market.identifier, 24 * 60 * 60],
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
-        }).catch(() => {
+        }).catch((err) => {
             this.notifyError('Service unavailable now. Can not load the chart data');
+            this.sendLogs('error', 'Can not load the chart data', err);
         });
     },
     methods: {
@@ -349,6 +350,7 @@ export default {
                     })
                     .catch((err) => {
                         this.$toasted.error('Can not update WEB circulation supply. Market Cap might not be accurate.');
+                        this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });
             });

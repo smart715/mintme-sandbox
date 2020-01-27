@@ -51,11 +51,11 @@
 import moment from 'moment';
 import {formatMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
-import {FiltersMixin} from '../../mixins';
+import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins';
 
 export default {
     name: 'TopHolders',
-    mixins: [FiltersMixin],
+    mixins: [FiltersMixin, LoggerMixin, NotificationMixin],
     props: {
       tokenName: String,
     },
@@ -106,7 +106,10 @@ export default {
                     date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
                     amount: Math.round(row.balance),
                 };
-            }));
+            })).catch((err) => {
+                this.notifyError('Can not get top holders. Please, try again');
+                this.sendLogs('error', 'Can not get top holders', err);
+            });
         },
     },
     mounted: function() {

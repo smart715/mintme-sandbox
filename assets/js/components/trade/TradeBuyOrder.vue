@@ -16,7 +16,7 @@
                 </span>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div v-if="balanceLoaded" class="row">
                     <div class="col-12">
                         <label
                             for="buy-price-input"
@@ -134,6 +134,11 @@
                         </template>
                     </div>
                 </div>
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -141,14 +146,21 @@
 
 <script>
 import Guide from '../Guide';
-import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins/';
+import {
+    WebSocketMixin,
+    PlaceOrder,
+    MoneyFilterMixin,
+    PricePositionMixin,
+    RebrandingFilterMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, LoggerMixin],
     components: {
         Guide,
     },
@@ -159,6 +171,7 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
+        balanceLoaded: [String, Boolean],
     },
     data() {
         return {
@@ -207,7 +220,10 @@ export default {
                         this.showNotification(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error))
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.sendLogs('error', 'Can not get place order', error);
+                    })
                     .then(() => this.hasOrderPlaced = false);
             }
         },
@@ -312,14 +328,14 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
+        balance: function() {
+            this.immutableBalance = this.balance;
+            if (!this.balance) {
+                return;
+            }
+        },
     },
     mounted: function() {
-        this.immutableBalance = this.balance;
-
-        if (!this.balance) {
-            return;
-        }
-
         this.addMessageHandler((response) => {
             if (
                 'asset.update' === response.method &&

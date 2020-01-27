@@ -11,42 +11,32 @@
         <div class="row trade-orders">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
-                        v-if="balanceLoaded"
-                        :websocket-url="websocketUrl"
-                        :hash="hash"
-                        :login-url="loginUrl"
-                        :signup-url="signupUrl"
-                        :logged-in="loggedIn"
-                        :market="market"
-                        :market-price="marketPriceBuy"
-                        :balance="baseBalance"
-                        @check-input="checkInput"
+                    :websocket-url="websocketUrl"
+                    :hash="hash"
+                    :login-url="loginUrl"
+                    :signup-url="signupUrl"
+                    :logged-in="loggedIn"
+                    :market="market"
+                    :market-price="marketPriceBuy"
+                    :balance="baseBalance"
+                    :balance-loaded="balanceLoaded"
+                    @check-input="checkInput"
                 />
-                <template v-else>
-                    <div class="p-5 text-center text-white">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                </template>
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
-                <trade-sell-order
-                        v-if="balanceLoaded"
-                        :websocket-url="websocketUrl"
-                        :hash="hash"
-                        :login-url="loginUrl"
-                        :signup-url="signupUrl"
-                        :logged-in="loggedIn"
-                        :market="market"
-                        :market-price="marketPriceSell"
-                        :balance="quoteBalance"
-                        :is-owner="isOwner"
-                        @check-input="checkInput"
+                 <trade-sell-order
+                    :websocket-url="websocketUrl"
+                    :hash="hash"
+                    :login-url="loginUrl"
+                    :signup-url="signupUrl"
+                    :logged-in="loggedIn"
+                    :market="market"
+                    :market-price="marketPriceSell"
+                    :balance="quoteBalance"
+                    :balance-loaded="balanceLoaded"
+                    :is-owner="isOwner"
+                    @check-input="checkInput"
                 />
-                <template v-else>
-                    <div class="p-5 text-center text-white">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
-                </template>
             </div>
         </div>
         <div class="row">
@@ -77,14 +67,14 @@ import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
-import {WebSocketMixin, NotificationMixin} from '../../mixins';
+import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
 const WSAPI = Constants.WSAPI;
 
 export default {
     name: 'Trade',
-    mixins: [WebSocketMixin, NotificationMixin],
+    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     components: {
         TradeBuyOrder,
         TradeSellOrder,
@@ -117,11 +107,11 @@ export default {
     },
     computed: {
         baseBalance: function() {
-            return this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
+            return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
                 : false;
         },
         quoteBalance: function() {
-            return this.balances[this.market.quote.symbol] ? this.balances[this.market.quote.symbol].available
+            return this.balances && this.balances[this.market.quote.symbol] ? this.balances[this.market.quote.symbol].available
                 : false;
         },
         balanceLoaded: function() {
@@ -192,7 +182,10 @@ export default {
                         this.buyOrders = result.data.buy;
                         this.sellOrders = result.data.sell;
                         resolve();
-                    }).catch(reject);
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not update orders', err);
+                        reject();
+                    });
                 } else {
                     this.$axios.retry.get(this.$routing.generate('pending_orders', {
                         base: this.market.base.symbol,
@@ -219,7 +212,10 @@ export default {
 
                         context.resolve();
                         resolve(result.data);
-                    }).catch(reject);
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not update orders', err);
+                        reject();
+                    });
                 }
             });
         },
@@ -245,10 +241,11 @@ export default {
                                 id: parseInt(Math.random().toString().replace('0.', '')),
                             }));
                         })
-                        .catch(() => {
+                        .catch((err) => {
                             this.notifyError(
                                 'Can not connect to internal services'
                             );
+                            this.sendLogs('error', 'Can not connect to internal services', err);
                         });
                 })
                 .catch((err) => {
@@ -256,6 +253,7 @@ export default {
                         this.balances = false;
                     } else {
                         this.notifyError('Can not load current balance. Try again later.');
+                        this.sendLogs('error', 'Can not load current balance', err);
                     }
                 });
         },
@@ -280,7 +278,10 @@ export default {
                         });
                         this.saveOrders(orders, isSell);
                     })
-                    .catch(() => this.notifyError('Something went wrong. Can not update orders.'));
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Can not update orders.');
+                        this.sendLogs('error', 'Can not update orders', err);
+                    });
                     break;
                 case WSAPI.order.status.UPDATE:
                     if (typeof order === 'undefined') {
