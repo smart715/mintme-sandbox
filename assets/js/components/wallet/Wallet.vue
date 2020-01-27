@@ -276,7 +276,6 @@ export default {
                             );
                             this.sendLogs('error', 'Can not connect to internal services', err);
                         });
-
                 })
                 .catch((err) => {
                     this.notifyError('Can not update tokens now. Try again later.');
