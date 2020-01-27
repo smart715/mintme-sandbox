@@ -256,7 +256,7 @@ class MarketCapCalculatorTest extends TestCase
         return $this->createMock(Token::class);
     }
 
-    private function mockMoneyWrapper(int $subunit): MoneyWrapperInterface
+    private function mockMoneyWrapper(int $minimumVolumeForMarketcap): MoneyWrapperInterface
     {
         $mw = $this->createMock(MoneyWrapperInterface::class);
 
@@ -276,10 +276,9 @@ class MarketCapCalculatorTest extends TestCase
             return $money->getAmount();
         });
 
-        $currencies = $this->createMock(Currencies::class);
-        $currencies->method('subunitFor')->willReturn($subunit);
-
-        $mw->method('getRepository')->willReturn($currencies);
+        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol) {
+            return new Money($amount, new Currency($symbol));
+        });
 
         return $mw;
     }

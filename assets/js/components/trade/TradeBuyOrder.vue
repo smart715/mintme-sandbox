@@ -81,14 +81,15 @@
                                 @paste="checkAmountInput"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
-                                <label class="custom-control custom-checkbox pb-0">
+                                <label
+                                    v-if="!disabledMarketPrice"
+                                    class="custom-control custom-checkbox pb-0">
                                     <input
                                         v-model="useMarketPrice"
                                         step="0.00000001"
                                         type="checkbox"
                                         id="buy-price"
                                         class="custom-control-input"
-                                        :disabled="disabledMarketPrice"
                                     >
                                     <label
                                         class="custom-control-label pb-0"
@@ -146,14 +147,21 @@
 
 <script>
 import Guide from '../Guide';
-import {WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin} from '../../mixins/';
+import {
+    WebSocketMixin,
+    PlaceOrder,
+    MoneyFilterMixin,
+    PricePositionMixin,
+    RebrandingFilterMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin],
+    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, LoggerMixin],
     components: {
         Guide,
     },
@@ -213,7 +221,10 @@ export default {
                         this.showNotification(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error))
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.sendLogs('error', 'Can not get place order', error);
+                    })
                     .then(() => this.hasOrderPlaced = false);
             }
         },

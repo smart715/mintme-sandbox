@@ -93,12 +93,12 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {addressLength, webSymbol, addressContain} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
-    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Modal,
     },
@@ -196,6 +196,7 @@ export default {
             })
             .catch((error) => {
                 this.notifyError(error.response.data.message);
+                this.sendLogs('error', 'Withdraw response error', error);
             })
             .then(() => this.withdrawing = false);
 
