@@ -169,7 +169,7 @@ const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
-    mixins: [MoneyFilterMixin, NotificationMixin],
+    mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Guide,
     },
@@ -202,20 +202,29 @@ export default {
             .catch(() => this.notifyError('Can not load statistic data. Try again later'));
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err);
+            });
 
         this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
             name: this.market.quote.symbol,
         }))
             .then((res) => this.soldOnMarket = res.data)
-            .catch(() => this.notifyError('Can not load soldOnMarket value. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load soldOnMarket value. Try again later');
+                this.sendLogs('error', 'Can not load soldOnMarket value', err);
+            });
 
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
         }))
             .then((res) => this.pendingSellOrders = res.data.sell)
-            .catch(() => this.notifyError('Can not load statistic data. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err);
+            });
     },
     computed: {
         loaded: function() {

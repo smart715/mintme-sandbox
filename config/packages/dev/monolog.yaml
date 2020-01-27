@@ -1,11 +1,11 @@
 monolog:
-    channels: ['user_action']
+    channels: ['user_action', 'front_end']
     handlers:
         main:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action']
+            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end']
         console:
             type: console
             process_psr_3_messages: false
@@ -46,3 +46,9 @@ monolog:
             level: debug
             channels: ['user_action']
             formatter: monolog.formatter.user_action
+        front_end:
+            type: stream
+            path: "%kernel.logs_dir%/front_end.log"
+            level: debug
+            channels: ['front_end']
+            formatter: monolog.formatter.front_end
