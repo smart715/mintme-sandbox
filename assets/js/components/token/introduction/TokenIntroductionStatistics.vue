@@ -161,7 +161,7 @@
 import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
-import {MoneyFilterMixin, NotificationMixin} from '../../../mixins';
+import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
 import {mapGetters} from 'vuex';
 
 
