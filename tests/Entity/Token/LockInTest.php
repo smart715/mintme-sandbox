@@ -42,7 +42,7 @@ class LockInTest extends TestCase
         $initialAmount = '1000000';
         $amountToRelease = 9000000;
 
-        $token->expects($this->any())->method('isTokenDeployed')->willReturn(true);
+        $token->expects($this->any())->method('isDeployed')->willReturn(true);
 
         $li
             ->setAmountToRelease(new Money($amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL)))

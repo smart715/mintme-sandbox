@@ -352,7 +352,7 @@ class Token implements TradebleInterface
                 : self::DEPLOYED);
     }
 
-    public function isTokenDeployed(): bool
+    public function isDeployed(): bool
     {
         return self::DEPLOYED === $this->getDeploymentStatus();
     }

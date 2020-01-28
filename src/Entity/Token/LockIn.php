@@ -92,9 +92,13 @@ class LockIn
     {
         $releasedAtStart = new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        return $this->token->isTokenDeployed()
-            ? $releasedAtStart->add($this->getEarnedMoneyFromDeploy())
-            : $releasedAtStart;
+        if ($this->token->isDeployed()) {
+            return $releasedAtStart->add($this->getEarnedMoneyFromDeploy());
+        } else {
+            $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+            return $money->subtract($this->getFrozenAmount())->add($releasedAtStart);
+        }
     }
 
     /**
@@ -103,9 +107,8 @@ class LockIn
      */
     public function getFrozenAmount(): Money
     {
-        $notReleasedAtStart = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
-
-        if ($this->token->isTokenDeployed()) {
+        if ($this->token->isDeployed()) {
+            $notReleasedAtStart = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
             $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
             $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
 
@@ -113,7 +116,7 @@ class LockIn
                 ? $frozenAmount
                 : $zeroValue;
         } else {
-            return $notReleasedAtStart;
+            return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
         }
     }
 
@@ -168,7 +171,7 @@ class LockIn
             $timezone = date_default_timezone_get();
             date_default_timezone_set('UTC');
             $deployedTimestamp = strtotime($this->token->getDeployed()->format('Y-m-d H:i:s'));
-            $currentTimestamp = strtotime('now');
+            $currentTimestamp = time();
             $timestampDiff = abs($currentTimestamp - $deployedTimestamp);
             date_default_timezone_set($timezone);
 
