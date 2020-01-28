@@ -1,11 +1,11 @@
 <template>
     <div>
         <b-table small
+                 striped
                  v-if="hasClients"
                  ref="table"
                  :items="clients"
-                 :fields="fields"
-                 :striped="striped">
+                 :fields="fields">
             <template v-slot:cell(id)="row">
                 <div class="text-center">
                     <div class="text-left d-inline-block">
@@ -14,7 +14,7 @@
                         <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
                             <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                         </copy-link>
-                        <a @click="toggleInvalidateModal(true, row.item.id)">
+                        <a @click="setInvalidateModal(true, row.item.id)">
                             <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
                         </a><br />
                         Secret<br />
@@ -36,7 +36,7 @@
         </b-table>
         <p>Create New Client for OAuth:</p>
         <div class="btn btn-primary c-pointer" @click="createClient">Create</div>
-        <confirm-modal :visible="invalidateModal" @confirm="deleteClient(clientId)" @close="toggleInvalidateModal(false, clientId)">
+        <confirm-modal :visible="invalidateModal" @confirm="deleteClient(clientId)" @close="setInvalidateModal(false, clientId)">
             <p class="text-white modal-title pt-2">
                 Are you sure you want to delete your API Client.
                 Currently running applications will not work. Continue?
@@ -73,25 +73,29 @@
         methods: {
             createClient: function() {
                 return this.$axios.single.post(this.$routing.generate('post_client'))
-                    .then((res) => this.clients = res.data)
-                    .catch(() => this.notifyError('Something went wrong. Try to reload the page.'));
+                    .then((res) => this.clients.push(res.data))
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not create API Client', err);
+                    });
             },
             deleteClient: function(clientId) {
                 return this.$axios.single.delete(this.$routing.generate('delete_client'), {params: {id: clientId}})
-                    .then((res) => {
-                        this.clients = res.data;
-                        this.toggleInvalidateModal(false, '');
+                    .then(() => {
+                        this.clients = this.clients.filter(function (item) {
+                            return clientId != item.id;
+                        });
+                        this.setInvalidateModal(false, '');
                     })
-                    .catch(() => this.notifyError('Something went wrong. Try to reload the page.'));
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not delete API Client', err);
+                    });
             },
-            toggleInvalidateModal: function(on, clientId) {
+            setInvalidateModal: function(on, clientId) {
                 this.invalidateModal = on;
                 this.clientId = clientId;
             },
         },
     };
 </script>
-
-<style scoped>
-
-</style>

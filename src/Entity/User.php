@@ -182,7 +182,7 @@ class User extends BaseUser implements
     public function getApiClients(): array
     {
         return array_map(function (Client $client) {
-            return $client->getClient();
+            return ['id' => $client->getPublicId()];
         }, $this->clients->toArray());
     }
 

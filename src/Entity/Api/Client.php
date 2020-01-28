@@ -37,11 +37,6 @@ class Client extends BaseClient
         return $this->user;
     }
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * @codeCoverageIgnore
      * @param User $user
@@ -49,14 +44,5 @@ class Client extends BaseClient
     public function setUser(User $user): void
     {
         $this->user = $user;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     * @return array
-     */
-    public function getClient(): array
-    {
-        return ['id' => $this->getPublicId()];
     }
 }

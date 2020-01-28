@@ -94,21 +94,11 @@ class UsersController extends AbstractFOSRestController
         $user = $this->getUser();
         /** @var Client $client */
         $client = $this->clientManager->createClient();
-        $client->setAllowedGrantTypes(array('client_credentials'));
+        $client->setAllowedGrantTypes(['client_credentials']);
         $client->setUser($user);
         $this->clientManager->updateClient($client);
 
-        $clients = $user->GetApiClients();
-
-        // add secret only to new created client
-        // for other it will be hidden
-        foreach ($clients as $key => $val) {
-            if ($val['id'] ===  $client->getPublicId()) {
-                $clients[$key]['secret'] = $client->getSecret();
-            }
-        }
-
-        return $clients;
+        return ['id' => $client->getPublicId(), 'secret' => $client->getSecret()];
     }
 
     /**
@@ -116,10 +106,10 @@ class UsersController extends AbstractFOSRestController
      * @Rest\Delete("/clients", name="delete_client", options={"expose"=true})
      * @Rest\QueryParam(name="id", allowBlank=false, description="client id to delete")
      * @param ParamFetcherInterface $request
-     * @return array Client[]
+     * @return bool
      * @throws ApiNotFoundException
      */
-    public function deleteApiClient(ParamFetcherInterface $request): array
+    public function deleteApiClient(ParamFetcherInterface $request): bool
     {
 
         $id = $request->get('id');
@@ -137,14 +127,14 @@ class UsersController extends AbstractFOSRestController
         $user = $this->getUser();
         $client = $this->clientManager->findClientBy(['user' => $user, 'randomId' => $ids[1], 'id' => $ids[0]]);
 
-        if (!($client instanceof \App\Entity\Api\Client)) {
+        if (!($client instanceof Client)) {
             throw new ApiNotFoundException("No clients attached to the account");
         }
 
         $this->clientManager->deleteClient($client);
         $this->userActionLogger->info('Deleted API Client');
 
-        return $user->GetApiClients();
+        return true;
     }
 
     private function getEm(): ObjectManager
