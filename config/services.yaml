@@ -482,6 +482,7 @@ services:
             $supplyLinks: { Webchain: '%mintme_supply%' }
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
+            $minimumVolumeForMarketcap: '%minimum_volume_for_marketcap%'
 
     app.profile.form:
         class: App\Form\ProfileType
