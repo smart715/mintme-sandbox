@@ -12,6 +12,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currencies;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
@@ -33,8 +34,8 @@ class MarketCapCalculatorTest extends TestCase
         $token = $this->mockToken();
 
         # Markets
-        $webbtc = $this->mockMarketStatus($web, $btc, '10');
-        $tokenweb = $this->mockMarketStatus($token, $web, '10');
+        $webbtc = $this->mockMarketStatus($web, $btc, '10', '0');
+        $tokenweb = $this->mockMarketStatus($token, $web, '10', '0');
 
         # Market Status Repository
 
@@ -44,9 +45,10 @@ class MarketCapCalculatorTest extends TestCase
             ['Webchain' => __DIR__.'/supply.txt'],
             100,
             $this->mockEntityManager($repo),
-            $this->mockMoneyWrapper(),
+            $this->mockMoneyWrapper(0),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->assertEquals('11000', $marketCapCalculator->calculate());
@@ -65,25 +67,25 @@ class MarketCapCalculatorTest extends TestCase
         $token = $this->mockToken();
 
         # Markets
-        $webbtc = $this->mockMarketStatus($web, $btc, '10');
+        $webbtc = $this->mockMarketStatus($web, $btc, '10', '0');
 
         $exchangeableCryptoMarkets = [
             $webbtc,
-            $this->mockMarketStatus($ethereum, $btc, '7'),
-            $this->mockMarketStatus($monero, $btc, '1'),
+            $this->mockMarketStatus($ethereum, $btc, '7', '0'),
+            $this->mockMarketStatus($monero, $btc, '1', '0'),
         ];
 
         $tokenWEBMarkets = [
-            $this->mockMarketStatus($token, $web, '15'),
-            $this->mockMarketStatus($token, $web, '37'),
-            $this->mockMarketStatus($token, $web, '42'),
-            $this->mockMarketStatus($token, $web, '55'),
-            $this->mockMarketStatus($token, $web, '5'),
-            $this->mockMarketStatus($token, $web, '8'),
-            $this->mockMarketStatus($token, $web, '4'),
-            $this->mockMarketStatus($token, $web, '100'),
-            $this->mockMarketStatus($token, $web, '63'),
-            $this->mockMarketStatus($token, $web, '82'),
+            $this->mockMarketStatus($token, $web, '15', '0'),
+            $this->mockMarketStatus($token, $web, '37', '0'),
+            $this->mockMarketStatus($token, $web, '42', '0'),
+            $this->mockMarketStatus($token, $web, '55', '0'),
+            $this->mockMarketStatus($token, $web, '5', '0'),
+            $this->mockMarketStatus($token, $web, '8', '0'),
+            $this->mockMarketStatus($token, $web, '4', '0'),
+            $this->mockMarketStatus($token, $web, '100', '0'),
+            $this->mockMarketStatus($token, $web, '63', '0'),
+            $this->mockMarketStatus($token, $web, '82', '0'),
         ];
 
         # Market Status Repository
@@ -93,9 +95,10 @@ class MarketCapCalculatorTest extends TestCase
             ['Webchain' => __DIR__.'/supply.txt'],
             100,
             $this->mockEntityManager($repo),
-            $this->mockMoneyWrapper(),
+            $this->mockMoneyWrapper(0),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->assertEquals('412800', $marketCapCalculator->calculate());
@@ -111,8 +114,8 @@ class MarketCapCalculatorTest extends TestCase
         $token = $this->mockToken();
 
         # Markets
-        $webbtc = $this->mockMarketStatus($web, $btc, '10');
-        $tokenweb = $this->mockMarketStatus($token, $web, '10');
+        $webbtc = $this->mockMarketStatus($web, $btc, '10', '0');
+        $tokenweb = $this->mockMarketStatus($token, $web, '10', '0');
 
         # Market Status Repository
 
@@ -122,9 +125,10 @@ class MarketCapCalculatorTest extends TestCase
             ['Webchain' => __DIR__.'/supply.txt'],
             100,
             $this->mockEntityManager($repo),
-            $this->mockMoneyWrapper(),
+            $this->mockMoneyWrapper(0),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->assertEquals('20000', $marketCapCalculator->calculate('USD'));
@@ -132,7 +136,7 @@ class MarketCapCalculatorTest extends TestCase
 
     public function testCalculateWithInvalidBase(): void
     {
-         # Cryptos
+        # Cryptos
         $web = $this->mockCrypto('WEB', 'Webchain', true);
         $btc = $this->mockCrypto('BTC', 'Bitcoin', true);
 
@@ -140,25 +144,54 @@ class MarketCapCalculatorTest extends TestCase
         $token = $this->mockToken();
 
         # Markets
-        $webbtc = $this->mockMarketStatus($web, $btc, '10');
-        $tokenweb = $this->mockMarketStatus($token, $web, '10');
+        $webbtc = $this->mockMarketStatus($web, $btc, '10', '0');
+        $tokenweb = $this->mockMarketStatus($token, $web, '10', '0');
 
         # Market Status Repository
-
         $repo = $this->mockMarketStatusRepository([$tokenweb], [$webbtc], $webbtc);
 
         $marketCapCalculator = new MarketCapCalculator(
             ['Webchain' => __DIR__.'/supply.txt'],
             100,
             $this->mockEntityManager($repo),
-            $this->mockMoneyWrapper(),
+            $this->mockMoneyWrapper(0),
             $this->mockRpc(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockCryptoRatesFetcher(),
+            0
         );
 
         $this->expectException(\Throwable::class);
 
         $marketCapCalculator->calculate('ETH');
+    }
+
+    public function testCalculateWithUnreliableMarkets(): void
+    {
+        # Cryptos
+        $web = $this->mockCrypto('WEB', 'Webchain', true);
+        $btc = $this->mockCrypto('BTC', 'Bitcoin', true);
+
+        # Tokens
+        $token = $this->mockToken();
+
+        # Markets
+        $webbtc = $this->mockMarketStatus($web, $btc, '10', '0');
+        $tokenweb = $this->mockMarketStatus($token, $web, '10', '10');
+
+        # Market Status Repository
+        $repo = $this->mockMarketStatusRepository([$tokenweb], [], $webbtc);
+
+        $marketCapCalculator = new MarketCapCalculator(
+            ['Webchain' => __DIR__.'/supply.txt'],
+            100,
+            $this->mockEntityManager($repo),
+            $this->mockMoneyWrapper(0),
+            $this->mockRpc(),
+            $this->mockCryptoRatesFetcher(),
+            100
+        );
+
+        $this->assertEquals('0', $marketCapCalculator->calculate());
     }
 
     private function mockEntityManager(MarketStatusRepository $repo): EntityManagerInterface
@@ -190,14 +223,20 @@ class MarketCapCalculatorTest extends TestCase
     /**
         @param Crypto|Token $quote
     */
-    private function mockMarketStatus($quote, Crypto $crypto, string $lastPrice): MarketStatus
-    {
+    private function mockMarketStatus(
+        $quote,
+        Crypto $crypto,
+        string $lastPrice,
+        string $monthVolume
+    ): MarketStatus {
         $lastPrice = new Money($lastPrice, new Currency($crypto->getSymbol()));
+        $monthVolume = new Money($monthVolume, new Currency($crypto->getSymbol()));
 
         $ms = $this->createMock(MarketStatus::class);
         $ms->method('getLastPrice')->willReturn($lastPrice);
         $ms->method('getCrypto')->willReturn($crypto);
         $ms->method('getQuote')->willReturn($quote);
+        $ms->method('getMonthVolume')->willReturn($monthVolume);
 
         return $ms;
     }
@@ -217,7 +256,7 @@ class MarketCapCalculatorTest extends TestCase
         return $this->createMock(Token::class);
     }
 
-    private function mockMoneyWrapper(): MoneyWrapperInterface
+    private function mockMoneyWrapper(int $minimumVolumeForMarketcap): MoneyWrapperInterface
     {
         $mw = $this->createMock(MoneyWrapperInterface::class);
 
@@ -235,6 +274,10 @@ class MarketCapCalculatorTest extends TestCase
         $mw->method('convert')->willReturnCallback($callback->bindTo($mw));
         $mw->method('format')->willReturnCallback(function ($money) {
             return $money->getAmount();
+        });
+
+        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol) {
+            return new Money($amount, new Currency($symbol));
         });
 
         return $mw;

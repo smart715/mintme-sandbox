@@ -39,13 +39,17 @@ class MarketCapCalculator
     /** @var cryptoRatesFetcherInterface */
     private $cryptoRatesFetcher;
 
+    /** @var int */
+    private $minimumVolumeForMarketcap;
+
     public function __construct(
         array $supplyLinks,
         int $tokenSupply,
         EntityManagerInterface $em,
         MoneyWrapperInterface $moneyWrapper,
         RestRpcInterface $rpc,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        CryptoRatesFetcherInterface $cryptoRatesFetcher,
+        int $minimumVolumeForMarketcap
     ) {
         $this->supplyLinks = $supplyLinks;
         $this->tokenSupply = $tokenSupply;
@@ -53,6 +57,7 @@ class MarketCapCalculator
         $this->rpc = $rpc;
         $this->repository = $em->getRepository(MarketStatus::class);
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
+        $this->minimumVolumeForMarketcap = $minimumVolumeForMarketcap;
     }
 
     public function calculate(string $base = Token::BTC_SYMBOL): string
@@ -95,9 +100,12 @@ class MarketCapCalculator
     private function calculateTokenMarketCap(): Money
     {
         $tokenMarkets = $this->repository->getTokenWEBMarkets();
+        // do not show market cap for markets with 30d volume of value less than min_web_cap MINTME
 
         return array_reduce($tokenMarkets, function ($marketCap, $market) {
-            return $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
+            return $market->getMonthVolume()->lessThan($this->getMinimumMonthVolume())
+                ? $marketCap
+                : $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Token::WEB_SYMBOL));
     }
 
@@ -169,5 +177,10 @@ class MarketCapCalculator
     private function format(Money $money): string
     {
         return $this->moneyWrapper->format($money);
+    }
+
+    private function getMinimumMonthVolume(): Money
+    {
+        return $this->moneyWrapper->parse((string)$this->minimumVolumeForMarketcap, Token::WEB_SYMBOL);
     }
 }
