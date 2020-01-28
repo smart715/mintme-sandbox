@@ -61,7 +61,7 @@
                             Market Cap
                         </template>
                         <template slot="body">
-                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created. Marketcap is not shown if 30d volume is lower than {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
                         </template>
                     </guide>
                     <br>
@@ -99,7 +99,7 @@ import {
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
-import {webSymbol} from '../../utils/constants.js';
+import {WEB} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
@@ -108,6 +108,7 @@ export default {
         websocketUrl: String,
         market: Object,
         mintmeSupplyUrl: String,
+        minimumVolumeForMarketcap: Number,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -170,7 +171,7 @@ export default {
             min,
             monthInfoRequestId: 0,
             supply: 1e7,
-            volumeSymbol: webSymbol.toUpperCase() === this.market.quote.symbol.toUpperCase()
+            volumeSymbol: WEB.symbol === this.market.quote.symbol.toUpperCase()
                 ? 'MINTME'
                 : 'Tokens',
         };
@@ -286,14 +287,12 @@ export default {
             const marketAmount = parseFloat(marketInfo.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-            const marketCap = marketLastPrice * this.supply;
 
             const marketStatus = {
                 change: toMoney(changePercentage, 2),
                 last: toMoney(marketLastPrice, this.market.base.subunit),
                 volume: toMoney(marketVolume, this.market.quote.subunit),
                 amount: toMoney(marketAmount, this.market.base.subunit),
-                marketCap: toMoney(marketCap, this.market.base.subunit),
             };
 
             this.marketStatus = {...this.marketStatus, ...marketStatus};
@@ -315,11 +314,15 @@ export default {
             const marketAmount = parseFloat(marketData.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
+            const marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
+                ? 0
+                : parseFloat(this.marketStatus.last) * this.supply;
 
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
+                marketCap: toMoney(marketCap, this.market.base.subunit),
             };
 
             this.marketStatus = {...this.marketStatus, ...monthInfo};
