@@ -34,27 +34,79 @@ class LockInTest extends TestCase
         $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
     }
 
+    public function testGetReleasedAmountForDeployedToken(): void
+    {
+        $releasedAtStart = '1000000';
+        $token = $this->mockToken();
+        $li = new LockIn($token);
+        $token->method('isDeployed')->willReturn(true);
+        $token
+            ->expects($this->atLeast(2))
+            ->method('getDeployed')
+            ->willReturn((new \DateTimeImmutable())->add(new \DateInterval('P1D')));
+
+        $releasedAtStartObj = new Money($releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $li->setReleasedAtStart($releasedAtStart);
+
+        $this->assertEquals(
+            $releasedAtStartObj->add($li->getEarnedMoneyFromDeploy()),
+            $li->getReleasedAmount()
+        );
+    }
+
     public function testUpdateFrozenAmount(): void
+    {
+        $li = new LockIn($this->mockToken());
+        $amountToRelease = new Money('9000000', new Currency(MoneyWrapper::TOK_SYMBOL));
+
+        $li
+            ->setAmountToRelease($amountToRelease)
+            ->updateFrozenAmount();
+
+        $this->assertEquals(
+            $amountToRelease->subtract($li->getHourlyRate())->getAmount(),
+            $li->getFrozenAmount()->getAmount()
+        );
+    }
+
+    public function testUpdateFrozenAmountForDeployedToken(): void
     {
         /** @var Token|MockObject $token */
         $token = $this->mockToken();
         $li = new LockIn($token);
         $initialAmount = '1000000';
-        $amountToRelease = 9000000;
+        $amountToRelease = new Money(9000000, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        $token->expects($this->any())->method('isDeployed')->willReturn(true);
+        $token
+            ->expects($this->any())
+            ->method('isDeployed')->willReturn(true);
 
         $li
-            ->setAmountToRelease(new Money($amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setAmountToRelease($amountToRelease)
+            ->setReleasedAtStart($initialAmount)
+            ->updateFrozenAmount();
+        $this->assertEquals($initialAmount, (int)$li->getReleasedAmount()->getAmount());
+        $this->assertEquals($amountToRelease->getAmount(), $li->getFrozenAmount()->getAmount());
+
+        /** @var Token|MockObject $token */
+        $token = $this->mockToken();
+        $li = new LockIn($token);
+
+        date_default_timezone_set('UTC');
+        $token
+            ->expects($this->atLeast(2))
+            ->method('getDeployed')
+            ->willReturn((new \DateTimeImmutable())->add(new \DateInterval('P5D')));
+
+        $li
+            ->setAmountToRelease($amountToRelease)
             ->setReleasedAtStart($initialAmount)
             ->updateFrozenAmount();
 
-        $this->assertEquals($initialAmount, (int)$li->getReleasedAmount()->getAmount());
-
-        date_default_timezone_set('UTC');
-        $token->expects($this->atLeast(2))->method('getDeployed')->willReturn((new \DateTimeImmutable())->add(new \DateInterval('P5D')));
-        $li->updateFrozenAmount();
-
+        $this->assertEquals(
+            $amountToRelease->subtract($li->getHourlyRate())->getAmount(),
+            $li->getFrozenAmount()->getAmount()
+        );
         $this->assertEquals(5 * 24, $li->getCountHoursFromDeploy());
         $this->assertGreaterThan($initialAmount, $li->getReleasedAmount()->getAmount());
         $this->assertLessThan($amountToRelease, $li->getFrozenAmount()->getAmount());
