@@ -1,6 +1,15 @@
 import {webSymbol, btcSymbol} from '../utils/constants';
 
 export default {
+    props: {
+        loggedIn: Boolean,
+        market: Object,
+    },
+    data() {
+        return {
+            action: '',
+        };
+    },
     computed: {
         showDepositMoreLink: function() {
             return this.loggedIn && this.isMarketBTCOrWEB;

@@ -6,15 +6,6 @@ describe('depositMixin', function() {
     const $url = 'URL';
     const $routing = {generate: () => $url};
     const Component = Vue.component('foo', {
-        props: {
-            loggedIn: Boolean,
-            market: Object,
-        },
-        data() {
-            return {
-                action: '',
-            };
-        },
         mixins: [DepositMixin],
     });
     const wrapper = shallowMount(Component, {
