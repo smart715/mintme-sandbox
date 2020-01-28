@@ -410,7 +410,10 @@ export default {
         },
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
             let hiddenName = this.findHiddenName(token);
-            let marketCap = Decimal.mul(lastPrice, supply);
+
+            let marketCap = parseFloat(monthVolume) < this.minimumVolumeForMarketcap
+                ? 0
+                : Decimal.mul(lastPrice, supply);
             return {
                 pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
