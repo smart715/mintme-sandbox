@@ -90,14 +90,15 @@
                                 @paste="checkAmountInput"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
-                                <label class="custom-control custom-checkbox pb-0">
+                                <label
+                                    v-if="!disabledMarketPrice"
+                                   class="custom-control custom-checkbox pb-0">
                                     <input
                                         v-model.number="useMarketPrice"
                                         step="0.00000001"
                                         type="checkbox"
                                         id="sell-price"
                                         class="custom-control-input"
-                                        :disabled="disabledMarketPrice"
                                     >
                                     <label
                                         class="custom-control-label pb-0"
