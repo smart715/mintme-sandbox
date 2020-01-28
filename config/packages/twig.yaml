@@ -23,3 +23,4 @@ twig:
         show_full_data_in_profile: '%show_full_data_in_profile%'
         mintme_coin: '%mintme_coin%'
         mintme_coin_link: '%mintme_coin_link%'
+        minimum_volume_for_marketcap: '%minimum_volume_for_marketcap%'
