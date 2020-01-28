@@ -82,7 +82,7 @@
             deleteClient: function(clientId) {
                 return this.$axios.single.delete(this.$routing.generate('delete_client'), {params: {id: clientId}})
                     .then(() => {
-                        this.clients = this.clients.filter(function (item) {
+                        this.clients = this.clients.filter(function(item) {
                             return clientId != item.id;
                         });
                         this.setInvalidateModal(false, '');
