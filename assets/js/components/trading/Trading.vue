@@ -410,10 +410,10 @@ export default {
         },
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
             let hiddenName = this.findHiddenName(token);
-
-            let marketCap = parseFloat(monthVolume) < this.minimumVolumeForMarketcap
+            let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
                 ? 0
                 : Decimal.mul(lastPrice, supply);
+
             return {
                 pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
@@ -516,21 +516,29 @@ export default {
         },
         updateMonthVolume: function(requestId, marketInfo) {
             const marketName = this.stateQueriesIdsTokensMap.get(requestId);
-            const marketCurrency = this.markets[marketName].base.symbol;
-            const marketToken = this.markets[marketName].quote.symbol;
-            // const marketPrecision = this.markets[marketName].base.subunit; I'll leave this here in any case we ever need it again
-            const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
+            const market = this.markets[marketName];
+            const tokenized = market.quote.deploymentStatus === tokenDeploymentStatus.deployed;
+            const marketOnTopIndex = this.getMarketOnTopIndex(market.base.symbol, market.quote.symbol);
 
-            let monthVolume = marketInfo.deal;
-            let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = this.toMoney(monthVolume, BTC.symbol === marketCurrency ? 4 : 2) + ' ' + marketCurrency;
+            const sanitizedMarket = this.getSanitizedMarket(
+                market.base.symbol,
+                market.quote.symbol,
+                this.getPercentage(
+                    parseFloat(market.lastPrice),
+                    parseFloat(market.openPrice)
+                ),
+                market.lastPrice,
+                market.dayVolume,
+                market.monthVolume = marketInfo.deal,
+                market.supply,
+                market.base.subunit,
+                tokenized
+                );
 
             if (marketOnTopIndex > -1) {
-                this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
-                this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolumeUSD = monthVolumeUSD;
+                this.sanitizedMarketsOnTop[marketOnTopIndex] = sanitizedMarket;
             } else {
-                this.sanitizedMarkets[marketName].monthVolume = monthVolume;
-                this.sanitizedMarkets[marketName].monthVolumeUSD = monthVolumeUSD;
+                this.sanitizedMarkets[marketName] = sanitizedMarket;
             }
         },
         requestMonthInfo: function(market) {
@@ -632,10 +640,9 @@ export default {
             return toMoney(val, precision);
         },
         marketCapFormatter: function(value, key, item) {
-          // do not show market cap for markets with 30d volume of value less than minimumVolumeForMarketcap MINTME
-          return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
-              ? '-'
-              : value;
+            return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
+                ? '-'
+                : value;
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
