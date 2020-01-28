@@ -240,7 +240,7 @@ export default {
                     ...this.volumes[this.activeVolume],
                     key: this.volumes[this.activeVolume].key + (this.showUsd ? USD.symbol : ''),
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(this.monthValueFormatter(value, key, item)),
+                    formatter: formatMoney,
                 },
                 marketCap: {
                     label: 'Market Cap',
@@ -416,7 +416,7 @@ export default {
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 volume: this.toMoney(volume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
-                monthVolume: this.toMoney(monthVolume, BTC.symbol === currency ? 4 : 2),
+                monthVolume: this.toMoney(monthVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
@@ -520,7 +520,7 @@ export default {
 
             let monthVolume = marketInfo.deal;
             let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = this.toMoney(monthVolume, BTC.symbol === marketCurrency ? 4 : 2);
+            monthVolume = this.toMoney(monthVolume, BTC.symbol === marketCurrency ? 4 : 2) + ' ' + marketCurrency;
 
             if (marketOnTopIndex > -1) {
                 this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
@@ -629,12 +629,10 @@ export default {
             return toMoney(val, precision);
         },
         marketCapFormatter: function(value, key, item) {
-            return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
-                ? '-'
-                : value;
-        },
-        monthValueFormatter: function(value, key, item) {
-            return value + ' ' + item.base;
+          // do not show market cap for markets with 30d volume of value less than minimumVolumeForMarketcap MINTME
+          return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
+              ? '-'
+              : value;
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
