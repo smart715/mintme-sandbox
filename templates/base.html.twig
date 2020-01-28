@@ -21,7 +21,7 @@
                 {% block header %}
                     {% include 'topnav.html.twig' %}
                 {% endblock %}
-                <main class="flex-fill content">
+                <main class="flex-fill content {% block bgclass %}{% endblock %}">
                     {% block main %}
                         {% block messageContainer %}
                             {% if app.session.flashbag.peekAll() is not empty %}
