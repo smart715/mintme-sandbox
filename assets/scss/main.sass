@@ -42,6 +42,9 @@ body
   background-size: 100% 100%
   min-height: 100vh
 
+.content-wrapper
+  min-height: 100vh
+
   @include media-breakpoint-up(xs)
     content: "xs"
 
@@ -63,8 +66,14 @@ body
 .text-bold
   font-weight: 800
 
-.content-wrapper
+.index-bg
   min-height: 100vh
+  margin-top: -6.5%
+  padding-top: 6.5%
+  background: url("../img/hero_image.jpg") no-repeat, linear-gradient(#102238 50%, transparent)
+  background-size: 100% auto
+  @include media-breakpoint-down(xs)
+    background: linear-gradient($secondary-dark 50%, transparent)
 
 a
   color: $color-link
