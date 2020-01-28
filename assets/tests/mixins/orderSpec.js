@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
-import DepositMixin from '../../js/mixins/deposit';
+import OrderMixin from '../../js/mixins/order';
 
-describe('depositMixin', function() {
+describe('OrderMixin', function() {
     const $url = 'URL';
     const $routing = {generate: () => $url};
     const Component = Vue.component('foo', {
-        mixins: [DepositMixin],
+        mixins: [OrderMixin],
     });
     const wrapper = shallowMount(Component, {
         mocks: {

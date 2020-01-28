@@ -165,7 +165,7 @@ import {
     MoneyFilterMixin,
     PricePositionMixin,
     RebrandingFilterMixin,
-    DepositMixin,
+    OrderMixin,
     LoggerMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
@@ -184,7 +184,7 @@ export default {
         MoneyFilterMixin,
         PricePositionMixin,
         RebrandingFilterMixin,
-        DepositMixin,
+        OrderMixin,
         LoggerMixin,
     ],
     props: {
