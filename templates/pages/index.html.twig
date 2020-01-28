@@ -2,15 +2,13 @@
 
 {% block title %}mintMe crowdfunding | create token, create coin, monetize yourself on the blockchain!{% endblock %}
 
-{% block bodyclass %}homepage{% endblock %}
-
-{% block messageClass %}d-none{% endblock %}
+{% block bgclass %}index-bg{% endblock %}
 
 {% block content %}
     <section id="top-showcase" class="container-fluid text-responsive pt-2 pb-5 py-sm-0">
         <div class="row">
             <div class="col p-0 text-center">
-                <div class="position-sm-absolute container-fluid w-100 h-100">
+                <div class="container-fluid w-100 h-100">
                     <div class="row h-75">
                         <div class="col d-flex justify-content-center">
                             <div class="align-self-center pt-4 pt-md-0">
@@ -35,7 +33,6 @@
                         </div>
                     </div>
                 </div>
-                <img class="w-100 visible-hidden d-none d-sm-block" src="{{ asset('build/images/hero_image.jpg') }}" alt="Mintme image explaining how users participate"/>
             </div>
         </div>
     </section>
@@ -269,6 +266,10 @@
         </div>
     </section>
 {% endblock %}
+
+{% block bodyclass %}homepage{% endblock %}
+
+{% block messageClass %}d-none{% endblock %}
 
 {% block pagescripts %}
     <script src="{{ asset('build/home.js') }}"></script>
