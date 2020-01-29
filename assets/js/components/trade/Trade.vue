@@ -6,7 +6,6 @@
                 :websocket-url="websocketUrl"
                 :market="market"
                 :mintme-supply-url="mintmeSupplyUrl"
-                :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
             />
         </div>
         <div class="row trade-orders">
@@ -96,7 +95,6 @@ export default {
         userId: Number,
         precision: Number,
         mintmeSupplyUrl: String,
-        minimumVolumeForMarketcap: Number,
     },
     data() {
         return {
