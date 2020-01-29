@@ -19,6 +19,7 @@ new Vue({
             tokenName: '',
             tokenNameExists: false,
             tokenNameProcessing: false,
+            tokenNameTimeout: null,
         };
     },
     computed: {
@@ -36,17 +37,19 @@ new Vue({
 
             if (!this.$v.tokenName.$invalid && this.tokenName) {
                 this.tokenNameProcessing = true;
-                this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.tokenName}))
-                    .then((response) => {
-                        if (HTTP_OK === response.status) {
-                            this.tokenNameExists = response.data.exists;
-                        }
-                    }, (error) => {
-                        this.$toasted.error('An error has occurred, please try again later');
-                    })
-                    .then(() => {
-                        this.tokenNameProcessing = false;
-                    });
+                this.tokenNameTimeout = setTimeout(() => {
+                    this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.tokenName}))
+                        .then((response) => {
+                            if (HTTP_OK === response.status) {
+                                this.tokenNameExists = response.data.exists;
+                            }
+                        }, (error) => {
+                            this.$toasted.error('An error has occurred, please try again later');
+                        })
+                        .then(() => {
+                            this.tokenNameProcessing = false;
+                        });
+                }, 1000);
             }
         },
     },
