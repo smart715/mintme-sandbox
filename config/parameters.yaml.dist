@@ -114,9 +114,6 @@ parameters:
 
     # If true, then it will cut headers for front end logging
     front_end_logs_cut_headers: true
-<<<<<<< HEAD
-=======
 
     # 30d min value for token to be added to market cap total on trading page
     minimum_volume_for_marketcap: 100000
->>>>>>> 026b35e5c2b7ccc36a412ffc11624d4e51d19aa7
