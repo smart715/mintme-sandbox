@@ -61,7 +61,7 @@
                             Market Cap
                         </template>
                         <template slot="body">
-                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created. Marketcap is not shown if 30d volume is lower than {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
                         </template>
                     </guide>
                     <br>
@@ -108,6 +108,7 @@ export default {
         websocketUrl: String,
         market: Object,
         mintmeSupplyUrl: String,
+        minimumVolumeForMarketcap: Number,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -221,6 +222,7 @@ export default {
             this.fetchWEBsupply().then(() => {
                 this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
             }).catch((error) => {
+                this.notifyError('Can not update the market cap for BTC / MINTME');
                 this.supply = 0;
             });
         }
@@ -312,7 +314,9 @@ export default {
             const marketAmount = parseFloat(marketData.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-            const marketCap = parseFloat(this.marketStatus.last) * this.supply;
+            const marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
+                ? 0
+                : parseFloat(this.marketStatus.last) * this.supply;
 
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
