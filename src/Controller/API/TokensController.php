@@ -616,7 +616,8 @@ class TokensController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/{name}/check-token-name-exists", name="check_token_name_exists", options={"expose"=true})
      */
-    public function checkTokenNameExists(string $name): View {
+    public function checkTokenNameExists(string $name): View
+    {
         $token = $this->tokenManager->findByName($name);
 
         return $this->view(['exists' => null !== $token], Response::HTTP_OK);
