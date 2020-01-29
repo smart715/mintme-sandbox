@@ -10,6 +10,7 @@ use App\Repository\PendingWithdrawRepository;
 use App\Wallet\WalletInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -32,12 +33,15 @@ class WalletController extends Controller
     }
 
     /**
-     * @Route(name="wallet")
+     * @param Request $request
+     * @Route(name="wallet", options={"expose"=true})
+     * @return Response
      */
-    public function wallet(): Response
+    public function wallet(Request $request): Response
     {
         return $this->render('pages/wallet.html.twig', [
             'hash' => $this->getUser()->getHash(),
+            'depositMore' => $request->get('depositMore') ?? '',
         ]);
     }
 
