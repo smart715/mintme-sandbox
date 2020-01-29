@@ -221,6 +221,9 @@ export default {
         if ('WEBBTC' === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
                 this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
+            }).catch((error) => {
+                this.notifyError('Can not update the market cap for BTC / MINTME');
+                this.supply = 0;
             });
         }
 
@@ -356,6 +359,7 @@ export default {
                         this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });
+                reject(new Error('CORS error'));
             });
         },
     },
