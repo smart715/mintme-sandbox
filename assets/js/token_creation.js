@@ -1,5 +1,6 @@
 import Modal from './components/modal/Modal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {NotificationMixin} from './mixins/';
 import {
     HTTP_OK,
     tokenNameValidChars,
@@ -10,6 +11,7 @@ import {
 
 new Vue({
     el: '#token',
+    mixins: [NotificationMixin],
     components: {
         Modal,
     },
@@ -44,7 +46,7 @@ new Vue({
                                 this.tokenNameExists = response.data.exists;
                             }
                         }, (error) => {
-                            this.$toasted.error('An error has occurred, please try again later');
+                            this.notifyError('An error has occurred, please try again later');
                         })
                         .then(() => {
                             this.tokenNameProcessing = false;
