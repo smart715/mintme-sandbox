@@ -15,6 +15,7 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -64,7 +65,9 @@ class TransactionSubscriberTest extends TestCase
 
     public function testUpdateTokenWithdraw(): void
     {
+        /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
+        /** @var LoggerInterface|MockObject $logger */
         $logger = $this->mockLogger();
 
         $subscriber = new TransactionSubscriber(
