@@ -231,7 +231,7 @@ export default {
             return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },
         walletBalance: function() {
-            return toMoney(this.tokenExchangeAmount);
+            return this.releasedAmount !== null ? toMoney(this.releasedAmount) : toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
             let sum = new Decimal(0);
