@@ -16,7 +16,11 @@ export const GENERAL = {
     precision: 8,
     dateFormat: 'DD.MM.YYYY hh:mm:ss',
 };
-export const webSymbol = 'web';
+
+export const webSymbol = 'WEB';
+export const btcSymbol = 'BTC';
+export const tokSymbol = 'TOK';
+
 export const tokenDeploymentStatus = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
 export const addressLength = {
     WEB: {
@@ -45,5 +49,20 @@ export const WSAPI = {
 
 export const USD = {
     symbol: 'USD',
+    subunit: 4,
+};
+
+export const WEB = {
+    symbol: 'WEB',
+    subunit: 4,
+};
+
+export const BTC = {
+    symbol: 'BTC',
+    subunit: 8,
+};
+
+export const MINTME = {
+    symbol: 'MINTME',
     subunit: 4,
 };

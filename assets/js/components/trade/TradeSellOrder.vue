@@ -9,7 +9,7 @@
                             Sell Order
                         </template>
                         <template slot="body">
-                            Form used to create  an order so you can sell {{ market.quote.symbol|rebranding }} or make offer.
+                            Form used to create  an order so you can sell {{ market.quote.symbol | rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
@@ -20,13 +20,13 @@
                         <label
                             for="sell-price-input"
                             class="text-white">
-                            Price in {{ market.base.symbol|rebranding }}:
+                            Price in {{ market.base.symbol | rebranding }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ market.base.symbol|rebranding }}
+                                    Price in {{ market.base.symbol | rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {{ market.quote.symbol|rebranding }}.
+                                    The price at which you want to sell one {{ market.quote.symbol | rebranding }}.
                                 </template>
                             </guide>
                         </label>
@@ -36,7 +36,7 @@
                                 type="text"
                                 id="sell-price-input"
                                 class="form-control"
-                                :class="sellInputClass"
+                                :class="orderInputClass"
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
@@ -45,17 +45,25 @@
                                 Your
                                 <span class="c-pointer" @click="balanceClicked"
                                       v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
-                                    {{ market.quote.symbol|rebranding | truncate(7) }}:
+                                    {{ market.quote.symbol | rebranding | truncate(7) }}:
                                     <span class="text-white">
-                                        {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
-                                        <guide>
-                                            <template slot="header">
-                                                Your Tokens
-                                            </template>
-                                            <template slot="body">
-                                                Your {{ market.quote.symbol|rebranding }} balance.
-                                            </template>
-                                        </guide>
+                                        <span class="text-nowrap">
+                                            {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
+                                        </span>
+                                        <span class="text-nowrap">
+                                            <a
+                                                v-if="showDepositMoreLink"
+                                                :href="depositMoreLink"
+                                            >Deposit more</a>
+                                            <guide>
+                                                <template slot="header">
+                                                    Your Tokens
+                                                </template>
+                                                <template slot="body">
+                                                    Your {{ market.quote.symbol | rebranding }} balance.
+                                                </template>
+                                            </guide>
+                                        </span>
                                     </span>
                                 </span>
                             </div>
@@ -67,7 +75,7 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol|rebranding }}</span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol | rebranding }}</span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">
@@ -76,7 +84,7 @@
                                 type="text"
                                 id="sell-price-amount"
                                 class="form-control"
-                                :class="sellInputClass"
+                                :class="orderInputClass"
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
@@ -102,7 +110,7 @@
                                             </template>
                                             <template slot="body">
                                                 Checking this box fetches current best market price
-                                                for which you can sell {{ market.quote.symbol|rebranding }}.
+                                                for which you can sell {{ market.quote.symbol | rebranding }}.
                                             </template>
                                         </guide>
                                     </label>
@@ -112,7 +120,7 @@
                     </div>
                     <div class="col-12 pt-2">
                         Total Price:
-                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol|rebranding }}
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol | rebranding }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -157,6 +165,7 @@ import {
     MoneyFilterMixin,
     PricePositionMixin,
     RebrandingFilterMixin,
+    OrderMixin,
     LoggerMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
@@ -168,7 +177,16 @@ export default {
     components: {
         Guide,
     },
-    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin, PricePositionMixin, RebrandingFilterMixin, LoggerMixin],
+    mixins: [
+        WebSocketMixin,
+        PlaceOrder,
+        FiltersMixin,
+        MoneyFilterMixin,
+        PricePositionMixin,
+        RebrandingFilterMixin,
+        OrderMixin,
+        LoggerMixin,
+    ],
     props: {
         loginUrl: String,
         signupUrl: String,
@@ -244,7 +262,12 @@ export default {
                 this.useMarketPrice = false;
             }
         },
-        balanceClicked: function() {
+        balanceClicked: function(event) {
+            // Skip "Deposit more" link
+            if ('a' === event.target.tagName.toLowerCase()) {
+                return;
+            }
+
             if (!this.balanceManuallyEdited || !parseFloat(this.sellPrice)) {
                 this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
                 this.setBalanceManuallyEdited(false);
@@ -279,9 +302,6 @@ export default {
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
-        },
-        sellInputClass: function() {
-            return this.loggedIn ? 'w-50' : 'w-100';
         },
         ...mapGetters('makeOrder', [
             'getSellPriceInput',
