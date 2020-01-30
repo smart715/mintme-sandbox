@@ -2,7 +2,7 @@
 
 namespace App\Security\Model;
 
-class ApiKeyCredentials
+class ApiKeyCredentials implements ApiAuthCredentialsInterface
 {
     /** @var string */
     private $private;

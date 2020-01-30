@@ -103,26 +103,19 @@ class UsersController extends AbstractFOSRestController
 
     /**
      * @Rest\View(statusCode=203)
-     * @Rest\Delete("/clients", name="delete_client", options={"expose"=true})
-     * @Rest\QueryParam(name="id", allowBlank=false, description="client id to delete")
-     * @param ParamFetcherInterface $request
+     * @Rest\Delete(
+     *     "/clients/{id}",
+     *     name="delete_client",
+     *     requirements={"id"="^\d+_[a-zA-Z0-9]+$"},
+     *     options={"expose"=true}
+     * )
+     * @param string $id
      * @return bool
      * @throws ApiNotFoundException
      */
-    public function deleteApiClient(ParamFetcherInterface $request): bool
+    public function deleteApiClient(string $id): bool
     {
-
-        $id = $request->get('id');
-
-        if (empty($id)) {
-            throw new ApiNotFoundException("Client ID required");
-        }
-
-        $ids = explode('_', $id);
-
-        if (count($ids) < 2) {
-            throw new ApiNotFoundException("Wrong Client ID");
-        }
+       $ids = explode('_', $id);
 
         $user = $this->getUser();
         $client = $this->clientManager->findClientBy(['user' => $user, 'randomId' => $ids[1], 'id' => $ids[0]]);

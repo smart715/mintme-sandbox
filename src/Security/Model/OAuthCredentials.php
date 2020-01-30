@@ -2,7 +2,7 @@
 
 namespace App\Security\Model;
 
-class OAuthCredentials
+class OAuthCredentials implements ApiAuthCredentialsInterface
 {
     /** @var string */
     private $token;
