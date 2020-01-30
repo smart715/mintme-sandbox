@@ -36,10 +36,15 @@ class LockInTest extends TestCase
 
     public function testGetReleasedAmountForDeployedToken(): void
     {
-        $releasedAtStart = '1000000';
+        /** @var Token|MockObject $token */
         $token = $this->mockToken();
         $li = new LockIn($token);
-        $token->method('isDeployed')->willReturn(true);
+        $releasedAtStart = '1000000';
+
+        $token
+            ->expects($this->once())
+            ->method('isDeployed')
+            ->willReturn(true);
         $token
             ->expects($this->atLeast(2))
             ->method('getDeployed')
