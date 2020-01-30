@@ -115,7 +115,7 @@ class UsersController extends AbstractFOSRestController
      */
     public function deleteApiClient(string $id): bool
     {
-       $ids = explode('_', $id);
+        $ids = explode('_', $id);
 
         $user = $this->getUser();
         $client = $this->clientManager->findClientBy(['user' => $user, 'randomId' => $ids[1], 'id' => $ids[0]]);
