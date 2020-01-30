@@ -109,6 +109,9 @@ parameters:
     # How much user receive for registration
     landing_web_bonus: 5
 
+    # Quick Registration Default Password for Hacker Menu -> Quick Registration.
+    quick_registration_password: 'blockchaincrowdfunding'
+
     # If true, then it will cut headers for front end logging
     front_end_logs_cut_headers: true
 
