@@ -165,7 +165,7 @@
             </ul>
         </div>
     </div>
-    {% if is_hacker_allowed and app.user %}
-        <admin-menu></admin-menu>
+    {% if is_hacker_allowed %}
+        <admin-menu :is-user-logged="{{ app.user ? 'true' : 'false' }}"></admin-menu>
     {% endif %}
 </nav>

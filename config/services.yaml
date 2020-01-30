@@ -503,6 +503,11 @@ services:
         class: App\Canonicalizer\EmailCanonicalizer
         public: false
 
+    App\Controller\HackerController:
+        arguments:
+            $quickRegistrationPassword: '%quick_registration_password%'
+
+
     App\Controller\API\UsersController:
          arguments:
             $clientManager: '@fos_oauth_server.client_manager.default'
