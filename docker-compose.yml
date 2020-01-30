@@ -77,7 +77,7 @@ services:
       # Replace next paths with actuals on your system
       - .docker/default/WEB/password.txt:/data/password
       - .docker/default/WEB/private.txt:/data/private
-      - webchaind_root:/root/.webchain/mainnet
+      - webchaind_root:/root/.webchain/morden
 
   nginx:
     image: nginx:latest
