@@ -186,8 +186,13 @@ class RegistrationController extends FOSRegistrationController
 
     public function confirmedAction(Request $request): Response
     {
-        /** @var User $user */
+        /** @var User|null */
         $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            return parent::confirmedAction($request);
+        }
+
         $bonus = $user->getBonus();
 
         if ($bonus &&
