@@ -7,6 +7,7 @@ use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
 use App\Mailer\MailerInterface;
@@ -57,6 +58,42 @@ class TransactionSubscriberTest extends TestCase
         $subscriber->sendTransactionCompletedMail(
             $this->mockTransactionCompletedEvent($tradable, '1')
         );
+
+        $this->assertTrue(true);
+    }
+
+    public function testUpdateTokenWithdraw(): void
+    {
+        $em = $this->mockEntityManager();
+        $logger = $this->mockLogger();
+
+        $subscriber = new TransactionSubscriber(
+            $this->mockMailer(),
+            $this->mockMoneyWrapper(),
+            $logger,
+            $em
+        );
+
+        $tradable = $this->createMock(Token::class);
+        $user = $this->createMock(User::class);
+        $profile = $this->createMock(Profile::class);
+
+        $user->expects($this->exactly(2))->method('getId')->willReturn(1);
+        $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
+        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn('0');
+        $profile->expects($this->once())->method('getUser')->willReturn($user);
+
+        $em->expects($this->once())->method('persist')->with($tradable);
+        $em->expects($this->once())->method('flush');
+
+        $logger->expects($this->once())->method('info');
+
+        $event = $this->createMock(DepositCompletedEvent::class);
+        $event->expects($this->once())->method('getTradable')->willReturn($tradable);
+        $event->expects($this->once())->method('getUser')->willReturn($user);
+        $event->expects($this->once())->method('getAmount')->willReturn('1000');
+
+        $subscriber->updateTokenWithdraw($event);
 
         $this->assertTrue(true);
     }
