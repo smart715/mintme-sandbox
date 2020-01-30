@@ -24,19 +24,17 @@
                 <main class="flex-fill content {% block bgclass %}{% endblock %}">
                     {% block main %}
                         {% block messageContainer %}
-                            <div id="notifications">
-                                {% if app.session.flashbag.peekAll() is not empty %}
-                                    <div class="text-center {% block messageClass %}{% endblock %}">
-                                        {% for label, messages in app.flashes %}
-                                            {% for message in messages %}
-                                                <notification type="{{ label }}" class="d-none">
-                                                    {{ message }}
-                                                </notification>
-                                            {% endfor %}
+                            {% if app.session.flashbag.peekAll() is not empty %}
+                                <div id="notifications" class="text-center {% block messageClass %}{% endblock %}">
+                                    {% for label, messages in app.flashes %}
+                                        {% for message in messages %}
+                                            <notification type="{{ label }}" class="d-none">
+                                                {{ message }}
+                                            </notification>
                                         {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         {% endblock %}
                         {% block content %}{% endblock %}
                     {% endblock %}
