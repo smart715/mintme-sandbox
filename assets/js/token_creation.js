@@ -51,7 +51,7 @@ new Vue({
                         .then(() => {
                             this.tokenNameProcessing = false;
                         });
-                }, 1000);
+                }, 2000);
             }
         },
     },
