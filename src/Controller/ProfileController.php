@@ -41,7 +41,11 @@ class ProfileController extends Controller
         }
 
         $profileClone = clone $profile;
-        $profileDescription = $profile->getDescription() ?? '';
+        $profileDescription = preg_replace(
+            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+            '\2',
+            $profile->getDescription() ?? ''
+        ) ?? '';
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 

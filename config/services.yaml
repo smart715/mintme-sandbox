@@ -498,7 +498,20 @@ services:
             $rpc: '@coinmarketcap.rest_rpc'
 
     App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
-    
+
     app.emailCanonicalizer:
         class: App\Canonicalizer\EmailCanonicalizer
-        public: false    
+        public: false
+
+    App\Controller\HackerController:
+        arguments:
+            $quickRegistrationPassword: '%quick_registration_password%'
+
+
+    App\Controller\API\UsersController:
+         arguments:
+            $clientManager: '@fos_oauth_server.client_manager.default'
+
+    App\Security\ApiKeyAuthenticator:
+         arguments:
+            $oAuthStorage: '@fos_oauth_server.storage.default'

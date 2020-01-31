@@ -84,7 +84,7 @@ services:
       # Replace next paths with actuals on your system
       - .docker/default/WEB/password.txt:/data/password
       - .docker/default/WEB/account.json:/root/.webchain/morden/keystore/9139413fe7247da35ae0797f9270271ba758d248
-      - webchaind_root:/root/.webchain/mainnet
+      - webchaind_root:/root/.webchain/morden
 
   nginx:
     image: nginx:latest
