@@ -89,7 +89,7 @@
                             </div>
                             <div class="pb-1">
                                 Release period: <br>
-                                {{ releasePeriod !== null ? releasePeriod : stats.releasePeriod }}
+                                {{ null !== nullreleasePeriod ? releasePeriod : stats.releasePeriod }}
                                 <template v-if="stats.releasePeriod !== defaultValue">year(s)</template>
                                 <guide>
                                     <template slot="header">
@@ -104,7 +104,7 @@
                             </div>
                             <div class="pb-1">
                                 Hourly installment: <br>
-                                {{ hourlyRate !== null ? hourlyRate : stats.hourlyRate | toMoney(precision, false) | formatMoney }}
+                                {{ null !== hourlyRate ? hourlyRate : stats.hourlyRate | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Hourly installment
@@ -116,7 +116,7 @@
                             </div>
                             <div class="pb-1">
                                 Already released: <br>
-                                {{ releasedAmount !== null ? releasedAmount : stats.releasedAmount | toMoney(precision, false) | formatMoney }}
+                                {{ null !== releasedAmount ? releasedAmount : stats.releasedAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Already released
@@ -129,7 +129,7 @@
                             </div>
                             <div class="pb-1">
                                 Not yet released: <br>
-                                {{ frozenAmount !== null ? frozenAmount :  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
+                                {{ null !== frozenAmount ? frozenAmount :  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Not yet released
@@ -239,7 +239,7 @@ export default {
             return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },
         walletBalance: function() {
-            return this.releasedAmount !== null ? toMoney(this.releasedAmount) : toMoney(this.tokenExchangeAmount);
+            return null !== this.releasedAmount ? toMoney(this.releasedAmount) : toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
             let sum = new Decimal(0);
