@@ -109,4 +109,11 @@ parameters:
     # How much user receive for registration
     landing_web_bonus: 5
 
+    # Quick Registration Default Password for Hacker Menu -> Quick Registration.
+    quick_registration_password: 'blockchaincrowdfunding'
 
+    # If true, then it will cut headers for front end logging
+    front_end_logs_cut_headers: true
+
+    # 30d min value for token to be added to market cap total on trading page
+    minimum_volume_for_marketcap: 100000

@@ -31,6 +31,7 @@ describe('TradeSellOrder', () => {
             loginUrl: 'loginUrl',
             signupUrl: 'signupUrl',
             loggedIn: false,
+            balanceLoaded: true,
             market: {
                 base: {
                     name: 'Betcoin',
@@ -49,6 +50,15 @@ describe('TradeSellOrder', () => {
             isOwner: false,
         },
     });
+    it('hide sell order  contents and show loading instead', () => {
+        wrapper.vm.balanceLoaded = false;
+        expect(wrapper.find('font-awesome-icon').exists()).to.deep.equal(true);
+        expect(wrapper.find('div.card-body > div.row').exists()).to.deep.equal(false);
+        wrapper.vm.balanceLoaded = true;
+        expect(wrapper.find('font-awesome-icon').exists()).to.deep.equal(false);
+        expect(wrapper.find('div.card-body > div.row').exists()).to.deep.equal(true);
+    });
+
 
     it('show login & logout buttons if not logged in', () => {
         expect(wrapper.find('a[href="loginUrl"]').exists()).to.deep.equal(true);
@@ -87,10 +97,16 @@ describe('TradeSellOrder', () => {
     });
 
     describe('balanceClicked', () => {
+        let event = {
+            target: {
+                tagName: 'span',
+            },
+        };
+
         it('should add all the balance to the amount input', () => {
             wrapper.vm.immutableBalance = 5;
             wrapper.vm.marketPrice = 7;
-            wrapper.vm.balanceClicked();
+            wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).to.deep.equal('5');
             expect(wrapper.vm.sellPrice).to.deep.equal('7');
@@ -101,7 +117,7 @@ describe('TradeSellOrder', () => {
             wrapper.vm.marketPrice = 7;
             wrapper.vm.sellPrice = 2;
             wrapper.vm.balanceManuallyEdited = true;
-            wrapper.vm.balanceClicked();
+            wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).to.deep.equal('5');
             expect(wrapper.vm.sellPrice).to.deep.equal(2);
@@ -112,7 +128,7 @@ describe('TradeSellOrder', () => {
             wrapper.vm.marketPrice = 7;
             wrapper.vm.sellPrice = '000';
             wrapper.vm.balanceManuallyEdited = false;
-            wrapper.vm.balanceClicked();
+            wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).to.deep.equal('5');
             expect(wrapper.vm.sellPrice).to.deep.equal('7');
@@ -123,10 +139,22 @@ describe('TradeSellOrder', () => {
             wrapper.vm.marketPrice = 7;
             wrapper.vm.sellPrice = null;
             wrapper.vm.balanceManuallyEdited = false;
-            wrapper.vm.balanceClicked();
+            wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).to.deep.equal('5');
             expect(wrapper.vm.sellPrice).to.deep.equal('7');
+        });
+
+        it('Deposit more link click - should not add the balance to the amount input, price/amount not changing', () => {
+            wrapper.vm.immutableBalance = 50;
+            wrapper.vm.marketPrice = 17;
+            wrapper.vm.sellAmount = '0';
+            wrapper.vm.sellPrice = '0';
+            event.target.tagName = 'a';
+            wrapper.vm.balanceClicked(event);
+
+            expect(wrapper.vm.sellAmount).to.deep.equal('0');
+            expect(wrapper.vm.sellPrice).to.deep.equal('0');
         });
     });
 });

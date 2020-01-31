@@ -1,5 +1,32 @@
 <template>
     <div class="trading">
+        <div class="card-header">
+            <span>Trading</span>
+                <b-dropdown
+                    id="currency"
+                    variant="primary"
+                    class="float-right"
+                    :lazy="true"
+                >
+                <template slot="button-content">
+                    Currency:
+                <span v-if="showUsd">
+                    USD
+                </span>
+                <span v-else>
+                    Crypto
+                </span>
+                </template>
+                <template>
+                    <b-dropdown-item @click="toggleUsd(false)">
+                        Crypto
+                    </b-dropdown-item>
+                    <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
+                        USD
+                    </b-dropdown-item>
+                </template>
+            </b-dropdown>
+        </div>
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
@@ -59,6 +86,8 @@
                             </template>
                             <template slot=body>
                                 Market cap based on max supply of 10 million tokens.
+                                Market cap is not shown if 30d volume is lower than
+                                {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
                             </template>
                         </guide>
                     </template>
@@ -92,7 +121,7 @@
             </div>
         </template>
         <template v-else>
-            <div class="p-5 text-center">
+            <div class="p-5 text-center text-white">
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
         </template>
@@ -102,22 +131,22 @@
 <script>
 import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
-import {USD} from '../../utils/constants.js';
+import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         page: Number,
         tokensCount: Number,
         userId: Number,
         coinbaseUrl: String,
-        showUsd: Boolean,
         mintmeSupplyUrl: String,
+        minimumVolumeForMarketcap: Number,
     },
     components: {
         Guide,
@@ -133,8 +162,10 @@ export default {
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
-                {currency: 'BTC', token: 'WEB'},
+                {currency: BTC.symbol, token: WEB.symbol},
             ],
+            showUsd: false,
+            enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
             sortBy: '',
@@ -215,7 +246,7 @@ export default {
                     label: 'Market Cap',
                     key: 'marketCap' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
-                    formatter: formatMoney,
+                    formatter: (value, key, item) => formatMoney(this.marketCapFormatter(value, key, item)),
                 },
             };
         },
@@ -224,15 +255,22 @@ export default {
         },
         globalMarketCap: function() {
             if (this.showUsd) {
-                return this.globalMarketCaps['USD'] + ' USD';
+                return this.globalMarketCaps[USD.symbol] + USD.symbol;
             }
-            return this.globalMarketCaps['BTC'] + ' BTC';
+            return this.globalMarketCaps[BTC.symbol] + BTC.symbol;
         },
     },
     mounted() {
         this.fetchData();
     },
     methods: {
+        toggleUsd: function(show) {
+            this.showUsd = show;
+        },
+        disableUsd: function() {
+            this.showUsd = false;
+            this.enableUsd = false;
+        },
         fetchData: function(page = false) {
             if (page) {
                 this.currentPage = page;
@@ -270,7 +308,6 @@ export default {
             let numeric = key !== this.fields.pair.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
-                // If both compared fields are native numbers
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
@@ -320,6 +357,7 @@ export default {
                     })
                     .catch((err) => {
                         this.notifyError('Can not update the markets data. Try again later.');
+                        this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
             });
@@ -372,14 +410,16 @@ export default {
         },
         getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
             let hiddenName = this.findHiddenName(token);
+            let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
+                ? 0
+                : Decimal.mul(lastPrice, supply);
 
-            let marketCap = Decimal.mul(lastPrice, supply);
             return {
-                pair: 'BTC' === currency ? `${currency}/${token}` : `${token}`,
+                pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: this.toMoney(volume, 'BTC' === currency ? 4 : 2) + ' ' + currency,
-                monthVolume: this.toMoney(monthVolume, 'BTC' === currency ? 4 : 2) + ' ' + currency,
+                volume: this.toMoney(volume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
+                monthVolume: this.toMoney(monthVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
@@ -389,6 +429,8 @@ export default {
                 marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
                 tokenized: tokenized,
+                base: currency,
+                quote: token,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -420,6 +462,7 @@ export default {
                         });
                         if ('undefined' === typeof this.markets[market].supply) {
                             this.notifyError('Can not update market cap for BTC/MINTME.');
+                            this.sendLogs('error', 'Can not update market cap for BTC/MINTME', 'markets supply === undefined');
                             this.markets[market].supply = 0;
                         }
                     } else {
@@ -473,21 +516,29 @@ export default {
         },
         updateMonthVolume: function(requestId, marketInfo) {
             const marketName = this.stateQueriesIdsTokensMap.get(requestId);
-            const marketCurrency = this.markets[marketName].base.symbol;
-            const marketToken = this.markets[marketName].quote.symbol;
-            // const marketPrecision = this.markets[marketName].base.subunit; I'll leave this here in any case we ever need it again
-            const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
+            const market = this.markets[marketName];
+            const tokenized = market.quote.deploymentStatus === tokenDeploymentStatus.deployed;
+            const marketOnTopIndex = this.getMarketOnTopIndex(market.base.symbol, market.quote.symbol);
 
-            let monthVolume = marketInfo.deal;
-            let monthVolumeUSD = this.toUSD(monthVolume, marketCurrency);
-            monthVolume = this.toMoney(monthVolume, 'BTC' === marketCurrency ? 4 : 2) + ' ' + marketCurrency;
+            const sanitizedMarket = this.getSanitizedMarket(
+                market.base.symbol,
+                market.quote.symbol,
+                this.getPercentage(
+                    parseFloat(market.lastPrice),
+                    parseFloat(market.openPrice)
+                ),
+                market.lastPrice,
+                market.dayVolume,
+                market.monthVolume = marketInfo.deal,
+                market.supply,
+                market.base.subunit,
+                tokenized
+                );
 
             if (marketOnTopIndex > -1) {
-                this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolume = monthVolume;
-                this.sanitizedMarketsOnTop[marketOnTopIndex].monthVolumeUSD = monthVolumeUSD;
+                this.sanitizedMarketsOnTop[marketOnTopIndex] = sanitizedMarket;
             } else {
-                this.sanitizedMarkets[marketName].monthVolume = monthVolume;
-                this.sanitizedMarkets[marketName].monthVolumeUSD = monthVolumeUSD;
+                this.sanitizedMarkets[marketName] = sanitizedMarket;
             }
         },
         requestMonthInfo: function(market) {
@@ -517,6 +568,7 @@ export default {
                 .catch((err) => {
                     this.$emit('disable-usd');
                     this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                    this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                     reject();
                 });
             });
@@ -540,7 +592,8 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update WEB circulation supply. BTC/WEB market cap might not be accurate.');
+                        this.notifyError('Can not update MINTME circulation supply. BTC/MINTME market cap might not be accurate.');
+                        this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });
             });
@@ -566,11 +619,17 @@ export default {
         fetchGlobalMarketCap: function() {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
                 .then((res) => {
-                    this.globalMarketCaps['BTC'] = this.toMoney(res.data.marketcap);
+                    this.globalMarketCaps[BTC.symbol] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch BTC from global market cap', err);
                 });
             this.$axios.retry.get(this.$routing.generate('marketcap', {base: 'USD'}))
                 .then((res) => {
-                    this.globalMarketCaps['USD'] = this.toMoney(res.data.marketcap);
+                    this.globalMarketCaps[USD.symbol] = this.toMoney(res.data.marketcap);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Can not fetch USD from global market cap', err);
                 });
         },
         toMoney: function(val, subunit = 2) {
@@ -579,6 +638,11 @@ export default {
                 ? subunit
                 : 0;
             return toMoney(val, precision);
+        },
+        marketCapFormatter: function(value, key, item) {
+            return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
+                ? '-'
+                : value;
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;

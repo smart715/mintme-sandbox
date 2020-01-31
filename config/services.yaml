@@ -405,6 +405,22 @@ services:
         tags:
             - { name: monolog.logger, channel: user_action }
 
+    App\Logger\FrontEndProcessor:
+        autowire: true
+        tags:
+            - { name: monolog.processor, channel: front_end }
+
+    monolog.formatter.front_end:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%extra.url%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
+    App\Logger\FrontEndLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: front_end }
+
     logout_listner:
         class: App\EventListener\LogoutListener
 
@@ -466,6 +482,7 @@ services:
             $supplyLinks: { Webchain: '%mintme_supply%' }
             $tokenSupply: "%token_quantity%"
             $rpc: '@coinmarketcap.rest_rpc'
+            $minimumVolumeForMarketcap: '%minimum_volume_for_marketcap%'
 
     app.profile.form:
         class: App\Form\ProfileType
@@ -481,7 +498,20 @@ services:
             $rpc: '@coinmarketcap.rest_rpc'
 
     App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
-    
+
     app.emailCanonicalizer:
         class: App\Canonicalizer\EmailCanonicalizer
-        public: false    
+        public: false
+
+    App\Controller\HackerController:
+        arguments:
+            $quickRegistrationPassword: '%quick_registration_password%'
+
+
+    App\Controller\API\UsersController:
+         arguments:
+            $clientManager: '@fos_oauth_server.client_manager.default'
+
+    App\Security\ApiKeyAuthenticator:
+         arguments:
+            $oAuthStorage: '@fos_oauth_server.storage.default'

@@ -15,6 +15,11 @@ nelmio_api_doc:
                 description: 'X-API-KEY: {apiKey}'
                 name: X-API-KEY
                 in: header
+            OAuthToken:
+                 type: apiKey
+                 description: 'Authorization: Bearer {token}'
+                 name: Authorization
+                 in: header
         sandbox:
             accept_type: 'application/json'
             body_format:
@@ -26,6 +31,7 @@ nelmio_api_doc:
         security:
             - PublicKey: []
               PrivateKey: []
+              OAuthToken: []
 
     models:
         use_jms: false

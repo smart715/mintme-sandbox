@@ -148,15 +148,28 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import {WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../mixins';
+import {
+    WebSocketMixin,
+    FiltersMixin,
+    MoneyFilterMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-const TOK_SYMBOL = 'TOK';
-const WEB_SYMBOL = 'WEB';
+import {tokSymbol, btcSymbol, webSymbol} from '../../utils/constants';
 
 export default {
     name: 'Wallet',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     components: {
         WithdrawModal,
         DepositModal,
@@ -165,6 +178,7 @@ export default {
         withdrawUrl: {type: String, required: true},
         createTokenUrl: String,
         tradingUrl: String,
+        depositMore: String,
         twofa: String,
     },
     data() {
@@ -234,40 +248,54 @@ export default {
         },
     },
     mounted: function() {
-        this.$axios.retry.get(this.$routing.generate('tokens'))
-            .then((res) => {
-                let tokensData = res.data;
-                this.tokens = tokensData.common;
-                this.predefinedTokens = tokensData.predefined;
-            })
-            .then(() => {
-                this.authorize()
-                    .then(() => {
-                        this.addMessageHandler((response) => {
-                            if ('asset.update' === response.method) {
-                                this.updateBalances(response.params[0]);
-                            }
-                        }, 'wallet-asset-update');
+        Promise.all([
+            this.$axios.retry.get(this.$routing.generate('tokens'))
+                .then((res) => {
+                    let tokensData = res.data;
+                    this.tokens = tokensData.common;
+                    this.predefinedTokens = tokensData.predefined;
+                })
+                .then(() => {
+                    this.authorize()
+                        .then(() => {
+                            this.addMessageHandler((response) => {
+                                if ('asset.update' === response.method) {
+                                    this.updateBalances(response.params[0]);
+                                }
+                            }, 'wallet-asset-update');
 
-                        this.sendMessage(JSON.stringify({
-                            method: 'asset.subscribe',
-                            params: this.allTokensName,
-                            id: parseInt(Math.random()),
-                        }));
-                    })
-                    .catch(() => this.notifyError(
-                        'Can not connect to internal services'
-                    ));
-            })
-            .catch(() => {
-                this.notifyError('Can not update tokens now. Try again later.');
-            });
+                            this.sendMessage(JSON.stringify({
+                                method: 'asset.subscribe',
+                                params: this.allTokensName,
+                                id: parseInt(Math.random()),
+                            }));
+                        })
+                        .catch((err) => {
+                            this.notifyError(
+                                'Can not connect to internal services'
+                            );
+                            this.sendLogs('error', 'Can not connect to internal services', err);
+                        });
+                })
+                .catch((err) => {
+                    this.notifyError('Can not update tokens now. Try again later.');
+                    this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
+                }),
 
-        this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
-            .then((res) => this.depositAddresses = res.data)
-            .catch(() => {
-                this.notifyError('Can not update deposit data now. Try again later.');
-            });
+            this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
+                .then((res) => this.depositAddresses = res.data)
+                .catch((err) => {
+                    this.notifyError('Can not update deposit data now. Try again later.');
+                    this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
+                }),
+        ])
+        .then(() => {
+            this.openDepositMore();
+        })
+        .catch((err) => {
+            this.notifyError('Can not load Wallet data. Try again later.');
+            this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
+        });
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
@@ -280,10 +308,10 @@ export default {
             this.isTokenModal = isToken;
             this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
             this.withdraw.webFee = toMoney(
-                isToken || WEB_SYMBOL === currency ? this.predefinedTokens[WEB_SYMBOL].fee : 0,
+                isToken || webSymbol === currency ? this.predefinedTokens[webSymbol].fee : 0,
                 subunit
             );
-            this.withdraw.availableWeb = this.predefinedTokens[WEB_SYMBOL].available;
+            this.withdraw.availableWeb = this.predefinedTokens[webSymbol].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
@@ -291,7 +319,7 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency, subunit, isToken = false) {
-            this.depositAddress = (isToken ? this.depositAddresses[TOK_SYMBOL] : this.depositAddresses[currency])
+            this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
                 || 'Loading..';
             this.depositDescription = `Send ${currency}s to the address above.`;
             this.selectedCurrency = currency;
@@ -299,14 +327,15 @@ export default {
             this.isTokenModal = isToken;
 
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
-                    crypto: isToken ? WEB_SYMBOL : currency,
+                    crypto: isToken ? webSymbol : currency,
                 }))
-                .then((res) => this.deposit.fee = res.data && parseFloat(res.data) !== 0.0 ?
+                .then((res) => this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
                     toMoney(res.data, subunit) :
                     undefined
                 )
-                .catch(() => {
+                .catch((err) => {
                     this.notifyError('Can not update deposit fee status. Try again later.');
+                    this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
             // TODO: Get rid of hardcoded WEB
@@ -315,6 +344,19 @@ export default {
         },
         closeDeposit: function() {
             this.showDepositModal = false;
+        },
+        openDepositMore: function() {
+            if (
+                [webSymbol, btcSymbol].includes(this.depositMore) &&
+                null !== this.predefinedTokens &&
+                this.predefinedTokens.hasOwnProperty(this.depositMore) &&
+                this.depositAddresses.hasOwnProperty(this.depositMore)
+            ) {
+                this.openDeposit(
+                    this.depositMore,
+                    this.predefinedTokens[this.depositMore].subunit
+                );
+            }
         },
         updateBalances: function(data) {
             Object.keys(data).forEach((oTokenName) => {
@@ -338,7 +380,9 @@ export default {
                                 this.tokens[token].available = res.data ?
                                     new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
                             )
-                            .catch(() => {});
+                            .catch((err) => {
+                                this.sendLogs('error', 'Can not get lock-period', err);
+                            });
                     }
                 });
             });

@@ -35,18 +35,18 @@
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
-    addressContain,
+    tokenNameValidChars,
     tokenValidFirstChars,
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
 } from '../../utils/constants';
-import {NotificationMixin} from '../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../mixins';
 
 const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenChangeName',
-    mixins: [NotificationMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     components: {
         TwoFactorModal,
     },
@@ -113,7 +113,7 @@ export default {
             } else if (!this.$v.newName.noSpaceBetweenDashes) {
                 this.notifyError('Token name can not contain space between dashes');
                 return;
-            } else if (!this.$v.newName.addressContain) {
+            } else if (!this.$v.newName.validChars) {
                 this.notifyError('Token name can contain alphabets, numbers, spaces and dashes');
                 return;
             } else if (!this.$v.newName.minLength) {
@@ -158,10 +158,13 @@ export default {
             }, (error) => {
                 if (!error.response) {
                     this.notifyError('Network error');
+                    this.sendLogs('error', 'Edit name network error', error);
                 } else if (error.response.data.message) {
                     this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not edit name', error);
                 } else {
                     this.notifyError('An error has occurred, please try again later');
+                    this.sendLogs('error', 'An error has occurred, please try again later', error);
                 }
             })
             .then(() => {
@@ -173,10 +176,10 @@ export default {
         return {
             newName: {
                 required,
-                addressContain,
-                validFirstChars: tokenValidFirstChars,
-                validLastChars: tokenValidLastChars,
-                noSpaceBetweenDashes: tokenNoSpaceBetweenDashes,
+                validFirstChars: (value) => !tokenValidFirstChars(value),
+                validLastChars: (value) => !tokenValidLastChars(value),
+                noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
+                validChars: tokenNameValidChars,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),
             },

@@ -41,6 +41,11 @@ class ProfileController extends Controller
         }
 
         $profileClone = clone $profile;
+        $profileDescription = preg_replace(
+            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+            '\2',
+            $profile->getDescription() ?? ''
+        ) ?? '';
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
@@ -48,6 +53,7 @@ class ProfileController extends Controller
             return $this->render('pages/profile.html.twig', [
                 'token' => $profile->getToken(),
                 'profile' => $profileClone,
+                'profileDescription' => substr($profileDescription, 0, 200),
                 'form' =>  $form->createView(),
                 'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
                 'editFormShowFirst' => !! $form->getErrors(true)->count(),

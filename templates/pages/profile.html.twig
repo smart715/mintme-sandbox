@@ -9,6 +9,15 @@
     {% endif %}
 {% endblock %}
 
+{% block tokenDescription %}
+    {% if profileDescription is defined and profileDescription is not empty %}
+        <meta property="og:description" content="{{ profileDescription }}">
+        <meta property="description" content="{{ profileDescription }}">
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
 {% block bodyclass %}profile-view{% endblock %}
 
 {% block content %}

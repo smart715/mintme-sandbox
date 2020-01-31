@@ -37,9 +37,12 @@
                             <div class="card-body py-2 px-0">
                                 <div class="mx-0 px-1 px-sm-4 mt-4 mb-0 pb-0">
                                     <p>
-                                        All requests must be provided with unique API keys, which you can generate in dashboard.<br />
+                                        All requests must be provided with unique API keys or OAuth token, which you can generate in dashboard.<br />
                                         You have to pass API keys with each request in headers as <span class="text-danger">X-API-ID</span> (public)
                                         and <span class="text-danger">X-API-KEY</span> (private) parameters.<br />
+                                        Or you have to pass OAuth token with each request in headers as <span class="text-danger">Authorization: Bearer {token}</span> parameter.<br />
+                                        You can get OAuth token by sending the request to address: <span class="text-danger">{{ path('fos_oauth_server_token') }}?client_id={YOUR_CLIENT_ID}&grant_type=client_credentials&client_secret={YOUR_SECRET}</span><br />
+                                        Token will expired after some time. You should get token again after expiration.
                                         Our data is delivered to you on-demand using well-documented and simple HTTP RESTful API in JSON format.
                                     </p>
                                     <p>
@@ -49,13 +52,13 @@
                                     </p>
                                     <p>
                                         {% if app.user is not null %}
-                                            Go to <a href="{{ path('settings') }}">settings</a> to generate your own API keys.
+                                            Go to <a href="{{ path('settings') }}">settings</a> to generate your own API keys or OAuth Client ID and Secret.
                                         {% else %}
-                                            <a href="{{ path('login') }}">Log in</a> to generate your own API keys.
+                                            <a href="{{ path('login') }}">Log in</a> to generate your own API keys or OAuth Client ID and Secret.
                                         {% endif %}
                                     </p>
                                     <p>
-                                        You can test our API here. Authorize your generated keys and click on specific methods to see how they work live.
+                                        You can test our API here. Authorize your generated keys or token and click on specific methods to see how they work live.
                                     </p>
                                 </div>
                                 {{ parent() }}

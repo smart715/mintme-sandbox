@@ -3,41 +3,31 @@
         <div class="row p-0 m-0">
             <div class="col-12 col-xl-6 pr-xl-2 mt-3">
                 <trade-buy-orders
-                        v-if="ordersLoaded"
-                        @update-data="updateBuyOrders"
-                        :orders-list="filteredBuyOrders"
-                        :token-name="market.base.symbol"
-                        :fields="fields"
-                        sort-by="price"
-                        :sort-desc="true"
-                        :basePrecision="market.base.subunit"
-                        :quotePrecision="market.quote.subunit"
-                        :logged-in="loggedIn"
-                        @modal="removeOrderModal"/>
-                <template v-else>
-                    <div class="p-5 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
-                    </div>
-                </template>
+                    @update-data="updateBuyOrders"
+                    :orders-list="filteredBuyOrders"
+                    :orders-loaded="ordersLoaded"
+                    :token-name="market.base.symbol"
+                    :fields="fields"
+                    sort-by="price"
+                    :sort-desc="true"
+                    :basePrecision="market.base.subunit"
+                    :quotePrecision="market.quote.subunit"
+                    :logged-in="loggedIn"
+                    @modal="removeOrderModal"/>
             </div>
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
-                        v-if="ordersLoaded"
-                        @update-data="updateSellOrders"
-                        :orders-list="filteredSellOrders"
-                        :token-name="market.quote.symbol"
-                        :fields="fields"
-                        sort-by="price"
-                        :sort-desc="false"
-                        :basePrecision="market.base.subunit"
-                        :quotePrecision="market.quote.subunit"
-                        :logged-in="loggedIn"
-                        @modal="removeOrderModal"/>
-                <template v-else>
-                    <div class="p-5 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
-                    </div>
-                </template>
+                    @update-data="updateSellOrders"
+                    :orders-list="filteredSellOrders"
+                    :orders-loaded="ordersLoaded"
+                    :token-name="market.quote.symbol"
+                    :fields="fields"
+                    sort-by="price"
+                    :sort-desc="false"
+                    :basePrecision="market.base.subunit"
+                    :quotePrecision="market.quote.subunit"
+                    :logged-in="loggedIn"
+                    @modal="removeOrderModal"/>
             </div>
         </div>
         <confirm-modal
@@ -63,11 +53,11 @@ import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
-import {RebrandingFilterMixin, NotificationMixin} from '../../mixins/';
+import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 
 export default {
     name: 'TokenTradeOrders',
-    mixins: [RebrandingFilterMixin, NotificationMixin],
+    mixins: [RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         TradeBuyOrders,
         TradeSellOrders,
@@ -110,10 +100,10 @@ export default {
     },
     computed: {
         filteredBuyOrders: function() {
-            return this.ordersList(this.groupByPrice(this.buyOrders));
+            return this.buyOrders ? this.ordersList(this.groupByPrice(this.buyOrders)) : [];
         },
         filteredSellOrders: function() {
-            return this.ordersList(this.groupByPrice(this.sellOrders));
+            return this.sellOrders ? this.ordersList(this.groupByPrice(this.sellOrders)) : [];
         },
     },
     methods: {
@@ -206,8 +196,9 @@ export default {
                 quote: this.market.quote.symbol,
             });
             this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
-                .catch(() => {
+                .catch((err) => {
                     this.notifyError('Service unavailable, try again later');
+                    this.sendLogs('error', 'Remove order service unavailable', err);
                 });
         },
         switchConfirmModal: function(val) {

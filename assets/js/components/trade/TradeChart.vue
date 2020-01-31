@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loaded" class="card">
+    <div class="card">
         <div class="card-body p-2">
             <div class="mx-2 d-flex flex-column flex-lg-row justify-content-between">
                 <div class="my-1 text-center text-lg-left">
@@ -61,7 +61,7 @@
                             Market Cap
                         </template>
                         <template slot="body">
-                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created.
+                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created. Marketcap is not shown if 30d volume is lower than {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
                         </template>
                     </guide>
                     <br>
@@ -84,27 +84,31 @@
             </div>
         </div>
     </div>
-    <div v-else class="p-5 text-center text-white">
-        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-    </div>
 </template>
 
 <script>
 import VeCandle from '../../utils/candle';
 import Guide from '../Guide';
-import {WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin} from '../../../js/mixins/';
+import {
+    WebSocketMixin,
+    MoneyFilterMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../../js/mixins/';
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
-import {webSymbol} from '../../utils/constants.js';
+import {WEB} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
-    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin],
+    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         websocketUrl: String,
         market: Object,
         mintmeSupplyUrl: String,
+        minimumVolumeForMarketcap: Number,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -162,12 +166,12 @@ export default {
                 monthAmount: '0',
                 marketCap: '0',
             },
-            stats: null,
+            stats: [],
             maxAvailableDays: 30,
             min,
             monthInfoRequestId: 0,
             supply: 1e7,
-            volumeSymbol: webSymbol.toUpperCase() === this.market.quote.symbol.toUpperCase()
+            volumeSymbol: WEB.symbol === this.market.quote.symbol.toUpperCase()
                 ? 'MINTME'
                 : 'Tokens',
         };
@@ -198,9 +202,6 @@ export default {
                 rows: this.chartRows,
             };
         },
-        loaded: function() {
-            return this.stats !== null;
-        },
     },
     watch: {
         chartRows: function(rows) {
@@ -220,6 +221,9 @@ export default {
         if ('WEBBTC' === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
                 this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
+            }).catch((error) => {
+                this.notifyError('Can not update the market cap for BTC / MINTME');
+                this.supply = 0;
             });
         }
 
@@ -265,8 +269,9 @@ export default {
                 params: [this.market.identifier, 24 * 60 * 60],
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
-        }).catch(() => {
+        }).catch((err) => {
             this.notifyError('Service unavailable now. Can not load the chart data');
+            this.sendLogs('error', 'Can not load the chart data', err);
         });
     },
     methods: {
@@ -282,14 +287,12 @@ export default {
             const marketAmount = parseFloat(marketInfo.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-            const marketCap = marketLastPrice * this.supply;
 
             const marketStatus = {
                 change: toMoney(changePercentage, 2),
                 last: toMoney(marketLastPrice, this.market.base.subunit),
                 volume: toMoney(marketVolume, this.market.quote.subunit),
                 amount: toMoney(marketAmount, this.market.base.subunit),
-                marketCap: toMoney(marketCap, this.market.base.subunit),
             };
 
             this.marketStatus = {...this.marketStatus, ...marketStatus};
@@ -311,11 +314,15 @@ export default {
             const marketAmount = parseFloat(marketData.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
+            const marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
+                ? 0
+                : parseFloat(this.marketStatus.last) * this.supply;
 
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
+                marketCap: toMoney(marketCap, this.market.base.subunit),
             };
 
             this.marketStatus = {...this.marketStatus, ...monthInfo};
@@ -349,8 +356,10 @@ export default {
                     })
                     .catch((err) => {
                         this.$toasted.error('Can not update WEB circulation supply. Market Cap might not be accurate.');
+                        this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });
+                reject(new Error('CORS error'));
             });
         },
     },

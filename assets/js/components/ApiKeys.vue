@@ -2,14 +2,14 @@
     <div>
         <template v-if="existed">
             <p>
-                Your public key: <span class="text-danger">{{ keys.publicKey }}</span>
+                Your public key: <span class="text-danger word-break">{{ keys.publicKey }}</span>
                 <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
                     <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                 </copy-link>
             </p>
             <template v-if="keys.plainPrivateKey">
                 <p>
-                    Your private key: <span class="text-danger">{{ keys.plainPrivateKey }}</span>
+                    Your private key: <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
                     <copy-link
                             class="code-copy c-pointer ml-2"
                             id="private-copy-btn"
@@ -39,11 +39,11 @@
 <script>
     import ConfirmModal from './modal/ConfirmModal';
     import CopyLink from './CopyLink';
-    import {NotificationMixin} from '../mixins';
+    import {LoggerMixin, NotificationMixin} from '../mixins';
 
     export default {
         name: 'ApiKeys',
-        mixins: [NotificationMixin],
+        mixins: [NotificationMixin, LoggerMixin],
         components: {ConfirmModal, CopyLink},
         props: {
             apiKeys: {type: [Object, Array], required: true},
@@ -63,7 +63,10 @@
             generate: function() {
                 return this.$axios.single.post(this.$routing.generate('post_keys'))
                     .then((res) => this.keys = res.data)
-                    .catch(() => this.notifyError('Something went wrong. Try to reload the page.'));
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not generate API Keys', err);
+                    });
             },
             invalidate: function() {
                 return this.$axios.single.delete(this.$routing.generate('delete_keys'))
@@ -71,7 +74,10 @@
                         this.keys = {};
                         this.toggleInvalidateModal(false);
                     })
-                    .catch(() => this.notifyError('Something went wrong. Try to reload the page.'));
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not invalidate API Keys', err);
+                    });
             },
             toggleInvalidateModal: function(on) {
                 this.invalidateModal = on;
