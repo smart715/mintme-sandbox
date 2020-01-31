@@ -2,7 +2,7 @@
 
 namespace App\Security\Model;
 
-class ApiKeyCredentials
+class ApiKeyCredentials implements ApiAuthCredentialsInterface
 {
     /** @var string */
     private $private;
@@ -17,6 +17,11 @@ class ApiKeyCredentials
     }
 
     public function getPublic(): string
+    {
+        return $this->public;
+    }
+
+    public function getToken(): string
     {
         return $this->public;
     }
