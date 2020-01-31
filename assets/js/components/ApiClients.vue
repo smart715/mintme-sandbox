@@ -1,0 +1,101 @@
+<template>
+    <div>
+        <b-table small
+                 striped
+                 v-if="hasClients"
+                 ref="table"
+                 :items="clients"
+                 :fields="fields">
+            <template v-slot:cell(id)="row">
+                <div class="text-center">
+                    <div class="text-left d-inline-block">
+                        ID<br />
+                        <span class="text-danger word-break">{{ row.item.id }}</span>
+                        <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
+                            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                        </copy-link>
+                        <a @click="setInvalidateModal(true, row.item.id)">
+                            <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                        </a><br />
+                        Secret<br />
+                        <template v-if="row.item.secret">
+                            <span class="text-danger word-break">{{ row.item.secret }}</span>
+                            <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">
+                                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                            </copy-link>
+                            <div class="text-center small">
+                                (Copy this secret, you will not able to see it again after reload)
+                            </div>
+                        </template>
+                        <template v-else>
+                            <span class="text-white-50">** hidden **</span>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </b-table>
+        <p>Create New Client for OAuth:</p>
+        <div class="btn btn-primary c-pointer" @click="createClient">Create</div>
+        <confirm-modal :visible="invalidateModal" @confirm="deleteClient(clientId)" @close="setInvalidateModal(false, clientId)">
+            <p class="text-white modal-title pt-2">
+                Are you sure you want to delete your API Client.
+                Currently running applications will not work. Continue?
+            </p>
+        </confirm-modal>
+    </div>
+</template>
+
+<script>
+    import ConfirmModal from './modal/ConfirmModal';
+    import CopyLink from './CopyLink';
+    import {NotificationMixin} from '../mixins';
+
+    export default {
+        name: 'ApiClients',
+        mixins: [NotificationMixin],
+        components: {ConfirmModal, CopyLink},
+        props: {
+            apiClients: {type: [Array], required: true},
+        },
+        data() {
+            return {
+                clients: this.apiClients,
+                invalidateModal: false,
+                clientId: '',
+                fields: [{key: 'id', label: ''}],
+            };
+        },
+        computed: {
+            hasClients: function() {
+                return this.clients.length > 0;
+            },
+        },
+        methods: {
+            createClient: function() {
+                return this.$axios.single.post(this.$routing.generate('post_client'))
+                    .then((res) => this.clients.push(res.data))
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not create API Client', err);
+                    });
+            },
+            deleteClient: function(clientId) {
+                return this.$axios.single.delete(this.$routing.generate('delete_client', {id: clientId}))
+                    .then(() => {
+                        this.clients = this.clients.filter(function(item) {
+                            return clientId != item.id;
+                        });
+                        this.setInvalidateModal(false, '');
+                    })
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.sendLogs('error', 'Can not delete API Client', err);
+                    });
+            },
+            setInvalidateModal: function(on, clientId) {
+                this.invalidateModal = on;
+                this.clientId = clientId;
+            },
+        },
+    };
+</script>
