@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Util\CanonicalFieldsUpdater;
 use FOS\UserBundle\Util\PasswordUpdaterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UserManagerTest extends TestCase
@@ -40,6 +41,39 @@ class UserManagerTest extends TestCase
         );
 
         $this->assertEquals($user, $manager->findByReferralCode('foo'));
+    }
+
+    public function testGetTraidersData(): void
+    {
+        $users = [1, 2, 3];
+        $user = $this->mockUser();
+        /** @var UserRepository|MockObject $userRepository */
+        $userRepository = $this->mockRepository($user);
+
+        $userRepository
+            ->method('getTraidersData')
+            ->with($users)
+            ->willReturn([
+                [
+                    'id' => 1,
+                ],
+                [
+                    'id' => 2,
+                ],
+                [
+                    'id' => 3,
+                ],
+            ]);
+
+        $manager = new UserManager(
+            $this->mockPasswordUpdater(),
+            $this->mockCanonicalFieldsUpdater(),
+            $this->mockObjectManager($userRepository),
+            'Foo'
+        );
+
+        $tradersData = $manager->getTradersData($users);
+        $this->assertNotEmpty($tradersData);
     }
 
     private function mockPasswordUpdater(): PasswordUpdaterInterface

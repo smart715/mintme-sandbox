@@ -389,6 +389,43 @@ class MarketHandlerTest extends TestCase
         $mh->getMarketInfo($market);
     }
 
+    public function testGetTradersByOrderPrice(): void
+    {
+        $fetcher = $this->mockMarketFetcher();
+        $fetcher
+            ->method('getPendingOrders')
+            ->with('convertedmarket', 0, 100, 1)
+            ->willReturn(
+                $this->getPendingOrdersForTradersSearch()
+            );
+
+        $userManager = $this->mockUserManager();
+        $userManager
+            ->method('getTradersData')
+            ->with([4, 6])
+            ->willReturn($this->getTradersData());
+
+        $market = $this->mockMarket();
+
+        $mh = new MarketHandler(
+            $fetcher,
+            $this->mockMoneyWrapper(),
+            $userManager,
+            $this->mockMarketNameConverter()
+        );
+
+        $tradersData = $mh->getTradersByOrderPrice($market, [
+            'ownerId' => '1',
+            'price' => '5',
+            'side' => '1',
+        ]);
+
+        $this->assertArrayHasKey('moreCount', $tradersData);
+        $this->assertArrayHasKey('tradersData', $tradersData);
+        $this->assertEquals(0, $tradersData['moreCount']);
+        $this->assertEquals(count($this->getTradersData()), count($tradersData['tradersData']));
+    }
+
     private function getExecutedOrders(): array
     {
         return [
@@ -405,6 +442,26 @@ class MarketHandlerTest extends TestCase
             ['user'=>1,'id'=>2,'left'=>'3','side'=>0,'price'=>'6','mtime'=>7,'maker_fee'=>8.,'taker_fee'=>8.],
             ['user'=>1,'id'=>2,'left'=>'3','side'=>1,'price'=>'6','mtime'=>7,'maker_fee'=>8.,'taker_fee'=>8.],
             ['user'=>1,'id'=>2,'left'=>'3','side'=>2,'price'=>'6','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
+        ];
+    }
+
+    private function getPendingOrdersForTradersSearch(): array
+    {
+        return [
+            ['user'=>1,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','mtime'=>7,'maker_fee'=>8.,'taker_fee'=>8.],
+            ['user'=>2,'id'=>2,'left'=>'3','side'=>1,'price'=>'6','mtime'=>7,'maker_fee'=>8.,'taker_fee'=>8.],
+            ['user'=>3,'id'=>2,'left'=>'3','side'=>2,'price'=>'7','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
+            ['user'=>4,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
+            ['user'=>5,'id'=>2,'left'=>'3','side'=>2,'price'=>'6','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
+            ['user'=>6,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
+        ];
+    }
+
+    private function getTradersData(): array
+    {
+        return [
+            ['id'=>4,'firstName'=>'Test2','lastName'=>'User2','anonymous'=>'1','page_url'=>'user2',],
+            ['id'=>6,'firstName'=>'Test3','lastName'=>'User3','anonymous'=>'5','page_url'=>'user3',],
         ];
     }
 
