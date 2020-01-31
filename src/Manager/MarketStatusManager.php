@@ -63,12 +63,16 @@ class MarketStatusManager implements MarketStatusManagerInterface
         return $this->parseMarketStatuses(
             array_merge(
                 $predefinedMarketStatus,
-                $this->repository->findBy(
-                    [],
-                    ['lastPrice' => Criteria::DESC],
-                    $limit - count($predefinedMarketStatus),
-                    $offset
-                )
+                $this->repository->createQueryBuilder('ms')
+                    ->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
+                    ->join('ms.quoteToken', 'qt')
+                    ->where('qt IS NOT NULL')
+                    ->orderBy('deployed', 'DESC')
+                    ->addOrderBy('ms.lastPrice', 'DESC')
+                    ->setFirstResult($offset)
+                    ->setMaxResults($limit - count($predefinedMarketStatus))
+                    ->getQuery()
+                    ->getResult()
             )
         );
     }
