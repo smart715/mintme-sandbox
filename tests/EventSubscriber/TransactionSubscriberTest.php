@@ -181,7 +181,7 @@ class TransactionSubscriberTest extends TestCase
         $event = $this->createMock(WithdrawCompletedEvent::class);
         $event->expects($this->once())->method('getTradable')->willReturn($tradable);
         $event->expects($this->once())->method('getUser')->willReturn($eventUser);
-        $event->expects($this->once())->method('getAmount')->willReturn('0');
+        $event->expects($this->once())->method('getAmount')->willReturn('2500');
 
         $subscriber->updateTokenWithdraw($event);
 
