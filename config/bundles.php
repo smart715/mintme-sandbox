@@ -37,6 +37,7 @@ return [
     Sonata\ClassificationBundle\SonataClassificationBundle::class => ['all' => true],
     Sonata\NewsBundle\SonataNewsBundle::class => ['all' => true],
     FOS\JsRoutingBundle\FOSJsRoutingBundle::class => ['all' => true],
+    FOS\OAuthServerBundle\FOSOAuthServerBundle::class => ['all' => true],
     Presta\SitemapBundle\PrestaSitemapBundle::class => ['all' => true],
     Nelmio\ApiDocBundle\NelmioApiDocBundle::class => ['all' => true],
     Endroid\QrCodeBundle\EndroidQrCodeBundle::class => ['all' => true],
