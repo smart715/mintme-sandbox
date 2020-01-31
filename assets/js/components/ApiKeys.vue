@@ -2,14 +2,14 @@
     <div>
         <template v-if="existed">
             <p>
-                Your public key: <span class="text-danger">{{ keys.publicKey }}</span>
+                Your public key: <span class="text-danger word-break">{{ keys.publicKey }}</span>
                 <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
                     <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                 </copy-link>
             </p>
             <template v-if="keys.plainPrivateKey">
                 <p>
-                    Your private key: <span class="text-danger">{{ keys.plainPrivateKey }}</span>
+                    Your private key: <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
                     <copy-link
                             class="code-copy c-pointer ml-2"
                             id="private-copy-btn"
