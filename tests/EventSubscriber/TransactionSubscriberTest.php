@@ -9,9 +9,10 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
+use App\Events\WithdrawCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
 use App\Mailer\MailerInterface;
-use App\Wallet\Money\MoneyWrapperInterface;
+use App\Tests\MockMoneyWrapper;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -21,6 +22,9 @@ use Psr\Log\LoggerInterface;
 
 class TransactionSubscriberTest extends TestCase
 {
+
+    use MockMoneyWrapper;
+
     public function testSendTransactionCompletedMailWithCrypto(): void
     {
         $subscriber = new TransactionSubscriber(
@@ -63,7 +67,139 @@ class TransactionSubscriberTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testUpdateTokenWithdraw(): void
+    public function testUpdateTokenWithdrawForDeposit(): void
+    {
+        $zeroValue = '0';
+        $amountValue = '1000';
+        $zeroObj = new Money($zeroValue, new Currency(Token::WEB_SYMBOL));
+        $amountObj = new Money($amountValue, new Currency(Token::WEB_SYMBOL));
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->mockEntityManager();
+        /** @var LoggerInterface|MockObject $logger */
+        $logger = $this->mockLogger();
+
+        $subscriber = new TransactionSubscriber(
+            $this->mockMailer(),
+            $this->mockMoneyWrapper(),
+            $logger,
+            $em
+        );
+
+        $tradable = $this->createMock(Token::class);
+        $user = $this->createMock(User::class);
+        $profile = $this->createMock(Profile::class);
+
+        $user->expects($this->exactly(2))->method('getId')->willReturn(1);
+        $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
+        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn($zeroValue);
+        $tradable->expects($this->once())->method('setWithdrawn')->with(
+            $zeroObj->subtract($amountObj)->getAmount()
+        );
+        $profile->expects($this->once())->method('getUser')->willReturn($user);
+
+        $em->expects($this->once())->method('persist')->with($tradable);
+        $em->expects($this->once())->method('flush');
+
+        $logger->expects($this->once())->method('info');
+
+        $event = $this->createMock(DepositCompletedEvent::class);
+        $event->expects($this->once())->method('getTradable')->willReturn($tradable);
+        $event->expects($this->once())->method('getUser')->willReturn($user);
+        $event->expects($this->once())->method('getAmount')->willReturn($amountValue);
+
+        $subscriber->updateTokenWithdraw($event);
+
+        $this->assertTrue(true);
+    }
+
+    public function testUpdateTokenWithdrawForWithdraw(): void
+    {
+        $zeroValue = '0';
+        $amountValue = '5000';
+        $zeroObj = new Money($zeroValue, new Currency(Token::WEB_SYMBOL));
+        $amountObj = new Money($amountValue, new Currency(Token::WEB_SYMBOL));
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->mockEntityManager();
+        /** @var LoggerInterface|MockObject $logger */
+        $logger = $this->mockLogger();
+
+        $subscriber = new TransactionSubscriber(
+            $this->mockMailer(),
+            $this->mockMoneyWrapper(),
+            $logger,
+            $em
+        );
+
+        $tradable = $this->createMock(Token::class);
+        $user = $this->createMock(User::class);
+        $profile = $this->createMock(Profile::class);
+
+        $user->expects($this->exactly(2))->method('getId')->willReturn(1);
+        $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
+        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn($zeroValue);
+        $tradable->expects($this->once())->method('setWithdrawn')->with(
+            $zeroObj->add($amountObj)->getAmount()
+        );
+        $profile->expects($this->once())->method('getUser')->willReturn($user);
+
+        $em->expects($this->once())->method('persist')->with($tradable);
+        $em->expects($this->once())->method('flush');
+
+        $logger->expects($this->once())->method('info');
+
+        $event = $this->createMock(WithdrawCompletedEvent::class);
+        $event->expects($this->once())->method('getTradable')->willReturn($tradable);
+        $event->expects($this->once())->method('getUser')->willReturn($user);
+        $event->expects($this->once())->method('getAmount')->willReturn($amountValue);
+
+        $subscriber->updateTokenWithdraw($event);
+
+        $this->assertTrue(true);
+    }
+
+    public function testUpdateTokenWithdrawForZeroAmount(): void
+    {
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->mockEntityManager();
+        /** @var LoggerInterface|MockObject $logger */
+        $logger = $this->mockLogger();
+
+        $subscriber = new TransactionSubscriber(
+            $this->mockMailer(),
+            $this->mockMoneyWrapper(),
+            $logger,
+            $em
+        );
+
+        $tradable = $this->createMock(Token::class);
+        $eventUser = $this->createMock(User::class);
+        $tokenOwner = $this->createMock(User::class);
+        $profile = $this->createMock(Profile::class);
+
+        $eventUser->expects($this->once())->method('getId')->willReturn(1);
+        $tokenOwner->expects($this->once())->method('getId')->willReturn(3);
+
+        $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
+        $tradable->expects($this->never())->method('getWithdrawn');
+        $tradable->expects($this->never())->method('setWithdrawn');
+        $profile->expects($this->once())->method('getUser')->willReturn($tokenOwner);
+
+        $em->expects($this->never())->method('persist');
+        $em->expects($this->never())->method('flush');
+
+        $logger->expects($this->never())->method('info');
+
+        $event = $this->createMock(WithdrawCompletedEvent::class);
+        $event->expects($this->once())->method('getTradable')->willReturn($tradable);
+        $event->expects($this->once())->method('getUser')->willReturn($eventUser);
+        $event->expects($this->once())->method('getAmount')->willReturn('0');
+
+        $subscriber->updateTokenWithdraw($event);
+
+        $this->assertTrue(true);
+    }
+
+    public function testUpdateTokenWithdrawForNotTokenOwner(): void
     {
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
@@ -83,18 +219,19 @@ class TransactionSubscriberTest extends TestCase
 
         $user->expects($this->exactly(2))->method('getId')->willReturn(1);
         $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
-        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn('0');
+        $tradable->expects($this->never())->method('getWithdrawn');
+        $tradable->expects($this->never())->method('setWithdrawn');
         $profile->expects($this->once())->method('getUser')->willReturn($user);
 
-        $em->expects($this->once())->method('persist')->with($tradable);
-        $em->expects($this->once())->method('flush');
+        $em->expects($this->never())->method('persist');
+        $em->expects($this->never())->method('flush');
 
-        $logger->expects($this->once())->method('info');
+        $logger->expects($this->never())->method('info');
 
-        $event = $this->createMock(DepositCompletedEvent::class);
+        $event = $this->createMock(WithdrawCompletedEvent::class);
         $event->expects($this->once())->method('getTradable')->willReturn($tradable);
         $event->expects($this->once())->method('getUser')->willReturn($user);
-        $event->expects($this->once())->method('getAmount')->willReturn('1000');
+        $event->expects($this->once())->method('getAmount')->willReturn('0');
 
         $subscriber->updateTokenWithdraw($event);
 
@@ -104,19 +241,6 @@ class TransactionSubscriberTest extends TestCase
     private function mockMailer(): MailerInterface
     {
         return $this->createMock(MailerInterface::class);
-    }
-
-    private function mockMoneyWrapper(): MoneyWrapperInterface
-    {
-        $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
-            return new Money($amount, new Currency($symbol));
-        });
-        $mw->method('format')->willReturnCallback(function (Money $money): string {
-            return $money->getAmount();
-        });
-
-        return $mw;
     }
 
     private function mockTransactionCompletedEvent(TradebleInterface $tradable, string $amount): TransactionCompletedEvent
