@@ -35,19 +35,17 @@
                                     :href="row.item.traderUrl"
                                     class="d-flex flex-row flex-nowrap justify-content-between w-100 buy-orders-tooltip"
                                     v-b-tooltip="popoverConfig"
-                                    v-on:mouseover="mouseover"
-                                    :id="'side_' + row.item.side + '_order_' + row.item.orderId"
-                                    :data-order-id="row.item.orderId"
+                                    tabindex="0"
+                                    v-on:mouseover="mouseoverHandler"
                                     :data-owner-id="row.item.ownerId"
-                                    :data-side="row.item.side"
                                     :data-price="row.item.price"
                                 >
-                                    <span class="d-inline-block truncate-name flex-grow-1">
+                                    <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
                                         {{ row.value }}
                                     </span>
                                     <img
                                         src="../../../img/avatar.png"
-                                        class="d-block flex-grow-0"
+                                        class="d-block flex-grow-0 pointer-events-none"
                                         alt="avatar">
                                 </a>
                                 <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
@@ -72,19 +70,31 @@
                 </div>
             </div>
         </div>
-        <div id="buy-traiders-tooltip-container"></div>
     </div>
 </template>
 
 <script>
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
+import {WSAPI} from '../../utils/constants';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin} from '../../mixins/';
+import {
+    LazyScrollTableMixin,
+    MoneyFilterMixin,
+    OrderClickedMixin,
+    RebrandingFilterMixin,
+    TraderHoveredMixin,
+} from '../../mixins/';
 
 export default {
     name: 'TradeBuyOrders',
-    mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
+    mixins: [
+        LazyScrollTableMixin,
+        MoneyFilterMixin,
+        OrderClickedMixin,
+        RebrandingFilterMixin,
+        TraderHoveredMixin,
+    ],
     props: {
         ordersList: [Array],
         tokenName: String,
@@ -97,7 +107,7 @@ export default {
     data() {
         return {
             tableData: this.ordersList,
-            tooltip: 'Loading...',
+            side: WSAPI.order.type.BUY,
         };
     },
     components: {
@@ -105,10 +115,6 @@ export default {
     },
     mounted: function() {
         this.startScrollListeningOnce(this.ordersList);
-
-        this.$root.$on('bv::tooltip::hidden', () => {
-            this.tooltip = 'Loading...';
-        });
     },
     computed: {
         total: function() {
@@ -119,39 +125,8 @@ export default {
         hasOrders: function() {
             return this.tableData.length > 0;
         },
-        popoverConfig() {
-            return {
-                title: this.tooltipContent,
-                html: true,
-                boundary:'viewport',
-                show: 300,
-                hide: 100,
-                id: 'buy-traiders-tooltip-container'
-            };
-        },
     },
     methods: {
-        mouseover: function(event) {
-            let target = event.target;
-
-            if ('a' !== target.tagName.toLowerCase()) {
-                target = target.parentElement;
-            }
-
-            let orderId = target.getAttribute('data-order-id'),
-                ownerId = target.getAttribute('data-owner-id'),
-                side = target.getAttribute('data-side'),
-                price = target.getAttribute('data-price');
-
-            let data = {
-                orderId,
-                ownerId,
-                side,
-                price
-            };
-
-            this.orderTraderHovered(data);
-        },
         removeOrderModal: function(row) {
             this.$emit('modal', row);
         },
