@@ -34,7 +34,7 @@
                                     <a
                                         v-else
                                         :href="row.item.traderUrl"
-                                        class="d-flex flex-row flex-nowrap justify-content-between w-100 buy-orders-tooltip"
+                                        class="d-flex flex-row flex-nowrap justify-content-between w-100"
                                         v-b-tooltip="popoverConfig"
                                         tabindex="0"
                                         v-on:mouseover="mouseoverHandler"
