@@ -16,9 +16,6 @@ final class Version20200106151719 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE token ADD deployed DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('UPDATE token t
-                            SET t.deployed = NOW()
-                            WHERE t.address IS NOT NULL AND t.address <> \'\' AND t.address <> "0x"');
     }
 
     public function down(Schema $schema) : void
