@@ -69,10 +69,6 @@ class TransactionSubscriberTest extends TestCase
 
     public function testUpdateTokenWithdrawForDeposit(): void
     {
-        $zeroValue = '0';
-        $amountValue = '1000';
-        $zeroObj = new Money($zeroValue, new Currency(Token::WEB_SYMBOL));
-        $amountObj = new Money($amountValue, new Currency(Token::WEB_SYMBOL));
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
         /** @var LoggerInterface|MockObject $logger */
@@ -91,10 +87,8 @@ class TransactionSubscriberTest extends TestCase
 
         $user->expects($this->exactly(2))->method('getId')->willReturn(1);
         $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
-        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn($zeroValue);
-        $tradable->expects($this->once())->method('setWithdrawn')->with(
-            $zeroObj->subtract($amountObj)->getAmount()
-        );
+        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn('0');
+        $tradable->expects($this->once())->method('setWithdrawn')->with('-1000');
         $profile->expects($this->once())->method('getUser')->willReturn($user);
 
         $em->expects($this->once())->method('persist')->with($tradable);
@@ -105,7 +99,7 @@ class TransactionSubscriberTest extends TestCase
         $event = $this->createMock(DepositCompletedEvent::class);
         $event->expects($this->once())->method('getTradable')->willReturn($tradable);
         $event->expects($this->once())->method('getUser')->willReturn($user);
-        $event->expects($this->once())->method('getAmount')->willReturn($amountValue);
+        $event->expects($this->once())->method('getAmount')->willReturn('1000');
 
         $subscriber->updateTokenWithdraw($event);
 
@@ -114,10 +108,7 @@ class TransactionSubscriberTest extends TestCase
 
     public function testUpdateTokenWithdrawForWithdraw(): void
     {
-        $zeroValue = '0';
         $amountValue = '5000';
-        $zeroObj = new Money($zeroValue, new Currency(Token::WEB_SYMBOL));
-        $amountObj = new Money($amountValue, new Currency(Token::WEB_SYMBOL));
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
         /** @var LoggerInterface|MockObject $logger */
@@ -136,10 +127,8 @@ class TransactionSubscriberTest extends TestCase
 
         $user->expects($this->exactly(2))->method('getId')->willReturn(1);
         $tradable->expects($this->once())->method('getProfile')->willReturn($profile);
-        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn($zeroValue);
-        $tradable->expects($this->once())->method('setWithdrawn')->with(
-            $zeroObj->add($amountObj)->getAmount()
-        );
+        $tradable->expects($this->exactly(2))->method('getWithdrawn')->willReturn('0');
+        $tradable->expects($this->once())->method('setWithdrawn')->with($amountValue);
         $profile->expects($this->once())->method('getUser')->willReturn($user);
 
         $em->expects($this->once())->method('persist')->with($tradable);
