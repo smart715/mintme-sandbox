@@ -157,7 +157,7 @@ class TransactionSubscriberTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testUpdateTokenWithdrawForZeroAmount(): void
+    public function testUpdateTokenWithdrawForNotTokenOwner(): void
     {
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
@@ -199,7 +199,7 @@ class TransactionSubscriberTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testUpdateTokenWithdrawForNotTokenOwner(): void
+    public function testUpdateTokenWithdrawForZeroAmount(): void
     {
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
