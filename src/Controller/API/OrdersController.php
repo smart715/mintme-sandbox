@@ -143,16 +143,15 @@ class OrdersController extends AbstractFOSRestController
 
     /**
      * @Rest\Get("/{base}/{quote}/traders", name="traders_with_similar_orders", options={"expose"=true})
-     * @Rest\QueryParam(name="data", allowBlank=false)
+     * @Rest\QueryParam(name="params", allowBlank=false)
      * @Rest\View()
      * @return mixed[]
      */
     public function getTradersWithSimilarOrders(Market $market, ParamFetcherInterface $request): array
     {
-        $data = $request->get('data') ?: [];
-        $traiders = $this->marketHandler->getTradersByOrderPrice($market, $data);
+        $params = $request->get('params') ?: [];
 
-        return $traiders;
+        return $this->marketHandler->getTradersByOrderPrice($market, $params);
     }
 
     /**

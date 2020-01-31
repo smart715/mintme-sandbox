@@ -16,8 +16,6 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
-use Money\Currency;
-use Money\Money;
 
 class MarketHandler implements MarketHandlerInterface
 {
@@ -25,6 +23,7 @@ class MarketHandler implements MarketHandlerInterface
     public const BUY = 2;
 
     private const MONTH_PERIOD = 2592000;
+    private const COUNT_TRADERS_TO_SHOW = 5;
 
     /** @var MarketFetcherInterface */
     private $marketFetcher;
@@ -188,10 +187,17 @@ class MarketHandler implements MarketHandlerInterface
 
     public function getTradersByOrderPrice(Market $market, array $params = [], int $limit = 100): array
     {
-        $returnData = [];
-        $side = (int)$params['side'];
-        $user = (int)$params['ownerId'];
-        $price = $params['price'];
+        $side = (int)$params['side'] ?? null;
+        $user = (int)$params['ownerId'] ?? null;
+        $price = $params['price'] ?? null;
+
+        if (!$side || !$user || !$price) {
+            return [
+                'moreCount' => 0,
+                'tradersData' => [],
+            ];
+        }
+
         $pendingOrders = $this->marketFetcher->getPendingOrders(
             $this->marketNameConverter->convert($market),
             0,
@@ -208,12 +214,13 @@ class MarketHandler implements MarketHandlerInterface
         });
 
         $usersIds = array_column($filteredOrders, 'user');
-        $traidersData = $this->userManager->getTraidersData($usersIds);
-        $traidersCount = count($traidersData);
-        $returnData['moreCount'] = $traidersCount > 5 ? $traidersCount - 5 : 0;
-        $returnData['traidersData'] = array_slice($traidersData, 0, 5, true);
+        $tradersData = $this->userManager->getTradersData($usersIds);
+        $tradersCount = count($tradersData);
 
-        return $returnData;
+        return [
+            'moreCount' => $tradersCount > self::COUNT_TRADERS_TO_SHOW ? $tradersCount - self::COUNT_TRADERS_TO_SHOW : 0,
+            'tradersData' => array_slice($tradersData, 0, self::COUNT_TRADERS_TO_SHOW, true),
+        ];
     }
 
     /** @return Order[] */
