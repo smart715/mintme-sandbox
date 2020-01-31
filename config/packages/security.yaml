@@ -39,6 +39,9 @@ security:
                 multi_factor: true
                 csrf_token_generator: security.csrf.token_manager
                 authentication_required_handler: two_factor.auth_require_handler
+        oauth_token:
+            pattern:    ^/oauth/v2/token
+            security:   false
 
     role_hierarchy:
         ROLE_ADMIN_NEWS_ADMIN:

@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="row pb-3 justify-content-center">
+        <div class="row justify-content-center">
             <div class="card-fixed-large m-3 pl-0">
                 <div class="card">
                     <div class="card-header text-uppercase">API</div>
@@ -53,6 +53,22 @@
                             <div v-cloak>
                                 {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
                                 <api-keys class="mb-2" :api-keys="{{ keys | json_encode }}" v-cloak></api-keys>
+                            </div>
+                            <p>
+                                Check <a href="{{ path('nelmio_api_doc.swagger_ui') }}">documentation</a> for more information
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-fixed-large ml-3 mr-3 pl-0">
+                <div class="card">
+                    <div class="card-header">Clients for OAuth access to API</div>
+                    <div class="card-body m-0 pt-4">
+                        <div class="text-center">
+                            <div v-cloak>
+                                {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
+                                <api-clients class="mb-2" :api-clients="{{ clients | json_encode }}" v-cloak></api-clients>
                             </div>
                             <p>
                                 Check <a href="{{ path('nelmio_api_doc.swagger_ui') }}">documentation</a> for more information
