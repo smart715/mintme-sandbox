@@ -155,6 +155,12 @@ class Token implements TradebleInterface
      */
     protected $users;
 
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $withdrawn = '0';
+
     /** @return User[] */
     public function getUsers(): array
     {
@@ -389,6 +395,18 @@ class Token implements TradebleInterface
     public function setDiscordUrl(?string $url): self
     {
         $this->discordUrl = $url;
+
+        return $this;
+    }
+
+    public function getWithdrawn(): string
+    {
+        return $this->withdrawn;
+    }
+
+    public function setWithdrawn(string $withdrawn): self
+    {
+        $this->withdrawn = $withdrawn;
 
         return $this;
     }

@@ -185,6 +185,7 @@ export default {
             soldOnMarket: null,
             isTokenExchanged: true,
             defaultValue: defaultValue,
+            tokenWithdrawn: 0,
             stats: {
                 releasePeriod: defaultValue,
                 hourlyRate: defaultValue,
@@ -224,6 +225,13 @@ export default {
                 this.sendLogs('error', 'Can not load soldOnMarket value', err);
             });
 
+        this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
+            .then((res) => this.tokenWithdrawn = res.data)
+            .catch((err) => {
+                this.notifyError('Can not load token withdrawn statistic data. Try again later');
+                this.sendLogs('error', 'Can not load token withdrawn value', err);
+            });
+
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
@@ -252,7 +260,7 @@ export default {
             return toMoney(sum.toString());
         },
         withdrawBalance: function() {
-            return toMoney(0);
+            return toMoney(this.tokenWithdrawn);
         },
         soldOrdersSum: function() {
             let sum = new Decimal(0);
