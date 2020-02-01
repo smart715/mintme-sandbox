@@ -84,12 +84,14 @@ new Vue({
     },
 });
 
-new Vue({
-    el: '#notifications',
-    components: {
-        Notification,
-    },
-});
+if (document.getElementById('notifications')) {
+    new Vue({
+        el: '#notifications',
+        components: {
+            Notification,
+        },
+    });
+}
 
 new Vue({
     el: '#footer',
