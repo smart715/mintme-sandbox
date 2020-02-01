@@ -31,6 +31,8 @@ new Vue({
     },
     watch: {
         tokenName: function() {
+            clearTimeout(this.tokenNameTimeout);
+
             if (this.tokenName.replace(/-|\s/g, '').length === 0) {
                 this.tokenName = '';
             }
