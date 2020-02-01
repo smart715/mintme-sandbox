@@ -161,6 +161,12 @@ class Token implements TradebleInterface
      */
     private $deployed;
 
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $withdrawn = '0';
+
     /** @return User[] */
     public function getUsers(): array
     {
@@ -414,6 +420,18 @@ class Token implements TradebleInterface
     public function setDeployed(?\DateTimeImmutable $deployed): self
     {
         $this->deployed = $deployed;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getWithdrawn(): string
+    {
+        return $this->withdrawn;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setWithdrawn(string $withdrawn): self
+    {
+        $this->withdrawn = $withdrawn;
 
         return $this;
     }
