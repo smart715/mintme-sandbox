@@ -321,7 +321,7 @@ export default {
         openDeposit: function(currency, subunit, isToken = false) {
             this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
                 || 'Loading..';
-            this.depositDescription = `Send ${currency}s to the address above.`;
+            this.depositDescription = `Send ${currency} to the address above.`;
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
