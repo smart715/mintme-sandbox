@@ -317,7 +317,7 @@ export default {
                 this.notifyError('Can not update the market cap for BTC / MINTME');
                 marketCap = 0;
             } else {
-                marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
+                marketCap = WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap
                     ? '-'
                     : toMoney(parseFloat(this.marketStatus.last) * this.supply, this.market.base.subunit) + ' ' + this.market.base.symbol;
             }
