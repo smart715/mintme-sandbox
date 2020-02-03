@@ -64,7 +64,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             array_merge(
                 $predefinedMarketStatus,
                 $this->repository->createQueryBuilder('ms')
-                    ->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
+                    ->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
                     ->join('ms.quoteToken', 'qt')
                     ->where('qt IS NOT NULL')
                     ->orderBy('deployed', 'DESC')
