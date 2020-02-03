@@ -221,9 +221,6 @@ export default {
         if ('WEBBTC' === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
                 this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
-            }).catch((error) => {
-                this.notifyError('Can not update the market cap for BTC / MINTME');
-                this.supply = 0;
             });
         }
 
@@ -314,9 +311,16 @@ export default {
             const marketAmount = parseFloat(marketData.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-            const marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
-                ? '-'
-                : toMoney(parseFloat(this.marketStatus.last) * this.supply, this.market.base.subunit) + ' ' + this.market.base.symbol;
+            let marketCap;
+
+            if ('WEBBTC' === this.market.identifier && 1e7 === this.supply) {
+                this.notifyError('Can not update the market cap for BTC / MINTME');
+                marketCap = 0;
+            } else {
+                marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
+                    ? '-'
+                    : toMoney(parseFloat(this.marketStatus.last) * this.supply, this.market.base.subunit) + ' ' + this.market.base.symbol;
+            }
 
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
@@ -359,7 +363,6 @@ export default {
                         this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });
-                reject(new Error('CORS error'));
             });
         },
     },
