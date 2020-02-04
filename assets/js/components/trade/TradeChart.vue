@@ -65,7 +65,7 @@
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.marketCap | formatMoney }} {{ market.base.symbol|rebranding }}
+                    {{ marketStatus.marketCap | formatMoney | rebranding }}
                 </div>
             </div>
             <div class="row">
@@ -164,7 +164,7 @@ export default {
                 monthVolume: '0',
                 monthChange: '0',
                 monthAmount: '0',
-                marketCap: '0',
+                marketCap: '0 ' + this.market.base.symbol,
             },
             stats: [],
             maxAvailableDays: 30,
@@ -317,16 +317,16 @@ export default {
                 this.notifyError('Can not update the market cap for BTC / MINTME');
                 marketCap = 0;
             } else {
-                marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
-                    ? 0
-                    : parseFloat(this.marketStatus.last) * this.supply;
+                marketCap = WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap
+                    ? '-'
+                    : toMoney(parseFloat(this.marketStatus.last) * this.supply, this.market.base.subunit) + ' ' + this.market.base.symbol;
             }
 
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
-                marketCap: toMoney(marketCap, this.market.base.subunit),
+                marketCap: marketCap,
             };
 
             this.marketStatus = {...this.marketStatus, ...monthInfo};
