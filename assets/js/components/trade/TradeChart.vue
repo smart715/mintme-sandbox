@@ -65,7 +65,7 @@
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.marketCap | formatMoney }} {{ market.base.symbol|rebranding }}
+                    {{ marketStatus.marketCap | formatMoney | rebranding }}
                 </div>
             </div>
             <div class="row">
@@ -164,7 +164,7 @@ export default {
                 monthVolume: '0',
                 monthChange: '0',
                 monthAmount: '0',
-                marketCap: '0',
+                marketCap: '0 ' + this.market.base.symbol,
             },
             stats: [],
             maxAvailableDays: 30,
@@ -221,9 +221,6 @@ export default {
         if ('WEBBTC' === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
                 this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
-            }).catch((error) => {
-                this.notifyError('Can not update the market cap for BTC / MINTME');
-                this.supply = 0;
             });
         }
 
@@ -314,15 +311,22 @@ export default {
             const marketAmount = parseFloat(marketData.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-            const marketCap = WEB.symbol === this.market.base.symbol && marketVolume < this.minimumVolumeForMarketcap
-                ? 0
-                : parseFloat(this.marketStatus.last) * this.supply;
+            let marketCap;
+
+            if ('WEBBTC' === this.market.identifier && 1e7 === this.supply) {
+                this.notifyError('Can not update the market cap for BTC / MINTME');
+                marketCap = 0;
+            } else {
+                marketCap = WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap
+                    ? '-'
+                    : toMoney(parseFloat(this.marketStatus.last) * this.supply, this.market.base.subunit) + ' ' + this.market.base.symbol;
+            }
 
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
-                marketCap: toMoney(marketCap, this.market.base.subunit),
+                marketCap: marketCap,
             };
 
             this.marketStatus = {...this.marketStatus, ...monthInfo};
@@ -359,7 +363,6 @@ export default {
                         this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });
-                reject(new Error('CORS error'));
             });
         },
     },
