@@ -43,7 +43,7 @@ class UserManagerTest extends TestCase
         $this->assertEquals($user, $manager->findByReferralCode('foo'));
     }
 
-    public function testGetTraidersData(): void
+    public function testGetTradersData(): void
     {
         $users = [1, 2, 3];
         $user = $this->mockUser();
@@ -51,7 +51,7 @@ class UserManagerTest extends TestCase
         $userRepository = $this->mockRepository($user);
 
         $userRepository
-            ->method('getTraidersData')
+            ->method('getTradersData')
             ->with($users)
             ->willReturn([
                 [

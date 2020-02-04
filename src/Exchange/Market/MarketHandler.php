@@ -218,7 +218,9 @@ class MarketHandler implements MarketHandlerInterface
         $tradersCount = count($tradersData);
 
         return [
-            'moreCount' => $tradersCount > self::COUNT_TRADERS_TO_SHOW ? $tradersCount - self::COUNT_TRADERS_TO_SHOW : 0,
+            'moreCount' => $tradersCount > self::COUNT_TRADERS_TO_SHOW
+                ? $tradersCount - self::COUNT_TRADERS_TO_SHOW
+                : 0,
             'tradersData' => array_slice($tradersData, 0, self::COUNT_TRADERS_TO_SHOW, true),
         ];
     }

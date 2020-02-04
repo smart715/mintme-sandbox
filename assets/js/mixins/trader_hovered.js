@@ -34,7 +34,7 @@ export default {
     },
     methods: {
         mouseoverHandler: function(event) {
-            if (!this.loggedIn || true === this.isLoading) {
+            if (!this.loggedIn || this.isLoading) {
                 return;
             }
 

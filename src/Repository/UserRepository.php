@@ -53,7 +53,7 @@ class UserRepository extends EntityRepository
     }
 
     /** @codeCoverageIgnore */
-    public function getTraidersData(array $users): array
+    public function getTradersData(array $users): array
     {
         return $this->createQueryBuilder('u')
             ->select([
