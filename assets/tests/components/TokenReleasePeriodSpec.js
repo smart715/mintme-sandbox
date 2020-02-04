@@ -41,7 +41,7 @@ describe('TokenReleasePeriod', () => {
             moxios.stubRequest('lock-period', {status: 200, response: {released: 10}});
 
             moxios.wait(() => {
-                expect(wrapper.vm.releasedDisabled).to.equal(true);
+                expect(wrapper.vm.releasedDisabled).to.equal(false);
                 done();
             });
         });
@@ -59,7 +59,7 @@ describe('TokenReleasePeriod', () => {
             moxios.stubRequest('lock-period', {status: 200, response: {released: 10}});
 
             moxios.wait(() => {
-                expect(wrapper.vm.releasedDisabled).to.equal(true);
+                expect(wrapper.vm.releasedDisabled).to.equal(false);
                 done();
             });
         });
@@ -74,7 +74,7 @@ describe('TokenReleasePeriod', () => {
                 },
             });
 
-            expect(wrapper.vm.releasedDisabled).to.equal(true);
+            expect(wrapper.vm.releasedDisabled).to.equal(false);
         });
     });
 
@@ -107,7 +107,7 @@ describe('TokenReleasePeriod', () => {
                 },
             });
 
-            expect(wrapper.vm.releasePeriodDisabled).to.equal(true);
+            expect(wrapper.vm.releasePeriodDisabled).to.equal(false);
         });
     });
 });
