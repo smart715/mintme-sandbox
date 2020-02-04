@@ -19,13 +19,41 @@
                                 {% endif %}
                             {% endfor %}
                         {% endif %}
-                        {{ form_row(form.name, {'attr': {
-                            'v-model': '$v.tokenName.$model',
-                            'class' : 'form-control',
-                            'oninvalid': 'setCustomValidity("Invalid token name.")',
-                            'onchange': 'setCustomValidity("")',
-                            'oninput': 'setCustomValidity("")',
-                        }}) }}
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-12">
+                                    {{ form_errors(form) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-left">
+                                    <div class="clearfix">
+                                        <div class="float-left">
+                                            {{ form_label(form.name, null, {'label_attr': {'class': 'mb-1'}}) }}
+                                        </div>
+                                        <div class="float-right">
+                                            <div
+                                                v-cloak="$v.tokenName"
+                                                v-if="tokenNameExists"
+                                                class="alert alert-danger alert-token-name-exists"
+                                            >
+                                                <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                                                Token name is already taken
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    {{ form_widget(form.name, {'attr': {
+                                        'v-model': '$v.tokenName.$model',
+                                        'class' : 'form-control',
+                                        'oninvalid': 'setCustomValidity("Invalid token name.")',
+                                        'onchange': 'setCustomValidity("")',
+                                        'oninput': 'setCustomValidity("")',
+                                    }}) }}
+                                </div>
+                            </div>
+                        </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validChars" class="text-danger text-center">
                             Token name can contain only alphabets, numbers, spaces and dashes
                         </div>
@@ -38,9 +66,9 @@
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
                             Token name can't be longer than 255 characters
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row mt-3">
                             <div class="col-md-12 text-left">
-                                <input type="submit" :disabled="$v.$anyError || !tokenName" class="btn btn-primary" value="Create token" />
+                                <input type="submit" :disabled="saveBtnDisabled" class="btn btn-primary" value="Create token" />
                                 <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
                             </div>
                         </div>
