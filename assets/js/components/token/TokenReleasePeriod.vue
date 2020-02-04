@@ -113,10 +113,10 @@ export default {
             return 100 !== this.released;
         },
         releasedDisabled: function() {
-            return (0 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
+            return this.isTokenDeployed || !(0 !== this.released && this.isTokenExchanged);
         },
         releasePeriodDisabled: function() {
-            return !this.isTokenNotDeployed;
+            return this.isTokenDeployed || !(0 !== this.releasePeriod && this.isTokenExchanged);
         },
     },
     mounted: function() {
