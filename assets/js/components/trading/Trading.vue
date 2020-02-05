@@ -92,7 +92,7 @@
                         </guide>
                     </template>
                     <template v-slot:cell(pair)="row">
-                        <div v-if="row.value.length > 45" class="truncate-name w-100">
+                        <div v-if="row.value.length > 38" class="truncate-name w-100">
                             <a  :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
                                 {{ row.value }}
                             </a>
