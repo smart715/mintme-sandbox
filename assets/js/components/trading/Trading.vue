@@ -92,13 +92,27 @@
                         </guide>
                     </template>
                     <template v-slot:cell(pair)="row">
-                        <div class="truncate-name w-100">
-                            <a :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value.length > 41 ? row.value : ''">
+                        <div v-if="row.value.length > 45" class="truncate-name w-100">
+                            <a  :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
                                 {{ row.value }}
                             </a>
                             <guide
                                 placement="top"
                                 max-width="150px"
+                                v-if="row.item.tokenized">
+                                <template slot="icon">
+                                    <img src="../../../img/mintmecoin_W.png" alt="deployed">
+                                </template>
+                                <template slot="body">
+                                    This token exists on blockchain.
+                                </template>
+                            </guide>
+                        </div>
+                        <div v-else>
+                            <a  :href="row.item.tokenUrl" class="text-white">
+                                {{ row.value }}
+                            </a>
+                            <guide
                                 v-if="row.item.tokenized">
                                 <template slot="icon">
                                     <img src="../../../img/mintmecoin_W.png" alt="deployed">
