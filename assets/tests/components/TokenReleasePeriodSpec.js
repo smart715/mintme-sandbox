@@ -92,7 +92,7 @@ describe('TokenReleasePeriod', () => {
             moxios.stubRequest('lock-period', {status: 200, response: {releasePeriod: 10}});
 
             moxios.wait(() => {
-                expect(wrapper.vm.releasePeriodDisabled).to.equal(true);
+                expect(wrapper.vm.releasePeriodDisabled).to.equal(false);
                 done();
             });
         });
