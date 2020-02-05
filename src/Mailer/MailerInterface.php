@@ -14,5 +14,5 @@ interface MailerInterface
     public function sendAuthCodeToMail(string $subject, string $label, TwoFactorInterface $user): void;
     public function sendTransactionCompletedMail(TradebleInterface $tradable, User $user, string $amount, string $eventName): void;
     public function checkConnection(): void;
-    public function sendTokenDeletedMail(Token $token, User $user): void;
+    public function sendTokenDeletedMail(Token $token): void;
 }

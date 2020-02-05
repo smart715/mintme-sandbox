@@ -446,7 +446,7 @@ class TokensController extends AbstractFOSRestController
 
         $this->addFlash('success', "Token {$token->getName()} was successfully deleted.");
 
-        $mailer->sendTokenDeletedMail($token, $user);
+        $mailer->sendTokenDeletedMail($token);
 
         $this->userActionLogger->info('Delete token', $request->all());
 

@@ -136,8 +136,10 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         }
     }
 
-    public function sendTokenDeletedMail(Token $token, User $user): void
+    public function sendTokenDeletedMail(Token $token): void
     {
+        $user = $token->getProfile()->getUser();
+
         $body = $this->twigEngine->render("mail/token_deleted.html.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $token->getName(),
