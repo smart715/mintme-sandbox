@@ -1,4 +1,4 @@
-import {MINTME, WEB} from '../../utils/constants';
+import {MINTME, WEB} from '../utils/constants';
 
 let pair = (baseSymbol, quoteSymbol) => {
   return MINTME.symbol === baseSymbol || WEB.symbol === baseSymbol
