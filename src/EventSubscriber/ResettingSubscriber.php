@@ -2,7 +2,11 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\User;
+use App\Mailer\MailerInterface;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ResettingSubscriber implements EventSubscriberInterface
 {
@@ -21,8 +25,11 @@ class ResettingSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function sendPasswordResetMail(FilterUserResponseEven $event): void
+    public function sendPasswordResetMail(FilterUserResponseEvent $event): void
     {
-        $this->mailer->sendPasswordResetMail($event->getUser());
+        /** @var User */
+        $user = $event->getUser();
+
+        $this->mailer->sendPasswordResetMail($user);
     }
 }

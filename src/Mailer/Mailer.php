@@ -135,7 +135,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'username' => $user->getUsername(),
         ]);
 
-        $msg = (new Swift_Message("Your password has been reset")
+        $msg = (new Swift_Message("Your password has been reset"))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
