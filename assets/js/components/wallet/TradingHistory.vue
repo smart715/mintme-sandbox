@@ -12,7 +12,7 @@
                             v-b-tooltip="{title: rebrandingFunc(row.value), boundary:'viewport'}"
                         >
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value }}
+                                {{ row.value | rebranding }}
                             </a>
                         </div>
                     </template>
