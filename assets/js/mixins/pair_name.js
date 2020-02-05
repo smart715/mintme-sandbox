@@ -8,8 +8,6 @@ let pair = (baseSymbol, quoteSymbol) => {
 
 export default {
     methods: {
-        pairNameFunc: function(baseSymbol, quoteSymbol) {
-            return pair(baseSymbol, quoteSymbol);
-        },
+        pairNameFunc: pair,
     },
 };
