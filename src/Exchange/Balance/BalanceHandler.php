@@ -8,6 +8,7 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
+use App\Entity\UserTradebleInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalancesArrayFactoryInterface;
 use App\Exchange\Balance\Factory\TraderBalanceView;
@@ -196,7 +197,7 @@ class BalanceHandler implements BalanceHandlerInterface
         $usersTradables = count($balances) > 0 ? $this->getUserTradables($tradable, array_keys($balances)) : [];
 
         if ($isMax || count($usersTradables) >= $limit) {
-            return $this->traderBalanceViewFactory->create(array_slice($usersTradables, 0, $limit), $balances);
+            return $this->traderBalanceViewFactory->create($usersTradables, $balances, $limit);
         }
 
         return $this->topHolders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
