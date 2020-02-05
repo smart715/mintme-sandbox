@@ -38,11 +38,11 @@ import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, PairNameMixin} from '../../mixins/';
 
 export default {
     name: 'TradingHistory',
-    mixins: [FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, PairNameMixin],
     data() {
         return {
             tableData: null,
@@ -95,7 +95,7 @@ export default {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
                     side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
-                    name: history.market.base.symbol + '/' + history.market.quote.symbol,
+                    name: this.pairNameFunc(history.market.base.symbol, history.market.quote.symbol),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
                     total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),

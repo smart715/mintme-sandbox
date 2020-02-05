@@ -58,11 +58,13 @@ import {
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
+    PairNameMixin,
 } from '../../mixins/';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin,
+      PairNameMixin],
     components: {
         ConfirmModal,
     },
@@ -130,7 +132,7 @@ export default {
                 return {
                     date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
+                    name: this.pairNameFunc(order.market.base.symbol, order.market.quote.symbol),
                     amount: toMoney(order.amount, order.market.base.subunit),
                     price: toMoney(order.price, order.market.base.subunit),
                     total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
