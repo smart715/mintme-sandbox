@@ -22,6 +22,7 @@ class ResettingSubscriber implements EventSubscriberInterface
     {
         return [
             FOSUserEvents::RESETTING_RESET_COMPLETED => 'sendPasswordResetMail',
+            FOSUserEvents::CHANGE_PASSWORD_COMPLETED => 'sendPasswordResetMail'
         ];
     }
 
