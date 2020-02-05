@@ -3,7 +3,7 @@ import WebSocketMixin from './websocket';
 import PricePositionMixin from './price_position';
 import PlaceOrder from './place_order';
 import OrderClickedMixin from './order_clicked';
-import {MoneyFilterMixin, RebrandingFilterMixin, TruncateFilterMixin as FiltersMixin} from './filters';
+import {MoneyFilterMixin, RebrandingFilterMixin, TruncateFilterMixin as FiltersMixin, PairNameMixin} from './filters';
 import NotificationMixin from './notification';
 import OrderMixin from './order';
 import LoggerMixin from './logger';
@@ -20,4 +20,5 @@ export {
     WebSocketMixin,
     OrderMixin,
     LoggerMixin,
+    PairNameMixin,
 };
