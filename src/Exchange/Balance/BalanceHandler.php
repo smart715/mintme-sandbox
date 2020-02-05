@@ -8,7 +8,6 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
-use App\Entity\UserTradebleInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalancesArrayFactoryInterface;
 use App\Exchange\Balance\Factory\TraderBalanceView;
