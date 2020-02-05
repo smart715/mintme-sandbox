@@ -515,3 +515,7 @@ services:
     App\Security\ApiKeyAuthenticator:
          arguments:
             $oAuthStorage: '@fos_oauth_server.storage.default'
+
+    App\EventSubscriber\AuthenticationListener:
+        arguments:
+            $firewallName: '%fos_user.firewall_name%'
