@@ -1,7 +1,7 @@
-import {BTC, MINTME} from '../../utils/constants';
+import {BTC, MINTME, WEB} from '../../utils/constants';
 
 let pair = (baseSymbol, quoteSymbol) => {
-  return BTC.symbol === baseSymbol && MINTME.symbol === quoteSymbol ?
+  return BTC.symbol === baseSymbol && (MINTME.symbol === quoteSymbol || WEB.symbol === quoteSymbol) ?
     `${baseSymbol}/${quoteSymbol}` : `${quoteSymbol}`;
 };
 
