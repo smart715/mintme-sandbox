@@ -34,7 +34,7 @@ describe('TokenReleasePeriod', () => {
                 localVue,
                 propsData: {
                     isTokenExchanged: true,
-                    isTokenDeployed: false,
+                    isTokenNotDeployed: true,
                 },
             });
 
