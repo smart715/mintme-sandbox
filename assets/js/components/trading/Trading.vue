@@ -92,16 +92,27 @@
                         </guide>
                     </template>
                     <template v-slot:cell(pair)="row">
-                        <div :class="row.value.length > 38 ? 'truncate-name w-100' : ''">
-                            <a v-if="row.value.length > 38" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
-                                {{ row.value }}
-                            </a>
-                             <a v-else :href="row.item.tokenUrl" class="text-white">
+                        <div v-if="row.value.length >= 43" class="truncate-name w-100">
+                            <a class="text-white" :href="row.item.tokenUrl" v-b-tooltip.hover :title="row.value">
                                 {{ row.value }}
                             </a>
                             <guide
                                 placement="top"
                                 max-width="150px"
+                                v-if="row.item.tokenized">
+                                <template slot="icon">
+                                    <img src="../../../img/mintmecoin_W.png" alt="deployed">
+                                </template>
+                                <template slot="body">
+                                    This token exists on blockchain.
+                                </template>
+                            </guide>
+                        </div>
+                        <div v-else>
+                            <a class="text-white" :href="row.item.tokenUrl">
+                                {{ row.value }}
+                            </a>
+                            <guide
                                 v-if="row.item.tokenized">
                                 <template slot="icon">
                                     <img src="../../../img/mintmecoin_W.png" alt="deployed">
@@ -139,6 +150,7 @@ import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {tokenDeploymentStatus} from '../../utils/constants';
+
 
 export default {
     name: 'Trading',
