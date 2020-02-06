@@ -63,8 +63,15 @@ import {
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin,
-      PairNameMixin],
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        LazyScrollTableMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+        PairNameMixin,
+    ],
     components: {
         ConfirmModal,
     },

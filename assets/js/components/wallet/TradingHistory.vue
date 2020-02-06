@@ -42,7 +42,14 @@ import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationM
 
 export default {
     name: 'TradingHistory',
-    mixins: [FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, PairNameMixin],
+    mixins: [
+        FiltersMixin,
+        LazyScrollTableMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+        PairNameMixin,
+    ],
     data() {
         return {
             tableData: null,
