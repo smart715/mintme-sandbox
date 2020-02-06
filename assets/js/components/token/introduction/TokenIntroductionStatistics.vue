@@ -89,8 +89,8 @@
                             </div>
                             <div class="pb-1">
                                 Release period: <br>
-                                {{ null !== releasePeriod ? releasePeriod : stats.releasePeriod }}
-                                <template v-if="stats.releasePeriod !== defaultValue || null !== releasePeriod">year(s)</template>
+                                {{ stats.releasePeriod }}
+                                <template v-if="stats.releasePeriod !== defaultValue">year(s)</template>
                                 <guide>
                                     <template slot="header">
                                         Release period
@@ -104,7 +104,7 @@
                             </div>
                             <div class="pb-1">
                                 Hourly installment: <br>
-                                {{ null !== hourlyRate ? hourlyRate : stats.hourlyRate | toMoney(precision, false) | formatMoney }}
+                                {{ stats.hourlyRate | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Hourly installment
@@ -116,7 +116,7 @@
                             </div>
                             <div class="pb-1">
                                 Already released: <br>
-                                {{ null !== releasedAmount ? releasedAmount : stats.releasedAmount | toMoney(precision, false) | formatMoney }}
+                                {{ stats.releasedAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Already released
@@ -129,7 +129,7 @@
                             </div>
                             <div class="pb-1">
                                 Not yet released: <br>
-                                {{ null !== frozenAmount ? frozenAmount :  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
+                                {{  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Not yet released
@@ -162,7 +162,7 @@ import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
 import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
-import {mapGetters} from 'vuex';
+import {mapGetters, mapMutations} from 'vuex';
 
 
 const defaultValue = '-';
@@ -186,12 +186,6 @@ export default {
             isTokenExchanged: true,
             defaultValue: defaultValue,
             tokenWithdrawn: 0,
-            stats: {
-                releasePeriod: defaultValue,
-                hourlyRate: defaultValue,
-                releasedAmount: defaultValue,
-                frozenAmount: defaultValue,
-            },
         };
     },
     mounted: function() {
@@ -242,12 +236,19 @@ export default {
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
     },
+    methods: {
+        ...mapMutations('tokenStatistics', [
+            'setStats',
+        ]),
+    },
     computed: {
         loaded: function() {
             return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },
         walletBalance: function() {
-            return null !== this.releasedAmount ? toMoney(this.releasedAmount) : toMoney(this.tokenExchangeAmount);
+            return this.defaultValue !== this.stats.releasedAmount ?
+                toMoney(this.stats.releasedAmount) :
+                    toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
             let sum = new Decimal(0);
@@ -276,29 +277,14 @@ export default {
             return toMoney(sum.toString());
         },
         ...mapGetters('tokenStatistics', [
-            'getReleasePeriod',
-            'getHourlyRate',
-            'getReleasedAmount',
-            'getFrozenAmount',
+            'getStats',
         ]),
-        releasePeriod: {
+        stats: {
             get() {
-                return this.getReleasePeriod;
+                return this.getStats;
             },
-        },
-        hourlyRate: {
-            get() {
-                return this.getHourlyRate;
-            },
-        },
-        releasedAmount: {
-            get() {
-                return this.getReleasedAmount;
-            },
-        },
-        frozenAmount: {
-            get() {
-                return this.getFrozenAmount;
+            set(val) {
+                this.setStats(val);
             },
         },
     },

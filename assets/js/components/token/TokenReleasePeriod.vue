@@ -85,7 +85,7 @@ import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
-import {mapMutations, mapGetters} from 'vuex';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenReleasePeriod',
@@ -119,44 +119,6 @@ export default {
         releasePeriodDisabled: function() {
             return !this.isTokenNotDeployed;
         },
-        ...mapGetters('tokenStatistics', [
-            'getReleasePeriod',
-            'getHourlyRate',
-            'getReleasedAmount',
-            'getFrozenAmount',
-        ]),
-        tokenReleasePeriod: {
-            get() {
-                return this.getReleasePeriod;
-            },
-            set(val) {
-                this.setReleasePeriod(val);
-            },
-        },
-        tokenHourlyRate: {
-            get() {
-                return this.getHourlyRate;
-            },
-            set(val) {
-                this.setHourlyRate(val);
-            },
-        },
-        tokenReleasedAmount: {
-            get() {
-                return this.getReleaseAmount;
-            },
-            set(val) {
-                this.setReleasedAmount(val);
-            },
-        },
-        tokenFrozenAmount: {
-            get() {
-                return this.getFrozenAmount;
-            },
-            set(val) {
-                this.setFrozenAmount(val);
-            },
-        },
     },
     mounted: function() {
         this.$axios.retry.get(this.$routing.generate('lock-period', {
@@ -184,10 +146,12 @@ export default {
     },
     methods: {
         updateTokenStatistics: function(newTokenStatistics) {
-            this.tokenReleasePeriod = newTokenStatistics.releasePeriod;
-            this.tokenHourlyRate = newTokenStatistics.hourlyRate;
-            this.tokenReleasedAmount = newTokenStatistics.releasedAmount;
-            this.tokenFrozenAmount = newTokenStatistics.frozenAmount;
+            this.setStats({
+                releasePeriod: newTokenStatistics.releasePeriod,
+                hourlyRate: newTokenStatistics.hourlyRate,
+                releasedAmount: newTokenStatistics.releasedAmount,
+                frozenAmount: newTokenStatistics.frozenAmount,
+            });
         },
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
@@ -225,10 +189,7 @@ export default {
             });
         },
         ...mapMutations('tokenStatistics', [
-            'setReleasePeriod',
-            'setHourlyRate',
-            'setReleasedAmount',
-            'setFrozenAmount',
+            'setStats',
         ]),
     },
 };
