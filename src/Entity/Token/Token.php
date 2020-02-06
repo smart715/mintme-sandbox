@@ -420,6 +420,8 @@ class Token implements TradebleInterface
     public function setDeployed(?\DateTimeImmutable $deployed): self
     {
         $this->deployed = $deployed;
+
+        return $this;
     }
 
     /** @codeCoverageIgnore */
