@@ -38,7 +38,14 @@ import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
 import {GENERAL, WSAPI} from '../../utils/constants';
-import {FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, PairNameMixin} from '../../mixins/';
+import {
+    FiltersMixin,
+    LazyScrollTableMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+    PairNameMixin,
+} from '../../mixins/';
 
 export default {
     name: 'TradingHistory',
