@@ -117,3 +117,6 @@ parameters:
 
     # 30d min value for token to be added to market cap total on trading page
     minimum_volume_for_marketcap: 100000
+
+    # max top holders for each token
+    top_holders: 10
