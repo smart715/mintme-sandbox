@@ -446,6 +446,7 @@ services:
 
     App\Controller\API\TokensController:
         arguments:
+            $topHolders: "%top_holders%"
             $expirationTime: "%token_deletion_confirm_code_expiration_time%"
 
     two_factor.auth_require_handler:

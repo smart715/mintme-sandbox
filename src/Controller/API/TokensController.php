@@ -48,8 +48,6 @@ use Throwable;
  */
 class TokensController extends AbstractFOSRestController
 {
-    private const TOP_HOLDERS_COUNT = 10;
-
     /** @var EntityManagerInterface */
     private $em;
 
@@ -63,6 +61,9 @@ class TokensController extends AbstractFOSRestController
     private $userActionLogger;
 
     /** @var int */
+    private $topHolders;
+
+    /** @var int */
     private $expirationTime;
 
     public function __construct(
@@ -70,12 +71,14 @@ class TokensController extends AbstractFOSRestController
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         UserActionLogger $userActionLogger,
+        int $topHolders = 10,
         int $expirationTime = 60
     ) {
         $this->em = $entityManager;
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->userActionLogger = $userActionLogger;
+        $this->topHolders = $topHolders;
         $this->expirationTime = $expirationTime;
     }
 
@@ -411,6 +414,7 @@ class TokensController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
+        MailerInterface $mailer,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -442,6 +446,10 @@ class TokensController extends AbstractFOSRestController
 
         $this->em->remove($token);
         $this->em->flush();
+
+        $this->addFlash('success', "Token {$token->getName()} was successfully deleted.");
+
+        $mailer->sendTokenDeletedMail($token);
 
         $this->userActionLogger->info('Delete token', $request->all());
 
@@ -496,7 +504,13 @@ class TokensController extends AbstractFOSRestController
             throw $this->createNotFoundException('Not Found');
         }
 
-        $topTraders = $balanceHandler->topHolders($tradable, self::TOP_HOLDERS_COUNT);
+        $topTraders = $balanceHandler->topHolders(
+            $tradable,
+            $this->topHolders,
+            $this->topHolders + 5,
+            5,
+            $this->topHolders * 4
+        );
 
         return $this->view($topTraders, Response::HTTP_OK);
     }
