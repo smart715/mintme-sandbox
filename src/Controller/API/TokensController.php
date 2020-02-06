@@ -79,7 +79,6 @@ class TokensController extends AbstractFOSRestController
         $this->expirationTime = $expirationTime;
     }
 
-
     /**
      * @Rest\View()
      * @Rest\Patch("/{name}", name="token_update", options={"2fa"="optional", "expose"=true})
@@ -412,6 +411,7 @@ class TokensController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
+        MailerInterface $mailer,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -443,6 +443,10 @@ class TokensController extends AbstractFOSRestController
 
         $this->em->remove($token);
         $this->em->flush();
+
+        $this->addFlash('success', "Token {$token->getName()} was successfully deleted.");
+
+        $mailer->sendTokenDeletedMail($token);
 
         $this->userActionLogger->info('Delete token', $request->all());
 
@@ -627,5 +631,16 @@ class TokensController extends AbstractFOSRestController
             $balanceHandler->soldOnMarket($token, $this->getParameter('token_quantity'), $ownerPendingOrders),
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/check-token-name-exists", name="check_token_name_exists", options={"expose"=true})
+     */
+    public function checkTokenNameExists(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        return $this->view(['exists' => null !== $token], Response::HTTP_OK);
     }
 }
