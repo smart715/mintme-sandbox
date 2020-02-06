@@ -1,37 +1,21 @@
 const storage = {
     namespaced: true,
     state: {
-        releasePeriod: null,
-        hourlyRate: null,
-        releasedAmount: null,
-        frozenAmount: null,
+        stats: {
+            releasePeriod: '-',
+            hourlyRate: '-',
+            releasedAmount: '-',
+            frozenAmount: '-',
+        },
     },
     getters: {
-        getReleasePeriod: function(state) {
-            return state.releasePeriod;
-        },
-        getHourlyRate: function(state) {
-            return state.hourlyRate;
-        },
-        getReleasedAmount: function(state) {
-            return state.releasedAmount;
-        },
-        getFrozenAmount: function(state) {
-            return state.frozenAmount;
+        getStats: function(state) {
+            return state.stats;
         },
     },
     mutations: {
-        setReleasePeriod: function(state, n) {
-            state.releasePeriod = n;
-        },
-        setHourlyRate: function(state, n) {
-            state.hourlyRate = n;
-        },
-        setReleasedAmount: function(state, n) {
-            state.releasedAmount = n;
-        },
-        setFrozenAmount: function(state, n) {
-            state.frozenAmount = n;
+        setStats: function(state, n) {
+            state.stats = n;
         },
     },
 };
