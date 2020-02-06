@@ -27,7 +27,8 @@ class TraderBalanceViewFactoryTest extends TestCase
                 1 => '999',
                 3 => '9',
                 2 => '99',
-            ]
+            ],
+            3
         );
 
         $this->assertCount(3, $result);
@@ -40,6 +41,36 @@ class TraderBalanceViewFactoryTest extends TestCase
             [1, '999'],
             [2, '99'],
             [3, '9'],
+        ]);
+    }
+
+    public function testCreateWithLimit(): void
+    {
+        $factory = new TraderBalanceViewFactory();
+
+        /** @var TraderBalanceView[] $result */
+        $result = $factory->create(
+            [
+                $this->mockUserToken($this->mockUser(2), $this->mockDate()),
+                $this->mockUserToken($this->mockUser(3), $this->mockDate()),
+                $this->mockUserToken($this->mockUser(1), $this->mockDate()),
+            ],
+            [
+                1 => '999',
+                3 => '9',
+                2 => '99',
+            ],
+            2
+        );
+
+        $this->assertCount(2, $result);
+
+        $this->assertEquals([
+            [$result[0]->getUser()->getId(), $result[0]->getBalance()],
+            [$result[1]->getUser()->getId(), $result[1]->getBalance()],
+        ], [
+            [1, '999'],
+            [2, '99'],
         ]);
     }
 
@@ -57,7 +88,8 @@ class TraderBalanceViewFactoryTest extends TestCase
             [
                 1 => '999',
                 2 => '99',
-            ]
+            ],
+            2
         );
 
         $this->assertCount(2, $result);

@@ -7,7 +7,7 @@ use App\Entity\UserToken;
 class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
 {
     /** @inheritDoc */
-    public function create(array $usersTokens, array $balances): array
+    public function create(array $usersTokens, array $balances, int $limit): array
     {
         $traderBalanceViews = [];
 
@@ -28,6 +28,6 @@ class TraderBalanceViewFactory implements TraderBalanceViewFactoryInterface
             return -((float)$a->getBalance() <=> (float)$b->getBalance());
         });
 
-        return $traderBalanceViews;
+        return array_slice($traderBalanceViews, 0, $limit);
     }
 }

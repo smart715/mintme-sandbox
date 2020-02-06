@@ -270,9 +270,9 @@ export default {
         },
         globalMarketCap: function() {
             if (this.showUsd) {
-                return this.globalMarketCaps[USD.symbol] + USD.symbol;
+                return this.globalMarketCaps[USD.symbol] + ' ' + USD.symbol;
             }
-            return this.globalMarketCaps[BTC.symbol] + BTC.symbol;
+            return this.globalMarketCaps[BTC.symbol] + ' ' + BTC.symbol;
         },
     },
     mounted() {
