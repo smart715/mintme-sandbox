@@ -81,10 +81,6 @@ class ResettingController extends FOSResettingController
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
-            $this->addFlash(
-                'success',
-                'The password has been reset successfully.'
-            );
 
             $response = $this->redirectToRoute('fos_user_security_login', [], 301);
 
