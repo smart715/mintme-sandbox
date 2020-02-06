@@ -11,7 +11,8 @@ interface TraderBalanceViewFactoryInterface
     /**
      * @param UserTradebleInterface[] $usersTokens
      * @param string[] $balances
+     * @param int $limit
      * @return TraderBalanceView[]
      */
-    public function create(array $usersTokens, array $balances): array;
+    public function create(array $usersTokens, array $balances, int $limit): array;
 }
