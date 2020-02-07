@@ -294,6 +294,9 @@
     "paragonie/random_compat": {
         "version": "v2.0.17"
     },
+    "php": {
+        "version": "7.2"
+    },
     "php-amqplib/php-amqplib": {
         "version": "v2.7.2"
     },
@@ -549,6 +552,12 @@
             "ref": "87c585d24de9f43bca80ebcfd5cf5cb39445d95f"
         }
     },
+    "symfony/http-client": {
+        "version": "v4.4.4"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v2.0.1"
+    },
     "symfony/http-foundation": {
         "version": "v4.1.1"
     },
@@ -560,9 +569,6 @@
     },
     "symfony/intl": {
         "version": "v4.1.2"
-    },
-    "symfony/lts": {
-        "version": "4-dev"
     },
     "symfony/maker-bundle": {
         "version": "1.0",
@@ -617,6 +623,9 @@
     },
     "symfony/polyfill-php72": {
         "version": "v1.8.0"
+    },
+    "symfony/polyfill-php73": {
+        "version": "v1.13.1"
     },
     "symfony/process": {
         "version": "v4.1.1"
