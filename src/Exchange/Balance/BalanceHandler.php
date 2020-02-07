@@ -196,7 +196,7 @@ class BalanceHandler implements BalanceHandlerInterface
         $usersTradables = count($balances) > 0 ? $this->getUserTradables($tradable, array_keys($balances)) : [];
 
         if ($isMax || count($usersTradables) >= $limit) {
-            return $this->traderBalanceViewFactory->create(array_slice($usersTradables, 0, $limit), $balances);
+            return $this->traderBalanceViewFactory->create($usersTradables, $balances, $limit);
         }
 
         return $this->topHolders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
