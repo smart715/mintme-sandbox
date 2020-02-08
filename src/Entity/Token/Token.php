@@ -156,6 +156,12 @@ class Token implements TradebleInterface
     protected $users;
 
     /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable|null
+     */
+    private $deployed;
+
+    /**
      * @ORM\Column(type="string")
      * @var string
      */
@@ -352,6 +358,11 @@ class Token implements TradebleInterface
                 : self::DEPLOYED);
     }
 
+    public function isDeployed(): bool
+    {
+        return self::DEPLOYED === $this->getDeploymentStatus();
+    }
+
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());
@@ -399,11 +410,27 @@ class Token implements TradebleInterface
         return $this;
     }
 
+    /** @codeCoverageIgnore */
+    public function getDeployed(): ?\DateTimeImmutable
+    {
+        return $this->deployed;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setDeployed(?\DateTimeImmutable $deployed): self
+    {
+        $this->deployed = $deployed;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
     public function getWithdrawn(): string
     {
         return $this->withdrawn;
     }
 
+    /** @codeCoverageIgnore */
     public function setWithdrawn(string $withdrawn): self
     {
         $this->withdrawn = $withdrawn;
