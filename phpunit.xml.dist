@@ -44,21 +44,6 @@
         <!-- ###+ php-amqplib/rabbitmq-bundle ### -->
         <env name="RABBITMQ_URL" value="amqp://guest:guest@localhost:5672"/>
         <!-- ###- php-amqplib/rabbitmq-bundle ### -->
-
-        <env name="YOUTUBE_CLIENT" value="616023022148-v4dh8b26ugmn351udmgmt4ntab62437c.apps.googleusercontent.com"/>
-        <env name="FACEBOOK_CLIENT" value="308376513111821"/>
-
-        <!-- VIABTC offset to use. From which token/user IDs starts -->
-        <env name="VIABTC_OFFSET" value="308376513111821"/>
-
-        <!-- If set to '0', panel will not check actual hash. Do it only in testing env -->
-        <env name="VIABTC_FORCE_WS_AUTH" value="308376513111821"/>
-
-
-        <env name="DEPOSIT_RPC" value="http://deposit:3000"/>
-        <env name="WITHDRAW_RPC" value="http://nginx:8000"/>
-        <env name="VIABTC_RPC" value="http://btc:8080"/>
-        <env name="WEBSOCKET_URL" value="ws://localhost:18364"/>
     </php>
 
     <testsuites>
