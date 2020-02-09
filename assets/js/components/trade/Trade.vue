@@ -181,8 +181,8 @@ export default {
                     this.$axios.retry.get(this.$routing.generate('pending_orders', {
                         base: this.market.base.symbol, quote: this.market.quote.symbol,
                     })).then((result) => {
-                        this.buyOrders = result.data.buy;
-                        this.sellOrders = result.data.sell;
+                        this.buyOrders = this.sortOrders(result.data.buy, false);
+                        this.sellOrders = this.sortOrders(result.data.sell, true);
                         resolve();
                     }).catch((err) => {
                         this.sendLogs('error', 'Can not update orders', err);
@@ -273,11 +273,7 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        orders = orders.sort((a, b) => {
-                            return isSell ?
-                                parseFloat(a.price) - parseFloat(b.price) :
-                                parseFloat(b.price) - parseFloat(a.price);
-                        });
+                        orders = this.sortOrders(orders, isSell);
                         this.saveOrders(orders, isSell);
                     })
                     .catch((err) => {
@@ -314,6 +310,13 @@ export default {
                 this.buyOrders = orders;
             }
         },
+        sortOrders: function(orders, isSell) {
+            return orders.sort((a, b) => {
+                return isSell ?
+                    parseFloat(a.price) - parseFloat(b.price) :
+                    parseFloat(b.price) - parseFloat(a.price);
+            });
+        }
     },
 };
 </script>
