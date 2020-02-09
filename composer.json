@@ -67,6 +67,8 @@
         "phpstan/phpstan-symfony": "^0.10.0",
         "slevomat/coding-standard": "~4.0",
         "squizlabs/php_codesniffer": "*",
+        "symfony/browser-kit": "^4.1",
+        "symfony/css-selector": "^4.1",
         "symfony/dotenv": "^4.1",
         "symfony/maker-bundle": "^1.5",
         "symfony/phpunit-bridge": "^4.1",
