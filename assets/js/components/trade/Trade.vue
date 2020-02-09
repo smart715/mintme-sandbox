@@ -316,7 +316,7 @@ export default {
                     parseFloat(a.price) - parseFloat(b.price) :
                     parseFloat(b.price) - parseFloat(a.price);
             });
-        }
+        },
     },
 };
 </script>
