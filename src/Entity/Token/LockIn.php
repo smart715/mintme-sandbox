@@ -90,10 +90,15 @@ class LockIn
      */
     public function getReleasedAmount(): Money
     {
-        $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
         $releasedAtStart = new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
 
-        return $money->subtract($this->getFrozenAmount())->add($releasedAtStart);
+        if ($this->token->isDeployed()) {
+            return $releasedAtStart->add($this->getEarnedMoneyFromDeploy());
+        } else {
+            $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+            return $money->subtract($this->getFrozenAmount())->add($releasedAtStart);
+        }
     }
 
     /**
@@ -102,7 +107,23 @@ class LockIn
      */
     public function getFrozenAmount(): Money
     {
-        return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        if ($this->token->isDeployed()) {
+            $notReleasedAtStart = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
+            $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+            return $frozenAmount->greaterThan($zeroValue)
+                ? $frozenAmount
+                : $zeroValue;
+        } else {
+            return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        }
+    }
+
+    /** @codeCoverageIgnore */
+    public function getReleasedAtStart(): string
+    {
+        return $this->releasedAtStart;
     }
 
     /** @codeCoverageIgnore */
@@ -137,5 +158,31 @@ class LockIn
             : $this->getFrozenAmount()->subtract($this->getHourlyRate())->getAmount();
 
         return $this;
+    }
+
+    /**
+     * Get amount of hours that passed since token was deployed to blockchain.
+     *
+     * @return float
+     */
+    public function getCountHoursFromDeploy(): float
+    {
+        if ($this->token->getDeployed() instanceof \DateTimeImmutable) {
+            $timezone = date_default_timezone_get();
+            date_default_timezone_set('UTC');
+            $deployedTimestamp = strtotime($this->token->getDeployed()->format('Y-m-d H:i:s'));
+            $currentTimestamp = time();
+            $timestampDiff = abs($currentTimestamp - $deployedTimestamp);
+            date_default_timezone_set($timezone);
+
+            return round(($timestampDiff / 3600), 2);
+        }
+
+        return 0;
+    }
+
+    public function getEarnedMoneyFromDeploy(): Money
+    {
+        return $this->getHourlyRate()->multiply($this->getCountHoursFromDeploy());
     }
 }
