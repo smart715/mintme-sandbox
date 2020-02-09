@@ -119,9 +119,6 @@
     "exsyst/swagger": {
         "version": "v0.4.1"
     },
-    "facebook/webdriver": {
-        "version": "1.6.0"
-    },
     "friendsofsymfony/ckeditor-bundle": {
         "version": "1.1.0"
     },
@@ -599,9 +596,6 @@
     },
     "symfony/orm-pack": {
         "version": "v1.0.5"
-    },
-    "symfony/panther": {
-        "version": "v0.2.0"
     },
     "symfony/phpunit-bridge": {
         "version": "4.1",
