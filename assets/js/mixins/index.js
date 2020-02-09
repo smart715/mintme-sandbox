@@ -7,6 +7,7 @@ import {MoneyFilterMixin, RebrandingFilterMixin, TruncateFilterMixin as FiltersM
 import NotificationMixin from './notification';
 import OrderMixin from './order';
 import LoggerMixin from './logger';
+import PairNameMixin from './pair_name';
 
 export {
     FiltersMixin,
@@ -20,4 +21,5 @@ export {
     WebSocketMixin,
     OrderMixin,
     LoggerMixin,
+    PairNameMixin,
 };
