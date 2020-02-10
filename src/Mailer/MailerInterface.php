@@ -15,4 +15,5 @@ interface MailerInterface
     public function sendTransactionCompletedMail(TradebleInterface $tradable, User $user, string $amount, string $eventName): void;
     public function checkConnection(): void;
     public function sendTokenDeletedMail(Token $token): void;
+    public function sendPasswordResetMail(User $user): void;
 }
