@@ -109,7 +109,7 @@
                                             </template>
                                             <template slot="body">
                                                 Checking this box fetches current best market price
-                                                for which you can buy {{ market.base.symbol | rebranding }}.
+                                                for which you can buy {{ market.quote.symbol | rebranding }}.
                                             </template>
                                         </guide>
                                     </label>
