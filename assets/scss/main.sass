@@ -70,6 +70,12 @@ body
 .text-bold
   font-weight: 800
 
+.img-reduced
+  @include media-breakpoint-up(md)
+    max-width: 80%
+  @include media-breakpoint-up(xl)
+    max-width: 60%
+
 .index-bg
   min-height: 100vh
   margin-top: -6.5%
