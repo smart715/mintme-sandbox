@@ -152,6 +152,12 @@ export default {
                 releasedAmount: newTokenStatistics.releasedAmount,
                 frozenAmount: newTokenStatistics.frozenAmount,
             });
+            this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
+            .then((res) => this.setTokenExchangeAmount(res.data))
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err);
+            });
         },
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
@@ -190,6 +196,7 @@ export default {
         },
         ...mapMutations('tokenStatistics', [
             'setStats',
+            'setTokenExchangeAmount',
         ]),
     },
 };

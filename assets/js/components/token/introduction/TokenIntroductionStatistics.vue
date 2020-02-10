@@ -180,7 +180,6 @@ export default {
     },
     data() {
         return {
-            tokenExchangeAmount: null,
             pendingSellOrders: null,
             soldOnMarket: null,
             isTokenExchanged: true,
@@ -239,6 +238,7 @@ export default {
     methods: {
         ...mapMutations('tokenStatistics', [
             'setStats',
+            'setTokenExchangeAmount',
         ]),
     },
     computed: {
@@ -246,9 +246,7 @@ export default {
             return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },
         walletBalance: function() {
-            return this.defaultValue !== this.stats.releasedAmount ?
-                toMoney(this.stats.releasedAmount) :
-                    toMoney(this.tokenExchangeAmount);
+            return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
             let sum = new Decimal(0);
@@ -263,22 +261,18 @@ export default {
         withdrawBalance: function() {
             return toMoney(this.tokenWithdrawn);
         },
-        soldOrdersSum: function() {
-            let sum = new Decimal(0);
-            for (let key in this.executedOrders) {
-                if (
-                    this.executedOrders.hasOwnProperty(key) &&
-                    WSAPI.order.type.SELL === parseInt(this.executedOrders[key]['side'])
-                ) {
-                    let amount = new Decimal(this.executedOrders[key]['amount']);
-                    sum = sum.plus(amount);
-                }
-            }
-            return toMoney(sum.toString());
-        },
         ...mapGetters('tokenStatistics', [
             'getStats',
+            'getTokenExchangeAmount',
         ]),
+        tokenExchangeAmount: {
+            get() {
+                return this.getTokenExchangeAmount;
+            },
+            set(val) {
+                this.setTokenExchangeAmount(val);
+            },
+        },
         stats: {
             get() {
                 return this.getStats;
