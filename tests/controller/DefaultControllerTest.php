@@ -11,7 +11,7 @@ class DefaultControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/');
+        $client->request('GET', $url);
 
         $this->assertTrue($client->getResponse()->isSuccessful());
 
@@ -19,6 +19,7 @@ class DefaultControllerTest extends WebTestCase
             0,
             $client->getCrawler()->filter('nav ul li a[href="/login"]')->count()
         );
+        $this->assertTrue(true);
     }
 
     public function provideUrls(): array
@@ -28,9 +29,9 @@ class DefaultControllerTest extends WebTestCase
             ['/trading'],
             ['/news/archive'],
             ['/kb'],
-            ['/register'],
+            ['/register/'],
             ['/login'],
-            ['/dev/documentation/v1'],
+            ['/dev/documentation/v1/'],
             ['/privacy-policy'],
             ['/terms-of-service'],
         ];
