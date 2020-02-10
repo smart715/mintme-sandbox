@@ -33,7 +33,15 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
     {
         return $this->getRepository()->findByDomain($domain);
     }
-
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function findUserByEmail($email)
+    {
+        return $this->findUserBy(array('email' => $email));
+    }
+    
     public function checkExistCanonicalEmail(string $email): bool
     {
         return $this->getRepository()->checkExistCanonicalEmail($email);
