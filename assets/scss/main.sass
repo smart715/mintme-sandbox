@@ -228,7 +228,24 @@ a
       background-color: $dark-white
       color: inherit
 
+
 .row
+  &.trade-orders
+    .card
+      .card-body
+        line-height: 1 !important
+
+      .d-flex
+        .w-50
+          .custom-checkbox
+            min-height: 1rem !important
+
+            >.custom-control-label
+              &:before, &:after
+                top: 0 !important
+
+              .blue-question
+                vertical-align: bottom
   .donation
     background: none
     position: relative
@@ -253,24 +270,6 @@ a
       >.donation-header
         background-color: $dark-white
         color: inherit
-
-.row
-  &.trade-orders
-    .card
-      .card-body
-        line-height: 1 !important
-
-      .d-flex
-        .w-50
-          .custom-checkbox
-            min-height: 1rem !important
-
-            >.custom-control-label
-              &:before, &:after
-                top: 0 !important
-
-              .blue-question
-                vertical-align: bottom
 
 .btn-primary
   color: $white
