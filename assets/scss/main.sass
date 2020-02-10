@@ -229,6 +229,32 @@ a
       color: inherit
 
 .row
+  .donation
+    background: none
+    position: relative
+    color: $card-text-color
+    border: none
+    border-radius: 0
+
+    .donation-header
+      border: none
+      background: $donation-header-bg
+      color: $dark-white
+      padding: .45rem 1.35rem
+
+      @include font-scale(md)
+
+    .donation-body
+      background: $donation-body-bg
+
+    &.transparent
+      background-color: transparent
+
+      >.donation-header
+        background-color: $dark-white
+        color: inherit
+
+.row
   &.trade-orders
     .card
       .card-body
