@@ -1,4 +1,5 @@
 fos_user:
+    use_authentication_listener: false
     db_driver: orm
     firewall_name: main
     user_class: App\Entity\User
