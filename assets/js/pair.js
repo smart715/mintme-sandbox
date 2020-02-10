@@ -5,8 +5,9 @@ import TokenIntroductionDescription from './components/token/introduction/TokenI
 import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
+import Donation from './components/donation/Donation';
 import store from './storage';
-import {tokenDeploymentStatus} from './utils/constants';
+import {tokenDeploymentStatus, tokenTabs} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -27,6 +28,7 @@ new Vue({
     TokenName,
     TokenDeployIcon,
     TopHolders,
+    Donation,
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -38,7 +40,7 @@ new Vue({
         window.history.replaceState(
             {}, document.title, this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: i ? 'trade' : 'intro',
+              tab: tokenTabs.hasOwnProperty(i) ? tokenTabs[i] : 'intro',
             })
         );
       }
