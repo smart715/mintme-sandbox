@@ -15,13 +15,11 @@ class DefaultControllerTest extends WebTestCase
     /** @var EntityManagerInterface */
     private $em;
 
-    public function load(EntityManagerInterface $em): void
-    {
-        $this->em = $em;
-    }
-
     public function setUp(): void
     {
+        $kernel = self::bootKernel();
+
+        $this->em = $kernel->getContainer()->get('doctrine')->getManager();
         $this->truncateEntities();
         $this->client = static::createClient();
     }
