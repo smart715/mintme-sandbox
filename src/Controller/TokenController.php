@@ -85,7 +85,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET"},
-     *     requirements={"tab" = "trade|intro"},
+     *     requirements={"tab" = "trade|intro|donation"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -146,6 +146,7 @@ class TokenController extends Controller
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
             'showTrade' => true,
+            'showDonation' => true,
             'market' => $this->normalize($market),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
