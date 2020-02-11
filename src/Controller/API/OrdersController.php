@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -145,11 +146,16 @@ class OrdersController extends AbstractFOSRestController
      * @Rest\Get("/{base}/{quote}/traders", name="traders_with_similar_orders", options={"expose"=true})
      * @Rest\QueryParam(name="params", allowBlank=false)
      * @Rest\View()
+     * @throws ApiBadRequestException
      * @return mixed[]
      */
     public function getTradersWithSimilarOrders(Market $market, ParamFetcherInterface $request): array
     {
         $params = $request->get('params') ?: [];
+
+        if (!$params) {
+            throw new ApiBadRequestException('Invalid request param!');
+        }
 
         return $this->marketHandler->getTradersByOrderPrice($market, $params);
     }

@@ -90,7 +90,6 @@
     </div>
 </template>
 
-
 <script>
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
