@@ -79,7 +79,7 @@ export default {
                 }
 
                 if (responseData.moreCount > 0) {
-                    content += ' and ' + responseData.moreCount + ' more';
+                    content += ' and ' + responseData.moreCount + ' more.';
                 }
 
                 this.tooltipData = content;
