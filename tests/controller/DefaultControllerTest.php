@@ -2,25 +2,17 @@
 
 namespace App\Tests\controller;
 
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DefaultControllerTest extends WebTestCase
 {
     /** @var Client */
     private $client;
 
-    /** @var EntityManagerInterface */
-    private $em;
-
     public function setUp(): void
     {
-        $kernel = self::bootKernel();
+        parent::setUp();
 
-        $this->em = $kernel->getContainer()->get('doctrine')->getManager();
-        $this->truncateEntities();
         $this->client = static::createClient();
     }
 
@@ -44,7 +36,7 @@ class DefaultControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/login'));
 
-        $this->register('foo@mail.com', 'Foo123456');
+        $this->register($this->client);
 
         $this->client->request('GET', $url);
         $this->assertFalse($this->client->getResponse()->isRedirect());
@@ -71,27 +63,5 @@ class DefaultControllerTest extends WebTestCase
             ['/profile'],
             ['/token'],
         ];
-    }
-
-    private function register(string $email, string $pass): void
-    {
-
-        $this->client->request('GET', '/register/');
-        $this->client->submitForm(
-            'Sign Up',
-            [
-                'fos_user_registration_form[email]' => $email,
-                'fos_user_registration_form[plainPassword]' => $pass,
-            ],
-            'POST',
-            [
-                '_with_csrf' => false,
-            ]
-        );
-    }
-
-    private function truncateEntities(): void
-    {
-        (new ORMPurger($this->em))->purge();
     }
 }
