@@ -1,33 +1,38 @@
 <template>
     <div>
-        <div class="col-12 pb-3 px-0">
-            <label for="tokenName" class="d-block text-left">
-                Edit your token name:
-            </label>
-            <input
-                id="tokenName"
-                type="text"
-                v-model="newName"
-                ref="tokenNameInput"
-                class="token-name-input w-100 px-2"
-                :class="{ 'is-invalid': $v.$invalid }"
-            >
+        <div v-if="isTokenNotDeployed && !isTokenExchanged">
+            <div class="col-12 pb-3 px-0">
+                <label for="tokenName" class="d-block text-left">
+                    Edit your token name:
+                </label>
+                <input
+                    id="tokenName"
+                    type="text"
+                    v-model="newName"
+                    ref="tokenNameInput"
+                    class="token-name-input w-100 px-2"
+                    :class="{ 'is-invalid': $v.$invalid }"
+                >
+            </div>
+            <div class="col-12 pt-2 px-0 clearfix">
+                <button
+                    class="btn btn-primary float-left"
+                    :disabled="btnDisabled"
+                    @click="editName"
+                >
+                    Save
+                </button>
+            </div>
+            <two-factor-modal
+                :visible="showTwoFactorModal"
+                :twofa="twofa"
+                @verify="doEditName"
+                @close="closeTwoFactorModal"
+            />
         </div>
-        <div class="col-12 pt-2 px-0 clearfix">
-            <button
-                class="btn btn-primary float-left"
-                :disabled="btnDisabled"
-                @click="editName"
-            >
-                Save
-            </button>
+        <div v-else class="col-12 text-center">
+                {{ errorMessage }}
         </div>
-        <two-factor-modal
-            :visible="showTwoFactorModal"
-            :twofa="twofa"
-            @verify="doEditName"
-            @close="closeTwoFactorModal"
-        />
     </div>
 </template>
 
@@ -68,6 +73,17 @@ export default {
     computed: {
         btnDisabled: function() {
             return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
+        },
+        errorMessage: function() {
+            let message = "";
+
+            if (!this.isTokenNotDeployed) {
+                message = "The name of a deployed token can't be changed";
+            } else if (this.isTokenExchanged) {
+                message = "You need all your tokens to change the token's name"
+            }
+
+            return message;
         },
     },
     watch: {
