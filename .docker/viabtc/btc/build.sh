@@ -16,7 +16,9 @@ sed -i "$c" makefile
 sed -i "$l" makefile
 make
 
-cd  /src/viabtc/marketprice/
+export PATH=$PATH:/usr/local/bin:/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/go/bin:$GOPATH/bin
+
+cd  /src/viabtc/marketprice/marketprice
 make
 
 cd  /src/viabtc/accesshttp/
