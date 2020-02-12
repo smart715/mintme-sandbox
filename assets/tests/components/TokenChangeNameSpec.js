@@ -24,18 +24,22 @@ describe('TokenChangeName', () => {
         wrapper.vm.isTokenExchanged = true;
         wrapper.vm.isTokenNotDeployed = false;
         expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+        expect(wrapper.contains('#error-message')).toBe(true);
 
         wrapper.vm.isTokenExchanged = true;
         wrapper.vm.isTokenNotDeployed = true;
         expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+        expect(wrapper.contains('#error-message')).toBe(true);
 
         wrapper.vm.isTokenExchanged = false;
         wrapper.vm.isTokenNotDeployed = false;
         expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+        expect(wrapper.contains('#error-message')).toBe(true);
 
         wrapper.vm.isTokenExchanged = false;
         wrapper.vm.isTokenNotDeployed = true;
         expect(wrapper.find('button').attributes('disabled')).to.equal(undefined);
+        expect(wrapper.contains('#error-message')).toBe(false);
     });
 
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
