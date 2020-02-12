@@ -151,13 +151,16 @@ class OrdersController extends AbstractFOSRestController
      */
     public function getTradersWithSimilarOrders(Market $market, ParamFetcherInterface $request): array
     {
-        $params = $request->get('params') ?: [];
+        $params = $request->get('params');
+        $side = (int)$params['side'] ?? null;
+        $user = (int)$params['ownerId'] ?? null;
+        $price = (string)$params['price'] ?? null;
 
-        if (!$params) {
+        if (!$side || !$user || !$price) {
             throw new ApiBadRequestException('Invalid request param!');
         }
 
-        return $this->marketHandler->getTradersByOrderPrice($market, $params);
+        return $this->marketHandler->getTradersByOrderPrice($market, $side, $user, $price);
     }
 
     /**

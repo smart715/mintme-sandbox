@@ -414,11 +414,7 @@ class MarketHandlerTest extends TestCase
             $this->mockMarketNameConverter()
         );
 
-        $tradersData = $mh->getTradersByOrderPrice($market, [
-            'ownerId' => '1',
-            'price' => '5',
-            'side' => '1',
-        ]);
+        $tradersData = $mh->getTradersByOrderPrice($market, 1, 1, '5');
 
         $this->assertArrayHasKey('moreCount', $tradersData);
         $this->assertArrayHasKey('tradersData', $tradersData);
