@@ -36,6 +36,7 @@ export default {
         loggedIn: Boolean,
         isOwner: Boolean,
         userId: Number,
+        googleRecaptchaSiteKey: String,
     },
     data() {
         return {
@@ -56,8 +57,13 @@ export default {
                 formContentOnly: true,
             }))
                 .then((res) => {
-                    let el = document.getElementById('tab-login-form-container');
-                    el.innerHTML = res.data;
+                    let formContainer = document.getElementById('tab-login-form-container');
+                    formContainer.innerHTML = res.data;
+
+                    let captchaContainer = document.querySelector('.g-recaptcha');
+                    grecaptcha.render(captchaContainer, {
+                        'sitekey': this.googleRecaptchaSiteKey,
+                    });
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
