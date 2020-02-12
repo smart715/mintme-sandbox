@@ -29,6 +29,9 @@ class SecurityController extends FOSSecurityController
     /** @var SessionInterface */
     private $session;
 
+    /** @var bool */
+    private $formContentOnly = false;
+
     public function __construct(
         ContainerInterface $container,
         UserActionLogger $userActionLogger,
@@ -41,7 +44,7 @@ class SecurityController extends FOSSecurityController
         parent::__construct($tokenManager);
     }
 
-    /** @Route("/login", name="login") */
+    /** @Route("/login", name="login", options={"expose"=true}) */
     public function loginAction(Request $request): Response
     {
         $securityContext = $this->container->get('security.authorization_checker');
@@ -55,6 +58,7 @@ class SecurityController extends FOSSecurityController
         $this->form->handleRequest($request);
 
         $refers = $request->headers->get('Referer');
+        $this->formContentOnly = $request->get('formContentOnly', false);
 
         if (!empty($refers) && $refers !== $this->generateUrl('login', [], UrlGeneratorInterface::ABSOLUTE_URL)) {
             $this->session->set('login_referer', $refers);
@@ -105,7 +109,11 @@ class SecurityController extends FOSSecurityController
      */
     protected function renderLogin(array $data): Response
     {
-        return $this->render('@FOSUser/Security/login.html.twig', array_merge($data, [
+        $template = $this->formContentOnly
+            ? '@FOSUser/Security/login_form_content.html.twig'
+            : '@FOSUser/Security/login.html.twig';
+
+        return $this->render($template, array_merge($data, [
             'form' => $this->form->createView(),
         ]));
     }

@@ -83,36 +83,13 @@
                 {% if showDonation %}
                     <b-tab title="Donate" {% if tab == 'donation' %} {{ 'active' }} {% endif %}>
                         <div class="container-fluid px-0">
-                            <div class="row justify-content-center">
-                                <div class="col-12 col-lg-6 pr-lg-2 mt-3">
-                                    <div class="h-100">
-                                        <div class="h-100 donation">
-                                            <div class="donation-header text-left">
-                                                {% if app.user %}
-                                                    <span>Donations</span>
-                                                {% else %}
-                                                    <span>To make a donation you have to be logged in</span>
-                                                {% endif %}
-                                            </div>
-                                            <div class="donation-body">
-                                                {% if app.user %}
-                                                    <donation
-                                                        websocket-url="{{ global_websocket_url }}"
-                                                        :market="{{ market | json_encode }}"
-                                                        :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                                        :precision="{{ precision }}"
-                                                        :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                                                        :user-id="{{ app.user ? app.user.id : 0 }}"
-                                                    >
-                                                    </donation>
-                                                {% else %}
-                                                    {{ render(controller('App\\Controller\\SecurityController::loginAction')) }}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <donation
+                                :market="{{ market | json_encode }}"
+                                :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                :user-id="{{ app.user ? app.user.id : 0 }}"
+                            >
+                            </donation>
                         </div>
                     </b-tab>
                 {% endif %}
