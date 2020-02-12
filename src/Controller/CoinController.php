@@ -61,6 +61,7 @@ class CoinController extends Controller
             'market' => $this->normalize($market),
             'isOwner' => false,
             'showTrade' => true,
+            'showDonation' => false,
             'hash' => $this->getUser() ?
                 $this->getUser()->getHash() :
                 '',
