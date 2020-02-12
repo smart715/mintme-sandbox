@@ -1,38 +1,36 @@
 <template>
     <div>
-        <div v-if="isTokenNotDeployed && !isTokenExchanged">
-            <div class="col-12 pb-3 px-0">
-                <label for="tokenName" class="d-block text-left">
-                    Edit your token name:
-                </label>
-                <input
-                    id="tokenName"
-                    type="text"
-                    v-model="newName"
-                    ref="tokenNameInput"
-                    class="token-name-input w-100 px-2"
-                    :class="{ 'is-invalid': $v.$invalid }"
-                >
-            </div>
-            <div class="col-12 pt-2 px-0 clearfix">
-                <button
-                    class="btn btn-primary float-left"
-                    :disabled="btnDisabled"
-                    @click="editName"
-                >
-                    Save
-                </button>
-            </div>
-            <two-factor-modal
-                :visible="showTwoFactorModal"
-                :twofa="twofa"
-                @verify="doEditName"
-                @close="closeTwoFactorModal"
-            />
+        <div v-if="isTokenExchanged || !isTokenNotDeployed" class="bg-danger text-white text-center py-2 mb-3">
+            {{ errorMessage }}
         </div>
-        <div v-else class="col-12 text-center">
-                {{ errorMessage }}
+        <div class="col-12 pb-3 px-0">
+            <label for="tokenName" class="d-block text-left">
+                Edit your token name:
+            </label>
+            <input
+                id="tokenName"
+                type="text"
+                v-model="newName"
+                ref="tokenNameInput"
+                class="token-name-input w-100 px-2"
+                :class="{ 'is-invalid': $v.$invalid }"
+            >
         </div>
+        <div class="col-12 pt-2 px-0 clearfix">
+            <button
+                class="btn btn-primary float-left"
+                :disabled="btnDisabled"
+                @click="editName"
+            >
+                Save
+            </button>
+        </div>
+        <two-factor-modal
+            :visible="showTwoFactorModal"
+            :twofa="twofa"
+            @verify="doEditName"
+            @close="closeTwoFactorModal"
+        />
     </div>
 </template>
 
