@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="isTokenExchanged || !isTokenNotDeployed" class="bg-danger text-white text-center py-2 mb-3">
+        <div v-if="isTokenExchanged || !isTokenNotDeployed" id="error-message" class="bg-danger text-white text-center py-2 mb-3">
             {{ errorMessage }}
         </div>
         <div class="col-12 pb-3 px-0">
