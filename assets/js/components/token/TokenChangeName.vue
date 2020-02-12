@@ -75,12 +75,12 @@ export default {
             return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
         },
         errorMessage: function() {
-            let message = "";
+            let message = '';
 
             if (!this.isTokenNotDeployed) {
-                message = "The name of a deployed token can't be changed";
+                message = 'The name of a deployed token can\'t be changed';
             } else if (this.isTokenExchanged) {
-                message = "You need all your tokens to change the token's name"
+                message = 'You need all your tokens to change the token\'s name';
             }
 
             return message;
