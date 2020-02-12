@@ -24,16 +24,8 @@ class TokenControllerTest extends WebTestCase
         $this->client->request('GET', '/token');
         $this->assertFalse($this->client->getResponse()->isRedirect());
 
-        $this->client->submitForm(
-            'Create token',
-            [
-                'token_create[name]' => 'tok'. $this->generateString(),
-            ],
-            'POST',
-            [
-                '_with_csrf' => false,
-            ]
-        );
+        $this->createToken($this->client);
+
         $this->client->request('GET', '/token');
         $this->assertTrue($this->client->getResponse()->isRedirect());
     }

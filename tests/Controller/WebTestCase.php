@@ -4,7 +4,6 @@ namespace App\Tests\Controller;
 
 use App\Entity\Profile;
 use App\Entity\User;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
@@ -58,11 +57,28 @@ class WebTestCase extends BaseWebTestCase
         string $lName = 'bar'
     ): void {
         $client->request('GET', '/profile');
+
         $client->submitForm(
             'Save',
             [
                 'profile[firstName]' => $fName,
                 'profile[lastName]' => $lName,
+            ],
+            'POST',
+            [
+                '_with_csrf' => false,
+            ]
+        );
+    }
+
+    protected function createToken(Client $client): void
+    {
+        $client->request('GET', '/token');
+
+        $client->submitForm(
+            'Create token',
+            [
+                'token_create[name]' => 'tok'. $this->generateString(),
             ],
             'POST',
             [
