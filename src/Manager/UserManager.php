@@ -39,7 +39,7 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
      */
     public function findUserByEmail($email)
     {
-        return $this->findUserBy(array('email' => $email));
+        return $this->findUserBy(['email' => $email]);
     }
     
     public function checkExistCanonicalEmail(string $email): bool
