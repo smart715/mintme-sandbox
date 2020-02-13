@@ -2,7 +2,10 @@ FROM ubuntu:xenial AS btc-build
 
 MAINTAINER Guo Yukun
 
+
 RUN sed -i "s/archive.ubuntu./mirrors.aliyun./g" /etc/apt/sources.list
+
+RUN apt-get update && apt-get -y install wget git && wget https://storage.googleapis.com/golang/go1.12.1.linux-amd64.tar.gz && tar -xvf go1.12.1.linux-amd64.tar.gz && mv go /usr/local
 
 RUN apt-get update &&\
     apt-get install -y wget vim psmisc &&\
@@ -53,7 +56,7 @@ ADD build.sh /src/build.sh
 COPY source /src/viabtc
 
 RUN sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/matchengine/makefile &&\
-    sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/marketprice/makefile &&\
+#    sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/marketprice/makefile &&\
     sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/readhistory/makefile
 
 RUN cd /src/viabtc/network &&\
@@ -79,7 +82,7 @@ RUN mkdir -p /var/log/trade &&\
     touch /var/log/trade/matchengine.log &&\
 	mv /src/viabtc/matchengine/matchengine.exe  /btc/matchengine/ &&\
 	mv /src/viabtc/accesshttp/accesshttp.exe  /btc/accesshttp/ &&\
-	mv /src/viabtc/marketprice/marketprice.exe  /btc/marketprice/ &&\
+	mv /src/viabtc/marketprice/marketprice/marketprice  /btc/marketprice/ &&\
 	mv /src/viabtc/accessws/accessws.exe  /btc/accessws/ &&\
 	mv /src/viabtc/alertcenter/alertcenter.exe  /btc/alertcenter/ &&\
 	mv /src/viabtc/readhistory/readhistory.exe  /btc/readhistory/ &&\
