@@ -93,10 +93,10 @@
                     </template>
                     <template v-slot:cell(pair)="row">
                         <div class="truncate-name w-100">
-                            <a v-if="row.value.length > 45" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
+                            <a v-if="isEllipsisActive" ref="checkTrunc" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
                                 {{ row.value }}
                             </a>
-                            <a v-else :href="row.item.tokenUrl" class="text-white">
+                            <a v-else ref="checkTrunc" :href="row.item.tokenUrl" class="text-white">
                                 {{ row.value }}
                             </a>
                             <guide
@@ -156,6 +156,7 @@ export default {
     },
     data() {
         return {
+            isEllipsisActive: false,
             markets: null,
             currentPage: this.page,
             perPage: 25,
@@ -266,7 +267,37 @@ export default {
     mounted() {
         this.fetchData();
     },
+    updated(){
+        this.$nextTick(() => {
+        this.checkEllipsis();
+       });
+    },
+    watch:{
+      loaded: function(newVal, oldVal){
+        console.log('the old value of loaded is '+ oldVal);
+        console.log('the new value of loaded is '+ newVal);
+        // if(newVal == true){
+        //   this.isEllipsisActive = true
+        // }
+        //console.log(this.isEllipsisActive)
+      },
+      // checkEllipsis: function(newVal, oldVal){
+      //   console.log('the old value of ellipsis is ' + oldVal);
+      //   if (newVal == true){
+      //     this.isEllipsisActive = true
+      //   }
+      // }
+    },
     methods: {
+        checkEllipsis: function(element){
+          var element = this.$refs.checkTrunc
+          if (typeof element != "undefined"){
+            console.log(element.scrollWidth);
+            console.log(element.offsetWidth);
+          return (this.isEllipsisActive = element.scrollWidth >= element.offsetWidth)
+          console.log(this.isEllipsisActive)
+          }
+        },
         toggleUsd: function(show) {
             this.showUsd = show;
         },
