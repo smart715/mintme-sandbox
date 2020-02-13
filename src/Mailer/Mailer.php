@@ -126,6 +126,25 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
+    public function sendPasswordResetMail(User $user): void
+    {
+        $body = $this->twigEngine->render("mail/password_reset.html.twig", [
+            'username' => $user->getUsername(),
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/password_reset.txt.twig", [
+            'username' => $user->getUsername(),
+        ]);
+
+        $msg = (new Swift_Message("Your password has been reset"))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
     public function checkConnection(): void
     {
         $transport = $this->mailer->getTransport();
