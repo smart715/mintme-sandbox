@@ -24,9 +24,9 @@ class TokenControllerTest extends WebTestCase
         $this->client->request('GET', '/token');
         $this->assertFalse($this->client->getResponse()->isRedirect());
 
-        $this->createToken($this->client);
+        $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/token');
-        $this->assertTrue($this->client->getResponse()->isRedirect());
+        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/token/' . $tokName));
     }
 }

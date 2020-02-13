@@ -17,8 +17,6 @@ class WebTestCase extends BaseWebTestCase
 
     public function setUp(): void
     {
-        parent::setUp();
-
         $kernel = self::bootKernel();
 
         $this->em = $kernel->getContainer()->get('doctrine')->getManager();
@@ -71,20 +69,24 @@ class WebTestCase extends BaseWebTestCase
         );
     }
 
-    protected function createToken(Client $client): void
+    protected function createToken(Client $client): string
     {
+        $name = 'tok'. $this->generateString();
+
         $client->request('GET', '/token');
 
         $client->submitForm(
             'Create token',
             [
-                'token_create[name]' => 'tok'. $this->generateString(),
+                'token_create[name]' => $name,
             ],
             'POST',
             [
                 '_with_csrf' => false,
             ]
         );
+
+        return $name;
     }
 
     protected function generateString(int $len = 12): string

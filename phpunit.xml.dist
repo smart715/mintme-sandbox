@@ -64,8 +64,8 @@
     <testsuites>
         <testsuite name="unit">
             <directory>tests</directory>
-            <exclude>tests/Controller</exclude>
             <exclude>tests/Repository</exclude>
+            <exclude>tests/Controller</exclude>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Controller</directory>
