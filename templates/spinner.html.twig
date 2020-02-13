@@ -1,0 +1,65 @@
+{% block pagestyles %}
+    <style>
+        .vld-overlay {
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            align-items: center;
+            display: block;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 1
+        }
+
+        .vld-overlay.is-active {
+            display: flex
+        }
+
+        .vld-overlay.is-full-page {
+            z-index: 999;
+            position: fixed
+        }
+
+        .vld-overlay .vld-background {
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            background: #fff;
+            opacity: 0.5
+        }
+
+        .vld-icon {
+            background-image: url("{{ app.request.baseUrl }}/pub-img/page-load-spinner.gif");
+            background-size: contain;
+        }
+
+        .vld-overlay .vld-icon, .vld-parent {
+            position: relative
+        }
+    </style>
+{% endblock %}
+
+
+<div id="page-load-spinner">
+    <div class="vld-parent">
+        <div tabindex="0"
+             class="vld-overlay is-active {% if additiveClass is defined %}{{ additiveClass }}{% endif %}"
+             aria-label="Loading"
+             {% if zIndex is defined %}style=" zIndex: {{ zIndex }}"{% endif %}>
+            <div class="vld-background"
+                    {% if backgroundColor is defined or opacity is defined %}
+            style="{% if backgroundColor is defined %}background: {{ backgroundColor }};{% endif %} {% if opacity is defined %} opacity: {{ opacity }} {% endif %}"{% endif %}>
+            </div>
+            <div class="vld-icon"
+                    {% if image is defined or imageWidth is defined or imageHeight is defined %}
+            style="{% if image is defined %}background-image: url('{{ image }}'); {% endif %} {% if imageWidth is defined %}width: {{ imageWidth }}; {% endif %} {% if imageHeight is defined %} height: {{ imageHeight }} {% endif %}"{% endif %}>
+
+            </div>
+        </div>
+    </div>
+</div>
+<page-load-spinner id="page-load-spinner-js" spinner-div ="page-load-spinner"></page-load-spinner>

@@ -16,6 +16,7 @@ Encore
     .addEntry('reset', './assets/js/reset.js')
     .addEntry('login', './assets/js/login.js')
     .addEntry('token_creation', './assets/js/token_creation.js')
+    .addEntry('page_load_spinner', './assets/js/page_load_spinner.js')
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('admin', './assets/js/admin/admin.js')
 

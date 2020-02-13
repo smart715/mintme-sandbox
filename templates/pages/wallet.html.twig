@@ -4,6 +4,10 @@
 
 {% block bodyclass %}wallet{% endblock %}
 
+{% block spinnerblock %}
+    {{ include('spinner.html.twig', {'additiveClass': 'is-full-page', 'imageWidth': '100px', 'imageHeight': '100px'}) }}
+{% endblock %}
+
 {% block content %}
     <div id="wallet" class="container">
         <div class="row pt-5 justify-content-center">
@@ -11,13 +15,13 @@
                 <b-tabs :lazy="true" class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
                     <b-tab title="Wallet" active>
                         <wallet
-                            hash="{{ hash }}"
-                            websocket-url="{{ global_websocket_url }}"
-                            create-token-url="{{ path('token_create') }}"
-                            trading-url="{{ path('trading') }}"
-                            withdraw-url="{{ path('withdraw') }}"
-                            deposit-more="{{ depositMore }}"
-                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}">
+                                hash="{{ hash }}"
+                                websocket-url="{{ global_websocket_url }}"
+                                create-token-url="{{ path('token_create') }}"
+                                trading-url="{{ path('trading') }}"
+                                withdraw-url="{{ path('withdraw') }}"
+                                deposit-more="{{ depositMore }}"
+                                twofa="{{ app.user.isGoogleAuthenticatorEnabled }}">
                         </wallet>
                     </b-tab>
                     <b-tab title="Trading history">
@@ -41,4 +45,5 @@
 
 {% block pagescripts %}
     <script src="{{ asset('build/wallet.js') }}"></script>
+    <script src="{{ asset('build/page_load_spinner.js') }}"></script>
 {% endblock %}
