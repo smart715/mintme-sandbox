@@ -11,9 +11,10 @@
                         <div class="donation-body">
                             <div v-if="loggedIn">
                             </div>
-                            <div v-else>
-                                <div id="tab-login-form-container" class="p-md-4"></div>
+                            <div v-if="!contentLoaded" class="p-5 text-center">
+                                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                             </div>
+                            <div id="tab-login-form-container" class="p-md-4"></div>
                         </div>
                     </div>
                 </div>
@@ -40,7 +41,7 @@ export default {
     },
     data() {
         return {
-
+            contentLoaded: false,
         };
     },
     computed: {
@@ -60,6 +61,8 @@ export default {
                     let formContainer = document.getElementById('tab-login-form-container');
                     formContainer.innerHTML = res.data;
 
+                    this.contentLoaded = true;
+
                     let captchaContainer = document.querySelector('.g-recaptcha');
                     grecaptcha.render(captchaContainer, {
                         'sitekey': this.googleRecaptchaSiteKey,
@@ -67,7 +70,7 @@ export default {
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
-                    this.sendLogs('error', 'Can not delete API Client', err);
+                    this.sendLogs('error', 'Can not load tab content.', err);
                 });
         },
     },
