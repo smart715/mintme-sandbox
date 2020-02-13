@@ -78,7 +78,7 @@ export default {
             if (!this.isTokenNotDeployed) {
                 message = 'The name of a deployed token can\'t be changed';
             } else if (this.isTokenExchanged) {
-                message = 'You need all your tokens to change the token\'s name';
+                message = 'You must own all your tokens in order to change the token\'s name';
             }
 
             return message;

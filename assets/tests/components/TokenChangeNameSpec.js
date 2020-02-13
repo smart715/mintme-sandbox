@@ -18,7 +18,7 @@ describe('TokenChangeName', () => {
         });
 
         const deployedErrorMessage = 'The name of a deployed token can\'t be changed';
-        const exchangedErrorMessage = 'You need all your tokens to change the token\'s name';
+        const exchangedErrorMessage = 'You must own all your tokens in order to change the token\'s name';
 
         expect(wrapper.vm.currentName).to.equal('foobar');
         expect(wrapper.vm.newName).to.equal('foobar');
