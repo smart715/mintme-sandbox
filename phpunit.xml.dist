@@ -42,7 +42,7 @@
         <!-- ###- google/recaptcha ### -->
 
         <!-- ###+ php-amqplib/rabbitmq-bundle ### -->
-        <env name="RABBITMQ_URL" value="amqp://guest:guest@localhost:5672"/>
+        <env name="RABBITMQ_URL" value="amqp://guest:guest@rabbitmq:5672"/>
         <!-- ###- php-amqplib/rabbitmq-bundle ### -->
 
         <env name="YOUTUBE_CLIENT" value=""/>

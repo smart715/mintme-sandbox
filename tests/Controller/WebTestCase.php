@@ -2,9 +2,12 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Profile;
+use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
@@ -13,13 +16,13 @@ class WebTestCase extends BaseWebTestCase
     protected const DEFAULT_USER_PASS = 'Foo123456';
 
     /** @var EntityManagerInterface */
-    private $em;
+    protected $em;
 
     public function setUp(): void
     {
-        $kernel = self::bootKernel();
+        self::bootKernel();
 
-        $this->em = $kernel->getContainer()->get('doctrine')->getManager();
+        $this->em = self::$container->get('doctrine')->getManager();
     }
 
     protected function lastUserId(): int
@@ -33,13 +36,15 @@ class WebTestCase extends BaseWebTestCase
             : 0;
     }
 
-    protected function register(Client $client): void
+    protected function register(Client $client): string
     {
+        $email = $this->generateEmail();
+
         $client->request('GET', '/register/');
         $client->submitForm(
             'Sign Up',
             [
-                'fos_user_registration_form[email]' => $this->generateEmail(),
+                'fos_user_registration_form[email]' => $email,
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',
@@ -47,6 +52,8 @@ class WebTestCase extends BaseWebTestCase
                 '_with_csrf' => false,
             ]
         );
+
+        return $email;
     }
 
     protected function createProfile(
@@ -66,6 +73,22 @@ class WebTestCase extends BaseWebTestCase
             [
                 '_with_csrf' => false,
             ]
+        );
+    }
+
+    protected function sendWeb(string $email, string $amount = '100000000000000000000'): void
+    {
+        $balanceHandler = self::$container->get(BalanceHandlerInterface::class);
+
+        /** @var User $user */
+        $user = $this->em->getRepository(User::class)->findOneBy([
+            'email' => $email,
+        ]);
+
+        $balanceHandler->deposit(
+            $user,
+            Token::getFromSymbol(Token::WEB_SYMBOL),
+            new Money($amount, new Currency(Token::WEB_SYMBOL))
         );
     }
 

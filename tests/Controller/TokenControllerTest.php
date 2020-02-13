@@ -2,7 +2,6 @@
 
 namespace App\Tests\Controller;
 
-use App\Exchange\Balance\BalanceFetcher;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 class TokenControllerTest extends WebTestCase
