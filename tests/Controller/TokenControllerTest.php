@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Exchange\Balance\BalanceFetcher;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 class TokenControllerTest extends WebTestCase
@@ -27,6 +28,6 @@ class TokenControllerTest extends WebTestCase
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/token');
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/token/' . $tokName));
+        $this->assertTrue($this->client->getResponse()->isRedirect('/token/' . $tokName));
     }
 }

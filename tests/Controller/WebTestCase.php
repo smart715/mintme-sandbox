@@ -71,7 +71,7 @@ class WebTestCase extends BaseWebTestCase
 
     protected function createToken(Client $client): string
     {
-        $name = 'tok'. $this->generateString();
+        $name = $this->generateString();
 
         $client->request('GET', '/token');
 
@@ -104,6 +104,6 @@ class WebTestCase extends BaseWebTestCase
 
     private function generateEmail(): string
     {
-        return sprintf('foo%s@mail.com', $this->generateString());
+        return $this->generateString() . '@mail.com';
     }
 }

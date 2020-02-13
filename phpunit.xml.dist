@@ -55,10 +55,10 @@
         <env name="VIABTC_FORCE_WS_AUTH" value="0"/>
 
 
-        <env name="DEPOSIT_RPC" value=""/>
-        <env name="WITHDRAW_RPC" value=""/>
-        <env name="VIABTC_RPC" value=""/>
-        <env name="WEBSOCKET_URL" value=""/>
+        <env name="DEPOSIT_RPC" value="http://deposit:3000"/>
+        <env name="WITHDRAW_RPC" value="http://nginx:8000"/>
+        <env name="VIABTC_RPC" value="http://btc:8080"/>
+        <env name="WEBSOCKET_URL" value="ws://localhost:18364"/>
     </php>
 
     <testsuites>
