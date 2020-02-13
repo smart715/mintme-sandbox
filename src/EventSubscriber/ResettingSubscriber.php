@@ -28,12 +28,14 @@ class ResettingSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function sendPasswordResetMail(FilterUserResponseEvent $event): void
+    public function sendPasswordResetMail(FilterUserResponseEvent $event, string $eventName): void
     {
+        $resetting = FOSUserEvents::RESETTING_RESET_COMPLETED === $eventName;
+
         /** @var User */
         $user = $event->getUser();
 
-        $this->mailer->sendPasswordResetMail($user);
+        $this->mailer->sendPasswordResetMail($user, $resetting);
     }
 
     public function resetToken(GetResponseUserEvent $event): void
