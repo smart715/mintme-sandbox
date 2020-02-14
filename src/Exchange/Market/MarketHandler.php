@@ -208,6 +208,7 @@ class MarketHandler implements MarketHandlerInterface
         $usersIds = array_column($filteredOrders, 'user');
         // Order maker should be shown too, at first position.
         array_unshift($usersIds, $user);
+        $usersIds = array_unique($usersIds);
         $tradersData = $this->userManager->getTradersData($usersIds);
         $tradersCount = count($tradersData);
 
