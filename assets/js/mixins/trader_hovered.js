@@ -57,11 +57,12 @@ export default {
                 quote: this.$parent.market.quote.symbol,
                 params,
             })).then((response) => {
-                let responseData = response.data || [];
+                let tradersData = response.data.tradersData || [];
+                let moreCount = response.data.moreCount || 0;
                 let tradersArray = [];
                 let content = 'No data.';
 
-                responseData.tradersData.forEach(function(traderData) {
+                tradersData.forEach(function(traderData) {
                     if (traderData.anonymous) {
                         tradersArray.push('Anonymous');
                     } else {
@@ -78,8 +79,8 @@ export default {
                     content = tradersArray.join(', ');
                 }
 
-                if (responseData.moreCount > 0) {
-                    content += ' and ' + responseData.moreCount + ' more.';
+                if (moreCount > 0) {
+                    content += ' and ' + moreCount + ' more.';
                 }
 
                 this.tooltipData = content;

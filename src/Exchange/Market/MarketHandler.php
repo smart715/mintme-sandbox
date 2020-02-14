@@ -194,15 +194,20 @@ class MarketHandler implements MarketHandlerInterface
             $side
         );
 
-        $filteredOrders = array_filter($pendingOrders, function (array $orderData) use ($price, $user) {
-            return $price === $orderData['price'] && $user !== $orderData['user'];
+        $priceObj = $this->moneyWrapper->parse($price, MoneyWrapper::TOK_SYMBOL);
+        $filteredOrders = array_filter($pendingOrders, function (array $orderData) use ($priceObj, $user) {
+            $orderPriceObj = $this->moneyWrapper->parse($orderData['price'], MoneyWrapper::TOK_SYMBOL);
+
+            return $priceObj->equals($orderPriceObj) && $user !== $orderData['user'];
         });
 
         uasort($filteredOrders, function (array $lOrder, array $rOrder) {
-            return $lOrder['mtime'] < $rOrder['mtime'];
+            return intval($lOrder['ctime']) > intval($rOrder['ctime']);
         });
 
         $usersIds = array_column($filteredOrders, 'user');
+        // Order maker should be shown too, at first position.
+        array_unshift($usersIds, $user);
         $tradersData = $this->userManager->getTradersData($usersIds);
         $tradersCount = count($tradersData);
 

@@ -402,7 +402,7 @@ class MarketHandlerTest extends TestCase
         $userManager = $this->mockUserManager();
         $userManager
             ->method('getTradersData')
-            ->with([4, 6])
+            ->with([1, 4, 6])
             ->willReturn($this->getTradersData());
 
         $market = $this->mockMarket();
@@ -444,12 +444,12 @@ class MarketHandlerTest extends TestCase
     private function getPendingOrdersForTradersSearch(): array
     {
         return [
-            ['user'=>1,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','mtime'=>7,'maker_fee'=>8.,'taker_fee'=>8.],
-            ['user'=>2,'id'=>2,'left'=>'3','side'=>1,'price'=>'6','mtime'=>7,'maker_fee'=>8.,'taker_fee'=>8.],
-            ['user'=>3,'id'=>2,'left'=>'3','side'=>2,'price'=>'7','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
-            ['user'=>4,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
-            ['user'=>5,'id'=>2,'left'=>'3','side'=>2,'price'=>'6','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
-            ['user'=>6,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','mtime'=>7,'maker_fee'=>6.,'taker_fee'=>6.],
+            ['user'=>1,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','ctime'=>time(),'maker_fee'=>8.,'taker_fee'=>8.],
+            ['user'=>2,'id'=>2,'left'=>'3','side'=>1,'price'=>'6','ctime'=>time(),'maker_fee'=>8.,'taker_fee'=>8.],
+            ['user'=>3,'id'=>2,'left'=>'3','side'=>2,'price'=>'7','ctime'=>time(),'maker_fee'=>6.,'taker_fee'=>6.],
+            ['user'=>4,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','ctime'=>time(),'maker_fee'=>6.,'taker_fee'=>6.],
+            ['user'=>5,'id'=>2,'left'=>'3','side'=>2,'price'=>'6','ctime'=>time(),'maker_fee'=>6.,'taker_fee'=>6.],
+            ['user'=>6,'id'=>2,'left'=>'3','side'=>1,'price'=>'5','ctime'=>time(),'maker_fee'=>6.,'taker_fee'=>6.],
         ];
     }
 
