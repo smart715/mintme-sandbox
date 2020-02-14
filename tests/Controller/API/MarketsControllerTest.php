@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller\API;
 
+use App\Tests\Controller\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 class MarketsControllerTest extends WebTestCase
