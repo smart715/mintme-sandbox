@@ -5,7 +5,7 @@ namespace App\Tests\Controller\API;
 use App\Tests\Controller\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Client;
 
-class OrderControllerTest extends WebTestCase
+class OrdersControllerTest extends WebTestCase
 {
     /** @var Client */
     private $client;
