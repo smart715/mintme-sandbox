@@ -1,6 +1,3 @@
-<template>
-
-</template>
 <script>
   export default {
     name: 'pageloadspinner',
@@ -9,6 +6,9 @@
     },
     mounted() {
       document.getElementById(this.spinnerDiv).classList.add('hidden');
+    },
+    render() {
+      return null;
     },
   };
 </script>
