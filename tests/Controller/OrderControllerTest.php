@@ -2,8 +2,6 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Token\Token;
-use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 class OrderControllerTest extends WebTestCase
