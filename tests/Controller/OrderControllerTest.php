@@ -29,8 +29,6 @@ class OrderControllerTest extends WebTestCase
             'amountInput' => 1,
             'action' => 'sell',
         ]);
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
-
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
 
         $res = json_decode($this->client->getResponse()->getContent(), true);
@@ -61,8 +59,8 @@ class OrderControllerTest extends WebTestCase
             'action' => 'buy',
         ]);
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
 
+        $res = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertCount(0, $res['sell']);
         $this->assertCount(1, $res['buy']);
@@ -76,5 +74,122 @@ class OrderControllerTest extends WebTestCase
                 $res['buy'][0]['price'],
             ]
         );
+    }
+
+    public function testCancelOrder(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+        ]);
+
+        $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertCount(1, $res['sell']);
+
+        $this->client->request('POST', '/api/orders/cancel/WEB/'. $tokName, [
+            'orderData' => [
+                $res['sell'][0]['id'],
+            ],
+        ]);
+
+        $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertCount(0, $res['sell']);
+    }
+
+    public function testExecutedOrders(): void
+    {
+        $email = $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+        $this->sendWeb($email);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+        ]);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'buy',
+        ]);
+
+        sleep(10);
+
+        $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/executed/last/0');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertCount(1, $res);
+    }
+
+    public function testExecutedUserOrders(): void
+    {
+        $email = $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+        $this->sendWeb($email);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+        ]);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'buy',
+        ]);
+
+        $this->client->request('GET', '/api/orders/executed/page/1');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertCount(2, $res);
+    }
+
+    public function testPendingUserOrders(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+        ]);
+
+        $this->client->request('GET', '/api/orders/pending/page/1');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertCount(1, $res);
+    }
+
+    public function testPendingOrderDetails(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+        ]);
+
+        $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/' . $res['sell'][0]['id']);
+
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals($tokName, $res['market']['quote']['name']);
+        $this->assertEquals('pending', $res['status']);
     }
 }
