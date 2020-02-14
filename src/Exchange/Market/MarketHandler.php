@@ -211,6 +211,7 @@ class MarketHandler implements MarketHandlerInterface
         $usersIds = array_unique($usersIds);
         $tradersResultArray = [];
         $tradersData = $this->userManager->getTradersData($usersIds);
+
         // Reorder users after fetching
         foreach ($usersIds as $userId) {
             if (isset($tradersData[$userId])) {

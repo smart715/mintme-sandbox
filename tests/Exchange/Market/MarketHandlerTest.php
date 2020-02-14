@@ -456,8 +456,27 @@ class MarketHandlerTest extends TestCase
     private function getTradersData(): array
     {
         return [
-            ['id'=>4,'firstName'=>'Test2','lastName'=>'User2','anonymous'=>'1','page_url'=>'user2',],
-            ['id'=>6,'firstName'=>'Test3','lastName'=>'User3','anonymous'=>'5','page_url'=>'user3',],
+            1 => [
+                'id'=>1,
+                'firstName'=>'Order',
+                'lastName'=>'Maker',
+                'anonymous'=>'0',
+                'page_url'=>'user1',
+            ],
+            4 => [
+                'id'=>4,
+                'firstName'=>'Test2',
+                'lastName'=>'User2',
+                'anonymous'=>'1',
+                'page_url'=>'user2',
+            ],
+            6 => [
+                'id'=>6,
+                'firstName'=>'Test3',
+                'lastName'=>'User3',
+                'anonymous'=>'0',
+                'page_url'=>'user3',
+            ],
         ];
     }
 
