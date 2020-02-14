@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Tests\Controller;
+namespace App\Tests\Controller\API;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 
