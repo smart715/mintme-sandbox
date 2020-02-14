@@ -55,7 +55,7 @@ class UserRepository extends EntityRepository
     /** @codeCoverageIgnore */
     public function getTradersData(array $users): array
     {
-        return $this->createQueryBuilder('u')
+        return $this->createQueryBuilder('u', 'u.id')
             ->select([
                 'u.id',
                 'p.firstName',

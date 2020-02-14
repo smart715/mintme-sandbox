@@ -209,14 +209,22 @@ class MarketHandler implements MarketHandlerInterface
         // Order maker should be shown too, at first position.
         array_unshift($usersIds, $user);
         $usersIds = array_unique($usersIds);
+        $tradersResultArray = [];
         $tradersData = $this->userManager->getTradersData($usersIds);
-        $tradersCount = count($tradersData);
+        // Reorder users after fetching
+        foreach ($usersIds as $userId) {
+            if (isset($tradersData[$userId])) {
+                $tradersResultArray[] = $tradersData[$userId];
+            }
+        }
+
+        $tradersCount = count($tradersResultArray);
 
         return [
             'moreCount' => $tradersCount > self::COUNT_TRADERS_TO_SHOW
                 ? $tradersCount - self::COUNT_TRADERS_TO_SHOW
                 : 0,
-            'tradersData' => array_slice($tradersData, 0, self::COUNT_TRADERS_TO_SHOW, true),
+            'tradersData' => array_slice($tradersResultArray, 0, self::COUNT_TRADERS_TO_SHOW, true),
         ];
     }
 
