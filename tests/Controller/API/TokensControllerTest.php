@@ -185,7 +185,6 @@ class TokensControllerTest extends WebTestCase
         $this->em->flush();
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/withdrawn');
-
         $res = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('10.000000000000', $res);
@@ -262,8 +261,7 @@ class TokensControllerTest extends WebTestCase
             'code' => '123456',
         ]);
 
-        /** @var Token $token */
-        $token = $this->getToken($tokName);
+        $this->em->refresh($token);
 
         $this->assertNull($token);
     }
