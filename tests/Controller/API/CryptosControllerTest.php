@@ -2,10 +2,7 @@
 
 namespace App\Tests\Controller\API;
 
-use App\Entity\Token\Token;
 use App\Tests\Controller\WebTestCase;
-use App\Utils\DateTime;
-use DateInterval;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 class CryptosControllerTest extends WebTestCase
