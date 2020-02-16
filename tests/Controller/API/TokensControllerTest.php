@@ -20,7 +20,7 @@ class TokensControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    public function estUpdate(): void
+    public function testUpdate(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -58,7 +58,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function estSetTokenReleasePeriod(): void
+    public function testSetTokenReleasePeriod(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -88,7 +88,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function estLockPeriod(): void
+    public function testLockPeriod(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -120,7 +120,7 @@ class TokensControllerTest extends WebTestCase
     }
 
     /** @depends testUpdate() */
-    public function estTokenSearch(): void
+    public function testTokenSearch(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -136,7 +136,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals($tokName, $res[0]['name']);
     }
 
-    public function estGetTokens(): void
+    public function testGetTokens(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -153,7 +153,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertArrayHasKey('BTC', $res['predefined']);
     }
 
-    public function estGetTokenExchange(): void
+    public function testGetTokenExchange(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -172,7 +172,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals('9999999.000000000000', $res);
     }
 
-    public function estGetTokenWithdrawn(): void
+    public function testGetTokenWithdrawn(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -190,7 +190,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals('10.000000000000', $res);
     }
 
-    public function estIsTokenExchanged(): void
+    public function testIsTokenExchanged(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -215,7 +215,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function estIsTokenNotDeployed(): void
+    public function testIsTokenNotDeployed(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -267,7 +267,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertNull($token);
     }
 
-    public function estSendCode(): void
+    public function testSendCode(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -284,7 +284,7 @@ class TokensControllerTest extends WebTestCase
 //        $this->assertNotEquals('', $token->getProfile()->getUser()->getEmailAuthCode());
     }
 
-    public function estGetTopHolders(): void
+    public function testGetTopHolders(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -327,7 +327,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals('0.998', $res[1]['balance']);
     }
 
-    public function estSoldOnMarket(): void
+    public function testSoldOnMarket(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -358,7 +358,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function estCheckTokenNameExists(): void
+    public function testCheckTokenNameExists(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
