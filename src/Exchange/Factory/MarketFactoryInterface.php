@@ -16,7 +16,7 @@ interface MarketFactoryInterface
     public function createAll(): array;
 
     /** @return Market[] */
-    public function createUserRelated(User $user): array;
+    public function createUserRelated(User $user, ?string $deployed = null): array;
 
     /** @return Market[] */
     public function getCoinMarkets(): array;

@@ -29,16 +29,32 @@
         </div>
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
-            <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
-                <input
-                    type="checkbox"
-                    class="custom-control-input"
-                    id="checkbox"
-                    v-model="userTokensEnabled"
-                    @change="fetchData(1)"
-                    :disabled="loading">
-                <label for="checkbox" class="custom-control-label">Tokens I own</label>
-            </label>
+            <b-dropdown
+                v-if="userId" class="float-right pr-3"
+                id="customFilter"
+                variant="primary"
+                v-model="marketFilters.selectedFilter"
+            >
+                <template slot="button-content">
+                    <span v-if="marketFilters.selectedFilter === 'deployed'">
+                        Deployed tokens
+                    </span>
+                    <span v-if="marketFilters.selectedFilter === 'all'">
+                        All tokens
+                    </span>
+                    <span v-if="marketFilters.selectedFilter === 'user'">
+                        Tokens I own
+                    </span>
+                </template>
+                <template>
+                    <b-dropdown-item
+                        v-for="filter in marketFilters.options"
+                        :key="filter.key"
+                        :value="filter.label"
+                        @click="toggleFilter(filter.key)"> {{ filter.label }}
+                    </b-dropdown-item>
+                </template>
+            </b-dropdown>
         </div>
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
@@ -111,6 +127,21 @@
                     </template>
                 </b-table>
             </div>
+            <template v-if="marketFilters.selectedFilter == 'deployed' && tokens.length < 2">
+                <div class="row justify-content-center">
+                    <p class="text-center p-5">No one deployed his token yet</p>
+                </div>
+            </template>
+            <template v-if="marketFilters.selectedFilter == 'user' && tokens.length < 2">
+                <div class="row justify-content-center">
+                    <p class="text-center p-5">No any token yet</p>
+                </div>
+            </template>
+            <template v-if="marketFilters.selectedFilter === 'deployed' || marketFilters.selectedFilter === 'user' ">
+                <div class="row justify-content-center">
+                    <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
+                </div>
+            </template>
             <div class="row justify-content-center">
                 <b-pagination
                     @change="fetchData"
@@ -158,7 +189,6 @@ export default {
             perPage: 25,
             totalRows: 25,
             loading: false,
-            userTokensEnabled: false,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
@@ -175,6 +205,24 @@ export default {
                 USD: 0,
             },
             activeVolume: 'month',
+            marketFilters: {
+                userSelected: false,
+                selectedFilter: 'deployed',
+                options: [
+                {
+                    key: 'deployed',
+                    label: 'Deployed tokens',
+                },
+                {
+                    key: 'all',
+                    label: 'All tokens',
+                },
+                {
+                    key: 'user',
+                    label: 'Tokens I own',
+                },
+            ],
+            },
             volumes: {
                 day: {
                     key: 'volume',
@@ -211,7 +259,6 @@ export default {
                     return this.rebrandingFunc(item);
                 });
             });
-
             return tokens;
         },
         loaded: function() {
@@ -264,6 +311,13 @@ export default {
         this.fetchData();
     },
     methods: {
+        toggleFilter: function(value) {
+            this.marketFilters.userSelected = true;
+            this.marketFilters.selectedFilter = value;
+            this.sortBy = '';
+            this.sortDesc = true;
+            this.fetchData(1);
+        },
         toggleUsd: function(show) {
             this.showUsd = show;
         },
@@ -276,7 +330,7 @@ export default {
                 this.currentPage = page;
             }
 
-            let updateDataPromise = this.updateData(this.currentPage);
+            let updateDataPromise = this.updateData(this.currentPage, this.marketFilters.selectedFilter);
             let conversionRatesPromise = this.fetchConversionRates();
             this.fetchGlobalMarketCap();
 
@@ -321,11 +375,12 @@ export default {
         updateData: function(page) {
             return new Promise((resolve, reject) => {
                 let params = {page};
-
-                if (this.userTokensEnabled) {
-                    params.user = this.userTokensEnabled | 0;
+                if (this.marketFilters.selectedFilter === 'user') {
+                    params.user = 1;
                 }
-
+                if (this.marketFilters.selectedFilter === 'deployed') {
+                    params.deployed = 1;
+                }
                 this.loading = true;
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
@@ -648,6 +703,14 @@ export default {
             this.activeVolume = volume;
             this.sortBy = this.volumes[this.activeVolume].key;
             this.sortDesc = true;
+        },
+    },
+    watch: {
+        tokens(val) {
+            if (val.length < 2 && this.marketFilters.userSelected == false) {
+                this.marketFilters.selectedFilter = 'all';
+                this.fetchData();
+            }
         },
     },
 };

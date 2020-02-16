@@ -44,13 +44,13 @@ class MarketFactory implements MarketFactoryInterface
     }
 
     /** {@inheritdoc} */
-    public function createUserRelated(User $user): array
+    public function createUserRelated(User $user, ?string $deployed = null): array
     {
         return array_merge(
             $this->getCoinMarkets(),
             $this->getMarkets(
                 $this->getExchangableCryptos(),
-                $user->getTokens()
+                !$deployed ? $user->getTokens() : $this->tokenManager->getUserDeployedTokens($user)
             )
         );
     }
@@ -86,6 +86,7 @@ class MarketFactory implements MarketFactoryInterface
      */
     private function getMarkets(array $bases, array $quotes): array
     {
+     //dump($bases,$quotes);
         $markets = [];
 
         foreach ($bases as $base) {
