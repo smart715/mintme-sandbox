@@ -20,7 +20,7 @@ class TokensControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    public function testUpdate(): void
+    public function estUpdate(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -58,7 +58,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function testSetTokenReleasePeriod(): void
+    public function estSetTokenReleasePeriod(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -88,7 +88,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function testLockPeriod(): void
+    public function estLockPeriod(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -120,7 +120,7 @@ class TokensControllerTest extends WebTestCase
     }
 
     /** @depends testUpdate() */
-    public function testTokenSearch(): void
+    public function estTokenSearch(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -136,7 +136,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals($tokName, $res[0]['name']);
     }
 
-    public function testGetTokens(): void
+    public function estGetTokens(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -153,7 +153,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertArrayHasKey('BTC', $res['predefined']);
     }
 
-    public function testGetTokenExchange(): void
+    public function estGetTokenExchange(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -172,7 +172,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals('9999999.000000000000', $res);
     }
 
-    public function testGetTokenWithdrawn(): void
+    public function estGetTokenWithdrawn(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -190,7 +190,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals('10.000000000000', $res);
     }
 
-    public function testIsTokenExchanged(): void
+    public function estIsTokenExchanged(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -215,7 +215,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function testIsTokenNotDeployed(): void
+    public function estIsTokenNotDeployed(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -261,12 +261,13 @@ class TokensControllerTest extends WebTestCase
             'code' => '123456',
         ]);
 
-        $this->em->refresh($token);
+        /** @var Token $tokem */
+        $token = $this->getToken($tokName);
 
         $this->assertNull($token);
     }
 
-    public function testSendCode(): void
+    public function estSendCode(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -283,7 +284,7 @@ class TokensControllerTest extends WebTestCase
 //        $this->assertNotEquals('', $token->getProfile()->getUser()->getEmailAuthCode());
     }
 
-    public function testGetTopHolders(): void
+    public function estGetTopHolders(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -326,7 +327,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals('0.998', $res[1]['balance']);
     }
 
-    public function testSoldOnMarket(): void
+    public function estSoldOnMarket(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
@@ -357,7 +358,7 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function testCheckTokenNameExists(): void
+    public function estCheckTokenNameExists(): void
     {
         $this->register($this->client);
         $this->createProfile($this->client);
