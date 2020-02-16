@@ -34,6 +34,8 @@
         <!-- Delivery is disabled by default via "null://localhost" -->
         <env name="MAILER_URL" value="null://localhost"/>
 
+        <env name="MAILER_USER" value="mintme@mintme.abchosting.org"/>
+
         <!-- ###+ google/recaptcha ### -->
         <!-- To use Google Recaptcha, you must register a site on Recaptcha's admin panel: -->
         <!-- https://www.google.com/recaptcha/admin -->

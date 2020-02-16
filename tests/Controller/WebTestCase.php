@@ -112,7 +112,7 @@ class WebTestCase extends BaseWebTestCase
         return $name;
     }
 
-    protected function generateString(int $len = 12): string
+    protected function generateString(int $len = 20): string
     {
         $chars = range('a', 'z');
         $charsCount = count($chars);
