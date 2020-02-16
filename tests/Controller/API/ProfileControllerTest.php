@@ -28,6 +28,11 @@ class ProfileControllerTest extends WebTestCase
 
         $this->assertTrue($res['hasPattern']);
         $this->assertEquals('(\d\d\d\d\d)', $res['pattern']);
+    }
+
+    public function testValidateZipCodeWithEmpty(): void
+    {
+        $this->register($this->client);
 
         $this->client->request('POST', '/api/profile/validate-zip-code', [
             'country' => '',
