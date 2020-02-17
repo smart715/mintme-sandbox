@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div v-if="isTokenExchanged || !isTokenNotDeployed" id="error-message" class="bg-danger text-white text-center py-2 mb-3">
+            {{ errorMessage }}
+        </div>
         <div class="col-12 pb-3 px-0">
             <label for="tokenName" class="d-block text-left">
                 Edit your token name:
@@ -68,6 +71,17 @@ export default {
     computed: {
         btnDisabled: function() {
             return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
+        },
+        errorMessage: function() {
+            let message = '';
+
+            if (!this.isTokenNotDeployed) {
+                message = 'The name of a deployed token can\'t be changed';
+            } else if (this.isTokenExchanged) {
+                message = 'You must own all your tokens in order to change the token\'s name';
+            }
+
+            return message;
         },
     },
     watch: {
