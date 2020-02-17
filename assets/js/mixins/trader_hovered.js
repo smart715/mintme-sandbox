@@ -1,7 +1,4 @@
 export default {
-    props: {
-        loggedIn: Boolean,
-    },
     data() {
         return {
             tooltipData: 'Loading...',
@@ -34,7 +31,7 @@ export default {
     },
     methods: {
         mouseoverHandler: function(event) {
-            if (!this.loggedIn || this.isLoading) {
+            if (this.isLoading) {
                 return;
             }
 

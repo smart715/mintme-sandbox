@@ -7,11 +7,7 @@ describe('TraiderHoveredMixin', function() {
         mixins: [TraiderHoveredMixin],
     });
 
-    const wrapper = shallowMount(Component, {
-        propsData: {
-            loggedIn: false,
-        },
-    });
+    const wrapper = shallowMount(Component);
 
     it('should show tooltip content', () => {
         expect(wrapper.vm.tooltipContent).to.be.equal('Loading...');
@@ -38,10 +34,6 @@ describe('TraiderHoveredMixin', function() {
     });
 
     it('should not react (tooltip content not changing) on hover event', () => {
-        wrapper.vm.mouseoverHandler();
-        expect(wrapper.vm.tooltipContent).to.be.equal('Loading...');
-
-        wrapper.vm.loggedIn = true;
         wrapper.vm.isLoading = true;
         wrapper.vm.mouseoverHandler();
         expect(wrapper.vm.tooltipContent).to.be.equal('Loading...');
