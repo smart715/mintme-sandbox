@@ -22,7 +22,7 @@ class WalletControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    public function estGetDepositAddressesForCrypto(): void
+    public function testGetDepositAddressesForCrypto(): void
     {
         $this->register($this->client);
         $this->client->request('GET', '/api/wallet/addresses');
@@ -36,7 +36,7 @@ class WalletControllerTest extends WebTestCase
         $this->assertNotEquals('', $res['TOK']);
     }
 
-    public function estWithdrawCrypto(): void
+    public function testWithdrawCrypto(): void
     {
         $email = $this->register($this->client);
         $this->sendWeb($email);
@@ -62,7 +62,7 @@ class WalletControllerTest extends WebTestCase
         $this->assertEquals(10000000000000000000, $pendingWithdraw->getAmount()->getAmount()->getAmount());
     }
 
-    public function estWithdrawToken(): void
+    public function testWithdrawToken(): void
     {
         $email = $this->register($this->client);
         $this->createProfile($this->client);
@@ -90,7 +90,7 @@ class WalletControllerTest extends WebTestCase
         $this->assertEquals(10000000000000, $pendingWithdraw->getAmount()->getAmount()->getAmount());
     }
 
-    public function estGetDepositFee(): void
+    public function testGetDepositFee(): void
     {
         $this->register($this->client);
 
