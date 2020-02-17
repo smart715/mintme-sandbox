@@ -7,6 +7,8 @@ use App\Form\ResettingType;
 use App\Logger\UserActionLogger;
 use FOS\UserBundle\Controller\ResettingController as FOSResettingController;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\Event\FormEvent;
+use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Mailer\MailerInterface;
@@ -75,10 +77,20 @@ class ResettingController extends FOSResettingController
             return $this->render('pages/404.html.twig');
         }
 
+        $event = new GetResponseUserEvent($user, $request);
+        $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
+
         $resettingForm = $this->createForm(ResettingType::class, $user);
         $resettingForm->handleRequest($request);
 
+        if (null !== $event->getResponse()) {
+            return $event->getResponse();
+        }
+
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
+            $event = new FormEvent($resettingForm, $request);
+            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
 
