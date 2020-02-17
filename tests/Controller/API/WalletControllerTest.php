@@ -128,24 +128,28 @@ class WalletControllerTest extends WebTestCase
         );
         $this->createProfile($fooClient);
         $tokName = $this->createToken($fooClient);
+        $this->sendWeb($fooEmail);
 
-//        $fooClient->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-//            'priceInput' => 1,
-//            'amountInput' => 10,
-//            'action' => 'sell',
-//        ]);
+        $fooClient->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 10,
+            'action' => 'sell',
+        ]);
 
-//        $fooClient->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-//            'priceInput' => 1,
-//            'amountInput' => 10,
-//            'action' => 'buy',
-//        ]);
+        $fooClient->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 10,
+            'action' => 'buy',
+        ]);
 
         $this->client->request('GET', '/api/wallet/referral');
 
-//        file_put_contents('test.json', $this->client->getResponse()->getContent());
+        file_put_contents('test.json', $this->client->getResponse()->getContent());
 
-        $this->assertTrue(true);
+        $this->assertEquals(
+            '0.014970000000000000',
+            json_decode($this->client->getResponse()->getContent(), true)['balance']
+        );
     }
 
 
