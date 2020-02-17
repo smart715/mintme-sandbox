@@ -136,8 +136,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $userTokenIds = [];
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
         $markets = $this->marketFactory->createUserRelated($user, $deployed);
-            
-            //    : $this->marketFactory->createUserRelated($user);
                 
         foreach ($markets as $market) {
             if ($market->getQuote() instanceof Token) {

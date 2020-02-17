@@ -36,9 +36,11 @@
                 v-model="marketFilters.selectedFilter"
             >
                 <template slot="button-content">
-                    <div v-for="item in marketFilters.options" :key="item.key">
-                        <span v-if="item.key === marketFilters.selectedFilter">{{item.label}}</span>
-                    </div>
+                    <span v-for="item in marketFilters.options" :key="item.key" >
+                        <template v-if="item.key === marketFilters.selectedFilter">
+                            {{item.label}}
+                        </template>
+                    </span>
                 </template>
                 <template>
                     <b-dropdown-item
@@ -131,7 +133,7 @@
                     <p class="text-center p-5">No any token yet</p>
                 </div>
             </template>
-            <template v-if="marketFilters.selectedFilter === 'deployed' || marketFilters.selectedFilter === 'user' ">
+            <template v-if="userId && (marketFilters.selectedFilter === 'deployed' || marketFilters.selectedFilter === 'user') ">
                 <div class="row justify-content-center">
                     <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
                 </div>
@@ -371,7 +373,7 @@ export default {
                 let params = {page};
                 if (this.marketFilters.selectedFilter === 'user') {
                     params.user = 1;
-                } else if (this.marketFilters.selectedFilter === 'deployed') {
+                } else if (this.marketFilters.selectedFilter === 'deployed' && this.userId) {
                     params.deployed = 1;
                 }
                 this.loading = true;
