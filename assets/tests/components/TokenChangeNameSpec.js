@@ -17,6 +17,9 @@ describe('TokenChangeName', () => {
             },
         });
 
+        const deployedErrorMessage = 'The name of a deployed token can\'t be changed';
+        const exchangedErrorMessage = 'You must own all your tokens in order to change the token\'s name';
+
         expect(wrapper.vm.currentName).to.equal('foobar');
         expect(wrapper.vm.newName).to.equal('foobar');
         expect(wrapper.find('input').element.value).to.equal('foobar');
@@ -24,18 +27,25 @@ describe('TokenChangeName', () => {
         wrapper.vm.isTokenExchanged = true;
         wrapper.vm.isTokenNotDeployed = false;
         expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+        expect(wrapper.contains('#error-message')).to.equal(true);
+        expect(wrapper.find('#error-message').text()).to.equal(deployedErrorMessage);
 
         wrapper.vm.isTokenExchanged = true;
         wrapper.vm.isTokenNotDeployed = true;
         expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+        expect(wrapper.contains('#error-message')).to.equal(true);
+        expect(wrapper.find('#error-message').text()).to.equal(exchangedErrorMessage);
 
         wrapper.vm.isTokenExchanged = false;
         wrapper.vm.isTokenNotDeployed = false;
         expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+        expect(wrapper.contains('#error-message')).to.equal(true);
+        expect(wrapper.find('#error-message').text()).to.equal(deployedErrorMessage);
 
         wrapper.vm.isTokenExchanged = false;
         wrapper.vm.isTokenNotDeployed = true;
         expect(wrapper.find('button').attributes('disabled')).to.equal(undefined);
+        expect(wrapper.contains('#error-message')).to.equal(false);
     });
 
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
