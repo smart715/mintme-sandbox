@@ -36,15 +36,9 @@
                 v-model="marketFilters.selectedFilter"
             >
                 <template slot="button-content">
-                    <span v-if="marketFilters.selectedFilter === 'deployed'">
-                        Deployed tokens
-                    </span>
-                    <span v-if="marketFilters.selectedFilter === 'all'">
-                        All tokens
-                    </span>
-                    <span v-if="marketFilters.selectedFilter === 'user'">
-                        Tokens I own
-                    </span>
+                    <div v-for="item in marketFilters.options" :key="item.key">
+                        <span v-if="item.key === marketFilters.selectedFilter">{{item.label}}</span>
+                    </div>
                 </template>
                 <template>
                     <b-dropdown-item
@@ -127,12 +121,12 @@
                     </template>
                 </b-table>
             </div>
-            <template v-if="marketFilters.selectedFilter == 'deployed' && tokens.length < 2">
+            <template v-if="marketFilters.selectedFilter === 'deployed' && tokens.length < 2">
                 <div class="row justify-content-center">
                     <p class="text-center p-5">No one deployed his token yet</p>
                 </div>
             </template>
-            <template v-if="marketFilters.selectedFilter == 'user' && tokens.length < 2">
+            <template v-if="marketFilters.selectedFilter === 'user' && tokens.length < 2">
                 <div class="row justify-content-center">
                     <p class="text-center p-5">No any token yet</p>
                 </div>
@@ -208,20 +202,20 @@ export default {
             marketFilters: {
                 userSelected: false,
                 selectedFilter: 'deployed',
-                options: [
-                {
-                    key: 'deployed',
-                    label: 'Deployed tokens',
+                options: {
+                    deployed: {
+                        key: 'deployed',
+                        label: 'Deployed tokens',
+                    },
+                    all: {
+                        key: 'all',
+                        label: 'All tokens',
+                    },
+                    user: {
+                        key: 'user',
+                        label: 'Tokens I own',
+                    },
                 },
-                {
-                    key: 'all',
-                    label: 'All tokens',
-                },
-                {
-                    key: 'user',
-                    label: 'Tokens I own',
-                },
-            ],
             },
             volumes: {
                 day: {
@@ -377,8 +371,7 @@ export default {
                 let params = {page};
                 if (this.marketFilters.selectedFilter === 'user') {
                     params.user = 1;
-                }
-                if (this.marketFilters.selectedFilter === 'deployed') {
+                } else if (this.marketFilters.selectedFilter === 'deployed') {
                     params.deployed = 1;
                 }
                 this.loading = true;

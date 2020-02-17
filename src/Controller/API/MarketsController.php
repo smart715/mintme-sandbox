@@ -52,22 +52,17 @@ class MarketsController extends APIController
         ParamFetcherInterface $request,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-        $markets = $request->get('deployed')
+        $deployed =  $request->get('deployed')
+            ? true
+                : false;
+        $markets = $request->get('user') || $request->get('deployed')
             ? $marketStatusManager->getUserMarketStatus(
                 $this->getUser(),
                 ($page - 1) * self::OFFSET,
                 self::OFFSET,
-                $request->get('deployed')
+                $deployed
             )
-            : $marketStatusManager->getUserMarketStatus(
-                $this->getUser(),
-                ($page - 1) * self::OFFSET,
-                self::OFFSET
-            );
-
-        if (!$request->get('user') && !$request->get('deployed')) {
-            $markets = $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
-        }
+            : $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,

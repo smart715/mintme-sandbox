@@ -131,13 +131,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getUserMarketStatus(User $user, int $offset, int $limit, ?string $deployed = null): array
+    public function getUserMarketStatus(User $user, int $offset, int $limit, bool $deployed = false): array
     {
         $userTokenIds = [];
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
-        $markets = $deployed
-            ? $this->marketFactory->createUserRelated($user, 'deployed')
-                : $this->marketFactory->createUserRelated($user);
+        $markets = $this->marketFactory->createUserRelated($user, $deployed);
+            
+            //    : $this->marketFactory->createUserRelated($user);
                 
         foreach ($markets as $market) {
             if ($market->getQuote() instanceof Token) {

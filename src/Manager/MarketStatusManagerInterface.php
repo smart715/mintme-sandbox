@@ -22,5 +22,5 @@ interface MarketStatusManagerInterface
     public function updateMarketStatus(Market $market): void;
 
     /** @return array */
-    public function getUserMarketStatus(User $user, int $offset, int $limit, ?string $deployed = null): array;
+    public function getUserMarketStatus(User $user, int $offset, int $limit, bool $deployed = false): array;
 }

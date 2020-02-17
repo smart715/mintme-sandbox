@@ -57,13 +57,9 @@ class TokenRepository extends EntityRepository
      */
     public function getUserDeployedTokens(User $user): array
     {
-        $qb =  $this->createQueryBuilder('q');
-        
-        return $qb->select('ut')
-            ->from(Token::class, 'ut')
-            ->innerJoin('ut.profile', 'p')
-            ->where('ut.profile = ?1')
-            ->andWhere('ut.deployed IS NOT NULL')
+        return $this->createQueryBuilder('token')
+            ->where('token.profile = ?1')
+            ->andWhere('token.deployed IS NOT NULL')
             ->setParameter(1, $user->getProfile())
             ->getQuery()
             ->execute();
