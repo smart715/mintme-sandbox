@@ -14,9 +14,6 @@ interface MarketStatusManagerInterface
     public function getMarketsInfo(int $offset, int $limit): array;
 
     /** @return array<MarketStatus> */
-    public function getSortedMarketsInfo(int $offset, int $limit): array;
-
-    /** @return array<MarketStatus> */
     public function getAllMarketsInfo(): array;
 
     /** @var Market[] */

@@ -56,7 +56,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getSortedMarketsInfo(int $offset, int $limit): array
+    public function getMarketsInfo(int $offset, int $limit): array
     {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
@@ -69,28 +69,10 @@ class MarketStatusManager implements MarketStatusManagerInterface
                     ->where('qt IS NOT NULL')
                     ->orderBy('deployed', 'DESC')
                     ->addOrderBy('ms.lastPrice', 'DESC')
-                    ->setFirstResult($offset)
+                    ->setFirstResult($offset - count($predefinedMarketStatus))
                     ->setMaxResults($limit - count($predefinedMarketStatus))
                     ->getQuery()
                     ->getResult()
-            )
-        );
-    }
-
-    /** {@inheritDoc} */
-    public function getMarketsInfo(int $offset, int $limit): array
-    {
-        $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
-
-        return $this->parseMarketStatuses(
-            array_merge(
-                $predefinedMarketStatus,
-                $this->repository->findBy(
-                    [],
-                    ['lastPrice' => Criteria::DESC],
-                    $limit - count($predefinedMarketStatus),
-                    $offset
-                )
             )
         );
     }
