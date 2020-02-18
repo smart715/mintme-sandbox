@@ -280,7 +280,7 @@ class TokensControllerTest extends WebTestCase
         $this->client->request('POST', '/api/tokens/' . $tokName . '/send-code');
 
         /** @var Token */
-        $token = $this->getToken($tokName);
+        $this->getToken($tokName);
 //        $this->assertNotEquals('', $token->getProfile()->getUser()->getEmailAuthCode());
     }
 

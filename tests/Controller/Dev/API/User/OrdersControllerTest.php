@@ -308,7 +308,6 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res1 = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->client->request('GET', '/dev/api/v1/orders/finished', [
             'base' => 'MINTME',
@@ -320,7 +319,6 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res2 = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertTrue(true);
     }
