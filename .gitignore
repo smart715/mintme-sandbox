@@ -30,3 +30,6 @@ public/build
 /coverage-php
 /coverage-js
 .phpunit.result.cache
+
+###< docker databases ###
+.docker/db
