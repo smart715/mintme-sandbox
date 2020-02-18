@@ -19,7 +19,7 @@ class OrdersControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    public function estGetSellActiveOrders(): void
+    public function testGetSellActiveOrders(): void
     {
         $email = $this->register($this->client);
         $this->createProfile($this->client);
@@ -74,7 +74,7 @@ class OrdersControllerTest extends WebTestCase
         );
     }
 
-    public function estGetBuyActiveOrders(): void
+    public function testGetBuyActiveOrders(): void
     {
         $email = $this->register($this->client);
         $this->createProfile($this->client);
@@ -131,7 +131,7 @@ class OrdersControllerTest extends WebTestCase
         );
     }
 
-    public function estGetSellActiveOrdersWithOffset(): void
+    public function testGetSellActiveOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
         $this->createProfile($this->client);
@@ -193,7 +193,7 @@ class OrdersControllerTest extends WebTestCase
         $this->assertEquals('3.000000000000', $res2[0]['price']);
     }
 
-    public function estGetBuyActiveOrdersWithOffset(): void
+    public function testGetBuyActiveOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
         $this->createProfile($this->client);
@@ -257,7 +257,7 @@ class OrdersControllerTest extends WebTestCase
     }
 
     // todo fix then retest
-    public function estGetFinishedOrdersWithOffset(): void
+    public function testGetFinishedOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
         $this->createProfile($this->client);
@@ -325,7 +325,7 @@ class OrdersControllerTest extends WebTestCase
         $this->assertTrue(true);
     }
 
-    public function estPlaceOrder(): void
+    public function testPlaceOrder(): void
     {
         $email = $this->register($this->client);
         $this->createProfile($this->client);
@@ -378,7 +378,6 @@ class OrdersControllerTest extends WebTestCase
         $this->assertTrue(true);
     }
 
-    // todo change queryparam to requestparam then retest
     public function testCancelOrder(): void
     {
         $email = $this->register($this->client);
@@ -409,13 +408,16 @@ class OrdersControllerTest extends WebTestCase
         ]);
         $res1 = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->client->request('DELETE', '/dev/api/v1/user/orders/' . $res1[0]['id'], [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-        ], [], [
-            'HTTP_X-API-ID' => $keys->getPublicKey(),
-            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
-        ]);
+        $this->client->request(
+            'DELETE',
+            '/dev/api/v1/user/orders/' . $res1[0]['id'] . '?base=MINTME&quote=' . $tokName,
+            [],
+            [],
+            [
+                'HTTP_X-API-ID' => $keys->getPublicKey(),
+                'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+            ]
+        );
 
         $this->client->request('GET', '/dev/api/v1/user/orders/active', [
             'base' => 'MINTME',
@@ -428,6 +430,6 @@ class OrdersControllerTest extends WebTestCase
         $res2 = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res1);
-//        $this->assertCount(0, $res2);
+        $this->assertCount(0, $res2);
     }
 }
