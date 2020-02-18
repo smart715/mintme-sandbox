@@ -57,7 +57,7 @@ class MarketsController extends APIController
                 ($page - 1) * self::OFFSET,
                 self::OFFSET
             )
-            : $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
+            : $marketStatusManager->getSortedMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,
