@@ -127,7 +127,7 @@
     "extra": {
         "symfony": {
             "require": "4.4.*",
-            "allow-contrib": false
+            "allow-contrib": true
         },
         "incenteev-parameters": {
             "file": "config/parameters.yaml"
