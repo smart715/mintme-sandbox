@@ -125,7 +125,7 @@ class WebTestCase extends BaseWebTestCase
         return $str;
     }
 
-    private function generateEmail(): string
+    protected function generateEmail(): string
     {
         return $this->generateString() . '@mail.com';
     }
