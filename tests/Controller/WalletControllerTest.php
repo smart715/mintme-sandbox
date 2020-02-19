@@ -22,7 +22,7 @@ class WalletControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
-    public function estWithdrawConfirmCrypto(): void
+    public function testWithdrawConfirmCrypto(): void
     {
         $email = $this->register($this->client);
         $this->sendWeb($email);
