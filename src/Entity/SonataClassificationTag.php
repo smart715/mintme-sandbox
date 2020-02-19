@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace App\Entity;
 
@@ -20,9 +18,9 @@ class SonataClassificationTag extends BaseTag
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      * // Serializer\Groups(groups={"sonata_api_read", "sonata_api_write", "sonata_search"})
-     *
-     * @var int
      */
+
+     /** @var int */
     protected $id;
 
     /**
@@ -31,12 +29,12 @@ class SonataClassificationTag extends BaseTag
      *     cascade={"persist"}
      * )
      * @ORM\JoinColumn(name="context", referencedColumnName="id", nullable=false)
-     *
-     * @var SonataClassificationContext
      */
+
+     /** @var SonataClassificationContext */
     protected $context;
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

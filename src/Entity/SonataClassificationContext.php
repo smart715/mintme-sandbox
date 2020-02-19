@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace App\Entity;
 
@@ -20,11 +18,14 @@ class SonataClassificationContext extends BaseContext
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="NONE")
      * // Serializer\Groups(groups={"sonata_api_read", "sonata_api_write", "sonata_search"})
-     *
-     * @var int
      */
+
+    /** @var string|int */
     protected $id;
 
+    /**
+     * @return int|string
+     */
     public function getId()
     {
         return $this->id;

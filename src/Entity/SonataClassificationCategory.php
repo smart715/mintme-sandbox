@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace App\Entity;
 
@@ -22,9 +20,9 @@ class SonataClassificationCategory extends BaseCategory
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      * // Serializer\Groups(groups={"sonata_api_read", "sonata_api_write", "sonata_search"})
-     *
-     * @var int
-     */
+     **/
+
+    /** @var int */
     protected $id;
 
     /**
@@ -33,9 +31,9 @@ class SonataClassificationCategory extends BaseCategory
      *     mappedBy="parent", cascade={"persist"}, orphanRemoval=true
      * )
      * @ORM\OrderBy({"position"="ASC"})
-     *
-     * @var SonataClassificationCategory[]
-     */
+     * **/
+
+     /** @var SonataClassificationCategory[] */
     protected $children;
 
     /**
@@ -44,9 +42,9 @@ class SonataClassificationCategory extends BaseCategory
      *     inversedBy="children", cascade={"persist", "refresh", "merge", "detach"}
      * )
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
-     *
-     * @var SonataClassificationCategory
-     */
+     **/
+
+     /** @var SonataClassificationCategory*/
     protected $parent;
 
     /**
@@ -56,17 +54,17 @@ class SonataClassificationCategory extends BaseCategory
      * )
      * @ORM\JoinColumn(name="context", referencedColumnName="id", nullable=false)
      * @Assert\NotNull()
-     *
-     * @var SonataClassificationContext
-     */
+     **/
+
+    /** @var SonataClassificationContext */
     protected $context;
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    final public function setMedia(MediaInterface $media = null)
+    final public function setMedia(?MediaInterface $media = null): void
     {
         parent::setMedia($media);
     }
