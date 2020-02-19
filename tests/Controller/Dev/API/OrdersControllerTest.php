@@ -47,7 +47,7 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(
             [
@@ -94,7 +94,7 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(
             [
@@ -152,7 +152,7 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('1.000000000000', $res[0]['price']);
         $this->assertEquals('2.000000000000', $res[1]['price']);
@@ -249,7 +249,7 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res1 = json_decode($this->client->getResponse()->getContent(), true);
+        $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->client->request('GET', '/dev/api/v1/orders/active', [
             'base' => 'MINTME',
@@ -261,7 +261,7 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res2 = json_decode($this->client->getResponse()->getContent(), true);
+        $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res1);
         $this->assertCount(1, $res2);
@@ -306,7 +306,7 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res);
         $this->assertEquals(

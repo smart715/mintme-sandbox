@@ -38,7 +38,7 @@ class MarketsControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertGreaterThan(
             1,
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
     }
 
@@ -57,7 +57,7 @@ class MarketsControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertEquals(
@@ -90,7 +90,7 @@ class MarketsControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res1 = json_decode($this->client->getResponse()->getContent(), true);
+        $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->client->request('GET', '/dev/api/v1/markets', [
             'offset' => 1,
@@ -99,7 +99,7 @@ class MarketsControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res2 = json_decode($this->client->getResponse()->getContent(), true);
+        $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(3, $res1);
         $this->assertCount(3, $res2);

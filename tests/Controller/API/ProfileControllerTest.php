@@ -24,7 +24,7 @@ class ProfileControllerTest extends WebTestCase
         $this->client->request('POST', '/api/profile/validate-zip-code', [
             'country' => 'EG',
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertTrue($res['hasPattern']);
         $this->assertEquals('(\d\d\d\d\d)', $res['pattern']);
@@ -37,7 +37,7 @@ class ProfileControllerTest extends WebTestCase
         $this->client->request('POST', '/api/profile/validate-zip-code', [
             'country' => '',
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertFalse($res['hasPattern']);
         $this->assertEquals('', $res['pattern']);

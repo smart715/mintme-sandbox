@@ -114,7 +114,9 @@ services:
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 
-    App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
+    App\Manager\TwoFactorManagerInterface:
+        class: App\Manager\TwoFactorManager
+        public: true
 
     App\Wallet\Withdraw\Communicator\AMQPCommunicator:
         arguments:
@@ -520,3 +522,6 @@ services:
     App\EventSubscriber\AuthenticationListener:
         arguments:
             $firewallName: '%fos_user.firewall_name%'
+
+    App\Exchange\Balance\BalanceHandlerInterface:
+        public: true

@@ -30,7 +30,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertCount(0, $res['buy']);
         $this->assertCount(1, $res['sell']);
         $this->assertEquals(
@@ -59,7 +59,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertCount(0, $res['sell']);
         $this->assertCount(1, $res['buy']);
@@ -88,7 +88,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
 
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertCount(1, $res['sell']);
 
         $this->client->request('POST', '/api/orders/cancel/WEB/'. $tokName, [
@@ -98,7 +98,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
 
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertCount(0, $res['sell']);
     }
 
@@ -124,7 +124,7 @@ class OrdersControllerTest extends WebTestCase
         sleep(10);
 
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/executed/last/0');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertCount(1, $res);
     }
 
@@ -148,7 +148,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
 
         $this->client->request('GET', '/api/orders/executed/page/1');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertCount(2, $res);
     }
 
@@ -165,7 +165,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
 
         $this->client->request('GET', '/api/orders/pending/page/1');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertCount(1, $res);
     }
 
@@ -182,11 +182,11 @@ class OrdersControllerTest extends WebTestCase
         ]);
 
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/page/1');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/pending/' . $res['sell'][0]['id']);
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals($tokName, $res['market']['quote']['name']);
         $this->assertEquals('pending', $res['status']);

@@ -25,7 +25,7 @@ class MarketsControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/markets');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(2, $res);
         $this->assertEquals(
@@ -53,7 +53,7 @@ class MarketsControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/markets/info/1');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertGreaterThan(1, $res['markets']);
     }
@@ -66,7 +66,7 @@ class MarketsControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/markets/marketcap/WEB');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('marketcap', $res);
     }

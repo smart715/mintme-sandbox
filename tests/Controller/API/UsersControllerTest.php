@@ -33,7 +33,7 @@ class UsersControllerTest extends WebTestCase
         $this->em->flush();
 
         $this->client->request('GET', '/api/users/keys');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('publicKey', $res);
         $this->assertEquals('', $res['plainPrivateKey']);
@@ -44,7 +44,7 @@ class UsersControllerTest extends WebTestCase
         $email = $this->register($this->client);
 
         $this->client->request('POST', '/api/users/keys');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
@@ -85,7 +85,7 @@ class UsersControllerTest extends WebTestCase
         $email = $this->register($this->client);
 
         $this->client->request('POST', '/api/users/clients');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
@@ -103,7 +103,7 @@ class UsersControllerTest extends WebTestCase
         $email = $this->register($this->client);
 
         $this->client->request('POST', '/api/users/clients');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([

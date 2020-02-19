@@ -23,7 +23,7 @@ class WebSocketControllerTest extends WebTestCase
         $this->register($this->client);
 
         $this->client->request('GET', '/api/ws/auth');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('error', $res);
     }
@@ -38,7 +38,7 @@ class WebSocketControllerTest extends WebTestCase
         $this->client->request('GET', '/api/ws/auth', [], [], [
             'HTTP_authorization' => $user->getId(),
         ]);
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertArrayNotHasKey('error', $res);
         $this->assertEquals(

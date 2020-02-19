@@ -22,7 +22,7 @@ class CryptosControllerTest extends WebTestCase
         $this->register($this->client);
 
         $this->client->request('GET', '/api/cryptos/rates');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(2, $res);
         $this->assertArrayHasKey('BTC', $res);

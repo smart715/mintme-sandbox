@@ -38,7 +38,7 @@ class CurrenciesControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertGreaterThan(
             1,
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
     }
 
@@ -61,7 +61,7 @@ class CurrenciesControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertEquals(
             'WEB',
-            json_decode($this->client->getResponse()->getContent(), true)['symbol']
+            json_decode((string)$this->client->getResponse()->getContent(), true)['symbol']
         );
     }
 
@@ -84,7 +84,7 @@ class CurrenciesControllerTest extends WebTestCase
 //            'HTTP_X-API-ID' => $keys->getPublicKey(),
 //            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
 //        ]);
-//        $res1 = json_decode($this->client->getResponse()->getContent(), true);
+//        $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 //
 //        $this->client->request('GET', '/dev/api/v1/currencies', [
 //            'offset' => 1,
@@ -93,7 +93,7 @@ class CurrenciesControllerTest extends WebTestCase
 //            'HTTP_X-API-ID' => $keys->getPublicKey(),
 //            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
 //        ]);
-//        $res2 = json_decode($this->client->getResponse()->getContent(), true);
+//        $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
 //
 //        $this->assertCount(1, $res1);
 //        $this->assertCount(1, $res2);

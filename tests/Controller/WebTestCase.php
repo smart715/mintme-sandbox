@@ -5,6 +5,7 @@ namespace App\Tests\Controller;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -15,7 +16,7 @@ class WebTestCase extends BaseWebTestCase
 {
     protected const DEFAULT_USER_PASS = 'Foo123456';
 
-    /** @var EntityManagerInterface */
+    /** @var ObjectManager */
     protected $em;
 
     public function setUp(): void
@@ -76,6 +77,7 @@ class WebTestCase extends BaseWebTestCase
         );
     }
 
+    /** @test */
     protected function sendWeb(string $email, string $amount = '100000000000000000000'): void
     {
         $balanceHandler = self::$container->get(BalanceHandlerInterface::class);

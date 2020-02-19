@@ -101,7 +101,7 @@ class TokensControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/tokens/' . $tokName .'/lock-period');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(
             [
@@ -130,7 +130,7 @@ class TokensControllerTest extends WebTestCase
             'tokenName' => $tokName,
         ]);
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res);
         $this->assertEquals($tokName, $res[0]['name']);
@@ -144,7 +144,7 @@ class TokensControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/tokens');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res['common']);
         $this->assertCount(2, $res['predefined']);
@@ -167,7 +167,7 @@ class TokensControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/exchange-amount');
 
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('9999999.000000000000', $res);
     }
@@ -178,6 +178,7 @@ class TokensControllerTest extends WebTestCase
         $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
+        /** @var Token $token */
         $token = $this->getToken($tokName);
         $token->setWithdrawn('10000000000000');
         $token->setAddress('0x00');
@@ -185,7 +186,7 @@ class TokensControllerTest extends WebTestCase
         $this->em->flush();
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/withdrawn');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('10.000000000000', $res);
     }
@@ -199,7 +200,7 @@ class TokensControllerTest extends WebTestCase
         $this->client->request('GET', '/api/tokens/' . $tokName . '/is-exchanged');
 
         $this->assertFalse(
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -211,7 +212,7 @@ class TokensControllerTest extends WebTestCase
         $this->client->request('GET', '/api/tokens/' . $tokName . '/is-exchanged');
 
         $this->assertTrue(
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
     }
 
@@ -224,10 +225,11 @@ class TokensControllerTest extends WebTestCase
         $this->client->request('GET', '/api/tokens/' . $tokName . '/is-not_deployed');
 
         $this->assertTrue(
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
 
 
+        /** @var Token $token */
         $token = $this->getToken($tokName);
         $token->setAddress('0x00');
         $this->em->persist($token);
@@ -236,7 +238,7 @@ class TokensControllerTest extends WebTestCase
         $this->client->request('GET', '/api/tokens/' . $tokName . '/is-not_deployed');
 
         $this->assertFalse(
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
     }
 
@@ -319,7 +321,7 @@ class TokensControllerTest extends WebTestCase
         ]);
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/top-holders');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
 
         $this->assertCount(2, $res);
@@ -354,7 +356,7 @@ class TokensControllerTest extends WebTestCase
 
         $this->assertEquals(
             '1.996000000000',
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
     }
 
@@ -367,12 +369,12 @@ class TokensControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/tokens/foo-token/check-token-name-exists');
         $this->assertFalse(
-            json_decode($this->client->getResponse()->getContent(), true)['exists']
+            json_decode((string)$this->client->getResponse()->getContent(), true)['exists']
         );
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/check-token-name-exists');
         $this->assertTrue(
-            json_decode($this->client->getResponse()->getContent(), true)['exists']
+            json_decode((string)$this->client->getResponse()->getContent(), true)['exists']
         );
     }
 

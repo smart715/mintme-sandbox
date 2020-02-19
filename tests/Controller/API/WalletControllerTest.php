@@ -26,7 +26,7 @@ class WalletControllerTest extends WebTestCase
     {
         $this->register($this->client);
         $this->client->request('GET', '/api/wallet/addresses');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('WEB', $res);
         $this->assertArrayHasKey('BTC', $res);
@@ -43,7 +43,7 @@ class WalletControllerTest extends WebTestCase
         $backupCodes = $this->turnOn2FA($email);
 
         $this->client->request('GET', '/api/wallet/addresses');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->client->request('POST', '/api/wallet/withdraw', [
             'crypto' => 'WEB',
@@ -71,7 +71,7 @@ class WalletControllerTest extends WebTestCase
         $backupCodes = $this->turnOn2FA($email);
 
         $this->client->request('GET', '/api/wallet/addresses');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->client->request('POST', '/api/wallet/withdraw', [
             'crypto' => $tokName,
@@ -98,7 +98,7 @@ class WalletControllerTest extends WebTestCase
 
         $this->assertEquals(
             '0.004200000000000000',
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode((string)$this->client->getResponse()->getContent(), true)
         );
     }
 
@@ -144,11 +144,9 @@ class WalletControllerTest extends WebTestCase
 
         $this->client->request('GET', '/api/wallet/referral');
 
-        file_put_contents('test.json', $this->client->getResponse()->getContent());
-
         $this->assertEquals(
             '0.014970000000000000',
-            json_decode($this->client->getResponse()->getContent(), true)['balance']
+            json_decode((string)$this->client->getResponse()->getContent(), true)['balance']
         );
     }
 
