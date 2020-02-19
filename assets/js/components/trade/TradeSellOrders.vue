@@ -24,8 +24,6 @@
                         <b-table v-if="hasOrders"
                             ref="table"
                             @row-clicked="orderClicked"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
                             :items="tableData"
                             :fields="fields"
                         >
@@ -118,8 +116,6 @@ export default {
         ordersList: [Array],
         tokenName: String,
         fields: Array,
-        sortBy: String,
-        sortDesc: Boolean,
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
