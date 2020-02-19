@@ -121,7 +121,7 @@ class OrdersControllerTest extends WebTestCase
             'action' => 'buy',
         ]);
 
-        sleep(10);
+        sleep(15);
 
         $this->client->request('GET', '/api/orders/WEB/'. $tokName . '/executed/last/0');
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);

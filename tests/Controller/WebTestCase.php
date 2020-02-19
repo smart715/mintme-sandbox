@@ -4,9 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exchange\Balance\BalanceHandlerInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -77,10 +75,9 @@ class WebTestCase extends BaseWebTestCase
         );
     }
 
-    /** @test */
     protected function sendWeb(string $email, string $amount = '100000000000000000000'): void
     {
-        $balanceHandler = self::$container->get(BalanceHandlerInterface::class);
+        $balanceHandler = self::$container->get('balancer');
 
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([

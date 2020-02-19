@@ -27,7 +27,6 @@ class DefaultControllerTest extends WebTestCase
             0,
             $this->client->getCrawler()->filter('nav ul li a[href="/login"]')->count()
         );
-        $this->assertTrue(true);
     }
 
     /** @dataProvider authPages */

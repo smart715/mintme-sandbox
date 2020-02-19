@@ -373,7 +373,6 @@ class OrdersControllerTest extends WebTestCase
                 $res[0]['amount'],
             ]
         );
-        $this->assertTrue(true);
     }
 
     public function testCancelOrder(): void

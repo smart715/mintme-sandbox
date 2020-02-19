@@ -283,6 +283,7 @@ services:
 
     balancer:
         class: 'App\Exchange\Balance\BalanceHandler'
+        public: true
         arguments:
             $logger: '@logger'
         tags:
@@ -522,6 +523,3 @@ services:
     App\EventSubscriber\AuthenticationListener:
         arguments:
             $firewallName: '%fos_user.firewall_name%'
-
-    App\Exchange\Balance\BalanceHandlerInterface:
-        public: true
