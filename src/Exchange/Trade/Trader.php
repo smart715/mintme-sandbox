@@ -185,7 +185,7 @@ class Trader implements TraderInterface
         }
 
         if ($referrencer && !in_array($referrencer, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($user);
+            $userToken = (new UserToken())->setToken($token)->setUser($referrencer);
             $this->entityManager->persist($userToken);
             $referrencer->addToken($userToken);
             $this->entityManager->persist($referrencer);

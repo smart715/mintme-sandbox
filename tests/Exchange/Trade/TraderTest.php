@@ -41,7 +41,7 @@ class TraderTest extends TestCase
         $trader = new Trader(
             $trader,
             $this->mockLimitOrderConfig(1, 2),
-            $this->mockEm($this->exactly(2)),
+            $this->mockEm($this->once()),
             $this->mockMoneyWrapper(),
             $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
@@ -52,8 +52,48 @@ class TraderTest extends TestCase
         $quote = $this->mockToken('BAR', true);
 
         $user = $this->mockUser(1);
-        $user->method('getReferrencer')->willReturn($user);
-        $user->expects($this->exactly(2))->method('addToken');
+        $user->method('getReferrencer')->willReturn(null);
+        $user->expects($this->once())->method('addToken');
+
+        $trader->placeOrder(
+            $this->mockOrder($user, 1, 100, 50, 2, $this->mockMarket(
+                $this->mockToken('FOO', false),
+                $quote
+            ))
+        );
+    }
+
+    public function testPlaceOrderForTokenAndForUserWithReferencer(): void
+    {
+        $trader = $this->mockTraderFetcher();
+        $trader->expects($this->once())
+            ->method('placeOrder')
+            ->with(2, 'BARFOO', 1, 100, 50, 2, 1, 2, 1)
+            ->willReturn(
+                $this->mockTradeResult(
+                    TradeResult::SUCCESS
+                )
+            );
+
+        $trader = new Trader(
+            $trader,
+            $this->mockLimitOrderConfig(1, 2),
+            $this->mockEm($this->exactly(2)),
+            $this->mockMoneyWrapper(),
+            $this->mockPrelaunchConfig(1, false),
+            $this->mockMarketNameConverter(),
+            $this->createMock(NormalizerInterface::class),
+            $this->createMock(LoggerInterface::class)
+        );
+
+        $quote = $this->mockToken('BAR', true);
+
+        $referrencer = $this->mockUser(1);
+        $user = $this->mockUser(2);
+        $user->method('getReferrencer')->willReturn($referrencer);
+
+        $user->expects($this->once())->method('addToken');
+        $referrencer->expects($this->once())->method('addToken');
 
         $trader->placeOrder(
             $this->mockOrder($user, 1, 100, 50, 2, $this->mockMarket(
