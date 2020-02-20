@@ -22,8 +22,13 @@ class ProfileManager implements ProfileManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->profileRepository = $entityManager->getRepository(Profile::class);
-        $this->userRepository = $entityManager->getRepository(User::class);
+        /** @var ProfileRepository $profileRepository */
+        $profileRepository = $entityManager->getRepository(Profile::class);
+        $this->profileRepository = $profileRepository;
+
+        /** @var  UserRepository $userRepository */
+        $userRepository = $entityManager->getRepository(User::class);
+        $this->userRepository = $userRepository;
         $this->em = $entityManager;
     }
 
