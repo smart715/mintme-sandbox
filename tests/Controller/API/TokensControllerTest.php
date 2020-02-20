@@ -281,9 +281,11 @@ class TokensControllerTest extends WebTestCase
 
         $this->client->request('POST', '/api/tokens/' . $tokName . '/send-code');
 
-        /** @var Token */
-        $this->getToken($tokName);
-//        $this->assertNotEquals('', $token->getProfile()->getUser()->getEmailAuthCode());
+        $this->em->clear();
+
+        /** @var Token $token */
+        $token = $this->getToken($tokName);
+        $this->assertNotEquals('', $token->getProfile()->getUser()->getEmailAuthCode());
     }
 
     public function testGetTopHolders(): void
@@ -378,6 +380,119 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
+    public function testTokenDeployBalances(): void
+    {
+        $email = $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+        $this->sendWeb($email);
+
+        $this->client->request('GET', '/api/tokens/' . $tokName . '/deploy');
+        $res = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey('balance', $res);
+        $this->assertArrayHasKey('webCost', $res);
+        $this->assertEquals('100.000000000000000000', $res['balance']);
+    }
+
+    public function testDeployWithNoReleasePeriod(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $this->client->request('POST', '/api/tokens/' . $tokName . '/deploy');
+
+        $this->assertEquals($this->client->getResponse()->getStatusCode(), 400);
+    }
+
+    public function testDeployIfCantEdit(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $fooClient = self::createClient();
+        $this->register($fooClient);
+
+        $fooClient->request('POST', '/api/tokens/' . $tokName . '/deploy');
+
+        $this->assertEquals($this->client->getResponse()->getStatusCode(), 302);
+    }
+
+    public function testDeploy(): void
+    {
+        $email = $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+        $this->sendWeb($email);
+
+        $this->client->request('POST', '/api/tokens/' . $tokName .'/lock-in', [
+            'released' => '60',
+            'releasePeriod' => '10',
+        ]);
+
+        $this->client->request('POST', '/api/tokens/' . $tokName . '/deploy');
+
+        $this->em->clear();
+
+        /** @var Token $token */
+        $token = $this->getToken($tokName);
+
+        $this->assertEquals('pending', $token->getDeploymentStatus());
+    }
+
+    public function testContractUpdateIfCantEdit(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $fooClient = self::createClient();
+        $this->register($fooClient);
+
+        $fooClient->request('POST', '/api/tokens/' . $tokName . '/contract/update');
+
+        $this->assertEquals($this->client->getResponse()->getStatusCode(), 302);
+    }
+
+    public function testContractUpdateIfNotDeployed(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $this->client->request('POST', '/api/tokens/' . $tokName . '/contract/update', [
+            'address' => '0x00',
+        ]);
+
+        $this->assertEquals(400, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testContractUpdate(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        /** @var Token $token */
+        $token = $this->getToken($tokName);
+        $token->setAddress('0x00');
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $this->client->request('POST', '/api/tokens/' . $tokName . '/contract/update', [
+            'address' => '0x00',
+        ]);
+
+        $this->em->clear();
+
+        /** @var Token $token */
+        $token = $this->getToken($tokName);
+
+        $this->assertEquals('0x', $token->getMintDestination());
+    }
+
     private function getToken(string $name): ?Token
     {
         return $this->em->getRepository(Token::class)->findOneBy([
@@ -385,9 +500,5 @@ class TokensControllerTest extends WebTestCase
         ]);
     }
 
-    // todo fix testSendCode
     // todo test confirmWebsite()
-    // todo test tokenDeployBalances()
-    // todo test deploy()
-    // todo test contractUpdate()
 }
