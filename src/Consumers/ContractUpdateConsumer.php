@@ -46,6 +46,8 @@ class ContractUpdateConsumer implements ConsumerInterface
 
         try {
             $repo = $this->em->getRepository(Token::class);
+
+            /** @var Token|null $token */
             $token = $repo->findOneBy(['address' => $clbResult->getTokenAddress()]);
 
             if (!$token) {
@@ -54,7 +56,6 @@ class ContractUpdateConsumer implements ConsumerInterface
                 return true;
             }
 
-            /** @var Token $token */
             $token->setMintDestination($clbResult->getMintDestination());
 
             $this->em->persist($token);
