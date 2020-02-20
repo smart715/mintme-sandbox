@@ -36,7 +36,7 @@ class MarketsController extends APIController
         MarketFactoryInterface $marketManager
     ): View {
 
-        /** @var  App\Entity\User|null $currentUser */
+        /** @var  \App\Entity\User|null $currentUser */
         $currentUser = $this->getUser();
         $markets     = $marketManager->createUserRelated($currentUser);
 
@@ -54,7 +54,7 @@ class MarketsController extends APIController
         MarketStatusManagerInterface $marketStatusManager
     ): View {
 
-        /** @var  App\Entity\User|null $currentUser */
+        /** @var  \App\Entity\User|null $currentUser */
         $currentUser = $this->getUser();
         $markets = $request->get('user')
             ? $marketStatusManager->getUserMarketStatus(

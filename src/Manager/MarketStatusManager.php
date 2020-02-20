@@ -131,7 +131,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getUserMarketStatus(User $user, int $offset, int $limit): array
+    public function getUserMarketStatus(?User $user, int $offset, int $limit): array
     {
         $userTokenIds = [];
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();

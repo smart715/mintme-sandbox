@@ -44,7 +44,7 @@ class MarketFactory implements MarketFactoryInterface
     }
 
     /** {@inheritdoc} */
-    public function createUserRelated(User $user): array
+    public function createUserRelated(?User $user): array
     {
         return array_merge(
             $this->getCoinMarkets(),
