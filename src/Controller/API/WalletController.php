@@ -55,6 +55,7 @@ class WalletController extends AbstractFOSRestController
     ): array {
         /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
+
         return $wallet->getWithdrawDepositHistory(
             $user,
             ($page - 1) * self::DEPOSIT_WITHDRAW_HISTORY_LIMIT,
@@ -95,7 +96,6 @@ class WalletController extends AbstractFOSRestController
         $user = $this->getUser();
 
         try {
-
             $pendingWithdraw = $wallet->withdrawInit(
                 $user,
                 new Address(trim((string)$request->get('address'))),

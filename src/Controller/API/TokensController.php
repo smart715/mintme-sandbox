@@ -613,7 +613,6 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
-
             $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 
