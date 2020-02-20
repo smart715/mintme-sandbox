@@ -13,7 +13,10 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->kbRepository = $entityManager->getRepository(KnowledgeBase::class);
+        /** @var EntityRepository $repository */
+        $repository = $entityManager->getRepository(KnowledgeBase::class);
+
+        $this->kbRepository = $repository;
     }
 
     public function getAll(): array
