@@ -54,6 +54,7 @@ class DeployConsumer implements ConsumerInterface
 
         try {
             $repo = $this->em->getRepository(Token::class);
+            /** @var Token|null $token */
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
             if (!$token) {
@@ -61,8 +62,6 @@ class DeployConsumer implements ConsumerInterface
 
                 return true;
             }
-
-            /** @var Token $token */
 
             if (!$clbResult->getAddress()) {
                 if (null !== $token->getDeployCost()) {
