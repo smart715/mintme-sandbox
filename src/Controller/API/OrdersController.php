@@ -70,6 +70,7 @@ class OrdersController extends AbstractFOSRestController
 
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
+        
         foreach ($request->get('orderData') as $id) {
             $order = new Order(
                 $id,
@@ -104,7 +105,7 @@ class OrdersController extends AbstractFOSRestController
     ): View {
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
-        
+
         $tradeResult = $exchanger->placeOrder(
             $currentUser,
             $market,
