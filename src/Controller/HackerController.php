@@ -43,7 +43,7 @@ class HackerController extends AbstractController
         EventDispatcherInterface $eventDispatcher,
         string $quickRegistrationPassword
     ) {
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher           = $eventDispatcher;
         $this->quickRegistrationPassword = $quickRegistrationPassword;
     }
 
@@ -59,8 +59,8 @@ class HackerController extends AbstractController
     ): RedirectResponse {
         /** @var string $referer */
         $referer = $request->headers->get('referer');
-        $crypto = $cryptoManager->findBySymbol($crypto);
-        $user = $this->getUser();
+        $crypto  = $cryptoManager->findBySymbol($crypto);
+        $user    = $this->getUser();
 
         if (!$crypto || !$user) {
             return $this->redirect($referer);
@@ -109,9 +109,10 @@ class HackerController extends AbstractController
 
     /**
      * @Route("/quick-registration", name="quick-registration", options={"expose"=true})
-     * @param Request $request
-     * @param UserManagerInterface $userManager
+     * @param Request                      $request
+     * @param UserManagerInterface         $userManager
      * @param UserPasswordEncoderInterface $passwordEncoder
+     *
      * @return Response
      */
     public function quickRegistration(
@@ -134,15 +135,16 @@ class HackerController extends AbstractController
 
         return $this->render('pages/quick_registration.html.twig', [
             'formHeader' => 'Quick Registration',
-            'form' => $form->createView(),
+            'form'       => $form->createView(),
         ]);
     }
 
     /**
-     * @param Request $request
-     * @param UserManagerInterface $userManager
+     * @param Request                      $request
+     * @param UserManagerInterface         $userManager
      * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param string $email
+     * @param string                       $email
+     *
      * @return RedirectResponse $response
      */
     private function doQuickRegistration(
@@ -163,30 +165,32 @@ class HackerController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        $url = $this->generateUrl('fos_user_registration_confirmed');
+        $url      = $this->generateUrl('fos_user_registration_confirmed');
         $response = new RedirectResponse($url);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_INITIALIZE);
 
         $event = new FormEvent($this->createForm(RegistrationType::class, $user), $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
 
         $this->eventDispatcher->dispatch(
-            FOSUserEvents::REGISTRATION_COMPLETED,
-            new FilterUserResponseEvent($user, $request, $response)
+            new FilterUserResponseEvent($user, $request, $response),
+            FOSUserEvents::REGISTRATION_COMPLETED
+
         );
 
         $user->setEnabled(true);
         $user->setConfirmationToken(null);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_CONFIRM, $event);
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_CONFIRM);
         $userManager->updateUser($user);
 
         $this->eventDispatcher->dispatch(
-            FOSUserEvents::REGISTRATION_CONFIRMED,
-            new FilterUserResponseEvent($user, $request, $response)
+            new FilterUserResponseEvent($user, $request, $response),
+            FOSUserEvents::REGISTRATION_CONFIRMED
+
         );
 
         return $response;

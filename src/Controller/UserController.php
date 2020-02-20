@@ -231,7 +231,6 @@ class UserController extends AbstractController
             $this->userManager->updateUser($user);
             $this->addFlash('success', 'Password was updated successfully');
             $this->eventDispatcher->dispatch(
-                FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
                 new FilterUserResponseEvent(
                     $user,
                     $request,
@@ -240,7 +239,9 @@ class UserController extends AbstractController
                         $apiKey,
                         $user->GetApiClients()
                     )
-                )
+                ),
+                FOSUserEvents::CHANGE_PASSWORD_COMPLETED
+
             );
         }
 

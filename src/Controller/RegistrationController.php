@@ -130,7 +130,7 @@ class RegistrationController extends FOSRegistrationController
         $user->setEnabled(true);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_INITIALIZE);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -143,7 +143,7 @@ class RegistrationController extends FOSRegistrationController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 $event = new FormEvent($form, $request);
-                $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
+                $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
 
                 $this->userManager->updateUser($user);
 
@@ -168,15 +168,16 @@ class RegistrationController extends FOSRegistrationController
                 }
 
                 $this->eventDispatcher->dispatch(
-                    FOSUserEvents::REGISTRATION_COMPLETED,
-                    new FilterUserResponseEvent($user, $request, $response)
+                    new FilterUserResponseEvent($user, $request, $response),
+                    FOSUserEvents::REGISTRATION_COMPLETED
+
                 );
 
                 return $response;
             }
 
             $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_FAILURE, $event);
+            $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_FAILURE);
 
             if (null !== $response = $event->getResponse()) {
                 return $response;
