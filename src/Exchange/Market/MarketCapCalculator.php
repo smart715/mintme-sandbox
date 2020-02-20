@@ -55,7 +55,7 @@ class MarketCapCalculator
         $this->tokenSupply = $tokenSupply;
         $this->moneyWrapper = $moneyWrapper;
         $this->rpc = $rpc;
-        
+
         /** @var MarketStatusRepository $newRepository */
         $newRepository = $em->getRepository(MarketStatus::class);
 
