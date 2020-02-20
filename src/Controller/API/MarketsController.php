@@ -36,7 +36,9 @@ class MarketsController extends APIController
         MarketFactoryInterface $marketManager
     ): View {
 
-        $markets = $marketManager->createUserRelated($this->getUser());
+        /** @var  User|null $currentUser */
+        $currentUser = $this->getUser();
+        $markets     = $marketManager->createUserRelated($currentUser);
 
         return $this->view($markets);
     }
@@ -51,9 +53,12 @@ class MarketsController extends APIController
         ParamFetcherInterface $request,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
+
+        /** @var  User|null $currentUser */
+        $currentUser = $this->getUser();
         $markets = $request->get('user')
             ? $marketStatusManager->getUserMarketStatus(
-                $this->getUser(),
+                $currentUser,
                 ($page - 1) * self::OFFSET,
                 self::OFFSET
             )
@@ -61,8 +66,8 @@ class MarketsController extends APIController
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,
-            'rows' => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
-            'limit' => self::OFFSET,
+            'rows'    => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
+            'limit'   => self::OFFSET,
         ]);
     }
 
