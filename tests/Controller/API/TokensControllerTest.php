@@ -388,7 +388,7 @@ class TokensControllerTest extends WebTestCase
         $this->sendWeb($email);
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/deploy');
-        $res = json_decode($this->client->getResponse()->getContent(), true);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('balance', $res);
         $this->assertArrayHasKey('webCost', $res);

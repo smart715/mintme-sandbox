@@ -48,7 +48,7 @@ class WalletControllerTest extends WebTestCase
         $this->client->request('GET', '/wallet/withdraw/' . $pendingWithdraw->getHash());
         $this->client->followRedirect();
 
-        /** @var PendingWithdraw $pendingWithdraw */
+        /** @var PendingWithdraw|null $pendingWithdraw */
         $pendingWithdraw = $this->em->getRepository(PendingWithdraw::class)->findOneBy([
             'address' => $res['WEB'],
         ]);
@@ -92,7 +92,7 @@ class WalletControllerTest extends WebTestCase
         $this->client->request('GET', '/wallet/withdraw/' . $pendingWithdraw->getHash());
         $this->client->followRedirect();
 
-        /** @var PendingTokenWithdraw $pendingWithdraw */
+        /** @var PendingTokenWithdraw|null $pendingWithdraw */
         $pendingWithdraw = $this->em->getRepository(PendingTokenWithdraw::class)->findOneBy([
             'address' => $res['TOK'],
         ]);
