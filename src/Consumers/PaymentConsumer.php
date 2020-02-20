@@ -137,8 +137,7 @@ class PaymentConsumer implements ConsumerInterface
             }
         } elseif (self::STATUS_OK === $clbResult->getStatus()) {
             $this->eventDispatcher->dispatch(
-                new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount()),
-                WithdrawCompletedEvent::NAME
+                new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount())
             );
         }
 

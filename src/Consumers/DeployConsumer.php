@@ -62,6 +62,8 @@ class DeployConsumer implements ConsumerInterface
                 return true;
             }
 
+            /** @var Token $token */
+
             if (!$clbResult->getAddress()) {
                 if (null !== $token->getDeployCost()) {
                     $this->balanceHandler->deposit(
