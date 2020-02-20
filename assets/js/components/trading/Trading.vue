@@ -36,11 +36,7 @@
                 v-model="marketFilters.selectedFilter"
             >
                 <template slot="button-content">
-                    <span v-for="item in marketFilters.options" :key="item.key" >
-                        <template v-if="item.key === marketFilters.selectedFilter">
-                            {{item.label}}
-                        </template>
-                    </span>
+                    <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
                 </template>
                 <template>
                     <b-dropdown-item
