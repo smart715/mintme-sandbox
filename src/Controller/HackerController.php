@@ -173,7 +173,7 @@ class HackerController extends AbstractController
         $this->eventDispatcher->dispatch($event);
 
         $event = new FormEvent($this->createForm(RegistrationType::class, $user), $request);
-        $this->eventDispatcher->dispatch($event,);
+        $this->eventDispatcher->dispatch($event);
 
         $this->eventDispatcher->dispatch(
             new FilterUserResponseEvent($user, $request, $response)
