@@ -112,7 +112,6 @@ class HackerController extends AbstractController
      * @param Request                      $request
      * @param UserManagerInterface         $userManager
      * @param UserPasswordEncoderInterface $passwordEncoder
-     *
      * @return Response
      */
     public function quickRegistration(
@@ -144,7 +143,6 @@ class HackerController extends AbstractController
      * @param UserManagerInterface         $userManager
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param string                       $email
-     *
      * @return RedirectResponse $response
      */
     private function doQuickRegistration(
@@ -177,7 +175,6 @@ class HackerController extends AbstractController
         $this->eventDispatcher->dispatch(
             new FilterUserResponseEvent($user, $request, $response),
             FOSUserEvents::REGISTRATION_COMPLETED
-
         );
 
         $user->setEnabled(true);
@@ -190,7 +187,6 @@ class HackerController extends AbstractController
         $this->eventDispatcher->dispatch(
             new FilterUserResponseEvent($user, $request, $response),
             FOSUserEvents::REGISTRATION_CONFIRMED
-
         );
 
         return $response;

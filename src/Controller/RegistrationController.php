@@ -170,7 +170,6 @@ class RegistrationController extends FOSRegistrationController
                 $this->eventDispatcher->dispatch(
                     new FilterUserResponseEvent($user, $request, $response),
                     FOSUserEvents::REGISTRATION_COMPLETED
-
                 );
 
                 return $response;

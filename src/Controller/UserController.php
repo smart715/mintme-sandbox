@@ -241,7 +241,6 @@ class UserController extends AbstractController
                     )
                 ),
                 FOSUserEvents::CHANGE_PASSWORD_COMPLETED
-
             );
         }
 
