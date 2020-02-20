@@ -89,6 +89,7 @@ class OrdersController extends DevApiController
      */
     public function getActiveOrders(ParamFetcherInterface $request): array
     {
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
         $markets = $this->marketFactory->createUserRelated($user);
 
@@ -129,7 +130,9 @@ class OrdersController extends DevApiController
      */
     public function getFinishedOrders(ParamFetcherInterface $request): array
     {
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
+
         $markets = $this->marketFactory->createUserRelated($user);
 
         if (!$markets) {
@@ -195,8 +198,12 @@ class OrdersController extends DevApiController
         }
 
         $market = new Market($base, $quote);
+
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
         $tradeResult = $exchanger->placeOrder(
-            $this->getUser(),
+            $user,
             $market,
             (string)$request->get('amountInput'),
             (string)$request->get('priceInput'),
@@ -239,7 +246,10 @@ class OrdersController extends DevApiController
             throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
         }
 
-        $order = Order::createCancelOrder($id, $this->getUser(), new Market($base, $quote));
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
+        $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
 
         $this->trader->cancelOrder($order);
         $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);

@@ -14,6 +14,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Rest\Route("/api/users")
@@ -135,7 +136,10 @@ class UsersController extends AbstractFOSRestController
         return $this->getDoctrine()->getManager();
     }
 
-    protected function getUser(): User
+    /**
+     * @return UserInterface|object|null
+     */
+    protected function getUser()
     {
         return parent::getUser();
     }

@@ -253,7 +253,9 @@ class TokensController extends AbstractFOSRestController
         }
 
         if (!$lock->getId() || $isNotExchanged) {
-            $balance = $balanceHandler->balance($this->getUser(), $token);
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+            $balance = $balanceHandler->balance($user, $token);
 
             if ($balance->isFailed()) {
                 return $this->view('Service unavailable now. Try later', Response::HTTP_BAD_REQUEST);
@@ -310,9 +312,12 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
             $common = $balanceHandler->balances(
-                $this->getUser(),
-                $this->getUser()->getTokens()
+                $user,
+                $user->getTokens()
             );
         } catch (BalanceException $exception) {
             if (BalanceException::EMPTY == $exception->getCode()) {
@@ -323,7 +328,7 @@ class TokensController extends AbstractFOSRestController
         }
 
         $predefined = $balanceHandler->balances(
-            $this->getUser(),
+            $user,
             $this->tokenManager->findAllPredefined()
         );
 
@@ -473,6 +478,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
         $message = null;
 
@@ -531,9 +537,12 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
             $balances = [
                 'balance' => $balanceHandler->balance(
-                    $this->getUser(),
+                    $user,
                     Token::getFromSymbol(Token::WEB_SYMBOL)
                 )->getAvailable(),
                 'webCost' => $costFetcher->getDeployWebCost(),
@@ -569,7 +578,10 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
-            $deployment->execute($this->getUser(), $token);
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
+            $deployment->execute($user, $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
@@ -601,6 +613,7 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
+
             $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 

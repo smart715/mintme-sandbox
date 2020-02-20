@@ -53,8 +53,10 @@ class WalletController extends AbstractFOSRestController
         int $page,
         WalletInterface $wallet
     ): array {
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
         return $wallet->getWithdrawDepositHistory(
-            $this->getUser(),
+            $user,
             ($page - 1) * self::DEPOSIT_WITHDRAW_HISTORY_LIMIT,
             self::DEPOSIT_WITHDRAW_HISTORY_LIMIT
         );
@@ -89,9 +91,13 @@ class WalletController extends AbstractFOSRestController
             ], Response::HTTP_BAD_REQUEST);
         }
 
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
         try {
+
             $pendingWithdraw = $wallet->withdrawInit(
-                $this->getUser(),
+                $user,
                 new Address(trim((string)$request->get('address'))),
                 new Amount($moneyWrapper->parse(
                     $request->get('amount'),
@@ -105,7 +111,7 @@ class WalletController extends AbstractFOSRestController
             ], Response::HTTP_BAD_GATEWAY);
         }
 
-        $mailer->sendWithdrawConfirmationMail($this->getUser(), $pendingWithdraw);
+        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
         $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
@@ -124,12 +130,15 @@ class WalletController extends AbstractFOSRestController
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
          $depositAddresses = $depositCommunicator->getDepositCredentials(
-             $this->getUser(),
+             $user,
              $cryptoManager->findAll()
          );
 
-        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($this->getUser());
+        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($user);
 
         return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
     }
@@ -168,8 +177,11 @@ class WalletController extends AbstractFOSRestController
             throw new InvalidArgumentException();
         }
 
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
         return $this->view([
-            'balance' => $balanceHandler->balance($this->getUser(), $webToken)->getReferral(),
+            'balance' => $balanceHandler->balance($user, $webToken)->getReferral(),
             'token' => $webToken,
         ]);
     }

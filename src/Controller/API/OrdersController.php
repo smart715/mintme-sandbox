@@ -70,7 +70,7 @@ class OrdersController extends AbstractFOSRestController
 
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
-        
+
         foreach ($request->get('orderData') as $id) {
             $order = new Order(
                 $id,
@@ -168,7 +168,9 @@ class OrdersController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
+
         $markets = $this->marketManager->createUserRelated($user);
 
         if (!$markets) {
