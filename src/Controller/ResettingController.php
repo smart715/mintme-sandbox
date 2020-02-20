@@ -85,7 +85,6 @@ class ResettingController extends FOSResettingController
             $response = $this->redirectToRoute('fos_user_security_login', [], 301);
 
             $this->eventDispatcher->dispatch(
-                FOSUserEvents::RESETTING_RESET_COMPLETED,
                 new FilterUserResponseEvent($user, $request, $response)
             );
 
