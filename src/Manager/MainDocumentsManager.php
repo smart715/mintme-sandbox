@@ -16,7 +16,7 @@ class MainDocumentsManager implements MainDocumentsManagerInterfaces
     {
         /** @var EntityRepository $repository */
         $repository = $em->getRepository(MainDocument::class);
-        
+
         $this->mainDocsRepo = $repository;
     }
 
