@@ -311,10 +311,10 @@ class TokensController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
-        try {
-            /** @var  \App\Entity\User $user*/
-            $user = $this->getUser();
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
 
+        try {
             $common = $balanceHandler->balances(
                 $user,
                 $user->getTokens()

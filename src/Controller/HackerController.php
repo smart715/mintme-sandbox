@@ -69,8 +69,11 @@ class HackerController extends AbstractController
         $amount = self::BTC_SYMBOL === $crypto->getSymbol() ?
             '0.001' : '100';
 
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
         $balanceHandler->deposit(
-            $this->getUser(),
+            $user,
             Token::getFromCrypto($crypto),
             $moneyWrapper->parse($amount, $crypto->getSymbol())
         );
@@ -167,26 +170,24 @@ class HackerController extends AbstractController
         $response = new RedirectResponse($url);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_INITIALIZE);
+        $this->eventDispatcher->dispatch($event);
 
         $event = new FormEvent($this->createForm(RegistrationType::class, $user), $request);
-        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
+        $this->eventDispatcher->dispatch($event,);
 
         $this->eventDispatcher->dispatch(
-            new FilterUserResponseEvent($user, $request, $response),
-            FOSUserEvents::REGISTRATION_COMPLETED
+            new FilterUserResponseEvent($user, $request, $response)
         );
 
         $user->setEnabled(true);
         $user->setConfirmationToken(null);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_CONFIRM);
+        $this->eventDispatcher->dispatch($event);
         $userManager->updateUser($user);
 
         $this->eventDispatcher->dispatch(
-            new FilterUserResponseEvent($user, $request, $response),
-            FOSUserEvents::REGISTRATION_CONFIRMED
+            new FilterUserResponseEvent($user, $request, $response)
         );
 
         return $response;

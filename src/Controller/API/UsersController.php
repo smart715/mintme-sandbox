@@ -59,7 +59,10 @@ class UsersController extends AbstractFOSRestController
             throw new ApiBadRequestException("Keys already created");
         }
 
-        $keys = ApiKey::fromNewUser($this->getUser());
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
+        $keys = ApiKey::fromNewUser($user);
 
         $this->getEm()->persist($keys);
         $this->getEm()->flush();
@@ -74,7 +77,9 @@ class UsersController extends AbstractFOSRestController
      */
     public function invalidateApiKeys(): void
     {
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
+
         $keys = $user->getApiKey();
 
         if (!$keys) {
@@ -92,7 +97,9 @@ class UsersController extends AbstractFOSRestController
      */
     public function createApiClient(): array
     {
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
+
         /** @var Client $client */
         $client = $this->clientManager->createClient();
         $client->setAllowedGrantTypes(['client_credentials']);

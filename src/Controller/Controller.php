@@ -17,7 +17,7 @@ abstract class Controller extends AbstractController
 
     /**
      * @param mixed $object
-     * @return array|ArrayObject|bool|float|int|string|null
+     * @return App\Controller\ArrayObject|array|bool|float|int|string|null
      */
     protected function normalize($object)
     {
