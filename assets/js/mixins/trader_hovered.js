@@ -23,6 +23,7 @@ export default {
                 boundary: 'viewport',
                 show: 300,
                 hide: 100,
+                customClass: 'tooltip-traders',
             };
         },
         orderSide: function() {
