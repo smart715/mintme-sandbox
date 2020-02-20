@@ -182,15 +182,18 @@ class TokenController extends Controller
             }
 
             try {
+                /** @var  \App\Entity\User $user*/
+                $user = $this->getUser();
+
                 $balanceHandler->deposit(
-                    $this->getUser(),
+                    $user,
                     $token,
                     $moneyWrapper->parse(
                         (string)$this->getParameter('token_quantity'),
                         MoneyWrapper::TOK_SYMBOL
                     )
                 );
-                $market = $this->marketManager->createUserRelated($this->getUser());
+                $market = $this->marketManager->createUserRelated($user);
 
                 $marketStatusManager->createMarketStatus($market);
 

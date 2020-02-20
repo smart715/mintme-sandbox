@@ -26,6 +26,7 @@ class UserAdminCRUDController extends Controller
         MailerInterface $mailer
     ): RedirectResponse {
         $id = $request->get($this->admin->getIdParameter());
+        /** @var  \App\Entity\User $user*/
         $user = $this->admin->getObject($id);
 
         if (!$user) {
