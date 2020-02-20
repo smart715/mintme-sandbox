@@ -175,8 +175,8 @@ class TokenManager implements TokenManagerInterface
             : null;
     }
 
-    public function getUserDeployedTokens(User $user): array
+    public function getDeployedTokens(): array
     {
-        return $this->repository->getUserDeployedTokens($user);
+        return $this->repository->getDeployedTokens();
     }
 }

@@ -307,6 +307,7 @@ class MarketHandler implements MarketHandlerInterface
 
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo
     {
+        //dump('aqio');exit();
         $result = $this->marketFetcher->getMarketInfo(
             $this->marketNameConverter->convert($market),
             $period

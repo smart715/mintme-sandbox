@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Profile;
 use App\Entity\Token\Token;
-use App\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 class TokenRepository extends EntityRepository
@@ -55,12 +54,10 @@ class TokenRepository extends EntityRepository
      * @codeCoverageIgnore
      * @return Token[]
      */
-    public function getUserDeployedTokens(User $user): array
+    public function getDeployedTokens(): array
     {
         return $this->createQueryBuilder('token')
-            ->where('token.profile = ?1')
-            ->andWhere('token.deployed IS NOT NULL')
-            ->setParameter(1, $user->getProfile())
+            ->where('token.deployed IS NOT NULL')
             ->getQuery()
             ->execute();
     }
