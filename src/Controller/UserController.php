@@ -249,15 +249,14 @@ class UserController extends AbstractController
                         $apiKey,
                         $user->GetApiClients()
                     )
-                ),
-                FOSUserEvents::CHANGE_PASSWORD_COMPLETED
+                )
             );
         }
 
         return $passwordForm;
     }
 
-    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, array $clients): Response
+    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, ?array $clients): Response
     {
         return $this->render('pages/settings.html.twig', [
             'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
