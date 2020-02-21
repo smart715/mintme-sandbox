@@ -3,7 +3,6 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
-use App\Exception\ApiBadRequestException;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -11,15 +10,12 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -140,27 +136,6 @@ class OrdersController extends AbstractFOSRestController
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
         ];
-    }
-
-    /**
-     * @Rest\Get("/{base}/{quote}/traders", name="traders_with_similar_orders", options={"expose"=true})
-     * @Rest\QueryParam(name="params", allowBlank=false)
-     * @Rest\View()
-     * @throws ApiBadRequestException
-     * @return mixed[]
-     */
-    public function getTradersWithSimilarOrders(Market $market, ParamFetcherInterface $request): array
-    {
-        $params = $request->get('params') ?: [];
-        $side = $params['side'] ?? null;
-        $user = $params['ownerId'] ?? null;
-        $price = $params['price'] ?? null;
-
-        if (!$side || !$user || !$price) {
-            throw new ApiBadRequestException('Invalid request param!');
-        }
-
-        return $this->marketHandler->getTradersByOrderPrice($market, (int)$side, (int)$user, (string)$price);
     }
 
     /**

@@ -51,23 +51,4 @@ class UserRepository extends EntityRepository
 
             return 0 != count($user);
     }
-
-    /** @codeCoverageIgnore */
-    public function getTradersData(array $users): array
-    {
-        return $this->createQueryBuilder('u', 'u.id')
-            ->select([
-                'u.id',
-                'p.firstName',
-                'p.lastName',
-                'p.anonymous',
-                'p.page_url',
-            ])
-            ->leftJoin('u.profile', 'p')
-            ->andWhere('u.id IN (:users)')
-            ->andWhere('u.enabled = 1')
-            ->setParameter('users', $users)
-            ->getQuery()
-            ->getArrayResult();
-    }
 }

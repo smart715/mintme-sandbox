@@ -23,7 +23,6 @@ class MarketHandler implements MarketHandlerInterface
     public const BUY = 2;
 
     private const MONTH_PERIOD = 2592000;
-    private const COUNT_TRADERS_TO_SHOW = 5;
 
     /** @var MarketFetcherInterface */
     private $marketFetcher;
@@ -183,50 +182,6 @@ class MarketHandler implements MarketHandlerInterface
                 $market
             );
         }, $stats);
-    }
-
-    public function getTradersByOrderPrice(Market $market, int $side, int $user, string $price, int $limit = 100): array
-    {
-        $pendingOrders = $this->marketFetcher->getPendingOrders(
-            $this->marketNameConverter->convert($market),
-            0,
-            $limit,
-            $side
-        );
-
-        $priceObj = $this->moneyWrapper->parse($price, MoneyWrapper::TOK_SYMBOL);
-        $filteredOrders = array_filter($pendingOrders, function (array $orderData) use ($priceObj, $user) {
-            $orderPriceObj = $this->moneyWrapper->parse($orderData['price'], MoneyWrapper::TOK_SYMBOL);
-
-            return $priceObj->equals($orderPriceObj) && $user !== $orderData['user'];
-        });
-
-        uasort($filteredOrders, function (array $lOrder, array $rOrder) {
-            return intval($lOrder['ctime']) > intval($rOrder['ctime']);
-        });
-
-        $usersIds = array_column($filteredOrders, 'user');
-        // Order maker should be shown too, at first position.
-        array_unshift($usersIds, $user);
-        $usersIds = array_unique($usersIds);
-        $tradersResultArray = [];
-        $tradersData = $this->userManager->getTradersData($usersIds);
-
-        // Reorder users after fetching
-        foreach ($usersIds as $userId) {
-            if (isset($tradersData[$userId])) {
-                $tradersResultArray[] = $tradersData[$userId];
-            }
-        }
-
-        $tradersCount = count($tradersResultArray);
-
-        return [
-            'moreCount' => $tradersCount > self::COUNT_TRADERS_TO_SHOW
-                ? $tradersCount - self::COUNT_TRADERS_TO_SHOW
-                : 0,
-            'tradersData' => array_slice($tradersResultArray, 0, self::COUNT_TRADERS_TO_SHOW, true),
-        ];
     }
 
     /** @return Order[] */
