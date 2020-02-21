@@ -45,12 +45,7 @@ export default {
                 }
 
                 tradersIdsArray.push(order.maker.id);
-
-                if (order.maker.profile.anonymous) {
-                    tradersArray.push('Anonymous');
-                } else {
-                    tradersArray.push(self.createTraderLinkFromOrder(order));
-                }
+                tradersArray.push(self.createTraderLinkFromOrder(order));
             });
 
             if (tradersArray.length > 5) {
@@ -66,6 +61,10 @@ export default {
             this.tooltipData = content;
         },
         createTraderLinkFromOrder: function(order) {
+            if (order.maker.profile === null || order.maker.profile.anonymous) {
+                return 'Anonymous';
+            }
+
             let traderFullName = order.maker.profile.firstName + ' ' + order.maker.profile.lastName;
             let link = this.$routing.generate('profile-view', {
                 'pageUrl': order.maker.profile.page_url,

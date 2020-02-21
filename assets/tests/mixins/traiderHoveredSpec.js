@@ -26,7 +26,7 @@ describe('TraiderHoveredMixin', function() {
         expect(wrapper.vm.popoverConfig.boundary).to.be.equal('viewport');
     });
 
-    it('should not react (tooltip content not changing) on hover event', () => {
+    it('should create link to trader\'s profile from order data', () => {
         let order = {
             maker: {
                 profile: {
@@ -39,5 +39,17 @@ describe('TraiderHoveredMixin', function() {
         let link = '<a href="' + $url + '">User Test</a>';
 
         expect(wrapper.vm.createTraderLinkFromOrder(order)).to.be.equal(link);
+    });
+
+    it('should not create link to trader\'s profile from order data for anonymous', () => {
+        let order = {
+            maker: {
+                profile: {
+                    anonymous: true,
+                },
+            },
+        };
+
+        expect(wrapper.vm.createTraderLinkFromOrder(order)).to.be.equal('Anonymous');
     });
 });
