@@ -4,6 +4,10 @@
 
 {% block bodyclass %}trading{% endblock %}
 
+{% block spinnerblock %}
+    {{ include('spinner.html.twig', {'additiveClass': 'is-full-page', 'backgroundColor': '#0B2D48', 'opacity': 1}) }}
+{% endblock %}
+
 {% block content %}
     <div id="trading" class="container-fluid">
         <div class="row pt-5 justify-content-center">
@@ -29,4 +33,5 @@
 
 {% block pagescripts %}
     <script src="{{ asset('build/trading.js') }}"></script>
+    <script src="{{ asset('build/page_load_spinner.js') }}"></script>
 {% endblock %}
