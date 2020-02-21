@@ -15,7 +15,7 @@ class ReciprocalLinksManager implements ReciprocalLinksManagerInterface
     {
         /** @var EntityRepository $repository */
         $repository = $entityManager->getRepository(ReciprocalLinks::class);
-        $this->repository = $entityManager->getRepository(ReciprocalLinks::class);
+        $this->repository = $repository;
     }
 
     /**
