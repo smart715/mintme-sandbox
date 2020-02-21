@@ -13,6 +13,8 @@ class ReciprocalLinksManager implements ReciprocalLinksManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
+        /** @var EntityRepository $repository */
+        $repository = $entityManager->getRepository(ReciprocalLinks::class);
         $this->repository = $entityManager->getRepository(ReciprocalLinks::class);
     }
 

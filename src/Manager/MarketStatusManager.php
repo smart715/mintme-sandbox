@@ -42,7 +42,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler
     ) {
-        /** @var MarketStatus $repository */
+        /** @var MarketStatusRepository $repository */
         $repository = $em->getRepository(MarketStatus::class);
         $this->repository = $repository;
 

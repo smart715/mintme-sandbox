@@ -38,7 +38,9 @@ class TokenManager implements TokenManagerInterface
         CryptoManagerInterface $cryptoManager,
         Config $config
     ) {
-        $this->repository = $em->getRepository(Token::class);
+        /** @var TokenRepository $repository */
+        $repository = $em->getRepository(Token::class);
+        $this->repository = $repository;
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
@@ -152,7 +154,7 @@ class TokenManager implements TokenManagerInterface
         if (null !== $toDashedToken && $tokenName !== $toDashedTokenName) {
             return true;
         }
-        
+
         $toSpaceTokenName = str_replace('-', ' ', $tokenName);
         $toSpaceToken = $this->findByName($toSpaceTokenName);
 
