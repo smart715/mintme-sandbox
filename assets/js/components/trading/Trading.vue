@@ -43,6 +43,7 @@
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
+                    thead-class="trading-head"
                     :items="tokens"
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"
@@ -104,7 +105,7 @@
                                     <img src="../../../img/mintmecoin_W.png" alt="deployed">
                                 </template>
                                 <template slot="body">
-                                    This token exists on the blockchain.
+                                    This token exists on blockchain.
                                 </template>
                             </guide>
                         </div>
