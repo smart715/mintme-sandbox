@@ -5,10 +5,11 @@
 {% block bodyclass %}wallet{% endblock %}
 
 {% block spinnerblock %}
-    {{ include('spinner.html.twig', {'additiveClass': 'is-full-page', 'backgroundColor': '#0B2D48', 'opacity': 1}) }}
+    {{ include('spinner.html.twig') }}
 {% endblock %}
 
 {% block content %}
+    <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
     <div id="wallet" class="container">
         <div class="row pt-5 justify-content-center">
             <div class="col-md-12 card-fixed-large px-0 text-white">
@@ -45,5 +46,4 @@
 
 {% block pagescripts %}
     <script src="{{ asset('build/wallet.js') }}"></script>
-    <script src="{{ asset('build/page_load_spinner.js') }}"></script>
 {% endblock %}

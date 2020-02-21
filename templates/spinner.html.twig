@@ -1,19 +1,11 @@
 <div id="page-load-spinner">
     <div class="vld-parent">
-        <div tabindex="0"
-             class="vld-overlay is-active {% if additiveClass is defined %}{{ additiveClass }}{% endif %}"
-             aria-label="Loading"
-             {% if zIndex is defined %}style=" zIndex: {{ zIndex }}"{% endif %}>
-            <div class="vld-background"
-                    {% if backgroundColor is defined or opacity is defined %}
-            style="{% if backgroundColor is defined %}background: {{ backgroundColor }};{% endif %} {% if opacity is defined %} opacity: {{ opacity }} {% endif %}"{% endif %}>
+        <div tabindex="0" class="vld-overlay is-active is-full-page" aria-label="Loading">
+            <div class="vld-background" >
             </div>
-            <div class="vld-icon"
-                    {% if image is defined or imageWidth is defined or imageHeight is defined %}
-            style="{% if image is defined %}background-image: url('{{ image }}'); {% endif %} {% if imageWidth is defined %}width: {{ imageWidth }}; {% endif %} {% if imageHeight is defined %} height: {{ imageHeight }} {% endif %}"{% endif %}>
+            <div class="vld-icon">
 
             </div>
         </div>
     </div>
 </div>
-<page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner"></page-load-spinner>

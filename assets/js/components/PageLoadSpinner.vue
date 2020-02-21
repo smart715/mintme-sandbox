@@ -4,11 +4,13 @@
     props: {
       spinnerDiv: {type: String, required: true},
     },
-    mounted() {
-      document.getElementById(this.spinnerDiv).classList.add('hidden');
-    },
     render() {
       return null;
+    },
+    methods: {
+      hide: function() {
+        document.getElementById(this.spinnerDiv).classList.add('hidden');
+      },
     },
   };
 </script>

@@ -148,6 +148,7 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
+import Spinner from '../PageLoadSpinner';
 import {
     WebSocketMixin,
     FiltersMixin,
@@ -173,6 +174,7 @@ export default {
     components: {
         WithdrawModal,
         DepositModal,
+        PageLoadSpinner,
     },
     props: {
         withdrawUrl: {type: String, required: true},
@@ -291,8 +293,10 @@ export default {
         ])
         .then(() => {
             this.openDepositMore();
+            this.$refs.spinner.hide();
         })
         .catch((err) => {
+            this.$refs.spinner.hide();
             this.notifyError('Can not load Wallet data. Try again later.');
             this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
         });
