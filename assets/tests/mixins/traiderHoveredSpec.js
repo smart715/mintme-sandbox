@@ -3,17 +3,20 @@ import {shallowMount} from '@vue/test-utils';
 import TraiderHoveredMixin from '../../js/mixins/trader_hovered';
 
 describe('TraiderHoveredMixin', function() {
+    const $url = 'URL';
+    const $routing = {generate: () => $url};
     const Component = Vue.component('foo', {
         mixins: [TraiderHoveredMixin],
     });
 
-    const wrapper = shallowMount(Component);
+    const wrapper = shallowMount(Component, {
+        mocks: {
+            $routing,
+        },
+    });
 
     it('should show tooltip content', () => {
         expect(wrapper.vm.tooltipContent).to.be.equal('Loading...');
-
-        wrapper.vm.tooltipData = 'No data.';
-        expect(wrapper.vm.tooltipContent).to.be.equal('No data.');
     });
 
     it('should return popover config object', () => {
@@ -21,21 +24,20 @@ describe('TraiderHoveredMixin', function() {
         expect(wrapper.vm.popoverConfig.title).to.be.equal('Loading...');
         expect(wrapper.vm.popoverConfig.html).to.be.true;
         expect(wrapper.vm.popoverConfig.boundary).to.be.equal('viewport');
-        expect(wrapper.vm.popoverConfig.show).to.be.equal(300);
-        expect(wrapper.vm.popoverConfig.hide).to.be.equal(100);
-    });
-
-    it('should return order side', () => {
-        wrapper.vm.side = '1';
-        expect(wrapper.vm.orderSide).to.be.equal('1');
-
-        wrapper.vm.side = '2';
-        expect(wrapper.vm.orderSide).to.be.equal('2');
     });
 
     it('should not react (tooltip content not changing) on hover event', () => {
-        wrapper.vm.isLoading = true;
-        wrapper.vm.mouseoverHandler();
-        expect(wrapper.vm.tooltipContent).to.be.equal('Loading...');
+        let order = {
+            maker: {
+                profile: {
+                    firstName: 'User',
+                    lastName: 'Test',
+                    page_url: 'test-user',
+                },
+            },
+        };
+        let link = '<a href="' + $url + '">User Test</a>';
+
+        expect(wrapper.vm.createTraderLinkFromOrder(order)).to.be.equal(link);
     });
 });
