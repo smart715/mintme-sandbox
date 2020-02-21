@@ -1,16 +1,10 @@
+import {toMoney} from '../utils';
+
 export default {
     data() {
         return {
             tooltipData: 'Loading...',
-            side: '',
-            isLoading: false,
         };
-    },
-    mounted: function() {
-        this.$root.$on('bv::tooltip::hidden', () => {
-            this.tooltipData = 'Loading...';
-            this.isLoading = false;
-        });
     },
     computed: {
         tooltipContent: function() {
@@ -21,69 +15,63 @@ export default {
                 title: this.tooltipContent,
                 html: true,
                 boundary: 'viewport',
-                show: 300,
-                hide: 100,
                 customClass: 'tooltip-traders',
             };
         },
-        orderSide: function() {
-            return this.side;
-        },
     },
     methods: {
-        mouseoverHandler: function(event) {
-            if (this.isLoading) {
+        mouseoverHandler: function(ownerId, price) {
+            if (!ownerId || !price) {
                 return;
             }
 
-            let target = event.target;
+            let moreCount = 0;
+            let tradersArray = [];
+            let tradersIdsArray = [];
+            let basePrecision = this.basePrecision;
 
-            if (target.hasAttribute('data-owner-id') && target.hasAttribute('data-price')) {
-                this.orderTraderHovered({
-                    side: this.orderSide,
-                    ownerId: target.getAttribute('data-owner-id'),
-                    price: target.getAttribute('data-price'),
-                });
-            }
-        },
-        orderTraderHovered: function(params) {
-            let that = this;
-            this.isLoading = true;
-
-            this.$axios.retry.get(this.$routing.generate('traders_with_similar_orders', {
-                base: this.$parent.market.base.symbol,
-                quote: this.$parent.market.quote.symbol,
-                params,
-            })).then((response) => {
-                let tradersData = response.data.tradersData || [];
-                let moreCount = response.data.moreCount || 0;
-                let tradersArray = [];
-                let content = 'No data.';
-
-                tradersData.forEach(function(traderData) {
-                    if (traderData.anonymous) {
-                        tradersArray.push('Anonymous');
-                    } else {
-                        let traderFullName = traderData.firstName + ' ' + traderData.lastName;
-                        let link = that.$routing.generate('profile-view', {
-                            'pageUrl': traderData.page_url,
-                        });
-
-                        tradersArray.push('<a href="' + link + '">' + traderFullName + '</a>');
-                    }
-                });
-
-                if (tradersArray.length > 0) {
-                    content = tradersArray.join(', ');
-                }
-
-                if (moreCount > 0) {
-                    content += ' and ' + moreCount + ' more.';
-                }
-
-                this.tooltipData = content;
-                this.isLoading = false;
+            let hoveredOrder = this.fullOrdersList.find((order) => parseInt(order.maker.id) === parseInt(ownerId));
+            tradersArray.push(this.createTraderLinkFromOrder(hoveredOrder));
+            let orders = this.fullOrdersList.filter(function(order) {
+                return price === toMoney(order.price, basePrecision) && parseInt(ownerId) !== parseInt(order.maker.id);
             });
+
+            let self = this;
+            orders.sort((a, b) => a.timestamp - b.timestamp);
+            orders.forEach(function(order) {
+                // Avoid duplicates
+                if (tradersIdsArray.includes(order.maker.id)) {
+                    return;
+                }
+
+                tradersIdsArray.push(order.maker.id);
+
+                if (order.maker.profile.anonymous) {
+                    tradersArray.push('Anonymous');
+                } else {
+                    tradersArray.push(self.createTraderLinkFromOrder(order));
+                }
+            });
+
+            if (tradersArray.length > 5) {
+                moreCount = tradersArray.length - 5;
+                tradersArray = tradersArray.slice(0, 5);
+            }
+
+            let content = tradersArray.join(', ');
+            if (moreCount > 0) {
+                content += ' and ' + moreCount + ' more.';
+            }
+
+            this.tooltipData = content;
+        },
+        createTraderLinkFromOrder: function(order) {
+            let traderFullName = order.maker.profile.firstName + ' ' + order.maker.profile.lastName;
+            let link = this.$routing.generate('profile-view', {
+                'pageUrl': order.maker.profile.page_url,
+            });
+
+            return '<a href="' + link + '">' + traderFullName + '</a>';
         },
     },
 };

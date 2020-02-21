@@ -4,6 +4,7 @@
             <div class="col-12 col-xl-6 pr-xl-2 mt-3">
                 <trade-buy-orders
                     @update-data="updateBuyOrders"
+                    :full-orders-list="allBuyOrders"
                     :orders-list="filteredBuyOrders"
                     :orders-loaded="ordersLoaded"
                     :token-name="market.base.symbol"
@@ -16,6 +17,7 @@
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
                     @update-data="updateSellOrders"
+                    :full-orders-list="allSellOrders"
                     :orders-list="filteredSellOrders"
                     :orders-loaded="ordersLoaded"
                     :token-name="market.quote.symbol"
@@ -100,6 +102,12 @@ export default {
         },
         filteredSellOrders: function() {
             return this.sellOrders ? this.ordersList(this.groupByPrice(this.sellOrders)) : [];
+        },
+        allBuyOrders: function() {
+            return this.buyOrders;
+        },
+        allSellOrders: function() {
+            return this.sellOrders;
         },
     },
     methods: {

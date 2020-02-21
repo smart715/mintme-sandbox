@@ -26,7 +26,13 @@
                         >
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <span v-if="row.item.isAnonymous" class="d-inline-block truncate-name flex-grow-1">
+                                    <span
+                                        v-if="row.item.isAnonymous"
+                                        class="d-inline-block truncate-name flex-grow-1"
+                                        v-b-tooltip="popoverConfig"
+                                        tabindex="0"
+                                        v-on:mouseover="mouseoverHandler(row.item.ownerId, row.item.price)"
+                                    >
                                         {{ row.value }}
                                     </span>
                                     <a
@@ -35,13 +41,11 @@
                                         class="d-flex flex-row flex-nowrap justify-content-between w-100"
                                         v-b-tooltip="popoverConfig"
                                         tabindex="0"
-                                        v-on:mouseover="mouseoverHandler"
-                                        :data-owner-id="row.item.ownerId"
-                                        :data-price="row.item.price"
+                                        v-on:mouseover="mouseoverHandler(row.item.ownerId, row.item.price)"
                                     >
-                                    <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
-                                        {{ row.value }}
-                                    </span>
+                                        <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
+                                            {{ row.value }}
+                                        </span>
                                         <img
                                             src="../../../img/avatar.png"
                                             class="d-block flex-grow-0 pointer-events-none"
@@ -102,6 +106,7 @@ export default {
         TraderHoveredMixin,
     ],
     props: {
+        fullOrdersList: [Array],
         ordersList: [Array],
         tokenName: String,
         fields: Array,
