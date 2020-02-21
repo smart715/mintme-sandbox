@@ -16,6 +16,7 @@ export default {
                 html: true,
                 boundary: 'viewport',
                 customClass: 'tooltip-traders',
+                delay: 0,
             };
         },
     },

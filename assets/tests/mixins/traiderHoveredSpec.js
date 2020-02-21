@@ -24,6 +24,7 @@ describe('TraiderHoveredMixin', function() {
         expect(wrapper.vm.popoverConfig.title).to.be.equal('Loading...');
         expect(wrapper.vm.popoverConfig.html).to.be.true;
         expect(wrapper.vm.popoverConfig.boundary).to.be.equal('viewport');
+        expect(wrapper.vm.popoverConfig.delay).to.be.equal(0);
     });
 
     it('should create link to trader\'s profile from order data', () => {
