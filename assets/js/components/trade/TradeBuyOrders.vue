@@ -86,7 +86,6 @@
 <script>
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
-import {WSAPI} from '../../utils/constants';
 import Decimal from 'decimal.js';
 import {
     LazyScrollTableMixin,
@@ -117,7 +116,6 @@ export default {
     data() {
         return {
             tableData: this.ordersList,
-            side: WSAPI.order.type.BUY,
         };
     },
     components: {
