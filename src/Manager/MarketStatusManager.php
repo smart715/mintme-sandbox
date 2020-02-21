@@ -56,7 +56,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getMarketsInfo(int $offset, int $limit, $apiRequest = true): array
+    public function getMarketsInfo(int $offset, int $limit): array
     {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
