@@ -148,7 +148,7 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import Spinner from '../PageLoadSpinner';
+import PageLoadSpinner from '../PageLoadSpinner';
 import {
     WebSocketMixin,
     FiltersMixin,
@@ -293,7 +293,9 @@ export default {
         ])
         .then(() => {
             this.openDepositMore();
-            this.$refs.spinner.hide();
+            console.log(this.$refs);
+            console.log(this.$refs.spinner);
+            _this.$refs.spinner.hide();
         })
         .catch((err) => {
             this.$refs.spinner.hide();
