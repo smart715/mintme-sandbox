@@ -125,6 +125,7 @@
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
         </template>
+        <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
     </div>
 </template>
 
@@ -136,6 +137,7 @@ import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {tokenDeploymentStatus} from '../../utils/constants';
+import PageLoadSpinner from '../PageLoadSpinner';
 
 export default {
     name: 'Trading',
@@ -150,6 +152,7 @@ export default {
     },
     components: {
         Guide,
+        PageLoadSpinner,
     },
     data() {
         return {
@@ -293,6 +296,7 @@ export default {
                             this.updateMonthVolume(result.id, result.result);
                         }
                     });
+                    this.$refs.spinner.hide();
                 });
         },
         sortCompare: function(a, b, key) {

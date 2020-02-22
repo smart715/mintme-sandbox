@@ -117,6 +117,7 @@
                 </tr>
             </tbody>
         </table>
+        <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
@@ -148,7 +149,8 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import Spinner from '../PageLoadSpinner';
+import PageLoadSpinner from '../PageLoadSpinner';
+
 import {
     WebSocketMixin,
     FiltersMixin,
