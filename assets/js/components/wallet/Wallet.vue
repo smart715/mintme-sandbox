@@ -117,6 +117,7 @@
                 </tr>
             </tbody>
         </table>
+        <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
@@ -293,9 +294,7 @@ export default {
         ])
         .then(() => {
             this.openDepositMore();
-            console.log(this.$refs);
-            console.log(this.$refs.spinner);
-            _this.$refs.spinner.hide();
+            this.$refs.spinner.hide();
         })
         .catch((err) => {
             this.$refs.spinner.hide();
