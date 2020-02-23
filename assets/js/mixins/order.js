@@ -20,7 +20,7 @@ export default {
         depositMoreLink: function() {
             if (this.isMarketBTCOrWEB) {
                 return this.$routing.generate('wallet', {
-                    depositMore: this.marketIdentifier,
+                    depositMore: this.rebrandingFunc(this.marketIdentifier),
                 });
             }
         },
