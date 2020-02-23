@@ -107,7 +107,7 @@
                                     <img src="../../../img/mintmecoin_W.png" alt="deployed">
                                 </template>
                                 <template slot="body">
-                                    This token exists on blockchain.
+                                    This token exists on the blockchain.
                                 </template>
                             </guide>
                         </div>

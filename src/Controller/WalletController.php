@@ -7,6 +7,7 @@ use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
+use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\WalletInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,9 +26,16 @@ class WalletController extends Controller
     /** @var UserActionLogger */
     private $userActionLogger;
 
-    public function __construct(UserActionLogger $userActionLogger, NormalizerInterface $normalizer)
-    {
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
+    public function __construct(
+        UserActionLogger $userActionLogger,
+        NormalizerInterface $normalizer,
+        RebrandingConverterInterface $rebrandingConverter
+    ) {
         $this->userActionLogger = $userActionLogger;
+        $this->rebrandingConverter = $rebrandingConverter;
 
         parent::__construct($normalizer);
     }
@@ -39,9 +47,11 @@ class WalletController extends Controller
      */
     public function wallet(Request $request): Response
     {
+        $depositMore = $request->get('depositMore') ?? '';
+
         return $this->render('pages/wallet.html.twig', [
             'hash' => $this->getUser()->getHash(),
-            'depositMore' => $request->get('depositMore') ?? '',
+            'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
         ]);
     }
 
