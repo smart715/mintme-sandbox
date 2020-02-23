@@ -395,6 +395,23 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals('100.000000000000000000', $res['balance']);
     }
 
+    public function testDeployIfAlreadyDeployed(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        /** @var Token $token */
+        $token = $this->getToken($tokName);
+        $token->setAddress('0x');
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $this->client->request('POST', '/api/tokens/' . $tokName . '/deploy');
+
+        $this->assertEquals($this->client->getResponse()->getStatusCode(), 400);
+    }
+
     public function testDeployWithNoReleasePeriod(): void
     {
         $this->register($this->client);
