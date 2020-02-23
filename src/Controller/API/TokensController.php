@@ -560,6 +560,10 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+            throw new ApiBadRequestException('Token already deployed or deploying');
+        }
+
         if (!$token->getLockIn()) {
             throw new ApiBadRequestException('Token not has released period');
         }
