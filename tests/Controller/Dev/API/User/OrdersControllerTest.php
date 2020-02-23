@@ -189,7 +189,7 @@ class OrdersControllerTest extends WebTestCase
 
         $this->assertCount(1, $res1);
         $this->assertCount(1, $res2);
-        $this->assertEquals('1.000000000000', $res1[0]['price']);
+        $this->assertEquals('2.000000000000', $res1[0]['price']);
         $this->assertEquals('3.000000000000', $res2[0]['price']);
     }
 
@@ -252,7 +252,7 @@ class OrdersControllerTest extends WebTestCase
 
         $this->assertCount(1, $res1);
         $this->assertCount(1, $res2);
-        $this->assertEquals('1.000000000000', $res1[0]['price']);
+        $this->assertEquals('2.000000000000', $res1[0]['price']);
         $this->assertEquals('3.000000000000', $res2[0]['price']);
     }
 
