@@ -14,7 +14,7 @@
                                     <div>
                                         <p>Donation is non-refundable</p>
                                     </div>
-                                    <div class="row">
+                                    <div class="row currency-container">
                                         <div class="col">
                                             <p class="mb-2">Currency</p>
                                             <b-dropdown
@@ -26,7 +26,7 @@
                                                     v-for="option in options"
                                                     :key="option"
                                                     :value="option"
-                                                    @click="selectedCurrency = option"
+                                                    @click="selectedCurrency = option; balanceLoaded = false;"
                                                 >
                                                     {{ option | rebranding }}
                                                 </b-dropdown-item>
@@ -37,9 +37,16 @@
                                             class="col"
                                         >
                                             <p class="mb-2">Your balance:</p>
-                                            <span class="d-block">{{ cryptoBalance | toMoney(marketSubunit) | formatMoney }}</span>
-                                            <span class="d-block text-danger">Insufficient funds for donation,</span>
-                                            <span class="d-block">please make <a :href="getDepositLink">deposit</a> first</span>
+                                            <span v-if="balanceLoaded" class="d-block">
+                                                {{ cryptoBalance | toMoney(marketSubunit) | formatMoney }}
+                                            </span>
+                                            <font-awesome-icon v-else icon="circle-notch" spin class="loading-spinner" fixed-width />
+                                            <div v-if="showWarning">
+                                                <span class="d-block text-danger font-size-90">
+                                                    Insufficient funds for donation,
+                                                </span>
+                                                <span class="d-block">please make <a :href="getDepositLink">deposit</a> first</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div
@@ -49,7 +56,15 @@
                                         <div>
                                             <label for="amount-to-donate">Amount:</label>
                                             <div class="input-group">
-                                                <input id="amount-to-donate" type="text" class="form-control">
+                                                <input
+                                                    v-model="amountToDonate"
+                                                    id="amount-to-donate"
+                                                    type="text"
+                                                    class="form-control"
+                                                    :disabled="!loggedIn"
+                                                    @keypress="checkAmountInput"
+                                                    @paste="checkAmountInput"
+                                                >
                                                 <div class="input-group-append">
                                                     <button class="btn btn-primary" type="button">All</button>
                                                 </div>
@@ -69,7 +84,11 @@
                                         </div>
                                         <div>
                                             <p class="mb-2">Fee for donation: {{ fee }}%</p>
-                                            <button class="btn btn-primary">
+                                            <button
+                                                :disabled="buttonDisabled"
+                                                @click="donateDonation"
+                                                class="btn btn-primary"
+                                            >
                                                 Donate {{ donationCurrency }}
                                             </button>
                                         </div>
@@ -96,8 +115,11 @@ import {
     NotificationMixin,
     LoggerMixin,
     RebrandingFilterMixin,
+    InputValidationMixin,
 } from '../../mixins';
 import Guide from '../Guide';
+import Decimal from 'decimal.js';
+import {toMoney} from '../../utils';
 import {webSymbol, btcSymbol} from '../../utils/constants';
 
 export default {
@@ -107,6 +129,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         RebrandingFilterMixin,
+        InputValidationMixin,
     ],
     components: {
         Guide,
@@ -127,7 +150,9 @@ export default {
             },
             selectedCurrency: null,
             contentLoaded: false,
+            amountToDonate: 0,
             amountToReceive: 0,
+            balanceLoaded: false,
             balance: 0,
         };
     },
@@ -167,6 +192,15 @@ export default {
                 ? this.donationCurrency
                 : 'Select currency';
         },
+        minTotalPrice: function() {
+            return toMoney('1e-' + this.market.base.subunit, this.market.base.subunit);
+        },
+        showWarning: function() {
+            return this.balanceLoaded && (new Decimal(this.balance)).lessThan(this.minTotalPrice);
+        },
+        buttonDisabled: function() {
+            return !this.isCurrencySelected || this.showWarning;
+        },
     },
     mounted() {
         if (!this.loggedIn) {
@@ -196,19 +230,61 @@ export default {
                     this.sendLogs('error', 'Can not load tab content.', err);
                 });
         },
-        getTokenBalanse: function() {
+        getTokenBalance: function() {
             this.$axios.retry.get(this.$routing.generate('crypto_balance', {symbol: this.selectedCurrency}))
-                .then((res) => this.balance = res.data)
+                .then((res) => {
+                    this.balance = res.data;
+                    this.balanceLoaded = true;
+                })
                 .catch((err) => {
-                    this.notifyError('Can not load statistic data. Try again later');
-                    this.sendLogs('error', 'Can not load statistic data', err);
+                    this.notifyError('Can not load balance. Try again later.');
+                    this.sendLogs('error', 'Can not load crypto balance.', err);
+                });
+        },
+        checkAmountInput: function() {
+            return this.checkInput(this.market.base.subunit);
+        },
+        checkDonation: function() {
+            this.$axios.retry.get(this.$routing.generate('donation_check', {
+                market: this.selectedCurrency,
+                amount: this.amountToDonate,
+                fee: this.donationFee,
+            }))
+                .then((res) => this.amountToReceive = res.data)
+                .catch((err) => {
+                    this.notifyError('Can not to calculate approximate amount of tokens. Try again later.');
+                    this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', err);
+                });
+        },
+        donateDonation: function() {
+            this.$axios.single.post(this.$routing.generate('donation_donate', {
+                market: this.selectedCurrency,
+                amount: this.amountToDonate,
+                fee: this.donationFee,
+                expected_count_to_receive: this.amountToReceive,
+            }))
+                .then((response) => {
+                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
+                        this.notifySuccess(response.data.message);
+                    }
+                }, (error) => {
+                    if (!error.response) {
+                        this.notifyError('Network error');
+                        this.sendLogs('error', 'Make donation code network error.', error);
+                    } else if (error.response.data.message) {
+                        this.notifyError(error.response.data.message);
+                        this.sendLogs('error', 'Can not make donation.', error);
+                    } else {
+                        this.notifyError('An error has occurred, please try again later.');
+                        this.sendLogs('error', 'An error has occurred, please try again later.', error);
+                    }
                 });
         },
     },
     watch: {
         selectedCurrency: function() {
             if (this.isCurrencySelected) {
-                this.getTokenBalanse();
+                this.getTokenBalance();
             }
         },
     },
