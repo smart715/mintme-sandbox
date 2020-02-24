@@ -369,7 +369,7 @@ export default {
                 let params = {page};
                 if (this.marketFilters.selectedFilter === 'user') {
                     params.user = 1;
-                } else if (this.marketFilters.selectedFilter === 'deployed' && this.userId) {
+                } else if (this.marketFilters.selectedFilter === 'deployed') {
                     params.deployed = 1;
                 }
                 this.loading = true;
