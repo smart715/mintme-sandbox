@@ -200,11 +200,12 @@ class OrdersControllerTest extends WebTestCase
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        // todo fix then remove the comments
-//        $this->assertEquals('3.000000000000', $res[0]['price']);
-//        $this->assertEquals('2.000000000000', $res[1]['price']);
-//        $this->assertEquals('1.000000000000', $res[2]['price']);
-        $this->assertTrue(true);
+
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals('3.000000000000', $res[0]['price']);
+        $this->assertEquals('2.000000000000', $res[1]['price']);
+        $this->assertEquals('1.000000000000', $res[2]['price']);
     }
 
     public function testGetSellActiveOrdersWithOffset(): void
@@ -392,5 +393,66 @@ class OrdersControllerTest extends WebTestCase
         $this->assertTrue(true);
     }
 
-    // todo testGetBuyActiveOrdersWithOffset
+    public function testGetBuyActiveOrdersWithOffset(): void
+    {
+        $email = $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+        $this->sendWeb($email);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'buy',
+        ]);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 3,
+            'amountInput' => 1,
+            'action' => 'buy',
+        ]);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 2,
+            'amountInput' => 1,
+            'action' => 'buy',
+        ]);
+
+        /** @var User $user */
+        $user = $this->em->getRepository(User::class)->findOneBy([
+            'email' => $email,
+        ]);
+        $keys = ApiKey::fromNewUser($user);
+        $this->em->persist($keys);
+        $this->em->flush();
+
+        $this->client->request('GET', '/dev/api/v1/orders/active', [
+            'base' => 'MINTME',
+            'quote' => $tokName,
+            'side' => 'buy',
+            'offset' => 0,
+            'limit' => 1,
+        ], [], [
+            'HTTP_X-API-ID' => $keys->getPublicKey(),
+            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+        ]);
+        $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->client->request('GET', '/dev/api/v1/orders/active', [
+            'base' => 'MINTME',
+            'quote' => $tokName,
+            'side' => 'buy',
+            'offset' => 1,
+            'limit' => 1,
+        ], [], [
+            'HTTP_X-API-ID' => $keys->getPublicKey(),
+            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+        ]);
+        $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->assertCount(1, $res1);
+        $this->assertCount(1, $res2);
+        $this->assertEquals('3.000000000000', $res1[0]['price']);
+        $this->assertEquals('2.000000000000', $res2[0]['price']);
+    }
 }
