@@ -24,17 +24,6 @@ class WebTestCase extends BaseWebTestCase
         $this->em = self::$container->get('doctrine')->getManager();
     }
 
-    protected function lastUserId(): int
-    {
-        /** @var User[] $users */
-        $users = $this->em->getRepository(User::class)
-            ->findBy([], ['id' => 'DESC'], 1);
-
-        return $users
-            ? $users[0]->getId()
-            : 0;
-    }
-
     protected function register(Client $client): string
     {
         $email = $this->generateEmail();
