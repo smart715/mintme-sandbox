@@ -121,7 +121,6 @@ class WebTestCase extends BaseWebTestCase
 
     /**
      * @param string[] $entities
-     * @throws
      */
     protected function truncateEntities(array $entities): void
     {
