@@ -95,7 +95,7 @@ import {
     MoneyFilterMixin,
     NotificationMixin,
     LoggerMixin,
-    RebrandingFilterMixin
+    RebrandingFilterMixin,
 } from '../../mixins';
 import Guide from '../Guide';
 import {webSymbol, btcSymbol} from '../../utils/constants';
@@ -142,10 +142,10 @@ export default {
         donationCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
         },
-        marketSubunit: function () {
+        marketSubunit: function() {
             return this.market.base.subunit;
         },
-        cryptoBalance: function () {
+        cryptoBalance: function() {
             return this.balance;
         },
         fee: function() {
@@ -196,7 +196,7 @@ export default {
                     this.sendLogs('error', 'Can not load tab content.', err);
                 });
         },
-        getTokenBalanse: function () {
+        getTokenBalanse: function() {
             this.$axios.retry.get(this.$routing.generate('crypto_balance', {symbol: this.selectedCurrency}))
                 .then((res) => this.balance = res.data)
                 .catch((err) => {
@@ -206,11 +206,11 @@ export default {
         },
     },
     watch: {
-        selectedCurrency: function () {
+        selectedCurrency: function() {
             if (this.isCurrencySelected) {
                 this.getTokenBalanse();
             }
         },
-    }
+    },
 };
 </script>

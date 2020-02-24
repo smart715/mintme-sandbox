@@ -38,10 +38,12 @@ class CryptosController extends APIController
     public function getBalance(
         string $symbol,
         BalanceHandlerInterface $balanceHandler
-    ) {
-        return $balanceHandler->balance(
-            $this->getUser(),
-            Token::getFromSymbol($symbol)
-        )->getAvailable();
+    ): View {
+        return $this->view(
+            $balanceHandler->balance(
+                $this->getUser(),
+                Token::getFromSymbol($symbol)
+            )->getAvailable()
+        );
     }
 }
