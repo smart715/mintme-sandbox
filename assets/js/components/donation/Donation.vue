@@ -22,11 +22,13 @@
                                                 :text="dropdownText"
                                                 variant="primary"
                                             >
-                                                <b-dropdown-item v-for="option in options"
-                                                                 :key="option"
-                                                                 :value="option"
-                                                                 @click="selectedCurrency = option">
-                                                    {{ option|rebranding }}
+                                                <b-dropdown-item
+                                                    v-for="option in options"
+                                                    :key="option"
+                                                    :value="option"
+                                                    @click="selectedCurrency = option"
+                                                >
+                                                    {{ option | rebranding }}
                                                 </b-dropdown-item>
                                             </b-dropdown>
                                         </div>
@@ -35,7 +37,7 @@
                                             class="col"
                                         >
                                             <p class="mb-2">Your balance:</p>
-                                            <span class="d-block">{{ balance }}</span>
+                                            <span class="d-block">{{ cryptoBalance | toMoney(marketSubunit) | formatMoney }}</span>
                                             <span class="d-block text-danger">Insufficient funds for donation,</span>
                                             <span class="d-block">please make <a :href="getDepositLink">deposit</a> first</span>
                                         </div>
@@ -89,13 +91,23 @@
 </template>
 
 <script>
-import {NotificationMixin, LoggerMixin, RebrandingFilterMixin} from '../../mixins';
+import {
+    MoneyFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+    RebrandingFilterMixin
+} from '../../mixins';
 import Guide from '../Guide';
 import {webSymbol, btcSymbol} from '../../utils/constants';
 
 export default {
     name: 'Donation',
-    mixins: [NotificationMixin, LoggerMixin, RebrandingFilterMixin],
+    mixins: [
+        MoneyFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+        RebrandingFilterMixin,
+    ],
     components: {
         Guide,
     },
@@ -130,6 +142,12 @@ export default {
         donationCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
         },
+        marketSubunit: function () {
+            return this.market.base.subunit;
+        },
+        cryptoBalance: function () {
+            return this.balance;
+        },
         getDonationFee: function() {
             return this.donationFee;
         },
@@ -138,7 +156,7 @@ export default {
         },
         getDepositLink: function() {
             return this.$routing.generate('wallet', {
-                depositMore: this.selectedCurrency,
+                depositMore: this.donationCurrency,
             });
         },
         isCurrencySelected: function() {
@@ -178,6 +196,21 @@ export default {
                     this.sendLogs('error', 'Can not load tab content.', err);
                 });
         },
+        getTokenBalanse: function () {
+            this.$axios.retry.get(this.$routing.generate('crypto_balance', {symbol: this.selectedCurrency}))
+                .then((res) => this.balance = res.data)
+                .catch((err) => {
+                    this.notifyError('Can not load statistic data. Try again later');
+                    this.sendLogs('error', 'Can not load statistic data', err);
+                });
+        },
     },
+    watch: {
+        selectedCurrency: function () {
+            if (this.isCurrencySelected) {
+                this.getTokenBalanse();
+            }
+        },
+    }
 };
 </script>
