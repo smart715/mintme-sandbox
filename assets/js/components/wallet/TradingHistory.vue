@@ -8,9 +8,14 @@
                     :fields="fields">
                     <template v-slot:cell(name)="row">
                         <div
-                            class="truncate-name w-100"
+                            v-if="row.value.length > 11"
                             v-b-tooltip="{title: rebrandingFunc(row.value), boundary:'viewport'}"
                         >
+                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
+                                {{ row.value | rebranding | truncate(11) }}
+                            </a>
+                        </div>
+                        <div v-else>
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
                                 {{ row.value | rebranding }}
                             </a>

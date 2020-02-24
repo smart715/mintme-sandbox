@@ -59,11 +59,13 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                   <div>
-                        <a v-if="data.item.name.length > 38" :href="generatePairUrl(data.item)" class="text-white" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                    <div v-if="data.item.name.length > 38" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                        <a :href="generatePairUrl(data.item)" class="text-white">
                             {{ data.item.name | truncate(38) }}
                         </a>
-                        <a v-else np:href="generatePairUrl(data.item)" class="text-white">
+                    </div>
+                    <div v-else>
+                        <a :href="generatePairUrl(data.item)" class="text-white">
                             {{ data.item.name }}
                         </a>
                     </div>

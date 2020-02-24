@@ -25,14 +25,20 @@
                             :fields="fields">
 
                             <template v-slot:head(pricePerQuote)="row">
-                                <span v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
-                                    Price per {{ market.quote.symbol | rebranding | truncate(7) }}
+                                <span v-if="market.quote.symbol.length > 11" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                    Price per {{ market.quote.symbol | rebranding | truncate(11) }}
+                                </span>
+                                <span v-else>
+                                    Price per {{ market.quote.symbol | rebranding }}
                                 </span>
                             </template>
 
                             <template v-slot:head(quoteAmount)="row">
-                                <span v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
-                                    {{ market.quote.symbol | rebranding | truncate(7) }} amount
+                                <span v-if="market.quote.symbol > 11" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                    {{ market.quote.symbol | rebranding | truncate(11) }} amount
+                                </span>
+                                 <span v-else>
+                                    {{ market.quote.symbol | rebranding }} amount
                                 </span>
                             </template>
 
