@@ -21,9 +21,7 @@ class TradingControllerTest extends WebTestCase
         $this->client->request('GET', '/trading/1');
         $res = $this->client->getResponse()->getContent();
 
-        file_put_contents('test.html', $this->client->getResponse()->getContent());
-
-        $this->assertContains(':page="1"', $res);
-        $this->assertRegExp('/:tokens-count="\\d+"/u', $res);
+        $this->assertContains(':page="1"', (string)$res);
+        $this->assertRegExp('/:tokens-count="\\d+"/u', (string)$res);
     }
 }

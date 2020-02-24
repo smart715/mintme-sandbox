@@ -5,6 +5,7 @@ namespace App\Tests\Controller;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -14,14 +15,14 @@ class WebTestCase extends BaseWebTestCase
 {
     protected const DEFAULT_USER_PASS = 'Foo123456';
 
-    /** @var ObjectManager */
+    /** @var EntityManagerInterface */
     protected $em;
 
     public function setUp(): void
     {
         self::bootKernel();
 
-        $this->em = self::$container->get('doctrine')->getManager();
+        $this->em = self::$container->get('doctrine.orm.entity_manager');
     }
 
     protected function register(Client $client): string
@@ -116,5 +117,30 @@ class WebTestCase extends BaseWebTestCase
     protected function generateEmail(): string
     {
         return $this->generateString() . '@mail.com';
+    }
+
+    /**
+     * @param string[] $entities
+     * @throws
+     */
+    protected function truncateEntities(array $entities): void
+    {
+        $connection = $this->em->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+
+        if ($databasePlatform->supportsForeignKeyConstraints()) {
+            $connection->query('SET FOREIGN_KEY_CHECKS=0');
+        }
+
+        foreach ($entities as $entity) {
+            $query = $databasePlatform->getTruncateTableSQL(
+                $this->em->getClassMetadata($entity)->getTableName()
+            );
+            $connection->executeUpdate($query);
+        }
+
+        if ($databasePlatform->supportsForeignKeyConstraints()) {
+            $connection->query('SET FOREIGN_KEY_CHECKS=1');
+        }
     }
 }

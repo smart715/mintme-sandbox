@@ -98,4 +98,5 @@ class RegistrationControllerTest extends WebTestCase
 
         $this->assertEquals('sign-up', $user->getBonus()->getType());
         $this->assertEquals('paid', $user->getBonus()->getStatus());
-    }}
+    }
+}
