@@ -8,6 +8,7 @@ import NotificationMixin from './notification';
 import OrderMixin from './order';
 import LoggerMixin from './logger';
 import PairNameMixin from './pair_name';
+import InputValidationMixin from './input_validation';
 
 export {
     FiltersMixin,
@@ -22,4 +23,5 @@ export {
     OrderMixin,
     LoggerMixin,
     PairNameMixin,
+    InputValidationMixin,
 };
