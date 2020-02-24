@@ -34,7 +34,7 @@
                             </template>
 
                             <template v-slot:head(quoteAmount)="row">
-                                <span v-if="market.quote.symbol > 11" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                <span v-if="market.quote.symbol.length > 11" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
                                     {{ market.quote.symbol | rebranding | truncate(11) }} amount
                                 </span>
                                  <span v-else>
