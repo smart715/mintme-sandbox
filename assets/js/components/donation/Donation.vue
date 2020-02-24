@@ -68,7 +68,7 @@
                                             </p>
                                         </div>
                                         <div>
-                                            <p class="mb-2">Fee for donation: {{ getDonationFee }}%</p>
+                                            <p class="mb-2">Fee for donation: {{ fee }}%</p>
                                             <button class="btn btn-primary">
                                                 Donate {{ donationCurrency }}
                                             </button>
@@ -117,6 +117,7 @@ export default {
         isOwner: Boolean,
         userId: Number,
         googleRecaptchaSiteKey: String,
+        donationFee: Number,
     },
     data() {
         return {
@@ -126,7 +127,6 @@ export default {
             },
             selectedCurrency: null,
             contentLoaded: false,
-            donationFee: 0,
             amountToReceive: 0,
             balance: 0,
         };
@@ -148,7 +148,7 @@ export default {
         cryptoBalance: function () {
             return this.balance;
         },
-        getDonationFee: function() {
+        fee: function() {
             return this.donationFee;
         },
         getAmountToReceive: function() {

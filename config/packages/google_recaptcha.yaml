@@ -17,4 +17,4 @@ services:
 # You can also inject the "google_recaptcha_site_key" container parameter to your controllers.
 twig:
     globals:
-        google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+        google_recaptcha_site_key: '%google_recaptcha_site_key%'
