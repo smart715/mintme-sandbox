@@ -2,9 +2,6 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\GoogleAuthenticatorEntry;
-use App\Entity\User;
-use App\Manager\TwoFactorManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 class SecurityControllerTest extends WebTestCase
