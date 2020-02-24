@@ -48,7 +48,7 @@ class WebSocketController extends AbstractFOSRestController
 
         $user = $this->isAuth ?
             $profileManager->findProfileByHash($token) :
-            $this->userManager->find((int)$token);
+            $this->userManager->find((int)$token - $this->config->getOffset());
 
         if (null === $user) {
             return $this->error();
