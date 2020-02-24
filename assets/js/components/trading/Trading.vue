@@ -296,8 +296,15 @@ export default {
                             this.updateMonthVolume(result.id, result.result);
                         }
                     });
-                    this.$refs.spinner.hide();
-                });
+                })
+            .then(() => {
+              this.$refs.spinner.hide();
+            })
+              .catch((err) => {
+                this.$refs.spinner.hide();
+                this.notifyError('Can not load Trading data. Try again later.');
+                this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
+              });
         },
         sortCompare: function(a, b, key) {
             let pair = false;
@@ -364,7 +371,15 @@ export default {
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
-            });
+            })
+              .then(() => {
+                this.$refs.spinner.hide();
+              })
+              .catch((err) => {
+                this.$refs.spinner.hide();
+                this.notifyError('Can not load Trading data. Try again later.');
+                this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
+              });
         },
         sanitizeMarket: function(marketData) {
             if (!marketData.params) {
@@ -575,7 +590,15 @@ export default {
                     this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                     reject();
                 });
-            });
+            })
+              .then(() => {
+                this.$refs.spinner.hide();
+              })
+              .catch((err) => {
+                this.$refs.spinner.hide();
+                this.notifyError('Can not load Trading data. Try again later.');
+                this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
+              });
         },
         toUSD: function(amount, currency, subunit = false) {
             amount = Decimal.mul(amount, ((this.conversionRates[currency] || [])[USD.symbol] || 1));

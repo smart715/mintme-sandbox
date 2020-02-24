@@ -5,7 +5,7 @@
       spinnerDiv: {type: String, required: true},
     },
     render() {
-      return null;
+      return '<div></div>';
     },
     methods: {
       hide: function() {
