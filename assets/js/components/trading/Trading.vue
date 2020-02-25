@@ -1,5 +1,5 @@
 <template>
-    <div class="trading" v-cloak>
+    <div class="trading">
         <div class="card-header">
             <span>Trading</span>
                 <b-dropdown
@@ -265,7 +265,6 @@ export default {
     },
     mounted() {
           this.fetchData();
-          Vue.nextTick();
           this.$refs.spinner.hide();
     },
     methods: {
@@ -289,6 +288,7 @@ export default {
                 .then(() => {
                     this.updateDataWithMarkets();
                     this.loading = false;
+                    this.$refs.spinner.hide();
 
                     this.addMessageHandler((result) => {
                         if ('state.update' === result.method) {
@@ -300,6 +300,7 @@ export default {
                     });
                 })
               .catch((err) => {
+                this.$refs.spinner.hide();
                 this.notifyError('Can not load Trading data. Try again later.');
                 this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
               });
@@ -336,6 +337,7 @@ export default {
                 }
 
                 this.loading = true;
+                this.$refs.spinner.show();
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (null !== this.markets) {

@@ -5,29 +5,15 @@
       spinnerDiv: {type: String, required: true},
     },
     render() {
-      return '<div></div>';
-    },
-    data: function() {
-        return {
-              requests: 1,
-              visible: true,
-            };
+      return '';
     },
     methods: {
       hide: function() {
-        this.requiests--;
-        if (this.visible && !this.requests) {
-            document.getElementById(this.spinnerDiv).classList.add('hidden');
-            this.visible = false;
-          }
-        },
+        document.getElementById(this.spinnerDiv).classList.add('hidden');
+      },
       show: function() {
-        this.requests++;
-        if (!this.visible && this.requests == 1) {
-            document.getElementById(this.spinnerDiv).classList.remove('hidden');
-            this.visible = true;
-          }
-        },
+        document.getElementById(this.spinnerDiv).classList.remove('hidden');
+      },
     },
   };
 </script>
