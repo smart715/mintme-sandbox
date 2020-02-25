@@ -5,7 +5,7 @@
                 <b-table
                     v-if="hasHistory"
                     :items="history"
-                    :fields="fields">
+                    :fields="fieldsArray">
                     <template v-slot:cell(name)="row">
                         <div
                             class="truncate-name w-100"
@@ -61,40 +61,55 @@ export default {
         return {
             tableData: null,
             currentPage: 1,
-            fields: [
-                {key: 'date', label: 'Date', sortable: true},
-                {key: 'side', label: 'Type', sortable: true},
-                {
+            fields: {
+                date: {
+                    key: 'date',
+                    label: 'Date',
+                    sortable: true,
+                    type: 'date',
+                },
+                side: {
+                    key: 'side',
+                    label: 'Type',
+                    sortable: true,
+                    type: 'string',
+                },
+                name: {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
                     class: 'pair-cell',
+                    type: 'string',
                 },
-                {
+                amount: {
                     key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                price: {
                     key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                total: {
                     key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                fee: {
                     key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-            ],
+            },
         };
     },
     computed: {
@@ -117,6 +132,9 @@ export default {
                     pairUrl: this.generatePairUrl(history.market),
                 };
             });
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
     },
     mounted: function() {
