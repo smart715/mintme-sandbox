@@ -1,5 +1,5 @@
 <template>
-    <div class="trading">
+    <div class="trading" v-cloak>
         <div class="card-header">
             <span>Trading</span>
                 <b-dropdown
@@ -265,6 +265,7 @@ export default {
     },
     mounted() {
           this.fetchData();
+          Vue.nextTick();
           this.$refs.spinner.hide();
     },
     methods: {
