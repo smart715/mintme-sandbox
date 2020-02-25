@@ -41,7 +41,7 @@
                                                 {{ cryptoBalance | toMoney(marketSubunit) | formatMoney }}
                                             </span>
                                             <font-awesome-icon v-else icon="circle-notch" spin class="loading-spinner" fixed-width />
-                                            <div v-if="showWarning">
+                                            <div v-if="insufficientFunds">
                                                 <span class="d-block text-danger font-size-90">
                                                     Insufficient funds for donation,
                                                 </span>
@@ -63,6 +63,7 @@
                                                     class="form-control"
                                                     @keypress="checkAmountInput"
                                                     @paste="checkAmountInput"
+                                                    @keyup.enter="checkDonation"
                                                 >
                                                 <div class="input-group-append">
                                                     <button
@@ -92,7 +93,7 @@
                                             <p class="mb-2">Fee for donation: {{ fee }}%</p>
                                             <button
                                                 :disabled="buttonDisabled"
-                                                @click="donateDonation"
+                                                @click="makeDonation"
                                                 class="btn btn-primary"
                                             >
                                                 Donate {{ donationCurrency }}
@@ -156,7 +157,6 @@ export default {
             },
             selectedCurrency: null,
             contentLoaded: false,
-            immediateCheck: false,
             amountToDonate: 0,
             amountToReceive: 0,
             donationChecking: false,
@@ -204,11 +204,16 @@ export default {
         minTotalPrice: function() {
             return toMoney('1e-' + this.market.base.subunit, this.market.base.subunit);
         },
-        showWarning: function() {
-            return this.balanceLoaded && (new Decimal(this.balance)).lessThan(this.minTotalPrice);
+        insufficientFunds: function() {
+            return this.balanceLoaded &&
+                (
+                    (new Decimal(this.balance)).lessThan(this.minTotalPrice)
+                    ||
+                    (this.amountToDonate && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
+                );
         },
         buttonDisabled: function() {
-            return !this.loggedIn || !this.isCurrencySelected || this.showWarning || this.amountToReceive <= 0;
+            return !this.loggedIn || !this.isCurrencySelected || this.insufficientFunds || this.amountToReceive <= 0;
         },
     },
     mounted() {
@@ -254,9 +259,13 @@ export default {
             return this.checkInput(this.market.base.subunit);
         },
         checkDonation: function() {
+            if (this.insufficientFunds) {
+                return;
+            }
+
             this.donationChecking = true;
 
-            this.$axios.retry.get(this.$routing.generate('donation_check', {
+            this.$axios.retry.get(this.$routing.generate('check_donation', {
                 market: this.selectedCurrency,
                 amount: this.amountToDonate,
                 fee: this.donationFee,
@@ -270,24 +279,8 @@ export default {
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', err);
                 });
         },
-        onChange: function() {
-            if (this.showWarning) {
-                return;
-            }
-
-            this.amountToReceive = 0;
-
-            if (this.amountToDonate) {
-                let func = this.debounce(
-                    this.checkDonation,
-                    this.debounceTimeout,
-                    this.immediateCheck
-                );
-                func();
-            }
-        },
-        donateDonation: function() {
-            this.$axios.single.post(this.$routing.generate('donation_donate', {
+        makeDonation: function() {
+            this.$axios.single.post(this.$routing.generate('make_donation', {
                 market: this.selectedCurrency,
                 amount: this.amountToDonate,
                 fee: this.donationFee,
@@ -312,42 +305,13 @@ export default {
         },
         all: function() {
             this.amountToDonate = toMoney(this.balance);
-            this.immediateCheck = true;
-        },
-        debounce: function(func, wait, immediate) {
-            let timeout;
-            return function() {
-                let context = this, args = arguments;
-                let later = function() {
-                    timeout = null;
-                    if (!immediate) func.apply(context, args);
-                };
-                let callNow = immediate && !timeout;
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-                if (callNow) func.apply(context, args);
-            };
+            this.checkDonation();
         },
     },
     watch: {
         selectedCurrency: function() {
             if (this.isCurrencySelected) {
                 this.getTokenBalance();
-            }
-        },
-        amountToDonate: function() {
-            if (this.showWarning) {
-                return;
-            }
-
-            this.amountToReceive = 0;
-
-            if (this.amountToDonate) {
-                this.debounce(
-                    this.checkDonation,
-                    this.debounceTimeout,
-                    this.immediateCheck
-                )();
             }
         },
     },
