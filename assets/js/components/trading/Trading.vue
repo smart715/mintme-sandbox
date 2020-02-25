@@ -265,7 +265,6 @@ export default {
     },
     mounted() {
           this.fetchData();
-          this.$refs.spinner.hide();
     },
     methods: {
         toggleUsd: function(show) {

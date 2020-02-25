@@ -26,6 +26,13 @@ describe('Trading', () => {
         localVue,
         mocks: {
             $routing,
+            $refs: {
+                spinner: {
+                    hide: function() {
+
+                    },
+                },
+            },
         },
         propsData: {
             enableUsd: true,
