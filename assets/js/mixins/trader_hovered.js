@@ -21,33 +21,30 @@ export default {
         },
     },
     methods: {
-        mouseoverHandler: function(ownerId, price) {
-            if (!ownerId || !price) {
+        mouseoverHandler: function(fullOrdersList, basePrecision, ownerId, price) {
+            if (fullOrdersList.lenght === 0 || !ownerId || !price) {
                 return;
             }
 
             let moreCount = 0;
             let tradersArray = [];
             let tradersIdsArray = [];
-            let basePrecision = this.basePrecision;
 
-            let hoveredOrder = this.fullOrdersList.find((order) => parseInt(order.maker.id) === parseInt(ownerId));
-            tradersArray.push(this.createTraderLinkFromOrder(hoveredOrder));
-            let orders = this.fullOrdersList.filter(function(order) {
-                return price === toMoney(order.price, basePrecision) && parseInt(ownerId) !== parseInt(order.maker.id);
-            });
-
-            let self = this;
-            orders.sort((a, b) => a.timestamp - b.timestamp);
-            orders.forEach(function(order) {
-                // Avoid duplicates
-                if (tradersIdsArray.includes(order.maker.id)) {
-                    return;
+            let ownerOrder = fullOrdersList.find((order) => parseInt(order.maker.id) === parseInt(ownerId));
+            tradersArray.push(this.createTraderLinkFromOrder(ownerOrder));
+            let orders = fullOrdersList.filter((order) => {
+                let makerId = parseInt(order.maker.id);
+                if (tradersIdsArray.includes(makerId) || parseInt(ownerId) === makerId) {
+                    return false;
                 }
 
-                tradersIdsArray.push(order.maker.id);
-                tradersArray.push(self.createTraderLinkFromOrder(order));
+                tradersIdsArray.push(makerId);
+
+                return price === toMoney(order.price, basePrecision);
             });
+
+            orders.sort((a, b) => a.timestamp - b.timestamp);
+            orders.forEach((order) => tradersArray.push(this.createTraderLinkFromOrder(order)));
 
             if (tradersArray.length > 5) {
                 moreCount = tradersArray.length - 5;
@@ -62,7 +59,7 @@ export default {
             this.tooltipData = content;
         },
         createTraderLinkFromOrder: function(order) {
-            if (order.maker.profile === null || order.maker.profile.anonymous) {
+            if (!order || order.maker.profile === null || order.maker.profile.anonymous) {
                 return 'Anonymous';
             }
 
