@@ -1,10 +1,12 @@
 import CopyLink from './components/CopyLink';
+import PageLoadSpinner from './components/PageLoadSpinner';
 import {toMoney} from './utils';
 
 new Vue({
     el: '#referral',
     components: {
         CopyLink,
+        PageLoadSpinner,
     },
     data() {
         return {
@@ -22,6 +24,7 @@ new Vue({
             .then((result) => {
                 this.referralBalance = result.data.balance;
                 this.precision = result.data.token.subunit;
+                this.$refs.spinner.hide();
             });
     },
 });

@@ -2,6 +2,7 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
+import PageLoadSpinner from './components/PageLoadSpinner';
 import {minLength, helpers} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
@@ -16,6 +17,7 @@ new Vue({
         BbcodeHelp,
         BbcodeView,
         LimitedTextarea,
+        PageLoadSpinner,
     },
     data() {
         return {
@@ -55,6 +57,7 @@ new Vue({
         },
         countryChanged: function() {
             if (!this.$refs.zipCode) {
+                this.$refs.spinner.hide();
                 return;
             }
 
@@ -89,6 +92,7 @@ new Vue({
                 })
                 .then(() => {
                     this.zipCodeProcessing = false;
+                    this.$refs.spinner.hide();
                 });
         },
         zipCodeValidate: function() {
