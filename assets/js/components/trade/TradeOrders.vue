@@ -138,6 +138,7 @@ export default {
         },
         groupByPrice: function(orders) {
             let filtered = [];
+
             let grouped = this.clone(orders).reduce((a, e) => {
                 let price = parseFloat(e.price);
 
