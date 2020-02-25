@@ -264,7 +264,8 @@ export default {
         },
     },
     mounted() {
-        this.fetchData();
+          this.fetchData();
+          this.$refs.spinner.hide();
     },
     methods: {
         toggleUsd: function(show) {
@@ -297,11 +298,7 @@ export default {
                         }
                     });
                 })
-            .then(() => {
-              this.$refs.spinner.hide();
-            })
               .catch((err) => {
-                this.$refs.spinner.hide();
                 this.notifyError('Can not load Trading data. Try again later.');
                 this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
               });
@@ -372,11 +369,7 @@ export default {
                         reject(err);
                     });
             })
-              .then(() => {
-                this.$refs.spinner.hide();
-              })
               .catch((err) => {
-                this.$refs.spinner.hide();
                 this.notifyError('Can not load Trading data. Try again later.');
                 this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
               });
@@ -591,11 +584,7 @@ export default {
                     reject();
                 });
             })
-              .then(() => {
-                this.$refs.spinner.hide();
-              })
               .catch((err) => {
-                this.$refs.spinner.hide();
                 this.notifyError('Can not load Trading data. Try again later.');
                 this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
               });
