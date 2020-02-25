@@ -318,6 +318,7 @@ export default {
             this.enableUsd = false;
         },
         fetchData: function(page = false) {
+            console.log('calling...');
             if (page) {
                 this.currentPage = page;
             }
@@ -328,6 +329,7 @@ export default {
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
                 .then(() => {
+                    console.log('promise ok...');
                     this.updateDataWithMarkets();
                     this.loading = false;
 
