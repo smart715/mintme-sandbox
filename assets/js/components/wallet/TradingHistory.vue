@@ -5,7 +5,12 @@
                 <b-table
                     v-if="hasHistory"
                     :items="history"
-                    :fields="fieldsArray">
+                    :fields="fieldsArray"
+                    :sort-compare="sortCompare"
+                    :sort-by="fields.date.key"
+                    :sort-desc="true"
+                    sort-direction="desc"
+                >
                     <template v-slot:cell(name)="row">
                         <div
                             class="truncate-name w-100"
@@ -169,6 +174,28 @@ export default {
             }
 
             return this.$routing.generate('token_show', {name: market.quote.name});
+        },
+        sortCompare: function(a, b, key) {
+            switch (this.fields[key].type) {
+                case 'date':
+                    return this.dateCompare(a[key], b[key]);
+                case 'string':
+                    return a[key].localeCompare(b[key]);
+                case 'numeric':
+                    return this.numericCompare(a[key], b[key]);
+            }
+        },
+        numericCompare: function(a, b) {
+            a = parseFloat(a);
+            b = parseFloat(b);
+
+            return a < b ? -1 : (a > b ? 1 : 0);
+        },
+        dateCompare: function(a, b) {
+            a = moment(a, GENERAL.dateFormat).unix();
+            b = moment(b, GENERAL.dateFormat).unix();
+
+            return this.numericCompare(a, b);
         },
     },
 };
