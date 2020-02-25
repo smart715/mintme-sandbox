@@ -23,6 +23,11 @@ describe('OrderMixin', function() {
                 },
             },
         },
+        methods: {
+            rebrandingFunc: function(val) {
+                return val;
+            },
+        },
     });
 
     it('should show "Deposit more" link if user logged in', () => {
