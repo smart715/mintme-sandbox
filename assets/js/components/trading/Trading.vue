@@ -300,11 +300,10 @@ export default {
         },
     },
     mounted() {
-        console.log('caling mounted...');
         this.fetchData();
     },
     methods: {
-        toggleFilter: function(value) {            
+        toggleFilter: function(value) {
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
             this.sortBy = '';
@@ -319,7 +318,6 @@ export default {
             this.enableUsd = false;
         },
         fetchData: function(page = false) {
-            console.log('calling...');            
             if (page) {
                 this.currentPage = page;
             }
@@ -329,8 +327,12 @@ export default {
             this.fetchGlobalMarketCap();
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
-                .then(() => {
-                    console.log('promise ok...');
+                .then((res) => {
+                    if (Object.keys(this.markets).length === 1 && this.marketFilters.userSelected == false) {
+                        this.marketFilters.selectedFilter = 'all';
+                        this.fetchData();
+                        return;
+                    }
                     this.updateDataWithMarkets();
                     this.loading = false;
 
@@ -379,7 +381,6 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (null !== this.markets) {
-                            console.log('null on res')
                             this.addOnOpenHandler(() => {
                                 const request = JSON.stringify({
                                     method: 'state.unsubscribe',
@@ -395,7 +396,6 @@ export default {
                         this.totalRows = res.data.rows;
 
                         if (window.history.replaceState) {
-                            console.log('windows history');
                             // prevents browser from storing history with each change:
                             window.history.replaceState(
                                 {page}, document.title, this.$routing.generate('trading', {page})
@@ -699,15 +699,6 @@ export default {
             this.activeVolume = volume;
             this.sortBy = this.volumes[this.activeVolume].key;
             this.sortDesc = true;
-        },
-    },
-    watch: {
-        tokens(val) {
-            conosle.log('val on watch',val);
-            if (val.length < 2 && this.marketFilters.userSelected == false) {                
-                this.marketFilters.selectedFilter = 'all';
-                this.fetchData();
-            }
         },
     },
 };
