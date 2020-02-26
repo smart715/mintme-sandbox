@@ -38,7 +38,7 @@
                                         >
                                             <p class="mb-2">Your balance:</p>
                                             <span v-if="balanceLoaded" class="d-block">
-                                                {{ cryptoBalance | toMoney(marketSubunit) | formatMoney }}
+                                                {{ balance | toMoney(market.base.subunit) | formatMoney }}
                                             </span>
                                             <font-awesome-icon v-else icon="circle-notch" spin class="loading-spinner" fixed-width />
                                             <div v-if="insufficientFunds">
@@ -76,7 +76,7 @@
                                             <p class="mt-2 mb-4">
                                                 You will receive approximately:
                                                 <font-awesome-icon v-if="donationChecking" icon="circle-notch" spin class="loading-spinner" fixed-width />
-                                                <span v-else>{{ getAmountToReceive }}</span>
+                                                <span v-else>{{ amountToReceive }}</span>
                                                 tokens
                                                 <guide
                                                     :placement="'right-start'"
@@ -90,7 +90,7 @@
                                             </p>
                                         </div>
                                         <div>
-                                            <p class="mb-2">Fee for donation: {{ fee }}%</p>
+                                            <p class="mb-2">Fee for donation: {{ donationFee }}%</p>
                                             <button
                                                 :disabled="buttonDisabled"
                                                 @click="makeDonation"
@@ -162,7 +162,6 @@ export default {
             donationChecking: false,
             balanceLoaded: false,
             balance: 0,
-            debounceTimeout: 800,
         };
     },
     computed: {
@@ -175,18 +174,6 @@ export default {
         },
         donationCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
-        },
-        marketSubunit: function() {
-            return this.market.base.subunit;
-        },
-        cryptoBalance: function() {
-            return this.balance;
-        },
-        fee: function() {
-            return this.donationFee;
-        },
-        getAmountToReceive: function() {
-            return this.amountToReceive;
         },
         getDepositLink: function() {
             return this.$routing.generate('wallet', {
@@ -213,7 +200,11 @@ export default {
                 );
         },
         buttonDisabled: function() {
-            return !this.loggedIn || !this.isCurrencySelected || this.insufficientFunds || this.amountToReceive <= 0;
+            return !this.loggedIn
+                || !this.isCurrencySelected
+                || this.insufficientFunds
+                || this.balance <= 0
+                || this.amountToReceive <= 0;
         },
     },
     mounted() {
@@ -275,20 +266,23 @@ export default {
                     this.donationChecking = false;
                 })
                 .catch((err) => {
-                    this.notifyError('Can not to calculate approximate amount of tokens. Try again later.');
+                    this.notifyError('Can not to calculate amount of tokens. Try again later.');
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', err);
                 });
         },
         makeDonation: function() {
-            this.$axios.single.post(this.$routing.generate('make_donation', {
+            this.$axios.single.post(this.$routing.generate('make_donation'), {
                 market: this.selectedCurrency,
                 amount: this.amountToDonate,
                 fee: this.donationFee,
                 expected_count_to_receive: this.amountToReceive,
-            }))
+            })
                 .then((response) => {
-                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
-                        this.notifySuccess(response.data.message);
+                    if (HTTP_ACCEPTED === response.status) {
+                        this.notifySuccess(
+                            'Congratulations! Donation has been successfully made. '
+                            + 'You have received ' + this.amountToReceive + ' tokens.'
+                        );
                     }
                 }, (error) => {
                     if (!error.response) {
