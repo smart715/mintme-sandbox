@@ -62,7 +62,7 @@ class DeployConsumer implements ConsumerInterface
             sleep($this->coinbaseApiTimeout + 10);
             $this->em->clear();
             $repo = $this->em->getRepository(Token::class);
-            /** @var Token $token */
+            /** @var Token|null $token */
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
             if (!$token) {
@@ -75,7 +75,7 @@ class DeployConsumer implements ConsumerInterface
 
             if (!$clbResult->getAddress()) {
                 if ($token->getDeployCost()) {
-                    $amount = new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
+                    $amount = new Money((string)$token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
 
                     $this->balanceHandler->deposit(
                         $token->getProfile()->getUser(),

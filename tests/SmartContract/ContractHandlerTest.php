@@ -34,8 +34,6 @@ class ContractHandlerTest extends TestCase
                 [
                     'name' => 'foo',
                     'decimals' => 4,
-                    'status' => 'pending',
-                    'mintDestination' => 'foobarbaz',
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                 ]
@@ -44,7 +42,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -62,7 +59,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -83,8 +79,6 @@ class ContractHandlerTest extends TestCase
                 [
                     'name' => 'foo',
                     'decimals' => 4,
-                    'status' => 'pending',
-                    'mintDestination' => 'foobarbaz',
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                 ]
@@ -93,7 +87,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -120,7 +113,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -141,7 +133,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -172,7 +163,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -203,7 +193,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -226,7 +215,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -259,7 +247,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -310,7 +297,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -360,7 +346,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -390,7 +375,6 @@ class ContractHandlerTest extends TestCase
 
         $handler = new ContractHandler(
             $rpc,
-            $this->mockConfig(),
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
@@ -418,17 +402,6 @@ class ContractHandlerTest extends TestCase
         $user->method('getId')->willReturn($id);
 
         return $user;
-    }
-
-    /** @return Config|MockObject */
-    private function mockConfig(): Config
-    {
-        $config = $this->createMock(Config::class);
-
-        $config->method('getMintmeAddress')->willReturn('foobarbaz');
-        $config->method('getTokenQuantity')->willReturn('1000000');
-
-        return $config;
     }
 
     /** @return MoneyWrapperInterface|MockObject */
