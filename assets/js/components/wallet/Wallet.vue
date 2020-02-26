@@ -332,14 +332,18 @@ export default {
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
 
+            this.$refs.spinner.show();
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
                     crypto: isToken ? webSymbol : currency,
                 }))
-                .then((res) => this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
+                .then((res) => {
+                  this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
                     toMoney(res.data, subunit) :
-                    undefined
-                )
+                    undefined;
+                  this.$refs.spinner.hide();
+                })
                 .catch((err) => {
+                    this.$refs.spinner.hide();
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });

@@ -125,6 +125,9 @@ export default {
     methods: {
         updateTableData: function() {
             return new Promise((resolve, reject) => {
+              if (!this.loaded) {
+                this.$refs.spinner.show();
+              }
                 this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
                     .then((res) => {
                         res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
@@ -137,8 +140,10 @@ export default {
                         }
 
                         resolve(this.tableData);
+                      this.$refs.spinner.hide();
                     })
                     .catch((err) => {
+                        this.$refs.spinner.hide();
                         this.notifyError('Can not update trading history. Try again later.');
                         this.sendLogs('error', 'Service unavailable. Can not update trading history', err);
                         reject([]);
