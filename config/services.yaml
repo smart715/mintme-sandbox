@@ -109,6 +109,10 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
+    App\Exchange\Donation\DonationHandler:
+        arguments:
+            $jsonRpc: '@viabtc.json_rpc'
+
     App\SmartContract\ContractHandler:
         $rpc: '@deploy.json_rpc'
 
