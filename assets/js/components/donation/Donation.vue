@@ -12,9 +12,9 @@
                             <div v-if="loggedIn" class="h-100">
                                 <div class="p-md-4">
                                     <div>
-                                        <p>Donation is non-refundable</p>
+                                        <p class="info">Donation is non-refundable</p>
                                     </div>
-                                    <div class="row currency-container">
+                                    <div class="row" v-bind:class="{ 'currency-container': isCurrencySelected }">
                                         <div class="col">
                                             <p class="mb-2">Currency</p>
                                             <b-dropdown
@@ -26,7 +26,8 @@
                                                     v-for="option in options"
                                                     :key="option"
                                                     :value="option"
-                                                    @click="selectedCurrency = option; if (selectedCurrency !== option) balanceLoaded = false;"
+                                                    @click="selectedCurrency = option;
+                                                    if (selectedCurrency !== option) balanceLoaded = false;"
                                                 >
                                                     {{ option | rebranding }}
                                                 </b-dropdown-item>
@@ -40,12 +41,19 @@
                                             <span v-if="balanceLoaded" class="d-block">
                                                 {{ balance | toMoney(market.base.subunit) | formatMoney }}
                                             </span>
-                                            <font-awesome-icon v-else icon="circle-notch" spin class="loading-spinner" fixed-width />
+                                            <font-awesome-icon
+                                                v-else
+                                                icon="circle-notch"
+                                                spin
+                                                class="loading-spinner" fixed-width
+                                            />
                                             <div v-if="insufficientFunds">
                                                 <span class="d-block text-danger font-size-90">
                                                     Insufficient funds for donation,
                                                 </span>
-                                                <span class="d-block">please make <a :href="getDepositLink">deposit</a> first</span>
+                                                <span class="d-block">
+                                                    please make <a :href="getDepositLink">deposit</a> first
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -75,7 +83,12 @@
                                             </div>
                                             <p class="mt-2 mb-4">
                                                 You will receive approximately:
-                                                <font-awesome-icon v-if="donationChecking" icon="circle-notch" spin class="loading-spinner" fixed-width />
+                                                <font-awesome-icon
+                                                    v-if="donationChecking"
+                                                    icon="circle-notch"
+                                                    spin
+                                                    class="loading-spinner" fixed-width
+                                                />
                                                 <span v-else>{{ amountToReceive }}</span>
                                                 tokens
                                                 <guide
@@ -83,7 +96,8 @@
                                                     :max-width="'200px'"
                                                 >
                                                     <template slot="body">
-                                                        Amount of tokens you will receive may vary greatly depending on the current situation.
+                                                        Amount of tokens you will receive may vary greatly
+                                                        depending on the current situation.
                                                         It can be much less than suggested here.
                                                     </template>
                                                 </guide>
@@ -102,7 +116,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="!contentLoaded" class="p-5 text-center">
+                            <div v-if="!loginFormLoaded" class="p-5 text-center">
                                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                             </div>
                             <div
@@ -156,7 +170,7 @@ export default {
                 btcSymbol,
             },
             selectedCurrency: null,
-            contentLoaded: false,
+            loginFormLoaded: false,
             amountToDonate: 0,
             amountToReceive: 0,
             donationChecking: false,
@@ -211,7 +225,7 @@ export default {
         if (!this.loggedIn) {
             this.loadLoginForm();
         } else {
-            this.contentLoaded = true;
+            this.loginFormLoaded = true;
         }
     },
     methods: {
@@ -223,7 +237,7 @@ export default {
                     let formContainer = document.getElementById('tab-login-form-container');
                     formContainer.innerHTML = res.data;
 
-                    this.contentLoaded = true;
+                    this.loginFormLoaded = true;
 
                     let captchaContainer = document.querySelector('.g-recaptcha');
                     grecaptcha.render(captchaContainer, {
@@ -283,6 +297,8 @@ export default {
                             'Congratulations! Donation has been successfully made. '
                             + 'You have received ' + this.amountToReceive + ' tokens.'
                         );
+
+                        this.amountToDonate = 0;
                     }
                 }, (error) => {
                     if (!error.response) {
@@ -298,7 +314,7 @@ export default {
                 });
         },
         all: function() {
-            this.amountToDonate = toMoney(this.balance);
+            this.amountToDonate = toMoney(this.balance, this.market.base.subunit);
             this.checkDonation();
         },
     },
