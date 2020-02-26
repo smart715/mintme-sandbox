@@ -374,7 +374,7 @@ export default {
                 let params = {page};
                 if (this.marketFilters.selectedFilter === 'user') {
                     params.user = 1;
-                } else if (this.marketFilters.selectedFilter === 'deployed') {
+                } else if (this.marketFilters.selectedFilter === 'deployed' && this.userId) {
                     params.deployed = 1;
                 }
                 this.loading = true;
