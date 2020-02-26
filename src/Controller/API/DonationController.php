@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 class DonationController extends AbstractFOSRestController
 {
     /** @var DonationHandlerInterface */
-    private $donationHandler;
+    protected $donationHandler;
 
     public function __construct(DonationHandlerInterface $donationHandler)
     {
