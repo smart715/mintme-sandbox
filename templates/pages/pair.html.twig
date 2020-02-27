@@ -13,8 +13,14 @@
     {% if token|default %} {{ token.name }} token{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
 {% endblock %}
 
+{% block spinnerblock %}
+    {{ include('spinner.html.twig') }}
+{% endblock %}
+
+
 {% block content %}
-<div id="token" class="container">
+<div id="token" class="container" v-on:hide-spinner="hideSpinner" v-on:show-spinner="showSpinner">
+    <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
     <div class="row pt-5 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
@@ -114,7 +120,7 @@
                             <div class="nav-link-token">
                                 <div class="truncate-token">
                                     {% if(market.quote.name | rebranding is same as(mintme_coin)) %}
-                                        <a href="{{ mintme_coin_link }}" target="_blank"> 
+                                        <a href="{{ mintme_coin_link }}" target="_blank">
                                             <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
                                                 {{ market.quote.name | rebranding }}
                                             </span>

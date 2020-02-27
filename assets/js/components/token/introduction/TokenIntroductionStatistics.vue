@@ -188,49 +188,76 @@ export default {
         };
     },
     mounted: function() {
+      this.$emit('show-spinner');
         this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
-            .then((res) => this.isTokenExchanged = res.data)
+            .then((res) => {
+              this.$emit('hide-spinner');
+              this.isTokenExchanged = res.data;
+            })
             .catch((err) => {
+                this.$emit('hide-spinner');
                 this.notifyError('Can not load token data. Try again later');
                 this.sendLogs('error', 'Can not load token data', err);
             });
 
+        this.$emit('show-spinner');
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
-            .then((res) => this.stats = res.data || this.stats)
+            .then((res) => {
+              this.$emit('hide-spinner');
+              this.stats = res.data || this.stats;
+            })
             .catch((err) => {
+              this.$emit('hide-spinner');
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
 
+        this.$emit('show-spinner');
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
-            .then((res) => this.tokenExchangeAmount = res.data)
+            .then((res) => {
+              this.$emit('hide-spinner');
+              this.tokenExchangeAmount = res.data;
+            })
             .catch((err) => {
+              this.$emit('hide-spinner');
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
-
+        this.$emit('show-spinner');
         this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
             name: this.market.quote.symbol,
         }))
-            .then((res) => this.soldOnMarket = res.data)
+            .then((res) => {
+              this.$emit('hide-spinner');
+              this.soldOnMarket = res.data;
+            })
             .catch((err) => {
+              this.$emit('hide-spinner');
                 this.notifyError('Can not load soldOnMarket value. Try again later');
                 this.sendLogs('error', 'Can not load soldOnMarket value', err);
             });
-
+        this.$emit('show-spinner');
         this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
-            .then((res) => this.tokenWithdrawn = res.data)
+            .then((res) => {
+              this.$emit('hide-spinner');
+              this.tokenWithdrawn = res.data;
+            })
             .catch((err) => {
+                this.$emit('hide-spinner');
                 this.notifyError('Can not load token withdrawn statistic data. Try again later');
                 this.sendLogs('error', 'Can not load token withdrawn value', err);
             });
-
+       this.$emit('show-spinner');
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
         }))
-            .then((res) => this.pendingSellOrders = res.data.sell)
+            .then((res) => {
+              this.$emit('hide-spinner');
+              this.pendingSellOrders = res.data.sell;
+            })
             .catch((err) => {
+                this.$emit('hide-spinner');
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
             });

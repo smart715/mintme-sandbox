@@ -130,6 +130,7 @@ export default {
         },
     },
     mounted() {
+      this.$emit('show-spinner');
         this.updateOrders().then(() => {
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
@@ -142,6 +143,11 @@ export default {
                     this.processOrders(response.params[1], response.params[0]);
                 }
             }, 'trade-update-orders');
+        })
+        .then(() => {
+          this.$emit('hide-spinner');
+        }).catch((err) => {
+          this.$emit('hide-spinner');
         });
 
         this.addOnOpenHandler(() => {

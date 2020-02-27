@@ -12,7 +12,9 @@
         document.getElementById(this.spinnerDiv).classList.add('hidden');
       },
       show: function() {
-        document.getElementById(this.spinnerDiv).classList.remove('hidden');
+        if (document.getElementById(this.spinnerDiv).classList.contains('hidden')) {
+            document.getElementById(this.spinnerDiv).classList.remove('hidden');
+        }
       },
     },
   };

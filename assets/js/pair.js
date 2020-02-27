@@ -5,6 +5,7 @@ import TokenIntroductionDescription from './components/token/introduction/TokenI
 import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
+import PageLoadSpinner from './components/PageLoadSpinner';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
 
@@ -17,6 +18,7 @@ new Vue({
       editingName: false,
       tokenName: null,
       tokenPending: null,
+      spinnerQuantity: 0,
     };
   },
   components: {
@@ -27,6 +29,7 @@ new Vue({
     TokenName,
     TokenDeployIcon,
     TopHolders,
+    PageLoadSpinner,
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -48,6 +51,20 @@ new Vue({
     },
     getTokenStatus: function(status) {
       return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
+    },
+    showSpinner: function() {
+      if (this.spinnerQuantity == 0) {
+        this.$refs.spinner.show();
+      }
+      this.spinnerQuantity = this.spinnerQuantity + 1;
+      alert(this.spinnerQuantity);
+    },
+    hideSpinner: function() {
+      this.spinnerQuantity = this.spinnerQuantity - 1;
+      if (this.spinnerQuantity == 0) {
+        this.$refs.spinner.hide();
+      }
+      alert(this.spinnerQuantity);
     },
   },
   store,
