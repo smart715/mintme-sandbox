@@ -74,7 +74,12 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol | rebranding }}</span>
+                            <span v-if="market.quote.symbol.length > 17" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding | truncate(17) }}
+                            </span>
+                            <span v-else class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding }}
+                            </span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">
@@ -163,6 +168,7 @@ import {
     RebrandingFilterMixin,
     OrderMixin,
     LoggerMixin,
+    FiltersMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -178,6 +184,7 @@ export default {
         RebrandingFilterMixin,
         OrderMixin,
         LoggerMixin,
+        FiltersMixin,
     ],
     components: {
         Guide,
