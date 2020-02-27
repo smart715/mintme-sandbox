@@ -43,7 +43,9 @@
                         v-for="filter in marketFilters.options"
                         :key="filter.key"
                         :value="filter.label"
-                        @click="toggleFilter(filter.key)"> {{ filter.label }}
+                        @click="toggleFilter(filter.key)"
+                    >
+                        {{ filter.label }}
                     </b-dropdown-item>
                 </template>
             </b-dropdown>
@@ -328,7 +330,7 @@ export default {
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
                 .then((res) => {
-                    if (Object.keys(this.markets).length === 1 && this.marketFilters.userSelected == false) {
+                    if (Object.keys(this.markets).length === 1 && !this.marketFilters.userSelected) {
                         this.marketFilters.selectedFilter = 'all';
                         this.fetchData();
                         return;
