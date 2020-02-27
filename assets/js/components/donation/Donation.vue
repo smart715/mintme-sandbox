@@ -71,7 +71,7 @@
                                                     class="form-control"
                                                     @keypress="checkAmountInput"
                                                     @paste="checkAmountInput"
-                                                    @keyup.enter="checkDonation"
+                                                    @keyup="onKeyup"
                                                 >
                                                 <div class="input-group-append">
                                                     <button
@@ -131,6 +131,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import {
     MoneyFilterMixin,
     NotificationMixin,
@@ -213,12 +214,15 @@ export default {
                     (this.amountToDonate && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
                 );
         },
+        isAmountValid: function() {
+            return this.amountToDonate !== '' && (new Decimal(this.amountToDonate)).greaterThan(0);
+        },
         buttonDisabled: function() {
             return !this.loggedIn
                 || !this.isCurrencySelected
                 || this.insufficientFunds
-                || this.balance <= 0
-                || this.amountToReceive <= 0;
+                || !this.balance > 0
+                || !this.amountToReceive > 0;
         },
     },
     mounted() {
@@ -263,11 +267,17 @@ export default {
         checkAmountInput: function() {
             return this.checkInput(this.market.base.subunit);
         },
-        checkDonation: function() {
-            if (this.insufficientFunds) {
-                return;
-            }
+        onKeyup: function() {
+            let self = this;
+            _.debounce(function() {
+                if (self.insufficientFunds || !self.isAmountValid) {
+                    return;
+                }
 
+                self.checkDonation();
+            }, 500)();
+        },
+        checkDonation: function() {
             this.donationChecking = true;
 
             this.$axios.retry.get(this.$routing.generate('check_donation', {
@@ -298,7 +308,7 @@ export default {
                             + 'You have received ' + this.amountToReceive + ' tokens.'
                         );
 
-                        this.amountToDonate = 0;
+                        this.resetAmount();
                     }
                 }, (error) => {
                     if (!error.response) {
@@ -317,11 +327,21 @@ export default {
             this.amountToDonate = toMoney(this.balance, this.market.base.subunit);
             this.checkDonation();
         },
+        resetAmount: function() {
+            this.amountToDonate = 0;
+            this.amountToReceive = 0;
+        },
     },
     watch: {
         selectedCurrency: function() {
             if (this.isCurrencySelected) {
                 this.getTokenBalance();
+                this.resetAmount();
+            }
+        },
+        amountToDonate: function() {
+            if (this.amountToDonate === '') {
+                this.amountToReceive = 0;
             }
         },
     },
