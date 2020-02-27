@@ -34,13 +34,17 @@ export default {
             tradersArray.push(this.createTraderLinkFromOrder(ownerOrder));
             let orders = fullOrdersList.filter((order) => {
                 let makerId = parseInt(order.maker.id);
-                if (tradersIdsArray.includes(makerId) || parseInt(ownerId) === makerId) {
+                if (
+                    tradersIdsArray.includes(makerId)
+                    || parseInt(ownerId) === makerId
+                    || price !== toMoney(order.price, basePrecision)
+                ) {
                     return false;
                 }
 
                 tradersIdsArray.push(makerId);
 
-                return price === toMoney(order.price, basePrecision);
+                return true;
             });
 
             orders.sort((a, b) => a.timestamp - b.timestamp);
