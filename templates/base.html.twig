@@ -16,9 +16,9 @@
         </title>
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
+    {% block spinnerblock %}{% endblock %}
         {% block body %}
             <div onload="document.body.classList.remove('hidden')" class="content-wrapper hidden d-flex flex-column {% block contentclass %}{% endblock %}">
-                {% block spinnerblock %}{% endblock %}
                 {% block header %}
                     {% include 'topnav.html.twig' %}
                 {% endblock %}
