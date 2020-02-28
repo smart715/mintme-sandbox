@@ -115,7 +115,14 @@ export default {
         },
     },
     mounted: function() {
-        this.updateTableData();
+      this.$emit('show-spinner');
+      this.updateTableData()
+        .then(() => {
+          this.$emit('hide-spinner');
+        })
+        .catch((err) => {
+          this.$emit('hide-spinner');
+        });
     },
     methods: {
         addDetailsForEmptyMessageToHistory: function(historyData) {

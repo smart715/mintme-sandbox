@@ -120,13 +120,18 @@ export default {
         },
     },
     mounted: function() {
-        this.updateTableData();
+        this.$emit('show-spinner');
+        this.updateTableData()
+        .then(() => {
+          this.$emit('hide-spinner');
+        })
+        .catch((err) => {
+          this.$emit('hide-spinner');
+        });
     },
     methods: {
         updateTableData: function() {
             return new Promise((resolve, reject) => {
-              if (!this.loaded) {
-              }
                 this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
                     .then((res) => {
                         res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;

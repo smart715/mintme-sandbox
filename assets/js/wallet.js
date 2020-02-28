@@ -18,6 +18,7 @@ new Vue({
       depositWithdrawHistory: null,
       markets: null,
       orders: null,
+      spinnerQuantity: 0,
     };
   },
   computed: {
@@ -31,6 +32,20 @@ new Vue({
     ActiveOrders,
     DepositWithdrawHistory,
     PageLoadSpinner,
+  },
+  methods: {
+    showSpinner: function() {
+      if (!this.spinnerQuantity) {
+        this.$refs.spinner.show();
+      }
+      this.spinnerQuantity = this.spinnerQuantity + 1;
+    },
+    hideSpinner: function() {
+      this.spinnerQuantity = this.spinnerQuantity - 1;
+      if (!this.spinnerQuantity) {
+        this.$refs.spinner.hide();
+      }
+    },
   },
   store,
 });

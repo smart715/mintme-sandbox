@@ -252,6 +252,7 @@ export default {
         },
     },
     mounted: function() {
+      this.$refs.spinner.show();
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
