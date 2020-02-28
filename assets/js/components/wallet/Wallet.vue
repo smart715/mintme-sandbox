@@ -117,7 +117,6 @@
                 </tr>
             </tbody>
         </table>
-        <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
@@ -252,7 +251,7 @@ export default {
         },
     },
     mounted: function() {
-      this.$refs.spinner.show();
+        this.$emit('show-spinner');
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
@@ -296,10 +295,10 @@ export default {
         ])
         .then(() => {
             this.openDepositMore();
-            this.$refs.spinner.hide();
+            this.$emit('hide-spinner');
         })
         .catch((err) => {
-            this.$refs.spinner.hide();
+            this.$emit('hide-spinner');
             this.notifyError('Can not load Wallet data. Try again later.');
             this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
         });
