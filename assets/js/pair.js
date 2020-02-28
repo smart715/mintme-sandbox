@@ -31,6 +31,14 @@ new Vue({
     TopHolders,
     PageLoadSpinner,
   },
+  mounted() {
+    this.$on('hide-spinner', () => {
+      this.hideSpinner();
+    });
+    this.$on('show-spinner', () => {
+      this.showSpinner();
+    });
+  },
   methods: {
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
@@ -57,12 +65,14 @@ new Vue({
         this.$refs.spinner.show();
       }
       this.spinnerQuantity = this.spinnerQuantity + 1;
+      alert(' + ' + this.spinnerQuantity);
     },
     hideSpinner: function() {
       this.spinnerQuantity = this.spinnerQuantity - 1;
       if (!this.spinnerQuantity) {
         this.$refs.spinner.hide();
       }
+      alert(' - ' + this.spinnerQuantity);
     },
   },
   store,
