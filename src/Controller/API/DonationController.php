@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Exchange\Donation\DonationHandlerInterface;
+use App\Exchange\Market;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -26,12 +27,11 @@ class DonationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/check/{market}/{amount}/{fee}", name="check_donation", options={"expose"=true})
-     * @Rest\RequestParam(name="market", allowBlank=false, requirements="(WEB|BTC)", description="Market name.")
+     * @Rest\Get("/{base}/{quote}/check/{amount}/{fee}", name="check_donation", options={"expose"=true})
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(name="fee", allowBlank=false, description="Donation fee.")
      */
-    public function checkDonation(string $market, string $amount, string $fee): View
+    public function checkDonation(Market $market, string $amount, string $fee): View
     {
         $amountToReceive = 10;
 //        $amountToReceive = $this->donationHandler->checkDonation(
@@ -45,16 +45,15 @@ class DonationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/make", name="make_donation", options={"expose"=true})
-     * @Rest\RequestParam(name="market", allowBlank=false, requirements="(WEB|BTC)", description="Market name.")
+     * @Rest\Post("/{base}/{quote}/make", name="make_donation", options={"expose"=true})
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(name="fee", allowBlank=false, description="Donation fee.")
      * @Rest\RequestParam(name="expected_count_to_receive", allowBlank=false, description="Expected tokens count to receive.")
      */
-    public function getBalance(ParamFetcherInterface $request): View
+    public function getBalance(Market $market, ParamFetcherInterface $request): View
     {
 //        $this->donationHandler->makeDonation(
-//            (string)$request->get('market'),
+//            $market,
 //            (string)$request->get('amount'),
 //            (string)$request->get('fee'),
 //            (string)$request->get('expected_count_to_receive')

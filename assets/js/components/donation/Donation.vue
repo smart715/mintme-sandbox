@@ -108,7 +108,7 @@
                                             <button
                                                 :disabled="buttonDisabled"
                                                 @click="makeDonation"
-                                                class="btn btn-primary"
+                                                class="btn btn-primary btn-donate"
                                             >
                                                 Donate {{ donationCurrency }}
                                             </button>
@@ -211,7 +211,7 @@ export default {
                 (
                     (new Decimal(this.balance)).lessThan(this.minTotalPrice)
                     ||
-                    (this.amountToDonate && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
+                    (this.amountToDonate > 0 && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
                 );
         },
         isAmountValid: function() {
@@ -281,7 +281,8 @@ export default {
             this.donationChecking = true;
 
             this.$axios.retry.get(this.$routing.generate('check_donation', {
-                market: this.selectedCurrency,
+                base: this.selectedCurrency,
+                quote: this.market.quote.symbol,
                 amount: this.amountToDonate,
                 fee: this.donationFee,
             }))
@@ -295,7 +296,10 @@ export default {
                 });
         },
         makeDonation: function() {
-            this.$axios.single.post(this.$routing.generate('make_donation'), {
+            this.$axios.single.post(this.$routing.generate('make_donation', {
+                base: this.selectedCurrency,
+                quote: this.market.quote.symbol,
+            }), {
                 market: this.selectedCurrency,
                 amount: this.amountToDonate,
                 fee: this.donationFee,

@@ -4,6 +4,8 @@ namespace App\Exchange\Donation;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Exchange\Market;
+use App\Utils\Converter\MarketNameConverterInterface;
 
 class DonationHandler implements DonationHandlerInterface
 {
@@ -13,15 +15,21 @@ class DonationHandler implements DonationHandlerInterface
     /** @var JsonRpcInterface */
     private $jsonRpc;
 
-    public function __construct(JsonRpcInterface $jsonRpc)
-    {
+    /** @var MarketNameConverterInterface */
+    private $marketNameConverter;
+
+    public function __construct(
+        JsonRpcInterface $jsonRpc,
+        MarketNameConverterInterface $marketNameConverter
+    ) {
         $this->jsonRpc = $jsonRpc;
+        $this->marketNameConverter = $marketNameConverter;
     }
 
-    public function checkDonation(string $market, string $amount, string $fee): string
+    public function checkDonation(Market $market, string $amount, string $fee): string
     {
         $response = $this->jsonRpc->send(self::CHECK_DONATION_METHOD, [
-            $market,
+            $this->marketNameConverter->convert($market),
             $amount,
             $fee,
         ]);
@@ -33,10 +41,10 @@ class DonationHandler implements DonationHandlerInterface
         return $response->getResult();
     }
 
-    public function makeDonation(string $market, string $amount, string $fee, string $expectedAmount): void
+    public function makeDonation(Market $market, string $amount, string $fee, string $expectedAmount): void
     {
         $response = $this->jsonRpc->send(self::MAKE_DONATION_METHOD, [
-            $market,
+            $this->marketNameConverter->convert($market),
             $amount,
             $fee,
             $expectedAmount,
