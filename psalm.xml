@@ -13,4 +13,11 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+    <issueHandlers>
+        <UndefinedMagicPropertyFetch>
+            <errorLevel type="info">
+                <directory name="src"/>
+            </errorLevel>
+        </UndefinedMagicPropertyFetch>
+    </issueHandlers>
 </psalm>
