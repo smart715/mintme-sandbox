@@ -26,6 +26,7 @@
         "laminas/laminas-eventmanager": "^3.2",
         "moneyphp/money": "^3.1",
         "nelmio/api-doc-bundle": "^3.4",
+        "nikic/php-parser": "^4.3",
         "oro/doctrine-extensions": "^1.2",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "php-webdriver/webdriver": "^1.7",
@@ -75,7 +76,8 @@
         "symfony/profiler-pack": "^1.0",
         "symfony/test-pack": "^1.0",
         "symfony/var-dumper": "^4.1",
-        "symfony/web-server-bundle": "^4.1"
+        "symfony/web-server-bundle": "^4.1",
+        "vimeo/psalm": "^3.9"
     },
     "config": {
         "preferred-install": {
