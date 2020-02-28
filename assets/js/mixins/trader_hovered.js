@@ -21,8 +21,8 @@ export default {
         },
     },
     methods: {
-        mouseoverHandler: function(fullOrdersList, basePrecision, ownerId, price) {
-            if (fullOrdersList.lenght === 0 || !ownerId || !price) {
+        mouseoverHandler: function(fullOrdersList, basePrecision, price) {
+            if (fullOrdersList.lenght === 0 || !price) {
                 return;
             }
 
@@ -30,15 +30,9 @@ export default {
             let tradersArray = [];
             let tradersIdsArray = [];
 
-            let ownerOrder = fullOrdersList.find((order) => parseInt(order.maker.id) === parseInt(ownerId));
-            tradersArray.push(this.createTraderLinkFromOrder(ownerOrder));
             let orders = fullOrdersList.filter((order) => {
                 let makerId = parseInt(order.maker.id);
-                if (
-                    tradersIdsArray.includes(makerId)
-                    || parseInt(ownerId) === makerId
-                    || price !== toMoney(order.price, basePrecision)
-                ) {
+                if (tradersIdsArray.includes(makerId) || price !== toMoney(order.price, basePrecision)) {
                     return false;
                 }
 

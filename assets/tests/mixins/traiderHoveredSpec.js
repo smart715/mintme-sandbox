@@ -78,7 +78,6 @@ describe('TraiderHoveredMixin', function() {
         wrapper.vm.mouseoverHandler(
             orders.slice(0, 3),
             basePrecision,
-            1,
             '0.01'
         );
 
@@ -92,7 +91,6 @@ describe('TraiderHoveredMixin', function() {
         wrapper.vm.mouseoverHandler(
             orders.slice(0, 9),
             basePrecision,
-            1,
             '0.01'
         );
 
@@ -111,7 +109,6 @@ describe('TraiderHoveredMixin', function() {
         wrapper.vm.mouseoverHandler(
             orders.slice(0, 13),
             basePrecision,
-            1,
             '0.01'
         );
 
@@ -135,7 +132,6 @@ describe('TraiderHoveredMixin', function() {
         wrapper.vm.mouseoverHandler(
             orders,
             basePrecision,
-            1,
             '0.01'
         );
 
@@ -153,7 +149,6 @@ describe('TraiderHoveredMixin', function() {
         wrapper.vm.mouseoverHandler(
             orders,
             basePrecision,
-            3,
             '0.03'
         );
 
@@ -161,14 +156,12 @@ describe('TraiderHoveredMixin', function() {
     });
 
     it('should contain link to owner profile only for not existent price 0.476', () => {
-        let link = '<a href="' + $url + '">User4 Test4</a>';
         wrapper.vm.mouseoverHandler(
             orders,
             basePrecision,
-            4,
             '0.476'
         );
 
-        expect(wrapper.vm.tooltipData).to.be.equal(link);
+        expect(wrapper.vm.tooltipData).to.be.equal('');
     });
 });
