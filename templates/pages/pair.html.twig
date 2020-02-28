@@ -19,7 +19,7 @@
 
 
 {% block content %}
-<div id="token" class="container" v-on:hide-spinner="hideSpinner" v-on:show-spinner="showSpinner">
+<div id="token" class="container">
     <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
     <div class="row pt-5 justify-content-center">
         <div class="col-md-10" v-cloak>
@@ -34,6 +34,8 @@
                                     :description="tokenDescription"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     @updated="descriptionUpdated"
+                                    v-on:hide-spinner="hideSpinner"
+                                    v-on:show-spinner="showSpinner"
                             ></token-introduction-description>
                             <token-introduction-profile
                                     class="col-12 col-lg-6 pr-lg-2"
@@ -50,6 +52,8 @@
                                     token-name="{{ market.quote.name }}"
                                     telegram-url="{{ token.telegramUrl }}"
                                     discord-url="{{ token.discordUrl }}"
+                                    v-on:hide-spinner="hideSpinner"
+                                    v-on:show-spinner="showSpinner"
                             >
                             </token-introduction-profile>
                             <token-introduction-statistics
@@ -59,10 +63,14 @@
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
                                     twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                     token-created="{{ token.getCreated().format('d M Y') }}"
-                                    :precision="{{ precision }}">
+                                    :precision="{{ precision }}"
+                                    v-on:hide-spinner="hideSpinner"
+                                    v-on:show-spinner="showSpinner">
                             </token-introduction-statistics>
                             <top-holders
                                     class="col-12 mt-3"
+                                    v-on:hide-spinner="hideSpinner"
+                                    v-on:show-spinner="showSpinner"
                                     :token-name="{{ market.quote.symbol | json_encode }}">
                             </top-holders>
                         </div>
@@ -83,6 +91,8 @@
                             :user-id="{{ app.user ? app.user.id : 0 }}"
                             mintme-supply-url="{{ mintme_supply }}"
                             :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                            v-on:hide-spinner="hideSpinner"
+                            v-on:show-spinner="showSpinner"
                             >
                         </trade>
                     </b-tab>
@@ -95,6 +105,8 @@
                                     <token-deploy-icon
                                             :is-owner="{{ isOwner ? 'true' : 'false' }}"
                                             :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                            v-on:hide-spinner="hideSpinner"
+                                            v-on:show-spinner="showSpinner"
                                     />
                                 </div>
                             </li>
@@ -112,6 +124,8 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         release-address="{{ token.mintDestination }}"
                                         @token-deploy-pending="setTokenPending"
+                                        v-on:hide-spinner="hideSpinner"
+                                        v-on:show-spinner="showSpinner"
                                 />
                             </div>
                         </li>

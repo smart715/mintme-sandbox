@@ -53,18 +53,16 @@ new Vue({
       return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
     },
     showSpinner: function() {
-      if (this.spinnerQuantity == 0) {
+      if (!this.spinnerQuantity) {
         this.$refs.spinner.show();
       }
       this.spinnerQuantity = this.spinnerQuantity + 1;
-      alert(this.spinnerQuantity);
     },
     hideSpinner: function() {
       this.spinnerQuantity = this.spinnerQuantity - 1;
-      if (this.spinnerQuantity == 0) {
+      if (!this.spinnerQuantity) {
         this.$refs.spinner.hide();
       }
-      alert(this.spinnerQuantity);
     },
   },
   store,

@@ -217,6 +217,7 @@ export default {
     mounted() {
         window.addEventListener('resize', this.handleRightLabel);
         this.handleRightLabel();
+        this.$emit('show-spinner');
 
         if ('WEBBTC' === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
@@ -266,7 +267,12 @@ export default {
                 params: [this.market.identifier, 24 * 60 * 60],
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
-        }).catch((err) => {
+        })
+          .then(() => {
+            this.$emit('hide-spinner');
+          })
+          .catch((err) => {
+            this.$emit('hide-spinner');
             this.notifyError('Service unavailable now. Can not load the chart data');
             this.sendLogs('error', 'Can not load the chart data', err);
         });
