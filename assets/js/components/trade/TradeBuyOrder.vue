@@ -219,9 +219,10 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
+                    let symbol = this.rebrandingFunc(this.market.base.symbol);
                     this.showNotification({
                         result: 2,
-                        message: `Total amount has to be at least ${this.minTotalPrice} ${this.market.base.symbol}`,
+                        message: `Total amount has to be at least ${this.minTotalPrice} ${symbol}`,
                     });
                     return;
                 }
