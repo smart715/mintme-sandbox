@@ -194,7 +194,7 @@ class ContractHandler implements ContractHandlerInterface
                     MoneyWrapper::TOK_SYMBOL
                 ),
                 $this->tokenManager->findByName($transaction['token']),
-                Status::fromString('paid'),
+                Status::fromString($transaction['status']),
                 Type::fromString($transaction['type'])
             );
         }, $transactions);
