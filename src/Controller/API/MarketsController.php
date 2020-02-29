@@ -52,10 +52,8 @@ class MarketsController extends APIController
         ParamFetcherInterface $request,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-        $deployed =  $request->get('deployed')
-            ? true
-                : false;
-        $markets = $request->get('user') || $request->get('deployed')
+        $deployed = !!$request->get('deployed');
+        $markets = $request->get('user') || $deployed
             ? $marketStatusManager->getUserMarketStatus(
                 $this->getUser(),
                 ($page - 1) * self::OFFSET,
