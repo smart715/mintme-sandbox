@@ -1,13 +1,9 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
-
 {% set formHeader = "Log In" %}
 {% set featured = true %}
-
 {% block formBody %}
     <form action="{{ path("login") }}" method="post">
-
-
         {% if app.session.flashbag.peekAll() is not empty %}
             <div class="row">
                 {% for label, messages in app.flashes %}
