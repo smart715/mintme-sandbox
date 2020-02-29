@@ -129,7 +129,7 @@
                             </div>
                             <div class="pb-1">
                                 Not yet released: <br>
-                                {{ stats.frozenAmount | toMoney(precision, false) | formatMoney }}
+                                {{  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
                                         Not yet released
@@ -162,6 +162,8 @@ import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
 import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
+import {mapGetters, mapMutations} from 'vuex';
+
 
 const defaultValue = '-';
 
@@ -178,18 +180,11 @@ export default {
     },
     data() {
         return {
-            tokenExchangeAmount: null,
             pendingSellOrders: null,
             soldOnMarket: null,
             isTokenExchanged: true,
             defaultValue: defaultValue,
             tokenWithdrawn: 0,
-            stats: {
-                releasePeriod: defaultValue,
-                hourlyRate: defaultValue,
-                releasedAmount: defaultValue,
-                frozenAmount: defaultValue,
-            },
         };
     },
     mounted: function() {
@@ -240,6 +235,12 @@ export default {
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
     },
+    methods: {
+        ...mapMutations('tokenStatistics', [
+            'setStats',
+            'setTokenExchangeAmount',
+        ]),
+    },
     computed: {
         loaded: function() {
             return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
@@ -259,6 +260,26 @@ export default {
         },
         withdrawBalance: function() {
             return toMoney(this.tokenWithdrawn);
+        },
+        ...mapGetters('tokenStatistics', [
+            'getStats',
+            'getTokenExchangeAmount',
+        ]),
+        tokenExchangeAmount: {
+            get() {
+                return this.getTokenExchangeAmount;
+            },
+            set(val) {
+                this.setTokenExchangeAmount(val);
+            },
+        },
+        stats: {
+            get() {
+                return this.getStats;
+            },
+            set(val) {
+                this.setStats(val);
+            },
         },
     },
     filters: {
