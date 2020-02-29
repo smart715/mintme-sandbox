@@ -8,7 +8,7 @@ import TopHolders from './components/trade/TopHolders';
 import PageLoadSpinner from './components/PageLoadSpinner';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
-import {NestedSpinner} from '../mixins';
+import {NestedSpinner} from './mixins';
 
 new Vue({
   el: '#token',

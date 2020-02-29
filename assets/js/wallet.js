@@ -4,7 +4,7 @@ import ActiveOrders from './components/wallet/ActiveOrders';
 import DepositWithdrawHistory from './components/wallet/DepositWithdrawHistory';
 import PageLoadSpinner from './components/PageLoadSpinner';
 import store from './storage';
-import {NestedSpinner} from '../mixins';
+import {NestedSpinner} from './mixins';
 
 new Vue({
   el: '#wallet',
