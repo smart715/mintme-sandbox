@@ -4,9 +4,11 @@ import ActiveOrders from './components/wallet/ActiveOrders';
 import DepositWithdrawHistory from './components/wallet/DepositWithdrawHistory';
 import PageLoadSpinner from './components/PageLoadSpinner';
 import store from './storage';
+import {NestedSpinner} from '../mixins';
 
 new Vue({
   el: '#wallet',
+  mixins: [NestedSpinner],
   data() {
     return {
       tabIndex: 0,
@@ -32,20 +34,6 @@ new Vue({
     ActiveOrders,
     DepositWithdrawHistory,
     PageLoadSpinner,
-  },
-  methods: {
-    showSpinner: function() {
-      if (!this.spinnerQuantity) {
-        this.$refs.spinner.show();
-      }
-      this.spinnerQuantity = this.spinnerQuantity + 1;
-    },
-    hideSpinner: function() {
-      this.spinnerQuantity = this.spinnerQuantity - 1;
-      if (!this.spinnerQuantity) {
-        this.$refs.spinner.hide();
-      }
-    },
   },
   store,
 });

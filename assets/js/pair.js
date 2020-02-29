@@ -8,6 +8,7 @@ import TopHolders from './components/trade/TopHolders';
 import PageLoadSpinner from './components/PageLoadSpinner';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
+import {NestedSpinner} from '../mixins';
 
 new Vue({
   el: '#token',
@@ -18,7 +19,6 @@ new Vue({
       editingName: false,
       tokenName: null,
       tokenPending: null,
-      spinnerQuantity: 0,
     };
   },
   components: {
@@ -31,14 +31,7 @@ new Vue({
     TopHolders,
     PageLoadSpinner,
   },
-  mounted() {
-    this.$on('hide-spinner', () => {
-      this.hideSpinner();
-    });
-    this.$on('show-spinner', () => {
-      this.showSpinner();
-    });
-  },
+  mixins: [NestedSpinner],
   methods: {
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
@@ -59,18 +52,6 @@ new Vue({
     },
     getTokenStatus: function(status) {
       return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
-    },
-    showSpinner: function() {
-      if (!this.spinnerQuantity) {
-        this.$refs.spinner.show();
-      }
-      this.spinnerQuantity = this.spinnerQuantity + 1;
-    },
-    hideSpinner: function() {
-      this.spinnerQuantity = this.spinnerQuantity - 1;
-      if (!this.spinnerQuantity) {
-        this.$refs.spinner.hide();
-      }
     },
   },
   store,
