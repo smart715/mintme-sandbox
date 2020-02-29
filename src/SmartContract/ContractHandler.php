@@ -180,7 +180,7 @@ class ContractHandler implements ContractHandlerInterface
         return array_map(function (array $transaction) use ($withdrawFee, $depositFee) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
-                $transaction['hash'],
+                (string)$transaction['hash'],
                 $transaction['from'],
                 $transaction['to'],
                 new Money(
