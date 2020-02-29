@@ -282,6 +282,7 @@ class ContractHandlerTest extends TestCase
                     'amount' => '2000000000000',
                     'timestamp' => 1564566334,
                     'token' => 'foo',
+                    'status' => 'paid',
                     'type' => 'withdraw',
                 ],
                 [
@@ -291,6 +292,7 @@ class ContractHandlerTest extends TestCase
                     'amount' => '2000000000000',
                     'timestamp' => 1564566334,
                     'token' => 'bar',
+                    'status' => 'paid',
                     'type' => 'deposit',
                 ],
             ]));
