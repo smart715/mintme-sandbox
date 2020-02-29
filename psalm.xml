@@ -16,8 +16,19 @@
     <issueHandlers>
         <UndefinedMagicPropertyFetch>
             <errorLevel type="info">
-                <directory name="src"/>
+                <directory name="src/Validator"/>
             </errorLevel>
         </UndefinedMagicPropertyFetch>
+        <MoreSpecificImplementedParamType>
+            <errorLevel type="info">
+                <directory name="src"/>
+            </errorLevel>
+        </MoreSpecificImplementedParamType>
+        <InvalidScalarArgument>
+            <errorLevel type="info">
+                <file name="src/Wallet/Wallet.php"/>
+                <referencedFunction name="App\Wallet::getWithdrawDepositHistory"/>
+            </errorLevel>
+        </InvalidScalarArgument>
     </issueHandlers>
 </psalm>
