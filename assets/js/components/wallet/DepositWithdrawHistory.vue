@@ -3,6 +3,7 @@
         <template v-if="loaded">
         <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table">
             <b-table
+                thead-class="trading-head"
                 v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fields"
