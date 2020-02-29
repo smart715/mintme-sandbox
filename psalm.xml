@@ -27,8 +27,23 @@
         <InvalidScalarArgument>
             <errorLevel type="info">
                 <file name="src/Wallet/Wallet.php"/>
-                <referencedFunction name="App\Wallet::getWithdrawDepositHistory"/>
+                <file name="src/Exchange/Market/MarketHandler.php"/>
             </errorLevel>
         </InvalidScalarArgument>
+        <NullableReturnStatement>
+            <errorLevel type="info">
+                <file name="src/Security/ApiKeyUserProvider.php"/>
+            </errorLevel>
+        </NullableReturnStatement>
+        <ImplementedReturnTypeMismatch>
+            <errorLevel type="info">
+                <file name="src/Security/ApiKeyUserProvider.php"/>
+            </errorLevel>
+        </ImplementedReturnTypeMismatch>
+        <InvalidNullableReturnType>
+            <errorLevel type="info">
+                <file name="src/Security/ApiKeyUserProvider.php"/>
+            </errorLevel>
+        </InvalidNullableReturnType>
     </issueHandlers>
 </psalm>

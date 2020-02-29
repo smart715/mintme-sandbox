@@ -42,7 +42,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
                 ['base_uri' => $formatUrl, 'timeout' => $this->timeoutSeconds]
             );
             $response = $client->request('GET', self::URI);
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->selectError($exception->getCode());
             $this->logger->error($exception->getMessage());
 
