@@ -8,7 +8,7 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-if="row.value.full.length > 15" v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                        <div v-if="row.value.full.length > 17" v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
                                 {{ row.value.truncate | rebranding }}
                             </a>
@@ -104,7 +104,7 @@ export default {
                     formatter: (name) => {
                         return {
                             full: name,
-                            truncate: this.truncateFunc(name, 15),
+                            truncate: this.truncateFunc(name, 17),
                         };
                     },
                 },

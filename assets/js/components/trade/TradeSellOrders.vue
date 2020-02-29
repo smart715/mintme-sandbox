@@ -5,8 +5,8 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-if="tokenName.length > 22" v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
-                    {{ tokenName | rebranding | truncate(22) }}
+                    <span v-if="tokenName.length > 17" v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
+                    {{ tokenName | rebranding | truncate(17) }}
                     </span>
                     <span v-else>
                     {{ tokenName | rebranding }}

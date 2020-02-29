@@ -7,17 +7,15 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div
-                            v-if="row.value.length > 15"
-                            v-b-tooltip="{title: rebrandingFunc(row.value), boundary:'viewport'}"
-                        >
+                        <div v-if="row.value.full.length > 17"
+                            v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value | rebranding | truncate(15) }}
+                                {{ row.value.truncate | rebranding }}
                             </a>
                         </div>
                         <div v-else>
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value | rebranding }}
+                                {{ row.value.full | rebranding }}
                             </a>
                         </div>
                     </template>
@@ -74,6 +72,12 @@ export default {
                     label: 'Name',
                     sortable: true,
                     class: 'pair-cell',
+                    formatter: (name) => {
+                        return {
+                            full: name,
+                            truncate: this.truncateFunc(name, 17),
+                        };
+                    },
                 },
                 {
                     key: 'amount',
