@@ -53,6 +53,7 @@
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
+                    thead-class="trading-head"
                     :items="tokens"
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"
