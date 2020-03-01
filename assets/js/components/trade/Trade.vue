@@ -2,326 +2,324 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
-                    class="col"
-                    :websocket-url="websocketUrl"
-                    :market="market"
-                    :mintme-supply-url="mintmeSupplyUrl"
-                    :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
+                class="col"
+                :websocket-url="websocketUrl"
+                :market="market"
+                :mintme-supply-url="mintmeSupplyUrl"
+                :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
             />
         </div>
         <div class="row trade-orders">
             <div class="col-12 col-lg-6 pr-lg-2 mt-3">
                 <trade-buy-order
-                        :websocket-url="websocketUrl"
-                        :hash="hash"
-                        :login-url="loginUrl"
-                        :signup-url="signupUrl"
-                        :logged-in="loggedIn"
-                        :market="market"
-                        :market-price="marketPriceBuy"
-                        :balance="baseBalance"
-                        :balance-loaded="balanceLoaded"
-                        @check-input="checkInput"
+                    :websocket-url="websocketUrl"
+                    :hash="hash"
+                    :login-url="loginUrl"
+                    :signup-url="signupUrl"
+                    :logged-in="loggedIn"
+                    :market="market"
+                    :market-price="marketPriceBuy"
+                    :balance="baseBalance"
+                    :balance-loaded="balanceLoaded"
+                    @check-input="checkInput"
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
-                <trade-sell-order
-                        :websocket-url="websocketUrl"
-                        :hash="hash"
-                        :login-url="loginUrl"
-                        :signup-url="signupUrl"
-                        :logged-in="loggedIn"
-                        :market="market"
-                        :market-price="marketPriceSell"
-                        :balance="quoteBalance"
-                        :balance-loaded="balanceLoaded"
-                        :is-owner="isOwner"
-                        @check-input="checkInput"
+                 <trade-sell-order
+                    :websocket-url="websocketUrl"
+                    :hash="hash"
+                    :login-url="loginUrl"
+                    :signup-url="signupUrl"
+                    :logged-in="loggedIn"
+                    :market="market"
+                    :market-price="marketPriceSell"
+                    :balance="quoteBalance"
+                    :balance-loaded="balanceLoaded"
+                    :is-owner="isOwner"
+                    @check-input="checkInput"
                 />
             </div>
         </div>
         <div class="row">
             <trade-orders
-                    @update-data="updateOrders"
-                    :orders-loaded="ordersLoaded"
-                    :buy-orders="buyOrders"
-                    :sell-orders="sellOrders"
-                    :market="market"
-                    :user-id="userId"
-                    :logged-in="loggedIn"/>
+                @update-data="updateOrders"
+                :orders-loaded="ordersLoaded"
+                :buy-orders="buyOrders"
+                :sell-orders="sellOrders"
+                :market="market"
+                :user-id="userId"
+                :logged-in="loggedIn"/>
         </div>
         <div class="row mt-3">
             <trade-trade-history
-                    class="col"
-                    :hash="hash"
-                    :websocket-url="websocketUrl"
-                    :market="market" />
+                class="col"
+                :hash="hash"
+                :websocket-url="websocketUrl"
+                :market="market" />
         </div>
     </div>
 </template>
 
 <script>
-  import TradeBuyOrder from './TradeBuyOrder';
-  import TradeSellOrder from './TradeSellOrder';
-  import TradeChart from './TradeChart';
-  import TradeOrders from './TradeOrders';
-  import TradeTradeHistory from './TradeTradeHistory';
-  import OrderModal from '../modal/OrderModal';
-  import {isRetryableError} from 'axios-retry';
-  import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../mixins';
-  import {toMoney, Constants} from '../../utils';
+import TradeBuyOrder from './TradeBuyOrder';
+import TradeSellOrder from './TradeSellOrder';
+import TradeChart from './TradeChart';
+import TradeOrders from './TradeOrders';
+import TradeTradeHistory from './TradeTradeHistory';
+import OrderModal from '../modal/OrderModal';
+import {isRetryableError} from 'axios-retry';
+import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../mixins';
+import {toMoney, Constants} from '../../utils';
 
-  const WSAPI = Constants.WSAPI;
+const WSAPI = Constants.WSAPI;
 
-  export default {
+export default {
     name: 'Trade',
     mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     components: {
-      TradeBuyOrder,
-      TradeSellOrder,
-      TradeChart,
-      TradeOrders,
-      TradeTradeHistory,
-      OrderModal,
+        TradeBuyOrder,
+        TradeSellOrder,
+        TradeChart,
+        TradeOrders,
+        TradeTradeHistory,
+        OrderModal,
     },
     props: {
-      websocketUrl: String,
-      hash: String,
-      loginUrl: String,
-      signupUrl: String,
-      market: Object,
-      loggedIn: Boolean,
-      tokenName: String,
-      isOwner: Boolean,
-      userId: Number,
-      precision: Number,
-      mintmeSupplyUrl: String,
-      minimumVolumeForMarketcap: Number,
+        websocketUrl: String,
+        hash: String,
+        loginUrl: String,
+        signupUrl: String,
+        market: Object,
+        loggedIn: Boolean,
+        tokenName: String,
+        isOwner: Boolean,
+        userId: Number,
+        precision: Number,
+        mintmeSupplyUrl: String,
+        minimumVolumeForMarketcap: Number,
     },
     data() {
-      return {
-        buyOrders: null,
-        sellOrders: null,
-        balances: null,
-        sellPage: 2,
-        buyPage: 2,
-      };
+        return {
+            buyOrders: null,
+            sellOrders: null,
+            balances: null,
+            sellPage: 2,
+            buyPage: 2,
+        };
     },
     computed: {
-      baseBalance: function() {
-        return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
-          : false;
-      },
-      quoteBalance: function() {
-        return this.balances && this.balances[this.market.quote.symbol] ? this.balances[this.market.quote.symbol].available
-          : false;
-      },
-      balanceLoaded: function() {
-        return this.balances !== null;
-      },
-      ordersLoaded: function() {
-        return this.buyOrders !== null && this.sellOrders !== null;
-      },
-      marketPriceSell: function() {
-        return this.buyOrders && this.buyOrders[0] ? this.buyOrders[0].price : 0;
-      },
-      marketPriceBuy: function() {
-        return this.sellOrders && this.sellOrders[0] ? this.sellOrders[0].price : 0;
-      },
+        baseBalance: function() {
+            return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
+                : false;
+        },
+        quoteBalance: function() {
+            return this.balances && this.balances[this.market.quote.symbol] ? this.balances[this.market.quote.symbol].available
+                : false;
+        },
+        balanceLoaded: function() {
+            return this.balances !== null;
+        },
+        ordersLoaded: function() {
+            return this.buyOrders !== null && this.sellOrders !== null;
+        },
+        marketPriceSell: function() {
+            return this.buyOrders && this.buyOrders[0] ? this.buyOrders[0].price : 0;
+        },
+        marketPriceBuy: function() {
+            return this.sellOrders && this.sellOrders[0] ? this.sellOrders[0].price : 0;
+        },
     },
     mounted() {
-      this.$emit('show-spinner');
-      this.updateOrders().then(() => {
-        this.sendMessage(JSON.stringify({
-          method: 'order.subscribe',
-          params: [this.market.identifier],
-          id: parseInt(Math.random().toString().replace('0.', '')),
-        }));
+        this.updateOrders().then(() => {
+            this.$emit('show-spinner');
+            this.sendMessage(JSON.stringify({
+                method: 'order.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
 
-        this.addMessageHandler((response) => {
-          if ('order.update' === response.method) {
-            this.processOrders(response.params[1], response.params[0]);
-          }
-        }, 'trade-update-orders');
-        this.$emit('hide-spinner');
-      })
-      .catch((err) => {
-        this.$emit('hide-spinner');
-      });
+            this.addMessageHandler((response) => {
+                if ('order.update' === response.method) {
+                    this.processOrders(response.params[1], response.params[0]);
+                }
+            }, 'trade-update-orders');
 
-      this.addOnOpenHandler(() => {
-        this.sendMessage(JSON.stringify({
-          method: 'deals.subscribe',
-          params: [this.market.identifier],
-          id: parseInt(Math.random().toString().replace('0.', '')),
-        }));
+            this.$emit('hide-spinner');
+        });
 
-        this.updateAssets();
-      });
+        this.addOnOpenHandler(() => {
+            this.sendMessage(JSON.stringify({
+                method: 'deals.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
+
+            this.updateAssets();
+        });
     },
     methods: {
-      checkInput: function(precision) {
-        let selectionStart = event.target.selectionStart;
-        let selectionEnd = event.target.selectionEnd;
-        let amount = event.srcElement.value;
-        let regex = new RegExp(`^[0-9]{0,8}(\\.[0-9]{0,${precision}})?$`);
-        let input = event instanceof ClipboardEvent
-          ? event.clipboardData.getData('text')
-          : String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        checkInput: function(precision) {
+            let selectionStart = event.target.selectionStart;
+            let selectionEnd = event.target.selectionEnd;
+            let amount = event.srcElement.value;
+            let regex = new RegExp(`^[0-9]{0,8}(\\.[0-9]{0,${precision}})?$`);
+            let input = event instanceof ClipboardEvent
+                ? event.clipboardData.getData('text')
+                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
 
-        if (!regex.test(amount.slice(0, selectionStart) + input + amount.slice(selectionEnd))) {
-          event.preventDefault();
-          return false;
-        }
-
-        return true;
-      },
-      /**
-       * @param {undefined|{type, isAssigned, resolve}} context
-       * @return {Promise}
-       */
-      updateOrders: function(context) {
-        return new Promise((resolve, reject) => {
-          if (!context) {
-            this.$axios.retry.get(this.$routing.generate('pending_orders', {
-              base: this.market.base.symbol, quote: this.market.quote.symbol,
-            })).then((result) => {
-              this.buyOrders = this.sortOrders(result.data.buy, false);
-              this.sellOrders = this.sortOrders(result.data.sell, true);
-              resolve();
-            }).catch((err) => {
-              this.sendLogs('error', 'Can not update orders', err);
-              reject();
-            });
-          } else {
-            this.$axios.retry.get(this.$routing.generate('pending_orders', {
-              base: this.market.base.symbol,
-              quote: this.market.quote.symbol,
-              page: context.type === 'sell' ?
-                this.sellPage :
-                this.buyPage,
-            })).then((result) => {
-              if (!result.data.sell.length && !result.data.buy.length) {
-                context.resolve();
-                return resolve([]);
-              }
-
-              switch (context.type) {
-                case 'sell':
-                  this.sellOrders = this.sellOrders.concat(result.data.sell);
-                  this.sellPage++;
-                  break;
-                case 'buy':
-                  this.buyOrders = this.buyOrders.concat(result.data.buy);
-                  this.buyPage++;
-                  break;
-              }
-
-              context.resolve();
-              resolve(result.data);
-            }).catch((err) => {
-              this.sendLogs('error', 'Can not update orders', err);
-              reject();
-            });
-          }
-        });
-      },
-      updateAssets: function() {
-        if (!this.loggedIn) {
-          this.balances = false;
-          return;
-        }
-
-        this.$axios.retry.get(this.$routing.generate('tokens'))
-          .then((res) => {
-            this.balances = {...res.data.common, ...res.data.predefined};
-
-            if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
-              this.balances[this.market.quote.symbol] = {available: toMoney(0, this.precision)};
+            if (!regex.test(amount.slice(0, selectionStart) + input + amount.slice(selectionEnd))) {
+                event.preventDefault();
+                return false;
             }
 
-            this.authorize()
-              .then(() => {
-                this.sendMessage(JSON.stringify({
-                  method: 'asset.subscribe',
-                  params: [this.market.base.identifier, this.market.quote.identifier],
-                  id: parseInt(Math.random().toString().replace('0.', '')),
-                }));
-              })
-              .catch((err) => {
-                this.notifyError(
-                  'Can not connect to internal services'
-                );
-                this.sendLogs('error', 'Can not connect to internal services', err);
-              });
-          })
-          .catch((err) => {
-            if (!isRetryableError(err)) {
-              this.balances = false;
+            return true;
+        },
+        /**
+         * @param {undefined|{type, isAssigned, resolve}} context
+         * @return {Promise}
+         */
+        updateOrders: function(context) {
+            return new Promise((resolve, reject) => {
+                if (!context) {
+                    this.$axios.retry.get(this.$routing.generate('pending_orders', {
+                        base: this.market.base.symbol, quote: this.market.quote.symbol,
+                    })).then((result) => {
+                        this.buyOrders = this.sortOrders(result.data.buy, false);
+                        this.sellOrders = this.sortOrders(result.data.sell, true);
+                        resolve();
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not update orders', err);
+                        reject();
+                    });
+                } else {
+                    this.$axios.retry.get(this.$routing.generate('pending_orders', {
+                        base: this.market.base.symbol,
+                        quote: this.market.quote.symbol,
+                        page: context.type === 'sell' ?
+                            this.sellPage :
+                            this.buyPage,
+                    })).then((result) => {
+                        if (!result.data.sell.length && !result.data.buy.length) {
+                            context.resolve();
+                            return resolve([]);
+                        }
+
+                        switch (context.type) {
+                            case 'sell':
+                                this.sellOrders = this.sellOrders.concat(result.data.sell);
+                                this.sellPage++;
+                                break;
+                            case 'buy':
+                                this.buyOrders = this.buyOrders.concat(result.data.buy);
+                                this.buyPage++;
+                                break;
+                        }
+
+                        context.resolve();
+                        resolve(result.data);
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not update orders', err);
+                        reject();
+                    });
+                }
+            });
+        },
+        updateAssets: function() {
+            if (!this.loggedIn) {
+                this.balances = false;
+                return;
+            }
+
+            this.$axios.retry.get(this.$routing.generate('tokens'))
+                .then((res) => {
+                    this.balances = {...res.data.common, ...res.data.predefined};
+
+                    if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
+                        this.balances[this.market.quote.symbol] = {available: toMoney(0, this.precision)};
+                    }
+
+                    this.authorize()
+                        .then(() => {
+                            this.sendMessage(JSON.stringify({
+                                method: 'asset.subscribe',
+                                params: [this.market.base.identifier, this.market.quote.identifier],
+                                id: parseInt(Math.random().toString().replace('0.', '')),
+                            }));
+                        })
+                        .catch((err) => {
+                            this.notifyError(
+                                'Can not connect to internal services'
+                            );
+                            this.sendLogs('error', 'Can not connect to internal services', err);
+                        });
+                })
+                .catch((err) => {
+                    if (!isRetryableError(err)) {
+                        this.balances = false;
+                    } else {
+                        this.notifyError('Can not load current balance. Try again later.');
+                        this.sendLogs('error', 'Can not load current balance', err);
+                    }
+                });
+        },
+        processOrders: function(data, type) {
+            const isSell = WSAPI.order.type.SELL === parseInt(data.side);
+            let orders = isSell ? this.sellOrders : this.buyOrders;
+            let order = orders.find((order) => data.id === order.id);
+
+            switch (type) {
+                case WSAPI.order.status.PUT:
+                    this.$axios.retry.get(this.$routing.generate('pending_order_details', {
+                        base: this.market.base.symbol,
+                        quote: this.market.quote.symbol,
+                        id: data.id,
+                    }))
+                    .then((res) => {
+                        orders.push(res.data);
+                        orders = this.sortOrders(orders, isSell);
+                        this.saveOrders(orders, isSell);
+                    })
+                    .catch((err) => {
+                        this.notifyError('Something went wrong. Can not update orders.');
+                        this.sendLogs('error', 'Can not update orders', err);
+                    });
+                    break;
+                case WSAPI.order.status.UPDATE:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    let index = orders.indexOf(order);
+                    order.amount = data.left;
+                    order.price = data.price;
+                    order.timestamp = data.mtime;
+                    orders[index] = order;
+                    break;
+                case WSAPI.order.status.FINISH:
+                    if (typeof order === 'undefined') {
+                        return;
+                    }
+
+                    orders.splice(orders.indexOf(order), 1);
+                    break;
+            }
+
+            this.saveOrders(orders, isSell);
+        },
+        saveOrders: function(orders, isSell) {
+            if (isSell) {
+                this.sellOrders = orders;
             } else {
-              this.notifyError('Can not load current balance. Try again later.');
-              this.sendLogs('error', 'Can not load current balance', err);
+                this.buyOrders = orders;
             }
-          });
-      },
-      processOrders: function(data, type) {
-        const isSell = WSAPI.order.type.SELL === parseInt(data.side);
-        let orders = isSell ? this.sellOrders : this.buyOrders;
-        let order = orders.find((order) => data.id === order.id);
-
-        switch (type) {
-          case WSAPI.order.status.PUT:
-            this.$axios.retry.get(this.$routing.generate('pending_order_details', {
-              base: this.market.base.symbol,
-              quote: this.market.quote.symbol,
-              id: data.id,
-            }))
-              .then((res) => {
-                orders.push(res.data);
-                orders = this.sortOrders(orders, isSell);
-                this.saveOrders(orders, isSell);
-              })
-              .catch((err) => {
-                this.notifyError('Something went wrong. Can not update orders.');
-                this.sendLogs('error', 'Can not update orders', err);
-              });
-            break;
-          case WSAPI.order.status.UPDATE:
-            if (typeof order === 'undefined') {
-              return;
-            }
-
-            let index = orders.indexOf(order);
-            order.amount = data.left;
-            order.price = data.price;
-            order.timestamp = data.mtime;
-            orders[index] = order;
-            break;
-          case WSAPI.order.status.FINISH:
-            if (typeof order === 'undefined') {
-              return;
-            }
-
-            orders.splice(orders.indexOf(order), 1);
-            break;
-        }
-
-        this.saveOrders(orders, isSell);
-      },
-      saveOrders: function(orders, isSell) {
-        if (isSell) {
-          this.sellOrders = orders;
-        } else {
-          this.buyOrders = orders;
-        }
-      },
-      sortOrders: function(orders, isSell) {
-        return orders.sort((a, b) => {
-          return isSell ?
-            parseFloat(a.price) - parseFloat(b.price) :
-            parseFloat(b.price) - parseFloat(a.price);
-        });
-      },
+        },
+        sortOrders: function(orders, isSell) {
+            return orders.sort((a, b) => {
+                return isSell ?
+                    parseFloat(a.price) - parseFloat(b.price) :
+                    parseFloat(b.price) - parseFloat(a.price);
+            });
+        },
     },
-  };
+};
 </script>
