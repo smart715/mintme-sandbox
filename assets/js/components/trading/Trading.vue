@@ -265,7 +265,7 @@ export default {
         },
     },
     mounted() {
-          this.fetchData();
+        this.fetchData();
     },
     methods: {
         toggleUsd: function(show) {
