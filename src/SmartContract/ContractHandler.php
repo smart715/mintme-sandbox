@@ -82,6 +82,7 @@ class ContractHandler implements ContractHandlerInterface
                 'mintDestination' => $this->config->getMintmeAddress(),
                 'releasedAtCreation' => $token->getLockIn()->getReleasedAmount()->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
+                'userId' => $token->getProfile()->getUser()->getId(),
             ]
         );
 
