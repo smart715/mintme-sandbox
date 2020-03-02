@@ -3,17 +3,17 @@
         <div class="card-header">
             <span>Trading</span>
             <b-dropdown
-                    id="currency"
-                    variant="primary"
-                    class="float-right"
-                    :lazy="true"
+                id="currency"
+                variant="primary"
+                class="float-right"
+                :lazy="true"
             >
                 <template slot="button-content">
                     Currency:
-                    <span v-if="showUsd">
+                <span v-if="showUsd">
                     USD
                 </span>
-                    <span v-else>
+                <span v-else>
                     Crypto
                 </span>
                 </template>
@@ -31,40 +31,40 @@
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
                 <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="checkbox"
-                        v-model="userTokensEnabled"
-                        @change="fetchData(1)"
-                        :disabled="loading">
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="checkbox"
+                    v-model="userTokensEnabled"
+                    @change="fetchData(1)"
+                    :disabled="loading">
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
         </div>
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
-                        thead-class="trading-head"
-                        :items="tokens"
-                        :fields="fieldsArray"
-                        :sort-compare="sortCompare"
-                        sort-direction="desc"
-                        :sort-by.sync="sortBy"
-                        :sort-desc.sync="sortDesc"
+                    thead-class="trading-head"
+                    :items="tokens"
+                    :fields="fieldsArray"
+                    :sort-compare="sortCompare"
+                    sort-direction="desc"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
-                                id="volume"
-                                variant="primary"
-                                :lazy="true"
+                            id="volume"
+                            variant="primary"
+                            :lazy="true"
                         >
                             <template slot="button-content">
                                 {{ data.label|rebranding }}
                             </template>
                             <template>
                                 <b-dropdown-item
-                                        v-for="(volume, key) in volumes"
-                                        :key="key"
-                                        @click="toggleActiveVolume(key)"
+                                    v-for="(volume, key) in volumes"
+                                    :key="key"
+                                    @click="toggleActiveVolume(key)"
                                 >
                                     {{ volume.label|rebranding }}
                                 </b-dropdown-item>
@@ -98,9 +98,9 @@
                                 {{ row.value }}
                             </a>
                             <guide
-                                    placement="top"
-                                    max-width="150px"
-                                    v-if="row.item.tokenized">
+                                placement="top"
+                                max-width="150px"
+                                v-if="row.item.tokenized">
                                 <template slot="icon">
                                     <img src="../../../img/mintmecoin_W.png" alt="deployed">
                                 </template>
@@ -114,11 +114,11 @@
             </div>
             <div class="row justify-content-center">
                 <b-pagination
-                        @change="fetchData"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
-                        v-model="currentPage"
-                        class="my-0"/>
+                    @change="fetchData"
+                    :total-rows="totalRows"
+                    :per-page="perPage"
+                    v-model="currentPage"
+                    class="my-0"/>
             </div>
         </template>
         <template v-else>
@@ -358,7 +358,7 @@
                                     {page},
                                     document.title,
                                     this.$routing.generate('trading', {page})
-                                )
+                                );
                             }
                             resolve();
                         })
@@ -399,7 +399,7 @@
                     monthVolume,
                     supply,
                     marketPrecision,
-                    tokenized,
+                    tokenized
                 );
 
                 if (marketOnTopIndex > -1) {
@@ -486,7 +486,7 @@
                             parseFloat(this.markets[market].monthVolume),
                             this.markets[market].supply,
                             this.markets[market].base.subunit,
-                            tokenized,
+                            tokenized
                         );
                         if (marketOnTopIndex > -1) {
                             Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -530,14 +530,14 @@
                     market.quote.symbol,
                     this.getPercentage(
                         parseFloat(market.lastPrice),
-                        parseFloat(market.openPrice),
+                        parseFloat(market.openPrice)
                     ),
                     market.lastPrice,
                     market.dayVolume,
                     market.monthVolume = marketInfo.deal,
                     market.supply,
                     market.base.subunit,
-                    tokenized,
+                    tokenized
                 );
 
                 if (marketOnTopIndex > -1) {
@@ -627,7 +627,7 @@
                     parseFloat(market.monthVolume),
                     market.supply,
                     market.base.subunit,
-                    false,
+                    false
                 );
                 Vue.set(this.sanitizedMarketsOnTop, 0, market);
             },
