@@ -3,7 +3,7 @@
 namespace App\SmartContract\Model;
 
 /** @codeCoverageIgnore */
-class ContractUpdateCallbackMessage
+class ChangeMintDestinationCallbackMessage
 {
     /** @var string */
     private $tokenAddress;
