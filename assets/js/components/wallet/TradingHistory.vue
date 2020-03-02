@@ -37,7 +37,7 @@
 import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI} from '../../utils/constants';
+import {GENERAL} from '../../utils/constants';
 import {
     FiltersMixin,
     LazyScrollTableMixin,
@@ -45,6 +45,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     PairNameMixin,
+    OrderMixin,
 } from '../../mixins/';
 
 export default {
@@ -56,6 +57,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         PairNameMixin,
+        OrderMixin,
     ],
     data() {
         return {
@@ -108,7 +110,7 @@ export default {
             return this.tableData.map((history) => {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
-                    side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
+                    side: this.getSideByType(history.side),
                     name: this.pairNameFunc(history.market.base.symbol, history.market.quote.symbol),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),

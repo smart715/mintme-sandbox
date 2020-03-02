@@ -50,6 +50,7 @@ export const WSAPI = {
         type: {
             SELL: 1,
             BUY: 2,
+            DONATION: 3,
         },
     },
 };

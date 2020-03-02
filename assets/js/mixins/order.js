@@ -1,4 +1,4 @@
-import {webSymbol, btcSymbol} from '../utils/constants';
+import {webSymbol, btcSymbol, WSAPI} from '../utils/constants';
 
 export default {
     props: {
@@ -37,6 +37,18 @@ export default {
         },
         isMarketBTCOrWEB: function() {
             return [webSymbol, btcSymbol].includes(this.marketIdentifier);
+        },
+    },
+    methods: {
+        getSideByType: function(orderType) {
+            switch (orderType) {
+                case WSAPI.order.type.BUY:
+                    return 'Buy';
+                case WSAPI.order.type.SELL:
+                    return 'Sell';
+                case WSAPI.order.type.DONATION:
+                    return 'Donation';
+            }
         },
     },
 };
