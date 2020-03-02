@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Entity\UserToken;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -24,14 +25,19 @@ class DepositTokenStrategy implements BalanceStrategyInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         WalletInterface $wallet,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->wallet = $wallet;
         $this->em = $em;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** @param Token $tradeble */
@@ -46,7 +52,7 @@ class DepositTokenStrategy implements BalanceStrategyInterface
         $this->balanceHandler->deposit(
             $user,
             $token,
-            new Money($amount, new Currency(MoneyWrapper::TOK_SYMBOL))
+            $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL)
         );
     }
 
