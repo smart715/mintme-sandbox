@@ -382,7 +382,7 @@ export default {
                                     new Decimal(oToken.available).sub(this.tokenQuantity).add(res.data.minted_amount) : oToken.available
                             )
                             .catch((err) => {
-                                this.sendLogs('error', 'Can not get lock-period', err);
+                                this.sendLogs('error', 'Can not get minted_amount', err);
                             });
                     }
                 });

@@ -108,7 +108,7 @@ class LockIn
     public function getFrozenAmount(): Money
     {
         if ($this->token->isDeployed()) {
-            $notReleasedAtStart = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $notReleasedAtStart = $this->getAmountToRelease();
             $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
             $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
 
@@ -121,9 +121,9 @@ class LockIn
     }
 
     /** @codeCoverageIgnore */
-    public function getReleasedAtStart(): string
+    public function getReleasedAtStart(): Money
     {
-        return $this->releasedAtStart;
+        return new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     /** @codeCoverageIgnore */
@@ -186,8 +186,8 @@ class LockIn
         return $this->getHourlyRate()->multiply($this->getCountHoursFromDeploy());
     }
 
-    public function getAmountToRelease(): string
+    public function getAmountToRelease(): Money
     {
-        return $this->amountToRelease;
+        return new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 }

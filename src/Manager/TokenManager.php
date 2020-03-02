@@ -11,6 +11,7 @@ use App\Repository\TokenRepository;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Fetcher\ProfileFetcherInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -31,18 +32,23 @@ class TokenManager implements TokenManagerInterface
     /** @var Config */
     private $config;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileFetcherInterface $profileFetcher,
         TokenStorageInterface $storage,
         CryptoManagerInterface $cryptoManager,
-        Config $config
+        Config $config,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->repository = $em->getRepository(Token::class);
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
         $this->config = $config;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function findByHiddenName(string $name): ?Token
@@ -135,8 +141,12 @@ class TokenManager implements TokenManagerInterface
             return $balanceResult;
         }
 
+        $available = $balanceResult->getAvailable();
+
+        $available = !$token->isDeployed() ? $available->subtract($token->getLockIn()->getAmountToRelease()) : $available->subtract($this->moneyWrapper->parse((string) $this->config->getTokenQuantity(), Token::TOK_SYMBOL))->add($token->getMintedAmount());
+
         return BalanceResult::success(
-            $balanceResult->getAvailable()->subtract($token->getLockIn()->getFrozenAmount()),
+            $available,
             $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount()),
             $balanceResult->getReferral()
         );

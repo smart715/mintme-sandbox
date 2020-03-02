@@ -8,13 +8,22 @@ class Config
     /** @var int $offset */
     private $offset;
 
-    public function __construct(int $offset)
+    /** @var int */
+    private $tokenQuantity;
+
+    public function __construct(int $offset, int $tokenQuantity)
     {
         $this->offset = $offset;
+        $this->tokenQuantity = $tokenQuantity;
     }
 
     public function getOffset(): int
     {
         return $this->offset;
+    }
+
+    public function getTokenQuantity(): int
+    {
+        return $this->tokenQuantity;
     }
 }

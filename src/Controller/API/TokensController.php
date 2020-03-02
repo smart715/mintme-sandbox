@@ -26,8 +26,8 @@ use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
-use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -352,8 +352,12 @@ class TokensController extends AbstractFOSRestController
         )->getAvailable();
 
         if ($token->getLockIn()) {
-            $token_quantity = $moneyWrapper->parse($this->getParameter('token_quantity'), MoneyWrapper::TOK_SYMBOL);
-            $balance = $balance->subtract($token_quantity)->add($token->getMintedAmount());
+            if (!$token->isDeployed()) {
+                $balance = $balance->subtract($token->getLockIn()->getAmountToRelease());
+            } else {
+                $token_quantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), MoneyWrapper::TOK_SYMBOL);
+                $balance = $balance->subtract($token_quantity)->add($token->getMintedAmount());
+            }
         }
 
         return $this->view($balance);
