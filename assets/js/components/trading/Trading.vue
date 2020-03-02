@@ -585,7 +585,7 @@
             fetchWEBsupply: function() {
                 return new Promise((resolve, reject) => {
                     let config = {
-                        transformRequest: function(data, headers) {
+                        'transformRequest': function(data, headers) {
                             headers.common = {};
                             return data;
                         },
@@ -593,8 +593,8 @@
                             // Setting reasonable number of retries,
                             // the default retry 12, plus "retryDelay: axiosRetry.exponentialDelay" (in axios.js)
                             // takes too long time (minutes) before it finally throws an error.
-                            retries: 5
-                        }
+                            retries: 5,
+                        },
                     };
 
                     this.$axios.retry.get(this.mintmeSupplyUrl, config)
@@ -621,7 +621,7 @@
                     market.quote.symbol,
                     this.getPercentage(
                         parseFloat(market.lastPrice),
-                        parseFloat(market.openPrice),
+                        parseFloat(market.openPrice)
                     ),
                     parseFloat(market.lastPrice),
                     parseFloat(market.dayVolume),
