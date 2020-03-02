@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
