@@ -6,20 +6,9 @@ use App\Entity\Token\Token;
 use App\Tests\Controller\WebTestCase;
 use App\Utils\DateTime;
 use DateInterval;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class TokensControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testUpdate(): void
     {
         $this->register($this->client);

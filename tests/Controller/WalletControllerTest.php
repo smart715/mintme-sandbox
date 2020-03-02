@@ -8,20 +8,9 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\TwoFactorManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class WalletControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testWithdrawConfirmCrypto(): void
     {
         $email = $this->register($this->client);

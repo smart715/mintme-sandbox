@@ -3,20 +3,9 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class RegistrationControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testRegister(): void
     {
         $email = $this->generateEmail();

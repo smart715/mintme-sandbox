@@ -4,20 +4,9 @@ namespace App\Tests\Controller\API;
 
 use App\Entity\User;
 use App\Tests\Controller\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class WebSocketControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testAuthUserWhichNotAuthorized(): void
     {
         $this->register($this->client);

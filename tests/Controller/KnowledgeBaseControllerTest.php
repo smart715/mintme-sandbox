@@ -4,20 +4,9 @@ namespace App\Tests\Controller;
 
 use App\Entity\KnowledgeBase\Category;
 use App\Entity\KnowledgeBase\KnowledgeBase;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class KnowledgeBaseControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testShowAll(): void
     {
         $catName = $this->generateString();

@@ -2,20 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
-
 class DefaultControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     /** @dataProvider unAuthUPages */
     public function testUnauthorizedPages(string $url): void
     {

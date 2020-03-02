@@ -4,7 +4,6 @@ namespace App\Tests\Controller;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -18,11 +17,15 @@ class WebTestCase extends BaseWebTestCase
     /** @var EntityManagerInterface */
     protected $em;
 
+    /** @var Client */
+    protected $client;
+
     public function setUp(): void
     {
         self::bootKernel();
 
         $this->em = self::$container->get('doctrine.orm.entity_manager');
+        $this->client = static::createClient();
     }
 
     protected function register(Client $client): string

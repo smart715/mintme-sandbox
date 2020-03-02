@@ -2,23 +2,10 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\GoogleAuthenticatorEntry;
 use App\Entity\User;
-use App\Manager\TwoFactorManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class ResettingControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testSendEmailAction(): void
     {
         $email = $this->register($this->client);

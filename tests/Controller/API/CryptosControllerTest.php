@@ -3,20 +3,9 @@
 namespace App\Tests\Controller\API;
 
 use App\Tests\Controller\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class CryptosControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testGetRates(): void
     {
         $this->register($this->client);

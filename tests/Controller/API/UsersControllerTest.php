@@ -5,20 +5,9 @@ namespace App\Tests\Controller\API;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Tests\Controller\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class UsersControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testGetApiKeys(): void
     {
         $email = $this->register($this->client);

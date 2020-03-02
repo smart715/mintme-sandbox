@@ -5,20 +5,9 @@ namespace App\Tests\Controller\Dev\API;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Tests\Controller\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class MarketsControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testGetMarkets(): void
     {
         $email = $this->register($this->client);

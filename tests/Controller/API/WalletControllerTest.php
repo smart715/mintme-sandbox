@@ -8,20 +8,9 @@ use App\Entity\PendingWithdraw;
 use App\Entity\User;
 use App\Manager\TwoFactorManagerInterface;
 use App\Tests\Controller\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Client;
 
 class WalletControllerTest extends WebTestCase
 {
-    /** @var Client */
-    private $client;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->client = static::createClient();
-    }
-
     public function testGetDepositAddressesForCrypto(): void
     {
         $this->register($this->client);
