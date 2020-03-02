@@ -1,6 +1,6 @@
 const storage = {
   namespaced: true,
-  store: {
+  state: {
     isVisible: true,
     visibleLevel: 0,
   },
@@ -19,6 +19,7 @@ const storage = {
         state.isVisible = true;
       }
       state.visibleLevel++;
+      alert('Switch on! ' + state.visibleLevel);
     },
     directHideSpinner: function(state) {
       state.visibleLevel = 0;
@@ -27,10 +28,11 @@ const storage = {
     hideSpinner: function(state) {
       if (state.visibleLevel) {
         state.visibleLevel--;
-        if (!state.visibleLevel) {
-          state.isVisible = false;
-        }
-        alert('Switch!');
+        alert('Switch off! ' + state.visibleLevel);
+      }
+      if (!state.visibleLevel) {
+        state.isVisible = false;
+        alert('Switch off all!');
       }
     },
   },

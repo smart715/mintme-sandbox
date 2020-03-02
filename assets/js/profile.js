@@ -2,11 +2,12 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
-import PageLoadSpinner from './components/PageLoadSpinner';
 import {minLength, helpers} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
 import xRegExp from 'xregexp';
+import store from './storage';
+import {NestedSpinner} from './mixins/';
 
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
@@ -17,8 +18,10 @@ new Vue({
         BbcodeHelp,
         BbcodeView,
         LimitedTextarea,
-        PageLoadSpinner,
     },
+    mixins: [
+        NestedSpinner,
+    ],
     data() {
         return {
             showEditForm: false,
@@ -57,7 +60,7 @@ new Vue({
         },
         countryChanged: function() {
             if (!this.$refs.zipCode) {
-                this.$refs.spinner.hide();
+                this.hideSpinner();
                 return;
             }
 
@@ -92,7 +95,7 @@ new Vue({
                 })
                 .then(() => {
                     this.zipCodeProcessing = false;
-                    this.$refs.spinner.hide();
+                    this.hideSpinner();
                 });
         },
         zipCodeValidate: function() {
@@ -128,4 +131,5 @@ new Vue({
             },
         },
     },
+    store,
 });

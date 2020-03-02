@@ -4,13 +4,9 @@
 
 {% block bodyclass %}referral{% endblock %}
 
-{% block spinnerblock %}
-    {{ include('spinner.html.twig') }}
-{% endblock %}
-
 {% block content %}
     <div id="referral" class="container">
-        <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
+        {{ include('spinner.html.twig') }}
         <div class="row pt-5 pb-3 justify-content-center">
             <div class="col-12 card-fixed-large px-0 card">
                 <div class="card-header">Referral Program</div>

@@ -46,6 +46,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     PairNameMixin,
+    NestedSpinner,
 } from '../../mixins/';
 
 export default {
@@ -57,6 +58,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         PairNameMixin,
+        NestedSpinner,
     ],
     data() {
         return {
@@ -121,13 +123,10 @@ export default {
         },
     },
     mounted: function() {
-        this.$emit('show-spinner');
+        this.showSpinner();
         this.updateTableData()
-        .then(() => {
-          this.$emit('hide-spinner');
-        })
-        .catch((err) => {
-          this.$emit('hide-spinner');
+          .finally(() => {
+          this.hideSpinner();
         });
     },
     methods: {

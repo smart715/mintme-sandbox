@@ -126,23 +126,21 @@
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
         </template>
-        <page-load-spinner id="page-load-spinner-js" spinner-div="page-load-spinner" ref="spinner"></page-load-spinner>
     </div>
 </template>
 
 <script>
 import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, NestedSpinner} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {tokenDeploymentStatus} from '../../utils/constants';
-import PageLoadSpinner from '../PageLoadSpinner';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, NestedSpinner],
     props: {
         page: Number,
         tokensCount: Number,
@@ -153,7 +151,6 @@ export default {
     },
     components: {
         Guide,
-        PageLoadSpinner,
     },
     data() {
         return {
@@ -288,7 +285,6 @@ export default {
                 .then(() => {
                     this.updateDataWithMarkets();
                     this.loading = false;
-                    this.$refs.spinner.hide();
 
                     this.addMessageHandler((result) => {
                         if ('state.update' === result.method) {
@@ -300,9 +296,11 @@ export default {
                     });
                 })
               .catch((err) => {
-                this.$refs.spinner.hide();
                 this.notifyError('Can not load Trading data. Try again later.');
                 this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
+              })
+              .finally(() => {
+                this.hideSpinner();
               });
         },
         sortCompare: function(a, b, key) {
@@ -337,7 +335,7 @@ export default {
                 }
 
                 this.loading = true;
-                this.$refs.spinner.show();
+                this.showSpinner();
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (null !== this.markets) {

@@ -51,13 +51,14 @@ import {
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
+    NestedSpinner,
 } from '../../mixins/';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, NestedSpinner],
     components: {CopyLink},
     data() {
         return {
@@ -116,13 +117,10 @@ export default {
         },
     },
     mounted: function() {
-      this.$emit('show-spinner');
+      this.showSpinner();
       this.updateTableData()
-        .then(() => {
-          this.$emit('hide-spinner');
-        })
-        .catch((err) => {
-          this.$emit('hide-spinner');
+        .finally(() => {
+          this.hideSpinner();
         });
     },
     methods: {

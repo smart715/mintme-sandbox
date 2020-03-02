@@ -251,8 +251,7 @@ export default {
         },
     },
     mounted: function() {
-        this.showSpinner();
-        alert('Show');
+        this.directShowSpinner();
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
@@ -334,7 +333,7 @@ export default {
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
 
-            this.directShowSpinner();
+            this.showSpinner();
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
                     crypto: isToken ? webSymbol : currency,
                 }))
@@ -342,15 +341,13 @@ export default {
                   this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
                     toMoney(res.data, subunit) :
                     undefined;
-                  this.$refs.spinner.hide();
                 })
                 .catch((err) => {
-                    this.$refs.spinner.hide();
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 })
-            .finnaly(() => {
-              this.directHideSpinner();
+            .finally(() => {
+              this.hideSpinner();
             });
 
             // TODO: Get rid of hardcoded WEB
@@ -390,6 +387,7 @@ export default {
                             return;
                         }
 
+                        this.showSpinner();
                         this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
                             .then((res) =>
                                 this.tokens[token].available = res.data ?
@@ -397,7 +395,10 @@ export default {
                             )
                             .catch((err) => {
                                 this.sendLogs('error', 'Can not get lock-period', err);
-                            });
+                            })
+                        .finally(() => {
+                          this.hideSpinner();
+                        });
                     }
                 });
             });

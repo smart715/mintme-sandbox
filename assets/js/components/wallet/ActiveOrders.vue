@@ -60,6 +60,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     PairNameMixin,
+    NestedSpinner,
 } from '../../mixins/';
 
 export default {
@@ -72,6 +73,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         PairNameMixin,
+        NestedSpinner,
     ],
     components: {
         ConfirmModal,
@@ -156,7 +158,7 @@ export default {
         },
     },
     mounted: function() {
-      this.$emit('show-spinner');
+        this.showSpinner();
         Promise.all([
                 this.$axios.retry.get(this.$routing.generate('markets')).then((res) =>
                     this.markets = typeof res.data === 'object' ? Object.values(res.data) : res.data
@@ -181,13 +183,14 @@ export default {
                         }
                     }
                 }, 'active-tableData-update');
-                this.$emit('hide-spinner');
             })
             .catch((err) => {
-                this.$emit('hide-spinner');
                 this.notifyError('Can not update order list now. Try again later');
                 this.sendLogs('error', 'Service unavailable. Can not update order list now', err);
-            });
+            })
+          .finally(() => {
+                this.hideSpinner();
+          });
     },
     methods: {
         updateTableData: function() {

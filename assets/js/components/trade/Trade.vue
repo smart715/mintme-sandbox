@@ -68,14 +68,14 @@ import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
-import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../mixins';
+import {WebSocketMixin, NotificationMixin, LoggerMixin, NestedSpinner} from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
 const WSAPI = Constants.WSAPI;
 
 export default {
     name: 'Trade',
-    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
+    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin, NestedSpinner],
     components: {
         TradeBuyOrder,
         TradeSellOrder,
@@ -131,7 +131,7 @@ export default {
     },
     mounted() {
         this.updateOrders().then(() => {
-            this.$emit('show-spinner');
+            this.showSpinner();
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
                 params: [this.market.identifier],
@@ -144,7 +144,7 @@ export default {
                 }
             }, 'trade-update-orders');
 
-            this.$emit('hide-spinner');
+            this.hideSpinner();
         });
 
         this.addOnOpenHandler(() => {

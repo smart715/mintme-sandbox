@@ -1,13 +1,16 @@
 import CopyLink from './components/CopyLink';
-import PageLoadSpinner from './components/PageLoadSpinner';
 import {toMoney} from './utils';
+import {NestedSpinner} from './mixins/';
+import store from './storage';
 
 new Vue({
     el: '#referral',
     components: {
         CopyLink,
-        PageLoadSpinner,
     },
+    mixins: [
+      NestedSpinner,
+    ],
     data() {
         return {
             referralBalance: 0,
@@ -20,11 +23,13 @@ new Vue({
         },
     },
     mounted() {
+        this.showSpinner();
         this.$axios.retry.get(this.$routing.generate('referral_balance'))
             .then((result) => {
                 this.referralBalance = result.data.balance;
                 this.precision = result.data.token.subunit;
-                this.$refs.spinner.hide();
+                this.hideSpinner();
             });
     },
+    store,
 });

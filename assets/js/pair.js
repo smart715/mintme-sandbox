@@ -5,10 +5,9 @@ import TokenIntroductionDescription from './components/token/introduction/TokenI
 import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
-import PageLoadSpinner from './components/PageLoadSpinner';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
-import {NestedSpinner} from './mixins';
+import {NestedSpinner} from './mixins/';
 
 new Vue({
   el: '#token',
@@ -29,7 +28,6 @@ new Vue({
     TokenName,
     TokenDeployIcon,
     TopHolders,
-    PageLoadSpinner,
   },
   mixins: [NestedSpinner],
   methods: {
