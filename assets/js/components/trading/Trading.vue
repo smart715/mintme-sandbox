@@ -480,7 +480,7 @@
                             tokenName,
                             this.getPercentage(
                                 parseFloat(this.markets[market].lastPrice),
-                                parseFloat(this.markets[market].openPrice),
+                                parseFloat(this.markets[market].openPrice)
                             ),
                             parseFloat(this.markets[market].lastPrice),
                             parseFloat(this.markets[market].dayVolume),
