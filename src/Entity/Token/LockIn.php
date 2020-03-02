@@ -185,4 +185,9 @@ class LockIn
     {
         return $this->getHourlyRate()->multiply($this->getCountHoursFromDeploy());
     }
+
+    public function getAmountToRelease(): string
+    {
+        return $this->amountToRelease;
+    }
 }

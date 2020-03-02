@@ -8,7 +8,7 @@ class ContractUpdateCallbackMessage
     /** @var string */
     private $method;
 
-    /** @var array */
+    /** @var array[]> */
     private $message;
 
     private function __construct(

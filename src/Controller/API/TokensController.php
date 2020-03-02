@@ -26,6 +26,7 @@ use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -337,7 +338,7 @@ class TokensController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/{name}/exchange-amount", name="token_exchange_amount", options={"expose"=true})
      */
-    public function getTokenExchange(string $name, BalanceHandlerInterface $balanceHandler): View
+    public function getTokenExchange(string $name, BalanceHandlerInterface $balanceHandler, MoneyWrapperInterface $moneyWrapper): View
     {
         $token = $this->tokenManager->findByName($name);
 
@@ -351,7 +352,8 @@ class TokensController extends AbstractFOSRestController
         )->getAvailable();
 
         if ($token->getLockIn()) {
-            $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
+            $token_quantity = $moneyWrapper->parse($this->getParameter('token_quantity'), MoneyWrapper::TOK_SYMBOL);
+            $balance = $balance->subtract($token_quantity)->add($token->getMintedAmount());
         }
 
         return $this->view($balance);
@@ -655,5 +657,16 @@ class TokensController extends AbstractFOSRestController
         $token = $this->tokenManager->findByName($name);
 
         return $this->view(['exists' => null !== $token], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/minted", name="minted_amount", options={"expose"=true})
+     */
+    public function getMintedAmount(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        return $this->view(['mintedAmount' => $token->getMintedAmount()], Response::HTTP_OK);
     }
 }
