@@ -59,7 +59,7 @@ describe('Trading', () => {
     });
     it('show rest of token link', () => {
         wrapper.vm.marketFilters.selectedFilter = 'all';
-        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(false);        
+        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(false);
         wrapper.setProps({userId: 1});
         wrapper.vm.marketFilters.selectedFilter = 'user';
         expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
