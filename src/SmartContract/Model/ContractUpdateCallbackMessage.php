@@ -8,12 +8,12 @@ class ContractUpdateCallbackMessage
     /** @var string */
     private $method;
 
-    /** @var string */
+    /** @var array */
     private $message;
 
     private function __construct(
         string $method,
-        string $message
+        array $message
     ) {
         $this->method = $method;
         $this->message = $message;
@@ -24,7 +24,7 @@ class ContractUpdateCallbackMessage
         return $this->method;
     }
 
-    public function getMessage(): string
+    public function getMessage(): array
     {
         return $this->message;
     }

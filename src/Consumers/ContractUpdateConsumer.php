@@ -15,6 +15,9 @@ use Psr\Log\LoggerInterface;
 
 class ContractUpdateConsumer implements ConsumerInterface
 {
+    public const CHANGE_MINT_DESTINATION = 'changeMintDestination';
+    public const UPDATE_MINTED_AMOUNT = 'updateMintedAmount';
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -52,9 +55,9 @@ class ContractUpdateConsumer implements ConsumerInterface
             return true;
         }
 
-        if ('updateMintDestination' === $clbResult->getMethod()) {
+        if (self::CHANGE_MINT_DESTINATION === $clbResult->getMethod()) {
             try {
-                $clbMessage = ChangeMintDestinationCallbackMessage::parse(json_decode($clbResult->getMessage(), true));
+                $clbMessage = ChangeMintDestinationCallbackMessage::parse($clbResult->getMessage());
             } catch (\Throwable $exception) {
                 $this->logger->warning("[contract-update-consumer] Failed to parse incoming message", [$clbResult->getMessage()]);
 
@@ -62,9 +65,9 @@ class ContractUpdateConsumer implements ConsumerInterface
             }
 
             return $this->updateMintDestination($clbMessage);
-        } elseif ('updateMintedAmount' === $clbResult->getMethod()) {
+        } elseif (self::UPDATE_MINTED_AMOUNT === $clbResult->getMethod()) {
             try {
-                $clbMessage = UpdateMintedAmountCallbackMessage::parse(json_decode($clbResult->getMessage(), true));
+                $clbMessage = UpdateMintedAmountCallbackMessage::parse($clbResult->getMessage());
             } catch (\Throwable $exception) {
                 $this->logger->warning("[contract-update-consumer] Failed to parse incoming message", [$clbResult->getMessage()]);
 
