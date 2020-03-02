@@ -39,6 +39,9 @@
             <errorLevel type="info">
                 <file name="src/Security/ApiKeyUserProvider.php"/>
             </errorLevel>
+            <errorLevel type="info">
+                <file name="src/Entity/Classification/Context.php"/>
+            </errorLevel>
         </ImplementedReturnTypeMismatch>
         <InvalidNullableReturnType>
             <errorLevel type="info">
