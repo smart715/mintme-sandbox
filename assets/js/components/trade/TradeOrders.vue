@@ -151,6 +151,7 @@ export default {
             }, {});
 
             Object.values(grouped).forEach((e) => {
+                e.sort((a, b) => b.timestamp - a.timestamp);
                 let obj = e.reduce((a, e) => {
                     a.owner = a.owner || e.maker.id === this.userId;
                     a.orders.push(e);
@@ -159,10 +160,8 @@ export default {
                     let amount = a.orders.filter((order) => order.maker.id === e.maker.id)
                         .reduce((a, e) => new Decimal(a).add(e.amount), 0);
 
-                    if (parseFloat(a.main.amount) < parseFloat(amount)) {
-                        a.main.amount = amount;
-                        a.main.order = e;
-                    }
+                    a.main.amount = amount;
+                    a.main.order = e;
 
                     return a;
                 }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});
