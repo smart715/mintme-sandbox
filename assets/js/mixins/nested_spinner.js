@@ -2,9 +2,9 @@ import {mapMutations, mapGetters} from 'vuex';
 
 export default {
   computed: {
-    ...mapGetters('pageSpinnerStorage', [
-      'getIsSpinnerVisible',
-    ]),
+    ...mapGetters('pageSpinnerStorage', {
+      getIsSpinnerVisible: 'getIsSpinnerVisible',
+    }),
   },
   methods: {
     ...mapMutations('pageSpinnerStorage', [

@@ -171,11 +171,11 @@ export default {
         RebrandingFilterMixin,
         NotificationMixin,
         LoggerMixin,
+        NestedSpinner,
     ],
     components: {
         WithdrawModal,
         DepositModal,
-        PageLoadSpinner,
     },
     props: {
         withdrawUrl: {type: String, required: true},
@@ -252,6 +252,7 @@ export default {
     },
     mounted: function() {
         this.showSpinner();
+        alert('Show');
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {

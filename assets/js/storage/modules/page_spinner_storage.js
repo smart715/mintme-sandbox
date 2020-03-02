@@ -5,7 +5,7 @@ const storage = {
     visibleLevel: 0,
   },
   getters: {
-    getIsSpinnerVisible(state) {
+    getIsSpinnerVisible: function(state) {
       return state.isVisible;
     },
   },
@@ -30,6 +30,7 @@ const storage = {
         if (!state.visibleLevel) {
           state.isVisible = false;
         }
+        alert('Switch!');
       }
     },
   },
