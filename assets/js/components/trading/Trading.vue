@@ -132,7 +132,7 @@
                     <p class="text-center p-5">No any token yet</p>
                 </div>
             </template>
-            <template v-if="userId && (marketFilters.selectedFilter === 'deployed' || marketFilters.selectedFilter === 'user') ">
+            <template v-if="userId && (marketFilters.selectedFilter === 'deployed' || marketFilters.selectedFilter === 'user')">
                 <div class="row justify-content-center">
                     <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
                 </div>

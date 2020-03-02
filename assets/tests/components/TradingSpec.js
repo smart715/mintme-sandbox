@@ -17,24 +17,55 @@ describe('Trading', () => {
         moxios.uninstall();
     });
     const $routing = {generate: () => 'URL'};
-
     const localVue = createLocalVue();
     localVue.use(Axios);
-
 
     const wrapper = shallowMount(Trading, {
         localVue,
         mocks: {
             $routing,
         },
+        computed: {
+            loaded() {
+              return true;
+            },
+        },
         propsData: {
             enableUsd: true,
         },
     });
+
+    let market = {pair: 'tok1', change: '0', lastPrice: '0', volume: '0'};
+    let marketOnTop = [{pair: 'BTC/MINTME', change: '0', lastPrice: '0', volume: '0'}];
+
     it('Show USD in dropdown option if enableUSD is true', () => {
         expect(wrapper.find('.usdOption').exists()).to.deep.equal(true);
     });
-
+    it('show message if there are not deployed tokens yet', () => {
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(true);
+        wrapper.vm.sanitizedMarkets = market;
+        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
+        expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(false);
+    });
+    it('show message if user has no any token yet', () => {
+        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
+        wrapper.vm.sanitizedMarkets = {};
+        wrapper.vm.marketFilters.selectedFilter = 'user';
+        expect(wrapper.html().includes('No any token yet')).to.deep.equal(true);
+        wrapper.vm.sanitizedMarkets = market;
+        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
+        expect(wrapper.html().includes('No any token yet')).to.deep.equal(false);
+    });
+    it('show rest of token link', () => {
+        wrapper.vm.marketFilters.selectedFilter = 'all';
+        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(false);        
+        wrapper.setProps({userId: 1});
+        wrapper.vm.marketFilters.selectedFilter = 'user';
+        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
+    });
     describe('marketCapFormatter() function should return ', () => {
         it('dash(-) if market is for token and monthVolume less than minimumVolumeForMarketcap', () => {
             const wrapper = shallowMount(Trading, {
