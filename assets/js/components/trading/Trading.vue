@@ -468,6 +468,7 @@
                             this.fetchWEBsupply().then(
                                 (resolve) => {
                                     this.markets[market].supply = resolve;
+                                    this.updateWEBBTCMarket(this);
                                 }
                             );
                         } else {
