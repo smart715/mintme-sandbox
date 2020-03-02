@@ -4,10 +4,12 @@ namespace App\Exchange\Donation;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Exchange\Market;
 use App\Utils\Converter\MarketNameConverterInterface;
-use Money\Currency;
-use Money\Money;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 
 class DonationHandler implements DonationHandlerInterface
 {
@@ -20,22 +22,28 @@ class DonationHandler implements DonationHandlerInterface
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         JsonRpcInterface $jsonRpc,
-        MarketNameConverterInterface $marketNameConverter
+        MarketNameConverterInterface $marketNameConverter,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->jsonRpc = $jsonRpc;
         $this->marketNameConverter = $marketNameConverter;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function checkDonation(Market $market, string $amount, string $fee): string
     {
-        $amountObj = new Money($amount, new Currency($market->getBase()->getSymbol()));
+        $amountObj = $this->moneyWrapper->parse($amount, $this->getSymbol($market->getBase()));
+        $feeObj = $this->moneyWrapper->parse($fee, $this->getSymbol($market->getQuote()));
 
         $response = $this->jsonRpc->send(self::CHECK_DONATION_METHOD, [
             $this->marketNameConverter->convert($market),
             $amountObj->getAmount(),
-            $fee,
+            $feeObj->getAmount(),
         ]);
 
         if ($response->hasError()) {
@@ -47,17 +55,25 @@ class DonationHandler implements DonationHandlerInterface
 
     public function makeDonation(Market $market, string $amount, string $fee, string $expectedAmount): void
     {
-        $amountObj = new Money($amount, new Currency($market->getBase()->getSymbol()));
+        $amountObj = $this->moneyWrapper->parse($amount, $this->getSymbol($market->getBase()));
+        $feeObj = $this->moneyWrapper->parse($fee, $this->getSymbol($market->getQuote()));
 
         $response = $this->jsonRpc->send(self::MAKE_DONATION_METHOD, [
             $this->marketNameConverter->convert($market),
             $amountObj->getAmount(),
-            $fee,
+            $feeObj->getAmount(),
             $expectedAmount,
         ]);
 
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
         }
+    }
+
+    private function getSymbol(TradebleInterface $tradeble): string
+    {
+        return $tradeble instanceof Token
+            ? MoneyWrapper::TOK_SYMBOL
+            : $tradeble->getSymbol();
     }
 }
