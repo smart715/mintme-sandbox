@@ -351,6 +351,7 @@ services:
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
+            $tokenQuantity: "%token_quantity%"
 
     App\SmartContract\Config\Config:
         arguments:
