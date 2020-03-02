@@ -13,7 +13,9 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManager;
 use App\Repository\TokenRepository;
 use App\Utils\Fetcher\ProfileFetcherInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +36,8 @@ class TokenManagerTest extends TestCase
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockCryptoManager([$this->mockCrypto($name)]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
 
         $this->assertEquals($name, $tokenManager->findByName($name)->getCrypto()->getName());
@@ -60,7 +63,8 @@ class TokenManagerTest extends TestCase
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
 
         $this->assertEquals($token, $tokenManager->findByName($name));
@@ -82,7 +86,8 @@ class TokenManagerTest extends TestCase
             $profileFetcher,
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
         $this->assertEquals($token, $tokenManager->getOwnToken());
     }
@@ -98,7 +103,8 @@ class TokenManagerTest extends TestCase
             $profileFetcher,
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
         $this->assertEquals(null, $tokenManager->getOwnToken());
     }
@@ -120,7 +126,8 @@ class TokenManagerTest extends TestCase
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
-            $this->mockConfig(1)
+            $this->mockConfig(1),
+            $this->mockMoneyWrapper()
         );
 
         $tokenManager->findByHiddenName($origin);
@@ -156,7 +163,8 @@ class TokenManagerTest extends TestCase
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockCryptoManager([]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
 
         $this->assertTrue($tokenManager->isExisted($fooTok->getName()));
@@ -184,13 +192,16 @@ class TokenManagerTest extends TestCase
             $profileFetcher,
             $this->mockTokenStorage($token->getProfile()->getUser()),
             $this->mockCryptoManager([]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
 
+        $amount = $this->mockMoney(1);
+
         $br = $this->createMock(BalanceResult::class);
-        $br->method('getReferral')->willReturn(Money::USD(1));
-        $br->method('getFreeze')->willReturn(Money::USD(1));
-        $br->method('getAvailable')->willReturn(Money::USD(1));
+        $br->method('getReferral')->willReturn($amount);
+        $br->method('getFreeze')->willReturn($amount);
+        $br->method('getAvailable')->willReturn($amount);
 
         $res = $tokenManager->getRealBalance($token, $br);
 
@@ -203,8 +214,9 @@ class TokenManagerTest extends TestCase
     {
         return [
             [$this->mockToken('foo'), true, 1, 1, 1],
-            [$this->mockToken('foo', $this->mockLockIn(1)), true, 0, 2, 1],
-            [$this->mockToken('foo', $this->mockLockIn(1), $this->createMock(User::class)), true, 0, 2, 1],
+            [$this->mockToken('foo', $this->mockLockIn(1, 1)), true, 0, 2, 1],
+            [$this->mockToken('foo', $this->mockLockIn(1, 1), $this->createMock(User::class)), true, 0, 2, 1],
+            [$this->mockToken('foo', $this->mockLockIn(1, 0), $this->createMock(User::class), 2, true), true, 2, 2, 1],
         ];
     }
 
@@ -218,7 +230,8 @@ class TokenManagerTest extends TestCase
                 $this->mockCrypto('foo'),
                 $this->mockCrypto('bar'),
             ]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
 
         $toks = $tokenManager->findAllPredefined();
@@ -240,7 +253,8 @@ class TokenManagerTest extends TestCase
                 $this->mockCrypto('foo'),
                 $this->mockCrypto('bar'),
             ]),
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockMoneyWrapper()
         );
 
         $fooTok = $this->mockToken('foo');
@@ -256,7 +270,7 @@ class TokenManagerTest extends TestCase
 
 
 
-    private function mockToken(string $name, ?LockIn $lockIn = null, ?User $user = null): Token
+    private function mockToken(string $name, ?LockIn $lockIn = null, ?User $user = null, int $minted = 1, bool $deployed = false): Token
     {
         $profile = $this->createMock(Profile::class);
         $profile->method('getUser')->willReturn($user ?? $this->createMock(User::class));
@@ -265,14 +279,17 @@ class TokenManagerTest extends TestCase
         $tok->method('getName')->willReturn($name);
         $tok->method('getLockIn')->willReturn($lockIn);
         $tok->method('getProfile')->willReturn($profile);
+        $tok->method('getMintedAmount')->willReturn($this->mockMoney($minted));
+        $tok->method('isDeployed')->willReturn($deployed);
 
         return $tok;
     }
 
-    private function mockLockIn(int $frozen): LockIn
+    private function mockLockIn(int $frozen, int $toRelease): LockIn
     {
         $lockIn = $this->createMock(LockIn::class);
-        $lockIn->method('getFrozenAmount')->willReturn(Money::USD($frozen));
+        $lockIn->method('getFrozenAmount')->willReturn($this->mockMoney($frozen));
+        $lockIn->method('getAmountToRelease')->willReturn($this->mockMoney($toRelease));
 
         return $lockIn;
     }
@@ -321,12 +338,29 @@ class TokenManagerTest extends TestCase
     }
 
     /** @return MockObject|Config */
-    private function mockConfig(int $offset): Config
+    private function mockConfig(int $offset, int $tokenQuantity = 1): Config
     {
         $config = $this->createMock(Config::class);
 
         $config->method('getOffset')->willReturn($offset);
+        $config->method('getTokenQuantity')->willReturn($tokenQuantity);
 
         return $config;
+    }
+
+    /** @return MockObject|MoneywrapperInterface */
+    private function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        $mw = $this->createMock(MoneyWrapperInterface::class);
+        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol) {
+            return new Money($amount, new Currency($symbol));
+        });
+
+        return $mw;
+    }
+
+    private function mockMoney(int $amount, ?string $symbol = null): Money
+    {
+        return new Money($amount, new Currency($symbol ?? Token::TOK_SYMBOL));
     }
 }
