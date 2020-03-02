@@ -148,7 +148,6 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-import PageLoadSpinner from '../PageLoadSpinner';
 
 import {
     WebSocketMixin,
@@ -157,6 +156,7 @@ import {
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
+    NestedSpinner,
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
@@ -251,7 +251,7 @@ export default {
         },
     },
     mounted: function() {
-        this.$emit('show-spinner');
+        this.showSpinner();
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
@@ -295,13 +295,14 @@ export default {
         ])
         .then(() => {
             this.openDepositMore();
-            this.$emit('hide-spinner');
         })
         .catch((err) => {
-            this.$emit('hide-spinner');
             this.notifyError('Can not load Wallet data. Try again later.');
             this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
-        });
+        })
+        .finally(() => {
+          this.hideSpinner();
+      });
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
@@ -332,7 +333,7 @@ export default {
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
 
-            this.$refs.spinner.show();
+            this.directShowSpinner();
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
                     crypto: isToken ? webSymbol : currency,
                 }))
@@ -346,7 +347,10 @@ export default {
                     this.$refs.spinner.hide();
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
-                });
+                })
+            .finnaly(() => {
+              this.directHideSpinner();
+            });
 
             // TODO: Get rid of hardcoded WEB
             this.deposit.min = currency === 'WEB' ? toMoney(1, subunit) : undefined;
