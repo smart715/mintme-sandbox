@@ -36,6 +36,7 @@ describe('Trading', () => {
     });
 
     let market = {pair: 'tok1', change: '0', lastPrice: '0', volume: '0'};
+    let deployedToken = {pair: 'tok1', change: '0', lastPrice: '0', volume: '0', tokenized: true};
     let marketOnTop = [{pair: 'BTC/MINTME', change: '0', lastPrice: '0', volume: '0'}];
 
     it('Show USD in dropdown option if enableUSD is true', () => {
@@ -66,6 +67,41 @@ describe('Trading', () => {
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
     });
+    it('show all tokens if there are not deployed tokens', () => {
+        wrapper.vm.marketFilters.userSelected = false;
+        wrapper.vm.marketFilters.selectedFilter = 'all';
+        wrapper.vm.markets = JSON.stringify({
+            TOK000000000001WEB: ['tok1', 'WEB'],
+            TOK000000000002WEB: ['tok2', 'WEB'],
+            TOK000000000003BTC: ['WEB', 'BTC'],
+        });
+        expect(wrapper.vm.markets).to.not.be.null;
+    });
+    it('show only tokens deployed if user selected the option', () => {
+        wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
+    });
+    it('show only deployed tokens if there are at least one dployed', () => {
+       wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
+       wrapper.vm.sanitizedMarkets = deployedToken;
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
+    });
+    it('show all tokens when user selected the option', () => {
+        wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.marketFilters.selectedFilter = 'all';
+        expect(wrapper.vm.marketFilters.selectedFilter).to.deep.equal('all');
+        expect(wrapper.vm.markets).to.not.be.null;
+     });
+     it('show user tokens owns when user selected the option', () => {
+        wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.marketFilters.selectedFilter = 'user';
+        wrapper.vm.sanitizedMarkets = market;
+        expect(wrapper.vm.marketFilters.selectedFilter).to.deep.equal('user');
+        expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
+     });
+
     describe('marketCapFormatter() function should return ', () => {
         it('dash(-) if market is for token and monthVolume less than minimumVolumeForMarketcap', () => {
             const wrapper = shallowMount(Trading, {
