@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, mount, shallowMount} from '@vue/test-utils';
 import Donation from '../../js/components/donation/Donation';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -103,7 +103,7 @@ describe('Donation', () => {
     });
 
     it('should rebrand selected currency WEB -> MINTME', () => {
-        const wrapper = mount(Donation, {
+        const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
             },
@@ -121,7 +121,7 @@ describe('Donation', () => {
 
     it('should generate link to wallet for selected currency', () => {
         const localVue = mockVue();
-        const wrapper = mount(Donation, {
+        const wrapper = shallowMount(Donation, {
             localVue,
             propsData: {
                 loggedIn: true,
@@ -136,7 +136,7 @@ describe('Donation', () => {
     });
 
     it('should properly check if currency selected', () => {
-        const wrapper = mount(Donation, {
+        const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
             },
@@ -156,7 +156,7 @@ describe('Donation', () => {
     });
 
     it('should properly check insufficient funds', () => {
-        const wrapper = mount(Donation, {
+        const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
                 market: {
@@ -181,21 +181,115 @@ describe('Donation', () => {
     });
 
     it('should properly check amount to donate', () => {
-        const localVue = mockVue();
-        const wrapper = mount(Donation, {
-            localVue,
+        const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
             },
         });
 
         wrapper.vm.amountToDonate = '';
-        expect(wrapper.vm.insufficientFunds).to.be.false;
+        expect(wrapper.vm.isAmountValid).to.be.false;
 
         wrapper.vm.amountToDonate = '0.0';
-        expect(wrapper.vm.insufficientFunds).to.be.false;
+        expect(wrapper.vm.isAmountValid).to.be.false;
+
+        wrapper.vm.amountToDonate = '0.001';
+        expect(wrapper.vm.isAmountValid).to.be.true;
 
         wrapper.vm.amountToDonate = '0.0000';
-        expect(wrapper.vm.insufficientFunds).to.be.false;
+        expect(wrapper.vm.isAmountValid).to.be.false;
+
+        wrapper.vm.amountToDonate = '0.0001';
+        expect(wrapper.vm.isAmountValid).to.be.true;
+    });
+
+    it('should properly disable button', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(Donation, {
+            localVue,
+            propsData: {
+                loggedIn: false,
+                market: {
+                    base: {
+                        subunit: 4,
+                    },
+                },
+            },
+        });
+
+        expect(wrapper.vm.buttonDisabled).to.be.true;
+
+        wrapper.vm.loggedIn = true;
+        expect(wrapper.vm.buttonDisabled).to.be.true;
+
+        wrapper.vm.selectedCurrency = webSymbol;
+        expect(wrapper.vm.buttonDisabled).to.be.true;
+
+        wrapper.vm.balanceLoaded = true;
+        wrapper.vm.balance = '20';
+        expect(wrapper.vm.buttonDisabled).to.be.true;
+
+        wrapper.vm.amountToDonate = '5';
+        expect(wrapper.vm.buttonDisabled).to.be.true;
+    });
+
+    it('triggers login form load correctly', (done) => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(Donation, {
+            localVue,
+            propsData: {
+                loggedIn: false,
+            },
+        });
+
+        wrapper.vm.loadLoginForm();
+
+        moxios.wait(() => {
+            let request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 200,
+                response: {
+                    data: '<form></form>',
+                },
+            }).then(() => done());
+        });
+    });
+
+    it('triggers get token balance', (done) => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(Donation, {
+            localVue,
+            propsData: {
+                loggedIn: true,
+            },
+        });
+
+        wrapper.vm.selectedCurrency = webSymbol;
+        wrapper.vm.getTokenBalance();
+
+        moxios.wait(() => {
+            let request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 200,
+                response: {
+                    data: 100,
+                },
+            }).then(() => done());
+        });
+    });
+
+    it('check reset amount', () => {
+        const wrapper = shallowMount(Donation, {
+            propsData: {
+                loggedIn: true,
+            },
+        });
+
+        wrapper.vm.amountToDonate = 50;
+        wrapper.vm.amountToReceive = 7;
+        wrapper.vm.resetAmount();
+
+        expect(wrapper.vm.amountToDonate).to.be.equal(0);
+        expect(wrapper.vm.amountToReceive).to.be.equal(0);
     });
 });

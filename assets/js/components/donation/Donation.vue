@@ -221,8 +221,8 @@ export default {
             return !this.loggedIn
                 || !this.isCurrencySelected
                 || this.insufficientFunds
-                || !this.balance > 0
-                || !this.amountToReceive > 0;
+                || !parseFloat(this.balance)
+                || !parseFloat(this.amountToReceive);
         },
     },
     mounted() {
