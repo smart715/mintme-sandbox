@@ -18,7 +18,6 @@ new Vue({
       depositWithdrawHistory: null,
       markets: null,
       orders: null,
-      spinnerQuantity: 0,
     };
   },
   mixins: [
