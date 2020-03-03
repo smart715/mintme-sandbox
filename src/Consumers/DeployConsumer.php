@@ -18,6 +18,9 @@ class DeployConsumer implements ConsumerInterface
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var int */
+    private $coinbaseApiTimeout;
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -26,10 +29,12 @@ class DeployConsumer implements ConsumerInterface
 
     public function __construct(
         LoggerInterface $logger,
+        int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler
     ) {
         $this->logger = $logger;
+        $this->coinbaseApiTimeout = $coinbaseApiTimeout;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
     }
@@ -53,7 +58,11 @@ class DeployConsumer implements ConsumerInterface
         }
 
         try {
+            // wait to make sure that the the payment of the cost is done
+            sleep($this->coinbaseApiTimeout + 10);
+            $this->em->clear();
             $repo = $this->em->getRepository(Token::class);
+            /** @var Token|null $token */
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 
             if (!$token) {
@@ -62,24 +71,42 @@ class DeployConsumer implements ConsumerInterface
                 return true;
             }
 
+            $token->setDeployed(new \DateTimeImmutable());
+
             if (!$clbResult->getAddress()) {
-                if (null !== $token->getDeployCost()) {
+                if ($token->getDeployCost()) {
+                    $amount = new Money((string)$token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
+
                     $this->balanceHandler->deposit(
                         $token->getProfile()->getUser(),
                         Token::getFromSymbol(Token::WEB_SYMBOL),
-                        new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL))
+                        $amount
                     );
-                    $token->setDeployCost('');
+
+                    $this->logger->info(
+                        '[deploy-consumer] the money is payed back returned back'
+                        . json_encode([
+                            'userId' => $token->getProfile()->getUser()->getId(),
+                            'tokenName' => $token->getName(),
+                            'amount' => $amount,
+                        ])
+                    );
                 }
+
+                $token->setDeployCost('');
+                $token->setDeployed(null);
             }
 
             $token->setAddress($clbResult->getAddress());
-            $token->setDeployed(new \DateTimeImmutable());
-
             $this->em->persist($token);
             $this->em->flush();
         } catch (\Throwable $exception) {
-            $this->logger->error("[deploy-consumer] Failed to update token address. Retry operation. Reason: {$exception->getMessage()}");
+            $this->logger->error(
+                '[deploy-consumer] Failed to update token address. Retry operation.'
+                . json_encode([
+                    'Reason' => $exception->getMessage(),
+                ])
+            );
 
             return false;
         }
