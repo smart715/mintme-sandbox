@@ -130,8 +130,8 @@ export default {
         },
     },
     mounted() {
+        this.showSpinner();
         this.updateOrders().then(() => {
-            this.showSpinner();
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
                 params: [this.market.identifier],
