@@ -3,17 +3,17 @@
         <div class="card-header">
             <span>Trading</span>
             <b-dropdown
-                id="currency"
-                variant="primary"
-                class="float-right"
-                :lazy="true"
+                    id="currency"
+                    variant="primary"
+                    class="float-right"
+                    :lazy="true"
             >
                 <template slot="button-content">
                     Currency:
-                <span v-if="showUsd">
+                    <span v-if="showUsd">
                     USD
                 </span>
-                <span v-else>
+                    <span v-else>
                     Crypto
                 </span>
                 </template>
@@ -31,40 +31,40 @@
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <label v-if="userId" class="custom-control custom-checkbox float-right pr-3">
                 <input
-                    type="checkbox"
-                    class="custom-control-input"
-                    id="checkbox"
-                    v-model="userTokensEnabled"
-                    @change="fetchData(1)"
-                    :disabled="loading">
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="checkbox"
+                        v-model="userTokensEnabled"
+                        @change="fetchData(1)"
+                        :disabled="loading">
                 <label for="checkbox" class="custom-control-label">Tokens I own</label>
             </label>
         </div>
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
-                    thead-class="trading-head"
-                    :items="tokens"
-                    :fields="fieldsArray"
-                    :sort-compare="sortCompare"
-                    sort-direction="desc"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
+                        thead-class="trading-head"
+                        :items="tokens"
+                        :fields="fieldsArray"
+                        :sort-compare="sortCompare"
+                        sort-direction="desc"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
-                            id="volume"
-                            variant="primary"
-                            :lazy="true"
+                                id="volume"
+                                variant="primary"
+                                :lazy="true"
                         >
                             <template slot="button-content">
                                 {{ data.label|rebranding }}
                             </template>
                             <template>
                                 <b-dropdown-item
-                                    v-for="(volume, key) in volumes"
-                                    :key="key"
-                                    @click="toggleActiveVolume(key)"
+                                        v-for="(volume, key) in volumes"
+                                        :key="key"
+                                        @click="toggleActiveVolume(key)"
                                 >
                                     {{ volume.label|rebranding }}
                                 </b-dropdown-item>
@@ -98,9 +98,9 @@
                                 {{ row.value }}
                             </a>
                             <guide
-                                placement="top"
-                                max-width="150px"
-                                v-if="row.item.tokenized">
+                                    placement="top"
+                                    max-width="150px"
+                                    v-if="row.item.tokenized">
                                 <template slot="icon">
                                     <img src="../../../img/mintmecoin_W.png" alt="deployed">
                                 </template>
@@ -114,16 +114,16 @@
             </div>
             <div class="row justify-content-center">
                 <b-pagination
-                    @change="fetchData"
-                    :total-rows="totalRows"
-                    :per-page="perPage"
-                    v-model="currentPage"
-                    class="my-0"/>
+                        @change="fetchData"
+                        :total-rows="totalRows"
+                        :per-page="perPage"
+                        v-model="currentPage"
+                        class="my-0" />
             </div>
         </template>
         <template v-else>
             <div class="p-5 text-center text-white">
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width/>
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
         </template>
     </div>
@@ -132,14 +132,7 @@
 <script>
     import _ from 'lodash';
     import Guide from '../Guide';
-    import {
-        FiltersMixin,
-        WebSocketMixin,
-        MoneyFilterMixin,
-        RebrandingFilterMixin,
-        NotificationMixin,
-        LoggerMixin,
-    } from '../../mixins/';
+    import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
     import {toMoney, formatMoney} from '../../utils';
     import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
     import Decimal from 'decimal.js/decimal.js';
@@ -240,7 +233,7 @@
                     },
                     lastPrice: {
                         label: 'Last Price',
-                        key: 'lastPrice' + (this.showUsd ? USD.symbol : ''),
+                        key: 'lastPrice' + ( this.showUsd ? USD.symbol : ''),
                         sortable: true,
                         formatter: formatMoney,
                     },
@@ -252,7 +245,7 @@
                     },
                     marketCap: {
                         label: 'Market Cap',
-                        key: 'marketCap' + (this.showUsd ? USD.symbol : ''),
+                        key: 'marketCap' + ( this.showUsd ? USD.symbol : ''),
                         sortable: true,
                         formatter: (value, key, item) => formatMoney(this.marketCapFormatter(value, key, item)),
                     },
@@ -305,7 +298,7 @@
             },
             sortCompare: function(a, b, key) {
                 let pair = false;
-                this.marketsOnTop.forEach((market) => {
+                this.marketsOnTop.forEach((market)=> {
                     let currency = this.rebrandingFunc(market.currency);
                     let token = this.rebrandingFunc(market.token);
 
@@ -319,7 +312,7 @@
                     let first = parseFloat(a[key]);
                     let second = parseFloat(b[key]);
 
-                    return pair ? 0 : (first < second ? -1 : (first > second ? 1 : 0));
+                    return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
                 }
 
                 // If the value is not numeric, currently only pair column
@@ -355,11 +348,10 @@
                             if (window.history.replaceState) {
                                 // prevents browser from storing history with each change:
                                 window.history.replaceState(
-                                    {page},
-                                    document.title,
-                                    this.$routing.generate('trading', {page})
+                                    {page}, document.title, this.$routing.generate('trading', {page})
                                 );
                             }
+
                             resolve();
                         })
                         .catch((err) => {
@@ -567,6 +559,7 @@
                             if (!(res.data && Object.keys(res.data).length)) {
                                 return Promise.reject();
                             }
+
                             this.conversionRates = res.data;
                             resolve();
                         })
