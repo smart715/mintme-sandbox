@@ -92,7 +92,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         foreach ($markets as $market) {
             $marketStatus = $this->repository->findByBaseQuoteNames(
                 $market->getBase()->getSymbol(),
-                $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+                $market->getQuote()->getSymbol()
             );
 
             if ($marketStatus) {
@@ -116,7 +116,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $marketInfo = $this->marketHandler->getMarketInfo($market);
         $marketStatus = $this->repository->findByBaseQuoteNames(
             $market->getBase()->getSymbol(),
-            $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+            $market->getQuote()->getSymbol()
         );
 
         if (!$marketStatus) {
