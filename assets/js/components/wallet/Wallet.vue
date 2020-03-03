@@ -346,9 +346,9 @@ export default {
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 })
-            .finally(() => {
-              this.hideSpinner();
-            });
+                .finally(() => {
+                    this.hideSpinner();
+                });
 
             // TODO: Get rid of hardcoded WEB
             this.deposit.min = currency === 'WEB' ? toMoney(1, subunit) : undefined;
@@ -396,9 +396,9 @@ export default {
                             .catch((err) => {
                                 this.sendLogs('error', 'Can not get lock-period', err);
                             })
-                        .finally(() => {
-                          this.hideSpinner();
-                        });
+                            .finally(() => {
+                                this.hideSpinner();
+                            });
                     }
                 });
             });

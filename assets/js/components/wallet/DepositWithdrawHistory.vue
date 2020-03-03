@@ -117,11 +117,11 @@ export default {
         },
     },
     mounted: function() {
-      this.showSpinner();
-      this.updateTableData()
-        .finally(() => {
-          this.hideSpinner();
-        });
+        this.showSpinner();
+        this.updateTableData()
+          .finally(() => {
+            this.hideSpinner();
+          });
     },
     methods: {
         addDetailsForEmptyMessageToHistory: function(historyData) {
