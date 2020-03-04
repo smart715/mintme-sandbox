@@ -588,12 +588,10 @@ export default {
                 };
 
                 this.$axios.retry.get(this.mintmeSupplyUrl, config)
-                    .then(
-                        (res) => {
-                            this.markets['WEBBTC'].supply = res.data;
-                            resolve(res.data);
-                        }
-                    )
+                    .then((res) => {
+                        this.markets['WEBBTC'].supply = res.data;
+                        resolve(res.data);
+                    })
                     .catch((err) => {
                         this.notifyError('Can not update MINTME circulation supply. BTC/MINTME market cap might not be accurate.');
                         this.sendLogs('error', 'Can not update MINTME circulation supply', err);
