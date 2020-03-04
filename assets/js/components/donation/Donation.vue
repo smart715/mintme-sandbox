@@ -26,8 +26,7 @@
                                                     v-for="option in options"
                                                     :key="option"
                                                     :value="option"
-                                                    @click="selectedCurrency = option;
-                                                    if (selectedCurrency !== option) balanceLoaded = false;"
+                                                    @click="onSelect(option)"
                                                 >
                                                     {{ option | rebranding }}
                                                 </b-dropdown-item>
@@ -234,6 +233,12 @@ export default {
         }
     },
     methods: {
+        onSelect: function(newCurrency) {
+            if (this.selectedCurrency !== newCurrency) {
+                this.balanceLoaded = false;
+                this.selectedCurrency = newCurrency;
+            }
+        },
         loadLoginForm: function() {
             this.$axios.retry.get(this.$routing.generate('login', {
                 formContentOnly: true,

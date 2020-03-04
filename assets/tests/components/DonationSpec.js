@@ -233,6 +233,24 @@ describe('Donation', () => {
         expect(wrapper.vm.buttonDisabled).to.be.true;
     });
 
+    it('can select currency', () => {
+        const wrapper = shallowMount(Donation, {
+            propsData: {
+                loggedIn: true,
+            },
+        });
+
+        wrapper.vm.balanceLoaded = true;
+        wrapper.vm.onSelect(webSymbol);
+        expect(wrapper.vm.selectedCurrency).to.be.equal(webSymbol);
+        expect(wrapper.vm.balanceLoaded).to.be.false;
+
+        wrapper.vm.balanceLoaded = true;
+        wrapper.vm.onSelect(btcSymbol);
+        expect(wrapper.vm.selectedCurrency).to.be.equal(btcSymbol);
+        expect(wrapper.vm.balanceLoaded).to.be.false;
+    });
+
     it('can load login form', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
