@@ -233,7 +233,7 @@ describe('Donation', () => {
         expect(wrapper.vm.buttonDisabled).to.be.true;
     });
 
-    it('triggers login form load correctly', (done) => {
+    it('can load login form', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
             localVue,
@@ -255,7 +255,7 @@ describe('Donation', () => {
         });
     });
 
-    it('triggers get token balance', (done) => {
+    it('can load token balance', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
             localVue,
@@ -276,6 +276,57 @@ describe('Donation', () => {
                 },
             }).then(() => done());
         });
+    });
+
+    it('can check donation if logged in and currency selected and amount to donate not null', (done) => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(Donation, {
+            localVue,
+            propsData: {
+                loggedIn: true,
+                market: {
+                    quote: {
+                        symbol: 'TOK00011122233',
+                    },
+                },
+            },
+        });
+
+        moxios.stubRequest('make_donation', {
+            status: 202,
+        });
+
+        wrapper.vm.selectedCurrency = webSymbol;
+        wrapper.vm.donationFee = 1;
+        wrapper.vm.amountToDonate = 50;
+        wrapper.vm.checkDonation();
+        done();
+    });
+
+    it('can make donation if logged in and currency selected and amount to donate/receive not null', (done) => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(Donation, {
+            localVue,
+            propsData: {
+                loggedIn: true,
+                market: {
+                    quote: {
+                        symbol: 'TOK00011122233',
+                    },
+                },
+            },
+        });
+
+        moxios.stubRequest('make_donation', {
+            status: 202,
+        });
+
+        wrapper.vm.selectedCurrency = webSymbol;
+        wrapper.vm.donationFee = 1;
+        wrapper.vm.amountToDonate = 20;
+        wrapper.vm.amountToReceive = 2;
+        wrapper.vm.makeDonation();
+        done();
     });
 
     it('check reset amount', () => {

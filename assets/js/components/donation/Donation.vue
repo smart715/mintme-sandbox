@@ -215,13 +215,14 @@ export default {
                 );
         },
         isAmountValid: function() {
-            return this.amountToDonate !== '' && (new Decimal(this.amountToDonate)).greaterThan(0);
+            return !!parseFloat(this.amountToDonate) && (new Decimal(this.amountToDonate)).greaterThan(0);
         },
         buttonDisabled: function() {
             return !this.loggedIn
                 || !this.isCurrencySelected
                 || this.insufficientFunds
                 || !parseFloat(this.balance)
+                || !parseFloat(this.amountToDonate)
                 || !parseFloat(this.amountToReceive);
         },
     },
@@ -344,7 +345,7 @@ export default {
             }
         },
         amountToDonate: function() {
-            if (this.amountToDonate === '') {
+            if (!parseFloat(this.amountToDonate)) {
                 this.amountToReceive = 0;
             }
         },
