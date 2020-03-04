@@ -5,7 +5,12 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3 class="modal-title">WITHDRAW({{ currency|rebranding }})</h3>
+                <h3 v-if="currency.length > 31" v-b-tooltip.hover :title="currency" class="modal-title">
+                    WITHDRAW({{ currency | rebranding | truncate(31)}})
+                </h3>
+                <h3 v-else class="modal-title">
+                    WITHDRAW({{ currency | rebranding }})
+                </h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
                         Address:
@@ -68,7 +73,10 @@
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}</span>
+                    <span v-if="currency.length > 31" v-b-tooltip.hover :title="currency" class="float-right">
+                        {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding|truncate(31) }}
+                    </span>
+                    <span v-else class="float-right">{{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}</span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
@@ -93,12 +101,12 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {addressLength, webSymbol, addressContain} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
-    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Modal,
     },
