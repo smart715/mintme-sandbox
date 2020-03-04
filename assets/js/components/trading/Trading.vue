@@ -583,9 +583,6 @@ export default {
                         return data;
                     },
                     'axios-retry': {
-                        // Setting reasonable number of retries,
-                        // the default retry 12, plus "retryDelay: axiosRetry.exponentialDelay" (in axios.js)
-                        // takes too long time (minutes) before it finally throws an error.
                         retries: 5,
                     },
                 };
