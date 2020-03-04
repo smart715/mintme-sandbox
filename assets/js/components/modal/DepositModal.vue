@@ -20,12 +20,7 @@
                     <div class="clearfix"></div>
                     <b-row>
                         <b-col>
-                            <p v-if="description.length > 36" v-b-tooltip.hover :title="description" class="text-center mt-2">
-                                {{ description|rebranding|truncate(36) }}
-                            </p>
-                            <p v-else class="text-center mt-2">
-                                {{ description|rebranding }}
-                            </p>
+                            <p class="text-center mt-2 overflow-wrap-break-word">{{ description|rebranding }}</p>
                         </b-col>
                     </b-row>
                     <b-row>
