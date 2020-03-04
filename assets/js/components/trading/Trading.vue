@@ -595,9 +595,6 @@ export default {
                         (res) => {
                             this.markets['WEBBTC'].supply = res.data;
                             resolve(res.data);
-                        },
-                        (rej) => {
-                            throw new Error(rej);
                         }
                     )
                     .catch((err) => {
