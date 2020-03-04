@@ -4,11 +4,11 @@
         :no-close="noClose"
         @close="closeModal">
         <template slot="body">
-            <div class="text-center">
-                <h3 v-if="currency.length > 31" v-b-tooltip.hover :title="currency" class="modal-title">
+            <div class="text-center" style="word-wrap: break-word;">
+                <!-- <h3 v-if="currency.length > 31" v-b-tooltip.hover :title="currency" class="modal-title">
                     WITHDRAW({{ currency | rebranding | truncate(31)}})
-                </h3>
-                <h3 v-else class="modal-title">
+                </h3> -->
+                <h3 class="modal-title">
                     WITHDRAW({{ currency | rebranding }})
                 </h3>
                 <div class="col-12 pt-2">
@@ -74,7 +74,7 @@
                         Total to be withdrawn:
                     </label>
                     <span class="float-right">
-                        {{ fullAmount | toMoney(subunit) }}<span v-if="currency.length > 17" v-b-tooltip.hover :title="currency">{{ currency | rebranding | truncate(17) }}</span>
+                        {{ fullAmount | toMoney(subunit) }} <span v-if="currency.length > 17" v-b-tooltip.hover :title="currency">{{ currency | rebranding | truncate(17) }}</span>
                         <span v-else>{{ currency|rebranding }}</span>
                     </span>
                 </div>
