@@ -21,7 +21,7 @@
                     <b-row>
                         <b-col>
                             <p v-if="description.length > 31" v-b-tooltip.hover :title="description" class="text-center mt-2">
-                                {{ description|rebranding }}
+                                {{ description|rebranding|truncate(31) }}
                             </p>
                             <p v-else class="text-center mt-2">
                                 {{ description|rebranding }}
@@ -50,12 +50,12 @@
 <script>
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
-import {RebrandingFilterMixin} from '../../mixins';
+import {FiltersMixin, RebrandingFilterMixin} from '../../mixins';
 import {webSymbol} from '../../utils/constants';
 
 export default {
     name: 'DepositModal',
-    mixins: [RebrandingFilterMixin],
+    mixins: [FiltersMixin, RebrandingFilterMixin],
     components: {
         Modal,
         CopyLink,
