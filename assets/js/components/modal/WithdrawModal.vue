@@ -74,8 +74,7 @@
                         Total to be withdrawn:
                     </label>
                     <span class="float-right">
-                        {{ fullAmount | toMoney(subunit) }} 
-                        <span v-if="currency.length > 17" v-b-tooltip.hover :title="currency">{{ currency | rebranding | truncate(17) }}</span>
+                        {{ fullAmount | toMoney(subunit) }}<span v-if="currency.length > 17" v-b-tooltip.hover :title="currency">{{ currency | rebranding | truncate(17) }}</span>
                         <span v-else>{{ currency|rebranding }}</span>
                     </span>
                 </div>
