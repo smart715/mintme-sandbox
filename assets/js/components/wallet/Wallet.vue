@@ -180,7 +180,6 @@ export default {
         tradingUrl: String,
         depositMore: String,
         twofa: String,
-        tokenQuantity: String,
     },
     data() {
         return {
@@ -376,13 +375,13 @@ export default {
                             return;
                         }
 
-                        this.$axios.retry.get(this.$routing.generate('minted_amount', {name: token}))
+                        this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
                             .then((res) =>
                                 this.tokens[token].available = res.data ?
-                                    new Decimal(oToken.available).sub(this.tokenQuantity).add(res.data.minted_amount) : oToken.available
+                                    new Decimal(oToken.available).sub(res.data.frozenAmountWithReceived) : oToken.available
                             )
                             .catch((err) => {
-                                this.sendLogs('error', 'Can not get minted_amount', err);
+                                this.sendLogs('error', 'Can not get lock_period', err);
                             });
                     }
                 });

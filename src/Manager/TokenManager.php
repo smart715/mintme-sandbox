@@ -32,23 +32,18 @@ class TokenManager implements TokenManagerInterface
     /** @var Config */
     private $config;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
     public function __construct(
         EntityManagerInterface $em,
         ProfileFetcherInterface $profileFetcher,
         TokenStorageInterface $storage,
         CryptoManagerInterface $cryptoManager,
-        Config $config,
-        MoneyWrapperInterface $moneyWrapper
+        Config $config
     ) {
         $this->repository = $em->getRepository(Token::class);
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
         $this->config = $config;
-        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function findByHiddenName(string $name): ?Token
@@ -142,12 +137,18 @@ class TokenManager implements TokenManagerInterface
         }
 
         $available = $balanceResult->getAvailable();
+        $available = $token->isDeployed()
+            ? $available->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+            : $available->subtract($token->getLockIn()->getAmountToRelease());
 
-        $available = !$token->isDeployed() ? $available->subtract($token->getLockIn()->getAmountToRelease()) : $available->subtract($this->moneyWrapper->parse((string) $this->config->getTokenQuantity(), Token::TOK_SYMBOL))->add($token->getMintedAmount());
+        $freeze = $balanceResult->getFreeze();
+        $freeze = $token->isDeployed()
+            ? $freeze->add($token->getLockIn()->getFrozenAmountWithReceived())
+            : $freeze->add($token->getLockIn()->getAmountToRelease());
 
         return BalanceResult::success(
             $available,
-            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount()),
+            $freeze,
             $balanceResult->getReferral()
         );
     }

@@ -338,7 +338,7 @@ class TokensController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/{name}/exchange-amount", name="token_exchange_amount", options={"expose"=true})
      */
-    public function getTokenExchange(string $name, BalanceHandlerInterface $balanceHandler, MoneyWrapperInterface $moneyWrapper): View
+    public function getTokenExchange(string $name, BalanceHandlerInterface $balanceHandler): View
     {
         $token = $this->tokenManager->findByName($name);
 
@@ -352,12 +352,9 @@ class TokensController extends AbstractFOSRestController
         )->getAvailable();
 
         if ($token->getLockIn()) {
-            if (!$token->isDeployed()) {
-                $balance = $balance->subtract($token->getLockIn()->getAmountToRelease());
-            } else {
-                $token_quantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), MoneyWrapper::TOK_SYMBOL);
-                $balance = $balance->subtract($token_quantity)->add($token->getMintedAmount());
-            }
+            $balance = $token->isDeployed()
+                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+                : $balance = $balance->subtract($token->getLockIn()->getAmountToRelease());
         }
 
         return $this->view($balance);
@@ -661,16 +658,5 @@ class TokensController extends AbstractFOSRestController
         $token = $this->tokenManager->findByName($name);
 
         return $this->view(['exists' => null !== $token], Response::HTTP_OK);
-    }
-
-    /**
-     * @Rest\View()
-     * @Rest\Get("/{name}/minted", name="minted_amount", options={"expose"=true})
-     */
-    public function getMintedAmount(string $name): View
-    {
-        $token = $this->tokenManager->findByName($name);
-
-        return $this->view(['mintedAmount' => $token->getMintedAmount()], Response::HTTP_OK);
     }
 }
