@@ -12,6 +12,7 @@ syntax_check:
 	./vendor/bin/phplint
 	./vendor/bin/phpcs -n
 	./vendor/bin/phpstan analyse
+	./vendor/bin/psalm
 
 syntax_check_assets:
 	npm run stylelint
