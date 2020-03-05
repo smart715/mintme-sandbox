@@ -2,6 +2,7 @@
 
 namespace App\Tests\Exchange\Donation;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
@@ -9,6 +10,7 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\Market;
+use App\Manager\CryptoManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\MarketNameConverterInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,7 +25,7 @@ class DonationHandlerTest extends TestCase
     public function testCheckDonation(bool $hasError, ?string $expectedToReceive): void
     {
         $base = $this->mockCrypto();
-        $base->method('getSymbol')->willReturn('WEB');
+        $base->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
 
         $quote = $this->mockToken();
         $quote->method('getSymbol')->willReturn('TOK000000000123');
@@ -53,7 +55,9 @@ class DonationHandlerTest extends TestCase
         $donationHandler = new DonationHandler(
             $jsonRpc,
             $marketNameConverter,
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoRatesFetcher(),
+            $this->mockCryptoManager($base)
         );
 
         if ($hasError) {
@@ -77,8 +81,11 @@ class DonationHandlerTest extends TestCase
     /** @dataProvider getMakeDonationProvider */
     public function testMakeDonation(bool $hasError): void
     {
+        $webCrypto = $this->mockCrypto();
+        $webCrypto->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
+
         $base = $this->mockCrypto();
-        $base->method('getSymbol')->willReturn('BTC');
+        $base->method('getSymbol')->willReturn(Token::BTC_SYMBOL);
 
         $quote = $this->mockToken();
         $quote->method('getSymbol')->willReturn('TOK000000000123');
@@ -100,7 +107,7 @@ class DonationHandlerTest extends TestCase
         $jsonRpc->method('send')
             ->with('order.make_donation', [
                 'TOK000000000123BTC',
-                '30000',
+                '375000000000',
                 '1',
                 '20000',
             ])
@@ -109,7 +116,9 @@ class DonationHandlerTest extends TestCase
         $donationHandler = new DonationHandler(
             $jsonRpc,
             $marketNameConverter,
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoRatesFetcher(),
+            $this->mockCryptoManager($webCrypto)
         );
 
         if ($hasError) {
@@ -138,5 +147,35 @@ class DonationHandlerTest extends TestCase
     private function mockToken(): Token
     {
         return $this->createMock(Token::class);
+    }
+
+    /** @return CryptoRatesFetcherInterface|MockObject */
+    private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
+    {
+        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
+
+        $crf->method('fetch')->willReturn([
+            Token::WEB_SYMBOL => [
+                Token::BTC_SYMBOL => 0.00000008,
+            ],
+        ]);
+
+        return $crf;
+    }
+
+    /** @return CryptoManagerInterface|MockObject */
+    private function mockCryptoManager(?Crypto $crypto): CryptoManagerInterface
+    {
+        $manager = $this->createMock(CryptoManagerInterface::class);
+
+        $manager
+            ->method('findBySymbol')
+            ->willReturnCallback(function (string $symbol) use ($crypto) {
+                return $crypto->getSymbol() == $symbol
+                    ? $crypto
+                    : null;
+            });
+
+        return $manager;
     }
 }

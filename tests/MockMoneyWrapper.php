@@ -4,6 +4,7 @@ namespace App\Tests;
 
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
+use Money\Exchange\FixedExchange;
 use Money\Money;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,6 +30,17 @@ trait MockMoneyWrapper
 
         $wrapper->method('format')->willReturnCallback(function (Money $money) {
             return $money->getAmount();
+        });
+
+        $wrapper->method('convert')->willReturnCallback(function (Money $money, Currency $currency, FixedExchange $exchange) {
+            $currencyPair = $exchange->quote(
+                new Currency($money->getCurrency()->getCode()),
+                new Currency($currency->getCode())
+            );
+
+            $ratio = $currencyPair->getConversionRatio();
+
+            return $money->multiply($ratio);
         });
 
         return $wrapper;
