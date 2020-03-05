@@ -8,6 +8,7 @@
                 :items="sanitizedHistory"
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
+                sort-icon-left
             >
                 <template v-slot:cell(symbol)="data">
                     <a :href="rebrandingFunc(data.item.url)" class="text-white">

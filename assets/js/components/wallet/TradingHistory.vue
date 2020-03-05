@@ -6,7 +6,8 @@
                     thead-class="trading-head"
                     v-if="hasHistory"
                     :items="history"
-                    :fields="fields">
+                    :fields="fields"
+                    sort-icon-left>
                     <template v-slot:cell(name)="row">
                         <div
                             class="truncate-name w-100"

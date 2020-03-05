@@ -7,7 +7,8 @@
                     ref="btable"
                     v-if="hasOrders"
                     :items="history"
-                    :fields="fields">
+                    :fields="fields"
+                    sort-icon-left>
                     <template v-slot:cell(name)="row">
                         <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
