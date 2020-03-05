@@ -26,11 +26,13 @@ export default {
                 return;
             }
 
+            let orders = JSON.parse(JSON.stringify(fullOrdersList));
+            orders.sort((a, b) => a.timestamp - b.timestamp);
             let moreCount = 0;
             let tradersArray = [];
             let tradersIdsArray = [];
 
-            let orders = fullOrdersList.filter((order) => {
+            let filteredOrders = orders.filter((order) => {
                 let makerId = parseInt(order.maker.id);
                 if (tradersIdsArray.includes(makerId) || price !== toMoney(order.price, basePrecision)) {
                     return false;
@@ -41,8 +43,8 @@ export default {
                 return true;
             });
 
-            orders.sort((a, b) => a.timestamp - b.timestamp);
-            orders.forEach((order) => tradersArray.push(this.createTraderLinkFromOrder(order)));
+            filteredOrders.sort((a, b) => a.timestamp - b.timestamp);
+            filteredOrders.forEach((order) => tradersArray.push(this.createTraderLinkFromOrder(order)));
 
             if (tradersArray.length > 5) {
                 moreCount = tradersArray.length - 5;
