@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -91,7 +92,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         foreach ($markets as $market) {
             $marketStatus = $this->repository->findByBaseQuoteNames(
                 $market->getBase()->getSymbol(),
-                $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+                $market->getQuote()->getSymbol()
             );
 
             if ($marketStatus) {
@@ -115,7 +116,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $marketInfo = $this->marketHandler->getMarketInfo($market);
         $marketStatus = $this->repository->findByBaseQuoteNames(
             $market->getBase()->getSymbol(),
-            $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+            $market->getQuote()->getSymbol()
         );
 
         if (!$marketStatus) {
