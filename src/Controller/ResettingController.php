@@ -83,8 +83,10 @@ class ResettingController extends FOSResettingController
         $resettingForm = $this->createForm(ResettingType::class, $user);
         $resettingForm->handleRequest($request);
 
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
+        $eventResponse = $event->getResponse();
+
+        if (null !== $eventResponse) {
+            return $eventResponse;
         }
 
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
