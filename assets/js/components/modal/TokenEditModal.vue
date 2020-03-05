@@ -7,10 +7,10 @@
             @close="$emit('close')"
         >
             <template slot="header">
-                <span v-if="currentName.length > 31" v-b-tooltip:title="currentName">
-                {{ currentName | truncate(31) }}
+                <span v-if="currentName.length > 25" v-b-tooltip:title="currentName">
+                <p class="text-center">{{ currentName | truncate(25) }}</p>
                 </span>
-                <span v-else>{{ currentName }}</span>
+                <span v-else class="text-center"><p>{{ currentName }}</p></span>
             </template>
             <template slot="body">
                 <div class="token-edit p-0">

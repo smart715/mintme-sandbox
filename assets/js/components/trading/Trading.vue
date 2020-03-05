@@ -94,8 +94,8 @@
                     </template>
                     <template v-slot:cell(pair)="row">
                         <div>
-                            <a v-if="row.value.length > 31" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
-                                {{ row.value | truncate(31) }}
+                            <a v-if="row.value.length > 22" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
+                                {{ row.value | truncate(22) }}
                             </a>
                             <a v-else :href="row.item.tokenUrl" class="text-white">
                                 {{ row.value }}
