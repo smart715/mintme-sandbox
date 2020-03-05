@@ -167,9 +167,12 @@ class Exchanger implements ExchangerInterface
             $market->getBase() :
             $market->getQuote();
 
-        return bcdiv($amount, '1', $market->isTokenMarket() ?
+        /** @var string $amount */
+        $amount = bcdiv($amount, '1', $market->isTokenMarket() ?
             $this->bag->get('token_precision') :
             $crypto->getShowSubunit());
+
+        return $amount;
     }
 
     private function getSymbol(TradebleInterface $tradeble): string

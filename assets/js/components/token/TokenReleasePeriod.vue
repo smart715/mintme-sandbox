@@ -85,7 +85,6 @@ import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
-import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenReleasePeriod',
@@ -145,20 +144,6 @@ export default {
             });
     },
     methods: {
-        updateTokenStatistics: function(newTokenStatistics) {
-            this.setStats({
-                releasePeriod: newTokenStatistics.releasePeriod,
-                hourlyRate: newTokenStatistics.hourlyRate,
-                releasedAmount: newTokenStatistics.releasedAmount,
-                frozenAmount: newTokenStatistics.frozenAmount,
-            });
-            this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
-            .then((res) => this.setTokenExchangeAmount(res.data))
-            .catch((err) => {
-                this.notifyError('Can not load statistic data. Try again later');
-                this.sendLogs('error', 'Can not load statistic data', err);
-            });
-        },
         closeTwoFactorModal: function() {
             this.showTwoFactorModal = false;
         },
@@ -179,7 +164,6 @@ export default {
             }).then((response) => {
                 this.closeTwoFactorModal();
                 this.$emit('update', response);
-                this.updateTokenStatistics(response.data);
                 this.notifySuccess('Release period updated.');
             }).catch(({response}) => {
                 if (!response) {
@@ -194,10 +178,6 @@ export default {
                 }
             });
         },
-        ...mapMutations('tokenStatistics', [
-            'setStats',
-            'setTokenExchangeAmount',
-        ]),
     },
 };
 </script>
