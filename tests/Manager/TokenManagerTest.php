@@ -13,7 +13,6 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManager;
 use App\Repository\TokenRepository;
 use App\Utils\Fetcher\ProfileFetcherInterface;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
