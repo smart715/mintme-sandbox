@@ -347,7 +347,40 @@ describe('Donation', () => {
         done();
     });
 
-    it('check reset amount', () => {
+    it('can use all funds to donate', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(Donation, {
+            localVue,
+            propsData: {
+                loggedIn: true,
+                market: {
+                    base: {
+                        subunit: 4,
+                    },
+                    quote: {
+                        symbol: 'TOK3333322221111',
+                    },
+                },
+            },
+        });
+
+        wrapper.vm.selectedCurrency = webSymbol;
+        wrapper.vm.donationFee = 1;
+        wrapper.vm.balance = 100;
+        wrapper.vm.amountToDonate = 20;
+        wrapper.vm.all();
+
+        expect(wrapper.vm.amountToDonate).to.be.equal('100');
+
+        // Insufficient funds
+        wrapper.vm.balance = 100;
+        wrapper.vm.amountToDonate = 120;
+        wrapper.vm.all();
+
+        expect(wrapper.vm.amountToDonate).to.be.equal('100');
+    });
+
+    it('should reset amount to donate and amount to receive', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,

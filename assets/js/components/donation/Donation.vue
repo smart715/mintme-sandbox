@@ -8,7 +8,7 @@
                             <span v-if="loggedIn">Donations</span>
                             <span v-else>To make a donation you have to be logged in</span>
                         </div>
-                        <div class="donation-body">
+                        <div class="card-body donation-body">
                             <div v-if="loggedIn" class="h-100">
                                 <div class="p-md-4">
                                     <div>
@@ -80,7 +80,7 @@
                                                     >All</button>
                                                 </div>
                                             </div>
-                                            <p class="mt-2 mb-4">
+                                            <p class="mt-2 mb-4 text-nowrap">
                                                 You will receive approximately:
                                                 <font-awesome-icon
                                                     v-if="donationChecking"
@@ -335,7 +335,9 @@ export default {
         },
         all: function() {
             this.amountToDonate = toMoney(this.balance, this.market.base.subunit);
-            this.checkDonation();
+            if (!this.insufficientFunds) {
+                this.checkDonation();
+            }
         },
         resetAmount: function() {
             this.amountToDonate = 0;
