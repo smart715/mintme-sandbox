@@ -50,7 +50,6 @@
                     sort-direction="desc"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
-                    sort-icon-left
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
