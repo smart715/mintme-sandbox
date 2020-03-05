@@ -28,7 +28,7 @@ class DonationController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Get("/{base}/{quote}/check/{amount}/{fee}", name="check_donation", options={"expose"=true})
-     * @Rest\RequestParam(name="amount", allowBlank=false)
+     * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(name="fee", allowBlank=false, description="Donation fee.")
      */
     public function checkDonation(Market $market, string $amount, string $fee): View
@@ -46,7 +46,7 @@ class DonationController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{base}/{quote}/make", name="make_donation", options={"expose"=true})
-     * @Rest\RequestParam(name="amount", allowBlank=false)
+     * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(name="fee", allowBlank=false, description="Donation fee.")
      * @Rest\RequestParam(name="expected_count_to_receive", allowBlank=false, description="Expected tokens count to receive.")
      */
