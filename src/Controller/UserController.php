@@ -222,6 +222,7 @@ class UserController extends AbstractController
 
     private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
     {
+        /** @var User $user */
         $user = $this->getUser();
         $passwordForm = $this->createForm(ChangePasswordType::class, $user);
         $passwordForm->handleRequest($request);
@@ -247,7 +248,7 @@ class UserController extends AbstractController
         return $passwordForm;
     }
 
-    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, array $clients): Response
+    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, ?array $clients): Response
     {
         return $this->render('pages/settings.html.twig', [
             'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
