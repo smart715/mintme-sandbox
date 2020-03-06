@@ -2,12 +2,12 @@
 
 namespace App\Manager;
 
-use App\Entity\KnowledgeBase\KnowledgeBase;
+use App\Entity\ReciprocalLinks;
 
 interface ReciprocalLinksManagerInterface
 {
     /**
-     * @return KnowledgeBase[]
+     * @return ReciprocalLinks[]
      */
     public function getAll(): array;
 }
