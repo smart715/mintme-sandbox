@@ -83,7 +83,7 @@ class KernelSubscriber implements EventSubscriberInterface
         return (bool)preg_match('/^\/api\//', $request->getPathInfo());
     }
 
-    private function isCsrfTokenValid(string $token): bool
+    private function isCsrfTokenValid(?string $token): bool
     {
         return $this->csrfTokenManager->isTokenValid(
             new CsrfToken('authenticate', $token ?? '')
