@@ -174,7 +174,7 @@ describe('WithdrawModal', () => {
         expect(wrapper.vm.fullAmount).to.be.equal('15912.12');
     });
 
-    it('should be contain "12345" in the "Total to be withdrawn" field when fee props is greater than amount data', () => {
+    it('should be equal "12345" in the "Total to be withdrawn" field when fee props is greater than amount data', () => {
         propsForTestCorrectlyRenders.fee = '35678';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
@@ -184,7 +184,7 @@ describe('WithdrawModal', () => {
         expect(wrapper.vm.fullAmount).to.be.equal('12345');
     });
 
-    it('should\'t be contain "12345f" in the "Total to be withdrawn" field', () => {
+    it('should\'t be equal "12345f" in the "Total to be withdrawn" field', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
         });
