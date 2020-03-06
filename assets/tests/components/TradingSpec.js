@@ -8,7 +8,6 @@ import Axios from 'axios';
 
 Vue.component('b-pagination', BPagination);
 Vue.component('b-table', BTable);
-const BASE_URL = window.location.hostname;
 
 describe('Trading', () => {
     beforeEach(() => {
@@ -18,17 +17,12 @@ describe('Trading', () => {
         moxios.uninstall();
     });
     const $routing = {generate: () => 'URL'};
+    const BASE_URL = window.location.hostname;
     const localVue = createLocalVue();
-    localVue.use({
-        install(Vue, options) {
-            Vue.prototype.$axios = {retry: Axios, single: Axios};
-            Vue.prototype.$routing = {generate: (val) => val};
-        },
-    });
-
+    localVue.use(Axios);
     const wrapper = shallowMount(Trading, {
         localVue,
-        mocks: {
+         mocks: {
             $routing,
         },
         computed: {
@@ -42,7 +36,6 @@ describe('Trading', () => {
     });
 
     let market = {pair: 'tok1', change: '0', lastPrice: '0', volume: '0'};
-    let deployedToken = {pair: 'tok1', change: '0', lastPrice: '0', volume: '0', tokenized: true};
     let marketOnTop = [{pair: 'BTC/MINTME', change: '0', lastPrice: '0', volume: '0'}];
 
     it('Show USD in dropdown option if enableUSD is true', () => {
@@ -74,53 +67,19 @@ describe('Trading', () => {
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
     });
-    it('show all tokens if there are not deployed tokens', () => {
-        wrapper.vm.marketFilters.userSelected = false;
-        wrapper.vm.marketFilters.selectedFilter = 'all';
-        wrapper.vm.markets = JSON.stringify({
-            TOK000000000001WEB: ['tok1', 'WEB'],
-            TOK000000000002WEB: ['tok2', 'WEB'],
-            TOK000000000003BTC: ['WEB', 'BTC'],
-        });
-        expect(wrapper.vm.markets).to.not.be.null;
-        expect(wrapper.vm.markets).to.equal(JSON.stringify({
-            TOK000000000001WEB: ['tok1', 'WEB'],
-            TOK000000000002WEB: ['tok2', 'WEB'],
-            TOK000000000003BTC: ['WEB', 'BTC'],
-        }));
-    });
     it('show only deployed tokens if user selected the option', () => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
     });
-    it('show only deployed tokens if there are at least one dployed', () => {
-       wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
-       wrapper.vm.sanitizedMarkets = deployedToken;
-        wrapper.vm.marketFilters.selectedFilter = 'deployed';
-        expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
-    });
-    it('show all tokens when user selected the option', () => {
-        wrapper.vm.marketFilters.userSelected = true;
-        wrapper.vm.marketFilters.selectedFilter = 'all';
-        expect(wrapper.vm.marketFilters.selectedFilter).to.deep.equal('all');
-        expect(wrapper.vm.markets).to.not.be.null;
-    });
-    it('show user tokens owns when user selected the option', () => {
-        wrapper.vm.marketFilters.userSelected = true;
-        wrapper.vm.marketFilters.selectedFilter = 'user';
-        wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.vm.marketFilters.selectedFilter).to.deep.equal('user');
-        expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
-    });
-    it('make sure that expected "user=1" will be sent', () => {
+    it('make sure that expected "user=1" will be sent', (done) => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'user';
         wrapper.setProps({userId: 1});
+        const $routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
         let url = BASE_URL + '/api/markets/info';
         let params = {user: 1};
-        Vue.prototype.$routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
-        moxios.stubRequest(Vue.prototype.$routing.generate(url, params), {
+        moxios.stubRequest($routing.generate(url, params), {
             status: 200,
             response: {
                 markets: {
@@ -139,14 +98,14 @@ describe('Trading', () => {
             done();
         });
     });
-    it('make sure that expected "deployed=1" will be sent', () => {
+    it('make sure that expected "deployed=1" will be sent', (done) => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         wrapper.setProps({userId: 1});
         let url = BASE_URL + '/api/markets/info';
         let params = {deployed: 1};
-        Vue.prototype.$routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
-        moxios.stubRequest(Vue.prototype.$routing.generate(url, params), {
+        const $routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
+        moxios.stubRequest($routing.generate(url, params), {
             status: 200,
             response: {
                 markets: {
@@ -167,13 +126,13 @@ describe('Trading', () => {
             done();
         });
     });
-    it('make sure that "user=1" or "deployed=1" is not will be sent when user selected "all tokens"', () => {
+    it('make sure that "user=1" or "deployed=1" is not will be sent when user selected "all tokens"', (done) => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'all';
         wrapper.setProps({userId: 1});
         let url = BASE_URL + '/api/markets/info';
-        Vue.prototype.$routing = {generate: (url) => url};
-        moxios.stubRequest(Vue.prototype.$routing.generate(url), {
+        const $routing = {generate: (url) => url};
+        moxios.stubRequest($routing.generate(url), {
             status: 200,
             response: {
                 markets: {
