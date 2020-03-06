@@ -10,7 +10,7 @@
                         </div>
                         <div class="card-body donation-body">
                             <div v-if="loggedIn" class="h-100">
-                                <div class="p-md-4">
+                                <div>
                                     <div>
                                         <p class="info">Donation is non-refundable</p>
                                     </div>
