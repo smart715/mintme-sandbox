@@ -43,12 +43,14 @@
         <template v-if="loaded">
             <div class="trading-table table-responsive text-nowrap">
                 <b-table
+                    thead-class="trading-head"
                     :items="tokens"
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"
                     sort-direction="desc"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
+                    sort-icon-left
                 >
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
@@ -351,8 +353,6 @@ export default {
                             );
                         }
 
-                        this.fetchWEBsupply().then(this.updateWEBBTCMarket.bind(this));
-
                         resolve();
                     })
                     .catch((err) => {
@@ -457,14 +457,13 @@ export default {
                     if (marketOnTopIndex > -1 &&
                         cryptoSymbol === webBtcOnTop.currency &&
                         tokenName === webBtcOnTop.token) {
-                        this.fetchWEBsupply().then((supply) => {
-                            this.markets[market].supply = supply;
-                        });
-                        if ('undefined' === typeof this.markets[market].supply) {
-                            this.notifyError('Can not update market cap for BTC/MINTME.');
-                            this.sendLogs('error', 'Can not update market cap for BTC/MINTME', 'markets supply === undefined');
-                            this.markets[market].supply = 0;
-                        }
+                        this.markets[market].supply = 0;
+                        this.fetchWEBsupply().then(
+                            (resolve) => {
+                                this.markets[market].supply = resolve;
+                                this.updateWEBBTCMarket(this);
+                            }
+                        );
                     } else {
                         this.markets[market].supply = 1e7;
                     }
@@ -580,9 +579,12 @@ export default {
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
                 let config = {
-                    transformRequest: function(data, headers) {
+                    'transformRequest': function(data, headers) {
                         headers.common = {};
                         return data;
+                    },
+                    'axios-retry': {
+                        retries: 5,
                     },
                 };
 
