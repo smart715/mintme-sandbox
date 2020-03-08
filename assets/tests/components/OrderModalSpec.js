@@ -55,7 +55,7 @@ describe('OrderModal', () => {
         expect(wrapper.emitted('close').length).to.be.equal(1);
     });
 
-    it('should be contain "order-created.png" in img field when type props is true', () => {
+    it('should be contain "order-created" in img field when type props is true', () => {
         const wrapper = shallowMount(OrderModal, {
             propsData: {
                 type: true,
@@ -66,7 +66,7 @@ describe('OrderModal', () => {
         expect(wrapper.find('img').attributes('src')).to.contain('order-created');
     });
 
-    it('should be contain "order-failed.png" in img field when type props is false', () => {
+    it('should be contain "order-failed" in img field when type props is false', () => {
         const wrapper = shallowMount(OrderModal, {
             propsData: {
                 type: false,
@@ -77,7 +77,7 @@ describe('OrderModal', () => {
         expect(wrapper.find('img').attributes('src')).to.contain('order-failed');
     });
 
-    it('should be contain "addressTest" in the address field', () => {
+    it('should be contain "mintimeTest" in the address field', () => {
         const wrapper = shallowMount(OrderModal, {
             filters: {
                 rebranding: function(val) {
