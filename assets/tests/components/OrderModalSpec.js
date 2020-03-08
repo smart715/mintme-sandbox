@@ -77,7 +77,7 @@ describe('OrderModal', () => {
         expect(wrapper.find('img').attributes('src')).to.contain('order-failed');
     });
 
-    it('should be contain "mintimeTest" in the address field', () => {
+    it('should be contain "mintimeTest" in the title field', () => {
         const wrapper = shallowMount(OrderModal, {
             filters: {
                 rebranding: function(val) {
