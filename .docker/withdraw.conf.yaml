@@ -1,6 +1,6 @@
 # This file is auto-generated during the composer install
 parameters:
-    db_host: localhost
+    db_host: db
     db_port: 3306
     db_user: root
     db_password: root
