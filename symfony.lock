@@ -146,12 +146,6 @@
             "ref": "370bcf99b04c0dfd0b545745aad622d757af5e1b"
         }
     },
-    "friendsofsymfony/oauth-server-bundle": {
-        "version": "1.6.2"
-    },
-    "friendsofsymfony/oauth2-php": {
-        "version": "1.2.3"
-    },
     "friendsofsymfony/rest-bundle": {
         "version": "2.2",
         "recipe": {
@@ -235,15 +229,6 @@
     },
     "kriswallsmith/buzz": {
         "version": "v0.16.1"
-    },
-    "laminas/laminas-code": {
-        "version": "3.4.1"
-    },
-    "laminas/laminas-eventmanager": {
-        "version": "3.2.1"
-    },
-    "laminas/laminas-zendframework-bridge": {
-        "version": "1.0.1"
     },
     "lcobucci/jwt": {
         "version": "3.2.4"
