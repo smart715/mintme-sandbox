@@ -49,4 +49,16 @@ class TokenRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
+    public function getDeployedTokens(): array
+    {
+        return $this->createQueryBuilder('token')
+            ->where('token.deployed IS NOT NULL')
+            ->getQuery()
+            ->execute();
+    }
 }
