@@ -30,7 +30,7 @@
                                         v-if="row.item.isAnonymous"
                                         class="d-inline-block truncate-name flex-grow-1 c-pointer"
                                         v-b-tooltip="popoverConfig"
-                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price, row.item.side)"
                                     >
                                         {{ row.value }}
                                     </span>
@@ -39,7 +39,7 @@
                                         :href="row.item.traderUrl"
                                         class="d-flex flex-row flex-nowrap justify-content-between w-100"
                                         v-b-tooltip="popoverConfig"
-                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price, row.item.side)"
                                     >
                                         <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
                                             {{ row.value }}

@@ -4,7 +4,11 @@ export default {
     data() {
         return {
             tooltipData: 'Loading...',
+            executedOrders: [],
         };
+    },
+    mounted: function() {
+        this.$root.$on('trade-history-orders', (data) => this.executedOrders = data);
     },
     computed: {
         tooltipContent: function() {
@@ -21,30 +25,37 @@ export default {
         },
     },
     methods: {
-        mouseoverHandler: function(fullOrdersList, basePrecision, price) {
-            if (fullOrdersList.lenght === 0 || !price) {
+        mouseoverHandler: function(pendingOrders, basePrecision, price, side) {
+            if ((pendingOrders.length === 0 && this.executedOrders.length === 0) || !price) {
                 return;
             }
 
-            let orders = JSON.parse(JSON.stringify(fullOrdersList));
-            orders.sort((a, b) => a.timestamp - b.timestamp);
             let moreCount = 0;
             let tradersArray = [];
             let tradersIdsArray = [];
+            let orders = JSON.parse(JSON.stringify(pendingOrders));
 
-            let filteredOrders = orders.filter((order) => {
-                let makerId = parseInt(order.maker.id);
-                if (tradersIdsArray.includes(makerId) || price !== toMoney(order.price, basePrecision)) {
-                    return false;
-                }
+            // Filter orders by price
+            let pendingFilteredOrders = orders.filter((order) => price === toMoney(order.price, basePrecision));
+            let executedFilteredOrders = this.executedOrders.filter(
+                (order) => price === toMoney(order.price, basePrecision) && side === order.side
+            );
 
-                tradersIdsArray.push(makerId);
-
-                return true;
-            });
-
+            // Concat executed and pending orders
+            let filteredOrders = pendingFilteredOrders.concat(executedFilteredOrders);
             filteredOrders.sort((a, b) => a.timestamp - b.timestamp);
-            filteredOrders.forEach((order) => tradersArray.push(this.createTraderLinkFromOrder(order)));
+
+            filteredOrders.forEach((order) => {
+                if (order.maker && !tradersIdsArray.includes(parseInt(order.maker.id))) {
+                    tradersIdsArray.push(parseInt(order.maker.id));
+                    tradersArray.push(this.createTraderLinkFromProfile(order.maker.profile));
+
+                    if (order.taker && !tradersIdsArray.includes(parseInt(order.taker.id))) {
+                        tradersIdsArray.push(parseInt(order.taker.id));
+                        tradersArray.push(this.createTraderLinkFromProfile(order.taker.profile));
+                    }
+                }
+            });
 
             if (tradersArray.length > 5) {
                 moreCount = tradersArray.length - 5;
@@ -58,17 +69,16 @@ export default {
 
             this.tooltipData = content;
         },
-        createTraderLinkFromOrder: function(order) {
-            if (!order || order.maker.profile === null || order.maker.profile.anonymous) {
+        createTraderLinkFromProfile: function(profile) {
+            if (profile === null || profile.anonymous) {
                 return 'Anonymous';
             }
 
-            let traderFullName = order.maker.profile.firstName + ' ' + order.maker.profile.lastName;
             let link = this.$routing.generate('profile-view', {
-                'pageUrl': order.maker.profile.page_url,
+                'pageUrl': profile.page_url,
             });
 
-            return '<a href="' + link + '">' + traderFullName + '</a>';
+            return '<a href="' + link + '">' + profile.firstName + ' ' + profile.lastName + '</a>';
         },
     },
 };

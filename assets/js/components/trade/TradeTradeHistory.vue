@@ -264,5 +264,10 @@ export default {
             return profile.firstName + ' ' + profile.lastName;
         },
     },
+    watch: {
+        tableData: function() {
+            this.$root.$emit('trade-history-orders', this.tableData);
+        },
+    },
 };
 </script>
