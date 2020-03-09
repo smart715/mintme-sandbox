@@ -5,6 +5,7 @@ namespace App\Manager;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
 use App\Repository\TokenRepository;
@@ -172,5 +173,10 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
+    }
+
+    public function getDeployedTokens(): array
+    {
+        return $this->repository->getDeployedTokens();
     }
 }

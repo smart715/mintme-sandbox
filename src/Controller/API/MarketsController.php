@@ -45,17 +45,20 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
+     * @Rest\QueryParam(name="deployed")
      */
     public function getMarketsInfo(
         int $page,
         ParamFetcherInterface $request,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-        $markets = $request->get('user')
+        $deployed = !!$request->get('deployed');
+        $markets = $request->get('user') || $deployed
             ? $marketStatusManager->getUserMarketStatus(
                 $this->getUser(),
                 ($page - 1) * self::OFFSET,
-                self::OFFSET
+                self::OFFSET,
+                $deployed
             )
             : $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
 
