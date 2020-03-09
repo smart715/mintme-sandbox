@@ -4,7 +4,7 @@ import {mount} from '../testHelper';
 import Trading from '../../js/components/trading/Trading';
 import {BPagination, BTable} from 'bootstrap-vue';
 import moxios from 'moxios';
-import Axios from '../../js/axios';
+import Axios from 'axios';
 
 Vue.component('b-pagination', BPagination);
 Vue.component('b-table', BTable);
@@ -17,24 +17,146 @@ describe('Trading', () => {
         moxios.uninstall();
     });
     const $routing = {generate: () => 'URL'};
-
+    const BASE_URL = window.location.hostname;
     const localVue = createLocalVue();
     localVue.use(Axios);
-
-
     const wrapper = shallowMount(Trading, {
         localVue,
-        mocks: {
+         mocks: {
             $routing,
+        },
+        computed: {
+            loaded() {
+              return true;
+            },
         },
         propsData: {
             enableUsd: true,
         },
     });
+
+    let market = {pair: 'tok1', change: '0', lastPrice: '0', volume: '0'};
+    let marketOnTop = [{pair: 'BTC/MINTME', change: '0', lastPrice: '0', volume: '0'}];
+
     it('Show USD in dropdown option if enableUSD is true', () => {
         expect(wrapper.find('.usdOption').exists()).to.deep.equal(true);
     });
-
+    it('show message if there are not deployed tokens yet', () => {
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        wrapper.vm.marketFilters.userSelected = true;
+        expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(true);
+        wrapper.vm.sanitizedMarkets = market;
+        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
+        expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(false);
+    });
+    it('show message if user has no any token yet', () => {
+        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
+        wrapper.vm.sanitizedMarkets = {};
+        wrapper.vm.marketFilters.selectedFilter = 'user';
+        expect(wrapper.html().includes('No any token yet')).to.deep.equal(true);
+        wrapper.vm.sanitizedMarkets = market;
+        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
+        expect(wrapper.html().includes('No any token yet')).to.deep.equal(false);
+    });
+    it('show rest of token link', () => {
+        wrapper.vm.marketFilters.selectedFilter = 'all';
+        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(false);
+        wrapper.setProps({userId: 1});
+        wrapper.vm.marketFilters.selectedFilter = 'user';
+        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
+    });
+    it('show only deployed tokens if user selected the option', () => {
+        wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
+    });
+    it('make sure that expected "user=1" will be sent', (done) => {
+        wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.marketFilters.selectedFilter = 'user';
+        wrapper.setProps({userId: 1});
+        const $routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
+        let url = BASE_URL + '/api/markets/info';
+        let params = {user: 1};
+        moxios.stubRequest($routing.generate(url, params), {
+            status: 200,
+            response: {
+                markets: {
+                    WEBBTC: {},
+                },
+            },
+        });
+        const markets = JSON.stringify({
+            markets: {
+                WEBBTC: {},
+            },
+        });
+        wrapper.vm.sanitizedMarkets = markets;
+        moxios.wait(() => {
+            expect(wrapper.vm.sanitizedMarkets).to.be.equal(markets);
+            done();
+        });
+    });
+    it('make sure that expected "deployed=1" will be sent', (done) => {
+        wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        wrapper.setProps({userId: 1});
+        let url = BASE_URL + '/api/markets/info';
+        let params = {deployed: 1};
+        const $routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
+        moxios.stubRequest($routing.generate(url, params), {
+            status: 200,
+            response: {
+                markets: {
+                    WEBBTC: {},
+                    TOK000000000001WEB: {},
+                },
+            },
+        });
+        const markets = JSON.stringify({
+            markets: {
+                WEBBTC: {},
+                TOK000000000001WEB: {},
+            },
+        });
+        wrapper.vm.sanitizedMarkets = markets;
+        moxios.wait(() => {
+            expect(wrapper.vm.sanitizedMarkets).to.be.equal(markets);
+            done();
+        });
+    });
+    it('make sure that "user=1" or "deployed=1" is not will be sent when user selected "all tokens"', (done) => {
+        wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.marketFilters.selectedFilter = 'all';
+        wrapper.setProps({userId: 1});
+        let url = BASE_URL + '/api/markets/info';
+        const $routing = {generate: (url) => url};
+        moxios.stubRequest($routing.generate(url), {
+            status: 200,
+            response: {
+                markets: {
+                    WEBBTC: {},
+                    TOK000000000001WEB: {},
+                    TOK000000000002WEB: {},
+                    TOK000000000003WEB: {},
+                },
+            },
+        });
+        const markets = JSON.stringify({
+            markets: {
+                WEBBTC: {},
+                TOK000000000001WEB: {},
+                TOK000000000002WEB: {},
+                TOK000000000003WEB: {},
+            },
+        });
+        wrapper.vm.sanitizedMarkets = markets;
+        moxios.wait(() => {
+            expect(wrapper.vm.sanitizedMarkets).to.be.equal(markets);
+            done();
+        });
+    });
     describe('marketCapFormatter() function should return ', () => {
         it('dash(-) if market is for token and monthVolume less than minimumVolumeForMarketcap', () => {
             const wrapper = shallowMount(Trading, {
