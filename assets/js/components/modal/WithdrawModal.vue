@@ -196,7 +196,6 @@ export default {
             })
             .catch((error) => {
                 this.notifyError('Cannot withdraw: ' + error);
-                console.log('Cannot withdraw: ' + error);
                 this.sendLogs('error', 'Cannot withdraw: ', error);
             })
             .then(() => this.withdrawing = false);
