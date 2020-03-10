@@ -1,4 +1,5 @@
 import {toMoney} from '../utils';
+import {WSAPI} from '../utils/constants';
 
 export default {
     data() {
@@ -35,25 +36,56 @@ export default {
             let tradersIdsArray = [];
             let orders = JSON.parse(JSON.stringify(pendingOrders));
 
-            // Filter orders by price
-            let pendingFilteredOrders = orders.filter((order) => price === toMoney(order.price, basePrecision));
+            // Handle pending orders
             let executedFilteredOrders = this.executedOrders.filter(
-                (order) => price === toMoney(order.price, basePrecision) && side === order.side
+                (order) => price === toMoney(order.price, basePrecision)
             );
+            executedFilteredOrders.sort((a, b) => a.timestamp - b.timestamp);
+            executedFilteredOrders.forEach((order) => {
+                // TRADER IS MARKET MAKER. He creates buy order and wait for owner to make matching order.
+                if (
+                    order.side === WSAPI.order.type.SELL && side === WSAPI.order.type.SELL && order.taker
+                    && !tradersIdsArray.includes(parseInt(order.taker.id))
+                ) {
+                    tradersIdsArray.push(parseInt(order.taker.id));
+                    tradersArray.push(this.createTraderLinkFromProfile(order.taker.profile));
+                }
 
-            // Concat executed and pending orders
-            let filteredOrders = pendingFilteredOrders.concat(executedFilteredOrders);
-            filteredOrders.sort((a, b) => a.timestamp - b.timestamp);
+                // TRADER IS MARKET TAKER. He creates sell order which matches existing owner order.
+                if (
+                    order.side === WSAPI.order.type.SELL && side === WSAPI.order.type.BUY && order.maker
+                    && !tradersIdsArray.includes(parseInt(order.maker.id))
+                ) {
+                    tradersIdsArray.push(parseInt(order.maker.id));
+                    tradersArray.push(this.createTraderLinkFromProfile(order.maker.profile));
+                }
 
-            filteredOrders.forEach((order) => {
+                // TRADER IS MARKET MAKER. He creates sell order and wait for owner to make matching order.
+                if (
+                    order.side === WSAPI.order.type.BUY && side === WSAPI.order.type.SELL && order.maker
+                    && !tradersIdsArray.includes(parseInt(order.maker.id))
+                ) {
+                    tradersIdsArray.push(parseInt(order.maker.id));
+                    tradersArray.push(this.createTraderLinkFromProfile(order.maker.profile));
+                }
+
+                // TRADER IS MARKET TAKER. He creates buy order which matches existing owner order.
+                if (
+                    order.side === WSAPI.order.type.BUY && side === WSAPI.order.type.BUY && order.taker
+                    && !tradersIdsArray.includes(parseInt(order.taker.id))
+                ) {
+                    tradersIdsArray.push(parseInt(order.taker.id));
+                    tradersArray.push(this.createTraderLinkFromProfile(order.taker.profile));
+                }
+            });
+
+            // Handle pending orders
+            let pendingFilteredOrders = orders.filter((order) => price === toMoney(order.price, basePrecision));
+            pendingFilteredOrders.sort((a, b) => a.timestamp - b.timestamp);
+            pendingFilteredOrders.forEach((order) => {
                 if (order.maker && !tradersIdsArray.includes(parseInt(order.maker.id))) {
                     tradersIdsArray.push(parseInt(order.maker.id));
                     tradersArray.push(this.createTraderLinkFromProfile(order.maker.profile));
-
-                    if (order.taker && !tradersIdsArray.includes(parseInt(order.taker.id))) {
-                        tradersIdsArray.push(parseInt(order.taker.id));
-                        tradersArray.push(this.createTraderLinkFromProfile(order.taker.profile));
-                    }
                 }
             });
 
