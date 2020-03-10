@@ -98,6 +98,7 @@ class ContractHandler implements ContractHandlerInterface
                 'name' => $token->getName(),
                 'contractAddress' => $token->getAddress(),
                 'mintDestination' => $address,
+                'oldMintDestination' => $token->getMintDestination(),
             ]
         );
 

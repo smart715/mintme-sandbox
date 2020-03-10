@@ -108,6 +108,7 @@ class ContractHandlerTest extends TestCase
                     'name' => 'foo',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
+                    'oldMintDestination' => '0x789',
                 ]
             );
 
@@ -157,6 +158,7 @@ class ContractHandlerTest extends TestCase
                     'name' => 'foo',
                     'contractAddress' => '0x123',
                     'mintDestination' => '0x456',
+                    'oldMintDestination' => '0x789',
                 ]
             )
             ->willReturn($this->mockResponse(true));
@@ -427,12 +429,14 @@ class ContractHandlerTest extends TestCase
     private function mockToken(
         bool $hasReleasePeriod,
         string $address = '0x123',
-        string $status = 'not-deployed'
+        string $status = 'not-deployed',
+        string $mintDestination = '0x789'
     ): Token {
         $token = $this->createMock(Token::class);
         $token->method('getName')->willReturn('foo');
         $token->method('getAddress')->willReturn($address);
         $token->method('getDeploymentStatus')->willReturn($status);
+        $token->method('getMintDestination')->willReturn($mintDestination);
 
         if (!$hasReleasePeriod) {
             $token->method('getLockIn')->willReturn(null);
