@@ -178,7 +178,7 @@ export default {
             }
 
             if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
-                this.notifyError('You don\'t have enough MINTME to pay the fee');
+                this.notifyError('You do not have enough ' + this.rebrandingFunc(this.currency) + ' to pay the fee');
                 return;
             }
 
@@ -195,8 +195,8 @@ export default {
                 this.closeModal();
             })
             .catch((error) => {
-                this.notifyError('Cannot withdraw: '+error);
-                console.log('Cannot withdraw: '+error);
+                this.notifyError('Cannot withdraw: ' + error);
+                console.log('Cannot withdraw: ' + error);
                 this.sendLogs('error', 'Cannot withdraw: ', error);
             })
             .then(() => this.withdrawing = false);
