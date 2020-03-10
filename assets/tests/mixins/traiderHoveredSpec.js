@@ -205,19 +205,19 @@ describe('TraiderHoveredMixin', function() {
         let link17 = '<a href="' + $url + '">Taker17 Taker17</a>';
         let link4 = '<a href="' + $url + '">User4 Test4</a>';
 
-        expect(wrapper.vm.tooltipData).to.contain(link16);
+        expect(wrapper.vm.tooltipData).to.not.contain(link16);
         expect(wrapper.vm.tooltipData).to.contain(link17);
         expect(wrapper.vm.tooltipData).to.contain(link4);
         expect(wrapper.vm.tooltipData).to.contain($anon);
-        expect(wrapper.vm.tooltipData).to.be.equal([link16, link17, link4, $anon].join(', '));
+        expect(wrapper.vm.tooltipData).to.be.equal([link17, link4, $anon].join(', '));
     });
 
     it('should show other traders for sell executed and pending orders for price 3', () => {
         wrapper.vm.executedOrders = [
-            {price: '3', side: 1, timestamp: timestamp - 180, maker: {id: 18, profile: {firstName: 'Maker18', lastName: 'Maker18', page_url: 'test-user'}}},
+            {price: '3', side: 1, timestamp: timestamp - 180, taker: {id: 18, profile: {firstName: 'Maker18', lastName: 'Maker18', page_url: 'test-user'}}},
             {price: '7', side: 1, timestamp: timestamp, maker: {id: 19, profile: {firstName: 'User19', lastName: 'Test19', page_url: 'test-user'}}},
             {price: '4', side: 2, timestamp: timestamp, maker: {id: 20, profile: {firstName: 'User20', lastName: 'Test20', page_url: 'test-user'}}},
-            {price: '3', side: 1, timestamp: timestamp - 300, maker: {id: 21, profile: {firstName: 'Maker21', lastName: 'Maker21', page_url: 'test-user'}}},
+            {price: '3', side: 1, timestamp: timestamp - 300, taker: {id: 21, profile: {firstName: 'Maker21', lastName: 'Maker21', page_url: 'test-user'}}},
         ];
 
         wrapper.vm.mouseoverHandler(
