@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -91,7 +92,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         foreach ($markets as $market) {
             $marketStatus = $this->repository->findByBaseQuoteNames(
                 $market->getBase()->getSymbol(),
-                $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+                $market->getQuote()->getSymbol()
             );
 
             if ($marketStatus) {
@@ -115,7 +116,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $marketInfo = $this->marketHandler->getMarketInfo($market);
         $marketStatus = $this->repository->findByBaseQuoteNames(
             $market->getBase()->getSymbol(),
-            $market->getQuote()->getSymbol() ?? $market->getQuote()->getName()
+            $market->getQuote()->getSymbol()
         );
 
         if (!$marketStatus) {
@@ -131,12 +132,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getUserMarketStatus(User $user, int $offset, int $limit): array
+    public function getUserMarketStatus(User $user, int $offset, int $limit, bool $deployed = false): array
     {
         $userTokenIds = [];
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
-        $markets = $this->marketFactory->createUserRelated($user);
-
+        $markets = $this->marketFactory->createUserRelated($user, $deployed);
+                
         foreach ($markets as $market) {
             if ($market->getQuote() instanceof Token) {
                 array_push($userTokenIds, $market->getQuote()->getId());

@@ -260,7 +260,7 @@ class User extends BaseUser implements
         return $this->username;
     }
 
-    public function getGoogleAuthenticatorSecret(): string
+    public function getGoogleAuthenticatorSecret(): ?string
     {
         $googleAuth = $this->googleAuthenticatorEntry;
 
