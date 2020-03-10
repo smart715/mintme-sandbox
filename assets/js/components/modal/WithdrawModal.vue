@@ -178,7 +178,7 @@ export default {
             }
 
             if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
-                this.notifyError('You don\'t have enough web to pay fee');
+                this.notifyError('You don\'t have enough MINTME to pay the fee');
                 return;
             }
 
