@@ -178,7 +178,7 @@ export default {
             }
 
             if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
-                this.notifyError('You do not have enough ' + this.rebrandingFunc(this.currency) + ' to pay the fee');
+                this.notifyError('You do not have enough ' + this.rebrandingFunc(this.feeCurrency) + ' to pay the fee');
                 return;
             }
 
