@@ -6,18 +6,11 @@
 
 {% block content %}
     <div id="trading" class="container-fluid">
-       <!-- {{ include('spinner.html.twig') }} -->
         <div class="row pt-5 justify-content-center">
             <div class="col-12">
                 <div class="card card-fixed-large mx-auto">
                     <div class="card-body p-0">
-                        <div class="trading" style="height:182.50px" v-if="false">
-                            <div class="card-header">
-                                <span>Trading</span>
-                            </div>
-                            <div class="p-5 text-center text-white">
-                            </div>
-                        </div>
+                        {{ include('spinners/trading.html.twig') }}
                         <trading
                             websocket-url="{{ global_websocket_url }}"
                             coinbase-url="{{ global_coinbase_url }}"
