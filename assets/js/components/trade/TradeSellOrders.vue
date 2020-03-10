@@ -6,10 +6,10 @@
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
                     <span v-if="tokenName.length > 17" v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
-                    {{ tokenName | rebranding | truncate(17) }}
+                        {{ tokenName | rebranding | truncate(17) }}
                     </span>
                     <span v-else>
-                    {{ tokenName | rebranding }}
+                        {{ tokenName | rebranding }}
                     </span>
                     <guide>
                         <template slot="header">

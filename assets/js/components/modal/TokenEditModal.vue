@@ -8,7 +8,7 @@
         >
             <template slot="header">
                 <span v-if="currentName.length > 22" v-b-tooltip:title="currentName">
-                <p class="text-center">{{ currentName | truncate(22) }}</p>
+                    <p class="text-center">{{ currentName | truncate(22) }}</p>
                 </span>
                 <span v-else><p class="text-center">{{ currentName }}</p></span>
             </template>
