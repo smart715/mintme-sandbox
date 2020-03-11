@@ -3,7 +3,6 @@ import TradingHistory from './components/wallet/TradingHistory';
 import ActiveOrders from './components/wallet/ActiveOrders';
 import DepositWithdrawHistory from './components/wallet/DepositWithdrawHistory';
 import store from './storage';
-import {NestedSpinner} from './mixins/';
 
 new Vue({
   el: '#wallet',
@@ -20,9 +19,6 @@ new Vue({
       orders: null,
     };
   },
-  mixins: [
-    NestedSpinner,
-  ],
   computed: {
     expandedTab: function() {
       return this.tabIndexsWithoutPadding.indexOf(this.tabIndex) > -1;

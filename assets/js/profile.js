@@ -7,7 +7,6 @@ import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
 import xRegExp from 'xregexp';
 import store from './storage';
-import {NestedSpinner} from './mixins/';
 
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 
@@ -19,9 +18,6 @@ new Vue({
         BbcodeView,
         LimitedTextarea,
     },
-    mixins: [
-        NestedSpinner,
-    ],
     data() {
         return {
             showEditForm: false,
@@ -60,7 +56,6 @@ new Vue({
         },
         countryChanged: function() {
             if (!this.$refs.zipCode) {
-                this.hideSpinner();
                 return;
             }
 
@@ -95,7 +90,6 @@ new Vue({
                 })
                 .then(() => {
                     this.zipCodeProcessing = false;
-                    this.hideSpinner();
                 });
         },
         zipCodeValidate: function() {

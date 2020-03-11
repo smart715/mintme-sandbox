@@ -7,7 +7,6 @@ import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
-import {NestedSpinner} from './mixins/';
 
 new Vue({
   el: '#token',
@@ -29,7 +28,6 @@ new Vue({
     TokenDeployIcon,
     TopHolders,
   },
-  mixins: [NestedSpinner],
   methods: {
     descriptionUpdated: function(val) {
       this.tokenDescription = val;

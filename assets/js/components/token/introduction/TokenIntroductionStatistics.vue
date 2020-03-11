@@ -161,7 +161,7 @@
 import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
-import {LoggerMixin, MoneyFilterMixin, NotificationMixin, NestedSpinner} from '../../../mixins';
+import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
 import {mapGetters, mapMutations} from 'vuex';
 
 
@@ -169,7 +169,7 @@ const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
-    mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin, NestedSpinner],
+    mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Guide,
     },
@@ -188,8 +188,6 @@ export default {
         };
     },
     mounted: function() {
-        this.showSpinner();
-
         this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
             .then((res) => {
               this.isTokenExchanged = res.data;
@@ -197,12 +195,8 @@ export default {
             .catch((err) => {
                 this.notifyError('Can not load token data. Try again later');
                 this.sendLogs('error', 'Can not load token data', err);
-            })
-            .finally(() => {
-                this.hideSpinner();
             });
 
-        this.showSpinner();
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
             .then((res) => {
               this.stats = res.data || this.stats;
@@ -210,12 +204,8 @@ export default {
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
-            })
-            .finally(() => {
-              this.hideSpinner();
             });
 
-        this.showSpinner();
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => {
               this.tokenExchangeAmount = res.data;
@@ -223,12 +213,8 @@ export default {
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
-            })
-            .finally(() => {
-                this.hideSpinner();
             });
 
-        this.showSpinner();
         this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
                 name: this.market.quote.symbol,
             }))
@@ -238,11 +224,7 @@ export default {
             .catch((err) => {
                 this.notifyError('Can not load soldOnMarket value. Try again later');
                 this.sendLogs('error', 'Can not load soldOnMarket value', err);
-            })
-            .finally(() => {
-            this.hideSpinner();
             });
-        this.showSpinner();
         this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
             .then((res) => {
               this.tokenWithdrawn = res.data;
@@ -250,11 +232,7 @@ export default {
             .catch((err) => {
                 this.notifyError('Can not load token withdrawn statistic data. Try again later');
                 this.sendLogs('error', 'Can not load token withdrawn value', err);
-            })
-          .finally(() => {
-            this.hideSpinner();
-          });
-        this.showSpinner();
+            });
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
@@ -265,9 +243,6 @@ export default {
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
-            })
-            .finally(() => {
-              this.hideSpinner();
             });
     },
     methods: {

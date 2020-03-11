@@ -158,7 +158,7 @@
 <script>
 import _ from 'lodash';
 import Guide from '../Guide';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, NestedSpinner} from '../../mixins/';
+import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -166,7 +166,7 @@ import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, NestedSpinner],
+    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         page: Number,
         tokensCount: Number,
@@ -352,9 +352,6 @@ export default {
               .catch((err) => {
                 this.notifyError('Can not load Trading data. Try again later.');
                 this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
-              })
-              .finally(() => {
-                this.hideSpinner();
               });
         },
         sortCompare: function(a, b, key) {
@@ -389,7 +386,6 @@ export default {
                     params.deployed = 1;
                 }
                 this.loading = true;
-                this.showSpinner();
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (null !== this.markets) {

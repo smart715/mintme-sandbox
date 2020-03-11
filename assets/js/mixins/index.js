@@ -8,7 +8,6 @@ import NotificationMixin from './notification';
 import OrderMixin from './order';
 import LoggerMixin from './logger';
 import PairNameMixin from './pair_name';
-import NestedSpinner from './nested_spinner';
 
 export {
     FiltersMixin,
@@ -23,5 +22,4 @@ export {
     OrderMixin,
     LoggerMixin,
     PairNameMixin,
-    NestedSpinner,
 };

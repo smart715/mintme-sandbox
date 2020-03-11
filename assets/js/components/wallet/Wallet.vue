@@ -156,7 +156,6 @@ import {
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
-    NestedSpinner,
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
@@ -171,7 +170,6 @@ export default {
         RebrandingFilterMixin,
         NotificationMixin,
         LoggerMixin,
-        NestedSpinner,
     ],
     components: {
         WithdrawModal,
@@ -299,10 +297,7 @@ export default {
         .catch((err) => {
             this.notifyError('Can not load Wallet data. Try again later.');
             this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
-        })
-        .finally(() => {
-          this.hideSpinner();
-      });
+        });
     },
     methods: {
         openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
@@ -333,7 +328,6 @@ export default {
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
 
-            this.showSpinner();
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
                     crypto: isToken ? webSymbol : currency,
                 }))
@@ -345,9 +339,6 @@ export default {
                 .catch((err) => {
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
-                })
-                .finally(() => {
-                    this.hideSpinner();
                 });
 
             // TODO: Get rid of hardcoded WEB
@@ -387,7 +378,6 @@ export default {
                             return;
                         }
 
-                        this.showSpinner();
                         this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
                             .then((res) =>
                                 this.tokens[token].available = res.data ?
@@ -395,9 +385,6 @@ export default {
                             )
                             .catch((err) => {
                                 this.sendLogs('error', 'Can not get lock-period', err);
-                            })
-                            .finally(() => {
-                                this.hideSpinner();
                             });
                     }
                 });

@@ -95,7 +95,6 @@ import {
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
-    NestedSpinner,
 } from '../../../js/mixins/';
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
@@ -104,7 +103,7 @@ import {WEB} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
-    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin, NestedSpinner],
+    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     props: {
         websocketUrl: String,
         market: Object,
@@ -218,7 +217,6 @@ export default {
     mounted() {
         window.addEventListener('resize', this.handleRightLabel);
         this.handleRightLabel();
-        this.showSpinner();
 
         if ('WEBBTC' === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
@@ -272,10 +270,7 @@ export default {
           .catch((err) => {
             this.notifyError('Service unavailable now. Can not load the chart data');
             this.sendLogs('error', 'Can not load the chart data', err);
-        })
-          .finally(() => {
-            this.hideSpinner();
-          });
+        });
     },
     methods: {
         updateMarketData: function(marketData) {
