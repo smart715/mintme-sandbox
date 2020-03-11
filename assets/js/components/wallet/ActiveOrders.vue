@@ -38,7 +38,7 @@
                     @close="switchConfirmModal(false)"
                     @confirm="removeOrder"
             >
-                <div class="pt-2">
+                <div class="pt-2 overflow-wrap-break-word">
                     Are you sure that you want to remove {{ this.currentRow.name }}
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
