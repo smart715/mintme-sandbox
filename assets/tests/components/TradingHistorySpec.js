@@ -3,9 +3,7 @@ import {mount} from '@vue/test-utils';
 import TradingHistory from '../../js/components/wallet/TradingHistory';
 
 describe('TradingHistory', () => {
-    const el = mount(TradingHistory, {
-        store,
-    });
+    const el = mount(TradingHistory);
 
     const tableData = [
         {
