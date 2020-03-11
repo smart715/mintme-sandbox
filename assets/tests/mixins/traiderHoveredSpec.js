@@ -4,7 +4,6 @@ import TraiderHoveredMixin from '../../js/mixins/trader_hovered';
 
 describe('TraiderHoveredMixin', function() {
     const $url = 'URL';
-    const $anon = 'Anonymous';
     const $routing = {generate: () => $url};
     const Component = Vue.component('foo', {
         mixins: [TraiderHoveredMixin],
@@ -47,7 +46,7 @@ describe('TraiderHoveredMixin', function() {
         expect(wrapper.vm.popoverConfig.delay).to.be.equal(0);
     });
 
-    it('should create link to trader\'s profile from user profile', () => {
+    it('should create link to trader\'s profile from order data', () => {
         let order = {
             maker: {
                 profile: {
@@ -59,10 +58,10 @@ describe('TraiderHoveredMixin', function() {
         };
         let link = '<a href="' + $url + '">User Test</a>';
 
-        expect(wrapper.vm.createTraderLinkFromProfile(order.maker.profile)).to.be.equal(link);
+        expect(wrapper.vm.createTraderLinkFromOrder(order)).to.be.equal(link);
     });
 
-    it('should return Anonymous for anonymous user profile or if no user profile', () => {
+    it('should not create link to trader\'s profile from order data for anonymous', () => {
         let order = {
             maker: {
                 profile: {
@@ -71,8 +70,7 @@ describe('TraiderHoveredMixin', function() {
             },
         };
 
-        expect(wrapper.vm.createTraderLinkFromProfile(order.maker.profile)).to.be.equal($anon);
-        expect(wrapper.vm.createTraderLinkFromProfile(null)).to.be.equal($anon);
+        expect(wrapper.vm.createTraderLinkFromOrder(order)).to.be.equal('Anonymous');
     });
 
     it('should contain link to trader\'s profile that is owner of three orders with same price', () => {
@@ -98,7 +96,7 @@ describe('TraiderHoveredMixin', function() {
 
         expect(wrapper.vm.tooltipData).to.contain(link1);
         expect(wrapper.vm.tooltipData).to.contain(link6);
-        expect(wrapper.vm.tooltipData).to.contain($anon);
+        expect(wrapper.vm.tooltipData).to.contain('Anonymous');
     });
 
     it('should contain five links to trader\'s profiles `and 1 more.` for price 0.01', () => {
@@ -116,7 +114,7 @@ describe('TraiderHoveredMixin', function() {
 
         expect(wrapper.vm.tooltipData).to.contain(link1);
         expect(wrapper.vm.tooltipData).to.contain(link6);
-        expect(wrapper.vm.tooltipData).to.contain($anon);
+        expect(wrapper.vm.tooltipData).to.contain('Anonymous');
         expect(wrapper.vm.tooltipData).to.contain(link8);
         expect(wrapper.vm.tooltipData).to.contain(link9);
         expect(wrapper.vm.tooltipData).to.not.contain(link11);
@@ -139,7 +137,7 @@ describe('TraiderHoveredMixin', function() {
 
         expect(wrapper.vm.tooltipData).to.contain(link1);
         expect(wrapper.vm.tooltipData).to.contain(link6);
-        expect(wrapper.vm.tooltipData).to.contain($anon);
+        expect(wrapper.vm.tooltipData).to.contain('Anonymous');
         expect(wrapper.vm.tooltipData).to.contain(link8);
         expect(wrapper.vm.tooltipData).to.contain(link9);
         expect(wrapper.vm.tooltipData).to.not.contain(link11);
@@ -165,73 +163,5 @@ describe('TraiderHoveredMixin', function() {
         );
 
         expect(wrapper.vm.tooltipData).to.be.equal('');
-    });
-
-    it('should show other traders for buy executed and pending orders for price 0.05', () => {
-        wrapper.vm.executedOrders = [
-            {price: '0.07', side: 2, timestamp: timestamp, maker: {id: 14, profile: null}},
-            {price: '0.06', side: 2, timestamp: timestamp, maker: {id: 15, profile: null}},
-            {
-                price: '0.05',
-                timestamp: timestamp - 120,
-                side: 2,
-                maker: {
-                    id: 16,
-                    profile: {
-                        firstName: 'Maker16',
-                        lastName: 'Maker16',
-                        page_url: 'test-maker16',
-                    },
-                },
-                taker: {
-                    id: 17,
-                    profile: {
-                        firstName: 'Taker17',
-                        lastName: 'Taker17',
-                        page_url: 'test-taker17',
-                    },
-                },
-            },
-        ];
-
-        wrapper.vm.mouseoverHandler(
-            orders,
-            basePrecision,
-            '0.05',
-            2
-        );
-
-        let link16 = '<a href="' + $url + '">Maker16 Maker16</a>';
-        let link17 = '<a href="' + $url + '">Taker17 Taker17</a>';
-        let link4 = '<a href="' + $url + '">User4 Test4</a>';
-
-        expect(wrapper.vm.tooltipData).to.not.contain(link16);
-        expect(wrapper.vm.tooltipData).to.contain(link17);
-        expect(wrapper.vm.tooltipData).to.contain(link4);
-        expect(wrapper.vm.tooltipData).to.contain($anon);
-        expect(wrapper.vm.tooltipData).to.be.equal([link17, link4, $anon].join(', '));
-    });
-
-    it('should show other traders for sell executed and pending orders for price 3', () => {
-        wrapper.vm.executedOrders = [
-            {price: '3', side: 1, timestamp: timestamp - 180, taker: {id: 18, profile: {firstName: 'Maker18', lastName: 'Maker18', page_url: 'test-user'}}},
-            {price: '7', side: 1, timestamp: timestamp, maker: {id: 19, profile: {firstName: 'User19', lastName: 'Test19', page_url: 'test-user'}}},
-            {price: '4', side: 2, timestamp: timestamp, maker: {id: 20, profile: {firstName: 'User20', lastName: 'Test20', page_url: 'test-user'}}},
-            {price: '3', side: 1, timestamp: timestamp - 300, taker: {id: 21, profile: {firstName: 'Maker21', lastName: 'Maker21', page_url: 'test-user'}}},
-        ];
-
-        wrapper.vm.mouseoverHandler(
-            orders,
-            basePrecision,
-            '3',
-            1
-        );
-
-        let link18 = '<a href="' + $url + '">Maker18 Maker18</a>';
-        let link21 = '<a href="' + $url + '">Maker21 Maker21</a>';
-
-        expect(wrapper.vm.tooltipData).to.contain(link18);
-        expect(wrapper.vm.tooltipData).to.contain(link21);
-        expect(wrapper.vm.tooltipData).to.be.equal([link21, link18].join(', '));
     });
 });
