@@ -31,7 +31,7 @@ export default {
             let tradersIdsArray = [];
             let orders = JSON.parse(JSON.stringify(fullOrdersList));
 
-            orders.sort((a, b) => a.timestamp - b.timestamp);
+            orders.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
             orders.forEach((order) => {
                 let makerId = parseInt(order.maker.id);
                 if (price === toMoney(order.price, basePrecision) && !tradersIdsArray.includes(makerId)) {

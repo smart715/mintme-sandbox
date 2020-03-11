@@ -154,7 +154,7 @@ export default {
             }, {});
 
             Object.values(grouped).forEach((e) => {
-                e.sort((a, b) => b.timestamp - a.timestamp);
+                e.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
                 let obj = e.reduce((a, e) => {
                     a.owner = a.owner || e.maker.id === this.userId;
                     a.orders.push(e);

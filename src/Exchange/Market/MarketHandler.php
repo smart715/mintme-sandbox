@@ -221,7 +221,8 @@ class MarketHandler implements MarketHandlerInterface
                         (string)$orderData['taker_fee'],
                     $this->getSymbol($market->getQuote())
                 ),
-                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null
+                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null,
+                !empty($orderData['ctime']) ? intval($orderData['ctime']) : null
             );
         });
 
