@@ -1,14 +1,8 @@
 import '../../js/main';
 import {mount} from '@vue/test-utils';
 import TradingHistory from '../../js/components/wallet/TradingHistory';
-import Vuex from 'vuex';
-import pageSpinner from '../../js/storage/modules/page_spinner_storage';
 
 describe('TradingHistory', () => {
-    const store = new Vuex.Store({
-        modules: {pageSpinner},
-    });
-
     const el = mount(TradingHistory, {
         store,
     });
