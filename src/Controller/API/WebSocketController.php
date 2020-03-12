@@ -70,7 +70,7 @@ class WebSocketController extends AbstractFOSRestController
             }
 
             if (null === $user) {
-                throw new RuntimeException("User with $findBy $token could not be found in mintme db", 3);
+                throw new RuntimeException('User with '.$findBy.' '.$token.' could not be found in mintme db', 3);
             }
 
             $profileManager->createHash($user, false);
