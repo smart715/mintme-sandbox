@@ -131,10 +131,13 @@ class LockIn
      */
     public function getFrozenAmountWithReceived(): Money
     {
+        $received = $this->getReceivedMoneyFromDeploy();
         if ($this->token->isDeployed()) {
-            $frozenAmount = $this->getAmountToRelease()
-                ->subtract($this->getReceivedMoneyFromDeploy())
-                ->add($this->getReleasedAtStart());
+            $frozenAmount = $received->isZero()
+                ? $this->getAmountToRelease()
+                : $this->getAmountToRelease()
+                    ->subtract($received)
+                    ->add($this->getReleasedAtStart());
             $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
 
             return $frozenAmount->greaterThan($zeroValue)
