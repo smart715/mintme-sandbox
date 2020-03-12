@@ -1,9 +1,7 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
-
 {% set formHeader = "Log In" %}
 {% set featured = true %}
-
 {% block formBody %}
     {{ include('@FOSUser/Security/login_form_content.html.twig') }}
 {% endblock %}
