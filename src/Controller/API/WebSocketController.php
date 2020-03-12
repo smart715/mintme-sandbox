@@ -59,12 +59,18 @@ class WebSocketController extends AbstractFOSRestController
                 );
             }
 
-            $user = $this->isAuth ?
-                $profileManager->findProfileByHash($token) :
-                $this->userManager->find((int)$token - $this->config->getOffset());
+            if ($this->isAuth) {
+                // find user by hash
+                $findBy = 'hash';
+                $user = $profileManager->findProfileByHash($token);
+            } else {
+                // find user by id
+                $findBy = 'id';
+                $user = $this->userManager->find((int)$token - $this->config->getOffset());
+            }
 
             if (null === $user) {
-                throw new RuntimeException("User with hash $token could not be found in mintme db", 3);
+                throw new RuntimeException("User with $findBy $token could not be found in mintme db", 3);
             }
 
             $profileManager->createHash($user, false);
