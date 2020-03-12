@@ -1,6 +1,5 @@
 import CopyLink from './components/CopyLink';
 import {toMoney} from './utils';
-import store from './storage';
 
 new Vue({
     el: '#referral',
@@ -25,5 +24,4 @@ new Vue({
                 this.precision = result.data.token.subunit;
             });
     },
-    store,
 });
