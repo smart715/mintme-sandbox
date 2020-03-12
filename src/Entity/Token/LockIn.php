@@ -132,6 +132,7 @@ class LockIn
     public function getFrozenAmountWithReceived(): Money
     {
         $received = $this->getReceivedMoneyFromDeploy();
+
         if ($this->token->isDeployed()) {
             $frozenAmount = $received->isZero()
                 ? $this->getAmountToRelease()
