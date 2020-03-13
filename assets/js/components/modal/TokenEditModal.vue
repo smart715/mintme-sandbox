@@ -48,6 +48,19 @@
                     <div class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
+                                Airdrop campaign
+                            </template>
+                            <template slot="body">
+                                <token-airdrop-campaign
+                                        :is-token-exchanged="isTokenExchanged"
+                                        :is-token-not-deployed="isTokenNotDeployed"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom">
+                        <faq-item>
+                            <template slot="title">
                                 Change token name
                             </template>
                             <template slot="body">
@@ -102,6 +115,7 @@ import FaqItem from '../FaqItem';
 import Guide from '../Guide';
 import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
+import TokenAirdropCampaign from '../token/airdrop_campaign/TokenAirdropCampaign';
 import TokenDelete from '../token/TokenDelete';
 import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
@@ -117,6 +131,7 @@ export default {
         Guide,
         Modal,
         TokenChangeName,
+        TokenAirdropCampaign,
         TokenDelete,
         TokenDeploy,
         TokenReleasePeriod,
