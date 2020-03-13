@@ -14,7 +14,8 @@
                 >
                     <template v-slot:cell(name)="row">
                         <div v-if="row.value.full.length > 17"
-                            v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                            v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}"
+                        >
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
                                 {{ row.value.truncate | rebranding }}
                             </a>
