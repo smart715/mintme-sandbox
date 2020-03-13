@@ -195,8 +195,8 @@ export default {
                 this.closeModal();
             })
             .catch((error) => {
-                this.notifyError('Cannot withdraw');
-                this.sendLogs('error', 'Cannot withdraw: ', error);
+                this.notifyError(error.response.data.message);
+                this.sendLogs('error', 'Withdraw response error', error);
             })
             .then(() => this.withdrawing = false);
 
