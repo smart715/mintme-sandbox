@@ -44,14 +44,16 @@
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
                                 <span>
-                                    <span v-if="market.quote.symbol.length > 17" 
+                                    <span 
+                                        v-if="market.quote.symbol.length > 17" 
                                         class="c-pointer" 
                                         @click="balanceClicked"
                                         v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}"
                                     >
                                         {{ market.quote.symbol | rebranding | truncate(17) }} :
                                     </span>
-                                    <span v-else 
+                                    <span 
+                                        v-else 
                                         class="c-pointer" 
                                         @click="balanceClicked"
                                     >
