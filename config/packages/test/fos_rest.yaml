@@ -1,0 +1,7 @@
+# Read the documentation: https://symfony.com/doc/master/bundles/FOSRestBundle/index.html
+fos_rest:
+    format_listener:
+        rules:
+            - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [ json, js ] }
+            - { path: ^/dev/api, prefer_extension: true, fallback_format: json, priorities: [ json, js ] }
+            - { path: ^/, prefer_extension: true, fallback_format: html, priorities: [ html, '*/*' ] }
