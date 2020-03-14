@@ -142,7 +142,7 @@ export default {
                     formatter: formatMoney,
                     type: 'numeric',
                 },
-                fee: {key: 'fee',label: 'Fee', sortable: true, type: 'numeric'},
+                fee: {key: 'fee', label: 'Fee', sortable: true, type: 'numeric'},
                 action: {
                     key: 'action',
                     label: 'Action',
