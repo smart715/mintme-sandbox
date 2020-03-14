@@ -145,13 +145,13 @@ export default {
                 fee: {
                     key: 'fee',
                     label: 'Fee', 
-                    sortable: true,
+                    sortable: true, 
                     type: 'numeric',
                 },
                 action: {
                     key: 'action',
                     label: 'Action',
-                    sortable: false
+                    sortable: false,
                 },
             },
         };
