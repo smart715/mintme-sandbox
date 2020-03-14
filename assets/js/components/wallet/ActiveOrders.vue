@@ -7,9 +7,14 @@
                     ref="btable"
                     v-if="hasOrders"
                     :items="history"
-                    :fields="fields"
+                    :fields="fieldsArray"
+                    :sort-compare="sortCompare"
+                    :sort-by="fields.date.key"
+                    :sort-desc="true"
+                    sort-direction="desc"
                     sort-icon-left
-                    no-sort-reset>
+                    no-sort-reset
+                >
                     <template v-slot:cell(name)="row">
                         <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
@@ -92,10 +97,20 @@ export default {
             tokenName: null,
             amount: null,
             price: null,
-            fields: [
-                {key: 'date', label: 'Date', sortable: true},
-                {key: 'type', label: 'Type', sortable: true},
-                {
+            fields: {
+                date: {
+                    key: 'date',
+                    label: 'Date',
+                    sortable: true,
+                    type: 'date',
+                },
+                type: {
+                    key: 'type',
+                    label: 'Type',
+                    sortable: true,
+                    type: 'string',
+                },
+                name: {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
@@ -105,23 +120,40 @@ export default {
                             truncate: this.truncateFunc(name, 7),
                         };
                     },
+                    type: 'string',
                 },
-                {key: 'amount', label: 'Amount', sortable: true},
-                {
+                amount: {
+                    key: 'amount',
+                    label: 'Amount',
+                    sortable: true,
+                    type: 'numeric',
+                },
+                price: {
                     key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                total: {
                     key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {key: 'fee', label: 'Fee', sortable: true},
-                {key: 'action', label: 'Action', sortable: false},
-            ],
+                fee: {
+                    key: 'fee',
+                    label: 'Fee', 
+                    sortable: true,
+                    type: 'numeric',
+                },
+                action: {
+                    key: 'action',
+                    label: 'Action',
+                    sortable: false
+                },
+            },
         };
     },
     computed: {
@@ -136,6 +168,9 @@ export default {
         },
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
         history: function() {
             return this.tableData.map((order) => {
@@ -280,6 +315,28 @@ export default {
             if (this.$refs.btable) {
                 this.$refs.btable.refresh();
             }
+        },
+        sortCompare: function(a, b, key) {
+            switch (this.fields[key].type) {
+                case 'date':
+                    return this.dateCompare(a[key], b[key]);
+                case 'string':
+                    return a[key].localeCompare(b[key]);
+                case 'numeric':
+                    return this.numericCompare(a[key], b[key]);
+            }
+        },
+        numericCompare: function(a, b) {
+            a = parseFloat(a);
+            b = parseFloat(b);
+
+            return a < b ? -1 : (a > b ? 1 : 0);
+        },
+        dateCompare: function(a, b) {
+            a = moment(a, GENERAL.dateFormat).unix();
+            b = moment(b, GENERAL.dateFormat).unix();
+
+            return this.numericCompare(a, b);
         },
     },
 };
