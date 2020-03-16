@@ -9,7 +9,7 @@ describe('ConfirmModal', () => {
         expect(wrapper.vm.visible).to.be.true;
     });
 
-    it('emit "close" when the function closeModal() is running', () => {
+    it('emit "close" when the function closeModal() is called', () => {
         const wrapper = mount(ConfirmModal, {
             propsData: {visible: true},
         });
@@ -25,7 +25,7 @@ describe('ConfirmModal', () => {
         expect(wrapper.emitted('confirm').length).to.be.equal(1);
     });
 
-    it('emit "confirm" when the function onConfirm() is running', () => {
+    it('emit "confirm" when the function onConfirm() is called', () => {
         const wrapper = mount(ConfirmModal, {
             propsData: {visible: true},
         });
@@ -41,7 +41,7 @@ describe('ConfirmModal', () => {
         expect(wrapper.emitted('cancel').length).to.be.equal(1);
     });
 
-    it('emit "cancel" when the function onCancel() is running', () => {
+    it('emit "cancel" when the function onCancel() is called', () => {
         const wrapper = mount(ConfirmModal, {
             propsData: {visible: true},
         });
@@ -50,7 +50,7 @@ describe('ConfirmModal', () => {
         expect(wrapper.emitted('cancel').length).to.be.equal(1);
     });
 
-    it('start event.preventDefault() function when the function onCancel() is running', () => {
+    it('start event.preventDefault() function when the function onCancel() is called', () => {
         const wrapper = mount(ConfirmModal, {
             propsData: {visible: true},
         });
