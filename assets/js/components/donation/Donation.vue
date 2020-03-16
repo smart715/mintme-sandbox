@@ -118,9 +118,7 @@
                             <div v-if="!loginFormLoaded" class="p-5 text-center">
                                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                             </div>
-                            <div
-                                id="tab-login-form-container"
-                                :class="loginFormContainerClass"></div>
+                            <div v-if="!loggedIn" ref="tab-login-form-container"></div>
                         </div>
                     </div>
                 </div>
@@ -179,13 +177,6 @@ export default {
         };
     },
     computed: {
-        loginFormContainerClass: function() {
-            if (!this.loggedIn) {
-                return 'p-md-4';
-            }
-
-            return '';
-        },
         donationCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
         },
@@ -244,9 +235,7 @@ export default {
                 formContentOnly: true,
             }))
                 .then((res) => {
-                    let formContainer = document.getElementById('tab-login-form-container');
-                    formContainer.innerHTML = res.data;
-
+                    this.$refs['tab-login-form-container'].innerHTML = res.data;
                     this.loginFormLoaded = true;
 
                     let captchaContainer = document.querySelector('.g-recaptcha');
