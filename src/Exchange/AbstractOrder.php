@@ -26,6 +26,9 @@ abstract class AbstractOrder
     /** @var int|null */
     protected $timestamp;
 
+    /** @var int|null */
+    protected $createdTimestamp;
+
     /**
      * @var int
      * @SWG\Property(description="1 - sell, 2 - buy, 3 - donation")
@@ -101,5 +104,11 @@ abstract class AbstractOrder
     public function getTimestamp(): ?int
     {
         return $this->timestamp;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getCreatedTimestamp(): ?int
+    {
+        return $this->createdTimestamp;
     }
 }
