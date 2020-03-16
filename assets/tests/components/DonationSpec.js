@@ -36,8 +36,6 @@ describe('Donation', () => {
             },
         });
 
-        expect(wrapper.find('#tab-login-form-container').exists()).to.equal(true);
-        expect(wrapper.vm.loginFormContainerClass).to.equal('');
         expect(wrapper.vm.dropdownText).to.equal('Select currency');
         expect(wrapper.vm.isCurrencySelected).to.be.false;
         expect(wrapper.vm.loginFormLoaded).to.be.true;
@@ -56,8 +54,6 @@ describe('Donation', () => {
             },
         });
 
-        expect(wrapper.find('#tab-login-form-container').exists()).to.equal(true);
-        expect(wrapper.vm.loginFormContainerClass).to.equal('p-md-4');
         expect(wrapper.vm.loginFormLoaded).to.be.false;
         expect(wrapper.vm.buttonDisabled).to.be.true;
         expect(wrapper.vm.isAmountValid).to.be.false;
