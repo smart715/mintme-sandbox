@@ -19,7 +19,14 @@
                 </div>
             </div>
 
-            {{ include('share_buttons.html.twig', { 'url': url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }) }}
+            {% include 'share_buttons.html.twig' with
+                {
+                    'url': url(
+                        'sonata_news_view',
+                        { 'permalink': sonata_news_permalink(post) }
+                    )
+                }
+            %}
 
             {#            {% if post.iscommentable %}#}
             {#                {{ render(controller('SonataNewsBundle:Post:comments', {'postId': post.id})) }}#}
