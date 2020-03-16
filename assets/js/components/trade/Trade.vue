@@ -286,6 +286,10 @@ export default {
                         return;
                     }
 
+                    if (!order.hasOwnProperty('createdTimestamp') && data.hasOwnProperty('ctime')) {
+                        order.createdTimestamp = data.ctime;
+                    }
+
                     let index = orders.indexOf(order);
                     order.amount = data.left;
                     order.price = data.price;
