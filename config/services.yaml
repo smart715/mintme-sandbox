@@ -118,7 +118,9 @@ services:
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 
-    App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
+    App\Manager\TwoFactorManagerInterface:
+        class: App\Manager\TwoFactorManager
+        public: true
 
     App\Wallet\Withdraw\Communicator\AMQPCommunicator:
         arguments:
@@ -286,6 +288,7 @@ services:
 
     balancer:
         class: 'App\Exchange\Balance\BalanceHandler'
+        public: true
         arguments:
             $logger: '@logger'
         tags:
