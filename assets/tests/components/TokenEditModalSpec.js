@@ -15,21 +15,45 @@ let propsForTestCorrectlyRenders = {
     websocketUrl: '',
 };
 
+const vueSliderTest = Vue.component('vue-slider-test', {
+    template: '<div></div>',
+        data() {
+            return {
+                refreshd: false,
+            };
+        },
+        methods: {
+            refresh: function() {
+                this.refreshd = true;
+            },
+    },
+});
+
+const vueSliderPeriodTest = Vue.component('vue-slider-period-test', {
+    template: '<div></div>',
+        data() {
+            return {
+                refreshd: false,
+            };
+    },
+    methods: {
+        refresh: function() {
+            this.refreshd = true;
+        },
+    },
+});
+
+
+const tokenReleasePeriodTest = Vue.component('token-release-period', {
+    template: '<div><vue-slider-test ref="released-slider"></vue-slider-test><vue-slider-period-test ref="release-period-slider"></vue-slider-period-test></div>',
+    components: {
+         vueSliderTest,
+         vueSliderPeriodTest,
+    },
+
+});
+
 describe('TokenEditModal', () => {
-    it('should be visible when visible props is true', () => {
-        const wrapper = shallowMount(TokenEditModal, {
-            propsData: propsForTestCorrectlyRenders,
-        });
-        expect(wrapper.vm.visible).to.be.true;
-    });
-
-    it('should provide closing on ESC and closing on backdrop click when noClose props is false', () => {
-        const wrapper = shallowMount(TokenEditModal, {
-            propsData: propsForTestCorrectlyRenders,
-        });
-        expect(wrapper.vm.noClose).to.be.false;
-    });
-
     it('should be true when statusProp props is equal "not-deployed"', () => {
         const wrapper = shallowMount(TokenEditModal, {
             propsData: propsForTestCorrectlyRenders,
@@ -45,11 +69,23 @@ describe('TokenEditModal', () => {
         expect(wrapper.vm.isTokenDeployed).to.be.true;
     });
 
-    it('should be true when the function releasePeriodUpdated() is running', () => {
+    it('should be true when the function releasePeriodUpdated() is called', () => {
         const wrapper = shallowMount(TokenEditModal, {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.releasePeriodUpdated();
         expect(wrapper.vm.hasReleasePeriod).to.be.true;
+    });
+
+    it('should refresh sliders for "released-slider" and "release-period-slider" refs', () => {
+        const wrapper = shallowMount(TokenEditModal, {
+            stubs: {
+                'token-release-period': tokenReleasePeriodTest,
+            },
+        });
+
+        wrapper.vm.refreshSliders();
+        expect(wrapper.find(vueSliderTest).vm.refreshd).to.be.true;
+        expect(wrapper.find(vueSliderPeriodTest).vm.refreshd).to.be.true;
     });
 });
