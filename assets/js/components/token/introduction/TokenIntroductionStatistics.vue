@@ -237,9 +237,7 @@ export default {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
         }))
-            .then((res) => {
-              this.pendingSellOrders = res.data.sell;
-            })
+            .then((res) => this.pendingSellOrders = res.data.sell)
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);

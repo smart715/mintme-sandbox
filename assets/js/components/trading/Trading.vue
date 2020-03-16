@@ -631,11 +631,7 @@ export default {
                     this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                     reject();
                 });
-            })
-              .catch((err) => {
-                this.notifyError('Can not load Trading data. Try again later.');
-                this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
-              });
+            });
         },
         toUSD: function(amount, currency, subunit = false) {
             amount = Decimal.mul(amount, ((this.conversionRates[currency] || [])[USD.symbol] || 1));

@@ -330,11 +330,10 @@ export default {
             this.$axios.retry.get(this.$routing.generate('deposit_fee', {
                     crypto: isToken ? webSymbol : currency,
                 }))
-                .then((res) => {
-                  this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
+                .then((res) => this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
                     toMoney(res.data, subunit) :
-                    undefined;
-                })
+                    undefined
+                )
                 .catch((err) => {
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
