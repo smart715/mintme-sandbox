@@ -1,19 +1,15 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-{% apply spaceless %}
+{% spaceless %}
     {{ post.title }} | mintMe
-{% endapply %}
+{% endspaceless %}
 {% endblock %}
 {% block metaDescription %}{{ post.abstract }}{% endblock %}
 
 {% block contentClass %}blog{% endblock %}
 
 {% block content %}
-    <div id="news" class="py-4">
+    <div class="py-4">
         {{ include("@SonataNews/Post/view_content.html.twig") }}
     </div>
-{% endblock %}
-
-{% block pagescripts %}
-    <script src="{{ asset('build/news.js') }}"></script>
 {% endblock %}

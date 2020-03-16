@@ -18,7 +18,6 @@ Encore
     .addEntry('token_creation', './assets/js/token_creation.js')
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('admin', './assets/js/admin/admin.js')
-    .addEntry('news', './assets/js/news.js')
 
     .enablePostCssLoader()
 
