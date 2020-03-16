@@ -631,7 +631,7 @@ nav.top-navbar
   width: 22px
   height: 20px
 
-.tooltip
+.tooltip:not(.tooltip-traders)
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
 
@@ -706,6 +706,9 @@ meter
 
 .overflow-wrap-break-word
   overflow-wrap: break-word
+
+.pointer-events-none
+  pointer-events: none !important
 
 .bg-module
   background: $module-background
