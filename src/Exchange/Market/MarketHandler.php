@@ -218,9 +218,7 @@ class MarketHandler implements MarketHandlerInterface
                 ),
                 Order::PENDING_STATUS,
                 $this->moneyWrapper->parse(
-                    self::SELL === $orderData['side'] ?
-                        (string)$orderData['maker_fee'] :
-                        (string)$orderData['taker_fee'],
+                    (string)$orderData['maker_fee'],
                     $this->getSymbol($market->getQuote())
                 ),
                 !empty($orderData['mtime']) ? intval($orderData['mtime']) : null
