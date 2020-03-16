@@ -84,7 +84,7 @@ describe('Modal', () => {
         expect(wrapper.emitted('close').length).to.be.equal(1);
     });
 
-    it('emit "close" when the function closeModal() is running', () => {
+    it('emit "close" when the function closeModal() is called', () => {
         const wrapper = mount(Modal, {
            propsData: {
                 visible: true,

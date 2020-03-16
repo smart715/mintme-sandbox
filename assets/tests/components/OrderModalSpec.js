@@ -31,7 +31,7 @@ describe('OrderModal', () => {
         expect(wrapper.vm.visible).to.be.true;
     });
 
-    it('emit "close" when the function closeModal() is running', () => {
+    it('emit "close" when the function closeModal() is called', () => {
         const wrapper = shallowMount(OrderModal, {
             propsData: {
                 type: true,
