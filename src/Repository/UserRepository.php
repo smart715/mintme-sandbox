@@ -45,7 +45,8 @@ class UserRepository extends EntityRepository
     public function checkExistCanonicalEmail(string $email): bool
     {
         $user = $this->createQueryBuilder('u')
-            ->Where("u.emailCanonical LIKE '".$email."'")
+            ->Where("u.emailCanonical LIKE :email")
+            ->setParameter('email', $email)
             ->getQuery()
             ->getArrayResult();
 
