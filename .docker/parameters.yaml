@@ -36,8 +36,6 @@ parameters:
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
     mintme_supply: 'https://mintme.com/coin/supply.txt'
-    mintme_coin: 'MintMe Coin'
-    mintme_coin_link: 'https://www.mintme.com/coin/'
     deploy_cost: 0
     deploy_rpc: 'http://deploytok:3001'
     deploy_response_timeout_seconds: 60
@@ -53,10 +51,3 @@ parameters:
     docs_path: /docs
     password_reset_expiration_time: 3600
     password_reset_retry_time: 3600
-    show_full_data_in_profile: false
-    landing_web_bonus_limit: 50000
-    landing_web_bonus: 5
-    quick_registration_password: blockchaincrowdfunding
-    front_end_logs_cut_headers: true
-    minimum_volume_for_marketcap: 100000
-    top_holders: 10
