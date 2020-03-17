@@ -2,6 +2,7 @@
 
 namespace App\Entity\Token;
 
+use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
@@ -9,6 +10,7 @@ use App\Entity\User;
 use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -166,6 +168,17 @@ class Token implements TradebleInterface
      * @var string
      */
     protected $withdrawn = '0';
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\Airdrop", mappedBy="token", orphanRemoval=true)
+     * @var ArrayCollection
+     */
+    private $airdrops;
+
+    public function __construct()
+    {
+        $this->airdrops = new ArrayCollection();
+    }
 
     /** @return User[] */
     public function getUsers(): array
@@ -434,6 +447,44 @@ class Token implements TradebleInterface
     public function setWithdrawn(string $withdrawn): self
     {
         $this->withdrawn = $withdrawn;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Airdrop[]
+     */
+    public function getAirdrops(): Collection
+    {
+        return $this->airdrops;
+    }
+
+    public function getActiveAirdrop(): ?Airdrop
+    {
+        $activeAirdrop = $this->getAirdrops()->filter(function (Airdrop $airdrop) {
+            return Airdrop::STATUS_ACTIVE === $airdrop->getStatus();
+        });
+
+        return $activeAirdrop->isEmpty()
+            ? null
+            : $activeAirdrop->first();
+    }
+
+    public function addAirdrop(Airdrop $airdrop): self
+    {
+        if (!$this->airdrops->contains($airdrop)) {
+            $this->airdrops[] = $airdrop;
+            $airdrop->setToken($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAirdrop(Airdrop $airdrop): self
+    {
+        if ($this->airdrops->contains($airdrop)) {
+            $this->airdrops->removeElement($airdrop);
+        }
 
         return $this;
     }
