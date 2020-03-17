@@ -266,8 +266,7 @@ export default {
                 params: [this.market.identifier, 24 * 60 * 60],
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
-        })
-          .catch((err) => {
+        }).catch((err) => {
             this.notifyError('Service unavailable now. Can not load the chart data');
             this.sendLogs('error', 'Can not load the chart data', err);
         });

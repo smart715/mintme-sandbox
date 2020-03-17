@@ -148,7 +148,6 @@
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
-
 import {
     WebSocketMixin,
     FiltersMixin,
