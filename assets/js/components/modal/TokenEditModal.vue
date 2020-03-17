@@ -6,9 +6,7 @@
             :without-padding="true"
             @close="$emit('close')"
         >
-            <template slot="header">
-                <p class="overflow-wrap-break-word">{{ currentName }}</p> 
-            </template>
+            <template slot="header"><p class="overflow-wrap-break-word">{{ currentName }}</p></template>
             <template slot="body">
                 <div class="token-edit p-0">
                     <div class="row faq-block mx-0 border-bottom border-top">
