@@ -53,7 +53,7 @@ describe('DepositModal', () => {
         expect(wrapper.vm.noClose).to.be.false;
     });
 
-    it('emit "close" when the function closeModal() is running', () => {
+    it('emit "close" when the function closeModal() is called', () => {
         const wrapper = shallowMount(DepositModal, {
             propsData: {
                 visible: true,
@@ -87,7 +87,7 @@ describe('DepositModal', () => {
         expect(wrapper.emitted('success').length).to.be.equal(1);
     });
 
-    it('emit "success" when the function onSuccess() is running', () => {
+    it('emit "success" when the function onSuccess() is called', () => {
         const wrapper = shallowMount(DepositModal, {
             propsData: {
                 visible: true,
