@@ -407,12 +407,13 @@ export default {
                         }
 
                         resolve();
+                    })
+                    .catch((err) => {
+                        this.notifyError('Can not update the markets data. Try again later.');
+                        this.sendLogs('error', 'Can not update the markets data', err);
+                        reject(err);
                     });
-            })
-              .catch((err) => {
-                this.notifyError('Can not load Trading data. Try again later.');
-                this.sendLogs('error', 'Service unavailable. Can not load trading data now.', err);
-              });
+            });
         },
         sanitizeMarket: function(marketData) {
             if (!marketData.params) {
