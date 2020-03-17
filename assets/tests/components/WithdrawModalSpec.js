@@ -82,7 +82,7 @@ describe('WithdrawModal', () => {
         expect(wrapper.vm.noClose).to.be.false;
     });
 
-    it('emit "close" when the function closeModal() is running', () => {
+    it('emit "close" when the function closeModal() is called', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
         });
@@ -260,7 +260,7 @@ describe('WithdrawModal', () => {
         expect(!wrapper.vm.$v.amount.$error).to.be.true;
     });
 
-    it('calculate the amount correctly when the function setMaxAmount() is running', () => {
+    it('calculate the amount correctly when the function setMaxAmount() is called', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
         });
@@ -277,7 +277,7 @@ describe('WithdrawModal', () => {
         expect(wrapper.vm.amount).to.be.equal('0');
     });
 
-    it('do $axios request and emit "withdraw" when the function closeModal() is running and when data is correct', (done) => {
+    it('do $axios request and emit "withdraw" when the function closeModal() is called and when data is correct', (done) => {
         const localVue = mockVue();
         propsForTestCorrectlyRenders.currency = 'BTC';
         const wrapper = shallowMount(WithdrawModal, {
