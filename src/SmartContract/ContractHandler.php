@@ -72,6 +72,7 @@ class ContractHandler implements ContractHandlerInterface
                     $this->moneyWrapper->getRepository()->subunitFor(new Currency(MoneyWrapper::TOK_SYMBOL)),
                 'releasedAtCreation' => $token->getLockIn()->getReleasedAmount()->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
+                'userId' => $token->getProfile()->getUser()->getId(),
             ]
         );
 
