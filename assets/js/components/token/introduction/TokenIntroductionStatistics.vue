@@ -224,6 +224,7 @@ export default {
                 this.notifyError('Can not load token withdrawn statistic data. Try again later');
                 this.sendLogs('error', 'Can not load token withdrawn value', err);
             });
+
         this.$axios.retry.get(this.$routing.generate('pending_orders', {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
