@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Entity\Crypto;
+use App\Entity\Profile;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -36,6 +37,7 @@ class ContractHandlerTest extends TestCase
                     'decimals' => 4,
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
+                    'userId' => 1,
                 ]
             )
             ->willReturn($this->mockResponse(false, []));
@@ -81,6 +83,7 @@ class ContractHandlerTest extends TestCase
                     'decimals' => 4,
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
+                    'userId' => 1,
                 ]
             )
             ->willReturn($this->mockResponse(true, []));
@@ -446,6 +449,12 @@ class ContractHandlerTest extends TestCase
         $lockIn->method('getReleasePeriod')->willReturn(10);
         $lockIn->method('getReleasedAmount')->willReturn(new Money('100000', new Currency(MoneyWrapper::TOK_SYMBOL)));
         $token->method('getLockIn')->willReturn($lockIn);
+
+        $user = $this->createMock(User::class);
+        $user->method('getId')->willReturn(1);
+        $profile = $this->createMock(Profile::class);
+        $profile->method('getUser')->willReturn($user);
+        $token->method('getProfile')->willReturn($profile);
 
         return $token;
     }

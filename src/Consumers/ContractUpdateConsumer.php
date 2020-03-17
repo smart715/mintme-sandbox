@@ -4,7 +4,10 @@ namespace App\Consumers;
 
 use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
+use App\SmartContract\Model\ChangeMintDestinationCallbackMessage;
 use App\SmartContract\Model\ContractUpdateCallbackMessage;
+use App\SmartContract\Model\UpdateMintedAmountCallbackMessage;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -12,18 +15,26 @@ use Psr\Log\LoggerInterface;
 
 class ContractUpdateConsumer implements ConsumerInterface
 {
+    public const CHANGE_MINT_DESTINATION = 'changeMintDestination';
+    public const UPDATE_MINTED_AMOUNT = 'updateMintedAmount';
+
     /** @var LoggerInterface */
     private $logger;
 
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         LoggerInterface $logger,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->logger = $logger;
         $this->em = $em;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritdoc} */
@@ -44,6 +55,35 @@ class ContractUpdateConsumer implements ConsumerInterface
             return true;
         }
 
+        if (self::CHANGE_MINT_DESTINATION === $clbResult->getMethod()) {
+            try {
+                $clbMessage = ChangeMintDestinationCallbackMessage::parse($clbResult->getMessage());
+            } catch (\Throwable $exception) {
+                $this->logger->warning("[contract-update-consumer] Failed to parse incoming message", [$clbResult->getMessage()]);
+
+                return true;
+            }
+
+            return $this->updateMintDestination($clbMessage);
+        } elseif (self::UPDATE_MINTED_AMOUNT === $clbResult->getMethod()) {
+            try {
+                $clbMessage = UpdateMintedAmountCallbackMessage::parse($clbResult->getMessage());
+            } catch (\Throwable $exception) {
+                $this->logger->warning("[contract-update-consumer] Failed to parse incoming message", [$clbResult->getMessage()]);
+
+                return true;
+            }
+
+            return $this->updateMintedAmount($clbMessage);
+        } else {
+            $this->logger->warning("[contract-update-consumer] Invalid method", [$clbResult->getMethod()]);
+
+            return true;
+        }
+    }
+
+    private function updateMintDestination(ChangeMintDestinationCallbackMessage $clbResult): bool
+    {
         try {
             $repo = $this->em->getRepository(Token::class);
             $token = $repo->findOneBy(['address' => $clbResult->getTokenAddress()]);
@@ -60,6 +100,33 @@ class ContractUpdateConsumer implements ConsumerInterface
             $this->em->flush();
         } catch (\Throwable $exception) {
             $this->logger->error("[contract-update-consumer] Failed to update token address. Retry operation. Reason: {$exception->getMessage()}");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function updateMintedAmount(UpdateMintedAmountCallbackMessage $clbResult): bool
+    {
+        try {
+            $repo = $this->em->getRepository(Token::class);
+            $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
+
+            if (!$token) {
+                $this->logger->info("[contract-update-consumer] Invalid token name '{$clbResult->getTokenName()}' given");
+
+                return true;
+            }
+
+            $minted = $this->moneyWrapper->parse($clbResult->getValue(), Token::TOK_SYMBOL);
+
+            $token->setMintedAmount($token->getMintedAmount()->add($minted));
+
+            $this->em->persist($token);
+            $this->em->flush();
+        } catch (\Throwable $exception) {
+            $this->logger->error("[contract-update-consumer] Failed to update token minted amount. Retry operation. Reason: {$exception->getMessage()}");
 
             return false;
         }
