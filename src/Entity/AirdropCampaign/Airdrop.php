@@ -149,9 +149,6 @@ class Airdrop
         return $this;
     }
 
-    /**
-     * @return Collection|Participant[]
-     */
     public function getClaimedParticipants(): Collection
     {
         return $this->claimedParticipants;
@@ -160,7 +157,7 @@ class Airdrop
     public function addClaimedParticipant(Participant $claimedParticipant): self
     {
         if (!$this->claimedParticipants->contains($claimedParticipant)) {
-            $this->claimedParticipants[] = $claimedParticipant;
+            $this->claimedParticipants->add($claimedParticipant);
             $claimedParticipant->setAirdrop($this);
         }
 

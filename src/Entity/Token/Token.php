@@ -451,9 +451,6 @@ class Token implements TradebleInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Airdrop[]
-     */
     public function getAirdrops(): Collection
     {
         return $this->airdrops;
@@ -473,7 +470,7 @@ class Token implements TradebleInterface
     public function addAirdrop(Airdrop $airdrop): self
     {
         if (!$this->airdrops->contains($airdrop)) {
-            $this->airdrops[] = $airdrop;
+            $this->airdrops->add($airdrop);
             $airdrop->setToken($this);
         }
 
