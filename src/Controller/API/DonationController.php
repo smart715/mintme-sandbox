@@ -48,9 +48,13 @@ class DonationController extends AbstractFOSRestController
      * @Rest\Post("/{base}/{quote}/make", name="make_donation", options={"expose"=true})
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(name="fee", allowBlank=false, description="Donation fee.")
-     * @Rest\RequestParam(name="expected_count_to_receive", allowBlank=false, description="Expected tokens count to receive.")
+     * @Rest\RequestParam(
+     *     name="expected_count_to_receive",
+     *     allowBlank=false,
+     *     description="Expected tokens count to receive."
+     * )
      */
-    public function getBalance(Market $market, ParamFetcherInterface $request): View
+    public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
 //        $this->donationHandler->makeDonation(
 //            $market,

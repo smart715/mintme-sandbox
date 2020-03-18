@@ -102,7 +102,7 @@ class SecurityController extends FOSSecurityController
             return $this->redirectToRoute($refererRoute);
         }
 
-        if ($this->isRefererValid($referer)) {
+        if ($referer && $this->isRefererValid($referer)) {
             return $this->redirect($referer);
         }
 

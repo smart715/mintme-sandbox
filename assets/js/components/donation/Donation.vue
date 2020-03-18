@@ -295,7 +295,6 @@ export default {
                 base: this.selectedCurrency,
                 quote: this.market.quote.symbol,
             }), {
-                market: this.selectedCurrency,
                 amount: this.amountToDonate,
                 fee: this.donationFee,
                 expected_count_to_receive: this.amountToReceive,

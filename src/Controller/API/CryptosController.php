@@ -33,7 +33,12 @@ class CryptosController extends APIController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{symbol}/balance", name="crypto_balance", requirements={"symbol"="(WEB|BTC)"}, options={"expose"=true})
+     * @Rest\Get(
+     *     "/{symbol}/balance",
+     *     name="crypto_balance",
+     *     requirements={"symbol"="(WEB|BTC)"},
+     *     options={"expose"=true}
+     * )
      */
     public function getBalance(
         string $symbol,
