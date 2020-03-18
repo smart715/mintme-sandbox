@@ -13,6 +13,7 @@ use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
@@ -55,6 +56,9 @@ class Wallet implements WalletInterface
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     public function __construct(
         WithdrawGatewayInterface $withdrawGateway,
         BalanceHandlerInterface $balanceHandler,
@@ -63,7 +67,8 @@ class Wallet implements WalletInterface
         EntityManagerInterface $em,
         CryptoManagerInterface $cryptoManager,
         ContractHandlerInterface $contractHandler,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        TokenManagerInterface $tokenManager
     ) {
         $this->withdrawGateway = $withdrawGateway;
         $this->balanceHandler = $balanceHandler;
@@ -73,6 +78,7 @@ class Wallet implements WalletInterface
         $this->cryptoManager = $cryptoManager;
         $this->contractHandler = $contractHandler;
         $this->logger = $logger;
+        $this->tokenManager = $tokenManager;
     }
 
     /** {@inheritdoc} */
@@ -118,7 +124,11 @@ class Wallet implements WalletInterface
             throw new NotFoundTokenException();
         }
 
-        $available = $this->balanceHandler->balance($user, $token)->getAvailable();
+        $available = $this->tokenManager->getRealBalance(
+            $token,
+            $this->balanceHandler->balance($user, $token)
+        )->getAvailable();
+
         $this->logger->info(
             "Created a new withdraw request for '{$user->getEmail()}' to 
             send {$amount->getAmount()->getAmount()} {$tradable->getSymbol()} on {$address->getAddress()}"
