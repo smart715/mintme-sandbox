@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p v-dompurify-html="parsedValue"></p>
+        <p v-html-sanitize="parsedValue"></p>
     </div>
 </template>
 
