@@ -135,9 +135,19 @@ class TokenManager implements TokenManagerInterface
             return $balanceResult;
         }
 
+        $available = $balanceResult->getAvailable();
+        $available = $token->isDeployed()
+            ? $available->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+            : $available->subtract($token->getLockIn()->getAmountToRelease());
+
+        $freeze = $balanceResult->getFreeze();
+        $freeze = $token->isDeployed()
+            ? $freeze->add($token->getLockIn()->getFrozenAmountWithReceived())
+            : $freeze->add($token->getLockIn()->getAmountToRelease());
+
         return BalanceResult::success(
-            $balanceResult->getAvailable()->subtract($token->getLockIn()->getFrozenAmount()),
-            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount()),
+            $available,
+            $freeze,
             $balanceResult->getReferral()
         );
     }
