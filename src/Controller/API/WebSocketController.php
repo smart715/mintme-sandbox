@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Exchange\Config\Config;
 use App\Manager\ProfileManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -19,9 +20,13 @@ class WebSocketController extends AbstractFOSRestController
     /** @var bool */
     private $isAuth;
 
-    public function __construct(bool $isAuth)
+    /** @var Config */
+    private $config;
+
+    public function __construct(bool $isAuth, Config $config)
     {
         $this->isAuth = $isAuth;
+        $this->config = $config;
     }
 
     /**
@@ -37,7 +42,10 @@ class WebSocketController extends AbstractFOSRestController
             $token = $request->headers->get('authorization');
 
             if (null == $token) {
-                throw new RuntimeException('"Authorization" header was not found in HTTP request from via btc server', 1);
+                throw new RuntimeException(
+                    '"Authorization" header was not found in HTTP request from via btc server',
+                    1
+                );
             }
 
             if (is_array($token)) {
@@ -62,7 +70,7 @@ class WebSocketController extends AbstractFOSRestController
 
             $profileManager->createHash($user, false);
 
-            return $this->confirmed((int)$token);
+            return $this->confirmed($user->getId() + $this->config->getOffset());
         } catch (RuntimeException $e) {
             return $this->view([
                 "error" => [
