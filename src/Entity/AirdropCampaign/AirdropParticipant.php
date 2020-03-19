@@ -6,14 +6,14 @@ use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\AirdropCampaign\ParticipantRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\AirdropCampaign\AirdropParticipantRepository")
  * @ORM\Table(
  *     name="airdrop_participants",
  *     uniqueConstraints={@ORM\UniqueConstraint(name="airdrop_participant_index", columns={"user_id", "airdrop_id"})}
  * )
  * @codeCoverageIgnore
  */
-class Participant
+class AirdropParticipant
 {
     /**
      * @ORM\Id()

@@ -2,7 +2,7 @@
 
 namespace App\Repository\AirdropCampaign;
 
-use App\Entity\AirdropCampaign\Participant;
+use App\Entity\AirdropCampaign\AirdropParticipant;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -12,10 +12,10 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method Participant[]    findAll()
  * @method Participant[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ParticipantRepository extends ServiceEntityRepository
+class AirdropParticipantRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, Participant::class);
+        parent::__construct($registry, AirdropParticipant::class);
     }
 }
