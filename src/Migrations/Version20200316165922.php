@@ -23,6 +23,7 @@ final class Version20200316165922 extends AbstractMigration
                                 status SMALLINT NOT NULL,
                                 amount VARCHAR(100) NOT NULL,
                                 participants INT NOT NULL,
+                                end_date DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\',
                                 actual_amount VARCHAR(100) DEFAULT NULL,
                                 actual_participants INT DEFAULT NULL,
                                 INDEX IDX_4D15AF2C41DEE7B9 (token_id),
