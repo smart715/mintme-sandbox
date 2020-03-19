@@ -352,8 +352,6 @@ export default {
                             );
                         }
 
-                        this.fetchWEBsupply().then(this.updateWEBBTCMarket.bind(this));
-
                         resolve();
                     })
                     .catch((err) => {
@@ -458,14 +456,13 @@ export default {
                     if (marketOnTopIndex > -1 &&
                         cryptoSymbol === webBtcOnTop.currency &&
                         tokenName === webBtcOnTop.token) {
-                        this.fetchWEBsupply().then((supply) => {
-                            this.markets[market].supply = supply;
-                        });
-                        if ('undefined' === typeof this.markets[market].supply) {
-                            this.notifyError('Can not update market cap for BTC/MINTME.');
-                            this.sendLogs('error', 'Can not update market cap for BTC/MINTME', 'markets supply === undefined');
-                            this.markets[market].supply = 0;
-                        }
+                        this.markets[market].supply = 0;
+                        this.fetchWEBsupply().then(
+                            (resolve) => {
+                                this.markets[market].supply = resolve;
+                                this.updateWEBBTCMarket(this);
+                            }
+                        );
                     } else {
                         this.markets[market].supply = 1e7;
                     }
@@ -581,9 +578,12 @@ export default {
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
                 let config = {
-                    transformRequest: function(data, headers) {
+                    'transformRequest': function(data, headers) {
                         headers.common = {};
                         return data;
+                    },
+                    'axios-retry': {
+                        retries: 5,
                     },
                 };
 
