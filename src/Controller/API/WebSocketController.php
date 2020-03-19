@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Exchange\Config\Config;
 use App\Manager\ProfileManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -20,13 +19,9 @@ class WebSocketController extends AbstractFOSRestController
     /** @var bool */
     private $isAuth;
 
-    /** @var Config */
-    private $config;
-
-    public function __construct(bool $isAuth, Config $config)
+    public function __construct(bool $isAuth)
     {
         $this->isAuth = $isAuth;
-        $this->config = $config;
     }
 
     /**
