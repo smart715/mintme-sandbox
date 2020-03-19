@@ -93,8 +93,8 @@
                         </guide>
                     </template>
                     <template v-slot:cell(pair)="row">
-                        <div class="truncate-name w-100">
-                            <a :href="row.item.tokenUrl" class="text-white" v-b-tooltip:title="row.value">
+                        <div class="w-100">
+                            <a :href="row.item.tokenUrl" class="text-white truncate-pair" v-b-tooltip:title="row.value">
                                 {{ row.value }}
                             </a>
                             <guide
