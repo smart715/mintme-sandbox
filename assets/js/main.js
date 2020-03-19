@@ -46,18 +46,7 @@ Vue.use(Toasted, {
     className: 'toast',
     iconPack: 'custom-class',
 });
-Vue.use(sanitizeHtml, {
-    default: {
-        ALLOWED_TAGS: ['a', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'ul', 'ol', 'li', 'p'],
-        ALLOWED_ATTR: ['src', 'href', 'rel', 'target', 'style'],
-        html: false,
-        ALLOW_DATA_ATTR: false,
-        ALLOW_UNKNOWN_PROTOCOLS: false,
-    },
-    beforeSanitizeElements: () => {
-        console.log(111);
-    },
-});
+Vue.use(sanitizeHtml);
 
 Vue.options.delimiters = ['{[', ']}'];
 
