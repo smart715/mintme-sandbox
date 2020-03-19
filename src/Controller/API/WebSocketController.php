@@ -36,7 +36,7 @@ class WebSocketController extends AbstractFOSRestController
         try {
             $token = $request->headers->get('authorization');
 
-            if (null == $token) {
+            if (null === $token) {
                 throw new RuntimeException('"Authorization" header was not found in HTTP request from via btc server', 1);
             }
 
