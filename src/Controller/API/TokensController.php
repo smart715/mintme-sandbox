@@ -213,7 +213,7 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"2fa"="optional", "expose"=true})
+     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[0-9][0-9]?$|^100$")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
@@ -549,7 +549,7 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"2fa"="optional", "expose"=true})
+     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
      */
     public function deploy(
