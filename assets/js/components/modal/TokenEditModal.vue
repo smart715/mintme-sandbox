@@ -52,6 +52,7 @@
                             </template>
                             <template slot="body">
                                 <token-airdrop-campaign
+                                        :token-name="currentName"
                                         :is-token-exchanged="isTokenExchanged"
                                         :is-token-not-deployed="isTokenNotDeployed"
                                 />
