@@ -3,9 +3,13 @@
 namespace App\Entity\AirdropCampaign;
 
 use App\Entity\Token\Token;
+use App\Wallet\Money\MoneyWrapper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Money\Currency;
+use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AirdropCampaign\AirdropRepository")
@@ -20,12 +24,14 @@ class Airdrop
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"API"})
      * @var int
      */
     private $id;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"API"})
      * @var int
      */
     private $status = self::STATUS_REMOVED;
@@ -39,15 +45,24 @@ class Airdrop
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"API"})
      * @var string
      */
     private $amount;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"API"})
      * @var int
      */
     private $participants;
+
+    /**
+     * @ORM\Column(name="end_date", type="datetime_immutable", nullable=true)
+     * @Groups({"API"})
+     * @var \DateTimeImmutable|null
+     */
+    private $endDate;
 
     /**
      * @ORM\Column(name="actual_amount", type="string", length=100, nullable=true)
@@ -62,7 +77,7 @@ class Airdrop
     private $actualParticipants;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\Participant", mappedBy="airdrop", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\AirdropParticipant", mappedBy="airdrop", orphanRemoval=true)
      * @var ArrayCollection
      */
     private $claimedParticipants;
@@ -125,6 +140,18 @@ class Airdrop
         return $this;
     }
 
+    public function getEndDate(): ?\DateTimeImmutable
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(?\DateTimeImmutable $endDate): self
+    {
+        $this->endDate = $endDate;
+
+        return $this;
+    }
+
     public function getActualAmount(): ?string
     {
         return $this->actualAmount;
@@ -154,7 +181,7 @@ class Airdrop
         return $this->claimedParticipants;
     }
 
-    public function addClaimedParticipant(Participant $claimedParticipant): self
+    public function addClaimedParticipant(AirdropParticipant $claimedParticipant): self
     {
         if (!$this->claimedParticipants->contains($claimedParticipant)) {
             $this->claimedParticipants->add($claimedParticipant);
@@ -164,7 +191,7 @@ class Airdrop
         return $this;
     }
 
-    public function removeClaimedParticipant(Participant $claimedParticipant): self
+    public function removeClaimedParticipant(AirdropParticipant $claimedParticipant): self
     {
         if ($this->claimedParticipants->contains($claimedParticipant)) {
             $this->claimedParticipants->removeElement($claimedParticipant);
