@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Exchange\Config\Config;
 use App\Manager\ProfileManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -19,9 +20,13 @@ class WebSocketController extends AbstractFOSRestController
     /** @var bool */
     private $isAuth;
 
-    public function __construct(bool $isAuth)
+    /** @var Config */
+    private $config;
+
+    public function __construct(bool $isAuth, Config $config)
     {
         $this->isAuth = $isAuth;
+        $this->config = $config;
     }
 
     /**
@@ -62,7 +67,7 @@ class WebSocketController extends AbstractFOSRestController
 
             $profileManager->createHash($user, false);
 
-            return $this->confirmed((int)$token);
+            return $this->confirmed($user->getId() + $this->config->getOffset());
         } catch (RuntimeException $e) {
             return $this->view([
                 "error" => [
