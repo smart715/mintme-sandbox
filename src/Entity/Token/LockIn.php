@@ -102,13 +102,16 @@ class LockIn
     }
 
     /**
+     * This function calculates the FrozenAmount taking into account the hourly rate
+     * and the time that has passed since deploying
+     *
      * @Groups({"Default", "API"})
      * @codeCoverageIgnore
      */
     public function getFrozenAmount(): Money
     {
         if ($this->token->isDeployed()) {
-            $notReleasedAtStart = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $notReleasedAtStart = $this->getAmountToRelease();
             $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
             $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
 
@@ -120,10 +123,36 @@ class LockIn
         }
     }
 
-    /** @codeCoverageIgnore */
-    public function getReleasedAtStart(): string
+    /**
+     * This function calculates the FrozenAmount taking into account the actual
+     * tokens the mintme address has received from deploy
+     *
+     * @Groups({"Default", "API"})
+     */
+    public function getFrozenAmountWithReceived(): Money
     {
-        return $this->releasedAtStart;
+        $received = $this->getReceivedMoneyFromDeploy();
+
+        if ($this->token->isDeployed()) {
+            $frozenAmount = $received->isZero()
+                ? $this->getAmountToRelease()
+                : $this->getAmountToRelease()
+                    ->subtract($received)
+                    ->add($this->getReleasedAtStart());
+            $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+            return $frozenAmount->greaterThan($zeroValue)
+                ? $frozenAmount
+                : $zeroValue;
+        } else {
+            return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        }
+    }
+
+    /** @codeCoverageIgnore */
+    public function getReleasedAtStart(): Money
+    {
+        return new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
     /** @codeCoverageIgnore */
@@ -181,8 +210,25 @@ class LockIn
         return 0;
     }
 
+    /**
+     * This function calculates the money earned from deploy
+     * by multiplying the hourly rate of token release by the time that has passed since deploying
+     */
     public function getEarnedMoneyFromDeploy(): Money
     {
         return $this->getHourlyRate()->multiply($this->getCountHoursFromDeploy());
+    }
+
+    /**
+     * This function returns the actual amount of tokens the mintme address has received from deploy
+     */
+    public function getReceivedMoneyFromDeploy(): Money
+    {
+        return $this->token->getMintedAmount();
+    }
+
+    public function getAmountToRelease(): Money
+    {
+        return new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 }
