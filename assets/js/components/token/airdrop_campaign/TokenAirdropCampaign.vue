@@ -8,6 +8,7 @@
                 id="tokensAmount"
                 type="text"
                 v-model="tokensAmount"
+                :disabled="hasAirdropCampaign"
                 class="token-name-input w-100 px-2"
                 @keypress="checkInput(4)"
                 @paste="checkInput(4)"
@@ -21,18 +22,20 @@
                 id="participantsAmount"
                 type="text"
                 v-model="participantsAmount"
+                :disabled="hasAirdropCampaign"
                 class="token-name-input w-100 px-2"
                 @keypress="checkInput(false)"
                 @paste="checkInput(false)"
             >
         </div>
-        <div class="col-12 pb-3 px-0">
+        <div v-if="!hasAirdropCampaign" class="col-12 pb-3 px-0">
             <label class="custom-control custom-checkbox pb-0">
                 <input
                     v-b-toggle.collapse-and-date
                     v-model="showEndDate"
                     type="checkbox"
                     id="showEndDate"
+                    ref="end-date-checkbox"
                     class="custom-control-input"
                 >
                 <label
@@ -43,23 +46,30 @@
             </label>
         </div>
         <b-collapse id="collapse-and-date">
-            <div class="col-12 pb-3 px-0">
+            <div class="w-50 pb-3 px-0">
                 <label for="endDate" class="d-block text-left">
                     End date:
                 </label>
                 <date-picker
                     v-model="endDate"
                     id="endDate"
-                    :disabled="!showEndDate"
+                    :disabled="!showEndDate || hasAirdropCampaign"
                     :config="options">
                 </date-picker>
             </div>
         </b-collapse>
-        <div class="col-12 pt-2 px-0 clearfix">
+        <div class="col-12 px-0 clearfix">
+            <p>{{ errorMessage }}</p>
+            <font-awesome-icon
+                    v-if="loading"
+                    icon="circle-notch"
+                    spin
+                    class="loading-spinner" fixed-width
+            />
             <button
-                v-if="hasAirdropCampaign"
+                v-else-if="hasAirdropCampaign"
                 class="btn btn-primary float-left"
-                @click="deleteCampaign"
+                @click="deleteAirdropCampaign"
             >
                 Delete
             </button>
@@ -67,7 +77,7 @@
                 v-else
                 class="btn btn-primary float-left"
                 :disabled="btnDisabled"
-                @click="createCampaign"
+                @click="createAirdropCampaign"
             >
                 Save
             </button>
@@ -100,16 +110,17 @@ export default {
             airdropCampaign: null,
             tokenBalance: 0,
             minTokenReward: '0.0001',
-            submitting: false,
+            loading: false,
             showEndDate: false,
-            tokensAmount: 100,
-            participantsAmount: 100,
+            tokensAmount: null,
+            participantsAmount: null,
             endDate: moment().add(30, 'days').toDate(),
             options: {
                 format: GENERAL.dateFormat,
                 useCurrent: false,
                 minDate: moment(),
             },
+            errorMessage: '',
         };
     },
     mounted: function() {
@@ -118,14 +129,19 @@ export default {
     },
     computed: {
         hasAirdropCampaign: function() {
-            return this.airdropCampaign !== null && parseInt(this.airdropCampaign.id) > 0;
+            return null !== this.airdropCampaign
+                && 'object' === typeof this.airdropCampaign
+                && this.airdropCampaign.hasOwnProperty('id');
         },
         btnDisabled: function() {
             return !(this.isAmountValid && this.isParticipantsAmountValid && this.isDateEndValid);
         },
         isAmountValid: function() {
-            return this.tokensAmount > 0
-                && (new Decimal(this.tokensAmount)).lessThan(this.tokenBalance);
+            if (this.tokensAmount > 0) {
+                return (new Decimal(this.tokensAmount)).lessThan(this.tokenBalance);
+            }
+
+            return false;
         },
         isParticipantsAmountValid: function() {
             return this.participantsAmount > 0;
@@ -134,7 +150,7 @@ export default {
             return !this.showEndDate || this.isDateValid;
         },
         isDateValid: function() {
-            return this.showEndDate && moment(this.endDate).isValid();
+            return this.showEndDate && moment(this.endDate, GENERAL.dateFormat).isValid();
         },
         isRewardValid: function() {
             if (this.isAmountValid && this.isParticipantsAmountValid) {
@@ -159,27 +175,40 @@ export default {
                 });
         },
         loadAirdropCampaign: function() {
+            this.loading = true;
             this.$axios.retry.get(this.$routing.generate('get_airdrop_campaign', {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
                     this.airdropCampaign = result.data;
-                    if (typeof this.airdropCampaign === 'object') {
+                    if (this.hasAirdropCampaign) {
                         this.tokensAmount = this.airdropCampaign.amount;
                         this.participantsAmount = this.airdropCampaign.participants;
 
                         if (this.airdropCampaign.endDate) {
-                            this.endDate = this.airdropCampaign.endDate;
+                            if (!this.showEndDate) {
+                                this.$refs['end-date-checkbox'].click();
+                            }
+                            this.endDate = moment(this.airdropCampaign.endDate).toDate();
                         }
+                    } else {
+                        this.setDefaultValues();
                     }
+                    this.loading = false;
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },
-        createCampaign: function() {
+        createAirdropCampaign: function() {
             if (this.btnDisabled) {
+                return;
+            }
+
+            if (!this.isRewardValid) {
+                this.errorMessage = 'Reward can\'t be lower than 0.0001 ' + this.tokenName + '.' +
+                    'Set higher amount of tokens for airdrop or lower amount of participants.';
                 return;
             }
 
@@ -192,33 +221,44 @@ export default {
                 data.endDate = this.endDate;
             }
 
+            this.loading = true;
             return this.$axios.single.post(this.$routing.generate('create_airdrop_campaign', {
                 tokenName: this.tokenName,
             }), data)
-                .then((res) => this.clients.push(res.data))
+                .then(() => this.loadAirdropCampaign())
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
                     this.sendLogs('error', 'Can not create API Client', err);
                 });
         },
-        deleteCampaign: function() {
+        deleteAirdropCampaign: function() {
             if (!this.hasAirdropCampaign) {
                 return;
             }
 
+            this.loading = true;
             return this.$axios.single.delete(this.$routing.generate('delete_airdrop_campaign', {
                 id: this.airdropCampaign.id,
             }))
                 .then(() => {
                     this.airdropCampaign = null;
-                    this.tokensAmount = 100;
-                    this.participantsAmount = 100;
-                    this.endDate = moment().add(30, 'days').toDate();
+                    this.setDefaultValues();
+                    this.loading = false;
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
                     this.sendLogs('error', 'Can not delete airdrop.', err);
                 });
+        },
+        setDefaultValues: function() {
+            if (this.showEndDate) {
+                this.showEndDate = false;
+                this.$refs['end-date-checkbox'].click();
+            }
+
+            this.tokensAmount = 100;
+            this.participantsAmount = 100;
+            this.endDate = moment().add(30, 'days').toDate();
         },
         checkInput: function(precision) {
             let selectionStart = event.target.selectionStart;
