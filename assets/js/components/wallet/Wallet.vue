@@ -49,7 +49,7 @@
         <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
             Tokens you own
         </div>
-        <div class="text-center p-5" v-if="showLoadingIcon">
+        <div class="text-center truncated-p-5" v-if="showLoadingIcon">
             <font-awesome-icon
                 icon="circle-notch"
                 spin class="loading-spinner"
