@@ -353,7 +353,7 @@ class TokensController extends AbstractFOSRestController
         if ($token->getLockIn()) {
             $balance = $token->isDeployed()
                 ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
-                : $balance = $balance->subtract($token->getLockIn()->getAmountToRelease());
+                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
         }
 
         return $this->view($balance);
