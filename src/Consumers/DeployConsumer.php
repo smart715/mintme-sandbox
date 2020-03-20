@@ -3,8 +3,8 @@
 namespace App\Consumers;
 
 use App\Consumers\Helpers\DBConnection;
-use App\Entity\Token\Token;
 use App\Entity\Token\LockIn;
+use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
