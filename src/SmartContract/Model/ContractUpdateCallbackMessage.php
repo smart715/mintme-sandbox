@@ -6,55 +6,42 @@ namespace App\SmartContract\Model;
 class ContractUpdateCallbackMessage
 {
     /** @var string */
-    private $tokenAddress;
+    private $method;
 
-    /** @var string */
-    private $mintDestination;
-
-    /** @var bool */
-    private $lock;
+    /** @var string[] */
+    private $message;
 
     private function __construct(
-        string $tokenAddress,
-        string $mintDestination,
-        bool $lock
+        string $method,
+        array $message
     ) {
-        $this->tokenAddress = $tokenAddress;
-        $this->mintDestination = $mintDestination;
-        $this->lock = $lock;
+        $this->method = $method;
+        $this->message = $message;
     }
 
-    public function getTokenAddress(): string
+    public function getMethod(): string
     {
-        return $this->tokenAddress;
+        return $this->method;
     }
 
-    public function getMintDestination(): string
+    public function getMessage(): array
     {
-        return $this->mintDestination;
+        return $this->message;
     }
-
-    public function getLock(): bool
-    {
-        return $this->lock;
-    }
-
 
     public static function parse(array $data): self
     {
         return new self(
-            $data['tokenAddress'],
-            $data['mintDestination'],
-            $data['lock']
+            $data['method'],
+            $data['message']
         );
     }
 
     public function toArray(): array
     {
         return [
-            'tokenAddress' => $this->getTokenAddress(),
-            'mintDestination' => $this->getMintDestination(),
-            'lock' => $this->getLock(),
+            'method' => $this->getMethod(),
+            'message' => $this->getMessage(),
         ];
     }
 }
