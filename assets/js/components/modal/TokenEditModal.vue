@@ -45,7 +45,9 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div
+                            v-if="isTokenCreated && isOwner"
+                            class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
                                 Airdrop campaign
@@ -142,6 +144,7 @@ export default {
         currentName: String,
         hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
+        isTokenCreated: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
         precision: Number,

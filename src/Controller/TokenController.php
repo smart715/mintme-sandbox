@@ -151,6 +151,7 @@ class TokenController extends Controller
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
+            'isTokenCreated' => $this->isTokenCreated(),
             'tab' => $tab,
             'showTrade' => true,
             'market' => $this->normalize($market),

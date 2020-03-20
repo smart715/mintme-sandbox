@@ -6,6 +6,7 @@
                 :current-name="currentName"
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
+                :is-token-created="isTokenCreated"
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
@@ -46,6 +47,7 @@ export default {
     props: {
         editable: Boolean,
         hasReleasePeriodProp: Boolean,
+        isTokenCreated: Boolean,
         identifier: String,
         name: String,
         precision: Number,
