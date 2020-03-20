@@ -63,9 +63,9 @@ class MarketsController extends DevApiController
      *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/MarketStatus"))
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @Rest\QueryParam(name="offset", requirements="\d+", default="0")
-     * @Rest\QueryParam(name="limit", requirements="\d+", default="100")
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>0]")
+     * @Rest\QueryParam(name="offset", requirements="^[0-9]*$", default="0")
+     * @Rest\QueryParam(name="limit", requirements="^([1-9]|[1-9][0-9]|[0-4][0-9][0-9]|500)$", default="100")
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Markets")
      */
