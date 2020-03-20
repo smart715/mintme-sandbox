@@ -4,6 +4,7 @@ namespace App\Consumers;
 
 use App\Consumers\Helpers\DBConnection;
 use App\Entity\Token\Token;
+use App\Entity\Token\LockIn;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -71,6 +72,7 @@ class DeployConsumer implements ConsumerInterface
                 return true;
             }
 
+            /** @var LockIn */
             $lockIn = $token->getLockIn();
 
             if (!$clbResult->getAddress()) {
