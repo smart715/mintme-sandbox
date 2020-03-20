@@ -71,7 +71,7 @@ class DeployConsumer implements ConsumerInterface
                 return true;
             }
 
-            $token->setDeployed(new \DateTimeImmutable());
+            $lockIn = $token->getLockIn();
 
             if (!$clbResult->getAddress()) {
                 if ($token->getDeployCost()) {
@@ -83,6 +83,9 @@ class DeployConsumer implements ConsumerInterface
                         $amount
                     );
 
+                    $token->setDeployCost('');
+                    $token->setDeployed(null);
+
                     $this->logger->info(
                         '[deploy-consumer] the money is payed back returned back'
                         . json_encode([
@@ -92,12 +95,14 @@ class DeployConsumer implements ConsumerInterface
                         ])
                     );
                 }
-
-                $token->setDeployCost('');
-                $token->setDeployed(null);
+            } else {
+                $lockIn->setReleasedAtStart($lockIn->getReleasedAmount()->getAmount());
+                $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
+                $token->setDeployed(new \DateTimeImmutable());
+                $token->setAddress($clbResult->getAddress());
             }
 
-            $token->setAddress($clbResult->getAddress());
+            $this->em->persist($lockIn);
             $this->em->persist($token);
             $this->em->flush();
         } catch (\Throwable $exception) {
