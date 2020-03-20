@@ -92,13 +92,11 @@ class LockIn
     {
         $releasedAtStart = $this->getReleasedAtStart();
 
-        if ($this->token->isDeployed()) {
-            return $releasedAtStart->add($this->getEarnedMoneyFromDeploy());
-        } else {
-            return $this->getAmountToRelease()
+        return $this->token->isDeployed()
+            ? $releasedAtStart->add($this->getEarnedMoneyFromDeploy())
+            : $this->getAmountToRelease()
                 ->subtract($this->getFrozenAmount())
                 ->add($releasedAtStart);
-        }
     }
 
     /**
