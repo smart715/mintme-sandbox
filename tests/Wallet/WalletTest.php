@@ -13,6 +13,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
@@ -58,7 +59,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager(),
             $this->mockContractHandler($tokenTransactions),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $history = $wallet->getWithdrawDepositHistory($this->mockUser(), 0, 10);
@@ -141,7 +143,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $wallet->withdrawInit(
@@ -162,7 +165,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -189,7 +193,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $wallet->withdrawInit(
@@ -214,7 +219,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager($this->once(), true),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $this->expectException(NotFoundTokenException::class);
@@ -241,7 +247,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -268,7 +275,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $this->expectException(NotEnoughAmountException::class);
@@ -291,7 +299,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000'));
@@ -307,7 +316,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $this->expectException(NotEnoughAmountException::class);
@@ -325,7 +335,8 @@ class WalletTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $this->mockCryptoManager(),
             $this->mockContractHandler([], $this->once()),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->mockTokenManager()
         );
 
         $wallet->withdrawCommit($this->mockPendingTokenWithdraw('1000000000000'));
@@ -538,5 +549,17 @@ class WalletTest extends TestCase
         $address->method('getAddress')->willReturn($str);
 
         return $address;
+    }
+
+    public function mockTokenManager(): TokenManagerInterface
+    {
+        $tm = $this->createMock(TokenManagerInterface::class);
+        $tm->method('getRealBalance')->willReturnCallback(
+            function (Token $token, BalanceResult $balanceResult) {
+                return $balanceResult;
+            }
+        );
+
+        return $tm;
     }
 }

@@ -104,7 +104,11 @@ class TwoFactorManagerTest extends TestCase
     {
         /** @var User|MockObject $user */
         $user = $this->createMock(User::class);
-        $user->method('getGoogleAuthenticatorBackupCodes')->willReturn($backupCodes);
+        $user->method('isBackupCode')->willReturnCallback(
+            function (string $code) use ($backupCodes) {
+                return in_array($code, $backupCodes);
+            }
+        );
 
         return $user;
     }
