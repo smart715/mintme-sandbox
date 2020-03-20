@@ -90,14 +90,14 @@ class LockIn
      */
     public function getReleasedAmount(): Money
     {
-        $releasedAtStart = new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $releasedAtStart = $this->getReleasedAtStart();
 
         if ($this->token->isDeployed()) {
             return $releasedAtStart->add($this->getEarnedMoneyFromDeploy());
         } else {
-            $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
-
-            return $money->subtract($this->getFrozenAmount())->add($releasedAtStart);
+            return $this->getAmountToRelease()
+                ->subtract($this->getFrozenAmount())
+                ->add($releasedAtStart);
         }
     }
 
