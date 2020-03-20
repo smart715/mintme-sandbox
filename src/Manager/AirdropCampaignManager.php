@@ -24,16 +24,16 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     public function createAirdrop(
         Token $token,
-        Money $amount,
+        string $amount,
         int $participants,
         ?\DateTimeImmutable $endDate = null
     ): Airdrop {
-        $this->removeActiveAirdrop($token);
+        $this->deleteActiveAirdrop($token);
 
         $airdrop = new Airdrop();
         $airdrop->setStatus(Airdrop::STATUS_ACTIVE);
         $airdrop->setToken($token);
-        $airdrop->setAmount($amount->getAmount());
+        $airdrop->setAmount($amount);
         $airdrop->setParticipants($participants);
 
         if ($endDate instanceof \DateTimeImmutable && $endDate->getTimestamp() > time()) {
@@ -54,7 +54,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $this->em->flush();
     }
 
-    public function removeActiveAirdrop(Token $token): void
+    public function deleteActiveAirdrop(Token $token): void
     {
         $existingAirdrop = $token->getActiveAirdrop();
 

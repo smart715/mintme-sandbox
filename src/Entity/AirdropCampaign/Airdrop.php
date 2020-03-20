@@ -199,4 +199,12 @@ class Airdrop
 
         return $this;
     }
+
+    public function getAirdropReward(): string
+    {
+        $amount = new Money($this->amount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $reward = $amount->divide($this->participants, Money::ROUND_HALF_DOWN);
+
+        return $reward->getAmount();
+    }
 }

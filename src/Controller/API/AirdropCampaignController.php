@@ -51,28 +51,36 @@ class AirdropCampaignController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{tokenName}/create", name="create_airdrop_campaign", options={"expose"=true})
      */
-    public function newAirdrop(string $tokenName, MoneyWrapperInterface $moneyWrapper, Request $request): View
-    {
+    public function createAirdropCampaign(
+        string $tokenName,
+        MoneyWrapperInterface $moneyWrapper,
+        Request $request
+    ): View {
         $token = $this->fetchToken($tokenName);
-        $amount = $moneyWrapper->parse(
+        $amount = (string)$request->get('amount');
+        $amountObj = $moneyWrapper->parse(
             (string)$request->get('amount'),
             MoneyWrapper::TOK_SYMBOL
         );
         $participants = (int)$request->get('participants');
 
-        if ($amount->isNegative() || $amount->isZero()) {
+        if ($amountObj->isNegative() || $amountObj->isZero()) {
             throw new \InvalidArgumentException('Incorrect amount.');
         }
 
         if (!$participants) {
-            throw new \InvalidArgumentException('Wrong participants amount.');
+            throw new \InvalidArgumentException('Incorrect participants amount.');
         }
+
+        $endDate = $request->get('endDate')
+            ? new \DateTimeImmutable($request->get('endDate'))
+            : null;
 
         $airdrop = $this->airdropCampaignManager->createAirdrop(
             $token,
             $amount,
             $participants,
-            $request->get('endDate')
+            $endDate
         );
 
         return $this->view($airdrop, Response::HTTP_ACCEPTED);
@@ -87,7 +95,7 @@ class AirdropCampaignController extends AbstractFOSRestController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function deleteAirdrop(Airdrop $airdrop): View
+    public function deleteAirdropCampaign(Airdrop $airdrop): View
     {
         $this->airdropCampaignManager->deleteAirdrop($airdrop);
 

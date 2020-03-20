@@ -10,7 +10,7 @@ interface AirdropCampaignManagerInterface
 {
     public function createAirdrop(
         Token $token,
-        Money $amount,
+        string $amount,
         int $participants,
         ?\DateTimeImmutable $endDate = null
     ): Airdrop;
