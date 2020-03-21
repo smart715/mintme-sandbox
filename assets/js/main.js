@@ -16,6 +16,7 @@ import TokenSearcher from './components/token/TokenSearcher';
 import AdminMenu from './components/AdminMenu';
 import {directive as onClickaway} from 'vue-clickaway';
 import Notification from './components/Notification';
+import sanitizeHtml from './sanitize_html';
 
 /*
     To enable passive listeners,
@@ -47,7 +48,7 @@ Vue.use(Toasted, {
     className: 'toast',
     iconPack: 'custom-class',
 });
-Vue.use(VueDOMPurifyHTML);
+Vue.use(sanitizeHtml);
 
 Vue.options.delimiters = ['{[', ']}'];
 
