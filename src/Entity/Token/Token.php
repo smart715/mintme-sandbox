@@ -12,6 +12,8 @@ use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Money\Currency;
+use Money\Money;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -28,6 +30,7 @@ class Token implements TradebleInterface
     public const MINTME_SYMBOL = "MINTME";
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
+    public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
     public const NOT_DEPLOYED = 'not-deployed';
@@ -168,6 +171,12 @@ class Token implements TradebleInterface
      * @var string
      */
     protected $withdrawn = '0';
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string|null
+     */
+    private $mintedAmount;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\Airdrop", mappedBy="token", orphanRemoval=true)
@@ -449,6 +458,16 @@ class Token implements TradebleInterface
         $this->withdrawn = $withdrawn;
 
         return $this;
+    }
+
+    public function getMintedAmount(): Money
+    {
+        return new Money($this->mintedAmount ?? 0, new Currency(self::TOK_SYMBOL));
+    }
+
+    public function setMintedAmount(Money $mintedAmount): void
+    {
+        $this->mintedAmount = $mintedAmount->getAmount();
     }
 
     public function getAirdrops(): Collection
