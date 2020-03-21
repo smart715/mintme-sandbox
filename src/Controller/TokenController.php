@@ -9,6 +9,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
+use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
@@ -100,7 +101,8 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
-        TokenNameConverterInterface $tokenNameConverter
+        TokenNameConverterInterface $tokenNameConverter,
+        AirdropCampaignManagerInterface $airdropCampaignManager
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
@@ -160,6 +162,8 @@ class TokenController extends Controller
                 '',
             'precision' => $this->getParameter('token_precision'),
             'isTokenPage' => true,
+            'showAirdropCampaign' => $airdropCampaignManager
+                ->showAirdropCampaign($this->getUser(), $token),
         ]);
     }
 

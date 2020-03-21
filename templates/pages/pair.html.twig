@@ -19,6 +19,7 @@
     <div class="row pt-5 justify-content-center">
         <token-ongoing-airdrop-campaign
             v-if="!{{ isOwner }}"
+            :token-name="{{ token.name }}"
         ></token-ongoing-airdrop-campaign>
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}

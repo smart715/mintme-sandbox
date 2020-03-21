@@ -4,7 +4,7 @@ namespace App\Manager;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Token\Token;
-use Money\Money;
+use App\Entity\User;
 
 interface AirdropCampaignManagerInterface
 {
@@ -15,4 +15,5 @@ interface AirdropCampaignManagerInterface
         ?\DateTimeImmutable $endDate = null
     ): Airdrop;
     public function deleteAirdrop(Airdrop $airdrop): void;
+    public function showAirdropCampaign(User $user, Token $token): bool;
 }

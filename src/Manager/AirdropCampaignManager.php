@@ -3,23 +3,21 @@
 namespace App\Manager;
 
 use App\Entity\AirdropCampaign\Airdrop;
+use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
+use App\Repository\AirdropCampaign\AirdropRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Money;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
 {
     /** @var EntityManagerInterface */
     private $em;
 
-    /** @var AirdropParticipantRepository */
-    private $repository;
-
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->em = $entityManager;
-        $this->repository = $entityManager->getRepository(Airdrop::class);
     }
 
     public function createAirdrop(
@@ -63,8 +61,26 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
     }
 
-    public function getRepository(): AirdropParticipantRepository
+    public function showAirdropCampaign(User $user, Token $token): bool
     {
-        return $this->repository;
+        if (!$token->getActiveAirdrop()) {
+            return false;
+        }
+
+        $participant = $this
+            ->getParticipantRepository()
+            ->getParticipantByUserAndToken($user, $token->getActiveAirdrop());
+
+        return null === $participant;
+    }
+
+    public function getAirdropRepository(): AirdropRepository
+    {
+        return $this->em->getRepository(Airdrop::class);
+    }
+
+    public function getParticipantRepository(): AirdropParticipantRepository
+    {
+        return $this->em->getRepository(AirdropParticipant::class);
     }
 }
