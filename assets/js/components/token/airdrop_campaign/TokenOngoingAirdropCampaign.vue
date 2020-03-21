@@ -13,7 +13,9 @@
                     <p class="m-0 text-white">Airdrop ands on {{ 1 }}</p>
                 </div>
                 <div class="col-3 text-right align-middle">
-                    <button class="btn btn-primary">
+                    <button
+                        @click="claimCampaign"
+                        class="btn btn-primary">
                         Participate
                     </button>
                 </div>
@@ -35,12 +37,10 @@ export default {
     },
     props: {
         tokenName: String,
-        isOwner: Boolean,
-        isTokenExchanged: Boolean,
-        isTokenNotDeployed: Boolean,
     },
     data() {
         return {
+            airdropCampaign: null,
         };
     },
     mounted: function() {
@@ -50,6 +50,9 @@ export default {
     watch: {
     },
     methods: {
+        claimCampaign: function() {
+
+        },
     },
 };
 </script>
