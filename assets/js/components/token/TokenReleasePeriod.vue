@@ -101,7 +101,7 @@ export default {
             released: 0,
             releasePeriod: 0,
             showTwoFactorModal: false,
-            hasLockin: false;
+            hasLockin: false,
         };
     },
     components: {
