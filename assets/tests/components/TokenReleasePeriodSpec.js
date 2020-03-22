@@ -28,13 +28,14 @@ describe('TokenReleasePeriod', () => {
     });
 
     describe('releasedDisabled', () => {
-        it('returns true if token is exchanged even if not deployed', (done) => {
+        it('returns true if token is exchanged and has lockin even if not deployed', (done) => {
             const localVue = mockVue();
             const wrapper = mount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
                     isTokenExchanged: true,
                     isTokenNotDeployed: true,
+                    hasLockin: true,
                 },
             });
 
@@ -53,6 +54,7 @@ describe('TokenReleasePeriod', () => {
                 propsData: {
                     isTokenExchanged: false,
                     isTokenNotDeployed: false,
+                    hasLockin: true,
                 },
             });
 
@@ -71,6 +73,21 @@ describe('TokenReleasePeriod', () => {
                 propsData: {
                     isTokenExchanged: false,
                     isTokenNotDeployed: true,
+                    hasLockin: true,
+                },
+            });
+
+            expect(wrapper.vm.releasedDisabled).to.equal(false);
+        });
+
+        it('returns false if token doesn\'t have lockin and is not deployed, even if it is exchanged', () => {
+            const localVue = mockVue();
+            const wrapper = mount(TokenReleasePeriod, {
+                localVue,
+                propsData: {
+                    isTokenExchanged: true,
+                    isTokenNotDeployed: false,
+                    hasLockin: false,
                 },
             });
 
