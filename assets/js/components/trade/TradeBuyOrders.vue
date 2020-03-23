@@ -21,23 +21,32 @@
                         <b-table v-if="hasOrders"
                             ref="table"
                             @row-clicked="orderClicked"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
                             :items="tableData"
                             :fields="fields"
                         >
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <span v-if="row.item.isAnonymous" class="d-inline-block truncate-name flex-grow-1">
+                                    <span
+                                        v-if="row.item.isAnonymous"
+                                        class="d-inline-block truncate-name flex-grow-1 c-pointer"
+                                        v-b-tooltip="popoverConfig"
+                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                    >
                                         {{ row.value }}
                                     </span>
-                                    <a v-else :href="row.item.traderUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
+                                    <a
+                                        v-else
+                                        :href="row.item.traderUrl"
+                                        class="d-flex flex-row flex-nowrap justify-content-between w-100"
+                                        v-b-tooltip="popoverConfig"
+                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                    >
+                                        <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
                                             {{ row.value }}
                                         </span>
                                         <img
                                             src="../../../img/avatar.png"
-                                            class="d-block flex-grow-0"
+                                            class="d-block flex-grow-0 pointer-events-none"
                                             alt="avatar">
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
@@ -75,17 +84,28 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin} from '../../mixins/';
+import {
+    LazyScrollTableMixin,
+    MoneyFilterMixin,
+    OrderClickedMixin,
+    RebrandingFilterMixin,
+    TraderHoveredMixin,
+} from '../../mixins/';
 
 export default {
     name: 'TradeBuyOrders',
-    mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
+    mixins: [
+        LazyScrollTableMixin,
+        MoneyFilterMixin,
+        OrderClickedMixin,
+        RebrandingFilterMixin,
+        TraderHoveredMixin,
+    ],
     props: {
+        fullOrdersList: [Array],
         ordersList: [Array],
         tokenName: String,
         fields: Array,
-        sortBy: String,
-        sortDesc: Boolean,
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,

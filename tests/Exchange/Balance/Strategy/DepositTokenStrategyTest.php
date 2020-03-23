@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\DepositTokenStrategy;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -20,7 +21,8 @@ class DepositTokenStrategyTest extends TestCase
         $strategy = new DepositTokenStrategy(
             $this->mockBalanceHandler($this->once(), $this->once()),
             $this->mockWallet(),
-            $this->mockEM($this->once())
+            $this->mockEM($this->once()),
+            $this->mockMoneyWrapper()
         );
 
         $strategy->deposit(
@@ -54,5 +56,13 @@ class DepositTokenStrategyTest extends TestCase
         $em->expects($invocation)->method('flush');
 
         return $em;
+    }
+
+    private function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        $mw = $this->createMock(MoneyWrapperInterface::class);
+        $mw->method("parse")->wilLReturn(new Money("100000000000000", new Currency('TOK')));
+
+        return $mw;
     }
 }

@@ -36,9 +36,7 @@ class MarketsController extends APIController
         MarketFactoryInterface $marketManager
     ): View {
 
-        /** @var  \App\Entity\User|null $currentUser */
-        $currentUser = $this->getUser();
-        $markets     = $marketManager->createUserRelated($currentUser);
+        $markets = $marketManager->createUserRelated($this->getUser());
 
         return $this->view($markets);
     }
@@ -47,27 +45,27 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
+     * @Rest\QueryParam(name="deployed")
      */
     public function getMarketsInfo(
         int $page,
         ParamFetcherInterface $request,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-
-        /** @var  \App\Entity\User|null $currentUser */
-        $currentUser = $this->getUser();
-        $markets = $request->get('user')
+        $deployed = !!$request->get('deployed');
+        $markets = $request->get('user') || $deployed
             ? $marketStatusManager->getUserMarketStatus(
-                $currentUser,
+                $this->getUser(),
                 ($page - 1) * self::OFFSET,
-                self::OFFSET
+                self::OFFSET,
+                $deployed
             )
             : $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,
-            'rows'    => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
-            'limit'   => self::OFFSET,
+            'rows' => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
+            'limit' => self::OFFSET,
         ]);
     }
 

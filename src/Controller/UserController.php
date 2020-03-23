@@ -63,9 +63,7 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
-        /** @var  \App\Entity\User|null $user*/
         $user = $this->getUser();
-
         $keys = $user
             ? $user->getApiKey()
             : null;
@@ -110,11 +108,8 @@ class UserController extends AbstractController
         Request $request,
         TwoFactorManagerInterface $twoFactorManager
     ): Response {
-        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
-
         $form = $this->createForm(TwoFactorType::class);
-
         $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
 
         if (!$isTwoFactor) {
@@ -201,10 +196,7 @@ class UserController extends AbstractController
     public function getBackupCodes(TwoFactorManagerInterface $twoFactorManager): array
     {
         $backupCodes = $twoFactorManager->generateBackupCodes();
-
-        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
-
         $user->setGoogleAuthenticatorBackupCodes($backupCodes);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
@@ -230,9 +222,8 @@ class UserController extends AbstractController
 
     private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
     {
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user */
         $user = $this->getUser();
-
         $passwordForm = $this->createForm(ChangePasswordType::class, $user);
         $passwordForm->handleRequest($request);
 
@@ -241,6 +232,7 @@ class UserController extends AbstractController
             $this->userManager->updateUser($user);
             $this->addFlash('success', 'Password was updated successfully');
             $this->eventDispatcher->dispatch(
+                FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
                 new FilterUserResponseEvent(
                     $user,
                     $request,

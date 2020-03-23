@@ -114,7 +114,9 @@ services:
 
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 
-    App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
+    App\Manager\TwoFactorManagerInterface:
+        class: App\Manager\TwoFactorManager
+        public: true
 
     App\Wallet\Withdraw\Communicator\AMQPCommunicator:
         arguments:
@@ -255,6 +257,7 @@ services:
         class: 'App\Consumers\DeployConsumer'
         arguments:
             $logger: '@logger'
+            $coinbaseApiTimeout: '%coinbase_api_timeout%'
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
@@ -281,6 +284,7 @@ services:
 
     balancer:
         class: 'App\Exchange\Balance\BalanceHandler'
+        public: true
         arguments:
             $logger: '@logger'
         tags:
@@ -351,11 +355,6 @@ services:
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
-
-    App\SmartContract\Config\Config:
-        arguments:
-            $mintmeAddress: "%mintme_address%"
-            $tokenQuantity: "%token_quantity%"
 
     App\Controller\API\WebSocketController:
         arguments:

@@ -356,7 +356,9 @@ class TokensController extends AbstractFOSRestController
         )->getAvailable();
 
         if ($token->getLockIn()) {
-            $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
+            $balance = $token->isDeployed()
+                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+                : $balance = $balance->subtract($token->getLockIn()->getAmountToRelease());
         }
 
         return $this->view($balance);
@@ -567,6 +569,10 @@ class TokensController extends AbstractFOSRestController
 
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
+        }
+
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+            throw new ApiBadRequestException('Token already deployed or deploying');
         }
 
         if (!$token->getLockIn()) {

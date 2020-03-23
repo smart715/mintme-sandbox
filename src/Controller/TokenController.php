@@ -9,6 +9,8 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
+use App\Manager\BlacklistManager;
+use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
@@ -43,6 +45,9 @@ class TokenController extends Controller
     /** @var ProfileManagerInterface */
     protected $profileManager;
 
+    /** @var BlacklistManagerInterface */
+    protected $blacklistManager;
+
     /** @var TokenManagerInterface */
     protected $tokenManager;
 
@@ -67,7 +72,8 @@ class TokenController extends Controller
         MarketFactoryInterface $marketManager,
         TraderInterface $trader,
         NormalizerInterface $normalizer,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        BlacklistManager $blacklistManager
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -76,6 +82,7 @@ class TokenController extends Controller
         $this->marketManager = $marketManager;
         $this->trader = $trader;
         $this->userActionLogger = $userActionLogger;
+        $this->blacklistManager = $blacklistManager;
 
         parent::__construct($normalizer);
     }
@@ -169,6 +176,10 @@ class TokenController extends Controller
         $token = new Token();
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
+
+        if ($this->blacklistManager->isBlacklisted($token->getName(), 'token')) {
+            $this->addFlash('danger', 'This value is not allowed');
+        }
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());

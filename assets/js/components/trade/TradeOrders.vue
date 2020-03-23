@@ -4,12 +4,11 @@
             <div class="col-12 col-xl-6 pr-xl-2 mt-3">
                 <trade-buy-orders
                     @update-data="updateBuyOrders"
+                    :full-orders-list="buyOrders"
                     :orders-list="filteredBuyOrders"
                     :orders-loaded="ordersLoaded"
                     :token-name="market.base.symbol"
                     :fields="fields"
-                    sort-by="price"
-                    :sort-desc="true"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
@@ -18,12 +17,11 @@
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
                     @update-data="updateSellOrders"
+                    :full-orders-list="sellOrders"
                     :orders-list="filteredSellOrders"
                     :orders-loaded="ordersLoaded"
                     :token-name="market.quote.symbol"
                     :fields="fields"
-                    sort-by="price"
-                    :sort-desc="false"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
@@ -134,6 +132,8 @@ export default {
                     side: order.side,
                     owner: order.owner,
                     isAnonymous: !order.maker.profile || order.maker.profile.anonymous,
+                    orderId: order.id,
+                    ownerId: order.maker.id,
                 };
             });
         },
@@ -142,15 +142,19 @@ export default {
         },
         groupByPrice: function(orders) {
             let filtered = [];
+
             let grouped = this.clone(orders).reduce((a, e) => {
-                if (a[e.price] === undefined) {
-                    a[e.price] = [];
+                let price = parseFloat(e.price);
+
+                if (a[price] === undefined) {
+                    a[price] = [];
                 }
-                a[e.price].push(e);
+                a[price].push(e);
                 return a;
             }, {});
 
             Object.values(grouped).forEach((e) => {
+                e.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
                 let obj = e.reduce((a, e) => {
                     a.owner = a.owner || e.maker.id === this.userId;
                     a.orders.push(e);
@@ -159,10 +163,8 @@ export default {
                     let amount = a.orders.filter((order) => order.maker.id === e.maker.id)
                         .reduce((a, e) => new Decimal(a).add(e.amount), 0);
 
-                    if (parseFloat(a.main.amount) < parseFloat(amount)) {
-                        a.main.amount = amount;
-                        a.main.order = e;
-                    }
+                    a.main.amount = amount;
+                    a.main.order = e;
 
                     return a;
                 }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});

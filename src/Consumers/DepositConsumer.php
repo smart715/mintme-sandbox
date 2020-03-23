@@ -125,7 +125,12 @@ class DepositConsumer implements ConsumerInterface
             }
 
             $strategy = $tradable instanceof Token
-                ? new DepositTokenStrategy($this->balanceHandler, $this->depositCommunicator, $this->em)
+                ? new DepositTokenStrategy(
+                    $this->balanceHandler,
+                    $this->depositCommunicator,
+                    $this->em,
+                    $this->moneyWrapper
+                )
                 : new DepositCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
             $balanceContext = new BalanceContext($strategy);

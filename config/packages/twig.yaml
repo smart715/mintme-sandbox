@@ -24,3 +24,4 @@ twig:
         mintme_coin: '%mintme_coin%'
         mintme_coin_link: '%mintme_coin_link%'
         minimum_volume_for_marketcap: '%minimum_volume_for_marketcap%'
+        landing_web_bonus: '%landing_web_bonus%'

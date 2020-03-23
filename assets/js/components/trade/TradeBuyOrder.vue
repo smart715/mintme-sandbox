@@ -109,7 +109,7 @@
                                             </template>
                                             <template slot="body">
                                                 Checking this box fetches current best market price
-                                                for which you can buy {{ market.base.symbol | rebranding }}.
+                                                for which you can buy {{ market.quote.symbol | rebranding }}.
                                             </template>
                                         </guide>
                                     </label>
@@ -212,9 +212,10 @@ export default {
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
+                    let symbol = this.rebrandingFunc(this.market.base.symbol);
                     this.showNotification({
                         result: 2,
-                        message: `Total amount has to be at least ${this.minTotalPrice} ${this.market.base.symbol}`,
+                        message: `Total amount has to be at least ${this.minTotalPrice} ${symbol}`,
                     });
                     return;
                 }

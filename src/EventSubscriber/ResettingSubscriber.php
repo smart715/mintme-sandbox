@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use App\Entity\User;
 use App\Mailer\MailerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\FOSUserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -23,14 +24,22 @@ class ResettingSubscriber implements EventSubscriberInterface
         return [
             FOSUserEvents::RESETTING_RESET_COMPLETED => 'sendPasswordResetMail',
             FOSUserEvents::CHANGE_PASSWORD_COMPLETED => 'sendPasswordResetMail',
+            FOSUserEvents::RESETTING_RESET_REQUEST => 'resetToken',
         ];
     }
 
-    public function sendPasswordResetMail(FilterUserResponseEvent $event): void
+    public function sendPasswordResetMail(FilterUserResponseEvent $event, string $eventName): void
     {
+        $resetting = FOSUserEvents::RESETTING_RESET_COMPLETED === $eventName;
+
         /** @var User */
         $user = $event->getUser();
 
-        $this->mailer->sendPasswordResetMail($user);
+        $this->mailer->sendPasswordResetMail($user, $resetting);
+    }
+
+    public function resetToken(GetResponseUserEvent $event): void
+    {
+        $event->getUser()->setConfirmationToken(null);
     }
 }
