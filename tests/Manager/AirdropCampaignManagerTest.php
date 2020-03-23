@@ -17,8 +17,8 @@ class AirdropCampaignManagerTest extends TestCase
     {
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->exactly(2))->method('persist');
-        $em->expects($this->exactly(2))->method('flush');
+        $em->expects($this->once())->method('persist');
+        $em->expects($this->once())->method('flush');
         /** @var Token|MockObject $em */
         $token = $this->createMock(Token::class);
 
