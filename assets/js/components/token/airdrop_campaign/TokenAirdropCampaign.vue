@@ -7,11 +7,11 @@
             <input
                 id="tokensAmount"
                 type="text"
-                v-model="tokensAmount"
+                v-model="tokensAmountFormatted"
                 :disabled="hasAirdropCampaign"
                 class="token-name-input w-100 px-2"
-                @keypress="checkInput(4)"
-                @paste="checkInput(4)"
+                @keypress="checkInput(TOK.subunit)"
+                @paste="checkInput(TOK.subunit)"
             >
         </div>
         <div class="col-12 pb-3 px-0">
@@ -71,7 +71,7 @@
                 class="btn btn-primary float-left"
                 @click="deleteAirdropCampaign"
             >
-                Delete
+                Cancel
             </button>
             <button
                 v-else
@@ -89,9 +89,10 @@
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import datePicker from 'vue-bootstrap-datetimepicker';
+import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
+import {toMoney} from '../../../utils';
 import {GENERAL} from '../../../utils/constants';
 
 export default {
@@ -109,6 +110,8 @@ export default {
         return {
             airdropCampaign: null,
             tokenBalance: 0,
+            minTokensAmount: '0.001',
+            minParticipantsAmount: 100,
             minTokenReward: '0.0001',
             loading: false,
             showEndDate: false,
@@ -128,6 +131,13 @@ export default {
         this.loadAirdropCampaign();
     },
     computed: {
+        tokensAmountFormatted: function() {
+            if (this.tokensAmount) {
+                return toMoney(this.tokensAmount);
+            }
+
+            return '';
+        },
         hasAirdropCampaign: function() {
             return null !== this.airdropCampaign
                 && 'object' === typeof this.airdropCampaign
@@ -138,13 +148,16 @@ export default {
         },
         isAmountValid: function() {
             if (this.tokensAmount > 0) {
-                return (new Decimal(this.tokensAmount)).lessThan(this.tokenBalance);
+                let tokensAmount = new Decimal(this.tokensAmount);
+
+                return tokensAmount.greaterThanOrEqualTo(this.minTokensAmount)
+                    && tokensAmount.lessThan(this.tokenBalance);
             }
 
             return false;
         },
         isParticipantsAmountValid: function() {
-            return this.participantsAmount > 0;
+            return this.participantsAmount >= this.minParticipantsAmount;
         },
         isDateEndValid: function() {
             return !this.showEndDate || this.isDateValid;

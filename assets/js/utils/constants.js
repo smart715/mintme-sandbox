@@ -57,6 +57,11 @@ export const WEB = {
     subunit: 4,
 };
 
+export const TOK = {
+    symbol: 'TOK',
+    subunit: 4,
+};
+
 export const BTC = {
     symbol: 'BTC',
     subunit: 8,
