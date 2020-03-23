@@ -47,7 +47,7 @@ describe('TokenFacebookAddress', () => {
         expect(wrapper.vm.computedAddress).to.be.equal('Add Facebook address');
     });
 
-    it('should be equal "foo address" when address props is not blank', () => {
+    it('should equal to address props when address props is not empty', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             mocks: {
                 $routing,
