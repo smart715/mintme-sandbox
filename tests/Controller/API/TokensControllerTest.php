@@ -55,7 +55,7 @@ class TokensControllerTest extends WebTestCase
 
         $this->client->request('POST', '/api/tokens/' . $tokName .'/lock-in', [
             'released' => '60',
-            'releasePeriod' => '10',
+            'releasePeriod' => 10,
         ]);
 
         /** @var Token $token */
@@ -64,7 +64,7 @@ class TokensControllerTest extends WebTestCase
         $this->assertEquals(
             [
                 $token->getLockIn()->getFrozenAmount()->getAmount(),
-                $token->getLockIn()->getReleasedAtStart(),
+                $token->getLockIn()->getReleasedAtStart()->getAmount(),
                 $token->getLockIn()->getReleasePeriod(),
                 $token->getLockIn()->getHourlyRate()->getAmount(),
             ],
