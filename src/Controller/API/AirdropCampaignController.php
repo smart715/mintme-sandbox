@@ -57,7 +57,6 @@ class AirdropCampaignController extends AbstractFOSRestController
         Request $request
     ): View {
         $token = $this->fetchToken($tokenName);
-        $amount = (string)$request->get('amount');
         $amountObj = $moneyWrapper->parse(
             (string)$request->get('amount'),
             MoneyWrapper::TOK_SYMBOL
@@ -76,14 +75,14 @@ class AirdropCampaignController extends AbstractFOSRestController
             ? new \DateTimeImmutable($request->get('endDate'))
             : null;
 
-        $airdrop = $this->airdropCampaignManager->createAirdrop(
+        $this->airdropCampaignManager->createAirdrop(
             $token,
-            $amount,
+            $moneyWrapper->format($amountObj),
             $participants,
             $endDate
         );
 
-        return $this->view($airdrop, Response::HTTP_ACCEPTED);
+        return $this->view(null, Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -102,17 +101,33 @@ class AirdropCampaignController extends AbstractFOSRestController
         return $this->view(null, Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{tokenName}/claim", name="claim_airdrop_campaign", options={"expose"=true})
+     */
+    public function claimAirdropCampaign(string $tokenName): View
+    {
+        $token = $this->fetchToken($tokenName);
+
+        if (!$token->getActiveAirdrop()) {
+            throw $this->createNotFoundException('Token does not have active airdrop campaign.');
+        }
+
+        $this->airdropCampaignManager->claimAirdropCampaign(
+            $this->getUser(),
+            $token
+        );
+
+        return $this->view(null, Response::HTTP_ACCEPTED);
+    }
+
     private function fetchToken(string $tokenName): Token
     {
         /** @var Token $token */
         $token = $this->tokenManager->findByName($tokenName);
 
         if (!$token instanceof Token) {
-            throw $this->createNotFoundException('Token does not exist');
-        }
-
-        if ($token !== $this->tokenManager->getOwnToken()) {
-            throw new AccessDeniedException();
+            throw $this->createNotFoundException('Token does not exist.');
         }
 
         return $token;

@@ -7,7 +7,6 @@ use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
-use App\Repository\AirdropCampaign\AirdropRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
@@ -15,9 +14,13 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var AirdropParticipantRepository */
+    private $participantRepository;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->em = $entityManager;
+        $this->participantRepository = $entityManager->getRepository(AirdropParticipant::class);
     }
 
     public function createAirdrop(
@@ -25,7 +28,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         string $amount,
         int $participants,
         ?\DateTimeImmutable $endDate = null
-    ): Airdrop {
+    ): void {
         $this->deleteActiveAirdrop($token);
 
         $airdrop = new Airdrop();
@@ -40,8 +43,6 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         $this->em->persist($airdrop);
         $this->em->flush();
-
-        return $airdrop;
     }
 
     public function deleteAirdrop(Airdrop $airdrop): void
@@ -50,6 +51,8 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         $this->em->persist($airdrop);
         $this->em->flush();
+
+        // TODO: Viabtc - return all tokens that were left if any
     }
 
     public function deleteActiveAirdrop(Token $token): void
@@ -61,26 +64,32 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
     }
 
-    public function showAirdropCampaign(User $user, Token $token): bool
+    public function showAirdropCampaign(?User $user, Token $token): bool
     {
-        if (!$token->getActiveAirdrop()) {
-            return false;
+        if ($user instanceof User && $token->getActiveAirdrop() instanceof Airdrop) {
+            $participant = $this->participantRepository
+                ->getParticipantByUserAndToken($user, $token->getActiveAirdrop());
+
+            return null === $participant;
         }
 
-        $participant = $this
-            ->getParticipantRepository()
-            ->getParticipantByUserAndToken($user, $token->getActiveAirdrop());
-
-        return null === $participant;
+        return false;
     }
 
-    public function getAirdropRepository(): AirdropRepository
+    public function claimAirdropCampaign(User $user, Token $token): void
     {
-        return $this->em->getRepository(Airdrop::class);
-    }
+        /** @var Airdrop $activeAirdrop */
+        $activeAirdrop = $token->getActiveAirdrop();
+        $activeAirdrop->incrementActualParticipants();
 
-    public function getParticipantRepository(): AirdropParticipantRepository
-    {
-        return $this->em->getRepository(AirdropParticipant::class);
+        $participant = new AirdropParticipant();
+        $participant->setUser($user);
+        $participant->setAirdrop($activeAirdrop);
+
+        $this->em->persist($activeAirdrop);
+        $this->em->persist($participant);
+        $this->em->flush();
+
+        // TODO: Viabtc - send participant airdrop reward
     }
 }

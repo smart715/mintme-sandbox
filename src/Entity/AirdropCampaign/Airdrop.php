@@ -68,16 +68,21 @@ class Airdrop
      * @ORM\Column(name="actual_amount", type="string", length=100, nullable=true)
      * @var string|null
      */
-    private $actualAmount;
+    private $actualAmount = '0';
 
     /**
      * @ORM\Column(name="actual_participants", type="integer", nullable=true)
+     * @Groups({"API"})
      * @var int|null
      */
-    private $actualParticipants;
+    private $actualParticipants = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\AirdropParticipant", mappedBy="airdrop", orphanRemoval=true)
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\AirdropCampaign\AirdropParticipant",
+     *     mappedBy="airdrop",
+     *     orphanRemoval=true
+     * )
      * @var ArrayCollection
      */
     private $claimedParticipants;
@@ -176,6 +181,11 @@ class Airdrop
         return $this;
     }
 
+    public function incrementActualParticipants(): ?int
+    {
+        return $this->actualParticipants += 1;
+    }
+
     public function getClaimedParticipants(): Collection
     {
         return $this->claimedParticipants;
@@ -198,13 +208,5 @@ class Airdrop
         }
 
         return $this;
-    }
-
-    public function getAirdropReward(): string
-    {
-        $amount = new Money($this->amount, new Currency(MoneyWrapper::TOK_SYMBOL));
-        $reward = $amount->divide($this->participants, Money::ROUND_HALF_DOWN);
-
-        return $reward->getAmount();
     }
 }

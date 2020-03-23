@@ -13,7 +13,8 @@ interface AirdropCampaignManagerInterface
         string $amount,
         int $participants,
         ?\DateTimeImmutable $endDate = null
-    ): Airdrop;
+    ): void;
     public function deleteAirdrop(Airdrop $airdrop): void;
-    public function showAirdropCampaign(User $user, Token $token): bool;
+    public function showAirdropCampaign(?User $user, Token $token): bool;
+    public function claimAirdropCampaign(User $user, Token $token): void;
 }
