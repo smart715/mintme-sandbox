@@ -64,13 +64,13 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
     }
 
-    public function showAirdropCampaign(?User $user, Token $token): bool
+    public function checkIfUserClaimed(?User $user, Token $token): bool
     {
         if ($user instanceof User && $token->getActiveAirdrop() instanceof Airdrop) {
             $participant = $this->participantRepository
                 ->getParticipantByUserAndToken($user, $token->getActiveAirdrop());
 
-            return null === $participant;
+            return $participant instanceof AirdropParticipant;
         }
 
         return false;

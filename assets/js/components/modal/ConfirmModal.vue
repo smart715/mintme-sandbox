@@ -19,6 +19,7 @@
                         <slot name="confirm">Confirm</slot>
                     </button>
                     <span
+                        v-if="showCancelButton"
                         class="btn-cancel pl-3 c-pointer"
                         @click="onCancel">
                         <slot name="cancel">Cancel</slot>
@@ -38,6 +39,10 @@ export default {
     },
     props: {
         visible: Boolean,
+        showCancelButton: {
+            type: Boolean,
+            default: true,
+        },
     },
     methods: {
         closeModal: function() {

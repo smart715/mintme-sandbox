@@ -21,10 +21,23 @@
                 </div>
                 <div class="col-3 text-right align-self-center mx-auto">
                     <button
-                        @click="claimAirdropCampaign"
+                        @click="showModal = true"
                         class="btn btn-primary">
                         Participate
                     </button>
+                    <confirm-modal
+                            :visible="showModal"
+                            :show-cancel-button="false"
+                            @confirm="claimAirdropCampaign"
+                            @close="showModal = false">
+                        <p v-if="userAlreadyClaimed">
+                            You already claimed tokens from this airdrop.
+                        </p>
+                        <p v-else class="text-white modal-title pt-2">
+                            Are you sure you want to claim {{ tokenName }}?
+                        </p>
+                        <template v-if="userAlreadyClaimed" v-slot:confirm>OK</template>
+                    </confirm-modal>
                 </div>
             </div>
         </div>
@@ -37,6 +50,7 @@
 <script>
 import moment from 'moment';
 import Decimal from 'decimal.js';
+import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {TOK} from '../../../utils/constants';
 import {toMoney} from '../../../utils';
@@ -45,12 +59,15 @@ export default {
     name: 'TokenOngoingAirdropCampaign',
     mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
     components: {
+        ConfirmModal,
     },
     props: {
         tokenName: String,
+        userAlreadyClaimed: Boolean,
     },
     data() {
         return {
+            showModal: false,
             airdropCampaign: null,
             loaded: false,
         };
@@ -98,13 +115,16 @@ export default {
                 });
         },
         claimAirdropCampaign: function() {
+            if (this.userAlreadyClaimed) {
+                return;
+            }
+
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
             }))
                 .then(() => {
                     // Show success message
-                    // Hide campaign
-                    this.$refs['ongoing-airdrop-campaign'].hide();
+                    this.userAlreadyClaimed = true;
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');

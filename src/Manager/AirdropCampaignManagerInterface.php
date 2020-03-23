@@ -15,6 +15,6 @@ interface AirdropCampaignManagerInterface
         ?\DateTimeImmutable $endDate = null
     ): void;
     public function deleteAirdrop(Airdrop $airdrop): void;
-    public function showAirdropCampaign(?User $user, Token $token): bool;
+    public function checkIfUserClaimed(?User $user, Token $token): bool;
     public function claimAirdropCampaign(User $user, Token $token): void;
 }

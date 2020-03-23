@@ -205,7 +205,7 @@ export default {
                             this.endDate = moment(this.airdropCampaign.endDate).toDate();
                         }
                     } else {
-                        this.setDefaultValues();
+                        this.setDefaultValues(false);
                     }
                     this.loading = false;
                 })
@@ -255,7 +255,7 @@ export default {
             }))
                 .then(() => {
                     this.airdropCampaign = null;
-                    this.setDefaultValues();
+                    this.setDefaultValues(true);
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -263,8 +263,8 @@ export default {
                     this.sendLogs('error', 'Can not delete airdrop.', err);
                 });
         },
-        setDefaultValues: function() {
-            if (this.showEndDate) {
+        setDefaultValues: function(hideDate) {
+            if (this.showEndDate && hideDate) {
                 this.showEndDate = false;
                 this.$refs['end-date-checkbox'].click();
             }

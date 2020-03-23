@@ -88,13 +88,13 @@ class AirdropCampaignManagerTest extends TestCase
 
         $airdropManager = new AirdropCampaignManager($em);
 
-        $this->assertFalse($airdropManager->showAirdropCampaign(null, $token));
-        $this->assertFalse($airdropManager->showAirdropCampaign($user, $token));
+        $this->assertFalse($airdropManager->checkIfUserClaimed(null, $token));
+        $this->assertFalse($airdropManager->checkIfUserClaimed($user, $token));
 
         $airdrop = new Airdrop();
         $airdrop->setStatus(Airdrop::STATUS_ACTIVE);
         $token->expects($this->exactly(2))->method('getActiveAirdrop')->willReturn($airdrop);
 
-        $this->assertTrue($airdropManager->showAirdropCampaign($user, $token));
+        $this->assertTrue($airdropManager->checkIfUserClaimed($user, $token));
     }
 }
