@@ -92,6 +92,7 @@ export default {
             loading: true,
             released: 0,
             releasePeriod: 0,
+            hasLockin: false,
         };
     },
     components: {
@@ -103,7 +104,7 @@ export default {
             return 100 !== this.released;
         },
         releasedDisabled: function() {
-            return (0 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
+            return (this.hasLockin && 0 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
         },
         releasePeriodDisabled: function() {
             return !this.isTokenNotDeployed;
@@ -115,18 +116,18 @@ export default {
         }))
             .then((res) => {
                 if (HTTP_OK === res.status) {
+                    this.hasLockin = true;
                     this.releasePeriod = res.data.releasePeriod;
 
                     let allTokens = new Decimal(res.data.frozenAmount).add(res.data.releasedAmount);
                     let percent = new Decimal(res.data.releasedAmount).div(allTokens.toString()).mul(100).floor();
                     this.released = percent.toNumber();
-
-                    this.loading = false;
                 } else if (HTTP_NO_CONTENT === res.status) {
                     this.releasePeriod = 10;
                     this.released = 10;
-                    this.loading = false;
                 }
+
+                this.loading = false;
             })
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
