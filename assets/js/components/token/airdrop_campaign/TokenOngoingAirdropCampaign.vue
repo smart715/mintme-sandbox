@@ -1,25 +1,35 @@
 <template>
-    <div class="col-md-10 bg-green">
-        <div class="container">
+    <div
+        ref="ongoing-airdrop-campaign"
+        class="col-md-10 bg-green">
+        <div v-if="loaded" class="container">
             <div class="row">
-                <div class="col-3 align-middle">
-                    <h3>Ongoing airdrop!</h3>
+                <div class="col-3 text-right">
+                    <span class="font-size-h3 align-self-center mx-auto">Ongoing airdrop!</span>
                 </div>
                 <div class="col-6 align-middle">
                     <p class="m-0 text-white">
-                        For first {{ 1 }} participants {{ 1 }} {{ tokenName }} for free.
-                        Currently {{ 1 }}/{{ 100 }} participants.
+                        For first {{ airdropCampaign.participants }} participants
+                        {{ airdropReward }} {{ tokenName }} for free.
+                        Currently {{ actualParticipants }}/{{ airdropCampaign.participants }} participants.
                     </p>
-                    <p class="m-0 text-white">Airdrop ands on {{ 1 }}</p>
+                    <p
+                        v-if="showEndDate"
+                        class="m-0 text-white">
+                        Airdrop ands on {{ andsDate }}
+                    </p>
                 </div>
-                <div class="col-3 text-right align-middle">
+                <div class="col-3 text-right align-self-center mx-auto">
                     <button
-                        @click="claimCampaign"
+                        @click="claimAirdropCampaign"
                         class="btn btn-primary">
                         Participate
                     </button>
                 </div>
             </div>
+        </div>
+        <div v-else class="text-center">
+            <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
         </div>
     </div>
 </template>
@@ -28,7 +38,8 @@
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
-import {GENERAL} from '../../../utils/constants';
+import {TOK} from '../../../utils/constants';
+import {toMoney} from '../../../utils';
 
 export default {
     name: 'TokenOngoingAirdropCampaign',
@@ -41,17 +52,64 @@ export default {
     data() {
         return {
             airdropCampaign: null,
+            loaded: false,
         };
     },
     mounted: function() {
+        this.getAirdropCampaign();
     },
     computed: {
+        actualParticipants: function() {
+            return this.airdropCampaign.actualParticipants
+                ? this.airdropCampaign.actualParticipants
+                : 0;
+        },
+        airdropReward: function() {
+            if (this.loaded) {
+                let airdropReward = new Decimal(this.airdropCampaign.amount)
+                    .dividedBy(new Decimal(this.airdropCampaign.participants));
+
+                return toMoney(airdropReward, TOK.subunit);
+            }
+
+            return 0;
+        },
+        showEndDate: function() {
+            return null !== this.airdropCampaign.endDate && '' !== this.airdropCampaign.endDate;
+        },
+        andsDate: function() {
+            return moment(this.airdropCampaign.endDate).format('D MMMM YYYY');
+        },
     },
     watch: {
     },
     methods: {
-        claimCampaign: function() {
-
+        getAirdropCampaign: function() {
+            this.$axios.retry.get(this.$routing.generate('get_airdrop_campaign', {
+                tokenName: this.tokenName,
+            }))
+                .then((result) => {
+                    this.airdropCampaign = result.data;
+                    this.loaded = true;
+                })
+                .catch((err) => {
+                    this.notifyError('Something went wrong. Try to reload the page.');
+                    this.sendLogs('error', 'Can not load airdrop campaign.', err);
+                });
+        },
+        claimAirdropCampaign: function() {
+            return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
+                tokenName: this.tokenName,
+            }))
+                .then(() => {
+                    // Show success message
+                    // Hide campaign
+                    this.$refs['ongoing-airdrop-campaign'].hide();
+                })
+                .catch((err) => {
+                    this.notifyError('Something went wrong. Try to reload the page.');
+                    this.sendLogs('error', 'Can not create API Client', err);
+                });
         },
     },
 };
