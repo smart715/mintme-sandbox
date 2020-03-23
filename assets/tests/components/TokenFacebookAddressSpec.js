@@ -40,28 +40,28 @@ describe('TokenFacebookAddress', () => {
             },
             propsData: {
                 address: '',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                appId: 'foo id',
+                tokenName: 'foo token name',
            },
         });
         expect(wrapper.vm.computedAddress).to.be.equal('Add Facebook address');
     });
 
-    it('should be equal "Add Test address" when address props is not blank', () => {
+    it('should be equal "foo address" when address props is not blank', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             mocks: {
                 $routing,
             },
             propsData: {
-                address: 'Add Test address',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                address: 'foo address',
+                appId: 'foo id',
+                tokenName: 'foo token name',
             },
         });
-        expect(wrapper.vm.computedAddress).to.be.equal('Add Test address');
+        expect(wrapper.vm.computedAddress).to.be.equal('foo address');
     });
 
-    it('should be contain "AddressTestLength012345678901234567..." in the address field', () => {
+    it('should truncate long address in the address field', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             filters: {
                 truncate: function(val, max) {
@@ -72,12 +72,12 @@ describe('TokenFacebookAddress', () => {
                 $routing,
             },
             propsData: {
-                address: 'AddressTestLength012345678901234567890',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                address: 'FooAddressLength01234567890123456789012345',
+                appId: 'foo id',
+                tokenName: 'foo token name',
             },
         });
-        expect(wrapper.html()).to.contain('AddressTestLength012345678901234567...');
+        expect(wrapper.html()).to.contain('FooAddressLength0123456789012345678...');
     });
 
     it('should be blank when pages array is empty', () => {
@@ -87,32 +87,32 @@ describe('TokenFacebookAddress', () => {
             },
             propsData: {
                 address: '',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                appId: 'foo id',
+                tokenName: 'foo token name',
             },
         });
         expect(wrapper.vm.selectedUrl).to.be.deep.equal('');
     });
 
-    it('should be contain "test_pages_name" and "test_pages_link" when pages array props contains value', () => {
+    it('should select index zero of pages if pages props not empty', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             mocks: {
                 $routing,
             },
             data() {
                 return {
-                    pages: [{link: 'test_pages_link', name: 'test_pages_name'}],
+                    pages: [{link: 'foo.com', name: 'foo name'}],
                 };
             },
             propsData: {
                 address: '',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                appId: 'foo id',
+                tokenName: 'foo token name',
             },
         });
-        expect(wrapper.vm.selectedUrl).to.be.equal('test_pages_link');
-        expect(wrapper.find('option').attributes('value')).to.be.equal('test_pages_link');
-        expect(wrapper.html()).to.contain('test_pages_name');
+        expect(wrapper.vm.selectedUrl).to.be.equal('foo.com');
+        expect(wrapper.find('option').attributes('value')).to.be.equal('foo.com');
+        expect(wrapper.html()).to.contain('foo name');
     });
 
     it('do $axios request and emit "saveFacebook" when the function saveFacebookAddress() is called', (done) => {
@@ -126,8 +126,8 @@ describe('TokenFacebookAddress', () => {
             },
             propsData: {
                 address: '',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                appId: 'foo id',
+                tokenName: 'foo token name',
             },
         });
         wrapper.vm.saveFacebookAddress();
@@ -144,7 +144,7 @@ describe('TokenFacebookAddress', () => {
         });
     });
 
-    it('emit "savePageTest" when the function savePage() is called', () => {
+    it('call saveFacebookAddress() when savePage() is called', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             mocks: {
                 $routing,
@@ -156,8 +156,8 @@ describe('TokenFacebookAddress', () => {
             },
             propsData: {
                 address: '',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                appId: 'foo id',
+                tokenName: 'foo token name',
             },
         });
         wrapper.vm.savePage();
@@ -165,7 +165,7 @@ describe('TokenFacebookAddress', () => {
         expect(wrapper.emitted('savePageTest').length).to.be.equal(1);
     });
 
-    it('emit "deleteAddressTest" when the function deleteAddress() is called', () => {
+    it('call saveFacebookAddress() when deleteAddress() is called', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
             mocks: {
                 $routing,
@@ -177,11 +177,11 @@ describe('TokenFacebookAddress', () => {
             },
             propsData: {
                 address: '',
-                appId: 'fooId',
-                tokenName: 'fooTokenName',
+                appId: 'foo id',
+                tokenName: 'foo token name',
             },
         });
-        wrapper.vm.selectedUrl = 'foo';
+        wrapper.vm.selectedUrl = 'foo.com';
         wrapper.vm.deleteAddress();
 
         expect(wrapper.vm.selectedUrl).to.be.deep.equal('');
