@@ -381,9 +381,6 @@
         ]
     },
     "php-webdriver/webdriver": {
-        "version": "1.8.1"
-    },
-    "php-webdriver/webdriver": {
         "version": "1.7.1"
     },
     "phpcollection/phpcollection": {
@@ -399,7 +396,7 @@
         "version": "1.0.1"
     },
     "phpoption/phpoption": {
-        "version": "1.7.2"
+        "version": "1.7.3"
     },
     "phpseclib/phpseclib": {
         "version": "2.0.23"
