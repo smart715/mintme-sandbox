@@ -14,7 +14,7 @@ export const HTTP_NO_CONTENT = 204;
 
 export const GENERAL = {
     precision: 8,
-    dateFormat: 'DD.MM.YYYY HH:m:s',
+    dateFormat: 'DD.MM.YYYY HH:mm:ss',
 };
 
 export const webSymbol = 'WEB';
