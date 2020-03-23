@@ -277,7 +277,7 @@ describe('WithdrawModal', () => {
         expect(wrapper.vm.amount).to.be.equal('0');
     });
 
-    it('do $axios request and emit "withdraw" when the function closeModal() is called and when data is correct', (done) => {
+    it('do $axios request and emit "withdraw" when the function onWithdraw() is called and when data is correct', (done) => {
         const localVue = mockVue();
         propsForTestCorrectlyRenders.currency = 'BTC';
         const wrapper = shallowMount(WithdrawModal, {
