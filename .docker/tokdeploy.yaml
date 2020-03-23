@@ -11,3 +11,4 @@ webchaind_ipc: '/src/webchain_root/webchaind.ipc'
 tokenimpladdress: '0x4462181c372ba51c217f568545b7b622c7c0eb4e'
 mintme_account:   '0x9139413fe7247da35ae0797f9270271ba758d248'
 mintme_address:   '0x9139413fe7247da35ae0797f9270271ba758d248'
+gas_limit: 90000
