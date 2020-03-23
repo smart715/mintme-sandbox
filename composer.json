@@ -23,6 +23,7 @@
         "fzaninotto/faker": "^1.8",
         "graze/guzzle-jsonrpc": "^3.2",
         "incenteev/composer-parameter-handler": "^2.1",
+        "jms/serializer-bundle": "^2",
         "laminas/laminas-code": "^3.4",
         "laminas/laminas-eventmanager": "^3.2",
         "moneyphp/money": "^3.1",
