@@ -17,7 +17,7 @@
                                         <i class="far fa-eye"></i>
                                     </span>
                                     {{ form_row(passwordForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
-                                    <div class="pwdmeter" v-if="false"></div>
+                                    <div class="pwdmeter" v-if="false"><meter max="5" value="0"></meter></div>
                                 </passwordmeter>
                                 <button type="submit" :disabled="disabled" class="btn btn-primary">Save</button>
                             {{ form_end(passwordForm) }}
