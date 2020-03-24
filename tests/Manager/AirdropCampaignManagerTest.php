@@ -3,6 +3,7 @@
 namespace App\Tests\Manager;
 
 use App\Entity\AirdropCampaign\Airdrop;
+use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\AirdropCampaignManager;
@@ -72,7 +73,7 @@ class AirdropCampaignManagerTest extends TestCase
         $repository
             ->expects($this->once())
             ->method('getParticipantByUserAndToken')
-            ->willReturn(null);
+            ->willReturn(new AirdropParticipant());
 
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
