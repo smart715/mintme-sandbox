@@ -36,6 +36,7 @@ class Order extends AbstractOrder
         string $status,
         ?Money $fee = null,
         ?int $timestamp = null,
+        ?int $createdTimestamp = null,
         int $referralId = 0
     ) {
         $this->id = $id;
@@ -48,6 +49,7 @@ class Order extends AbstractOrder
         $this->status = $status;
         $this->fee = $fee;
         $this->timestamp = $timestamp;
+        $this->createdTimestamp = $createdTimestamp;
         $this->referralId = $referralId;
     }
 

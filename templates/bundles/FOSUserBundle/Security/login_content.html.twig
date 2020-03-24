@@ -1,9 +1,7 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
-
 {% set formHeader = "Log In" %}
 {% set featured = true %}
-
 {% block formBody %}
     <form action="{{ path("login") }}" method="post">
         {% if app.session.flashbag.peekAll() is not empty %}
@@ -19,7 +17,13 @@
         {% elseif error %}
             <div class="row">
                 <div class="col">
-                    <div class="p-2 mb-2 bg-danger text-center text-white">Invalid credentials.</div>
+                {% if error.message == 'Bad credentials.' %}
+                    <div class="p-2 mb-2 bg-danger text-center text-white"> Invalid Credentials.</div>
+                {% elseif error.message == 'User account is disabled.' %}
+                    <div class="p-2 mb-2 bg-danger text-center text-white">Your account is locked, please contact support. </div>
+                {% else %}
+                    <div class="p-2 mb-2 bg-danger text-center text-white">{{error.message}}</div>
+                {% endif %}
                 </div>
             </div>
         {% endif %}
