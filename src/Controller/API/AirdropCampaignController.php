@@ -75,14 +75,16 @@ class AirdropCampaignController extends AbstractFOSRestController
             ? new \DateTimeImmutable($request->get('endDate'))
             : null;
 
-        $this->airdropCampaignManager->createAirdrop(
+        $airdrop = $this->airdropCampaignManager->createAirdrop(
             $token,
             $moneyWrapper->format($amountObj),
             $participants,
             $endDate
         );
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $this->view([
+            'id' => $airdrop->getId(),
+        ], Response::HTTP_ACCEPTED);
     }
 
     /**

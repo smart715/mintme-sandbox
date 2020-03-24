@@ -1,86 +1,105 @@
 <template>
     <div>
-        <div class="col-12 pb-3 px-0">
-            <label for="tokensAmount" class="d-block text-left">
-                Amount of tokens for airdrop:
-            </label>
-            <input
-                id="tokensAmount"
-                type="text"
-                v-model="tokensAmountFormatted"
-                :disabled="hasAirdropCampaign"
-                class="token-name-input w-100 px-2"
-                @keypress="checkInput(TOK.subunit)"
-                @paste="checkInput(TOK.subunit)"
-            >
-        </div>
-        <div class="col-12 pb-3 px-0">
-            <label for="participantsAmount" class="d-block text-left">
-                Amount of participants:
-            </label>
-            <input
-                id="participantsAmount"
-                type="text"
-                v-model="participantsAmount"
-                :disabled="hasAirdropCampaign"
-                class="token-name-input w-100 px-2"
-                @keypress="checkInput(false)"
-                @paste="checkInput(false)"
-            >
-        </div>
-        <div v-if="!hasAirdropCampaign" class="col-12 pb-3 px-0">
-            <label class="custom-control custom-checkbox pb-0">
-                <input
-                    v-b-toggle.collapse-and-date
-                    v-model="showEndDate"
-                    type="checkbox"
-                    id="showEndDate"
-                    ref="end-date-checkbox"
-                    class="custom-control-input"
-                >
-                <label
-                    class="custom-control-label pb-0"
-                    for="showEndDate">
-                    Add end date
-                </label>
-            </label>
-        </div>
-        <b-collapse id="collapse-and-date">
-            <div class="w-50 pb-3 px-0">
-                <label for="endDate" class="d-block text-left">
-                    End date:
-                </label>
-                <date-picker
-                    v-model="endDate"
-                    id="endDate"
-                    :disabled="!showEndDate || hasAirdropCampaign"
-                    :config="options">
-                </date-picker>
-            </div>
-        </b-collapse>
-        <div class="col-12 px-0 clearfix">
-            <p>{{ errorMessage }}</p>
+        <div
+            v-if="loading"
+            class="text-center"
+        >
             <font-awesome-icon
-                    v-if="loading"
-                    icon="circle-notch"
-                    spin
-                    class="loading-spinner" fixed-width
+                icon="circle-notch"
+                spin
+                class="loading-spinner"
+                fixed-width
             />
-            <button
-                v-else-if="hasAirdropCampaign"
-                class="btn btn-primary float-left"
-                @click="deleteAirdropCampaign"
-            >
-                Cancel
-            </button>
-            <button
-                v-else
-                class="btn btn-primary float-left"
-                :disabled="btnDisabled"
-                @click="createAirdropCampaign"
-            >
-                Save
-            </button>
+        </div>
+        <div v-else-if="hasAirdropCampaign" class="col-12 pb-3 px-0">
+            <div>
+                <span
+                    class="btn-cancel px-0 c-pointer m-1"
+                    @click="showModal = true"
+                >
+                    End this airdrop
+                </span>
+                <confirm-modal
+                    :visible="showModal"
+                    @confirm="deleteAirdropCampaign"
+                    @close="showModal = false">
+                    <p class="text-white modal-title pt-2">
+                        Are you sure?
+                    </p>
+                    <template v-slot:confirm>Yes</template>
+                    <template v-slot:cancel>No</template>
+                </confirm-modal>
+            </div>
+        </div>
+        <div v-else>
+            <div class="col-12 pb-3 px-0">
+                <label for="tokensAmount" class="d-block text-left">
+                    Amount of tokens for airdrop:
+                </label>
+                <input
+                    id="tokensAmount"
+                    type="text"
+                    v-model="tokensAmountFormatted"
+                    :disabled="hasAirdropCampaign"
+                    class="token-name-input w-100 px-2"
+                    @keypress="checkInput(TOK.subunit)"
+                    @paste="checkInput(TOK.subunit)"
+                >
+            </div>
+            <div class="col-12 pb-3 px-0">
+                <label for="participantsAmount" class="d-block text-left">
+                    Amount of participants:
+                </label>
+                <input
+                    id="participantsAmount"
+                    type="text"
+                    v-model="participantsAmount"
+                    :disabled="hasAirdropCampaign"
+                    class="token-name-input w-100 px-2"
+                    @keypress="checkInput(false)"
+                    @paste="checkInput(false)"
+                >
+            </div>
+            <div v-if="!hasAirdropCampaign" class="col-12 pb-3 px-0">
+                <label class="custom-control custom-checkbox pb-0">
+                    <input
+                        v-b-toggle.collapse-and-date
+                        v-model="showEndDate"
+                        type="checkbox"
+                        id="showEndDate"
+                        ref="end-date-checkbox"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="showEndDate">
+                        Add end date
+                    </label>
+                </label>
+            </div>
+            <b-collapse id="collapse-and-date">
+                <div class="w-50 pb-3 px-0">
+                    <label for="endDate" class="d-block text-left">
+                        End date:
+                    </label>
+                    <date-picker
+                        v-model="endDate"
+                        id="endDate"
+                        :disabled="!showEndDate || hasAirdropCampaign"
+                        :config="options">
+                    </date-picker>
+                </div>
+            </b-collapse>
+            <div class="col-12 px-0 clearfix">
+                <p>{{ errorMessage }}</p>
+                <button
+                    class="btn btn-primary float-left"
+                    :disabled="btnDisabled"
+                    @click="createAirdropCampaign"
+                >
+                    Save
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -91,15 +110,17 @@ import Decimal from 'decimal.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {toMoney} from '../../../utils';
-import {GENERAL} from '../../../utils/constants';
+import {GENERAL, STATUS_ACTIVE} from '../../../utils/constants';
 
 export default {
     name: 'TokenAirdropCampaign',
     mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
     components: {
         datePicker,
+        ConfirmModal,
     },
     props: {
         tokenName: String,
@@ -108,7 +129,8 @@ export default {
     },
     data() {
         return {
-            airdropCampaign: null,
+            showModal: false,
+            airdropCampaignId: null,
             tokenBalance: 0,
             minTokensAmount: '0.001',
             minParticipantsAmount: 100,
@@ -139,9 +161,7 @@ export default {
             return '';
         },
         hasAirdropCampaign: function() {
-            return null !== this.airdropCampaign
-                && 'object' === typeof this.airdropCampaign
-                && this.airdropCampaign.hasOwnProperty('id');
+            return parseInt(this.airdropCampaignId) > 0;
         },
         btnDisabled: function() {
             return !(this.isAmountValid && this.isParticipantsAmountValid && this.isDateEndValid);
@@ -177,7 +197,6 @@ export default {
             return false;
         },
     },
-    watch: {},
     methods: {
         loadTokenBalance: function() {
             this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
@@ -193,20 +212,14 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    this.airdropCampaign = result.data;
-                    if (this.hasAirdropCampaign) {
-                        this.tokensAmount = this.airdropCampaign.amount;
-                        this.participantsAmount = this.airdropCampaign.participants;
-
-                        if (this.airdropCampaign.endDate) {
-                            if (!this.showEndDate) {
-                                this.$refs['end-date-checkbox'].click();
-                            }
-                            this.endDate = moment(this.airdropCampaign.endDate).toDate();
-                        }
-                    } else {
-                        this.setDefaultValues(false);
+                    if (STATUS_ACTIVE === result.data.status) {
+                        this.airdropCampaignId = result.data.id;
                     }
+
+                    if (!this.hasAirdropCampaign) {
+                        this.setDefaultValues();
+                    }
+
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -238,7 +251,10 @@ export default {
             return this.$axios.single.post(this.$routing.generate('create_airdrop_campaign', {
                 tokenName: this.tokenName,
             }), data)
-                .then(() => this.loadAirdropCampaign())
+                .then((result) => {
+                    this.airdropCampaignId = result.data.id;
+                    this.loading = false;
+                })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
                     this.sendLogs('error', 'Can not create API Client', err);
@@ -251,10 +267,10 @@ export default {
 
             this.loading = true;
             return this.$axios.single.delete(this.$routing.generate('delete_airdrop_campaign', {
-                id: this.airdropCampaign.id,
+                id: this.airdropCampaignId,
             }))
                 .then(() => {
-                    this.airdropCampaign = null;
+                    this.airdropCampaignId = null;
                     this.setDefaultValues(true);
                     this.loading = false;
                 })

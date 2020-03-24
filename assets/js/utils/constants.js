@@ -12,6 +12,8 @@ export const HTTP_OK = 200;
 export const HTTP_ACCEPTED = 202;
 export const HTTP_NO_CONTENT = 204;
 
+export const STATUS_ACTIVE = 1;
+
 export const GENERAL = {
     precision: 8,
     dateFormat: 'DD.MM.YYYY hh:mm:ss',

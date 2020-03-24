@@ -18,19 +18,36 @@ class AirdropCampaignManagerTest extends TestCase
     {
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())->method('persist');
-        $em->expects($this->once())->method('flush');
+        $em->expects($this->exactly(2))->method('persist');
+        $em->expects($this->exactly(2))->method('flush');
         /** @var Token|MockObject $em */
         $token = $this->createMock(Token::class);
 
         $airdropManager = new AirdropCampaignManager($em);
 
-        $airdropManager->createAirdrop(
+        $airdrop = $airdropManager->createAirdrop(
             $token,
             '500',
-            150,
-            new \DateTimeImmutable('+2 days')
+            150
         );
+
+        $this->assertInstanceOf(Airdrop::class, $airdrop);
+        $this->assertEquals('500', $airdrop->getAmount());
+        $this->assertEquals(150, $airdrop->getParticipants());
+        $this->assertEquals(null, $airdrop->getEndDate());
+
+        $endDate = new \DateTimeImmutable('+2 days');
+        $airdrop = $airdropManager->createAirdrop(
+            $token,
+            '700',
+            300,
+            $endDate
+        );
+
+        $this->assertInstanceOf(Airdrop::class, $airdrop);
+        $this->assertEquals('700', $airdrop->getAmount());
+        $this->assertEquals(300, $airdrop->getParticipants());
+        $this->assertEquals($endDate, $airdrop->getEndDate());
     }
 
     public function testDeleteAirdrop(): void

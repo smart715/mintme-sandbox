@@ -28,7 +28,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         string $amount,
         int $participants,
         ?\DateTimeImmutable $endDate = null
-    ): void {
+    ): Airdrop {
         $this->deleteActiveAirdrop($token);
 
         $airdrop = new Airdrop();
@@ -43,6 +43,8 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         $this->em->persist($airdrop);
         $this->em->flush();
+
+        return $airdrop;
     }
 
     public function deleteAirdrop(Airdrop $airdrop): void
