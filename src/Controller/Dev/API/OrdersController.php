@@ -73,7 +73,7 @@ class OrdersController extends DevApiController
      * )
      * @Rest\QueryParam(
      *     name="limit",
-     *     requirements=@Assert\Range(min="1", max="500"),
+     *     requirements=@Assert\Range(min="1", max="101"),
      *     nullable=false,
      *     allowBlank=false,
      *     strict=true
@@ -82,7 +82,7 @@ class OrdersController extends DevApiController
      * @SWG\Parameter(name="base", in="query", description="Base name", type="string", required=true)
      * @SWG\Parameter(name="quote", in="query", description="Quote name", type="string", required=true)
      * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Parameter(name="side", in="query", type="string", description="Order side (sell|buy)")
      * @SWG\Tag(name="Orders")
      */
