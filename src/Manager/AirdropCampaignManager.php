@@ -90,6 +90,10 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $this->em->persist($participant);
         $this->em->flush();
 
+        if ($activeAirdrop->getParticipants() === $activeAirdrop->getActualParticipants()) {
+            $this->deleteAirdrop($activeAirdrop);
+        }
+
         // TODO: Viabtc - send participant airdrop reward
     }
 }
