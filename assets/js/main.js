@@ -1,9 +1,9 @@
 import '../scss/main.sass';
 import Vue from 'vue';
 import VueBootstrap from 'bootstrap-vue';
-import fontawesome from '@fortawesome/fontawesome';
-import fab from '@fortawesome/fontawesome-free-brands';
-import far from '@fortawesome/fontawesome-free-regular';
+import {library, dom} from '@fortawesome/fontawesome-svg-core';
+import {fab} from '@fortawesome/free-brands-svg-icons';
+import {far} from '@fortawesome/free-regular-svg-icons';
 import {faSearch, faCog, fas} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import VueClipboard from 'vue-clipboard2';
@@ -27,7 +27,9 @@ import sanitizeHtml from './sanitize_html';
 
 VueClipboard.config.autoSetContainer = true;
 
-fontawesome.library.add(fas, far, fab, faSearch, faCog);
+library.add(fas, far, fab, faSearch, faCog);
+
+dom.watch();
 
 window.Vue = Vue;
 
