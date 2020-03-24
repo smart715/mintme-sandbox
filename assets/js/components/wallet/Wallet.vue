@@ -378,10 +378,10 @@ export default {
                         this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
                             .then((res) =>
                                 this.tokens[token].available = res.data ?
-                                    new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
+                                    new Decimal(oToken.available).sub(res.data.frozenAmountWithReceived) : oToken.available
                             )
                             .catch((err) => {
-                                this.sendLogs('error', 'Can not get lock-period', err);
+                                this.sendLogs('error', 'Can not get lock_period', err);
                             });
                     }
                 });
