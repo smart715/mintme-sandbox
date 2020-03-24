@@ -5,6 +5,7 @@ namespace App\Manager;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
 use App\Repository\TokenRepository;
@@ -135,9 +136,19 @@ class TokenManager implements TokenManagerInterface
             return $balanceResult;
         }
 
+        $available = $balanceResult->getAvailable();
+        $available = $token->isDeployed()
+            ? $available->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+            : $available->subtract($token->getLockIn()->getAmountToRelease());
+
+        $freeze = $balanceResult->getFreeze();
+        $freeze = $token->isDeployed()
+            ? $freeze->add($token->getLockIn()->getFrozenAmountWithReceived())
+            : $freeze->add($token->getLockIn()->getAmountToRelease());
+
         return BalanceResult::success(
-            $balanceResult->getAvailable()->subtract($token->getLockIn()->getFrozenAmount()),
-            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount()),
+            $available,
+            $freeze,
             $balanceResult->getReferral()
         );
     }
@@ -172,5 +183,10 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
+    }
+
+    public function getDeployedTokens(): array
+    {
+        return $this->repository->getDeployedTokens();
     }
 }

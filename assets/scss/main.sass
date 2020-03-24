@@ -33,6 +33,7 @@ html
   min-height: 100vh
   box-sizing: border-box
   overflow-y: scroll
+  font-display: swap
 
 body
   @include font-scale(sm)
@@ -99,7 +100,8 @@ a
     color: $color-link-hover
 
 .btn-cancel
-  padding: .25rem 0rem
+  display: inline-block
+  padding: .25rem 1rem
   font-size: 1rem
   line-height: 1.5
   vertical-align: middle
@@ -263,16 +265,16 @@ a
   border-color: #007DC0
 
 .circle
-    background: #51677F
-    border-radius: 200px
-    height: 200px
-    width: 200px
-    display: table
+  background: #51677F
+  border-radius: 200px
+  height: 200px
+  width: 200px
+  display: table
 
-    img
-      vertical-align: middle
-      display: table-cell
-      width: 120px
+  img
+    vertical-align: middle
+    display: table-cell
+    width: 120px
 
 .custom-scrollbar
   scrollbar-color: auto
@@ -465,22 +467,22 @@ a
         overflow: visible
 
         .nav-link
-            color: inherit
-            position: relative
+          color: inherit
+          position: relative
 
-            @include font-scale(md)
+          @include font-scale(md)
 
-            &.active
-              color: $color-link
+          &.active
+            color: $color-link
 
-            &.active::after
-              content: ' '
-              position: absolute
-              bottom: .75rem
-              left: 1.5rem
-              height: .125rem
-              background-color: unset
-              width: calc(100% - 3rem)
+          &.active::after
+            content: ' '
+            position: absolute
+            bottom: .75rem
+            left: 1.5rem
+            height: .125rem
+            background-color: unset
+            width: calc(100% - 3rem)
 
       .edit-token-profile
         position: absolute
@@ -513,11 +515,11 @@ a
     @include font-scale(md)
 
 nav.top-navbar
-    .navbar-toggler-icon
+  .navbar-toggler-icon
+    outline: none
+    background-image: $navbar-toogler
+    &:focus
       outline: none
-      background-image: $navbar-toogler
-      &:focus
-        outline: none
 
 .input-custom-padding
   padding-right: 75px
@@ -633,7 +635,7 @@ nav.top-navbar
   width: 22px
   height: 20px
 
-.tooltip
+.tooltip:not(.tooltip-traders)
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
 
@@ -708,6 +710,9 @@ meter
 
 .overflow-wrap-break-word
   overflow-wrap: break-word
+
+.pointer-events-none
+  pointer-events: none !important
 
 .bg-module
   background: $module-background
