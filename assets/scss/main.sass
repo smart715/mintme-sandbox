@@ -448,6 +448,10 @@ a
           background-color: unset
           width: calc(100% - 3rem)
 
+    @media (max-width: 480px)
+      .swagger-ui .model
+        font-size: 10px
+
     @media (max-width: 767px)
       .nav-tabs
         text-align: center
@@ -689,10 +693,6 @@ meter
     position: absolute
     bottom: 1.2rem
     right: 1rem
-    
-@media (max-width: 480px)
-  .swagger-ui .model
-    font-size: 10px
 
 #token, #profile
   [v-cloak]
