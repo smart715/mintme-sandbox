@@ -6,7 +6,11 @@
                 thead-class="trading-head"
                 v-if="!noHistory"
                 :items="sanitizedHistory"
-                :fields="fields"
+                :fields="fieldsArray"
+                :sort-compare="sortCompare"
+                :sort-by="fields.date.key"
+                :sort-desc="true"
+                sort-direction="desc"
                 :class="{'empty-table': noHistory}"
                 sort-icon-left
             >
@@ -62,45 +66,52 @@ export default {
     components: {CopyLink},
     data() {
         return {
-            fields: [
-                {
+            fields: {
+                date: {
                     key: 'date',
                     label: 'Date',
                     sortable: true,
+                    type: 'date',
                 },
-                {
+                type: {
                     key: 'type',
                     label: 'Type',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                symbol: {
                     key: 'symbol',
                     label: 'Name',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                toAddress: {
                     key: 'toAddress',
                     label: 'Address',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                amount: {
                     key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                status: {
                     key: 'status',
                     label: 'Status',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                fee: {
                     key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-            ],
+            },
             tableData: null,
             currentPage: 1,
         };
@@ -114,6 +125,9 @@ export default {
         },
         loaded: function() {
             return this.tableData !== null;
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
     },
     mounted: function() {
@@ -183,6 +197,28 @@ export default {
             }
 
             return this.$routing.generate('token_show', {name: quote.name});
+        },
+        sortCompare: function(a, b, key) {
+            switch (this.fields[key].type) {
+                case 'date':
+                    return this.dateCompare(a[key], b[key]);
+                case 'string':
+                    return a[key].localeCompare(b[key]);
+                case 'numeric':
+                    return this.numericCompare(a[key], b[key]);
+            }
+        },
+        numericCompare: function(a, b) {
+            a = parseFloat(a);
+            b = parseFloat(b);
+
+            return a < b ? -1 : (a > b ? 1 : 0);
+        },
+        dateCompare: function(a, b) {
+            a = moment(a, GENERAL.dateFormat).unix();
+            b = moment(b, GENERAL.dateFormat).unix();
+
+            return this.numericCompare(a, b);
         },
     },
 };
