@@ -100,6 +100,10 @@ class AirdropCampaignController extends AbstractFOSRestController
     {
         $this->airdropCampaignManager->deleteAirdrop($airdrop);
 
+        if ($airdrop->getToken() !== $this->tokenManager->getOwnToken()) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->view(null, Response::HTTP_NO_CONTENT);
     }
 
@@ -130,6 +134,10 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         if (!$token instanceof Token) {
             throw $this->createNotFoundException('Token does not exist.');
+        }
+
+        if ($token !== $this->tokenManager->getOwnToken()) {
+            throw $this->createAccessDeniedException();
         }
 
         return $token;
