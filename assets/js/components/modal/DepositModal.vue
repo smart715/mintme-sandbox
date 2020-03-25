@@ -45,12 +45,12 @@
 <script>
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
-import {FiltersMixin, RebrandingFilterMixin} from '../../mixins';
+import {RebrandingFilterMixin} from '../../mixins';
 import {webSymbol} from '../../utils/constants';
 
 export default {
     name: 'DepositModal',
-    mixins: [FiltersMixin, RebrandingFilterMixin],
+    mixins: [RebrandingFilterMixin],
     components: {
         Modal,
         CopyLink,

@@ -80,7 +80,7 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span v-if="market.quote.symbol.length > 17" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
+                            <span v-if="shouldTruncate" v-b-tooltip:title="market.quote.symbol | rebranding" class="d-inline-block ml-1">
                                 {{ market.quote.symbol | rebranding | truncate(17) }}
                             </span>
                             <span v-else class="d-inline-block ml-1">
@@ -294,6 +294,9 @@ export default {
         ]),
     },
     computed: {
+        shouldTruncate: function(){
+            return this.market.quote.symbol.length > 17;
+        },
         totalPrice: function() {
             return new Decimal(this.sellPrice && !isNaN(this.sellPrice) ? this.sellPrice : 0)
                 .times(this.sellAmount && !isNaN(this.sellAmount) ? this.sellAmount : 0)

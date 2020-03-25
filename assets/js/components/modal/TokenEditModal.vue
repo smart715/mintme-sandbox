@@ -136,7 +136,6 @@ export default {
         visible: Boolean,
         websocketUrl: String,
     },
-    mixins: [FiltersMixin],
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,

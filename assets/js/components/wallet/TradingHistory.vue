@@ -13,7 +13,7 @@
                     sort-direction="desc"
                 >
                     <template v-slot:cell(name)="row">
-                        <div v-if="row.value.full.length > 17"
+                        <div v-if="shouldTruncate"
                             v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}"
                         >
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
@@ -128,6 +128,9 @@ export default {
         };
     },
     computed: {
+        shouldTruncate: function(){
+            return this.row.value.full.length > 17;
+        },
         loaded: function() {
             return this.tableData !== null;
         },

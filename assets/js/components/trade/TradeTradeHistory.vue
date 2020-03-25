@@ -25,7 +25,7 @@
                             :fields="fields">
 
                             <template v-slot:head(pricePerQuote)="row">
-                                <span v-if="market.quote.symbol.length > 17" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
                                     Price per {{ market.quote.symbol | rebranding | truncate(17) }}
                                 </span>
                                 <span v-else>
@@ -34,7 +34,7 @@
                             </template>
 
                             <template v-slot:head(quoteAmount)="row">
-                                <span v-if="market.quote.symbol.length > 17" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
                                     {{ market.quote.symbol | rebranding | truncate(17) }} amount
                                 </span>
                                  <span v-else>
@@ -164,6 +164,9 @@ export default {
         };
     },
     computed: {
+        shouldTruncate: function(){
+            return this.market.quote.symbol.length > 17;
+        },
         hasOrders: function() {
             return this.ordersList.length > 0;
         },
