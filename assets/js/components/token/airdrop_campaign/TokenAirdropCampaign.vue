@@ -111,7 +111,7 @@ import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {toMoney} from '../../../utils';
-import {GENERAL, STATUS_ACTIVE} from '../../../utils/constants';
+import {GENERAL} from '../../../utils/constants';
 
 export default {
     name: 'TokenAirdropCampaign',
@@ -122,8 +122,6 @@ export default {
     },
     props: {
         tokenName: String,
-        isTokenExchanged: Boolean,
-        isTokenNotDeployed: Boolean,
     },
     data() {
         return {
@@ -181,7 +179,7 @@ export default {
             return !this.showEndDate || this.isDateValid;
         },
         isDateValid: function() {
-            return this.showEndDate && moment(this.endDate, GENERAL.dateFormat).isValid();
+            return this.showEndDate && Date.parse(this.endDate) > Date.now();
         },
         isRewardValid: function() {
             if (this.isAmountValid && this.isParticipantsAmountValid) {
@@ -189,7 +187,7 @@ export default {
                 let participants = new Decimal(this.participantsAmount);
                 let res = amount.dividedBy(participants);
 
-                return res.greaterThan(this.minTokenReward);
+                return res.greaterThanOrEqualTo(this.minTokenReward);
             }
 
             return false;
@@ -210,9 +208,7 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    if (STATUS_ACTIVE === result.data.status) {
-                        this.airdropCampaignId = result.data.id;
-                    }
+                    this.airdropCampaignId = result.data.id;
 
                     if (!this.hasAirdropCampaign) {
                         this.setDefaultValues();
