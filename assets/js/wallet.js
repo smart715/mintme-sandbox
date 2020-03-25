@@ -3,6 +3,10 @@ import TradingHistory from './components/wallet/TradingHistory';
 import ActiveOrders from './components/wallet/ActiveOrders';
 import DepositWithdrawHistory from './components/wallet/DepositWithdrawHistory';
 import store from './storage';
+import walletSortPlugin from './wallet-sort-plugin.js';
+
+// load the wallet page tables sorting plugin
+Vue.use(walletSortPlugin);
 
 new Vue({
   el: '#wallet',
