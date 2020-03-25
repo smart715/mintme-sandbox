@@ -3,6 +3,14 @@ let rebranding = (val) => {
         return val;
     }
 
+    // Rebrand only Cryptos, not token names
+    if ('object' === typeof val) {
+        if (val.hasOwnProperty('symbol') && !cryptoSymbols.includes(val.symbol)) {
+            return val.symbol;
+        }
+    }
+
+
     const brandDict = [
         {regexp: /(Webchain)/g, replacer: 'MintMe Coin'},
         {regexp: /(webchain)/g, replacer: 'mintMe Coin'},
@@ -18,6 +26,8 @@ let rebranding = (val) => {
 
     return val;
 };
+
+import {cryptoSymbols} from '../../utils/constants';
 
 export default {
     filters: {
