@@ -20,7 +20,6 @@
                                     :is-token-exchanged="isTokenExchanged"
                                     :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
-                                    :twofa="twofa"
                                     @update="releasePeriodUpdated"
                                 />
                             </template>
@@ -35,7 +34,6 @@
                                 <token-deploy
                                     :has-release-period="hasReleasePeriod"
                                     :is-owner="isOwner"
-                                    :twofa="twofa"
                                     :name="currentName"
                                     :precision="precision"
                                     :status-prop="statusProp"

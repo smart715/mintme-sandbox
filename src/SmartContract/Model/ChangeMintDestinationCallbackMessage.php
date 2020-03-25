@@ -44,7 +44,7 @@ class ChangeMintDestinationCallbackMessage
     {
         return new self(
             $data['tokenAddress'],
-            $data['mintDestination'],
+            $data['mintDestination'] ?? '',
             $data['lock']
         );
     }
