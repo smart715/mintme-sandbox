@@ -85,6 +85,8 @@ class ContractUpdateConsumer implements ConsumerInterface
     private function updateMintDestination(ChangeMintDestinationCallbackMessage $clbResult): bool
     {
         try {
+            sleep(1);
+            $this->em->clear();
             $repo = $this->em->getRepository(Token::class);
             $token = $repo->findOneBy(['address' => $clbResult->getTokenAddress()]);
 
@@ -110,6 +112,8 @@ class ContractUpdateConsumer implements ConsumerInterface
     private function updateMintedAmount(UpdateMintedAmountCallbackMessage $clbResult): bool
     {
         try {
+            sleep(1);
+            $this->em->clear();
             $repo = $this->em->getRepository(Token::class);
             $token = $repo->findOneBy(['name' => $clbResult->getTokenName()]);
 

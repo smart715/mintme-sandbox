@@ -157,6 +157,7 @@ export default {
                 name: this.name,
             }), {
                 description: this.newDescription,
+                needToCheckCode: false,
             })
                 .then((response) => {
                     this.$emit('updated', this.newDescription);
