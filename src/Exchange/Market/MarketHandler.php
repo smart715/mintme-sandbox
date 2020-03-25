@@ -16,8 +16,6 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
-use Money\Currency;
-use Money\Money;
 
 class MarketHandler implements MarketHandlerInterface
 {
@@ -221,7 +219,8 @@ class MarketHandler implements MarketHandlerInterface
                     (string)$orderData['maker_fee'],
                     $this->getSymbol($market->getQuote())
                 ),
-                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null
+                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null,
+                !empty($orderData['ctime']) ? intval($orderData['ctime']) : null
             );
         });
 
