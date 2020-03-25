@@ -311,5 +311,5 @@ export default {
                 this.$refs.btable.refresh();
             }
         },
-    };
+    }
 </script>

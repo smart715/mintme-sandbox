@@ -198,5 +198,5 @@ export default {
 
             return this.$routing.generate('token_show', {name: quote.name});
         },
-    };
+    }
 </script>
