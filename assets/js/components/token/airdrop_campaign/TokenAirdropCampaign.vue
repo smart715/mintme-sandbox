@@ -78,7 +78,7 @@
                 </label>
             </div>
             <b-collapse id="collapse-and-date">
-                <div class="w-50 pb-3 px-0">
+                <div class="w-60 pb-3 px-0">
                     <label for="endDate" class="d-block text-left">
                         End date:
                     </label>
@@ -107,9 +107,7 @@
 <script>
 import moment from 'moment';
 import Decimal from 'decimal.js';
-import 'bootstrap/dist/css/bootstrap.css';
 import datePicker from 'vue-bootstrap-datetimepicker';
-import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {toMoney} from '../../../utils';
@@ -312,4 +310,3 @@ export default {
     },
 };
 </script>
-
