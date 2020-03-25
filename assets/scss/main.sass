@@ -389,9 +389,6 @@ a
   .tab-content
     flex: 1 1 auto
     background: $secondary
-    flex: initial
-    padding: 1.25rem 0
-    background: none
 
   &.no-padding
     .tab-content
@@ -453,10 +450,6 @@ a
           background-color: unset
           width: calc(100% - 3rem)
 
-    @media (max-width: 480px)
-      .swagger-ui .model
-        font-size: 10px
-
     @media (max-width: 767px)
       .nav-tabs
         text-align: center
@@ -493,6 +486,10 @@ a
         right: 0
         height: 100%
 
+    .tab-content
+      flex: initial
+      padding: 1.25rem 0
+      background: none
 
 .modal-content
   background: $secondary
