@@ -20,6 +20,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route(path="/dev/api/v1/user/orders")
@@ -80,10 +81,22 @@ class OrdersController extends DevApiController
      *     )
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @Rest\QueryParam(name="offset", requirements="\d+", default="0")
-     * @Rest\QueryParam(name="limit", requirements="\d+", default="100")
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
+     * @Rest\QueryParam(
+     *     name="offset",
+     *     requirements=@Assert\Range(min="0"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
+     * @Rest\QueryParam(
+     *     name="limit",
+     *     requirements=@Assert\Range(min="1", max="101"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -120,10 +133,22 @@ class OrdersController extends DevApiController
      *     )
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @Rest\QueryParam(name="offset", requirements="\d+", default="0")
-     * @Rest\QueryParam(name="limit", requirements="\d+", default="100")
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
+     * @Rest\QueryParam(
+     *     name="offset",
+     *     requirements=@Assert\Range(min="0"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
+     * @Rest\QueryParam(
+     *     name="limit",
+     *     requirements=@Assert\Range(min="1", max="101"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */

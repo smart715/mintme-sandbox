@@ -14,6 +14,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Cache(smaxage=15, mustRevalidate=true)
@@ -63,13 +64,25 @@ class OrdersController extends DevApiController
      * @SWG\Response(response="400",description="Bad request")
      * @Rest\QueryParam(name="base", allowBlank=false)
      * @Rest\QueryParam(name="quote", allowBlank=false)
-     * @Rest\QueryParam(name="offset", requirements="\d+", default="0")
-     * @Rest\QueryParam(name="limit", requirements="\d+", default="100")
+     * @Rest\QueryParam(
+     *     name="offset",
+     *     requirements=@Assert\Range(min="0"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
+     * @Rest\QueryParam(
+     *     name="limit",
+     *     requirements=@Assert\Range(min="1", max="101"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
      * @Rest\QueryParam(name="side", requirements="(sell|buy)", allowBlank=false, nullable=false)
      * @SWG\Parameter(name="base", in="query", description="Base name", type="string", required=true)
      * @SWG\Parameter(name="quote", in="query", description="Quote name", type="string", required=true)
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Parameter(name="side", in="query", type="string", description="Order side (sell|buy)")
      * @SWG\Tag(name="Orders")
      */
@@ -118,11 +131,17 @@ class OrdersController extends DevApiController
      * @SWG\Response(response="400",description="Bad request")
      * @Rest\QueryParam(name="base", allowBlank=false)
      * @Rest\QueryParam(name="quote", allowBlank=false)
-     * @Rest\QueryParam(name="lastId", requirements="\d+", default="0")
-     * @Rest\QueryParam(name="limit", requirements="\d+", default="100")
+     * @Rest\QueryParam(name="lastId", requirements="^[0-9]*$", default="0")
+     * @Rest\QueryParam(
+     *     name="limit",
+     *     requirements=@Assert\Range(min="1", max="500"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
      * @SWG\Parameter(name="base", in="query", description="Base name", type="string", required=true)
      * @SWG\Parameter(name="quote", in="query", description="Quote name", type="string", required=true)
-     * @SWG\Parameter(name="lastId", in="query", type="integer", description="Identifier of last order [>0]")
+     * @SWG\Parameter(name="lastId", in="query", type="integer", description="Identifier of last order [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Orders")
      */

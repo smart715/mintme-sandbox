@@ -44,12 +44,6 @@
                         fixed-width
                     />
                 </div>
-                <two-factor-modal
-                    :visible="showTwoFactorModal"
-                    :twofa="twofa"
-                    @verify="doDeploy"
-                    @close="closeTwoFactorModal"
-                />
             </template>
             <div
                 v-else-if="showPending"
@@ -80,7 +74,6 @@
 </template>
 
 <script>
-import TwoFactorModal from '../../modal/TwoFactorModal';
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
@@ -88,12 +81,8 @@ import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
-    components: {
-        TwoFactorModal,
-    },
     mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     props: {
-        twofa: Boolean,
         hasReleasePeriod: Boolean,
         isOwner: Boolean,
         name: String,
@@ -102,7 +91,6 @@ export default {
     },
     data() {
         return {
-            showTwoFactorModal: false,
             balance: null,
             deploying: false,
             status: this.statusProp,
@@ -133,9 +121,6 @@ export default {
         },
     },
     methods: {
-        closeTwoFactorModal: function() {
-            this.showTwoFactorModal = false;
-        },
         fetchBalances: function() {
             this.$axios.retry.get(this.$routing.generate('token_deploy_balances', {
                 name: this.name,
@@ -148,13 +133,6 @@ export default {
             });
         },
         deploy: function() {
-            if (this.twofa) {
-                this.showTwoFactorModal = true;
-            } else {
-                this.doDeploy();
-            }
-        },
-        doDeploy: function(code = '') {
             if (this.deploying) {
                 return;
             }
@@ -162,7 +140,6 @@ export default {
             this.deploying = true;
             this.$axios.single.post(this.$routing.generate('token_deploy', {
                 name: this.name,
-                code,
             }))
             .then(() => {
                 this.status = tokenDeploymentStatus.pending;
