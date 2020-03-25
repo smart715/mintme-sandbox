@@ -177,5 +177,6 @@ export default {
 
             return this.$routing.generate('token_show', {name: market.quote.name});
         },
-    }
+    },
+};
 </script>
