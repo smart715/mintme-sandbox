@@ -150,9 +150,6 @@ export default {
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
         },
-        closeTwoFactorModal: function() {
-            this.showTwoFactorModal = false;
-        },
         saveReleasePeriod: function() {
             this.$axios.single.post(this.$routing.generate('lock_in', {
                 name: this.tokenName,
