@@ -164,7 +164,7 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function(){
+        shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
         },
         hasOrders: function() {

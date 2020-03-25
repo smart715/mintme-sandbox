@@ -107,7 +107,6 @@ import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
-import {FiltersMixin} from '../../mixins';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {

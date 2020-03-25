@@ -128,7 +128,7 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function(){
+        shouldTruncate: function() {
             return this.row.value.full.length > 17;
         },
         loaded: function() {

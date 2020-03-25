@@ -228,7 +228,7 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function(){
+        shouldTruncate: function() {
             return this.data.item.name.length > 17;
         },
         hasTokens: function() {
@@ -386,10 +386,10 @@ export default {
                         this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
                             .then((res) =>
                                 this.tokens[token].available = res.data ?
-                                    new Decimal(oToken.available).sub(res.data.frozenAmountWithReceived) : oToken.available
+                                    new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
                             )
                             .catch((err) => {
-                                this.sendLogs('error', 'Can not get lock_period', err);
+                                this.sendLogs('error', 'Can not get lock-period', err);
                             });
                     }
                 });

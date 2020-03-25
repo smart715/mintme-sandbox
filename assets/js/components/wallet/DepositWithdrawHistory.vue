@@ -110,7 +110,7 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function(){
+        shouldTruncate: function() {
             return this.data.item.symbol.length > 17;
         },
         sanitizedHistory: function() {

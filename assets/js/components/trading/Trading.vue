@@ -237,7 +237,7 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function(){
+        shouldTruncate: function() {
             return this.row.value.length > 22;
         },
         marketsHiddenNames: function() {
