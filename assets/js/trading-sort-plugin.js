@@ -22,8 +22,8 @@ const tradingSortPlugin = {
             // If the value is not numeric, currently only pair column
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
             return pair ? 0 : b[key].localeCompare(a[key]);
-        }
-    }
+        };
+    },
 };
 
 export default tradingSortPlugin;
