@@ -434,6 +434,10 @@ class TokensController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
+        if ($name != $user->getTokens()[0]->getName()) {
+            throw new ApiUnauthorizedException('Unauthorized');
+        }
+
         if (!$user->isGoogleAuthenticatorEnabled()) {
             $response = $emailAuthManager->checkCode($user, $request->get('code'));
 
