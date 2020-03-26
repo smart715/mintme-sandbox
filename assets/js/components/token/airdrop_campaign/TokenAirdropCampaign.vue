@@ -39,11 +39,11 @@
                 <input
                     id="tokensAmount"
                     type="text"
-                    v-model="tokensAmountFormatted"
+                    v-model="tokensAmount"
                     :disabled="hasAirdropCampaign"
                     class="token-name-input w-100 px-2"
-                    @keypress="checkInput(TOK.subunit)"
-                    @paste="checkInput(TOK.subunit)"
+                    @keypress="checkInput(precision)"
+                    @paste="checkInput(precision)"
                 >
             </div>
             <div class="col-12 pb-3 px-0">
@@ -110,7 +110,7 @@ import Decimal from 'decimal.js';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
-import {toMoney} from '../../../utils';
+import {TOK} from '../../../utils/constants';
 
 export default {
     name: 'TokenAirdropCampaign',
@@ -127,7 +127,7 @@ export default {
             showModal: false,
             airdropCampaignId: null,
             tokenBalance: 0,
-            minTokensAmount: '0.001',
+            minTokensAmount: '0.01',
             minParticipantsAmount: 100,
             minTokenReward: '0.0001',
             loading: false,
@@ -140,6 +140,7 @@ export default {
                 minDate: moment().add(24, 'hours').toDate(),
             },
             errorMessage: '',
+            precision: TOK.subunit,
         };
     },
     mounted: function() {
@@ -147,13 +148,6 @@ export default {
         this.loadAirdropCampaign();
     },
     computed: {
-        tokensAmountFormatted: function() {
-            if (this.tokensAmount) {
-                return toMoney(this.tokensAmount);
-            }
-
-            return '';
-        },
         hasAirdropCampaign: function() {
             return parseInt(this.airdropCampaignId) > 0;
         },

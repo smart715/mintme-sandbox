@@ -28,22 +28,6 @@ describe('TokenAirdropCampaign', () => {
         moxios.uninstall();
     });
 
-    it('should format tokens amount correctly', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenAirdropCampaign, {
-            localVue,
-            data() {
-                return {
-                    tokensAmount: '100.000000000',
-                };
-            },
-        });
-
-        expect(wrapper.vm.tokensAmountFormatted).to.equal('100');
-        wrapper.vm.tokensAmount = 0;
-        expect(wrapper.vm.tokensAmountFormatted).to.equal('');
-    });
-
     it('should check if airdrop campaign exists', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
