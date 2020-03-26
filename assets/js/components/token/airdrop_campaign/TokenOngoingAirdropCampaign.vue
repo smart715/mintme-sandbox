@@ -27,16 +27,16 @@
                     </button>
                     <confirm-modal
                             :visible="showModal"
-                            :show-cancel-button="false"
+                            :show-cancel-button="!alreadyClaimed"
                             @confirm="claimAirdropCampaign"
                             @close="showModal = false">
-                        <p v-if="userAlreadyClaimed">
+                        <p v-if="alreadyClaimed">
                             You already claimed tokens from this airdrop.
                         </p>
                         <p v-else class="text-white modal-title pt-2">
                             Are you sure you want to claim {{ tokenName }}?
                         </p>
-                        <template v-if="userAlreadyClaimed" v-slot:confirm>OK</template>
+                        <template v-if="alreadyClaimed" v-slot:confirm>OK</template>
                     </confirm-modal>
                 </div>
             </div>
@@ -70,6 +70,7 @@ export default {
             showModal: false,
             airdropCampaign: null,
             loaded: false,
+            alreadyClaimed: this.userAlreadyClaimed,
         };
     },
     mounted: function() {
@@ -98,8 +99,6 @@ export default {
             return moment(this.airdropCampaign.endDate).format('D MMMM YYYY');
         },
     },
-    watch: {
-    },
     methods: {
         getAirdropCampaign: function() {
             this.$axios.retry.get(this.$routing.generate('get_airdrop_campaign', {
@@ -115,7 +114,7 @@ export default {
                 });
         },
         claimAirdropCampaign: function() {
-            if (this.userAlreadyClaimed) {
+            if (this.alreadyClaimed) {
                 return;
             }
 
@@ -123,8 +122,11 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then(() => {
-                    // Show success message
-                    this.userAlreadyClaimed = true;
+                    if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
+                        this.airdropCampaign.actualParticipants++;
+                    }
+
+                    this.alreadyClaimed = true;
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
