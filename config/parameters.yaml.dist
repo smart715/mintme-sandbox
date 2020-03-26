@@ -120,3 +120,7 @@ parameters:
 
     # max top holders for each token
     top_holders: 10
+
+    # forward proxy for hiding real mintme server IP when verifying token owner's website
+    # see cUrl docs for syntax: https://curl.haxx.se/libcurl/c/CURLOPT_PROXY.html
+    website_verify_proxy: ''
