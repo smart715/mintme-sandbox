@@ -16,7 +16,7 @@
                             </svg>
                         </td>
                         <td>[b]Bold[/b]</td>
-                        <td v-dompurify-html="parse('[b]Bold[/b]')"></td>
+                        <td v-html-sanitize="parse('[b]Bold[/b]')"></td>
                     </tr>
                     <tr>
                         <td>
@@ -25,7 +25,7 @@
                             </svg>
                         </td>
                         <td>[i]Italic[/i]</td>
-                        <td v-dompurify-html="parse('[i]Italic[/i]')"></td>
+                        <td v-html-sanitize="parse('[i]Italic[/i]')"></td>
                     </tr>
                     <tr>
                         <td>
@@ -34,7 +34,7 @@
                             </svg>
                         </td>
                         <td>[u]Underline[/u]</td>
-                        <td v-dompurify-html="parse('[u]Underline[/u]')"></td>
+                        <td v-html-sanitize="parse('[u]Underline[/u]')"></td>
                     </tr>
                     <tr>
                         <td>
@@ -43,7 +43,7 @@
                             </svg>
                         </td>
                         <td>[s]Strikethrough[/s]</td>
-                        <td v-dompurify-html="parse('[s]Strikethrough[/s]')"></td>
+                        <td v-html-sanitize="parse('[s]Strikethrough[/s]')"></td>
                     </tr>
                     <tr>
                         <td>
@@ -61,7 +61,7 @@
                             </svg>
                         </td>
                         <td>[p]Paragraph[/p]</td>
-                        <td v-dompurify-html="parse('[p]Paragraph[/p]')"></td>
+                        <td v-html-sanitize="parse('[p]Paragraph[/p]')"></td>
                     </tr>
                     <tr>
                         <th colspan="3">Lists</th>
@@ -78,7 +78,7 @@
                             &emsp;[li]Two[/li]<br>
                             [/ul]
                         </td>
-                        <td v-dompurify-html="parse('Unordered list:[ul][li]One[/li][li]Two[/li][/ul]')"></td>
+                        <td v-html-sanitize="parse('Unordered list:[ul][li]One[/li][li]Two[/li][/ul]')"></td>
                     </tr>
                     <tr>
                         <td>
@@ -92,7 +92,7 @@
                             &emsp;[li]Two[/li]<br>
                             [/ol]
                         </td>
-                        <td v-dompurify-html="parse('Ordered list:[ol][li]One[/li][li]Two[/li][/ol]')"></td>
+                        <td v-html-sanitize="parse('Ordered list:[ol][li]One[/li][li]Two[/li][/ol]')"></td>
                     </tr>
                     <tr>
                         <td>
@@ -101,7 +101,7 @@
                             </svg>
                         </td>
                         <td>[li]Item[/li]</td>
-                        <td v-dompurify-html="parse('List item:[li]Item[/li]')"></td>
+                        <td v-html-sanitize="parse('List item:[li]Item[/li]')"></td>
                     </tr>
                     <tr>
                         <th colspan="3">Links</th>
@@ -116,7 +116,7 @@
                             [url]link.com[/url]<br>
                             [url=link.com]Link[/url]
                         </td>
-                        <td v-dompurify-html="parse('[url]link.com[/url][br][url=link.com]Link[/url]')"></td>
+                        <td v-html-sanitize="parse('[url]link.com[/url][br][url=link.com]Link[/url]')"></td>
                     </tr>
                     <tr>
                         <th colspan="3">Images</th>
