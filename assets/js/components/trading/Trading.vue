@@ -209,7 +209,7 @@ export default {
             tokens = this.sanitizedMarketsOnTop.concat(tokens);
             tokens = _.map(tokens, (token) => {
                 return _.mapValues(token, (item, key) => {
-                    return cryptoSymbols.includes(token.base) && cryptoSymbols.includes(token.quote )
+                    return cryptoSymbols.includes(token.base) && cryptoSymbols.includes(token.quote)
                     || 'pair' !== key && 'tokenUrl' !== key
                         ? this.rebrandingFunc(item)
                         : item;
