@@ -21,7 +21,7 @@ const tableSortPlugin = {
             b = moment(b, GENERAL.dateFormat).unix();
 
             return this.numericCompare(a, b);
-        }
+        };
     },
 };
 
