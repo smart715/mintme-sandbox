@@ -62,6 +62,10 @@
                     :sort-desc.sync="sortDesc"
                     sort-icon-left
                 >
+                    <template v-slot:[`head(${fields.position.key})`]="data">
+                    <div class="d-lg-none">POS</div>
+                    <div class="d-none d-lg-block">Position</div>
+                    </template>
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
                             id="volume"
@@ -262,6 +266,12 @@ export default {
         },
         fields: function() {
             return {
+                position: {
+                    key: 'position',
+                    label: 'Position',
+                    sortable: true,
+                    class: 'd-none',
+                },
                 pair: {
                     key: 'pair',
                     label: 'Market',
@@ -361,12 +371,16 @@ export default {
                 }
             });
             let numeric = key !== this.fields.pair.key;
+            let position = key == this.fields.position.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
-                return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
+                let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
+
+                if (position) return -compareResult;
+                return compareResult;
             }
 
             // If the value is not numeric, currently only pair column
@@ -398,6 +412,8 @@ export default {
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
+
+                        this.setPositionToMarkets(page);
 
                         if (window.history.replaceState) {
                             // prevents browser from storing history with each change:
@@ -436,6 +452,8 @@ export default {
 
             const tokenized = this.markets[marketName].quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
+            const position = this.markets[marketName].position;
+
             const market = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
@@ -445,7 +463,8 @@ export default {
                 monthVolume,
                 supply,
                 marketPrecision,
-                tokenized
+                tokenized,
+                position
             );
 
             if (marketOnTopIndex > -1) {
@@ -461,13 +480,14 @@ export default {
                 dayVolume: marketInfo.deal,
             };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized, position) {
             let hiddenName = this.findHiddenName(token);
             let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
                 ? 0
                 : Decimal.mul(lastPrice, supply);
 
             return {
+                position: position,
                 pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
@@ -533,7 +553,8 @@ export default {
                         parseFloat(this.markets[market].monthVolume),
                         this.markets[market].supply,
                         this.markets[market].base.subunit,
-                        tokenized
+                        tokenized,
+                        this.markets[market].position
                     );
                     if (marketOnTopIndex > -1) {
                         Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -584,7 +605,8 @@ export default {
                 market.monthVolume = marketInfo.deal,
                 market.supply,
                 market.base.subunit,
-                tokenized
+                tokenized,
+                market.position
                 );
 
             if (marketOnTopIndex > -1) {
@@ -667,7 +689,8 @@ export default {
                 parseFloat(market.monthVolume),
                 market.supply,
                 market.base.subunit,
-                false
+                false,
+                market.position
             );
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
         },
@@ -703,6 +726,14 @@ export default {
             this.activeVolume = volume;
             this.sortBy = this.volumes[this.activeVolume].key;
             this.sortDesc = true;
+        },
+        setPositionToMarkets: function(page) {
+            let positionIndex = 1;
+            for (let key in this.markets) {
+                if (this.markets.hasOwnProperty(key) && this.markets[key].quote !== null) {
+                    this.markets[key].position = BTC.symbol === this.markets[key].base.symbol ? '' : (positionIndex++) * page;
+                }
+            }
         },
     },
 };
