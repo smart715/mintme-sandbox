@@ -122,5 +122,5 @@ parameters:
     top_holders: 10
 
     # forward proxy for hiding real mintme server IP when verifying token owner's website
-    # see cUrl docs for syntax: https://curl.haxx.se/libcurl/c/CURLOPT_PROXY.html
+    # see guzzlephp docs for syntax: http://docs.guzzlephp.org/en/stable/request-options.html?highlight=proxy#proxy
     website_verify_proxy: ''
