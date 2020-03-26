@@ -7,6 +7,8 @@ let rebranding = (val) => {
     if ('object' === typeof val) {
         if (val.hasOwnProperty('symbol') && !cryptoSymbols.includes(val.symbol)) {
             return val.symbol;
+        } else {
+            val = val.symbol;
         }
     }
 

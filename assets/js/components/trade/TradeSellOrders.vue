@@ -6,14 +6,14 @@
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
                     <span v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
-                    {{ tokenName | rebranding | truncate(7) }}
+                    {{ market.quote | rebranding | truncate(7) }}
                 </span>
                     <guide>
                         <template slot="header">
                             Sell Orders
                         </template>
                         <template slot="body">
-                            List of all active sell orders for {{ tokenName|rebranding }}.
+                            List of all active sell orders for {{ market.quote |rebranding }}.
                         </template>
                     </guide>
                 </span>
@@ -97,7 +97,7 @@ export default {
     mixins: [FiltersMixin, LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
     props: {
         ordersList: [Array],
-        tokenName: String,
+        market: Object,
         fields: Array,
         basePrecision: Number,
         loggedIn: Boolean,
