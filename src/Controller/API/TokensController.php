@@ -432,7 +432,7 @@ class TokensController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
-        if (null === $user || $name !== $ownToken->getName()) {
+        if (null == $user || $name !== $ownToken->getName()) {
             throw new ApiUnauthorizedException('Unauthorized');
         }
 
