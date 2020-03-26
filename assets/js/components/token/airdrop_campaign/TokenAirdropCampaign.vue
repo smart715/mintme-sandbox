@@ -111,7 +111,6 @@ import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {toMoney} from '../../../utils';
-import {GENERAL} from '../../../utils/constants';
 
 export default {
     name: 'TokenAirdropCampaign',
@@ -137,9 +136,8 @@ export default {
             participantsAmount: null,
             endDate: moment().add(30, 'days').toDate(),
             options: {
-                format: GENERAL.dateFormat,
                 useCurrent: false,
-                minDate: moment(),
+                minDate: moment().add(24, 'hours').toDate(),
             },
             errorMessage: '',
         };
