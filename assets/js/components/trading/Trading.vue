@@ -379,8 +379,7 @@ export default {
 
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
-                if (position) return -compareResult;
-                return compareResult;
+                return position ? -compareResult : (pair ? 0 : compareResult);
             }
 
             // If the value is not numeric, currently only pair column
