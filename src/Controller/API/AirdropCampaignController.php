@@ -56,7 +56,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         MoneyWrapperInterface $moneyWrapper,
         Request $request
     ): View {
-        $token = $this->fetchToken($tokenName);
+        $token = $this->fetchToken($tokenName, true);
         $amountObj = $moneyWrapper->parse(
             (string)$request->get('amount'),
             MoneyWrapper::TOK_SYMBOL
@@ -127,7 +127,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         return $this->view(null, Response::HTTP_ACCEPTED);
     }
 
-    private function fetchToken(string $tokenName): Token
+    private function fetchToken(string $tokenName, bool $checkAccess = false): Token
     {
         /** @var Token $token */
         $token = $this->tokenManager->findByName($tokenName);
@@ -136,7 +136,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw $this->createNotFoundException('Token does not exist.');
         }
 
-        if ($token !== $this->tokenManager->getOwnToken()) {
+        if ($checkAccess && $token !== $this->tokenManager->getOwnToken()) {
             throw $this->createAccessDeniedException();
         }
 
