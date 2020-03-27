@@ -21,6 +21,7 @@
                 </div>
                 <div class="col-3 text-right align-self-center mx-auto">
                     <button
+                        :disabled="btnDisabled"
                         @click="showModal = true"
                         class="btn btn-primary">
                         Participate
@@ -70,6 +71,7 @@ export default {
             showModal: false,
             airdropCampaign: null,
             loaded: false,
+            btnDisabled: false,
             alreadyClaimed: this.userAlreadyClaimed,
         };
     },
@@ -118,6 +120,7 @@ export default {
                 return;
             }
 
+            this.btnDisabled = true;
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
             }))
@@ -127,6 +130,7 @@ export default {
                     }
 
                     this.alreadyClaimed = true;
+                    this.btnDisabled = false;
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
