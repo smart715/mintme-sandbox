@@ -136,6 +136,7 @@ export default {
             participantsAmount: null,
             endDate: moment().add(30, 'days').toDate(),
             options: {
+                format: 'MM.DD.YYYY HH:mm',
                 useCurrent: false,
                 minDate: moment().add(24, 'hours').toDate(),
             },
@@ -230,7 +231,7 @@ export default {
                 };
 
             if (this.isDateValid) {
-                data.endDate = this.endDate;
+                data.endDate = moment(this.endDate).toDate();
             }
 
             this.loading = true;
