@@ -16,7 +16,7 @@
                     <p
                         v-if="showEndDate"
                         class="m-0 text-white">
-                        Airdrop ands on {{ andsDate }}
+                        Airdrop ends on {{ endsDate }} at {{ endsTime }}
                     </p>
                 </div>
                 <div class="col-3 text-right align-self-center mx-auto">
@@ -28,16 +28,19 @@
                     </button>
                     <confirm-modal
                             :visible="showModal"
-                            :show-cancel-button="!alreadyClaimed"
+                            :show-cancel-button="!isOwner && !alreadyClaimed"
                             @confirm="claimAirdropCampaign"
                             @close="showModal = false">
-                        <p v-if="alreadyClaimed">
+                        <p v-if="isOwner">
+                            Sorry, you can't participate in your own airdrop.
+                        </p>
+                        <p v-else-if="alreadyClaimed">
                             You already claimed tokens from this airdrop.
                         </p>
                         <p v-else class="text-white modal-title pt-2">
-                            Are you sure you want to claim {{ tokenName }}?
+                            Are you sure you want to claim {{ airdropReward }} {{ tokenName }}?
                         </p>
-                        <template v-if="alreadyClaimed" v-slot:confirm>OK</template>
+                        <template v-if="isOwner || alreadyClaimed" v-slot:confirm>OK</template>
                     </confirm-modal>
                 </div>
             </div>
@@ -63,6 +66,7 @@ export default {
         ConfirmModal,
     },
     props: {
+        isOwner: Boolean,
         tokenName: String,
         userAlreadyClaimed: Boolean,
     },
@@ -97,8 +101,11 @@ export default {
         showEndDate: function() {
             return null !== this.airdropCampaign.endDate && '' !== this.airdropCampaign.endDate;
         },
-        andsDate: function() {
+        endsDate: function() {
             return moment(this.airdropCampaign.endDate).format('D MMMM YYYY');
+        },
+        endsTime: function() {
+            return moment(this.airdropCampaign.endDate).format('HH:mm');
         },
     },
     methods: {

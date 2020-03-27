@@ -162,7 +162,7 @@ class TokenController extends Controller
                 '',
             'precision' => $this->getParameter('token_precision'),
             'isTokenPage' => true,
-            'showAirdropCampaign' => $token->getActiveAirdrop(),
+            'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
             'userAlreadyClaimed' => $airdropCampaignManager
                 ->checkIfUserClaimed($this->getUser(), $token),
         ]);

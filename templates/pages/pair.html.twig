@@ -20,7 +20,8 @@
 <div id="token" class="container">
     <div class="row pt-5 justify-content-center">
         <token-ongoing-airdrop-campaign
-            v-if="{{ showAirdropCampaign }} && !{{ isOwner }}"
+            v-if="{{ showAirdropCampaign }}"
+            :is-owner="{{ isOwner }}"
             :token-name="'{{ token.name }}'"
             :user-already-claimed="{{ userAlreadyClaimed }}"
         ></token-ongoing-airdrop-campaign>
