@@ -2,7 +2,7 @@ import Wallet from './components/wallet/Wallet';
 import TradingHistory from './components/wallet/TradingHistory';
 import ActiveOrders from './components/wallet/ActiveOrders';
 import DepositWithdrawHistory from './components/wallet/DepositWithdrawHistory';
-import tableSortPlugin from './table-sort-plugin.js';
+import tableSortPlugin from './table_sort_plugin.js';
 import store from './storage';
 
 

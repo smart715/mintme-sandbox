@@ -7,7 +7,7 @@
                 v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fieldsArray"
-                :sort-compare="sortCompare"
+                :sort-compare="$sortCompare"
                 :sort-by="fields.date.key"
                 :sort-desc="true"
                 sort-direction="desc"
