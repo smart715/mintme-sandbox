@@ -37,7 +37,7 @@ class Airdrop
     private $status = self::STATUS_REMOVED;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="airdrop")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="airdrops")
      * @ORM\JoinColumn(name="token_id", nullable=false)
      * @var Token
      */
@@ -121,7 +121,7 @@ class Airdrop
         return $this;
     }
 
-    public function getAmount(): ?string
+    public function getAmount(): string
     {
         return $this->amount;
     }
@@ -133,7 +133,7 @@ class Airdrop
         return $this;
     }
 
-    public function getParticipants(): ?int
+    public function getParticipants(): int
     {
         return $this->participants;
     }
