@@ -8,12 +8,16 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\AirdropCampaignManager;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
+use App\Tests\MockMoneyWrapper;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AirdropCampaignManagerTest extends TestCase
 {
+
+    use MockMoneyWrapper;
+
     public function testCreateAirdrop(): void
     {
         /** @var EntityManagerInterface|MockObject $em */
@@ -23,7 +27,7 @@ class AirdropCampaignManagerTest extends TestCase
         /** @var Token|MockObject $em */
         $token = $this->createMock(Token::class);
 
-        $airdropManager = new AirdropCampaignManager($em);
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper());
 
         $airdrop = $airdropManager->createAirdrop(
             $token,
@@ -59,7 +63,7 @@ class AirdropCampaignManagerTest extends TestCase
         $airdrop = new Airdrop();
         $airdrop->setStatus(Airdrop::STATUS_ACTIVE);
 
-        $airdropManager = new AirdropCampaignManager($em);
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper());
         $airdropManager->deleteAirdrop($airdrop);
 
         $this->assertEquals(Airdrop::STATUS_REMOVED, $airdrop->getStatus());
@@ -77,7 +81,7 @@ class AirdropCampaignManagerTest extends TestCase
         $token = $this->createMock(Token::class);
         $token->expects($this->once())->method('getActiveAirdrop')->willReturn($airdrop);
 
-        $airdropManager = new AirdropCampaignManager($em);
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper());
         $airdropManager->deleteActiveAirdrop($token);
 
         $this->assertEquals(Airdrop::STATUS_REMOVED, $airdrop->getStatus());
@@ -104,7 +108,7 @@ class AirdropCampaignManagerTest extends TestCase
         /** @var User|MockObject $user */
         $user = $this->createMock(User::class);
 
-        $airdropManager = new AirdropCampaignManager($em);
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper());
 
         $this->assertFalse($airdropManager->checkIfUserClaimed(null, $token));
         $this->assertFalse($airdropManager->checkIfUserClaimed($user, $token));
