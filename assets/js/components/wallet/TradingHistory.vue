@@ -153,7 +153,7 @@ export default {
             if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
                 return this.$routing.generate('coin', {
                     base: this.rebrandingFunc(market.base.symbol),
-                    quote: this.rebrandingFunc(market.quote.symbol)
+                    quote: this.rebrandingFunc(market.quote.symbol),
                 });
             }
 

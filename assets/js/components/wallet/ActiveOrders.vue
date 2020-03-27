@@ -221,7 +221,7 @@ export default {
             if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
                 return this.$routing.generate('coin', {
                     base: this.rebrandingFunc(market.base),
-                    quote: this.rebrandingFunc(market.quote)
+                    quote: this.rebrandingFunc(market.quote),
                 });
             }
             return this.$routing.generate('token_show', {name: market.quote.name});
