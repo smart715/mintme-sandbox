@@ -10,9 +10,9 @@
                 :class="{'empty-table': noHistory}"
             >
                 <template v-slot:cell(symbol)="data">
-                    <a :href="rebrandingFunc(data.item.url)" class="text-white">
-                        <span v-b-tooltip="{title: rebrandingFunc(data.item.symbol), boundary:'viewport'}">
-                            {{ data.item.symbol | rebranding | truncate(15) }}
+                    <a :href="data.item.url" class="text-white">
+                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                            {{ data.item.symbol | truncate(15) }}
                         </span>
                     </a>
                 </template>
@@ -159,7 +159,7 @@ export default {
                     ? toMoney(item.amount, item.tradable.subunit)
                     : null;
                 item['symbol'] = item.tradable.symbol
-                    ? item.tradable.symbol
+                    ? this.rebrandingFunc(item.tradable)
                     : null;
                 item['status'] = item.status.statusCode
                     ? item.status.statusCode
@@ -175,8 +175,8 @@ export default {
             if (quote.hasOwnProperty('exchangeble')) {
                 /** @TODO In future we need to use another solution and remove hardcoded BTC & MINTME symbols **/
                 let params = {
-                    base: !quote.exchangeble ? quote.symbol : 'BTC',
-                    quote: quote.exchangeble && quote.tradable ? quote.symbol : 'WEB',
+                    base: !quote.exchangeble ? this.rebrandingFunc(quote) : 'BTC',
+                    quote: quote.exchangeble && quote.tradable ? this.rebrandingFunc(quote) : 'MINTME',
                 };
                 return this.$routing.generate('coin', params);
             }

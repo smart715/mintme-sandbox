@@ -10,10 +10,10 @@
                     <template v-slot:cell(name)="row">
                         <div
                             class="truncate-name w-100"
-                            v-b-tooltip="{title: rebrandingFunc(row.value), boundary:'viewport'}"
+                            v-b-tooltip="{title: row.value, boundary:'viewport'}"
                         >
-                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value | rebranding }}
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value }}
                             </a>
                         </div>
                     </template>
@@ -110,7 +110,10 @@ export default {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
                     side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
-                    name: this.pairNameFunc(history.market.base.symbol, history.market.quote.symbol),
+                    name: this.pairNameFunc(
+                        this.rebrandingFunc(history.market.base),
+                        this.rebrandingFunc(history.market.quote)
+                    ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
                     total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
@@ -148,7 +151,10 @@ export default {
         },
         generatePairUrl: function(market) {
             if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
-                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+                return this.$routing.generate('coin', {
+                    base: this.rebrandingFunc(market.base.symbol),
+                    quote: this.rebrandingFunc(market.quote.symbol)
+                });
             }
 
             return this.$routing.generate('token_show', {name: market.quote.name});
