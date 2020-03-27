@@ -3,6 +3,7 @@
 namespace App\Exchange\Balance\Factory;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -30,7 +31,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     }
 
     /** {@inheritdoc} */
-    public function create(BalanceResultContainer $container): array
+    public function create(BalanceResultContainer $container, ?User $user = null): array
     {
         $result = [];
 
@@ -44,6 +45,10 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
             $name = $token->getName();
             $fee = null;
             $subunit = $this->tokenSubunit;
+
+            $owner = !is_null($user) && !is_null($token->getProfile())
+                ? $user === $token->getProfile()->getUser()
+                : false;
 
             if ($token->getCrypto()) {
                 $fee = $token->getCrypto()->getFee();
@@ -63,7 +68,8 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $subunit,
                 $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
                 $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
-                Token::DEPLOYED === $token->getDeploymentStatus()
+                Token::DEPLOYED === $token->getDeploymentStatus(),
+                $owner
             );
         }
 
