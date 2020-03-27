@@ -11,7 +11,7 @@
                 fixed-width
             />
         </div>
-        <div v-else-if="hasAirdropCampaign" class="col-12 pb-3 px-0">
+        <div v-else-if="hasAirdropCampaign">
             <div>
                 <span
                     class="btn-cancel px-0 c-pointer m-1"
@@ -63,7 +63,7 @@
             <div v-if="!hasAirdropCampaign" class="col-12 pb-3 px-0">
                 <label class="custom-control custom-checkbox pb-0">
                     <input
-                        v-b-toggle.collapse-and-date
+                        v-b-toggle.collapse-end-date
                         v-model="showEndDate"
                         type="checkbox"
                         id="showEndDate"
@@ -77,7 +77,7 @@
                     </label>
                 </label>
             </div>
-            <b-collapse id="collapse-and-date">
+            <b-collapse id="collapse-end-date">
                 <div class="w-60 pb-3 px-0">
                     <label for="endDate" class="d-block text-left">
                         End date:
@@ -239,8 +239,12 @@ export default {
                 tokenName: this.tokenName,
             }), data)
                 .then((result) => {
+                    this.notifySuccess('Your airdrop was created successfully');
+
                     this.airdropCampaignId = result.data.id;
                     this.loading = false;
+
+                    location.reload();
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
