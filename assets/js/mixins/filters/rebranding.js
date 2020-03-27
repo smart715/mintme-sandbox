@@ -4,9 +4,9 @@ let rebranding = (val) => {
     }
 
     // Rebrand only Cryptos, not token names
-    if ('object' === typeof val) {
-        if (val.hasOwnProperty('symbol') && !cryptoSymbols.includes(val.symbol)) {
-            return val.symbol;
+    if ('object' === typeof val && val.hasOwnProperty('symbol')) {
+        if (!cryptoSymbols.includes(val.symbol)) {
+            return val.symbol
         } else {
             val = val.symbol;
         }
