@@ -105,7 +105,7 @@
                     </template>
                     <template v-slot:cell(pair)="row">
                         <div>
-                            <a v-if="shouldTruncate" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
+                            <a v-if="row.value.length > 22" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
                                 {{ row.value | truncate(22) }}
                             </a>
                             <a v-else :href="row.item.tokenUrl" class="text-white">
@@ -237,9 +237,6 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function() {
-            return this.row.value.length > 22;
-        },
         marketsHiddenNames: function() {
             if (undefined === typeof this.markets) {
                 return {};

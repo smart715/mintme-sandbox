@@ -5,7 +5,7 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-if="tokenName.length > 17" v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
+                    <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
                         {{ tokenName | rebranding | truncate(17) }}
                     </span>
                     <span v-else>
@@ -134,6 +134,9 @@ export default {
         this.startScrollListeningOnce(this.ordersList);
     },
     computed: {
+        shouldTruncate: function() {
+            return this.tokenName.length > 17;
+        },
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
                 new Decimal(order.amount).add(sum), 0), this.quotePrecision
