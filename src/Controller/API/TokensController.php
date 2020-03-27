@@ -432,12 +432,12 @@ class TokensController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
-        if (null == $user || $name !== $ownToken->getName()) {
-            throw new ApiUnauthorizedException('Unauthorized');
+        if (null === $requestedToken || null === $ownToken) {
+            throw new ApiNotFoundException('Token does not exist');
         }
 
-        if (null === $requestedToken) {
-            throw new ApiNotFoundException('Token does not exist');
+        if (null == $user || $name !== $ownToken->getName()) {
+            throw new ApiUnauthorizedException('Unauthorized');
         }
 
         if (Token::NOT_DEPLOYED !== $requestedToken->getDeploymentStatus()) {
