@@ -5,7 +5,7 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
+                    <span v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
                     {{ market.quote | rebranding | truncate(7) }}
                 </span>
                     <guide>
