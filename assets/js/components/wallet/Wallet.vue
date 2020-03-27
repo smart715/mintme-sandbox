@@ -59,7 +59,7 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <div v-if="shouldTruncate" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
                         <a :href="generatePairUrl(data.item)" class="text-white">
                             {{ data.item.name | truncate(17) }}
                         </a>
@@ -228,9 +228,6 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function() {
-            return this.data.item.name.length > 17;
-        },
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },

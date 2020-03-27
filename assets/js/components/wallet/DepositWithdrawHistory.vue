@@ -10,7 +10,7 @@
                 :class="{'empty-table': noHistory}"
             >
                 <template v-slot:cell(symbol)="data">
-                    <a v-if="shouldTruncate" :href="rebrandingFunc(data.item.url)" class="text-white">
+                    <a v-if="data.item.symbol.length > 17" :href="rebrandingFunc(data.item.url)" class="text-white">
                         <span v-b-tooltip="{title: rebrandingFunc(data.item.symbol), boundary:'viewport'}">
                             {{ data.item.symbol | rebranding | truncate(17) }}
                         </span>
@@ -110,9 +110,6 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function() {
-            return this.data.item.symbol.length > 17;
-        },
         sanitizedHistory: function() {
             return this.sanitizeHistory(JSON.parse(JSON.stringify(this.tableData)));
         },

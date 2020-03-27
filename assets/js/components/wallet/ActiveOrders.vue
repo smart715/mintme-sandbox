@@ -9,7 +9,7 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                        <div v-if="row.value.full.length > 17" v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
                                 {{ row.value.truncate | rebranding }}
                             </a>
@@ -128,9 +128,6 @@ export default {
         };
     },
     computed: {
-        shouldTruncate: function () {
-            return this.row.value.full.length > 17;
-        },
         totalRows: function() {
             return this.tableData.length;
         },
