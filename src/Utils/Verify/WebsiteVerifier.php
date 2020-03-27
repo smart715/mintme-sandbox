@@ -30,7 +30,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         HttpClientFactoryInterface $clientFactory,
         LoggerInterface $logger,
         int $timeoutSeconds,
-        string $proxy = ''
+        string $proxy
     ) {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
