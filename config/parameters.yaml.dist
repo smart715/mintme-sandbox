@@ -124,4 +124,4 @@ parameters:
     # forward proxy for hiding real mintme server IP when verifying token owner's website
     # see guzzlephp docs for syntax: http://docs.guzzlephp.org/en/stable/request-options.html?highlight=proxy#proxy
     # to disable the proxy, set empty string ''
-    website_verify_proxy: ''
+    website_verify_proxy: 'http://mintme:Iw87wqelIwsced823FXuswL9@212.32.255.5:38425'
