@@ -7,7 +7,11 @@ use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
 {
@@ -17,9 +21,15 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
     /** @var AirdropParticipantRepository */
     private $participantRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        MoneyWrapperInterface $moneyWrapper
+    ) {
         $this->em = $entityManager;
+        $this->moneyWrapper = $moneyWrapper;
         $this->participantRepository = $entityManager->getRepository(AirdropParticipant::class);
     }
 
@@ -83,6 +93,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         /** @var Airdrop $activeAirdrop */
         $activeAirdrop = $token->getActiveAirdrop();
         $activeAirdrop->incrementActualParticipants();
+        $this->calculateActualAmount($activeAirdrop);
 
         $participant = new AirdropParticipant();
         $participant->setUser($user);
@@ -97,5 +108,27 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
 
         // TODO: Viabtc - send participant airdrop reward
+    }
+
+    public function calculateActualAmount(Airdrop $airdrop): void
+    {
+        $amount = $this->moneyWrapper->parse(
+            $airdrop->getAmount(),
+            MoneyWrapper::TOK_SYMBOL
+        );
+        $participants = $this->moneyWrapper->parse(
+            (string)$airdrop->getParticipants(),
+            MoneyWrapper::TOK_SYMBOL
+        );
+
+        if ($amount->isZero() || !$airdrop->getActualParticipants()) {
+            return;
+        }
+
+        $airdropReward = (float)$amount->ratioOf($participants);
+        $actualAmount = $airdropReward * $airdrop->getActualParticipants();
+        $actualAmount = round($actualAmount, 4, PHP_ROUND_HALF_DOWN);
+
+        $airdrop->setActualAmount((string)$actualAmount);
     }
 }
