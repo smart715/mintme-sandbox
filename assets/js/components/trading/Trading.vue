@@ -136,7 +136,7 @@ import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, N
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import {tokenDeploymentStatus} from '../../utils/constants';
+import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
@@ -208,8 +208,11 @@ export default {
             });
             tokens = this.sanitizedMarketsOnTop.concat(tokens);
             tokens = _.map(tokens, (token) => {
-                return _.mapValues(token, (item) => {
-                    return this.rebrandingFunc(item);
+                return _.mapValues(token, (item, key) => {
+                    return cryptoSymbols.includes(token.base) && cryptoSymbols.includes(token.quote)
+                    || 'pair' !== key && 'tokenUrl' !== key
+                        ? this.rebrandingFunc(item)
+                        : item;
                 });
             });
 
