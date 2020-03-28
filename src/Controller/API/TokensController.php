@@ -426,23 +426,20 @@ class TokensController extends AbstractFOSRestController
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
-        $ownToken = $this->tokenManager->getOwnToken();
-        $requestedToken = $this->tokenManager->findByName($name);
+        $token = $this->tokenManager->findByName($name);
 
-        /** @var User $user */
-        $user = $this->getUser();
-
-        if (null === $requestedToken || null === $ownToken) {
+        if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        if (null == $user || $name !== $ownToken->getName()) {
-            throw new ApiUnauthorizedException('Unauthorized');
-        }
+        $this->denyAccessUnlessGranted('delete', $token);
 
-        if (Token::NOT_DEPLOYED !== $requestedToken->getDeploymentStatus()) {
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
+
+        /** @var User $user */
+        $user = $this->getUser();
 
         if (!$user->isGoogleAuthenticatorEnabled()) {
             $response = $emailAuthManager->checkCode($user, $request->get('code'));
@@ -452,16 +449,16 @@ class TokensController extends AbstractFOSRestController
             }
         }
 
-        if (!$balanceHandler->isNotExchanged($requestedToken, $this->getParameter('token_quantity'))) {
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
             throw new ApiBadRequestException('You need all your tokens to delete token');
         }
 
-        $this->em->remove($requestedToken);
+        $this->em->remove($token);
         $this->em->flush();
 
-        $this->addFlash('success', "Token {$requestedToken->getName()} was successfully deleted.");
+        $this->addFlash('success', "Token {$token->getName()} was successfully deleted.");
 
-        $mailer->sendTokenDeletedMail($requestedToken);
+        $mailer->sendTokenDeletedMail($token);
 
         $this->userActionLogger->info('Delete token', $request->all());
 
