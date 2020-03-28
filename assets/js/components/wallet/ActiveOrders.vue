@@ -9,9 +9,9 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
-                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.truncate|rebranding }}
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value.truncate }}
                             </a>
                         </div>
                     </template>
@@ -140,7 +140,10 @@ export default {
                 return {
                     date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
                     type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: this.pairNameFunc(order.market.base.symbol, order.market.quote.symbol),
+                    name: this.pairNameFunc(
+                        this.rebrandingFunc(order.market.base),
+                        this.rebrandingFunc(order.market.quote)
+                    ),
                     amount: toMoney(order.amount, order.market.base.subunit),
                     price: toMoney(order.price, order.market.base.subunit),
                     total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
@@ -216,7 +219,10 @@ export default {
         },
         generatePairUrl: function(market) {
             if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
-                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+                return this.$routing.generate('coin', {
+                    base: this.rebrandingFunc(market.base),
+                    quote: this.rebrandingFunc(market.quote),
+                });
             }
             return this.$routing.generate('token_show', {name: market.quote.name});
         },
