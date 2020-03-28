@@ -41,6 +41,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -98,6 +100,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'buy',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -341,6 +345,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -388,6 +394,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -409,6 +417,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
