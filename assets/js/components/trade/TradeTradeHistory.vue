@@ -26,13 +26,13 @@
 
                             <template v-slot:head(pricePerQuote)="row">
                                 <span v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
-                                    Price per {{ market.quote.symbol | rebranding | truncate(7) }}
+                                    Price per {{ market.quote | rebranding | truncate(7) }}
                                 </span>
                             </template>
 
                             <template v-slot:head(quoteAmount)="row">
-                                <span v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
-                                    {{ market.quote.symbol | rebranding | truncate(7) }} amount
+                                <span v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
+                                    {{ market.quote | rebranding | truncate(7) }} amount
                                 </span>
                             </template>
 
