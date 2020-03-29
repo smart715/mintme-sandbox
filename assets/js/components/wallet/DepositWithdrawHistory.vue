@@ -4,7 +4,6 @@
         <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table" v-if="!noHistory">
             <b-table
                 thead-class="trading-head"
-                v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fields"
                 :class="{'empty-table': noHistory}"

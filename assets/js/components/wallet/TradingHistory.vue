@@ -4,7 +4,6 @@
             <div class="table-responsive table-restricted" ref="table" v-if="hasHistory">
                 <b-table
                     thead-class="trading-head"
-                    v-if="hasHistory"
                     :items="history"
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"

@@ -14,9 +14,8 @@
 {% endblock %}
 
 {% block content %}
-
-    <div id="token" class="container">
-        {{ include('spinners/pair.html.twig') }}
+<div id="token" class="container">
+    {{ include('spinners/pair.html.twig') }}
     <div class="row pt-5 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
