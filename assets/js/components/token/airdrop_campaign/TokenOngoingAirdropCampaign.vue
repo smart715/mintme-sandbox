@@ -29,9 +29,13 @@
                     <confirm-modal
                             :visible="showModal"
                             :show-cancel-button="!isOwner && !alreadyClaimed"
-                            @confirm="claimAirdropCampaign"
+                            @confirm="modalOnConfirm"
+                            @cancel="modalOnCancel"
                             @close="showModal = false">
-                        <p v-if="isOwner">
+                        <p v-if="!loggedIn">
+                            You have to be logged in to claim {{ airdropReward }} {{ tokenName }}
+                        </p>
+                        <p v-else-if="isOwner">
                             Sorry, you can't participate in your own airdrop.
                         </p>
                         <p v-else-if="alreadyClaimed">
@@ -40,7 +44,10 @@
                         <p v-else class="text-white modal-title pt-2">
                             Are you sure you want to claim {{ airdropReward }} {{ tokenName }}?
                         </p>
-                        <template v-if="isOwner || alreadyClaimed" v-slot:confirm>OK</template>
+                        <template v-if="!loggedIn" v-slot:cancel>Sign up</template>
+                        <template v-if="!loggedIn || isOwner || alreadyClaimed" v-slot:confirm>
+                            {{ confirmButtonText }}
+                        </template>
                     </confirm-modal>
                 </div>
             </div>
@@ -66,9 +73,12 @@ export default {
         ConfirmModal,
     },
     props: {
+        loggedIn: Boolean,
         isOwner: Boolean,
         tokenName: String,
         userAlreadyClaimed: Boolean,
+        loginUrl: String,
+        signupUrl: String,
     },
     data() {
         return {
@@ -107,6 +117,19 @@ export default {
         endsTime: function() {
             return moment(this.airdropCampaign.endDate).format('HH:mm');
         },
+        confirmButtonText: function() {
+            let button = '';
+
+            if (!this.loggedIn) {
+                button = 'Log In';
+            }
+
+            if (this.isOwner || this.alreadyClaimed) {
+                button = 'OK';
+            }
+
+            return button;
+        },
     },
     methods: {
         getAirdropCampaign: function() {
@@ -122,7 +145,11 @@ export default {
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },
-        claimAirdropCampaign: function() {
+        modalOnConfirm: function() {
+            if (!this.loggedIn) {
+                window.location.replace(this.loginUrl);
+            }
+
             if (this.alreadyClaimed) {
                 return;
             }
@@ -143,6 +170,11 @@ export default {
                     this.notifyError('Something went wrong. Try to reload the page.');
                     this.sendLogs('error', 'Can not create API Client', err);
                 });
+        },
+        modalOnCancel: function() {
+            if (!this.loggedIn) {
+                window.location.replace(this.signupUrl);
+            }
         },
     },
 };
