@@ -19,7 +19,10 @@ class CurrenciesControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/currencies', [], [], [
+        $this->client->request('GET', '/dev/api/v1/currencies', [
+            'offset' => 0,
+            'limit' => 100,
+        ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);

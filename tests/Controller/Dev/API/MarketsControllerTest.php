@@ -19,7 +19,10 @@ class MarketsControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/markets', [], [], [
+        $this->client->request('GET', '/dev/api/v1/markets', [
+            'offset' => 0,
+            'limit' => 100,
+        ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
