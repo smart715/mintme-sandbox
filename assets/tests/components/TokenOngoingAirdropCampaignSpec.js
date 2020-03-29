@@ -2,6 +2,7 @@ import {createLocalVue, mount, shallowMount} from '@vue/test-utils';
 import TokenOngoingAirdropCampaign from '../../js/components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
 import moxios from 'moxios';
 import axios from 'axios';
+import moment from 'moment';
 
 /**
  * @return {Wrapper<Vue>}
@@ -67,6 +68,49 @@ describe('TokenOngoingAirdropCampaign', () => {
         expect(wrapper.vm.airdropReward).to.equal('3');
     });
 
+    it('should format airdrop end date/time properly', () => {
+        let dateNow = moment();
+        const localVue = mockVue();
+        const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
+            localVue,
+            data() {
+                return {
+                    airdropCampaign: {
+                        endDate: dateNow,
+                    },
+                };
+            },
+        });
+
+        expect(wrapper.vm.endsDate).to.equal(moment(dateNow).format('D MMMM YYYY'));
+        expect(wrapper.vm.endsTime).to.equal(moment(dateNow).format('HH:mm'));
+    });
+
+    it('should show confirm button text properly', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
+            localVue,
+            propsData: {
+                loggedIn: false,
+                isOwner: false,
+            },
+            data() {
+                return {
+                    alreadyClaimed: false,
+                };
+            },
+        });
+
+        expect(wrapper.vm.confirmButtonText).to.equal('Log In');
+        wrapper.vm.loggedIn = true;
+        expect(wrapper.vm.confirmButtonText).to.equal('');
+        wrapper.vm.isOwner = true;
+        expect(wrapper.vm.confirmButtonText).to.equal('OK');
+        wrapper.vm.isOwner = false;
+        wrapper.vm.alreadyClaimed = true;
+        expect(wrapper.vm.confirmButtonText).to.equal('OK');
+    });
+
     it('should check airdrop end date', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
@@ -125,12 +169,13 @@ describe('TokenOngoingAirdropCampaign', () => {
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
             propsData: {
+                loggedIn: true,
                 tokenName: 'test1',
                 userAlreadyClaimed: false,
             },
         });
 
-        wrapper.vm.claimAirdropCampaign();
+        wrapper.vm.modalOnConfirm();
 
         moxios.wait(() => {
             let request = moxios.requests.mostRecent();
