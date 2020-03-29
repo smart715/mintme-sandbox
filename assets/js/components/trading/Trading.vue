@@ -259,7 +259,7 @@ export default {
                     return this.rebrandingFunc(item);
                 });
             });
-            return tokens;
+            return this.setTokenPositions(tokens);
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
@@ -411,8 +411,6 @@ export default {
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
-
-                        this.setPositionToMarkets(page);
 
                         if (window.history.replaceState) {
                             // prevents browser from storing history with each change:
@@ -726,13 +724,14 @@ export default {
             this.sortBy = this.volumes[this.activeVolume].key;
             this.sortDesc = true;
         },
-        setPositionToMarkets: function(page) {
+        setTokenPositions: function(tokens) {
             let positionIndex = 1;
-            for (let key in this.markets) {
-                if (this.markets.hasOwnProperty(key) && this.markets[key].quote !== null) {
-                    this.markets[key].position = BTC.symbol === this.markets[key].base.symbol ? '' : (positionIndex++) * page;
-                }
-            }
+            return _.map(tokens, (token) => {
+                 if (BTC.symbol != token.base) {
+                     token.position = positionIndex++;
+                 };
+                return token;
+            });
         },
     },
 };
