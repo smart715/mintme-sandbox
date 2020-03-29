@@ -1,13 +1,13 @@
 <template>
     <div
         ref="ongoing-airdrop-campaign"
-        class="col-md-10 bg-green">
-        <div v-if="loaded" class="container">
+        class="card col-12 bg-green py-1">
+        <div v-if="loaded">
             <div class="row">
-                <div class="col-3 text-right">
-                    <span class="font-size-h3 align-self-center mx-auto">Ongoing airdrop!</span>
+                <div class="col-sm-3 align-self-center">
+                    <h4 class="my-0 mx-auto line-height-1">Ongoing airdrop!</h4>
                 </div>
-                <div class="col-6 align-middle">
+                <div class="col-sm-7 align-middle">
                     <p class="m-0 text-white">
                         For first {{ airdropCampaign.participants }} participants
                         {{ airdropReward }} {{ tokenName }} for free.
@@ -19,7 +19,7 @@
                         Airdrop ends on {{ endsDate }} at {{ endsTime }}
                     </p>
                 </div>
-                <div class="col-3 text-right align-self-center mx-auto">
+                <div class="col-sm-2 text-right align-self-center">
                     <button
                         :disabled="btnDisabled"
                         @click="showModal = true"
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div v-else class="text-center">
+        <div v-else class="text-center py-1">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
         </div>
     </div>
