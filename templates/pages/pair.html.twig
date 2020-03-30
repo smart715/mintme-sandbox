@@ -18,6 +18,7 @@
 {% set showAirdropCampaign = showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed ? 'true' : 'false' %}
 <div id="token" class="container">
+    {{ include('spinners/pair.html.twig') }}
     <div class="row pt-5 justify-content-center">
         <div class="col-md-10" v-cloak>
             <token-ongoing-airdrop-campaign
@@ -126,7 +127,7 @@
                             <div class="nav-link-token">
                                 <div class="truncate-token">
                                     {% if(market.quote.name | rebranding is same as(mintme_coin)) %}
-                                        <a href="{{ mintme_coin_link }}" target="_blank"> 
+                                        <a href="{{ mintme_coin_link }}" target="_blank">
                                             <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
                                                 {{ market.quote.name | rebranding }}
                                             </span>
