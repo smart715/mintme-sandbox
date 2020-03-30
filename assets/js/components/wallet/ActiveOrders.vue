@@ -9,9 +9,14 @@
                     :items="history"
                     :fields="fields">
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                        <div v-if="row.value.full.length > 17" v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.truncate|rebranding }}
+                                {{ row.value.truncate | rebranding }}
+                            </a>
+                        </div>
+                        <div v-else>
+                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
+                                {{ row.value.full | rebranding }}
                             </a>
                         </div>
                     </template>
@@ -33,7 +38,7 @@
                     @close="switchConfirmModal(false)"
                     @confirm="removeOrder"
             >
-                <div class="pt-2">
+                <div class="pt-2 overflow-wrap-break-word">
                     Are you sure that you want to remove {{ this.currentRow.name }}
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
@@ -102,7 +107,7 @@ export default {
                     formatter: (name) => {
                         return {
                             full: name,
-                            truncate: this.truncateFunc(name, 7),
+                            truncate: this.truncateFunc(name, 17),
                         };
                     },
                 },

@@ -1,5 +1,5 @@
 <template>
-    <div class="truncate-token">
+    <div class="overflow-wrap-break-word">
         <template v-if="editable">
             <token-edit-modal
                 v-if="editable"
@@ -25,7 +25,7 @@
                 @click="editToken"
             />
         </template>
-        <span v-b-tooltip="{title: rebrandingFunc(currentName), boundary:'viewport'}">
+        <span>
             {{ currentName|rebranding }}
         </span>
     </div>
