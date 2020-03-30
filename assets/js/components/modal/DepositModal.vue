@@ -20,9 +20,7 @@
                     <div class="clearfix"></div>
                     <b-row>
                         <b-col>
-                            <p class="text-center mt-2">
-                                {{ description|rebranding }}
-                            </p>
+                            <p class="text-center mt-2 overflow-wrap-break-word">{{ description|rebranding }}</p>
                         </b-col>
                     </b-row>
                     <b-row>

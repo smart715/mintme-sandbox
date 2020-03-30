@@ -9,9 +9,14 @@
                 :class="{'empty-table': noHistory}"
             >
                 <template v-slot:cell(symbol)="data">
-                    <a :href="rebrandingFunc(data.item.url)" class="text-white">
+                    <a v-if="data.item.symbol.length > 17" :href="rebrandingFunc(data.item.url)" class="text-white">
                         <span v-b-tooltip="{title: rebrandingFunc(data.item.symbol), boundary:'viewport'}">
-                            {{ data.item.symbol | rebranding | truncate(15) }}
+                            {{ data.item.symbol | rebranding | truncate(17) }}
+                        </span>
+                    </a>
+                    <a v-else :href="rebrandingFunc(data.item.url)" class="text-white">
+                        <span>
+                            {{ data.item.symbol | rebranding }}
                         </span>
                     </a>
                 </template>
