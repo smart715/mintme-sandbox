@@ -56,4 +56,6 @@ interface BalanceHandlerInterface
         int $incrementer = 5,
         int $max = 40
     ): array;
+
+    public function update(User $user, Token $token, Money $amount, string $type): void;
 }

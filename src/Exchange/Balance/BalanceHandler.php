@@ -147,7 +147,7 @@ class BalanceHandler implements BalanceHandlerInterface
      * @throws FetchException
      * @throws BalanceException
      */
-    private function update(User $user, Token $token, Money $amount, string $type): void
+    public function update(User $user, Token $token, Money $amount, string $type): void
     {
         try {
             $this->balanceFetcher->update(

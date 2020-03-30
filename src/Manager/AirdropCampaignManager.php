@@ -6,11 +6,13 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Exception\BalanceException;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
+use InvalidArgumentException;
 use Money\Money;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
@@ -24,12 +26,17 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var BalanceHandlerInterface */
+    private $balanceHandler;
+
     public function __construct(
         EntityManagerInterface $entityManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        BalanceHandlerInterface $balanceHandler
     ) {
         $this->em = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->balanceHandler = $balanceHandler;
         $this->participantRepository = $entityManager->getRepository(AirdropParticipant::class);
     }
 
@@ -93,11 +100,19 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         /** @var Airdrop $activeAirdrop */
         $activeAirdrop = $token->getActiveAirdrop();
         $activeAirdrop->incrementActualParticipants();
-        $this->calculateActualAmount($activeAirdrop);
+        $airdropReward = $this->getAirdropReward($activeAirdrop);
 
-        $participant = new AirdropParticipant();
-        $participant->setUser($user);
-        $participant->setAirdrop($activeAirdrop);
+        $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
+        $this->balanceHandler->update(
+            $token->getProfile()->getUser(),
+            $token,
+            $airdropReward->negative(),
+            'reward'
+        );
+
+        $airdropReward = $airdropReward->multiply((int)$activeAirdrop->getActualParticipants());
+        $activeAirdrop->setActualAmount($this->moneyWrapper->format($airdropReward));
+        $participant = $this->createNewParticipant($user, $activeAirdrop);
 
         $this->em->persist($activeAirdrop);
         $this->em->persist($participant);
@@ -106,11 +121,9 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         if ($activeAirdrop->getParticipants() === $activeAirdrop->getActualParticipants()) {
             $this->deleteAirdrop($activeAirdrop);
         }
-
-        // TODO: Viabtc - send participant airdrop reward
     }
 
-    public function calculateActualAmount(Airdrop $airdrop): void
+    public function getAirdropReward(Airdrop $airdrop): Money
     {
         $amount = $this->moneyWrapper->parse(
             $airdrop->getAmount(),
@@ -122,13 +135,19 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         );
 
         if ($amount->isZero() || !$airdrop->getActualParticipants()) {
-            return;
+            throw new InvalidArgumentException('Airdrop reward calculation failed.');
         }
 
-        $airdropReward = (float)$amount->ratioOf($participants);
-        $actualAmount = $airdropReward * $airdrop->getActualParticipants();
-        $actualAmount = round($actualAmount, 4, PHP_ROUND_HALF_DOWN);
+        return $this->moneyWrapper->parse(
+            $amount->ratioOf($participants),
+            MoneyWrapper::TOK_SYMBOL
+        );
+    }
 
-        $airdrop->setActualAmount((string)$actualAmount);
+    private function createNewParticipant(User $user, Airdrop $airdrop): AirdropParticipant
+    {
+        return (new AirdropParticipant())
+            ->setUser($user)
+            ->setAirdrop($airdrop);
     }
 }
