@@ -138,6 +138,7 @@ services:
     App\Utils\Verify\WebsiteVerifier:
         arguments:
             $timeoutSeconds: '%verify_timeout_seconds%'
+            $proxy: '%website_verify_proxy%'
 
     App\Command\UpdateTokenRelease:
         arguments:
