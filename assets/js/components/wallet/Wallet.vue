@@ -59,7 +59,12 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <div class="truncate-name w-100" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                        <a :href="generatePairUrl(data.item)" class="text-white">
+                            {{ data.item.name | truncate(17) }}
+                        </a>
+                    </div>
+                    <div v-else>
                         <a :href="generatePairUrl(data.item)" class="text-white">
                             {{ data.item.name }}
                         </a>
@@ -378,10 +383,10 @@ export default {
                         this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
                             .then((res) =>
                                 this.tokens[token].available = res.data ?
-                                    new Decimal(oToken.available).sub(res.data.frozenAmountWithReceived) : oToken.available
+                                    new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
                             )
                             .catch((err) => {
-                                this.sendLogs('error', 'Can not get lock_period', err);
+                                this.sendLogs('error', 'Can not get lock-period', err);
                             });
                     }
                 });

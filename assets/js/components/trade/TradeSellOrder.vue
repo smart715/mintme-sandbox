@@ -43,10 +43,16 @@
                             >
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
-                                <span class="c-pointer" @click="balanceClicked">
-                                    {{ market.quote.symbol | rebranding | truncate(7) }}:
+                                <span>
+                                    <span v-if="shouldTruncate" class="c-pointer" @click="balanceClicked"
+                                        v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                        {{ market.quote.symbol | rebranding | truncate(17) }} :
+                                    </span>
+                                    <span v-else class="c-pointer" @click="balanceClicked">
+                                        {{ market.quote.symbol | rebranding }} :
+                                    </span>
                                     <span class="text-white">
-                                        <span class="text-nowrap">
+                                        <span class="text-nowrap p-1">
                                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                         </span>
                                         <span class="text-nowrap">
@@ -74,7 +80,12 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol | rebranding }}</span>
+                            <span v-if="shouldTruncate" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding | truncate(17) }}
+                            </span>
+                            <span v-else class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding }}
+                            </span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">
@@ -283,6 +294,9 @@ export default {
         ]),
     },
     computed: {
+        shouldTruncate: function() {
+            return this.market.quote.symbol.length > 17;
+        },
         totalPrice: function() {
             return new Decimal(this.sellPrice && !isNaN(this.sellPrice) ? this.sellPrice : 0)
                 .times(this.sellAmount && !isNaN(this.sellAmount) ? this.sellAmount : 0)
