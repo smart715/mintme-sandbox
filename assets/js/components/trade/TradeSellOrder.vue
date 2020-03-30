@@ -9,7 +9,7 @@
                             Sell Order
                         </template>
                         <template slot="body">
-                            Form used to create  an order so you can sell {{ market.quote.symbol | rebranding }} or make offer.
+                            Form used to create  an order so you can sell {{ market.quote | rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
@@ -26,7 +26,7 @@
                                     Price in {{ market.base.symbol | rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {{ market.quote.symbol | rebranding }}.
+                                    The price at which you want to sell one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
                         </label>
@@ -44,7 +44,7 @@
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
                                 <span class="c-pointer" @click="balanceClicked">
-                                    {{ market.quote.symbol | rebranding | truncate(7) }}:
+                                    {{ market.quote | rebranding | truncate(7) }}:
                                     <span class="text-white">
                                         <span class="text-nowrap">
                                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
@@ -59,7 +59,7 @@
                                                     Your Tokens
                                                 </template>
                                                 <template slot="body">
-                                                    Your {{ market.quote.symbol | rebranding }} balance.
+                                                    Your {{ market.quote | rebranding }} balance.
                                                 </template>
                                             </guide>
                                         </span>
@@ -74,7 +74,7 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol | rebranding }}</span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote | rebranding }}</span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">

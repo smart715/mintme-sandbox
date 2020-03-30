@@ -19,7 +19,10 @@ class MarketsControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/markets', [], [], [
+        $this->client->request('GET', '/dev/api/v1/markets', [
+            'offset' => 0,
+            'limit' => 100,
+        ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
@@ -94,7 +97,6 @@ class MarketsControllerTest extends WebTestCase
         $this->assertCount(3, $res2);
         $this->assertEquals($res1[0], $res2[0]);
         $this->assertNotEquals($res1[1], $res2[1]);
-        // todo fix offset then remove the comment here.
-        //$this->assertEquals($res1[2], $res2[1]);
+        $this->assertEquals($res1[2], $res2[1]);
     }
 }

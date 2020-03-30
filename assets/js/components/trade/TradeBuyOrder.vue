@@ -27,7 +27,7 @@
                                     Price in {{ market.base.symbol | rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to buy one {{ market.quote.symbol | rebranding }}.
+                                    The price at which you want to buy one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
                         </label>
@@ -74,7 +74,7 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol | rebranding }}</span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote | rebranding }}</span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">

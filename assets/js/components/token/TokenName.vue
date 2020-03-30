@@ -25,8 +25,8 @@
                 @click="editToken"
             />
         </template>
-        <span v-b-tooltip="{title: rebrandingFunc(currentName), boundary:'viewport'}">
-            {{ currentName|rebranding }}
+        <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
+            {{ currentName }}
         </span>
     </div>
 </template>
@@ -36,7 +36,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mixin as clickaway} from 'vue-clickaway';
-import {WebSocketMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {WebSocketMixin, FiltersMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import TokenEditModal from '../modal/TokenEditModal';
 
 library.add(faEdit);
@@ -58,7 +58,7 @@ export default {
         FontAwesomeIcon,
         TokenEditModal,
     },
-    mixins: [WebSocketMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin, clickaway, LoggerMixin],
+    mixins: [WebSocketMixin, FiltersMixin, NotificationMixin, clickaway, LoggerMixin],
     data() {
         return {
             currentName: this.name,
