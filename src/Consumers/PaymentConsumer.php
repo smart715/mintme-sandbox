@@ -118,7 +118,11 @@ class PaymentConsumer implements ConsumerInterface
         if (self::STATUS_FAIL === $clbResult->getStatus()) {
             try {
                 $strategy = $tradable instanceof Token
-                    ? new PaymentTokenStrategy($this->balanceHandler, $this->cryptoManager, $this->moneyWrapper)
+                    ? new PaymentTokenStrategy(
+                        $this->balanceHandler,
+                        $this->cryptoManager,
+                        $this->moneyWrapper
+                    )
                     : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
                 $balanceContext = new BalanceContext($strategy);
