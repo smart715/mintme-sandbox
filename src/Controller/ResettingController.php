@@ -78,7 +78,7 @@ class ResettingController extends FOSResettingController
         }
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
+        $this->eventDispatcher->dispatch($event);
 
         $resettingForm = $this->createForm(ResettingType::class, $user);
         $resettingForm->handleRequest($request);
@@ -91,7 +91,7 @@ class ResettingController extends FOSResettingController
 
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
             $event = new FormEvent($resettingForm, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+            $this->eventDispatcher->dispatch($event);
 
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
