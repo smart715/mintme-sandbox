@@ -1,10 +1,9 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table">
+        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table" v-if="!noHistory">
             <b-table
                 thead-class="trading-head"
-                v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
@@ -31,12 +30,12 @@
                     </div>
                 </template>
             </b-table>
-            <div v-if="noHistory">
-                <p class="text-center p-5">No transactions were added yet</p>
-            </div>
         </div>
         <div v-if="loading" class="p-1 text-center">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </div>
+        <div v-else-if="noHistory">
+            <p class="text-center p-5">No transactions were added yet</p>
         </div>
         </template>
         <template v-else>
