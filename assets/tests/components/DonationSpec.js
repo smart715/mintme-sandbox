@@ -197,6 +197,18 @@ describe('Donation', () => {
 
         wrapper.vm.amountToDonate = '0.0001';
         expect(wrapper.vm.isAmountValid).to.be.true;
+
+        wrapper.vm.selectedCurrency = btcSymbol;
+        wrapper.vm.amountToDonate = 0.0000001;
+        expect(wrapper.vm.isAmountValid).to.be.false;
+        wrapper.vm.amountToDonate = 0.000001;
+        expect(wrapper.vm.isAmountValid).to.be.true;
+
+        wrapper.vm.selectedCurrency = webSymbol;
+        wrapper.vm.amountToDonate = 0.00001;
+        expect(wrapper.vm.isAmountValid).to.be.false;
+        wrapper.vm.amountToDonate = 0.0001;
+        expect(wrapper.vm.isAmountValid).to.be.true;
     });
 
     it('should properly disable button', () => {

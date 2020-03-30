@@ -139,7 +139,7 @@ import {
 import Guide from '../Guide';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {webSymbol, btcSymbol, HTTP_ACCEPTED} from '../../utils/constants';
+import {webSymbol, btcSymbol, HTTP_ACCEPTED, BTC, MINTME} from '../../utils/constants';
 
 export default {
     name: 'Donation',
@@ -174,6 +174,8 @@ export default {
             donationChecking: false,
             balanceLoaded: false,
             balance: 0,
+            minBtcAmount: 0.000001,
+            minWebAmount: 0.0001,
         };
     },
     computed: {
@@ -193,8 +195,18 @@ export default {
                 ? this.donationCurrency
                 : 'Select currency';
         },
+        currencySubunit: function() {
+            return btcSymbol === this.selectedCurrency
+                ? BTC.subunit
+                : MINTME.subunit;
+        },
+        currencyMinAmount: function() {
+            return btcSymbol === this.selectedCurrency
+                ? this.minBtcAmount
+                : this.minWebAmount;
+        },
         minTotalPrice: function() {
-            return toMoney('1e-' + this.market.base.subunit, this.market.base.subunit);
+            return toMoney('1e-' + this.currencySubunit, this.currencySubunit);
         },
         insufficientFunds: function() {
             return this.balanceLoaded &&
@@ -205,7 +217,8 @@ export default {
                 );
         },
         isAmountValid: function() {
-            return !!parseFloat(this.amountToDonate) && (new Decimal(this.amountToDonate)).greaterThan(0);
+            return !!parseFloat(this.amountToDonate)
+                && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
             return !this.loggedIn
@@ -260,7 +273,7 @@ export default {
                 });
         },
         checkAmountInput: function() {
-            return this.checkInput(this.market.base.subunit);
+            return this.checkInput(this.currencySubunit);
         },
         onKeyup: function() {
             let self = this;
@@ -274,6 +287,12 @@ export default {
         },
         checkDonation: function() {
             this.donationChecking = true;
+            console.info(
+                'check_donation API, params:',
+                'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
+                'amount: ', this.amountToDonate,
+                'fee: ', this.donationFee
+            );
 
             this.$axios.retry.get(this.$routing.generate('check_donation', {
                 base: this.selectedCurrency,
@@ -284,6 +303,12 @@ export default {
                 .then((res) => {
                     this.amountToReceive = res.data;
                     this.donationChecking = false;
+
+                    console.info(
+                        'check_donation API, result:',
+                        'amountToReceive (fake data, should be generated on viabtc side): ',
+                        this.amountToReceive
+                    );
                 })
                 .catch((err) => {
                     this.notifyError('Can not to calculate amount of tokens. Try again later.');
@@ -291,6 +316,14 @@ export default {
                 });
         },
         makeDonation: function() {
+            console.info(
+                'make_donation API, params:',
+                'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
+                'amount: ', this.amountToDonate,
+                'fee: ', this.donationFee,
+                'expected_count_to_receive (fake data): ', this.amountToReceive
+            );
+
             this.$axios.single.post(this.$routing.generate('make_donation', {
                 base: this.selectedCurrency,
                 quote: this.market.quote.symbol,
@@ -307,6 +340,9 @@ export default {
                         );
 
                         this.resetAmount();
+                        console.info('Load token\'s balance after success donation' +
+                            ' (it should be updated om viabtc side).');
+                        this.getTokenBalance();
                     }
                 }, (error) => {
                     if (!error.response) {
