@@ -10,6 +10,7 @@
             <div class="col-12">
                 <div class="card card-fixed-large mx-auto">
                     <div class="card-body p-0">
+                        {{ include('spinners/trading.html.twig') }}
                         <trading
                             websocket-url="{{ global_websocket_url }}"
                             coinbase-url="{{ global_coinbase_url }}"

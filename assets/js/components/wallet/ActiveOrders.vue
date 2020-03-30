@@ -1,7 +1,7 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table">
+            <div class="table-responsive table-restricted" ref="table" v-if="hasOrders">
                 <b-table
                     thead-class="trading-head"
                     ref="btable"
@@ -21,12 +21,12 @@
                         </a>
                     </template>
                 </b-table>
-                <div v-if="!hasOrders">
-                    <p class="text-center p-5">No order was added yet</p>
-                </div>
             </div>
             <div v-if="loading" class="p-1 text-center">
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
+            <div v-else-if="!hasOrders">
+                <p class="text-center p-5">No order was added yet</p>
             </div>
             <confirm-modal
                     :visible="confirmModal"
