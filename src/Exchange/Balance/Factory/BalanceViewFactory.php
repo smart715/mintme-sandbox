@@ -47,7 +47,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
             $subunit = $this->tokenSubunit;
 
             $owner = !is_null($user) && !is_null($token->getProfile())
-                ? $user === $token->getProfile()->getUser()
+                ? $user->getId() === $token->getProfile()->getUser()->getId()
                 : false;
 
             if ($token->getCrypto()) {
