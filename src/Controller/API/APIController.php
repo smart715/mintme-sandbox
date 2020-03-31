@@ -2,13 +2,14 @@
 
 namespace App\Controller\API;
 
+use App\Controller\TwoFactorAuthenticatedController;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 
-abstract class APIController extends AbstractFOSRestController
+abstract class APIController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
 {
     /** @var TokenManagerInterface */
     private $tokenManager;
