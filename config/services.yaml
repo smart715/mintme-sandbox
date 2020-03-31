@@ -109,7 +109,7 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
-    App\Exchange\Donation\DonationHandler:
+    App\Exchange\Donation\DonationFetcher:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 

@@ -32,7 +32,9 @@ class DonationController extends AbstractFOSRestController
      */
     public function checkDonation(Market $market, string $amount): View
     {
-        $amountToReceive = 10;
+        // Fake data to avoid exception. Will be removed after viabtc API will done.
+        $amountToReceive = '10';
+
 //        $amountToReceive = $this->donationHandler->checkDonation(
 //            $market,
 //            $amount,
@@ -54,7 +56,7 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
-        $donationParams = $this->getParameter('donation');
+        // To avoid exception. Will be removed after viabtc API will done.
 //        $this->donationHandler->makeDonation(
 //            $market,
 //            (string)$request->get('amount'),

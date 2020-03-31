@@ -3,11 +3,9 @@
 namespace App\Tests\Exchange\Donation;
 
 use App\Communications\CryptoRatesFetcherInterface;
-use App\Communications\Exception\FetchException;
-use App\Communications\JsonRpcInterface;
-use App\Communications\JsonRpcResponse;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Exchange\Donation\DonationFetcherInterface;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
@@ -21,8 +19,7 @@ class DonationHandlerTest extends TestCase
 
     use MockMoneyWrapper;
 
-    /** @dataProvider getCheckDonationProvider */
-    public function testCheckDonation(bool $hasError, ?string $expectedToReceive): void
+    public function testCheckDonation(): void
     {
         $base = $this->mockCrypto();
         $base->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
@@ -39,47 +36,27 @@ class DonationHandlerTest extends TestCase
             ->with($market)
             ->willReturn('TOK000000000123WEB');
 
-        $jsonResponse = $this->createMock(JsonRpcResponse::class);
-        $jsonResponse->method('hasError')->willReturn($hasError);
-        $jsonResponse->method('getResult')->willReturn($expectedToReceive);
-
-        $jsonRpc = $this->createMock(JsonRpcInterface::class);
-        $jsonRpc->method('send')
-            ->with('order.check_donation', [
-                'TOK000000000123WEB',
-                '75',
-                '1',
-            ])
-            ->willReturn($jsonResponse);
+        $fetcher = $this->createMock(DonationFetcherInterface::class);
+        $fetcher
+            ->method('checkDonation')
+            ->with('TOK000000000123WEB', '75', '1')
+            ->willReturn('5');
 
         $donationHandler = new DonationHandler(
-            $jsonRpc,
+            $fetcher,
             $marketNameConverter,
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
             $this->mockCryptoManager($base)
         );
 
-        if ($hasError) {
-            $this->expectException(FetchException::class);
-        }
-
         $this->assertEquals(
-            $expectedToReceive,
+            '5',
             $donationHandler->checkDonation($market, '75', '1')
         );
     }
 
-    public function getCheckDonationProvider(): array
-    {
-        return [
-            [false, '0'],
-            [true, '50'],
-        ];
-    }
-
-    /** @dataProvider getMakeDonationProvider */
-    public function testMakeDonation(bool $hasError): void
+    public function testMakeDonation(): void
     {
         $webCrypto = $this->mockCrypto();
         $webCrypto->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
@@ -99,42 +76,21 @@ class DonationHandlerTest extends TestCase
             ->with($market)
             ->willReturn('TOK000000000123BTC');
 
-        $jsonResponse = $this->createMock(JsonRpcResponse::class);
-        $jsonResponse->method('hasError')->willReturn($hasError);
-        $jsonResponse->method('getResult');
-
-        $jsonRpc = $this->createMock(JsonRpcInterface::class);
-        $jsonRpc->method('send')
-            ->with('order.make_donation', [
-                'TOK000000000123BTC',
-                '375000000000',
-                '1',
-                '20000',
-            ])
-            ->willReturn($jsonResponse);
+        $fetcher = $this->createMock(DonationFetcherInterface::class);
+        $fetcher
+            ->method('makeDonation')
+            ->with('TOK000000000123BTC', '375000000000', '1', '20000');
 
         $donationHandler = new DonationHandler(
-            $jsonRpc,
+            $fetcher,
             $marketNameConverter,
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
             $this->mockCryptoManager($webCrypto)
         );
 
-        if ($hasError) {
-            $this->expectException(FetchException::class);
-        }
-
         $donationHandler->makeDonation($market, '30000', '1', '20000');
         $this->assertTrue(true);
-    }
-
-    public function getMakeDonationProvider(): array
-    {
-        return [
-            [false],
-            [true],
-        ];
     }
 
     /** @return Crypto|MockObject */

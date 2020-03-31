@@ -3,8 +3,6 @@
 namespace App\Exchange\Donation;
 
 use App\Communications\CryptoRatesFetcherInterface;
-use App\Communications\Exception\FetchException;
-use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Exchange\Market;
@@ -18,11 +16,8 @@ use Money\Money;
 
 class DonationHandler implements DonationHandlerInterface
 {
-    private const CHECK_DONATION_METHOD = 'order.check_donation';
-    private const MAKE_DONATION_METHOD = 'order.make_donation';
-
-    /** @var JsonRpcInterface */
-    private $jsonRpc;
+    /** @var DonationFetcherInterface */
+    private $donationFetcher;
 
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
@@ -37,13 +32,13 @@ class DonationHandler implements DonationHandlerInterface
     protected $cryptoManager;
 
     public function __construct(
-        JsonRpcInterface $jsonRpc,
+        DonationFetcherInterface $donationFetcher,
         MarketNameConverterInterface $marketNameConverter,
         MoneyWrapperInterface $moneyWrapper,
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
         CryptoManagerInterface $cryptoManager
     ) {
-        $this->jsonRpc = $jsonRpc;
+        $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
@@ -57,20 +52,13 @@ class DonationHandler implements DonationHandlerInterface
 
         if ($this->isBTCMarket($market)) {
             $amountObj = $this->convertAmountToWeb($amountObj);
-            $this->convertMarketToWeb($market);
         }
 
-        $response = $this->jsonRpc->send(self::CHECK_DONATION_METHOD, [
+        return $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
             $amountObj->getAmount(),
-            $feeObj->getAmount(),
-        ]);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
-
-        return $response->getResult();
+            $feeObj->getAmount()
+        );
     }
 
     public function makeDonation(Market $market, string $amount, string $fee, string $expectedAmount): void
@@ -80,19 +68,14 @@ class DonationHandler implements DonationHandlerInterface
 
         if ($this->isBTCMarket($market)) {
             $amountObj = $this->convertAmountToWeb($amountObj);
-            $this->convertMarketToWeb($market);
         }
 
-        $response = $this->jsonRpc->send(self::MAKE_DONATION_METHOD, [
+        $this->donationFetcher->makeDonation(
             $this->marketNameConverter->convert($market),
             $amountObj->getAmount(),
             $feeObj->getAmount(),
-            $expectedAmount,
-        ]);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
+            $expectedAmount
+        );
     }
 
     private function isBTCMarket(Market $market): bool
@@ -113,13 +96,6 @@ class DonationHandler implements DonationHandlerInterface
                 ],
             ])
         );
-    }
-
-    private function convertMarketToWeb(Market $market): void
-    {
-        /** @var TradebleInterface $crypto */
-        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $market->setBase($crypto);
     }
 
     private function getSymbol(TradebleInterface $tradeble): string
