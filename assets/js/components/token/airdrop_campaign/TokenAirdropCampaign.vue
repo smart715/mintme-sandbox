@@ -220,7 +220,7 @@ export default {
             }
 
             if (!this.isRewardValid) {
-                this.errorMessage = 'Reward can\'t be lower than 0.0001 ' + this.tokenName + '.' +
+                this.errorMessage = 'Reward can\'t be lower than 0.0001 ' + this.tokenName + '. ' +
                     'Set higher amount of tokens for airdrop or lower amount of participants.';
                 return;
             }
@@ -239,10 +239,9 @@ export default {
                 tokenName: this.tokenName,
             }), data)
                 .then((result) => {
-                    this.notifySuccess('Your airdrop was created successfully');
-
                     this.airdropCampaignId = result.data.id;
                     this.loading = false;
+                    this.notifySuccess('Your airdrop was created successfully');
 
                     location.reload();
                 })

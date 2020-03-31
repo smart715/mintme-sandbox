@@ -140,16 +140,16 @@ describe('TokenAirdropCampaign', () => {
             },
         });
 
+        moxios.stubRequest('token_exchange_amount', {
+            status: 200,
+            response: 1254.2356,
+        });
+
         wrapper.vm.loadTokenBalance();
 
         moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 200,
-                response: {
-                    data: '100.000000',
-                },
-            }).then(() => done());
+            expect(wrapper.vm.tokenBalance).to.equal(1254.2356);
+            done();
         });
     });
 
@@ -162,18 +162,21 @@ describe('TokenAirdropCampaign', () => {
             },
         });
 
+        moxios.stubRequest('get_airdrop_campaign', {
+            status: 200,
+            response: {
+                id: 4,
+            },
+        });
+
         wrapper.vm.loadAirdropCampaign();
+        expect(wrapper.vm.loading).to.be.true;
 
         moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 200,
-                response: {
-                    data: {
-                        'id': 10,
-                    },
-                },
-            }).then(() => done());
+            expect(wrapper.vm.hasAirdropCampaign).to.be.true;
+            expect(wrapper.vm.airdropCampaignId).to.be.equal(4);
+            expect(wrapper.vm.loading).to.be.false;
+            done();
         });
     });
 
@@ -186,25 +189,56 @@ describe('TokenAirdropCampaign', () => {
             },
             data() {
                 return {
+                    airdropCampaignId: null,
+                    tokenBalance: 500,
                     tokensAmount: '100',
                     participantsAmount: 100,
+                    showEndDate: false,
                 };
             },
         });
 
+        moxios.stubRequest('create_airdrop_campaign', {
+            status: 200,
+            response: {
+                id: 7,
+            },
+        });
+
         wrapper.vm.createAirdropCampaign();
+        expect(wrapper.vm.loading).to.be.true;
 
         moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 200,
-                response: {
-                    data: {
-                        'id': 10,
-                    },
-                },
-            }).then(() => done());
+            expect(wrapper.vm.airdropCampaignId).to.be.equal(7);
+            expect(wrapper.vm.loading).to.be.false;
+            done();
         });
+    });
+
+    it('should show error message if airdrop reward less than 0.0001', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(TokenAirdropCampaign, {
+            localVue,
+            propsData: {
+                tokenName: 'test5',
+            },
+            data() {
+                return {
+                    tokenBalance: 50,
+                    tokensAmount: '0.015',
+                    participantsAmount: 196,
+                    showEndDate: false,
+                };
+            },
+        });
+
+        expect(wrapper.vm.errorMessage).to.be.equal('');
+        wrapper.vm.createAirdropCampaign();
+
+        expect(wrapper.vm.btnDisabled).to.be.false;
+        expect(wrapper.vm.isRewardValid).to.be.false;
+        expect(wrapper.vm.errorMessage).to.be.equal('Reward can\'t be lower than 0.0001 test5. ' +
+            'Set higher amount of tokens for airdrop or lower amount of participants.');
     });
 
     it('can delete ongoing airdrop campaign', (done) => {
@@ -218,13 +252,20 @@ describe('TokenAirdropCampaign', () => {
             },
         });
 
+        moxios.stubRequest('delete_airdrop_campaign', {
+            status: 204,
+        });
+
         wrapper.vm.deleteAirdropCampaign();
+        expect(wrapper.vm.loading).to.be.true;
 
         moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 204,
-            }).then(() => done());
+            expect(wrapper.vm.airdropCampaignId).to.be.null;
+            expect(wrapper.vm.hasAirdropCampaign).to.be.false;
+            expect(wrapper.vm.tokensAmount).to.be.equal(100);
+            expect(wrapper.vm.participantsAmount).to.be.equal(100);
+            expect(wrapper.vm.loading).to.be.false;
+            done();
         });
     });
 

@@ -138,29 +138,28 @@ describe('TokenOngoingAirdropCampaign', () => {
             },
             data() {
                 return {
-                    airdropCampaign: {
-                        'amount': '568',
-                        'participants': 120,
-                        'actualParticipants': 8,
-                    },
+                    airdropCampaign: null,
                 };
+            },
+        });
+
+        moxios.stubRequest('get_airdrop_campaign', {
+            status: 200,
+            response: {
+                'amount': '568',
+                'participants': 120,
+                'actualParticipants': 8,
             },
         });
 
         wrapper.vm.getAirdropCampaign();
 
         moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 200,
-                response: {
-                    data: {
-                        'amount': '568',
-                        'participants': 120,
-                        'actualParticipants': 8,
-                    },
-                },
-            }).then(() => done());
+            expect(wrapper.vm.airdropCampaign.amount).to.equal('568');
+            expect(wrapper.vm.airdropCampaign.participants).to.equal(120);
+            expect(wrapper.vm.airdropCampaign.actualParticipants).to.equal(8);
+            expect(wrapper.vm.loaded).to.be.true;
+            done();
         });
     });
 
@@ -175,13 +174,24 @@ describe('TokenOngoingAirdropCampaign', () => {
             },
         });
 
+        moxios.stubRequest('claim_airdrop_campaign', {
+            status: 200,
+        });
+
+        wrapper.vm.airdropCampaign = {
+            amount: 300,
+            participants: 100,
+            actualParticipants: 13,
+        };
+
         wrapper.vm.modalOnConfirm();
+        expect(wrapper.vm.btnDisabled).to.be.true;
 
         moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 202,
-            }).then(() => done());
+            expect(wrapper.vm.airdropCampaign.actualParticipants).to.equal(14);
+            expect(wrapper.vm.alreadyClaimed).to.be.true;
+            expect(wrapper.vm.btnDisabled).to.be.false;
+            done();
         });
     });
 });
