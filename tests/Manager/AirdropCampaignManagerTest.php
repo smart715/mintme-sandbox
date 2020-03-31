@@ -4,13 +4,17 @@ namespace App\Tests\Manager;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropParticipant;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\AirdropCampaignManager;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Tests\MockMoneyWrapper;
+use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -25,16 +29,27 @@ class AirdropCampaignManagerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->exactly(2))->method('persist');
         $em->expects($this->exactly(2))->method('flush');
+        /** @var User|MockObject $em */
+        $user = $this->createMock(User::class);
+        /** @var Profile|MockObject $em */
+        $profile = $this->createMock(Profile::class);
+        $profile
+            ->method('getUser')
+            ->willReturn($user);
         /** @var Token|MockObject $em */
         $token = $this->createMock(Token::class);
+        $token
+            ->method('getProfile')
+            ->willReturn($profile);
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
+        $amount = new Money(500, new Currency(MoneyWrapper::TOK_SYMBOL));
 
         $airdrop = $airdropManager->createAirdrop(
             $token,
-            '500',
+            $amount,
             150
         );
 
@@ -43,10 +58,11 @@ class AirdropCampaignManagerTest extends TestCase
         $this->assertEquals(150, $airdrop->getParticipants());
         $this->assertEquals(null, $airdrop->getEndDate());
 
+        $amount = new Money(700, new Currency(MoneyWrapper::TOK_SYMBOL));
         $endDate = new \DateTimeImmutable('+2 days');
         $airdrop = $airdropManager->createAirdrop(
             $token,
-            '700',
+            $amount,
             300,
             $endDate
         );
@@ -65,9 +81,15 @@ class AirdropCampaignManagerTest extends TestCase
         $em->expects($this->once())->method('flush');
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
+        /** @var Token|MockObject $em */
+        $token = $this->createMock(Token::class);
 
         $airdrop = new Airdrop();
-        $airdrop->setStatus(Airdrop::STATUS_ACTIVE);
+        $airdrop
+            ->setToken($token)
+            ->setAmount('0')
+            ->setActualAmount('0')
+            ->setStatus(Airdrop::STATUS_ACTIVE);
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
         $airdropManager->deleteAirdrop($airdrop);
@@ -81,10 +103,15 @@ class AirdropCampaignManagerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())->method('persist');
         $em->expects($this->once())->method('flush');
-        $airdrop = new Airdrop();
-        $airdrop->setStatus(Airdrop::STATUS_ACTIVE);
         /** @var Token|MockObject $em */
         $token = $this->createMock(Token::class);
+        $airdrop = new Airdrop();
+        $airdrop
+            ->setAmount('0')
+            ->setActualAmount('0')
+            ->setStatus(Airdrop::STATUS_ACTIVE)
+            ->setToken($token);
+
         $token->expects($this->once())->method('getActiveAirdrop')->willReturn($airdrop);
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);

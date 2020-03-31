@@ -7,12 +7,12 @@ use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Balance\Exception\BalanceException;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Money\Currency;
 use Money\Money;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
@@ -42,7 +42,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     public function createAirdrop(
         Token $token,
-        string $amount,
+        Money $amount,
         int $participants,
         ?\DateTimeImmutable $endDate = null
     ): Airdrop {
@@ -51,7 +51,9 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $airdrop = new Airdrop();
         $airdrop->setStatus(Airdrop::STATUS_ACTIVE);
         $airdrop->setToken($token);
-        $airdrop->setAmount($amount);
+        $airdrop->setAmount(
+            $this->moneyWrapper->format($amount)
+        );
         $airdrop->setParticipants($participants);
 
         if ($endDate instanceof \DateTimeImmutable && $endDate->getTimestamp() > time()) {
@@ -61,17 +63,35 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $this->em->persist($airdrop);
         $this->em->flush();
 
+        // Lock tokens for airdrop campaign
+        $this->balanceHandler->update(
+            $token->getProfile()->getUser(),
+            $token,
+            $amount->negative(),
+            'airdrop_amount'
+        );
+
         return $airdrop;
     }
 
     public function deleteAirdrop(Airdrop $airdrop): void
     {
+        $token = $airdrop->getToken();
         $airdrop->setStatus(Airdrop::STATUS_REMOVED);
+
+        $amountToReturn = $this->getRestOfTokens($airdrop);
+
+        if ($amountToReturn) {
+            $this->balanceHandler->update(
+                $token->getProfile()->getUser(),
+                $token,
+                $amountToReturn,
+                'airdrop_amount'
+            );
+        }
 
         $this->em->persist($airdrop);
         $this->em->flush();
-
-        // TODO: Viabtc - return all tokens that were left if any
     }
 
     public function deleteActiveAirdrop(Token $token): void
@@ -103,12 +123,6 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $airdropReward = $this->getAirdropReward($activeAirdrop);
 
         $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
-        $this->balanceHandler->update(
-            $token->getProfile()->getUser(),
-            $token,
-            $airdropReward->negative(),
-            'reward'
-        );
 
         $airdropReward = $airdropReward->multiply((int)$activeAirdrop->getActualParticipants());
         $activeAirdrop->setActualAmount($this->moneyWrapper->format($airdropReward));
@@ -149,5 +163,26 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         return (new AirdropParticipant())
             ->setUser($user)
             ->setAirdrop($airdrop);
+    }
+
+    private function getRestOfTokens(Airdrop $airdrop): ?Money
+    {
+        $amount = $this->moneyWrapper->parse(
+            $airdrop->getAmount(),
+            MoneyWrapper::TOK_SYMBOL
+        );
+        $actualAmount = $this->moneyWrapper->parse(
+            (string)$airdrop->getActualAmount(),
+            MoneyWrapper::TOK_SYMBOL
+        );
+
+        $diffAmount = $amount->subtract($actualAmount);
+        $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+
+        if ($diffAmount->greaterThan($zeroValue)) {
+            return $diffAmount;
+        }
+
+        return null;
     }
 }

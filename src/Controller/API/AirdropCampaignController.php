@@ -57,13 +57,13 @@ class AirdropCampaignController extends AbstractFOSRestController
         Request $request
     ): View {
         $token = $this->fetchToken($tokenName, true);
-        $amountObj = $moneyWrapper->parse(
+        $amount = $moneyWrapper->parse(
             (string)$request->get('amount'),
             MoneyWrapper::TOK_SYMBOL
         );
         $participants = (int)$request->get('participants');
 
-        if ($amountObj->isNegative() || $amountObj->isZero()) {
+        if ($amount->isNegative() || $amount->isZero()) {
             throw new \InvalidArgumentException('Incorrect amount.');
         }
 
@@ -77,7 +77,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $airdrop = $this->airdropCampaignManager->createAirdrop(
             $token,
-            $moneyWrapper->format($amountObj),
+            $amount,
             $participants,
             $endDate
         );
