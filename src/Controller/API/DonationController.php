@@ -57,6 +57,7 @@ class DonationController extends AbstractFOSRestController
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
         // To avoid exception. Will be removed after viabtc API will done.
+        $fee = $this->getDonationFee();
 //        $this->donationHandler->makeDonation(
 //            $market,
 //            (string)$request->get('amount'),

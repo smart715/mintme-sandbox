@@ -290,7 +290,7 @@ export default {
             console.info(
                 'check_donation API, params:',
                 'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
-                'amount: ', this.amountToDonate,
+                'amount: ', this.amountToDonate
             );
 
             this.$axios.retry.get(this.$routing.generate('check_donation', {
