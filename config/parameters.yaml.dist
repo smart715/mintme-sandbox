@@ -70,7 +70,6 @@ parameters:
     deploy_cost: 99
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
-    mintme_address: '0xf69a0cf26ac7cc8b516bfb1e7038f6756710e70f'
 
     # Expiration time for token deletion confirm code (minutes)
     # Accepts an integer value:
