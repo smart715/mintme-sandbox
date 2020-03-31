@@ -30,7 +30,7 @@ export default {
             if (auth === status.FAILED) {
                 this.sendMessage(JSON.stringify({
                     method: 'server.auth',
-                    params: [(parseFloat(this.hash) + getUserOffset()).toString(), 'auth_api'],
+                    params: [this.hash, 'auth_api'],
                     id: METHOD_AUTH,
                 }));
                 this._loginClient(this.websocketUrl);
