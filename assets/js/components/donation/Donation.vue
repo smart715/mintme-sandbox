@@ -174,6 +174,7 @@ export default {
             donationChecking: false,
             balanceLoaded: false,
             balance: 0,
+            donationInProgress: false,
         };
     },
     computed: {
@@ -224,7 +225,8 @@ export default {
                 || this.insufficientFunds
                 || !parseFloat(this.balance)
                 || !parseFloat(this.amountToDonate)
-                || !parseFloat(this.amountToReceive);
+                || !parseFloat(this.amountToReceive)
+                || this.donationChecking || this.donationInProgress;
         },
     },
     mounted() {
@@ -312,6 +314,7 @@ export default {
                 });
         },
         makeDonation: function() {
+            this.donationInProgress = true;
             console.info(
                 'make_donation API, params:',
                 'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
@@ -328,6 +331,7 @@ export default {
             })
                 .then((response) => {
                     if (HTTP_ACCEPTED === response.status) {
+                        this.donationInProgress = false;
                         this.notifySuccess(
                             'Congratulations! Donation has been successfully made. '
                             + 'You have received ' + this.amountToReceive + ' tokens.'
@@ -336,6 +340,7 @@ export default {
                         this.resetAmount();
                         console.info('Load token\'s balance after success donation' +
                             ' (it should be updated om viabtc side).');
+                        this.balanceLoaded = false;
                         this.getTokenBalance();
                     }
                 }, (error) => {

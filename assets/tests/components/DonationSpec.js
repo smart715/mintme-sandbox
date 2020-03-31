@@ -239,6 +239,13 @@ describe('Donation', () => {
 
         wrapper.vm.amountToDonate = '5';
         expect(wrapper.vm.buttonDisabled).to.be.true;
+
+        wrapper.vm.donationChecking = true;
+        expect(wrapper.vm.buttonDisabled).to.be.true;
+
+        wrapper.vm.donationChecking = false;
+        wrapper.vm.donationInProgress = true;
+        expect(wrapper.vm.buttonDisabled).to.be.true;
     });
 
     it('can select currency', () => {
@@ -329,6 +336,7 @@ describe('Donation', () => {
         wrapper.vm.selectedCurrency = webSymbol;
         wrapper.vm.amountToDonate = 50;
         wrapper.vm.checkDonation();
+        expect(wrapper.vm.donationChecking).to.be.true;
 
         moxios.wait(() => {
             expect(wrapper.vm.amountToReceive).to.be.equal(2.5674);
@@ -363,10 +371,13 @@ describe('Donation', () => {
         });
 
         wrapper.vm.makeDonation();
+        expect(wrapper.vm.donationInProgress).to.be.true;
 
         moxios.wait(() => {
             expect(wrapper.vm.amountToDonate).to.be.equal(0);
             expect(wrapper.vm.amountToReceive).to.be.equal(0);
+            expect(wrapper.vm.donationInProgress).to.be.false;
+            expect(wrapper.vm.balanceLoaded).to.be.false;
             done();
         });
     });
