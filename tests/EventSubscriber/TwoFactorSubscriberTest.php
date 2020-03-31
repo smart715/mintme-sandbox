@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -27,7 +28,7 @@ class TwoFactorSubscriberTest extends TestCase
         );
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -40,7 +41,7 @@ class TwoFactorSubscriberTest extends TestCase
         );
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -53,7 +54,7 @@ class TwoFactorSubscriberTest extends TestCase
         );
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -66,7 +67,7 @@ class TwoFactorSubscriberTest extends TestCase
         );
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -79,7 +80,7 @@ class TwoFactorSubscriberTest extends TestCase
         );
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -92,7 +93,7 @@ class TwoFactorSubscriberTest extends TestCase
         );
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -105,7 +106,7 @@ class TwoFactorSubscriberTest extends TestCase
         );
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -120,7 +121,7 @@ class TwoFactorSubscriberTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -135,7 +136,7 @@ class TwoFactorSubscriberTest extends TestCase
         $this->expectExceptionMessage("Invalid user");
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -150,7 +151,7 @@ class TwoFactorSubscriberTest extends TestCase
         $this->expectExceptionMessage("2FA is not enabled");
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -165,7 +166,7 @@ class TwoFactorSubscriberTest extends TestCase
         $this->expectExceptionMessage("Invalid user");
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -180,7 +181,7 @@ class TwoFactorSubscriberTest extends TestCase
         $this->expectExceptionMessage("Invalid 2FA code");
 
         $subscriber->onRequest(
-            $this->mockGetResponseEvent("fooCode")
+            $this->mockGetControllerEvent("fooCode")
         );
     }
 
@@ -224,9 +225,9 @@ class TwoFactorSubscriberTest extends TestCase
         return $router;
     }
 
-    private function mockGetResponseEvent(string $code): GetResponseEvent
+    private function mockGetControllerEvent(string $code): FilterControllerEvent
     {
-        $event = $this->createMock(GetResponseEvent::class);
+        $event = $this->createMock(FilterControllerEvent::class);
         $request = $this->createMock(Request::class);
         $request->method('get')->willReturn($code);
         $request->attributes = $this->createMock(ParameterBag::class);
