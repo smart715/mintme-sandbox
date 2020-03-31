@@ -1,6 +1,5 @@
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
-import {getUserOffset} from '../utils';
 
 const METHOD_AUTH = 12345;
 
