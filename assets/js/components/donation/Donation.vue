@@ -103,7 +103,7 @@
                                             </p>
                                         </div>
                                         <div>
-                                            <p class="mb-2">Fee for donation: {{ donationFee }}%</p>
+                                            <p class="mb-2">Fee for donation: {{ donationParams.fee }}%</p>
                                             <button
                                                 :disabled="buttonDisabled"
                                                 @click="makeDonation"
@@ -159,7 +159,7 @@ export default {
         isOwner: Boolean,
         userId: Number,
         googleRecaptchaSiteKey: String,
-        donationFee: Number,
+        donationParams: Object,
     },
     data() {
         return {
@@ -174,8 +174,6 @@ export default {
             donationChecking: false,
             balanceLoaded: false,
             balance: 0,
-            minBtcAmount: 0.000001,
-            minWebAmount: 0.0001,
         };
     },
     computed: {
@@ -202,8 +200,8 @@ export default {
         },
         currencyMinAmount: function() {
             return btcSymbol === this.selectedCurrency
-                ? this.minBtcAmount
-                : this.minWebAmount;
+                ? this.donationParams.minBtcAmount
+                : this.donationParams.minWebAmount;
         },
         minTotalPrice: function() {
             return toMoney('1e-' + this.currencySubunit, this.currencySubunit);
@@ -291,14 +289,12 @@ export default {
                 'check_donation API, params:',
                 'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
                 'amount: ', this.amountToDonate,
-                'fee: ', this.donationFee
             );
 
             this.$axios.retry.get(this.$routing.generate('check_donation', {
                 base: this.selectedCurrency,
                 quote: this.market.quote.symbol,
                 amount: this.amountToDonate,
-                fee: this.donationFee,
             }))
                 .then((res) => {
                     this.amountToReceive = res.data;
@@ -320,7 +316,6 @@ export default {
                 'make_donation API, params:',
                 'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
                 'amount: ', this.amountToDonate,
-                'fee: ', this.donationFee,
                 'expected_count_to_receive (fake data): ', this.amountToReceive
             );
 
@@ -329,7 +324,6 @@ export default {
                 quote: this.market.quote.symbol,
             }), {
                 amount: this.amountToDonate,
-                fee: this.donationFee,
                 expected_count_to_receive: this.amountToReceive,
             })
                 .then((response) => {

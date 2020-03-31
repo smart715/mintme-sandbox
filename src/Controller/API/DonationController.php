@@ -27,17 +27,16 @@ class DonationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{base}/{quote}/check/{amount}/{fee}", name="check_donation", options={"expose"=true})
+     * @Rest\Get("/{base}/{quote}/check/{amount}", name="check_donation", options={"expose"=true})
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
-     * @Rest\RequestParam(name="fee", allowBlank=false, description="Donation fee.")
      */
-    public function checkDonation(Market $market, string $amount, string $fee): View
+    public function checkDonation(Market $market, string $amount): View
     {
         $amountToReceive = 10;
 //        $amountToReceive = $this->donationHandler->checkDonation(
 //            $market,
 //            $amount,
-//            $fee
+//            $this->getDonationFee()
 //        );
 
         return $this->view($amountToReceive);
@@ -47,7 +46,6 @@ class DonationController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{base}/{quote}/make", name="make_donation", options={"expose"=true})
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
-     * @Rest\RequestParam(name="fee", allowBlank=false, description="Donation fee.")
      * @Rest\RequestParam(
      *     name="expected_count_to_receive",
      *     allowBlank=false,
@@ -56,13 +54,19 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
+        $donationParams = $this->getParameter('donation');
 //        $this->donationHandler->makeDonation(
 //            $market,
 //            (string)$request->get('amount'),
-//            (string)$request->get('fee'),
+//            $this->getDonationFee(),
 //            (string)$request->get('expected_count_to_receive')
 //        );
 
         return $this->view(null, Response::HTTP_ACCEPTED);
+    }
+
+    private function getDonationFee(): string
+    {
+        return (string)$this->getParameter('donation')['fee'];
     }
 }

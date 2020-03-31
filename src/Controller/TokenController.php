@@ -159,7 +159,7 @@ class TokenController extends Controller
                 $tokenNameConverter->convert($token) :
                 '',
             'precision' => $this->getParameter('token_precision'),
-            'donationFee' => $this->getParameter('donation_fee'),
+            'donationParams' => $this->getParameter('donation'),
             'isTokenPage' => true,
         ]);
     }

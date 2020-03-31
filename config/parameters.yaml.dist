@@ -46,7 +46,10 @@ parameters:
 
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
-    donation_fee: 1
+    donation:
+        fee: 1
+        minBtcAmount: 0.000001
+        minWebAmount: 0.0001
 
     google_tracking_id: 'UA-2289508-20'
 
