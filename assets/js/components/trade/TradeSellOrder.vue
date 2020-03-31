@@ -364,7 +364,7 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
                     .then((res) => this.immutableBalance = res.data ?
                         new Decimal(response.params[0][this.market.quote.identifier].available).sub(
-                            res.data.frozenAmount
+                            res.data.frozenAmountWithReceived
                         ) : response.params[0][this.market.quote.identifier].available
                     )
                     .catch((err) => {
