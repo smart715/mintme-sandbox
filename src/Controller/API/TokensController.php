@@ -310,14 +310,16 @@ class TokensController extends AbstractFOSRestController
      */
     public function getTokens(BalanceHandlerInterface $balanceHandler, BalanceViewFactoryInterface $viewFactory): View
     {
-        if (!$this->getUser()) {
+        $user = $this->getUser();
+
+        if (!$user) {
             throw new AccessDeniedHttpException();
         }
 
         try {
             $common = $balanceHandler->balances(
-                $this->getUser(),
-                $this->getUser()->getTokens()
+                $user,
+                $user->getTokens()
             );
         } catch (BalanceException $exception) {
             if (BalanceException::EMPTY == $exception->getCode()) {
@@ -333,8 +335,8 @@ class TokensController extends AbstractFOSRestController
         );
 
         return $this->view([
-            'common' => $viewFactory->create($common),
-            'predefined' => $viewFactory->create($predefined),
+            'common' => $viewFactory->create($common, $user),
+            'predefined' => $viewFactory->create($predefined, $user),
         ]);
     }
 
