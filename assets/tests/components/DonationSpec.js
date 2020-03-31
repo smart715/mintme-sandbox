@@ -60,11 +60,6 @@ describe('Donation', () => {
         expect(wrapper.vm.dropdownText).to.equal('Select currency');
         expect(wrapper.find('.donation-header span').text()).to.equal('To make a donation you have to be logged in');
         expect(wrapper.find('b-dropdown').exists()).to.deep.equal(false);
-
-        moxios.stubRequest('login', {
-            status: 200,
-            response: {data: '<form></form>'},
-        });
     });
 
     it('should renders correctly for logged in user and load balance for selected currency', () => {
@@ -180,6 +175,11 @@ describe('Donation', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
+                donationParams: {
+                    fee: 1,
+                    minBtcAmount: 0.000001,
+                    minWebAmount: 0.0001,
+                },
             },
         });
 
@@ -268,16 +268,17 @@ describe('Donation', () => {
             },
         });
 
+        moxios.stubRequest('login', {
+            status: 200,
+            response: '<form></form>',
+        });
+
         wrapper.vm.loadLoginForm();
 
         moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 200,
-                response: {
-                    data: '<form></form>',
-                },
-            }).then(() => done());
+            expect(wrapper.vm.loginFormLoaded).to.be.true;
+            expect(wrapper.html()).to.contain('<form>');
+            done();
         });
     });
 
@@ -297,10 +298,12 @@ describe('Donation', () => {
             let request = moxios.requests.mostRecent();
             request.respondWith({
                 status: 200,
-                response: {
-                    data: 100,
-                },
-            }).then(() => done());
+                response: 111,
+            }).then(() => {
+                expect(wrapper.vm.balance).to.be.equal(111);
+                expect(wrapper.vm.balanceLoaded).to.be.true;
+                done();
+            });
         });
     });
 
@@ -318,15 +321,20 @@ describe('Donation', () => {
             },
         });
 
-        moxios.stubRequest('make_donation', {
+        moxios.stubRequest('check_donation', {
             status: 202,
+            response: '2.5674',
         });
 
         wrapper.vm.selectedCurrency = webSymbol;
-        wrapper.vm.donationFee = 1;
         wrapper.vm.amountToDonate = 50;
         wrapper.vm.checkDonation();
-        done();
+
+        moxios.wait(() => {
+            expect(wrapper.vm.amountToReceive).to.be.equal(2.5674);
+            expect(wrapper.vm.donationChecking).to.be.false;
+            done();
+        });
     });
 
     it('can make donation if logged in and currency selected and amount to donate/receive not null', (done) => {
@@ -341,18 +349,26 @@ describe('Donation', () => {
                     },
                 },
             },
+            data: {
+                selectedCurrency: webSymbol,
+                amountToDonate: 20,
+                amountToReceive: 2,
+                balanceLoaded: true,
+                balance: 220,
+            },
         });
 
         moxios.stubRequest('make_donation', {
             status: 202,
         });
 
-        wrapper.vm.selectedCurrency = webSymbol;
-        wrapper.vm.donationFee = 1;
-        wrapper.vm.amountToDonate = 20;
-        wrapper.vm.amountToReceive = 2;
         wrapper.vm.makeDonation();
-        done();
+
+        moxios.wait(() => {
+            expect(wrapper.vm.amountToDonate).to.be.equal(0);
+            expect(wrapper.vm.amountToReceive).to.be.equal(0);
+            done();
+        });
     });
 
     it('can use all funds to donate', () => {
@@ -373,7 +389,6 @@ describe('Donation', () => {
         });
 
         wrapper.vm.selectedCurrency = webSymbol;
-        wrapper.vm.donationFee = 1;
         wrapper.vm.balance = 100;
         wrapper.vm.amountToDonate = 20;
         wrapper.vm.all();
@@ -388,7 +403,7 @@ describe('Donation', () => {
         expect(wrapper.vm.amountToDonate).to.be.equal('100');
     });
 
-    it('should reset amount to donate and amount to receive', () => {
+    it('should reset amount to donate and amount to receive on calling resetAmount()', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,

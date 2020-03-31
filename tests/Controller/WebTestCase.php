@@ -68,7 +68,16 @@ class WebTestCase extends BaseWebTestCase
         );
     }
 
-    protected function sendWeb(
+    protected function sendWeb(string $email, string $amount = '100000000000000000000'): void
+    {
+        $this->deposit(
+            $email,
+            $amount,
+            Token::WEB_SYMBOL
+        );
+    }
+
+    protected function deposit(
         string $email,
         string $amount = '100000000000000000000',
         string $currency = Token::WEB_SYMBOL
