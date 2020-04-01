@@ -1,8 +1,8 @@
 <template>
     <div
         ref="ongoing-airdrop-campaign"
-        class="card col-12 bg-green py-1">
-        <div v-if="loaded">
+        class="card col-12 bg-green px-0">
+        <div v-if="loaded" class="container">
             <div class="row">
                 <div class="col-sm-3 align-self-center">
                     <h4 class="my-0 mx-auto line-height-1">Ongoing airdrop!</h4>

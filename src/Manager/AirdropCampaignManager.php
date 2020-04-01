@@ -17,6 +17,8 @@ use Money\Money;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
 {
+    private const AIRDROP_REWARD_PRECISION = 4;
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -76,6 +78,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     public function deleteAirdrop(Airdrop $airdrop): void
     {
+        /** @var Token $token */
         $token = $airdrop->getToken();
         $airdrop->setStatus(Airdrop::STATUS_REMOVED);
 
@@ -88,6 +91,21 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
                 $amountToReturn,
                 'airdrop_amount'
             );
+        }
+
+        if ($airdrop->getActualParticipants() > 0) {
+            $airdropsSummary = $this->moneyWrapper->parse(
+                $token->getAirdropsAmount(),
+                MoneyWrapper::TOK_SYMBOL
+            );
+            $actualAmount = $this->moneyWrapper->parse(
+                (string)$airdrop->getActualAmount(),
+                MoneyWrapper::TOK_SYMBOL
+            );
+
+            $airdropsSummary = $airdropsSummary->add($actualAmount);
+            $token->setAirdropsAmount($this->moneyWrapper->format($airdropsSummary));
+            $this->em->persist($token);
         }
 
         $this->em->persist($airdrop);
@@ -124,8 +142,12 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
 
-        $airdropReward = $airdropReward->multiply((int)$activeAirdrop->getActualParticipants());
-        $activeAirdrop->setActualAmount($this->moneyWrapper->format($airdropReward));
+        $rewardSummary = $airdropReward->multiply((int)$activeAirdrop->getActualParticipants());
+        $activeAirdrop->setActualAmount(
+            $this->roundAirdropReward(
+                $this->moneyWrapper->format($rewardSummary)
+            )
+        );
         $participant = $this->createNewParticipant($user, $activeAirdrop);
 
         $this->em->persist($activeAirdrop);
@@ -184,5 +206,11 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
 
         return null;
+    }
+
+    private function roundAirdropReward(string $amount): string
+    {
+        //Round rewards down and up to 4th decimal
+        return (string)round(floatval($amount), self::AIRDROP_REWARD_PRECISION, PHP_ROUND_HALF_DOWN);
     }
 }

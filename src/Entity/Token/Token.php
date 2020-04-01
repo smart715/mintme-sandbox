@@ -179,10 +179,21 @@ class Token implements TradebleInterface
     private $mintedAmount;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\Airdrop", mappedBy="token", orphanRemoval=true)
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\AirdropCampaign\Airdrop",
+     *     mappedBy="token",
+     *     orphanRemoval=true,
+     *     fetch="EXTRA_LAZY"
+     * )
      * @var ArrayCollection
      */
     private $airdrops;
+
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $airdropsAmount = '0';
 
     public function __construct()
     {
@@ -470,11 +481,13 @@ class Token implements TradebleInterface
         $this->mintedAmount = $mintedAmount->getAmount();
     }
 
+    /** @codeCoverageIgnore */
     public function getAirdrops(): Collection
     {
         return $this->airdrops;
     }
 
+    /** @codeCoverageIgnore */
     public function getActiveAirdrop(): ?Airdrop
     {
         $activeAirdrop = $this->getAirdrops()->filter(function (Airdrop $airdrop) {
@@ -486,6 +499,7 @@ class Token implements TradebleInterface
             : $activeAirdrop->first();
     }
 
+    /** @codeCoverageIgnore */
     public function addAirdrop(Airdrop $airdrop): self
     {
         if (!$this->airdrops->contains($airdrop)) {
@@ -496,11 +510,26 @@ class Token implements TradebleInterface
         return $this;
     }
 
+    /** @codeCoverageIgnore */
     public function removeAirdrop(Airdrop $airdrop): self
     {
         if ($this->airdrops->contains($airdrop)) {
             $this->airdrops->removeElement($airdrop);
         }
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getAirdropsAmount(): string
+    {
+        return $this->airdropsAmount;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setAirdropsAmount(string $airdropsAmount): self
+    {
+        $this->airdropsAmount = $airdropsAmount;
 
         return $this;
     }
