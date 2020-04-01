@@ -21,7 +21,7 @@ parameters:
         - "%rootDir%/../../../src/Validator/Constraints/*"
 
     autoload_files:
-        - vendor/bin/.phpunit/phpunit-6.5/vendor/autoload.php
+        - vendor/bin/.phpunit/phpunit-7.5-0/vendor/autoload.php
 
     ignoreErrors:
         - '#Cannot call method (.*) on (.*)\|null\.#'

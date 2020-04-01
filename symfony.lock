@@ -226,6 +226,9 @@
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
+    "jean85/pretty-package-versions": {
+        "version": "1.2"
+    },
     "jms/metadata": {
         "version": "1.7.0"
     },
@@ -310,6 +313,30 @@
     "netresearch/jsonmapper": {
         "version": "v1.6.0"
     },
+    "nette/bootstrap": {
+        "version": "v3.0.1"
+    },
+    "nette/di": {
+        "version": "v3.0.3"
+    },
+    "nette/finder": {
+        "version": "v2.5.2"
+    },
+    "nette/neon": {
+        "version": "v3.1.2"
+    },
+    "nette/php-generator": {
+        "version": "v3.3.4"
+    },
+    "nette/robot-loader": {
+        "version": "v3.2.3"
+    },
+    "nette/schema": {
+        "version": "v1.0.2"
+    },
+    "nette/utils": {
+        "version": "v3.1.1"
+    },
     "nikic/php-parser": {
         "version": "v4.3.0"
     },
@@ -371,17 +398,20 @@
     "phpseclib/phpseclib": {
         "version": "2.0.26"
     },
+    "phpstan/phpdoc-parser": {
+        "version": "0.3.5"
+    },
     "phpstan/phpstan": {
-        "version": "0.10.8"
+        "version": "0.12.18"
     },
     "phpstan/phpstan-doctrine": {
-        "version": "0.10"
+        "version": "0.12.10"
     },
     "phpstan/phpstan-phpunit": {
-        "version": "0.10"
+        "version": "0.12.6"
     },
     "phpstan/phpstan-symfony": {
-        "version": "0.10.2"
+        "version": "0.12.4"
     },
     "pragmarx/random": {
         "version": "v0.2.2"
@@ -721,10 +751,16 @@
             "tests/bootstrap.php"
         ]
     },
+    "symfony/polyfill-intl-grapheme": {
+        "version": "v1.15.0"
+    },
     "symfony/polyfill-intl-icu": {
         "version": "v1.15.0"
     },
     "symfony/polyfill-intl-idn": {
+        "version": "v1.15.0"
+    },
+    "symfony/polyfill-intl-normalizer": {
         "version": "v1.15.0"
     },
     "symfony/polyfill-mbstring": {
@@ -797,6 +833,9 @@
     },
     "symfony/stopwatch": {
         "version": "v4.4.7"
+    },
+    "symfony/string": {
+        "version": "v5.0.7"
     },
     "symfony/swiftmailer-bundle": {
         "version": "2.5",
@@ -910,6 +949,12 @@
         "files": [
             "config/packages/twig_extensions.yaml"
         ]
+    },
+    "twig/extra-bundle": {
+        "version": "v3.0.3"
+    },
+    "twig/string-extra": {
+        "version": "v3.0.3"
     },
     "twig/twig": {
         "version": "v2.12.5"
