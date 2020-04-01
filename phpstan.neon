@@ -5,6 +5,10 @@ includes:
 
 parameters:
 
+    checkMissingIterableValueType: false
+
+    checkGenericClassInNonGenericObjectType: false
+
     paths:
         - src
         - tests
