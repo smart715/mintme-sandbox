@@ -7,6 +7,7 @@ use App\EventSubscriber\TwoFactorSubscriber;
 use App\Manager\TwoFactorManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -228,6 +229,9 @@ class TwoFactorSubscriberTest extends TestCase
     private function mockGetControllerEvent(string $code): FilterControllerEvent
     {
         $event = $this->createMock(FilterControllerEvent::class);
+        $event->method('getController')->willReturn(
+            $this->createMock(EventSubscriberInterface::class)
+        );
         $request = $this->createMock(Request::class);
         $request->method('get')->willReturn($code);
         $request->attributes = $this->createMock(ParameterBag::class);
