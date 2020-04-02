@@ -210,7 +210,6 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     private function roundAirdropReward(string $amount): string
     {
-        //Round rewards down and up to 4th decimal
         return (string)round(floatval($amount), self::AIRDROP_REWARD_PRECISION, PHP_ROUND_HALF_DOWN);
     }
 }

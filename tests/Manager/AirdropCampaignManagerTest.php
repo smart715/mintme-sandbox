@@ -156,4 +156,63 @@ class AirdropCampaignManagerTest extends TestCase
 
         $this->assertTrue($airdropManager->checkIfUserClaimed($user, $token));
     }
+
+    public function testClaimAirdropCampaign(): void
+    {
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->exactly(2))->method('persist');
+        $em->expects($this->once())->method('flush');
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+        $bh->expects($this->once())->method('update');
+        /** @var Token|MockObject $em */
+        $token = $this->createMock(Token::class);
+        /** @var User|MockObject $user */
+        $user = $this->createMock(User::class);
+
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
+
+        $airdrop = new Airdrop();
+        $airdrop->setAmount('100');
+        $airdrop->setParticipants(100);
+
+        $token->expects($this->once())->method('getActiveAirdrop')->willReturn($airdrop);
+
+        $airdropManager->claimAirdropCampaign($user, $token);
+
+        $this->assertEquals('1', $airdrop->getActualAmount());
+        $this->assertEquals(1, $airdrop->getActualParticipants());
+    }
+
+    public function testGetAirdropReward(): void
+    {
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
+
+        $airdrop = new Airdrop();
+        $airdrop->setAmount('0');
+        $airdrop->setParticipants(10);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Airdrop reward calculation failed.');
+        $airdropManager->getAirdropReward($airdrop);
+
+        $airdrop->setAmount('100');
+        $airdrop->setParticipants(0);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Airdrop reward calculation failed.');
+        $airdropManager->getAirdropReward($airdrop);
+
+        $airdrop->setAmount('100');
+        $airdrop->setParticipants(100);
+
+        $reward = $airdropManager->getAirdropReward($airdrop);
+        $this->assertEquals('1', $reward->getAmount());
+    }
 }

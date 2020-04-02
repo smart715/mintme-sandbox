@@ -89,6 +89,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         ]);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
+        $this->assertTrue($this->client->getResponse()->isClientError());
+
         $this->client->request('GET', '/logout');
         $this->client->followRedirect();
 
