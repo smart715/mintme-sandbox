@@ -1,0 +1,13 @@
+app_server_port: 3001
+app_server_hostname: '0.0.0.0'
+
+# webchain-cli rpc server url
+vault_cli_host: 'http://webchain-cli:1920'
+
+rabbitmq_url: 'amqp://guest:guest@rabbitmq:5672'
+
+webchaind_url: 'http://webchaind:39573'
+webchaind_ipc: '/src/webchain_root/webchaind.ipc'
+tokenimpladdress: '0xf29476d5f09288eb93cd9dd00ed5d7c05cbcdeb7'
+mintme_account:   '0xf69a0cf26ac7cc8b516bfb1e7038f6756710e70f'
+mintme_address:   '0xf69a0cf26ac7cc8b516bfb1e7038f6756710e70f'
