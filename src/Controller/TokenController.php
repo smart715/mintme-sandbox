@@ -9,6 +9,8 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
+use App\Manager\BlacklistManager;
+use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
@@ -43,6 +45,9 @@ class TokenController extends Controller
     /** @var ProfileManagerInterface */
     protected $profileManager;
 
+    /** @var BlacklistManagerInterface */
+    protected $blacklistManager;
+
     /** @var TokenManagerInterface */
     protected $tokenManager;
 
@@ -67,7 +72,8 @@ class TokenController extends Controller
         MarketFactoryInterface $marketManager,
         TraderInterface $trader,
         NormalizerInterface $normalizer,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        BlacklistManager $blacklistManager
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -76,6 +82,7 @@ class TokenController extends Controller
         $this->marketManager = $marketManager;
         $this->trader = $trader;
         $this->userActionLogger = $userActionLogger;
+        $this->blacklistManager = $blacklistManager;
 
         parent::__construct($normalizer);
     }
@@ -83,22 +90,31 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/{tab}",
      *     name="token_show",
-     *     defaults={"tab" = "trade"},
+     *     defaults={"tab" = "intro"},
      *     methods={"GET"},
      *     requirements={"tab" = "trade|intro"},
-     *     options={"expose"=true}
+     *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
     public function show(
+        Request $request,
         string $name,
         ?string $tab,
         TokenNameConverterInterface $tokenNameConverter
     ): Response {
+        if (preg_match('/(intro)/', $request->getPathInfo())) {
+            return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
 
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
             return $this->redirectToRoute('token_show', ['name' => $dashedName]);
+        }
+
+        //rebranding
+        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
+            $name = Token::WEB_SYMBOL;
         }
 
         $token = $this->tokenManager->findByName($name);
@@ -107,24 +123,42 @@ class TokenController extends Controller
             throw new NotFoundTokenException();
         }
 
+        if ($this->tokenManager->isPredefined($token)) {
+            return $this->redirectToRoute(
+                'coin',
+                [
+                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
+                    'quote'=> Token::WEB_SYMBOL,
+                ]
+            );
+        }
+
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
+        $tokenDescription = preg_replace(
+            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+            '\2',
+            $token->getDescription() ?? ''
+        );
+        $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
 
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
+            'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
             'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'tab' => $tab,
-            'showIntro' => true,
+            'showTrade' => true,
             'market' => $this->normalize($market),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
             'precision' => $this->getParameter('token_precision'),
+            'isTokenPage' => true,
         ]);
     }
 
@@ -136,25 +170,19 @@ class TokenController extends Controller
         MarketStatusManagerInterface $marketStatusManager
     ): Response {
         if ($this->isTokenCreated()) {
-            return $this->redirectToOwnToken('trade');
+            return $this->redirectToOwnToken('intro');
         }
 
         $token = new Token();
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
 
+        if ($this->blacklistManager->isBlacklisted($token->getName(), 'token')) {
+            $this->addFlash('danger', 'This value is not allowed');
+        }
+
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
             $profile = $this->profileManager->getProfile($this->getUser());
-
-            if ($this->tokenManager->isExisted($token)) {
-                $form->addError(new FormError('Token name is already exists.'));
-
-                return $this->render('pages/token_creation.html.twig', [
-                    'formHeader' => 'Create your own token',
-                    'form' => $form->createView(),
-                    'profileCreated' => true,
-                ]);
-            }
 
             $this->em->beginTransaction();
 
@@ -180,10 +208,27 @@ class TokenController extends Controller
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                return $this->redirectToOwnToken('intro');
+                return $this->redirectToRoute('token_show', [
+                    'name' => $token->getName(),
+                    'tab' => 'intro',
+                ]);
             } catch (Throwable $exception) {
-                $this->em->rollback();
-                $this->addFlash('danger', 'Exchanger connection lost. Try again.');
+                if (false !== strpos($exception->getMessage(), 'cURL')) {
+                    $this->addFlash('danger', 'Exchanger connection lost. Try again');
+
+                    $this->userActionLogger->error(
+                        'Got an error, when registering a token: ',
+                        ['message' => $exception->getMessage()]
+                    );
+                } else {
+                    $this->em->rollback();
+                    $this->addFlash('danger', 'Error creating token. Try again');
+
+                    $this->userActionLogger->error(
+                        'Got an error, when registering a token',
+                        ['message' => $exception->getMessage()]
+                    );
+                }
             }
         }
 
@@ -195,7 +240,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/website-confirmation", name="token_website_confirmation")
+     * @Route("/{name}/website-confirmation", name="token_website_confirmation", options={"expose"=true})
      */
     public function getWebsiteConfirmationFile(string $name): Response
     {

@@ -5,6 +5,7 @@ namespace App\Communications\Factory;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 
+/** @codeCoverageIgnore */
 class HttpClientFactory implements HttpClientFactoryInterface
 {
     public function createClient(array $parameters): ClientInterface

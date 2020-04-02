@@ -1,5 +1,8 @@
 phpunit:
-	./vendor/bin/simple-phpunit
+	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" -and -not -path "*Controller/*" | ./vendor/bin/fastest "./vendor/bin/simple-phpunit -c phpunit.xml.dist {};"
+
+phpfunctional:
+	./vendor/bin/simple-phpunit --testsuite nothing && find tests/Controller -name "*Test.php" | ./vendor/bin/fastest "./vendor/bin/simple-phpunit -c phpunit.xml.dist {};"
 
 phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
@@ -12,6 +15,7 @@ syntax_check:
 	./vendor/bin/phplint
 	./vendor/bin/phpcs -n
 	./vendor/bin/phpstan analyse
+	./vendor/bin/psalm
 
 syntax_check_assets:
 	npm run stylelint

@@ -18,6 +18,9 @@ do
     sleep 5
 done
 
+# Need a little wait until BTC service is fully ready
+sleep 10
+
 if test ! -f ".env"; then
     cp .env.dist .env
 fi
@@ -42,6 +45,10 @@ echo 'Starting deposit consumer...'
 nohup php bin/console rabbitmq:consumer deposit &
 echo 'Starting market consumer...'
 nohup php bin/console rabbitmq:consumer market &
+echo 'Starting token consumer...'
+nohup php bin/console rabbitmq:consumer deploy &
+echo 'Starting update consumer...'
+nohup php bin/console rabbitmq:consumer contract_update &
 
 # Fallback to original entrypoint
 docker-php-entrypoint php-fpm

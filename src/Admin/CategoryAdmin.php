@@ -5,6 +5,7 @@ namespace App\Admin;
 use App\Entity\Classification\Context;
 use Sonata\ClassificationBundle\Admin\CategoryAdmin as Admin;
 
+/** @codeCoverageIgnore */
 class CategoryAdmin extends Admin
 {
 

@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use Faker\Factory;
 use Faker\Generator;
 
+/** @codeCoverageIgnore */
 trait FakerHelper
 {
     protected function getFaker(): Generator

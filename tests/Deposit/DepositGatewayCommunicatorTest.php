@@ -8,10 +8,7 @@ use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Currency;
-use Money\Money;
 use PHPUnit\Framework\TestCase;
 
 class DepositGatewayCommunicatorTest extends TestCase
@@ -64,7 +61,7 @@ class DepositGatewayCommunicatorTest extends TestCase
                 $transaction->getAmount()->getAmount(),
                 $transaction->getFee()->getAmount(),
                 $transaction->getDate()->getTimestamp(),
-                $transaction->getCrypto()->getSymbol(),
+                $transaction->getTradable()->getSymbol(),
                 $transaction->getStatus()->getStatusCode(),
             ]
         );

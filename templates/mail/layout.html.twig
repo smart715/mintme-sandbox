@@ -26,10 +26,7 @@
     a {
         color: #2199e8;
     }
-    center table {
-        display: table;
-        width: 500px;
-    }
+
 </style>
 <table style="min-width: 500px;padding: 0;width: 100%;background-size: 100% 100%;position: relative;display: table;font-size: 18px;font-weight: normal;margin: 0 auto;font-family: Helvetica, Arial, sans-serif;text-align:center;color:white;">
     <tr>
@@ -38,11 +35,11 @@
                 <table style="width: 500px;" background="{{absolute_url(asset('build/images/body.png'))}}">
                     <tr>
                         <td style="padding-left: 0;padding-right: 0;">
-                            <table style="width: 500px;padding: 0;background-size: 100% 100%;position: relative;display: table;font-size: 18px;font-weight: normal;margin: 0 auto;font-family: Helvetica, Arial, sans-serif;text-align:center;color:white;">
+                            <table  style="width: 500px;padding: 0;background-size: 100% 100%;position: relative;display: table;font-size: 18px;font-weight: normal;margin: 0 auto;font-family: Helvetica, Arial, sans-serif;text-align:center;color:white;">
                                 <tr style="padding: 20px; width: 100%; margin: 0 auto">
-                                    <a style="display: block" href="{{ absolute_url('/') }}" target=_blank>
-                                        <img width="200px" height="80px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe">
-                                    </a>
+                                    <td cellpadding="" align="middle">
+                                        <a style="display: block" href="{{ absolute_url('/') }}" target=_blank><img width="200px" height="80px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe"></a>
+                                    </td>
                                 </tr>
                             </table>
                             {% block content %}{% endblock %}

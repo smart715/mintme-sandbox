@@ -1,10 +1,11 @@
 <template>
     <modal
         :visible="visible"
+        :no-close="noClose"
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3 class="modal-title">WITHDRAW({{ currency }})</h3>
+                <h3 class="modal-title">WITHDRAW({{ currency|rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
                         Address:
@@ -37,13 +38,13 @@
                             @click="setMaxAmount">
                             All
                         </button>
-                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
-                            You don't have enough {{ currency }}
+                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
+                            You don't have enough {{ currency|rebranding }}
                         </div>
-                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center mt-4">
-                            Minimum withdraw amount is {{ minAmount }} {{ currency }}
+                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center">
+                            Minimum withdraw amount is {{ minAmount }} {{ currency|rebranding }}
                         </div>
-                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center mt-4">
+                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center">
                             Invalid amount.
                         </div>
                 </div>
@@ -61,26 +62,26 @@
                     <label>
                         Withdrawal fee:
                     </label>
-                    <span class="float-right">{{ fee | toMoney(subunit) }}</span>
+                    <span class="float-right">{{ feeAmount }} {{ feeCurrency|rebranding }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney(subunit) }}</span>
+                    <span class="float-right">{{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}</span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
                         class="btn btn-primary"
+                        :disabled="withdrawing"
                         @click="onWithdraw">
                         Withdraw
                     </button>
-                    <a
-                        href="#"
-                        class="btn-cancel pl-3"
+                    <span
+                        class="btn-cancel pl-3 c-pointer"
                         @click="onCancel">
                         <slot name="cancel">Cancel</slot>
-                    </a>
+                    </span>
                 </div>
             </div>
         </template>
@@ -90,35 +91,42 @@
 <script>
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
-import {required, minLength, maxLength, maxValue, decimal, minValue, helpers} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
+import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {addressLength, webSymbol, addressContain} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
+    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Modal,
     },
     props: {
         visible: Boolean,
         currency: String,
+        isToken: Boolean,
         fee: String,
+        webFee: String,
         withdrawUrl: String,
         maxAmount: String,
-        addressLength: Number,
+        availableWeb: String,
         subunit: Number,
         twofa: String,
+        noClose: Boolean,
     },
     data() {
         return {
+            withdrawing: false,
             code: '',
             amount: 0,
             address: '',
-            minAmount: toMoney('1e-' + this.subunit),
         };
     },
     computed: {
+        minAmount: function() {
+            return toMoney('1e-' + this.subunit, this.subunit);
+        },
         fullAmount: function() {
             Decimal.set({precision: 36});
 
@@ -126,7 +134,16 @@ export default {
                 new RegExp(/^[0-9]+(\.?[0-9]+)?$/).test(this.amount) ? this.amount : 0
             );
 
-            return toMoney(amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(), this.subunit);
+            return toMoney(
+                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
+                this.subunit
+            );
+        },
+        feeAmount: function() {
+            return this.isToken ? this.webFee : this.fee;
+        },
+        feeCurrency: function() {
+            return this.isToken ? webSymbol : this.currency;
         },
     },
     methods: {
@@ -156,9 +173,16 @@ export default {
         onWithdraw: function() {
             this.$v.$touch();
             if (this.$v.$error) {
-                this.$toasted.error('Correct your form fields');
+                this.notifyError('Correct your form fields');
                 return;
             }
+
+            if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
+                this.notifyError('You do not have enough ' + this.rebrandingFunc(this.feeCurrency) + ' to pay the fee');
+                return;
+            }
+
+            this.withdrawing = true;
 
             this.$axios.single.post(this.withdrawUrl, {
                 'crypto': this.currency,
@@ -167,12 +191,14 @@ export default {
                 'code': this.code || null,
             })
             .then((response) => {
-                this.$toasted.success('Confirmation email has been sent to your email. It will expire in 4 hours.');
+                this.notifySuccess('Confirmation email has been sent to your email. It will expire in 4 hours.');
                 this.closeModal();
             })
             .catch((error) => {
-                this.$toasted.error(error.response.data.error);
-            });
+                this.notifyError(error.response.data.message);
+                this.sendLogs('error', 'Withdraw response error', error);
+            })
+            .then(() => this.withdrawing = false);
 
             this.$emit('withdraw', this.currency, this.amount, this.address);
         },
@@ -198,16 +224,15 @@ export default {
             },
             address: {
                 required,
-                tokenContain: tokenContain,
-                minLength: minLength(this.addressLength),
-                maxLength: maxLength(this.addressLength),
+                addressContain,
+                minLength: minLength(
+                    addressLength[this.currency] ? addressLength[this.currency].min : addressLength.WEB.min
+                ),
+                maxLength: maxLength(
+                    addressLength[this.currency] ? addressLength[this.currency].max : addressLength.WEB.max
+                ),
             },
         };
-    },
-    filters: {
-        toMoney: function(val, subunit) {
-            return toMoney(val, subunit);
-        },
     },
 };
 </script>

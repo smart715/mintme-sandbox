@@ -35,13 +35,16 @@ class TradableNormalizer implements NormalizerInterface
     {
         $tradable = $this->normalizer->normalize($object, $format, $context);
 
-        $tradable['identifier'] = $object instanceof Token ?
-            $this->tokenNameConverter->convert($object) :
-            $object->getSymbol();
+        if ($context['groups'] &&
+            (in_array('Default', $context['groups']) || in_array('API', $context['groups']))) {
+            $tradable['identifier'] = $object instanceof Token ?
+                $this->tokenNameConverter->convert($object) :
+                $object->getSymbol();
 
-        $tradable['subunit'] = $object instanceof Crypto ?
-            $object->getShowSubunit() :
-            $this->tokenSubunit;
+            $tradable['subunit'] = $object instanceof Crypto ?
+                $object->getShowSubunit() :
+                $this->tokenSubunit;
+        }
 
         return $tradable;
     }

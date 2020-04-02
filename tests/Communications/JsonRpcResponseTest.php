@@ -9,10 +9,13 @@ class JsonRpcResponseTest extends TestCase
 {
     public function testParseResponse(): void
     {
+        $res = JsonRpcResponse::parse($this->getJsonResponse());
         $this->assertInstanceOf(
             JsonRpcResponse::class,
-            JsonRpcResponse::parse($this->getJsonResponse())
+            $res
         );
+
+        $this->assertEquals($this->getJsonResponseAsArray()['result'], $res->getResult());
     }
 
     public function testParseResponseWrongJsonResponse(): void

@@ -5,6 +5,7 @@ namespace App\Exchange\Balance\Factory;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+/** @codeCoverageIgnore */
 class BalanceView
 {
     /** @var string */
@@ -26,10 +27,16 @@ class BalanceView
     public $subunit;
 
     /** @var bool */
-    public $isNotExchanged;
+    public $exchangeble;
 
     /** @var bool */
-    public $isOwner;
+    public $tradable;
+
+    /** @var bool */
+    public $deployed;
+
+    /** @var bool */
+    public $owner;
 
     public function __construct(
         string $identifier,
@@ -38,17 +45,21 @@ class BalanceView
         string $fullname,
         ?Money $fee,
         int $subunit,
-        bool $isNotExchanged,
-        bool $isOwner = false
+        bool $exchangeble,
+        bool $tradable,
+        bool $deployed,
+        bool $owner
     ) {
         $this->identifier = $identifier;
-        $this->isNotExchanged = $isNotExchanged;
         $this->available = $available;
         $this->frozen = $frozen;
         $this->fullname = $fullname;
         $this->subunit = $subunit;
         $this->fee = $fee;
-        $this->isOwner = $isOwner;
+        $this->exchangeble = $exchangeble;
+        $this->tradable = $tradable;
+        $this->deployed = $deployed;
+        $this->owner = $owner;
     }
 
     /** @Groups({"API"}) */
@@ -82,20 +93,32 @@ class BalanceView
     }
 
     /** @Groups({"API"}) */
-    public function isNotExchanged(): bool
-    {
-        return $this->isNotExchanged;
-    }
-
-    /** @Groups({"API"}) */
-    public function isOwner(): bool
-    {
-        return $this->isOwner;
-    }
-
-    /** @Groups({"API"}) */
     public function getSubunit(): int
     {
         return $this->subunit;
+    }
+
+    /** @Groups({"API"}) */
+    public function isExchangeble(): bool
+    {
+        return $this->exchangeble;
+    }
+
+    /** @Groups({"API"}) */
+    public function isTradable(): bool
+    {
+        return $this->tradable;
+    }
+
+     /** @Groups({"API"}) */
+    public function isDeployed(): bool
+    {
+        return $this->deployed;
+    }
+
+    /** @Groups({"API"}) */
+    public function getOwner(): bool
+    {
+        return $this->owner;
     }
 }

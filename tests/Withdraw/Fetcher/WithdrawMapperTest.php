@@ -44,7 +44,7 @@ class WithdrawMapperTest extends TestCase
         $this->assertInstanceOf(Transaction::class, $transaction);
         $this->assertEquals($data[0]['createdDate'], $transaction->getDate()->getTimestamp());
         $this->assertEquals($data[0]['status'], $transaction->getStatus()->getStatusCode());
-        $this->assertEquals($data[0]['crypto'], $transaction->getCrypto()->getSymbol());
+        $this->assertEquals($data[0]['crypto'], $transaction->getTradable()->getSymbol());
         $this->assertEquals($data[0]['amount'], $transaction->getAmount()->getAmount());
     }
 

@@ -5,22 +5,51 @@ namespace App\Controller;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Form\QuickRegistrationType;
+use App\Form\RegistrationType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\Event\FormEvent;
+use FOS\UserBundle\Event\GetResponseUserEvent;
+use FOS\UserBundle\FOSUserEvents;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/hacker")
  * @Security(expression="is_granted('hacker')")
+ * @codeCoverageIgnore
  */
 class HackerController extends AbstractController
 {
-    /** @Route("/crypto/{crypto}", name="hacker-add-crypto", options={"expose"=true}) */
+    public const BTC_SYMBOL = 'BTC';
+
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    /** @var string */
+    private $quickRegistrationPassword;
+
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        string $quickRegistrationPassword
+    ) {
+        $this->eventDispatcher = $eventDispatcher;
+        $this->quickRegistrationPassword = $quickRegistrationPassword;
+    }
+
+    /**
+     * @Route("/crypto/{crypto}", name="hacker-add-crypto", options={"expose"=true})
+     */
     public function addCrypto(
         string $crypto,
         Request $request,
@@ -37,10 +66,13 @@ class HackerController extends AbstractController
             return $this->redirect($referer);
         }
 
+        $amount = self::BTC_SYMBOL === $crypto->getSymbol() ?
+            '0.001' : '100';
+
         $balanceHandler->deposit(
             $this->getUser(),
             Token::getFromCrypto($crypto),
-            $moneyWrapper->parse('100', $crypto->getSymbol())
+            $moneyWrapper->parse($amount, $crypto->getSymbol())
         );
 
         return $this->redirect($referer);
@@ -66,7 +98,7 @@ class HackerController extends AbstractController
             return $this->redirect($referer);
         }
 
-        $user->setRoles(['user' === $role ? User::ROLE_DEFAULT : 'ROLE_ADMIN']);
+        $user->setRoles(['user' === $role ? User::ROLE_DEFAULT : 'ROLE_SUPER_ADMIN']);
 
         $userManager->updateUser($user);
 
@@ -75,23 +107,88 @@ class HackerController extends AbstractController
         return $this->redirect($referer);
     }
 
-    /** @Route("/token/delete", name="hacker-delete-token", options={"expose"=true}) */
-    public function deleteToken(Request $request): RedirectResponse
-    {
-        /** @var User|null $user */
-        $user = $this->getUser();
+    /**
+     * @Route("/quick-registration", name="quick-registration", options={"expose"=true})
+     * @param Request $request
+     * @param UserManagerInterface $userManager
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return Response
+     */
+    public function quickRegistration(
+        Request $request,
+        UserManagerInterface $userManager,
+        UserPasswordEncoderInterface $passwordEncoder
+    ): Response {
+        $form = $this->createForm(QuickRegistrationType::class);
+        $form->handleRequest($request);
 
-        /** @var string $referer */
-        $referer = $request->headers->get('referer');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $email = $form->get('email')->getData();
 
-        if (!$user || !$user->getProfile() || !($token = $user->getProfile()->getToken())) {
-            return $this->redirect($referer);
+            if ($userManager->findUserByEmail($email)) {
+                $this->addFlash('danger', 'Email already used');
+            } else {
+                return $this->doQuickRegistration($request, $userManager, $passwordEncoder, $email);
+            }
         }
 
+        return $this->render('pages/quick_registration.html.twig', [
+            'formHeader' => 'Quick Registration',
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param UserManagerInterface $userManager
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param string $email
+     * @return RedirectResponse $response
+     */
+    private function doQuickRegistration(
+        Request $request,
+        UserManagerInterface $userManager,
+        UserPasswordEncoderInterface $passwordEncoder,
+        string $email
+    ): RedirectResponse {
+        $user = $userManager->createUser();
+        $user->setEmail($email);
+        $user->setPassword(
+            $passwordEncoder->encodePassword(
+                $user,
+                $this->quickRegistrationPassword
+            )
+        );
         $em = $this->getDoctrine()->getManager();
-        $em->remove($token);
+        $em->persist($user);
         $em->flush();
 
-        return $this->redirect($referer);
+        $url = $this->generateUrl('fos_user_registration_confirmed');
+        $response = new RedirectResponse($url);
+
+        $event = new GetResponseUserEvent($user, $request);
+        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
+
+        $event = new FormEvent($this->createForm(RegistrationType::class, $user), $request);
+        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
+
+        $this->eventDispatcher->dispatch(
+            FOSUserEvents::REGISTRATION_COMPLETED,
+            new FilterUserResponseEvent($user, $request, $response)
+        );
+
+        $user->setEnabled(true);
+        $user->setConfirmationToken(null);
+
+        $event = new GetResponseUserEvent($user, $request);
+        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_CONFIRM, $event);
+        $userManager->updateUser($user);
+
+        $this->eventDispatcher->dispatch(
+            FOSUserEvents::REGISTRATION_CONFIRMED,
+            new FilterUserResponseEvent($user, $request, $response)
+        );
+
+        return $response;
     }
 }

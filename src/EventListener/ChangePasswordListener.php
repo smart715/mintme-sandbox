@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Logger\UserActionLogger;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 
+/** @codeCoverageIgnore */
 class ChangePasswordListener
 {
     /** @var UserActionLogger */

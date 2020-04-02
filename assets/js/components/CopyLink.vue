@@ -37,9 +37,11 @@ export default {
             this.hideTooltip();
         },
         hideTooltip: function() {
-            if (this.$el._tippy != undefined) {
-                setTimeout(()=> this.$el._tippy.hide(), 1500);
-            }
+            setTimeout(()=> {
+                if (this.$el._tippy != undefined) {
+                    this.$el._tippy.hide();
+                }
+            }, 1500);
         },
     },
 };

@@ -3,16 +3,17 @@
 
 {% set formHeader = "Reset Password" %}
 {% block formBody %}
-    {{ form_start(form, { 'action': path('fos_user_resetting_reset', {'token': token}), 'attr': { 'class': 'fos_user_resetting_reset', 'id': 'reset' } }) }}
+    {{ form_start(resettingForm, { 'action': path('fos_user_resetting_reset', {'token': token}), 'attr': { 'class': 'fos_user_resetting_reset', 'id': 'reset' } }) }}
         <div>
             <passwordmeter :password="password" @toggle-error="toggleError">
-                {{ form_row(form.plainPassword.first, {'attr': {'v-model': 'password'}}) }}
+                <span @click="togglePassword()" class="show-password">
+                    <i class="far fa-eye"></i>
+                </span>
+                {{ form_row(resettingForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
             </passwordmeter>
         </div>
-        {{ form_row(form.plainPassword.second) }}
-        {{ form_widget(form) }}
         <div class="form-group text-center">
             <input type="submit" :disabled="disabled" class="btn btn-primary" value="{{ 'resetting.reset.submit'|trans }}" />
         </div>
-    {{ form_end(form) }}
+    {{ form_end(resettingForm) }}
 {% endblock %}

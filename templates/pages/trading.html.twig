@@ -1,23 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Trading{% endblock %}
+{% block title %}Trading | mintMe{% endblock %}
 
 {% block bodyclass %}trading{% endblock %}
 
 {% block content %}
-    <div id="trading" class="container">
+    <div id="trading" class="container-fluid">
         <div class="row pt-5 justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        Trading
-                    </div>
+            <div class="col-12">
+                <div class="card card-fixed-large mx-auto">
                     <div class="card-body p-0">
-                        <trading websocket-url="{{ global_websocket_url }}" v-cloak :page="{{ page }}">
-                            {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                            <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-                                Top {{ markets | length }} tokens
-                            </div>
+                        <trading
+                            websocket-url="{{ global_websocket_url }}"
+                            coinbase-url="{{ global_coinbase_url }}"
+                            :page="{{ page }}"
+                            :tokens-count="{{ tokensCount }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            mintme-supply-url="{{ mintme_supply }}"
+                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                        >
                         </trading>
                     </div>
                 </div>

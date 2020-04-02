@@ -6,15 +6,18 @@ use Doctrine\ORM\EntityRepository;
 
 class BlacklistRepository extends EntityRepository
 {
+    /** @codeCoverageIgnore */
     public function matchValue(string $value, string $type, bool $isSensetive = true): bool
     {
         $valCondition = $isSensetive ?
-            "UPPER(t.value) = UPPER('{$value}')" :
-            "t.value = '{$value}'";
+            "UPPER(t.value) = UPPER(:value)" :
+            "t.value = :value";
 
         return isset($this->createQueryBuilder('t')
             ->where($valCondition)
-            ->andWhere("t.type = '{$type}'")
+            ->andWhere("t.type = :type")
+            ->setParameter('value', $value)
+            ->setParameter('type', $type)
             ->getQuery()
             ->getResult()[0]);
     }

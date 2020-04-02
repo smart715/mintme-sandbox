@@ -6,6 +6,7 @@ export default {
     props: {
         basePrecision: Number,
         quotePrecision: Number,
+        loggedIn: Boolean,
     },
     computed: {
         ...mapGetters('makeOrder', [
@@ -17,6 +18,8 @@ export default {
     },
     methods: {
         orderClicked: function(order) {
+            if (!this.loggedIn) return;
+
             if (!this.getUseSellMarketPrice) {
                 this.setSellPriceInput(toMoney(order.price, this.basePrecision));
             }

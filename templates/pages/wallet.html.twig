@@ -1,15 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Wallet{% endblock %}
+{% block title %}Wallet | mintMe{% endblock %}
 
 {% block bodyclass %}wallet{% endblock %}
 
 {% block content %}
     <div id="wallet" class="container">
         <div class="row pt-5 justify-content-center">
-            <div class="col-md-8 text-white">
-                <b-tabs :lazy="true" class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}" v-cloak>
-                    {{ include("loader.html.twig", {vCloak:'v-cloak--block'}) }}
+            <div class="col-md-12 card-fixed-large px-0 text-white">
+                <b-tabs :lazy="true" class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
                     <b-tab title="Wallet" active>
                         <wallet
                             hash="{{ hash }}"
@@ -17,7 +16,9 @@
                             create-token-url="{{ path('token_create') }}"
                             trading-url="{{ path('trading') }}"
                             withdraw-url="{{ path('withdraw') }}"
-                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}">
+                            deposit-more="{{ depositMore }}"
+                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
+                        >
                         </wallet>
                     </b-tab>
                     <b-tab title="Trading history">

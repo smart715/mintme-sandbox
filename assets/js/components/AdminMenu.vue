@@ -1,9 +1,10 @@
 <template>
     <sidebar-menu
-            @collapse="isClicked = true"
-            :class="clickedStyles"
-            :width="!isClicked ? '30px' : '350px'"
-            :menu="menu" />
+        :class="clickedStyles"
+        :menu="menu"
+        :width="menuWidth"
+        @collapse="isClicked = true"
+    />
 </template>
 
 <script>
@@ -15,18 +16,16 @@ Vue.use(VueSidebarMenu);
 
 export default {
     name: 'AdminMenu',
+    props: {
+        isUserLogged: Boolean,
+    },
     data() {
         return {
             isClicked: false,
-            menu: [
+            authorizedMenu: [
                 {
                     header: true,
                     title: 'HACKER MENU',
-                },
-                {
-                    href: this.$routing.generate('hacker-delete-token'),
-                    title: 'Delete my token',
-                    icon: 'fa fa-bomb',
                 },
                 {
                     title: 'Permissions',
@@ -48,11 +47,27 @@ export default {
                     child: [
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'web'}),
-                            title: 'Add 100 WEBs',
+                            title: 'Add 100 MINTME',
                         },
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'btc'}),
-                            title: 'Add 100 BTCs',
+                            title: 'Add 0.001 BTC',
+                        },
+                    ],
+                },
+            ],
+            nonAuthorizedMenu: [
+                {
+                    header: true,
+                    title: 'HACKER MENU',
+                },
+                {
+                    title: 'Quick Menu',
+                    icon: 'fa fa-sign-in-alt',
+                    child: [
+                        {
+                            href: this.$routing.generate('quick-registration'),
+                            title: 'Quick registration',
                         },
                     ],
                 },
@@ -62,6 +77,12 @@ export default {
     computed: {
         clickedStyles: function() {
             return !this.isClicked ? 'v-sidebar-menu vsm-collapsed' : '';
+        },
+        menu: function() {
+            return this.isUserLogged ? this.authorizedMenu : this.nonAuthorizedMenu;
+        },
+        menuWidth: function() {
+            return this.isClicked ? '350px' : '30px';
         },
     },
     watch: {

@@ -1,7 +1,11 @@
 Mintme - cryptocurrency exchange market && token creator
 ========================================================
 
-This is the main mintme project, representing a user panel. 
+This is the main mintme project, representing a user panel, where each user can create his own token and start trading it or buy other user tokens.  
+Each user have his own `trade` page, where he can create buy/sell orders for his own token. He can check all existing tokens via `trading` 
+page and check trade page of each token. Also user have `wallet` page where he can get credentials for deposit BTC or MINTME or withdraw it, user also can check active orders, trading & deposit/withdraw history.
+Panel also provides News page & Knowledge Base.
+
 It fetches and updates user tokens data via 
 [viabtc](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server). 
 Also it communicates with 
@@ -19,6 +23,20 @@ Requirements:
 * a webserver (you can use [symfony's](https://packagist.org/packages/symfony/web-server-bundle) from dev composer dependencies)
 * [nodejs](https://nodejs.org/) 8+, npm 5.6+
 * [mysql](https://www.mysql.com/downloads/) 5.6 or compatible DBMS
+
+The following services are optional but are needed for some of features to work:
+
+Service|Purpose
+---|---
+mail server|Sending emails: e.g. for completing the registration or changing user's email, and for Contact Us form requests
+[rabbitmq](https://www.rabbitmq.com/download.html)|Communication between this project and deposit-gateway, widthderaw and token-contract
+[webchaind](https://github.com/webchain-network/webchaind)|webchain demon for deposit-gateway and token-contract 
+[token-contact](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/token-contract)|smart contracts for MintMe tokens
+[viabtc](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server)| Fork of https://github.com/viabtc/viabtc_exchange_server. ViaBTC Exchange Server is a trading backend with high-speed performance, designed for cryptocurrency exchanges. Backend for trading internal user tokens.
+[deposit-gateway](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/mintme-deposit-gateway)| Handles deposits of cryptocurrencies (MINTME coin and BTC) for the Mintme panel
+[withdraw(coinimp-payment)](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/coinimp-payment)|Perform payouts and also for `app:wallet:balance` CLI command
+
+
 
 Installation
 ------------
@@ -51,7 +69,14 @@ to listen for incoming deposits
 php bin/console rabbitmq:consumer market &
 ```
 to listen for new data in markets
-
+```
+php bin/console rabbitmq:consumer deploy &
+```
+to listen for token deploy
+```
+php bin/console rabbitmq:consumer contract_update &
+```
+to listen for updating mintDestination
 
 Development
 -----------
@@ -64,7 +89,7 @@ Development
 ### Installation:
 
 1. Clone this repository and checkout needed branch;
-2. Pull submodule repositories with `git submodule update --init --recursive`;
+2. Pull submodule repositories and also configure amount of tokens for viabtc service with `./docker-prepare.sh`
 
 You may need to replace `localhost` DNS with your docker-machine 
 ip address in case of using `docker-toolbox`.  
@@ -80,14 +105,14 @@ database_host: http://db:3306 # We are replacing actual ip with a service alias 
 
 ### Usage:
 
-1. Run `sudo docker-compose up -d` to setup a services cluster in background, if you would like to see logs output then start it with `sudo docker-compose up`.  
+1. Run `sudo docker-compose up -d` to setup a services cluster in background, if you would like to see logs output then start it with `sudo docker-compose up`.
 2. Wait until all services aren't started
 3. Check panel with `localhost` or docker-machine ip
 4. For checking logs type `docker-compose logs` in your repository folder , also you can see available containers with `sudo docker-compose ps` ,
 to check logs of specific container run `sudo docker logs container_name` where container_name is one of available containers 
 or `sudo docker-compose logs service_name` where service_name is one of available services which are described in `docker-compose.yml` 
 
-example output of available containers with `sudo docker-compose ps``
+example output of available containers with `sudo docker-compose ps`
 ```
 btc-kafka              start-kafka.sh                   Up      0.0.0.0:19092->9092/tcp                                                                                  
 btc-mysql              docker-entrypoint.sh mysqld      Up      0.0.0.0:13306->3306/tcp                                                                                  
@@ -109,6 +134,7 @@ panel_webchaind_1      docker-entrypoint.sh             Up      31440/tcp, 31440
 panel_withdraw_1       app-docker-entrypoint.sh         Up      9000/tcp                                                                                                 
 ```
 5. To stop services if they are running in foreground mode type `ctrl+c` or `sudo docker-compose stop` for background mode
+6. Databases stored in `.docker/db` ,also you can connect to mysql server with `mysql -u root -p --protocol=tcp`
 
 ### PS:
 

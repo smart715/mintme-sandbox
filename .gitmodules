@@ -1,12 +1,14 @@
 [submodule ".docker/viabtc/btc/source"]
 	path = .docker/viabtc/btc/source
+	branch = new-marketprice
 	url = ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurrencies/mintme/viabtc_exchange_server.git
 [submodule ".docker/deposit"]
 	path = .docker/deposit
+	branch = testnet
 	url = ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurrencies/mintme/mintme-deposit-gateway.git
 [submodule ".docker/withdraw"]
 	path = .docker/withdraw
 	url = ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurrencies/coinimp-payment.git
-[submodule ".docker/contract"]
-	path = .docker/contract
+[submodule ".docker/tokdeploy"]
+	path = .docker/tokdeploy
 	url = ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurrencies/mintme/token-contract.git

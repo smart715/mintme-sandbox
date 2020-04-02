@@ -10,8 +10,6 @@ use App\Exchange\Config\Config;
 use App\Repository\TokenRepository;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
-use App\Utils\Converter\TokenNameConverter;
-use App\Utils\Converter\TokenNameNormalizerInterface;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -78,7 +76,16 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
-    /** {@inheritdoc} */
+    public function findByAddress(string $address): ?Token
+    {
+        return $this->repository->findByAddress($address);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
+     */
     public function getTokensByPattern(string $pattern): array
     {
         return $this->repository->findTokensByPattern($pattern);
@@ -95,10 +102,19 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
-    /** {@inheritdoc} */
-    public function findAll(): array
+    public function isPredefined(Token $token): bool
     {
-        return $this->repository->findAll();
+        return in_array($token, $this->findAllPredefined());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
+     */
+    public function findAll(?int $offset = null, ?int $limit = null): array
+    {
+        return $this->repository->findBy([], null, $limit, $offset);
     }
 
     public function getOwnToken(): ?Token
@@ -119,11 +135,38 @@ class TokenManager implements TokenManagerInterface
             return $balanceResult;
         }
 
+        $available = $balanceResult->getAvailable();
+        $available = $token->isDeployed()
+            ? $available->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+            : $available->subtract($token->getLockIn()->getFrozenAmount());
+
+        $freeze = $balanceResult->getFreeze();
+        $freeze = $token->isDeployed()
+            ? $freeze->add($token->getLockIn()->getFrozenAmountWithReceived())
+            : $freeze->add($token->getLockIn()->getFrozenAmount());
+
         return BalanceResult::success(
-            $balanceResult->getAvailable()->subtract($token->getLockIn()->getFrozenAmount()),
-            $balanceResult->getFreeze()->add($token->getLockIn()->getFrozenAmount()),
+            $available,
+            $freeze,
             $balanceResult->getReferral()
         );
+    }
+
+    public function isExisted(string $tokenName): bool
+    {
+        $tokenName = strtoupper($tokenName);
+
+        $toDashedTokenName = str_replace(' ', '-', $tokenName);
+        $toDashedToken = $this->findByName($toDashedTokenName);
+
+        if (null !== $toDashedToken && $tokenName !== $toDashedTokenName) {
+            return true;
+        }
+        
+        $toSpaceTokenName = str_replace('-', ' ', $tokenName);
+        $toSpaceToken = $this->findByName($toSpaceTokenName);
+
+        return null !== $toSpaceToken && $tokenName !== $toSpaceTokenName;
     }
 
     private function getProfile(): ?Profile
@@ -139,15 +182,5 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
-    }
-
-    public function isExisted(Token $token): bool
-    {
-        $name = strtoupper(
-            str_replace(' ', '-', $token->getName())
-        );
-        $otherToken = $this->findByName($name);
-
-        return null !== $otherToken && $token !== $otherToken;
     }
 }

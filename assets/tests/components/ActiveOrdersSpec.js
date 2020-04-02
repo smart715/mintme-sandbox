@@ -43,11 +43,11 @@ describe('ActiveOrders', () => {
         };
         describe(':remove', () => {
             context('after remove orders we must see count - 1', () => {
-                vm.history = websocketAfterRemove;
+                vm.tableData = websocketAfterRemove;
 
                 it('length should be equal after remove', (done) => {
                     Vue.nextTick(() => {
-                        expect(vm.history).to.deep.equal(websocketAfterRemove);
+                        expect(vm.tableData).to.deep.equal(websocketAfterRemove);
                         done();
                     });
                 });

@@ -2,7 +2,7 @@
     <div class="input-group">
         <div ref="tokenSearch" @keyup.enter="redirectToToken">
             <autocomplete
-                    input-class="search-input form-control"
+                    :input-class="inputClass"
                     placeholder="Search for the token"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
@@ -10,12 +10,12 @@
                     @change="onInputChange"
                     :items="items"
                     :min-len="3"
-
+                    :input-attrs="inputAttrs"
             >
             </autocomplete>
         </div>
         <div class="input-group-append">
-            <span class="input-group-text text-white pl-2">
+            <span class="input-group-text text-white ml-2">
                 <font-awesome-icon class="c-pointer" @click="redirectToToken" icon="search"></font-awesome-icon>
             </span>
         </div>
@@ -24,9 +24,13 @@
 
 <script>
 import Autocomplete from 'v-autocomplete';
+import {LoggerMixin, NotificationMixin} from '../../mixins';
+
+const tokenRegEx = new RegExp('^[a-zA-Z0-9\\-\\s]*$');
 
 export default {
     name: 'TokenSearcher',
+    mixins: [NotificationMixin, LoggerMixin],
     components: {
         Autocomplete,
     },
@@ -35,8 +39,12 @@ export default {
     },
     data() {
         return {
+            validName: true,
             input: '',
             items: [],
+            inputAttrs: {
+                maxlength: 60,
+            },
         };
     },
     methods: {
@@ -49,10 +57,14 @@ export default {
                     return token.name;
                 });
             }).catch((error) => {
-                this.$toasted.error('Service timeout');
+                this.notifyError('Service timeout');
+                this.sendLogs('error', 'Service timeout error', error);
             });
         },
         redirectToToken: function() {
+            if (!tokenRegEx.test(this.input)) {
+                return;
+            }
             if (this.input.trim().length === 0) {
                 location.href = this.$routing.generate('trading');
                 return;
@@ -64,8 +76,14 @@ export default {
             this.redirectToToken();
         },
         onInputChange: function(val) {
+            this.validName = tokenRegEx.test(val);
             this.input = val;
             this.items = [];
+        },
+    },
+    computed: {
+        inputClass: function() {
+            return 'search-input form-control pr-3 no-bg-img ' + (this.validName ? '' : 'is-invalid');
         },
     },
 };

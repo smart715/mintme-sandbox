@@ -1,51 +1,86 @@
+# This file is auto-generated during the composer install
+parameters:
+    db_host: db
+    db_port: 3306
+    db_user: root
+    db_password: root
+    db_dbname: withdraw
+    db_driver: pdo_mysql
+    db_charset: utf8
+    db_default_table_options:
+        charset: utf8mb4
+        collate: utf8mb4_unicode_ci
+    rabbitmq_host: rabbitmq
+    rabbitmq_port: 5672
+    rabbitmq_user: guest
+    rabbitmq_password: guest
+    rabbitmq_vhost: /
+    monero_rpc_url: 'http://localhost:18081/json_rpc'
+    monero_auth:
+        type: digest
+        username: user
+        password: null
+    monero_transfer_options:
+        mixin: 2
+        priority: 1
+    webchain_wallet_address: '0x9139413fe7247da35ae0797f9270271ba758d248'
+    webchain_rpc_url: 'http://webchaind:39573'
+    webchain_auth:
+        type: digest
+        username: user
+        password: null
+    webchain_transfer_options: {  }
+    bitcoin_wallet_password: foobarbaz
+    bitcoin_rpc_url: 'http://electrum:7777'
+    bitcoin_auth:
+        type: basic
+        username: electrum
+        password: changeme
+    bitcoin_transfer_options: {  }
+    payment_retry_delay_minutes: 2
 doctrine:
-  host: db
-  port: 3306
-  user: root
-  password: root
-  dbname: withdraw
-  driver: pdo_mysql
-  charset: utf8
-  default_table_options:
-    charset: utf8mb4
-    collate: utf8mb4_unicode_ci
-
+    host: db
+    port: 3306
+    user: root
+    password: root
+    dbname: withdraw
+    driver: pdo_mysql
+    charset: utf8
+    default_table_options:
+        charset: utf8mb4
+        collate: utf8mb4_unicode_ci
 rabbitmq:
-  host: rabbitmq
-  port: 5672
-  user: guest
-  password: guest
-  vhost: /
-
+    host: rabbitmq
+    port: 5672
+    user: guest
+    password: guest
+    vhost: /
 wallets:
-  monero:
-    wallet_address: notNecessaryForMonero
-    rpc_url: http://localhost:18081/json_rpc
-    auth:
-      type: digest
-      username: user
-      password: ~
-    # For connection without authentication use
-    # auth: ~
-    transfer_options:
-      mixin: 2
-      priority: 1
-  webchain:
-    wallet_address: '0x8f06fe5c631d2ea3ff22673fa15b2e0c829c386b'
-    rpc_url: http://webchaind:39573
-    auth:
-      type: digest
-      username: user
-      password: ~
-    transfer_options: []
-  bitcoin:
-    wallet_address: notNecessaryForBitcoin
-    rpc_url: http://electrum:7777
-    auth:
-      type: basic
-      username: electrum
-      password: changeme
-    transfer_options: []
-
+    monero:
+        wallet_address: notNecessaryForMonero
+        rpc_url: 'http://localhost:18081/json_rpc'
+        auth:
+            type: digest
+            username: user
+            password: null
+        transfer_options:
+            mixin: 2
+            priority: 1
+    webchain:
+        wallet_address: '0x9139413fe7247da35ae0797f9270271ba758d248'
+        rpc_url: 'http://webchaind:39573'
+        auth:
+            type: digest
+            username: user
+            password: null
+        transfer_options: {  }
+    bitcoin:
+        wallet_address: notNecessaryForBitcoin
+        rpc_url: 'http://electrum:7777'
+        auth:
+            type: basic
+            username: electrum
+            password: changeme
+        transfer_options: {  }
 payment:
-  retry_delay_minutes: 2
+    retry_delay_minutes: 2

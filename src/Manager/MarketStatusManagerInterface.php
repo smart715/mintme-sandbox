@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\MarketStatus;
+use App\Entity\User;
 use App\Exchange\Market;
 
 interface MarketStatusManagerInterface
@@ -19,4 +20,7 @@ interface MarketStatusManagerInterface
     public function createMarketStatus(array $market): void;
 
     public function updateMarketStatus(Market $market): void;
+
+    /** @return array */
+    public function getUserMarketStatus(User $user, int $offset, int $limit): array;
 }

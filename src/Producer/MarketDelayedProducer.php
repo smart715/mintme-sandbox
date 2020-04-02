@@ -6,6 +6,7 @@ use OldSound\RabbitMqBundle\RabbitMq\Producer;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
+/** @codeCoverageIgnore */
 class MarketDelayedProducer extends Producer
 {
     private const MARKET_DELAYED_QUQUE_NAME     = 'market-delayed';

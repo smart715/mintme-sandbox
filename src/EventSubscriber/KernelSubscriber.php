@@ -40,6 +40,7 @@ class KernelSubscriber implements EventSubscriberInterface
         $this->csrfTokenManager = $csrfTokenManager;
     }
 
+    /** @codeCoverageIgnore */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -48,6 +49,7 @@ class KernelSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /** @codeCoverageIgnore */
     public function onResponse(FilterResponseEvent $event): void
     {
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
@@ -81,7 +83,7 @@ class KernelSubscriber implements EventSubscriberInterface
         return (bool)preg_match('/^\/api\//', $request->getPathInfo());
     }
 
-    private function isCsrfTokenValid(string $token): bool
+    private function isCsrfTokenValid(?string $token): bool
     {
         return $this->csrfTokenManager->isTokenValid(
             new CsrfToken('authenticate', $token ?? '')

@@ -10,7 +10,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class SecurityController extends FOSSecurityController
@@ -23,15 +25,19 @@ class SecurityController extends FOSSecurityController
 
     /** @var UserActionLogger */
     private $userActionLogger;
-
+    
+    /** @var SessionInterface */
+    private $session;
 
     public function __construct(
         ContainerInterface $container,
         UserActionLogger $userActionLogger,
+        SessionInterface $session,
         ?CsrfTokenManagerInterface $tokenManager = null
     ) {
         $this->container = $container;
         $this->userActionLogger = $userActionLogger;
+        $this->session = $session;
         parent::__construct($tokenManager);
     }
 
@@ -48,6 +54,12 @@ class SecurityController extends FOSSecurityController
         $this->form = $this->createForm(CaptchaLoginType::class);
         $this->form->handleRequest($request);
 
+        $refers = $request->headers->get('Referer');
+
+        if (!empty($refers) && $refers !== $this->generateUrl('login', [], UrlGeneratorInterface::ABSOLUTE_URL)) {
+            $this->session->set('login_referer', $refers);
+        }
+
         if ($this->form->isSubmitted() && $this->form->isValid()) {
             return $this->redirectToRoute('fos_user_security_check', [
                 'request' => $request,
@@ -57,14 +69,34 @@ class SecurityController extends FOSSecurityController
         return parent::loginAction($request);
     }
 
+    /** @Route("/logout_success", name="logout_success") */
+    public function postLogoutRedirectAction(): Response
+    {
+        $hasAuthenticated = $this->session->get('has_authenticated');
+        $this->session->clear();
+
+        return $hasAuthenticated
+            ? $this->redirectToRoute("homepage")
+            : $this->redirectToRoute("login");
+    }
+
     /** @Route("/login_success", name="login_success") */
     public function postLoginRedirectAction(PrelaunchConfig $prelaunchConfig): Response
     {
         $this->userActionLogger->info('Log in');
 
-         return $prelaunchConfig->isFinished()
-         ? $this->redirectToRoute("trading")
-         : $this->redirectToRoute("referral-program");
+        $referer = $this->session->get('login_referer');
+        $refererRoute = $this->refererMappings()[$referer] ?? '';
+
+        if ($refererRoute) {
+            $this->session->remove('login_referer');
+
+            return $this->redirectToRoute($refererRoute);
+        }
+
+        return $prelaunchConfig->isFinished()
+            ? $this->redirectToRoute("trading")
+            : $this->redirectToRoute("referral-program");
     }
 
     /**
@@ -76,5 +108,12 @@ class SecurityController extends FOSSecurityController
         return $this->render('@FOSUser/Security/login.html.twig', array_merge($data, [
             'form' => $this->form->createView(),
         ]));
+    }
+
+    private function refererMappings(): array
+    {
+        return [
+            $this->generateUrl('nelmio_api_doc.swagger_ui', [], UrlGeneratorInterface::ABSOLUTE_URL) => 'settings',
+        ];
     }
 }

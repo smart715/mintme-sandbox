@@ -16,6 +16,12 @@
 @import 'wallet'
 @import 'news'
 @import 'trading'
+@import 'markitup'
+@import 'bbcode-help'
+@import 'knowledge-base'
+@import 'doc'
+@import 'icons'
+@import 'sign-up-landing'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
@@ -26,26 +32,68 @@ html
   @include font-scale(sm)
   min-height: 100vh
   box-sizing: border-box
+  overflow-y: scroll
 
 body
   @include font-scale(sm)
-  color: $white
+  color: $dark-white
   font-family: $lato-font
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
   min-height: 100vh
 
+.content-wrapper
+  min-height: 100vh
+
+  @include media-breakpoint-up(xs)
+    content: "xs"
+
+  @include media-breakpoint-up(sm)
+    content: "sm"
+
+  @include media-breakpoint-up(md)
+    content: "md"
+
+  @include media-breakpoint-up(lg)
+    content: "lg"
+
+  @include media-breakpoint-up(xl)
+    content: "xl"
+
+.form-control
+  height: auto
+
+.text-white:not(input):not(.bg-danger)
+  color: $dark-white !important
+
+.trading-head
+  tr
+    th
+      outline: none
+
 .text-bold
   font-weight: 800
 
-.content-wrapper
+.img-reduced
+  @include media-breakpoint-up(md)
+    max-width: 80%
+  @include media-breakpoint-up(xl)
+    max-width: 60%
+
+.index-bg
   min-height: 100vh
+  margin-top: -6.5%
+  padding-top: 6.5%
+  background: url("../img/hero_image.jpg") no-repeat, linear-gradient(#102238 50%, transparent)
+  background-size: 100% auto
+  @include media-breakpoint-down(xs)
+    background: linear-gradient($secondary-dark 50%, transparent)
 
 a
   color: $color-link
 
   &.link-light
-    color: $white
+    color: $dark-white
 
   &:hover
     color: $color-link-hover
@@ -87,6 +135,16 @@ a
 
   p
     margin: 0
+
+.blue-question
+  background: $color-tooltip
+  padding: .125rem
+  font-size: .875em
+  vertical-align: middle
+
+  &.square
+    width: 1em
+    height: 1em
 
 .tooltip-static
   background: white
@@ -132,7 +190,6 @@ a
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
     background-color: $card-input-color !important
-    cursor: url('../img/input-cursor.png'), auto
     color: $white
     border-radius: 0
     border: none
@@ -141,9 +198,14 @@ a
   textarea
     height: auto
     border: none
+    cursor: url('../img/input-cursor.png'), auto
+    -webkit-text-fill-color: white
 
   .custom-select, .form-control
     border: none
+
+  .custom-select:focus
+    color: $white
 
 .card
   background: none
@@ -155,7 +217,7 @@ a
   .card-header
     border: none
     background: $card-header-bg
-    color: $white
+    color: $dark-white
     padding: .45rem 1.35rem
 
     @include font-scale(md)
@@ -165,7 +227,7 @@ a
 
     .card-header-icon
       float: right
-      color: $white
+      color: $dark-white
 
   .card-body
     background: $card-body-bg
@@ -174,8 +236,26 @@ a
     background-color: transparent
 
     >.card-header
-      background-color: $white
+      background-color: $dark-white
       color: inherit
+
+.row
+  &.trade-orders
+    .card
+      .card-body
+        line-height: 1 !important
+
+      .d-flex
+        .w-50
+          .custom-checkbox
+            min-height: 1rem !important
+
+            >.custom-control-label
+              &:before, &:after
+                top: 0 !important
+
+              .blue-question
+                vertical-align: bottom
 
 .btn-primary
   color: $white
@@ -193,6 +273,24 @@ a
       vertical-align: middle
       display: table-cell
       width: 120px
+
+.custom-scrollbar
+  scrollbar-color: auto
+  cursor: default
+
+  &::-webkit-scrollbar
+    width: 10px
+    height: 10px
+
+  &::-webkit-scrollbar-track-piece
+    background-color: $dark-white
+
+  &::-webkit-scrollbar-thumb:horizontal
+    background-color: $primary-light
+
+  &::-webkit-scrollbar-thumb:vertical
+    height: 30px
+    background-color: $primary-light
 
 .table, .table-responsive
   color: inherit
@@ -215,21 +313,7 @@ a
         border: none
 
   &, tbody
-    scrollbar-color: $primary-light $white
-
-    &::-webkit-scrollbar
-      width: 10px
-      height: 10px
-
-    &::-webkit-scrollbar-track-piece
-      background-color: $white
-
-    &::-webkit-scrollbar-thumb:horizontal
-      background-color: $primary-light
-
-    &::-webkit-scrollbar-thumb:vertical
-      height: 30px
-      background-color: $primary-light
+    @extend .custom-scrollbar
 
   td
     border: none
@@ -264,14 +348,13 @@ a
     .page-link
       background: none
       color: $color-link
-    span
-      font-size: 30px
       line-height: 13px
-
 
   .active
     .page-link
-      color: $white
+      color: $dark-white
+      cursor: default !important
+      pointer-events: none !important
 
 .tabs
   .nav-tabs
@@ -285,12 +368,12 @@ a
       flex: 1 1 auto
       padding: 0
       border: none
-      color: $white
+      color: $dark-white
 
       .nav-link
         border: none
         background-color: $color-tabs
-        color: $white
+        color: $dark-white
         padding: .45rem 1.35rem
 
         @include font-scale(md)
@@ -312,19 +395,74 @@ a
   &.transparent
     .nav-tabs
       position: relative
-      display: block
       background: $secondary
       text-align: left
       border: 2px solid $secondary
+      overflow: hidden
+      white-space: nowrap
+      flex-wrap: nowrap
+
+    .nav-item-token
+      flex: initial
+      overflow: hidden
+      margin-left: auto
+
+      .nav-link-token
+        @extend .nav-link
+
+        @include font-scale(md)
+
+        &.active
+          color: $color-link
+
+        &.active::after
+          content: ' '
+          position: absolute
+          bottom: .75rem
+          left: 1.5rem
+          height: .125rem
+          background-color: unset
+          width: calc(100% - 3rem)
+
+    .nav-item
+      display: inline-block
+      flex: initial
+      overflow: visible
+
+      .nav-link
+        color: inherit
+        position: relative
+        background: $secondary
+
+        @include font-scale(md)
+
+        &.active
+          color: $color-link
+
+        &.active::after
+          content: ' '
+          position: absolute
+          bottom: .75rem
+          left: 1.5rem
+          height: .125rem
+          background-color: unset
+          width: calc(100% - 3rem)
+
+    @media (max-width: 767px)
+      .nav-tabs
+        text-align: center
+        display: block
+        white-space: normal
+        overflow: visible
 
       .nav-item
         display: inline-block
         flex: initial
+        overflow: visible
 
         .nav-link
             color: inherit
             position: relative
-            background: $secondary
 
             @include font-scale(md)
 
@@ -364,7 +502,7 @@ a
     .modal-close
       @include font-scale(lg)
 
-      color: $white
+      color: $dark-white
       font-weight: lighter
 
   .modal-title
@@ -389,7 +527,6 @@ nav.top-navbar
   padding-bottom: 3px
 
 .wallet-code
-  color: $color-wallet-code
   @include font-scale(sm)
 
 .modal.show
@@ -401,14 +538,28 @@ nav.top-navbar
 
 .alert
   &.alert-danger
-    border-color: $red
-    background-color: $red
-    color: $white
+    border-color: $toast-error-bg
+    background-color: $toast-error-bg
+    color: $toast-error-text
 
   &.alert-success
-    border-color: $green
-    background-color: $green
-    color: $white
+    border-color: $toast-success-bg
+    background-color: $toast-success-bg
+    color: $toast-success-text
+
+  &.alert-primary, &.alert-info
+    border-color: $toast-info-bg
+    background-color: $toast-info-bg
+    color: $toast-info-text
+
+  &.alert-warning
+    border-color: $toast-warning-bg
+    background-color: $toast-warning-bg
+    color: $toast-warning-text
+
+  font-size: 20px
+  padding: 6px 15px
+  border-radius: 2px
 
 .empty-table
   .b-table-has-details
@@ -421,18 +572,24 @@ nav.top-navbar
   .link
     color: $blue
 
-.v-cloak--block
-  display: none
-
-.v-cloak--inline
+.v-cloak--block, .v-cloak--inline, .v-cloak--inline-block, .v-cloak--flex
   display: none
 
 [v-cloak]
   & > .v-cloak--block
-    display: block
+    display: block !important
 
   & > .v-cloak--inline
-    display: inline
+    display: inline !important
+
+  & > .v-cloak--inline-block
+    display: inline-block !important
+
+  & > .v-cloak--flex
+    display: flex !important
+
+  & > .v-cloak--hidden
+    display: none
 
   & > *:not(.v-cloak--inline)
     display: none
@@ -444,16 +601,6 @@ nav.top-navbar
   padding: 2px 4px 2px 2px
   word-spacing: 7px
   text-align: left
-
-.blue-question
-  background: $color-tooltip
-  padding: .125rem
-  font-size: .875em
-  vertical-align: middle
-
-  &.square
-    width: 1em
-    height: 1em
 
 .icon
   width: 18px
@@ -474,6 +621,51 @@ nav.top-navbar
   transform-origin: 0 0
   -webkit-transform-origin: 0 0
   margin-bottom: -25px
+
+.flex-basis-200
+  flex-basis: 200px
+
+.token-introduction-profile-icon
+  width: 22px
+  height: 20px
+
+.tooltip
+  transition-duration: .4s !important
+  transition-timing-function: ease-in !important
+
+.alert, .toast
+  i
+    margin-right: 15px
+
+.toast
+  &.toasted-primary
+    &.error
+      background: $toast-error-bg !important
+      color: $toast-error-text !important
+    &.info
+      background: $toast-info-bg !important
+      color: $toast-info-text !important
+    &.success
+      background: $toast-success-bg !important
+      color: $toast-success-text !important
+    &.warning
+      background: $toast-warning-bg
+      color: $toast-warning-text
+
+  justify-content: center !important
+  font-size: 20px !important
+  padding: 6px 15px !important
+
+.toast-text
+  text-align: center
+
+.toasted-container
+  align-items: center
+  justify-content: center
+  left: 0 !important
+  right: 0 !important
+  -webkit-transform: none !important
+  transform: none !important
 
 meter
   width: 100%
@@ -498,7 +690,7 @@ meter
     bottom: 1.2rem
     right: 1rem
 
-#token, #profile-creation, #profile
+#token, #profile
   [v-cloak]
     display: none
   .text-danger
@@ -518,3 +710,69 @@ meter
 
 .is-invalid
   border: 1px solid $red !important
+  &:focus, &:active
+    outline: 0 !important
+    outline-color: transparent !important
+    outline-width: 0 !important
+    outline-style: none !important
+    box-shadow: 0 0 0 0 rgba(0,123,255,0) !important
+
+input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
+  cursor: url('../img/input-cursor.png'), auto
+
+.no-bg-img
+  background-image: none !important
+
+.show-password
+  float: right
+  position: relative
+  top: 32px
+  right: 10px
+
+.show-password:hover
+  cursor: pointer
+  color: $color-toggle-password-active
+
+.show-password-active
+  @extend .show-password
+  color: $color-toggle-password-hover
+
+.truncate-name
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.truncate-token
+  width: 100%
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.truncate-address
+  strong
+    white-space: nowrap
+  span
+    width: 100%
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+.pair-cell
+  max-width: 200px
+
+.pair-cell-trading
+  max-width: 260px
+  min-width: 260px
+
+.card-fixed-small
+  width: 100%
+  max-width: 450px
+
+.card-fixed-large
+  width: 100%
+  max-width: 981px
+
+@include media-breakpoint-up(lg)
+  .card-two-divs-fixed-large
+    width: 100%
+    max-width: calc(981px / 2)

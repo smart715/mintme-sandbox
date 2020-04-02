@@ -1,64 +1,70 @@
 <template>
-    <div v-on-clickaway="cancelEditingMode">
+    <div class="truncate-token">
         <template v-if="editable">
-            <input
-                type="text"
-                v-model.trim="$v.newName.$model"
-                v-if="editingName"
-                ref="tokenNameInput"
-                class="token-name-input"
-                :class="{ 'is-invalid': $v.$invalid }">
+            <token-edit-modal
+                v-if="editable"
+                :current-name="currentName"
+                :has-release-period-prop="hasReleasePeriodProp"
+                :is-owner="editable"
+                :is-token-exchanged="isTokenExchanged"
+                :no-close="true"
+                :precision="precision"
+                :status-prop="statusProp"
+                :twofa="twofa"
+                :visible="showTokenEditModal"
+                :websocket-url="websocketUrl"
+                :release-address="releaseAddress"
+                @close="closeTokenEditModal"
+                @token-deploy-pending="$emit('token-deploy-pending')"
+                @update-release-address="updateReleaseAddress"
+            />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
-                :icon="icon"
+                icon="edit"
                 transform="shrink-4 up-1.5"
-                @click="editName"
+                @click="editToken"
             />
         </template>
-        <span v-if="!editingName">{{ currentName }}</span>
+        <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
+            {{ currentName }}
+        </span>
     </div>
 </template>
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
+import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import WebSocketMixin from '../../mixins/websocket';
-import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+import {WebSocketMixin, FiltersMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import TokenEditModal from '../modal/TokenEditModal';
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
-
-library.add(faEdit, faCheck);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
-
-const HTTP_ACCEPTED = 202;
-const HTTP_ALREADY_REPORTED = 208;
+library.add(faEdit);
 
 export default {
     name: 'TokenName',
     props: {
-        name: String,
-        identifier: String,
-        updateUrl: String,
         editable: Boolean,
+        hasReleasePeriodProp: Boolean,
+        identifier: String,
+        name: String,
+        precision: Number,
+        statusProp: String,
+        twofa: Boolean,
+        websocketUrl: String,
+        releaseAddress: String,
     },
     components: {
         FontAwesomeIcon,
+        TokenEditModal,
     },
-    mixins: [WebSocketMixin, clickaway],
+    mixins: [WebSocketMixin, FiltersMixin, NotificationMixin, clickaway, LoggerMixin],
     data() {
         return {
-            editingName: false,
-            icon: 'edit',
             currentName: this.name,
-            newName: this.name,
             isTokenExchanged: true,
-            minLength: 4,
+            isTokenNotDeployed: false,
+            showTokenEditModal: false,
         };
     },
     mounted: function() {
@@ -69,100 +75,38 @@ export default {
         this.checkIfTokenExchanged();
 
         this.addMessageHandler((response) => {
-            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier)) {
+            if (
+                ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier))
+                || 'order.update' === response.method
+            ) {
                 this.checkIfTokenExchanged();
             }
         }, 'token-name-asset-update');
     },
     methods: {
+        closeTokenEditModal: function() {
+            this.showTokenEditModal = false;
+        },
         checkIfTokenExchanged: function() {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
                 name: this.currentName,
             }))
-                .then((res) => this.isTokenExchanged = res.data)
-                .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
+            .then((res) => this.isTokenExchanged = res.data)
+            .catch((err) => {
+                this.notifyError('Can not fetch token data now. Try later');
+                this.sendLogs('error', 'Can not fetch token data now', err);
+            });
         },
-        editName: function() {
+        editToken: function() {
             if (!this.editable) {
                 return;
             }
 
-            if (null === this.isTokenExchanged || this.isTokenExchanged) {
-                this.$toasted.error('You need all your tokens to change token\'s name');
-                return;
-            }
-
-            if (this.icon === 'check') {
-                return this.doEditName();
-            }
-
-            this.editingName = !this.editingName;
-            this.icon = 'check';
-            this.$nextTick(() => {
-                let tokenNameInput = this.$refs.tokenNameInput;
-                tokenNameInput.focus();
-            });
+            this.showTokenEditModal = true;
         },
-        doEditName: function() {
-            this.$v.$touch();
-            if (this.currentName === this.newName) {
-                this.cancelEditingMode();
-                return;
-            } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
-                this.$toasted.error('Token name shouldn\'t be blank');
-                return;
-            } else if (!this.$v.newName.tokenContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
-            } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
-                this.$toasted.error('Token name should have at least 4 symbols');
-                return;
-            } else if (!this.$v.newName.maxLength) {
-                this.$toasted.error('Token name can not be longer than 60 characters');
-                return;
-            }
-
-            this.$axios.single.patch(this.updateUrl, {
-                name: this.newName,
-            })
-            .then((response) => {
-                if (response.status === HTTP_ACCEPTED) {
-                    this.currentName = response.data['tokenName'];
-
-                    // TODO: update name in a related components and link path instead of redirecting
-                    location.href = this.$routing.generate('token_show', {
-                        name: this.currentName,
-                    });
-                    this.cancelEditingMode();
-                } else if (response.status === HTTP_ALREADY_REPORTED) {
-                    this.$toasted.error(response.data);
-                }
-            }, (error) => {
-                if (!error.response) {
-                    this.$toasted.error('Network error');
-                } else if (error.response.data.message) {
-                    this.$toasted.error(error.response.data.message);
-                } else {
-                    this.$toasted.error('An error has occurred, please try again later');
-                }
-            });
+        updateReleaseAddress: function() {
+            this.releaseAddress = '0x';
         },
-        cancelEditingMode: function() {
-            this.$v.$reset();
-            this.newName = this.currentName;
-            this.editingName = false;
-            this.icon = 'edit';
-        },
-    },
-    validations() {
-        return {
-            newName: {
-                required,
-                tokenContain: tokenContain,
-                minLength: minLength(this.minLength),
-                maxLength: maxLength(60),
-            },
-        };
     },
 };
 </script>

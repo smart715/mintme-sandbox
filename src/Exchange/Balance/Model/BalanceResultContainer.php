@@ -28,12 +28,17 @@ class BalanceResultContainer implements \IteratorAggregate
         return new self($balances);
     }
 
+    /** @codeCoverageIgnore */
     public static function fail(): self
     {
         return new self([]);
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->getAll());

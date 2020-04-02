@@ -22,7 +22,7 @@ class TokenNameConverter implements TokenNameConverterInterface
 
     public function convert(Token $token): string
     {
-        return !$this->cryptoManager->findBySymbol(strtoupper($token->getName() ?? ''))
+        return !$this->cryptoManager->findBySymbol(strtoupper($token->getName()))
             ? 'TOK'.str_pad((string)($token->getId() + $this->config->getOffset()), 12, '0', STR_PAD_LEFT)
             : $token->getName();
     }

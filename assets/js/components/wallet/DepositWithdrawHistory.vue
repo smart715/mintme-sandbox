@@ -3,12 +3,20 @@
         <template v-if="loaded">
         <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table">
             <b-table
+                thead-class="trading-head"
                 v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
             >
-                <template slot="toAddress" slot-scope="row">
+                <template v-slot:cell(symbol)="data">
+                    <a :href="data.item.url" class="text-white">
+                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                            {{ data.item.symbol | truncate(15) }}
+                        </span>
+                    </a>
+                </template>
+                <template v-slot:cell(toAddress)="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
                         <copy-link :content-to-copy="row.value" class="c-pointer">
                             <div class="text-truncate text-blue">
@@ -37,50 +45,61 @@
 <script>
 import moment from 'moment';
 import {toMoney, formatMoney} from '../../utils';
-import {LazyScrollTableMixin} from '../../mixins';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import CopyLink from '../CopyLink';
+import {GENERAL} from '../../utils/constants';
 
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin],
+    mixins: [LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {CopyLink},
     data() {
         return {
-            fields: {
-                date: {
+            fields: [
+                {
+                    key: 'date',
                     label: 'Date',
                     sortable: true,
                 },
-                type: {
+                {
+                    key: 'type',
                     label: 'Type',
                     sortable: true,
                 },
-                crypto: {
+                {
+                    key: 'symbol',
                     label: 'Name',
                     sortable: true,
                 },
-                toAddress: {
+                {
+                    key: 'toAddress',
                     label: 'Address',
                     sortable: true,
                 },
-                amount: {
+                {
+                    key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                status: {
+                {
+                    key: 'status',
                     label: 'Status',
                     sortable: true,
                 },
-                fee: {
+                {
+                    key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: formatMoney,
                 },
-            },
-            history: {
-                dateFormat: 'MM-DD-YYYY',
-            },
+            ],
             tableData: null,
             currentPage: 1,
         };
@@ -120,25 +139,27 @@ export default {
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
-                        this.$toasted.error('Can not update payment history. Try again later.');
+                    .catch((err) => {
+                        this.notifyError('Can not update payment history. Try again later.');
+                        this.sendLogs('error', 'Can not update payment history', err);
                         reject([]);
                     });
             });
         },
         sanitizeHistory: function(historyData) {
             historyData.forEach((item) => {
+                item['url'] = this.generatePairUrl(item.tradable);
                 item['date'] = item.date
-                    ? moment(item.date).format(this.history.dateFormat)
+                    ? moment(item.date).format(GENERAL.dateFormat)
                     : null;
                 item['fee'] = item.fee
-                    ? toMoney(item.fee, item.crypto.subunit)
+                    ? toMoney(item.fee, item.tradable.subunit)
                     : null;
                 item['amount'] = item.amount
-                    ? toMoney(item.amount, item.crypto.subunit)
+                    ? toMoney(item.amount, item.tradable.subunit)
                     : null;
-                item['crypto'] = item.crypto.symbol
-                    ? item.crypto.symbol
+                item['symbol'] = item.tradable.symbol
+                    ? this.rebrandingFunc(item.tradable)
                     : null;
                 item['status'] = item.status.statusCode
                     ? item.status.statusCode
@@ -149,6 +170,18 @@ export default {
             });
 
             return historyData;
+        },
+        generatePairUrl: function(quote) {
+            if (quote.hasOwnProperty('exchangeble')) {
+                /** @TODO In future we need to use another solution and remove hardcoded BTC & MINTME symbols **/
+                let params = {
+                    base: !quote.exchangeble ? this.rebrandingFunc(quote) : 'BTC',
+                    quote: quote.exchangeble && quote.tradable ? this.rebrandingFunc(quote) : 'MINTME',
+                };
+                return this.$routing.generate('coin', params);
+            }
+
+            return this.$routing.generate('token_show', {name: quote.name});
         },
     },
 };

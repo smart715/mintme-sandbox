@@ -1,14 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Token{% endblock %}
+{% block tokenDescription %}
+    {% if isTokenPage and tokenDescription is defined %}
+        <meta property="og:description" content="{{ tokenDescription }}">
+        <meta name="description" content="{{ tokenDescription }}">
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block title %}
+    {% if token|default %} {{ token.name }} token{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
+{% endblock %}
 
 {% block content %}
-    <div id="token" class="container">
-        <div class="row pt-5 justify-content-center">
-            <div class="col-md-10" v-cloak>
-                {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
-                    <b-tab title="Trade" {% if tab|default and tab == 'trade' %} {{ 'active' }} {% endif %}>
+<div id="token" class="container">
+    <div class="row pt-5 justify-content-center">
+        <div class="col-md-10" v-cloak>
+            {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
+            <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
+                {% if isTokenPage %}
+                    <b-tab title="Introduction" {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}>
+                        <div class="row">
+                            <token-introduction-description
+                                    class="col-12 pb-3"
+                                    name="{{ token.name }}"
+                                    :description="tokenDescription"
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    @updated="descriptionUpdated"
+                            ></token-introduction-description>
+                            <token-introduction-profile
+                                    class="col-12 col-lg-6 pr-lg-2"
+                                    youtube-client-id="{{ global_youtube_client_id }}"
+                                    facebook-app-id="{{ global_facebook_app_id }}"
+                                    profile-name="{{ profile.firstName }} {{ profile.lastName }}"
+                                    website-url="{{ token.websiteUrl }}"
+                                    facebook-url="{{ token.facebookUrl }}"
+                                    youtube-channel-id="{{ token.youtubeChannelId }}"
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
+                                    :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                    token-contract-address="{{ token.address }}"
+                                    token-name="{{ market.quote.name }}"
+                                    telegram-url="{{ token.telegramUrl }}"
+                                    discord-url="{{ token.discordUrl }}"
+                            >
+                            </token-introduction-profile>
+                            <token-introduction-statistics
+                                    class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
+                                    :market="{{ market | json_encode }}"
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                    twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
+                                    token-created="{{ token.getCreated().format('d M Y') }}"
+                                    :precision="{{ precision }}">
+                            </token-introduction-statistics>
+                            <top-holders
+                                    class="col-12 mt-3"
+                                    :token-name="{{ market.quote.symbol | json_encode }}">
+                            </top-holders>
+                        </div>
+                    </b-tab>
+                {% endif %}
+                {% if showTrade %}
+                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
                         <trade
                             websocket-url="{{ global_websocket_url }}"
                             hash="{{ hash }}"
@@ -19,72 +74,72 @@
                             :is-owner="{{ isOwner ? 'true' : 'false' }}"
                             :precision="{{ precision }}"
                             :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}">
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            mintme-supply-url="{{ mintme_supply }}"
+                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                            >
                         </trade>
                     </b-tab>
-                    {% if showIntro %}
-                        <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
-                            <div class="row">
-                                <token-introduction-profile
-                                    class="col-12 col-lg-6 pr-lg-2"
-                                    youtube-client-id="{{ global_youtube_client_id }}"
-                                    facebook-app-id="{{ global_facebook_app_id }}"
-                                    confirm-website-file-url="{{ path('token_website_confirmation', {'name': market.quote.name}) }}"
-                                    confirm-website-url="{{ path('token_website_confirm', {'name': market.quote.name}) }}"
-                                    profile-name="{{ profile.firstName }} {{ profile.lastName }}"
-                                    website-url="{{ token.websiteUrl }}"
-                                    facebook-url="{{ token.facebookUrl }}"
-                                    youtube-channel-id="{{ token.youtubeChannelId }}"
-                                    update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
-                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
-                                >
-                                </token-introduction-profile>
-
-                                <token-introduction-statistics
-                                    class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
-                                    :market="{{ market | json_encode }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
-                                    token-created="{{ token.getCreated().format('d M Y') }}"
-                                    :precision="{{ precision }}">
-                                </token-introduction-statistics>
-                                <token-introduction-description
-                                    class="col-12 pt-3"
-                                    @updated="descriptionUpdated"
-                                    name="{{ token.name }}"
-                                    :description="tokenDescription"
-                                    update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}">
-                                </token-introduction-description>
-                            </div>
-                        </b-tab>
-                    {% endif %}
-                    <template slot="tabs">
-                        <li class="nav-item float-sm-right">
-                            <div class="nav-link">
+                {% endif %}
+                <template slot="tabs-end">
+                    {% if isTokenPage %}
+                        {% if token is defined %}
+                            <li class="nav-item">
+                                <div class="nav-link pr-md-0">
+                                    <token-deploy-icon
+                                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                            :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                    />
+                                </div>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item-token">
+                            <div class="nav-link-token">
                                 <token-name
-                                        websocket-url="{{ global_websocket_url }}"
+                                        :editable="{{ isOwner ? 'true' : 'false' }}"
+                                        :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
-                                        update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                        :editable="{{ isOwner ? 'true' : 'false' }}">
-                                </token-name>
+                                        :precision="{{ precision }}"
+                                        :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                        :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                                        websocket-url="{{ global_websocket_url }}"
+                                        release-address="{{ token.mintDestination }}"
+                                        @token-deploy-pending="setTokenPending"
+                                />
                             </div>
                         </li>
-                        <div class="clearfix"></div>
-                    </template>
-                </b-tabs>
-            </div>
+                    {% else %}
+                        <li class="nav-item-token">
+                            <div class="nav-link-token">
+                                <div class="truncate-token">
+                                    {% if(market.quote.name | rebranding is same as(mintme_coin)) %}
+                                        <a href="{{ mintme_coin_link }}" target="_blank"> 
+                                            <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
+                                                {{ market.quote.name | rebranding }}
+                                            </span>
+                                        </a>
+                                    {%else%}
+                                        <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
+                                            {{ market.quote.name | rebranding }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    <div class="clearfix"></div>
+                </template>
+            </b-tabs>
         </div>
         {% if token|default %}
             <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}" />
             <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
         {% endif %}
     </div>
+</div>
 
-    <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
+<input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
 {% endblock %}
 
 {% block pagescripts %}

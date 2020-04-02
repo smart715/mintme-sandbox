@@ -3,6 +3,7 @@
 namespace App\Exchange\Market;
 
 use App\Entity\User;
+use App\Exchange\Deal;
 use App\Exchange\Market;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
@@ -20,7 +21,7 @@ interface MarketHandlerInterface
 
     /**
      * @param Market[] $markets
-     * @return Order[]
+     * @return Deal[]
      */
     public function getUserExecutedHistory(User $userId, array $markets, int $offset = 0, int $limit = 50): array;
 
@@ -30,7 +31,7 @@ interface MarketHandlerInterface
      */
     public function getPendingOrdersByUser(User $user, array $markets, int $offset = 0, int $limit = 50): array;
 
-    public function getMarketInfo(Market $market): MarketInfo;
+    public function getMarketInfo(Market $market, int $period = 86400): MarketInfo;
 
     /**
      * @return Market\Model\LineStat[]

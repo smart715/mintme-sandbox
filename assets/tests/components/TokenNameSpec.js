@@ -1,6 +1,7 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import TokenName from '../../js/components/token/TokenName';
 import moxios from 'moxios';
+import axiosPlugin from '../../js/axios';
 import axios from 'axios';
 
 /**
@@ -8,7 +9,7 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axios);
+    localVue.use(axiosPlugin);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -69,68 +70,16 @@ describe('TokenName', () => {
     //     });
     // });
 
-    it('can not be edited if not editable', (done) => {
+    it('can not be edited if not editable', () => {
         const localVue = mockVue();
         const wrapper = mount(TokenName, {
             localVue,
             propsData: {
                 name: 'foo',
                 identifier: 'bar',
-                updateUrl: 'updateUrl',
                 editable: false,
             },
         });
-
-        moxios.stubRequest('is_token_exchanged', {
-            status: 200,
-            response: true,
-        });
-
-        moxios.wait(() => {
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            wrapper.vm.editName();
-
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            done();
-        });
-    });
-
-    it('can not be edited if token exchanged', (done) => {
-        const $toasted = {error: () => true};
-        const localVue = mockVue();
-        const wrapper = mount(TokenName, {
-            localVue,
-            mocks: {
-                $toasted,
-            },
-            methods: {addMessageHandler: () => {}},
-            propsData: {
-                name: 'foo',
-                identifier: 'bar',
-                updateUrl: 'updateUrl',
-                editable: true,
-            },
-        });
-
-        moxios.stubRequest('is_token_exchanged', {
-            status: 200,
-            response: true,
-        });
-
-        moxios.wait(() => {
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            wrapper.vm.editName();
-
-            expect(wrapper.find('input').exists()).to.deep.equal(false);
-            expect(wrapper.vm.editingName).to.deep.equal(false);
-
-            done();
-        });
+        expect(wrapper.find('svg').exists()).to.equal(false);
     });
 });

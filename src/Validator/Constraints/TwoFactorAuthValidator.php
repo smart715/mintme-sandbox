@@ -11,14 +11,16 @@ use Symfony\Component\Validator\ConstraintValidator;
 class TwoFactorAuthValidator extends ConstraintValidator
 {
     /** @var User */
-    protected $user;
+    public $user;
 
     /** @var TwoFactorManager  */
     protected $twoFactorManager;
 
     public function __construct(TokenStorageInterface $token, TwoFactorManager $twoFactorManager)
     {
-        $this->user = $token->getToken()->getUser();
+        /** @var User $user */
+        $user = $token->getToken()->getUser();
+        $this->user = $user;
         $this->twoFactorManager = $twoFactorManager;
     }
 

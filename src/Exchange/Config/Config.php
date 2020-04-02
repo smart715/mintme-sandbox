@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Config;
 
+/** @codeCoverageIgnore */
 class Config
 {
     /** @var int $offset */

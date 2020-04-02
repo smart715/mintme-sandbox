@@ -2,12 +2,13 @@
     <modal
         id="modal"
         :visible="visible"
+        :no-close="noClose"
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
                 <h3 class="modal-title">DEPOSIT</h3>
                 <div class="col-12 pt-2">
-                    <code class="wallet-code" id="walletaddress">
+                    <code class="wallet-code text-blue" id="walletaddress">
                         <span>
                             {{ address }}
                         </span>
@@ -20,13 +21,15 @@
                     <b-row>
                         <b-col>
                             <p class="text-center mt-2">
-                                {{ description }}
+                                {{ description|rebranding }}
                             </p>
                         </b-col>
                     </b-row>
                     <b-row>
-                        <b-col v-if="min" cols="auto" class="text-left">Minimal value: {{ min }} {{ currency }}</b-col>
-                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ currency }}</b-col>
+                        <b-col v-if="min" cols="auto" class="text-left">
+                            Minimal value: {{ min }} {{ currency|rebranding }}
+                        </b-col>
+                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ feeCurrency|rebranding }}</b-col>
                     </b-row>
                 </div>
                 <div class="pt-2 text-center">
@@ -44,9 +47,12 @@
 <script>
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
+import {MoneyFilterMixin, RebrandingFilterMixin} from '../../mixins';
+import {webSymbol} from '../../utils/constants';
 
 export default {
     name: 'DepositModal',
+    mixins: [MoneyFilterMixin, RebrandingFilterMixin],
     components: {
         Modal,
         CopyLink,
@@ -56,8 +62,15 @@ export default {
         address: String,
         description: String,
         currency: String,
+        isToken: Boolean,
         min: String,
         fee: String,
+        noClose: Boolean,
+    },
+    computed: {
+      feeCurrency: function() {
+          return this.isToken ? webSymbol : this.currency;
+      },
     },
     methods: {
         closeModal: function() {

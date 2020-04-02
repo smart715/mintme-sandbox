@@ -6,7 +6,21 @@ describe('TradeSellOrders', () => {
     const wrapper = shallowMount(TradeSellOrders, {
         propsData: {
             ordersList: [],
-            tokenName: 'TOK1',
+            ordersLoaded: true,
+            market: {
+                base: {
+                    name: 'Webchain',
+                    symbol: 'WEB',
+                    subunit: 4,
+                    identifier: 'BTC',
+                },
+                quote: {
+                    name: 'Token-name',
+                    symbol: 'Token-name',
+                    subunit: 4,
+                    identifier: 'TOK',
+                },
+            },
             fields: {
                 price: {
                     label: 'Price',

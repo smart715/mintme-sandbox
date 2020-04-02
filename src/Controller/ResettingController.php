@@ -3,9 +3,14 @@
 namespace App\Controller;
 
 use App\Form\ResetRequestType;
+use App\Form\ResettingType;
 use App\Logger\UserActionLogger;
-use FOS\UserBundle\Controller\ResettingController  as FOSResettingController;
+use FOS\UserBundle\Controller\ResettingController as FOSResettingController;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\Event\FormEvent;
+use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
+use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Mailer\MailerInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Util\TokenGeneratorInterface;
@@ -13,10 +18,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/** @codeCoverageIgnore  */
 class ResettingController extends FOSResettingController
 {
     /** @var UserActionLogger */
     private $userActionLogger;
+
+    /** @var UserManagerInterface */
+    private $userManager;
+
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -28,6 +40,8 @@ class ResettingController extends FOSResettingController
         UserActionLogger $userActionLogger
     ) {
         $this->userActionLogger = $userActionLogger;
+        $this->userManager = $userManager;
+        $this->eventDispatcher = $eventDispatcher;
         parent::__construct(
             $eventDispatcher,
             $formFactory,
@@ -51,6 +65,50 @@ class ResettingController extends FOSResettingController
 
         return $this->render('@FOSUser/Resetting/request.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    /** {@inheritdoc} */
+    public function resetAction(Request $request, $token): Response
+    {
+        $user = $this->userManager->findUserByConfirmationToken($token);
+
+        if (null === $user) {
+            return $this->render('pages/404.html.twig');
+        }
+
+        $event = new GetResponseUserEvent($user, $request);
+        $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
+
+        $resettingForm = $this->createForm(ResettingType::class, $user);
+        $resettingForm->handleRequest($request);
+
+        $eventResponse = $event->getResponse();
+
+        if (null !== $eventResponse) {
+            return $eventResponse;
+        }
+
+        if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
+            $event = new FormEvent($resettingForm, $request);
+            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+
+            $this->userManager->updatePassword($user);
+            $this->userManager->updateUser($user);
+
+            $response = $this->redirectToRoute('fos_user_security_login', [], 301);
+
+            $this->eventDispatcher->dispatch(
+                FOSUserEvents::RESETTING_RESET_COMPLETED,
+                new FilterUserResponseEvent($user, $request, $response)
+            );
+
+            return $response;
+        }
+
+        return $this->render('bundles/FOSUserBundle/Resetting/reset.html.twig', [
+            'token' => $token,
+            'resettingForm' => $resettingForm->createView(),
         ]);
     }
 }

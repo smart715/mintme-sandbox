@@ -20,17 +20,22 @@ class WebsiteVerifier implements WebsiteVerifierInterface
     /** @var int */
     private $timeoutSeconds;
 
+    /** @var string */
+    private $proxy;
+
     /** @var string[]|bool[] */
     private $error = [];
 
     public function __construct(
         HttpClientFactoryInterface $clientFactory,
         LoggerInterface $logger,
-        int $timeoutSeconds
+        int $timeoutSeconds,
+        string $proxy
     ) {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->timeoutSeconds = $timeoutSeconds;
+        $this->proxy = $proxy;
     }
 
     public function verify(string $url, string $verificationToken): bool
@@ -41,8 +46,8 @@ class WebsiteVerifier implements WebsiteVerifierInterface
             $client = $this->clientFactory->createClient(
                 ['base_uri' => $formatUrl, 'timeout' => $this->timeoutSeconds]
             );
-            $response = $client->request('GET', self::URI);
-        } catch (GuzzleException $exception) {
+            $response = $client->request('GET', self::URI, ['proxy' => $this->proxy]);
+        } catch (\Throwable $exception) {
             $this->selectError($exception->getCode());
             $this->logger->error($exception->getMessage());
 

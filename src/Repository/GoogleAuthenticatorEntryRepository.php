@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 
 class GoogleAuthenticatorEntryRepository extends EntityRepository
 {
+    /** @codeCoverageIgnore */
     public function getGoogleAuthenticator(int $userId): GoogleAuthenticatorEntry
     {
         return $this->findOneBy(['user' => $userId]) ?? new GoogleAuthenticatorEntry();

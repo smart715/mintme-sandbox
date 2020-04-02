@@ -3,106 +3,123 @@
         <div class="card h-100">
             <div class="card-header text-left">
                 Buy Order
-                <span  class="card-header-icon">
+                <span class="card-header-icon">
                     <guide>
                         <template slot="header">
                             Buy Order
                         </template>
                         <template slot="body">
                             Form used to create  an order so you can
-                            buy {{ market.base.symbol }} or make offer.
+                            buy {{ market.base.symbol | rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div v-if="immutableBalance"
-                         class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0">
-                        Your
-                        <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol }}:
-                            <span class="text-white word-break">
-                                {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        Your {{ market.base.symbol }}
-                                    </template>
-                                    <template slot="body">
-                                        Your {{ market.base.symbol }} balance.
-                                    </template>
-                                </guide>
-                            </span>
-                        </span>
-                    </div>
-                    <div
-                        class="col-12 col-sm-4 col-md-12 col-xl-4
-                        text-sm-right text-md-left text-xl-right">
-                        <label class="custom-control custom-checkbox">
-                            <input
-                                v-model="useMarketPrice"
-                                step="0.00000001"
-                                type="checkbox"
-                                id="buy-price"
-                                class="custom-control-input"
-                                :disabled="disabledMarketPrice"
-                            >
-                            <label
-                                class="custom-control-label"
-                                for="buy-price">
-                                Market Price
-                                <guide>
-                                    <template slot="header">
-                                        Market Price
-                                    </template>
-                                    <template slot="body">
-                                        Checking this box fetches current best market price
-                                        for which you can buy {{ market.base.symbol }}.
-                                    </template>
-                                </guide>
-                            </label>
-                        </label>
-                    </div>
-                    <div class="col-12 pt-2">
+                <div v-if="balanceLoaded" class="row">
+                    <div class="col-12">
                         <label
                             for="buy-price-input"
                             class="text-white">
-                            Price in {{ market.base.symbol }}:
+                            Price in {{ market.base.symbol | rebranding }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ market.base.symbol }}
+                                    Price in {{ market.base.symbol | rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to buy one {{ market.quote.symbol }}.
+                                    The price at which you want to buy one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
                         </label>
-                        <input
-                            v-model="buyPrice"
-                            type="text"
-                            id="buy-price-input"
-                            class="form-control"
-                            @keypress="$emit('check-input', market.base.subunit)"
-                            @paste="$emit('check-input', market.base.subunit)"
-                            :disabled="useMarketPrice"
-                        >
+                        <div class="d-flex">
+                            <input
+                                v-model="buyPrice"
+                                type="text"
+                                id="buy-price-input"
+                                class="form-control"
+                                :class="orderInputClass"
+                                :disabled="useMarketPrice || !loggedIn"
+                                @keypress="checkPriceInput"
+                                @paste="checkPriceInput"
+                            >
+                            <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
+                                Your
+                                <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
+                                    <span class="text-white">
+                                        <span class="text-nowrap">
+                                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                        </span>
+                                        <span class="text-nowrap">
+                                            <a
+                                                v-if="showDepositMoreLink"
+                                                :href="depositMoreLink"
+                                            >Deposit more</a>
+                                            <guide>
+                                                <template slot="header">
+                                                    Your {{ market.base.symbol | rebranding }}
+                                                </template>
+                                                <template slot="body">
+                                                    Your {{ market.base.symbol | rebranding }} balance.
+                                                </template>
+                                            </guide>
+                                        </span>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         <label
                             for="buy-price-amount"
-                            class="text-white">
-                            Amount in {{ market.quote.symbol }}:
-                        </label>
-                        <input
-                            v-model="buyAmount"
-                            type="text"
-                            id="buy-price-amount"
-                            @keypress="$emit('check-input', market.quote.subunit)"
-                            @paste="$emit('check-input', market.quote.subunit)"
-                            class="form-control"
+                            class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
+                            <span class="d-inline-block text-nowrap">Amount in </span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote | rebranding }}</span>
+                            <span class="d-inline-block">:</span>
+                        </label>
+                        <div class="d-flex">
+                            <input
+                                v-model="buyAmount"
+                                type="text"
+                                id="buy-price-amount"
+                                class="form-control"
+                                :class="orderInputClass"
+                                :disabled="!loggedIn"
+                                @keypress="checkAmountInput"
+                                @paste="checkAmountInput"
+                            >
+                            <div v-if="loggedIn" class="w-50 m-auto pl-4">
+                                <label
+                                    v-if="!disabledMarketPrice"
+                                    class="custom-control custom-checkbox pb-0">
+                                    <input
+                                        v-model="useMarketPrice"
+                                        step="0.00000001"
+                                        type="checkbox"
+                                        id="buy-price"
+                                        class="custom-control-input"
+                                    >
+                                    <label
+                                        class="custom-control-label pb-0"
+                                        for="buy-price">
+                                        Market Price
+                                        <guide>
+                                            <template slot="header">
+                                                Market Price
+                                            </template>
+                                            <template slot="body">
+                                                Checking this box fetches current best market price
+                                                for which you can buy {{ market.quote.symbol | rebranding }}.
+                                            </template>
+                                        </guide>
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        Total Price:
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol | rebranding }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -126,31 +143,44 @@
                         </template>
                     </div>
                 </div>
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
-        <order-modal
-            :type="modalSuccess"
-            :title="modalTitle"
-            :visible="showModal"
-            @close="showModal = false"
-        />
     </div>
 </template>
 
 <script>
 import Guide from '../Guide';
-import OrderModal from '../modal/OrderModal';
-import {WebSocketMixin, PlaceOrder, MoneyFilterMixin} from '../../mixins';
+import {
+    WebSocketMixin,
+    PlaceOrder,
+    MoneyFilterMixin,
+    PricePositionMixin,
+    RebrandingFilterMixin,
+    OrderMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'TradeBuyOrder',
-    mixins: [WebSocketMixin, PlaceOrder, MoneyFilterMixin],
+    mixins: [
+        WebSocketMixin,
+        PlaceOrder,
+        MoneyFilterMixin,
+        PricePositionMixin,
+        RebrandingFilterMixin,
+        OrderMixin,
+        LoggerMixin,
+    ],
     components: {
         Guide,
-        OrderModal,
     },
     props: {
         loginUrl: String,
@@ -159,20 +189,33 @@ export default {
         market: Object,
         marketPrice: [Number, String],
         balance: [String, Boolean],
+        balanceLoaded: [String, Boolean],
     },
     data() {
         return {
             action: 'buy',
             placingOrder: false,
+            balanceManuallyEdited: false,
         };
     },
     methods: {
+        setBalanceManuallyEdited: function(val = true) {
+            this.balanceManuallyEdited = val;
+        },
+        checkPriceInput() {
+            this.$emit('check-input', this.market.base.subunit);
+            this.setBalanceManuallyEdited(true);
+        },
+        checkAmountInput() {
+            this.$emit('check-input', this.market.quote.subunit);
+        },
         placeOrder: function() {
             if (this.buyPrice && this.buyAmount) {
                 if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
-                    this.showModalAction({
+                    let symbol = this.rebrandingFunc(this.market.base.symbol);
+                    this.showNotification({
                         result: 2,
-                        message: `Total amount has to be at least ${this.minTotalPrice} ${this.market.base.symbol}`,
+                        message: `Total amount has to be at least ${this.minTotalPrice} ${symbol}`,
                     });
                     return;
                 }
@@ -193,10 +236,13 @@ export default {
                         if (data.result === 1) {
                             this.resetOrder();
                         }
-                        this.showModalAction(data);
+                        this.showNotification(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error))
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.sendLogs('error', 'Can not get place order', error);
+                    })
                     .then(() => this.hasOrderPlaced = false);
             }
         },
@@ -213,12 +259,21 @@ export default {
                 this.useMarketPrice = false;
             }
         },
-        balanceClicked: function() {
+        balanceClicked: function(event) {
+            // Skip "Deposit more" link
+            if ('a' === event.target.tagName.toLowerCase()) {
+                return;
+            }
+
+            if (!this.balanceManuallyEdited || !parseFloat(this.buyPrice)) {
+                this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
+                this.setBalanceManuallyEdited(false);
+            }
+
             this.buyAmount = toMoney(
-                new Decimal(this.immutableBalance).div(parseFloat(this.price)|| 1).toString(),
+                new Decimal(this.immutableBalance).div(parseFloat(this.buyPrice)|| 1).toString(),
                 this.market.quote.subunit
             );
-            this.buyPrice = this.price || 0;
         },
         ...mapMutations('makeOrder', [
             'setBuyPriceInput',
@@ -229,8 +284,8 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(!isNaN(this.buyPrice) ? this.buyPrice : 0)
-                .times(!isNaN(this.buyAmount) ? this.buyAmount : 0)
+            return new Decimal(this.buyPrice && !isNaN(this.buyPrice) ? this.buyPrice : 0)
+                .times(this.buyAmount && !isNaN(this.buyAmount) ? this.buyAmount : 0)
                 .toString();
         },
         price: function() {
@@ -246,7 +301,7 @@ export default {
             return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
-            return !this.marketPrice > 0;
+            return !this.marketPrice > 0 || !this.loggedIn;
         },
         ...mapGetters('makeOrder', [
             'getBuyPriceInput',
@@ -294,14 +349,14 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
+        balance: function() {
+            this.immutableBalance = this.balance;
+            if (!this.balance) {
+                return;
+            }
+        },
     },
     mounted: function() {
-        this.immutableBalance = this.balance;
-
-        if (!this.balance) {
-            return;
-        }
-
         this.addMessageHandler((response) => {
             if (
                 'asset.update' === response.method &&

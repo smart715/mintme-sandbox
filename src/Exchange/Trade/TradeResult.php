@@ -2,6 +2,8 @@
 
 namespace App\Exchange\Trade;
 
+use Exception;
+
 class TradeResult
 {
     public const SUCCESS = 1;
@@ -13,7 +15,7 @@ class TradeResult
 
     private const MESSAGES = [
         self::SUCCESS =>
-            'ORDER CREATED',
+            'Order Created',
 
         self::FAILED =>
             'Order has failed. Try again later.',
@@ -36,7 +38,10 @@ class TradeResult
 
     public function __construct(int $result)
     {
-        assert(in_array($result, array_keys(self::MESSAGES)));
+        if (!in_array($result, array_keys(self::MESSAGES))) {
+            throw new Exception('Undefined error message');
+        }
+
         $this->result = $result;
     }
 

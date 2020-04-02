@@ -25,11 +25,11 @@ class Post extends BasePost
      * @Serializer\SerializedName("id")
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
-     * @var int|null
+     * @var int
      */
     protected $id;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }

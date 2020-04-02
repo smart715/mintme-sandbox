@@ -2,7 +2,9 @@
 
 namespace App\Mailer;
 
-use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
+use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
@@ -11,6 +13,7 @@ use Swift_Message;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
 
+/** @codeCoverageIgnore */
 class Mailer implements MailerInterface, AuthCodeMailerInterface
 {
     /** @var string */
@@ -37,7 +40,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function sendWithdrawConfirmationMail(User $user, PendingWithdraw $withdrawData): void
+    public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void
     {
         $confirmLink = $this->urlGenerator->generate(
             'withdraw-confirm',
@@ -50,27 +53,129 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'confirmationUrl' => $confirmLink,
         ]);
 
+        $textBody = $this->twigEngine->render('mail/withdraw_accept.txt.twig', [
+            'user' => $user,
+            'confirmationUrl' => $confirmLink,
+        ]);
+
         $msg = (new Swift_Message('Confirm withdraw'))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
-            ->setBody($body)
-            ->setContentType('text/html');
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
 
         $this->mailer->send($msg);
     }
 
     public function sendAuthCode(TwoFactorInterface $user): void
     {
+        $this->sendAuthCodeToMail(
+            'Confirm authentication',
+            'You verification code:',
+            $user
+        );
+    }
+
+    public function sendAuthCodeToMail(
+        string $subject,
+        string $label,
+        TwoFactorInterface $user
+    ): void {
         $body = $this->twigEngine->render('mail/auth_verification_code.html.twig', [
+            'label' => $label,
             'email' => $user->getEmailAuthRecipient(),
             'code' => $user->getEmailAuthCode(),
         ]);
 
-        $msg = (new Swift_Message('Confirm authentication'))
+        $textBody = $this->twigEngine->render('mail/auth_verification_code.txt.twig', [
+            'label' => $label,
+            'email' => $user->getEmailAuthRecipient(),
+            'code' => $user->getEmailAuthCode(),
+        ]);
+
+
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmailAuthRecipient())
-            ->setBody($body)
-            ->setContentType('text/html');
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendTransactionCompletedMail(TradebleInterface $tradable, User $user, string $amount, string $transactionType): void
+    {
+        $body = $this->twigEngine->render("mail/{$transactionType}_completed.html.twig", [
+            'username' => $user->getUsername(),
+            'tradable' => $tradable,
+            'amount' => $amount,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/{$transactionType}_completed.txt.twig", [
+            'username' => $user->getUsername(),
+            'tradable' => $tradable,
+            'amount' => $amount,
+        ]);
+
+        $msg = (new Swift_Message(ucfirst($transactionType)." Completed"))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendPasswordResetMail(User $user, bool $resetting): void
+    {
+        $body = $this->twigEngine->render("mail/password_reset.html.twig", [
+            'username' => $user->getUsername(),
+            'resetting' => $resetting,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/password_reset.txt.twig", [
+            'username' => $user->getUsername(),
+            'resetting' => $resetting,
+        ]);
+
+        $msg = (new Swift_Message("Your password has been ".($resetting ? "reset" : "changed")))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function checkConnection(): void
+    {
+        $transport = $this->mailer->getTransport();
+
+        if (!$transport->ping()) {
+            $transport->stop();
+            $transport->start();
+        }
+    }
+
+    public function sendTokenDeletedMail(Token $token): void
+    {
+        $user = $token->getProfile()->getUser();
+
+        $body = $this->twigEngine->render("mail/token_deleted.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/token_deleted.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+        ]);
+
+        $msg = (new Swift_Message("Token Deleted"))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
 
         $this->mailer->send($msg);
     }

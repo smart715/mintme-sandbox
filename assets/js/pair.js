@@ -1,10 +1,12 @@
-import {Tabs} from 'bootstrap-vue/es/components';
 import Trade from './components/trade/Trade';
 import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenName from './components/token/TokenName';
+import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
+import TopHolders from './components/trade/TopHolders';
 import store from './storage';
+import {tokenDeploymentStatus} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -14,6 +16,7 @@ new Vue({
       tokenDescription: null,
       editingName: false,
       tokenName: null,
+      tokenPending: null,
     };
   },
   components: {
@@ -22,7 +25,8 @@ new Vue({
     TokenIntroductionStatistics,
     TokenIntroductionDescription,
     TokenName,
-    Tabs,
+    TokenDeployIcon,
+    TopHolders,
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -34,10 +38,16 @@ new Vue({
         window.history.replaceState(
             {}, document.title, this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: i ? 'intro' : 'trade',
+              tab: i ? 'trade' : 'intro',
             })
         );
       }
+    },
+    setTokenPending: function() {
+      this.tokenPending = true;
+    },
+    getTokenStatus: function(status) {
+      return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
     },
   },
   store,

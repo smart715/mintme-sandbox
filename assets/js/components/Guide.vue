@@ -29,6 +29,7 @@ export default {
     name: 'Guide',
     props: {
         maxWidth: {type: String, default: '350px'},
+        placement: {type: String, default: 'bottom'},
     },
     data() {
         return {
@@ -39,7 +40,7 @@ export default {
         tooltipOptions: function() {
             if (this.id !== null) {
                 return {
-                    placement: 'bottom',
+                    placement: this.placement,
                     html: '#' + this.id,
                     arrow: true,
                     interactive: true,

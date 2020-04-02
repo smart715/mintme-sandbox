@@ -9,10 +9,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * @codeCoverageIgnore
+ * Ignored due the conflicting ConsoleSectionOutput class.
+ */
 class SynchronizeTokenBlacklist extends Command
 {
     /** @var BlacklistManagerInterface */
@@ -45,6 +50,7 @@ class SynchronizeTokenBlacklist extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         /** @var ConsoleSectionOutput $section */
+        /** @var ConsoleOutput $output */
         $section = $output->section();
         $style = new SymfonyStyle($input, $section);
         $list = $this->cryptoSynchronizer->fetchCryptos();

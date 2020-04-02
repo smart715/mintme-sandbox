@@ -19,7 +19,6 @@ class TwoFactorType extends AbstractType
                 'required' => true,
                 'constraints' => [ new NotBlank(), new TwoFactorAuth() ],
             ])
-            ->add('Verify Code', SubmitType::class)
         ;
     }
 }

@@ -8,21 +8,37 @@ use Doctrine\ORM\EntityRepository;
 
 class TokenRepository extends EntityRepository
 {
+    /** @codeCoverageIgnore */
     public function findByName(string $name): ?Token
     {
         return $this->findOneBy(['name' => $name]);
     }
 
+    /** @codeCoverageIgnore */
     public function findByUrl(string $name): ?Token
     {
         return $this->createQueryBuilder('token')
             ->where('REPLACE(token.name, \' \', \'-\' ) = (:name)')
+            ->orWhere('REPLACE(token.name, \'-\', \' \' ) = (:name)')
             ->setParameter('name', $name)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
-    /** @return Token[] */
+    /** @codeCoverageIgnore */
+    public function findByAddress(string $address): ?Token
+    {
+        return $this->createQueryBuilder('token')
+            ->where('token.address=:name')
+            ->setParameter(':name', $address)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
     public function findTokensByPattern(string $pattern): array
     {
         return $this->createQueryBuilder('token')

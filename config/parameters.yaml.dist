@@ -2,25 +2,29 @@
 parameters:
     locale: 'en'
 
-    version: 'V1.0.0'
-    is_beta_version: true
+    version: 'V1.1.0'
+    is_beta_version: false
 
     viabtc_rpc: 'http://btc:8080'
     viabtc_response_timeout_seconds: 10
-    withdraw_auth:
+    viabtc_auth:
         - 'user'
         - 'pass'
         - 'basic'
 
     withdraw_rpc: 'http://nginx:8000'
     withdraw_response_timeout_seconds: 10
-    deposit_auth:
+    withdraw_auth:
         - 'user'
         - 'pass'
         - 'basic'
 
     deposit_rpc: 'http://deposit:3000'
     deposit_response_timeout_seconds: 10
+    deposit_auth:
+        - 'user'
+        - 'pass'
+        - 'basic'
 
     websocket_url: 'ws://localhost:18364'
 
@@ -36,13 +40,12 @@ parameters:
     token_quantity: 10000000
 
     # Show all hidden from prelaunch content automatically when prelaunch finishes
-    prelaunch_autostart: false
+    prelaunch_autostart: true
     # Datetime to finish prelaunch period. Format `Y-m-d H:i:s`
     prelaunch_finish_datetime: '2019-04-01 10:00:00'
-    # Set date interval in ISO_8601 format
-    prelaunch_referral_trading_period: 'P1Y'
+
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
-    prelaunch_referral_fee: 0.5
+    referral_fee: 0.5
 
     google_tracking_id: 'UA-2289508-20'
 
@@ -50,7 +53,7 @@ parameters:
 
     # Precision to show for corresponding markets in trading view
     # This values can be set to any you want. Back-end will
-    # handle currencies with their actual precision (8 for BTC, 16 for WEB, 12 for Tokens)
+    # handle currencies with their actual precision (8 for BTC, 16 for MINTME, 12 for Tokens)
     token_precision: 4
 
     # Show hacker menu for testers. Works only on 'localhost' and 'mintme.abchosting.(abc|org)' domains.
@@ -59,3 +62,65 @@ parameters:
 
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
+    mintme_supply: 'https://www.mintme.com/coin/supply.txt'
+    mintme_coin: 'MintMe Coin'
+    mintme_coin_link: 'https://www.mintme.com/coin/'
+
+    # the cost of deploying token to blockchain in USD
+    deploy_cost: 99
+    deploy_rpc: 'http://localhost:3001'
+    deploy_response_timeout_seconds: 10
+
+    # Expiration time for token deletion confirm code (minutes)
+    # Accepts an integer value:
+    token_deletion_confirm_code_expiration_time: 60
+
+    # If the trusted device feature should be enabled
+    trusted_device_enabled: true
+
+    # Lifetime of the trusted device token (default 30 days)
+    trusted_device_cookie_lifetime: 2592000
+
+    # Automatically extend lifetime of the trusted cookie on re-login
+    trusted_device_extend_lifetime: true
+
+    origin_to_disposable_email_domains: 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/'
+    name_of_files_for_disposable_domains_index: 'index.json'
+    name_of_files_for_disposable_domains_wildcard: 'wildcard.json'
+
+    disposable_domains_timeout_seconds: 30
+
+    # Path for all main documents
+    docs_path: '/docs'
+
+    # Password reset link expiration time in seconds
+    password_reset_expiration_time: 7200
+
+    # Time that has to pass to be able to request password reset link again, in seconds
+    password_reset_retry_time: 1800
+
+    # Switch hide or show personal data in profile page (like city and zip code)
+    show_full_data_in_profile: false
+
+    # WEB limit for landing page bonus
+    landing_web_bonus_limit: 50000
+
+    # How much user receive for registration
+    landing_web_bonus: 5
+
+    # Quick Registration Default Password for Hacker Menu -> Quick Registration.
+    quick_registration_password: 'blockchaincrowdfunding'
+
+    # If true, then it will cut headers for front end logging
+    front_end_logs_cut_headers: true
+
+    # 30d min value for token to be added to market cap total on trading page
+    minimum_volume_for_marketcap: 100000
+
+    # max top holders for each token
+    top_holders: 10
+
+    # forward proxy for hiding real mintme server IP when verifying token owner's website
+    # see guzzlephp docs for syntax: http://docs.guzzlephp.org/en/stable/request-options.html?highlight=proxy#proxy
+    # to disable the proxy, set empty string ''
+    website_verify_proxy: 'http://mintme:Iw87wqelIwsced823FXuswL9@212.32.255.5:38425'

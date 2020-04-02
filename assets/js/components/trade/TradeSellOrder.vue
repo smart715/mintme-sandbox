@@ -9,98 +9,117 @@
                             Sell Order
                         </template>
                         <template slot="body">
-                            Form used to create  an order so you can sell {{ market.quote.symbol }} or make offer.
+                            Form used to create  an order so you can sell {{ market.quote | rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div v-if="immutableBalance"
-                        class="col-12 col-sm-8 col-md-12 col-xl-8 pr-0 pb-2 pb-sm-0 pb-md-2 pb-xl-0 word-break-all"
-                        >
-                        Your
-                        <span class="c-pointer" @click="balanceClicked">{{ market.quote.symbol }}:
-                            <span class="text-white  word-break">
-                                {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        Your Tokens
-                                    </template>
-                                    <template slot="body">
-                                        Your {{ market.quote.symbol }} balance.
-                                    </template>
-                                </guide>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="col-12 col-sm-4 col-md-12 col-xl-4 text-sm-right text-md-left text-xl-right">
-                        <label class="custom-control custom-checkbox">
-                            <input
-                                v-model.number="useMarketPrice"
-                                step="0.00000001"
-                                type="checkbox"
-                                id="sell-price"
-                                class="custom-control-input"
-                                :disabled="disabledMarketPrice"
-                            >
-                            <label
-                                class="custom-control-label"
-                                for="sell-price">
-                                Market Price
-                                <guide>
-                                    <template slot="header">
-                                        Market Price
-                                    </template>
-                                    <template slot="body">
-                                        Checking this box fetches current best market price
-                                        for which you can sell {{ market.quote.symbol }}.
-                                    </template>
-                                </guide>
-                            </label>
-                        </label>
-                    </div>
-                    <div class="col-12 pt-2">
+                <div v-if="balanceLoaded" class="row">
+                    <div class="col-12">
                         <label
                             for="sell-price-input"
                             class="text-white">
-                            Price in {{ market.base.symbol }}:
+                            Price in {{ market.base.symbol | rebranding }}:
                             <guide>
                                 <template slot="header">
-                                    Price in {{ market.base.symbol }}
+                                    Price in {{ market.base.symbol | rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {{ market.quote.symbol }}.
+                                    The price at which you want to sell one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
                         </label>
-                        <input
-                            v-model="sellPrice"
-                            type="text"
-                            id="sell-price-input"
-                            class="form-control"
-                            :disabled="useMarketPrice"
-                            @keypress="$emit('check-input', market.base.subunit)"
-                            @paste="$emit('check-input', market.base.subunit)"
-                        >
+                        <div class="d-flex">
+                            <input
+                                v-model="sellPrice"
+                                type="text"
+                                id="sell-price-input"
+                                class="form-control"
+                                :class="orderInputClass"
+                                :disabled="useMarketPrice || !loggedIn"
+                                @keypress="checkPriceInput"
+                                @paste="checkPriceInput"
+                            >
+                            <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
+                                Your
+                                <span class="c-pointer" @click="balanceClicked">
+                                    {{ market.quote | rebranding | truncate(7) }}:
+                                    <span class="text-white">
+                                        <span class="text-nowrap">
+                                            {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
+                                        </span>
+                                        <span class="text-nowrap">
+                                            <a
+                                                v-if="showDepositMoreLink"
+                                                :href="depositMoreLink"
+                                            >Deposit more</a>
+                                            <guide>
+                                                <template slot="header">
+                                                    Your Tokens
+                                                </template>
+                                                <template slot="body">
+                                                    Your {{ market.quote | rebranding }} balance.
+                                                </template>
+                                            </guide>
+                                        </span>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
                         <label
                             for="sell-price-amount"
-                            class="text-white">
-                            Amount in {{ market.quote.symbol }}:
-                        </label>
-                        <input
-                            v-model="sellAmount"
-                            type="text"
-                            id="sell-price-amount"
-                            class="form-control"
-                            @keypress="$emit('check-input', market.quote.subunit)"
-                            @paste="$emit('check-input', market.quote.subunit)"
+                            class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
+                            <span class="d-inline-block text-nowrap">Amount in </span>
+                            <span class="d-inline-block truncate-name ml-1">{{ market.quote | rebranding }}</span>
+                            <span class="d-inline-block">:</span>
+                        </label>
+                        <div class="d-flex">
+                            <input
+                                v-model="sellAmount"
+                                type="text"
+                                id="sell-price-amount"
+                                class="form-control"
+                                :class="orderInputClass"
+                                :disabled="!loggedIn"
+                                @keypress="checkAmountInput"
+                                @paste="checkAmountInput"
+                            >
+                            <div v-if="loggedIn" class="w-50 m-auto pl-4">
+                                <label
+                                    v-if="!disabledMarketPrice"
+                                   class="custom-control custom-checkbox pb-0">
+                                    <input
+                                        v-model.number="useMarketPrice"
+                                        step="0.00000001"
+                                        type="checkbox"
+                                        id="sell-price"
+                                        class="custom-control-input"
+                                    >
+                                    <label
+                                        class="custom-control-label pb-0"
+                                        for="sell-price">
+                                        Market Price
+                                        <guide>
+                                            <template slot="header">
+                                                Market Price
+                                            </template>
+                                            <template slot="body">
+                                                Checking this box fetches current best market price
+                                                for which you can sell {{ market.quote.symbol | rebranding }}.
+                                            </template>
+                                        </guide>
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 pt-2">
-                        Total Price: {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol }}
+                        Total Price:
+                        {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol | rebranding }}
                         <guide>
                             <template slot="header">
                                 Total Price
@@ -126,21 +145,28 @@
                         </template>
                     </div>
                 </div>
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
-        <order-modal
-            :type="modalSuccess"
-            :title="modalTitle"
-            :visible="showModal"
-            @close="showModal = false"
-        />
     </div>
 </template>
 
 <script>
 import Guide from '../Guide';
-import OrderModal from '../modal/OrderModal';
-import {FiltersMixin, PlaceOrder, WebSocketMixin, MoneyFilterMixin} from '../../mixins';
+import {
+    FiltersMixin,
+    PlaceOrder,
+    WebSocketMixin,
+    MoneyFilterMixin,
+    PricePositionMixin,
+    RebrandingFilterMixin,
+    OrderMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
@@ -149,9 +175,17 @@ export default {
     name: 'TradeSellOrder',
     components: {
         Guide,
-        OrderModal,
     },
-    mixins: [WebSocketMixin, PlaceOrder, FiltersMixin, MoneyFilterMixin],
+    mixins: [
+        WebSocketMixin,
+        PlaceOrder,
+        FiltersMixin,
+        MoneyFilterMixin,
+        PricePositionMixin,
+        RebrandingFilterMixin,
+        OrderMixin,
+        LoggerMixin,
+    ],
     props: {
         loginUrl: String,
         signupUrl: String,
@@ -160,20 +194,33 @@ export default {
         marketPrice: [Number, String],
         balance: [String, Boolean],
         isOwner: Boolean,
+        balanceLoaded: Boolean,
     },
     data() {
         return {
             action: 'sell',
             placingOrder: false,
+            balanceManuallyEdited: false,
         };
     },
     methods: {
+        setBalanceManuallyEdited: function(val = true) {
+            this.balanceManuallyEdited = val;
+        },
+        checkPriceInput() {
+            this.$emit('check-input', this.market.base.subunit);
+            this.setBalanceManuallyEdited(true);
+        },
+        checkAmountInput() {
+            this.$emit('check-input', this.market.quote.subunit);
+        },
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 if ((new Decimal(this.sellPrice)).times(this.sellAmount).lessThan(this.minTotalPrice)) {
-                    this.showModalAction({
+                    let symbol = this.rebrandingFunc(this.market.base.symbol);
+                    this.showNotification({
                         result: 2,
-                        message: `Total amount has to be at least ${this.minTotalPrice} ${this.market.base.symbol}`,
+                        message: `Total amount has to be at least ${this.minTotalPrice} ${symbol}`,
                     });
                     return;
                 }
@@ -193,10 +240,13 @@ export default {
                         if (data.result === 1) {
                             this.resetOrder();
                         }
-                        this.showModalAction(data);
+                        this.showNotification(data);
                         this.placingOrder = false;
                     })
-                    .catch((error) => this.handleOrderError(error))
+                    .catch((error) => {
+                        this.handleOrderError(error);
+                        this.sendLogs('error', 'Can not get place order', error);
+                    })
                     .then(() => this.placingOrder = false);
             }
         },
@@ -212,11 +262,18 @@ export default {
                 this.useMarketPrice = false;
             }
         },
-        balanceClicked: function() {
-            this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
-            if (parseFloat(this.price || 0) > 0) {
-                this.sellPrice = this.price;
+        balanceClicked: function(event) {
+            // Skip "Deposit more" link
+            if ('a' === event.target.tagName.toLowerCase()) {
+                return;
             }
+
+            if (!this.balanceManuallyEdited || !parseFloat(this.sellPrice)) {
+                this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
+                this.setBalanceManuallyEdited(false);
+            }
+
+            this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
         },
         ...mapMutations('makeOrder', [
             'setSellPriceInput',
@@ -227,8 +284,8 @@ export default {
     },
     computed: {
         totalPrice: function() {
-            return new Decimal(!isNaN(this.sellPrice) ? this.sellPrice : 0)
-                .times(!isNaN(this.sellAmount) ? this.sellAmount : 0)
+            return new Decimal(this.sellPrice && !isNaN(this.sellPrice) ? this.sellPrice : 0)
+                .times(this.sellAmount && !isNaN(this.sellAmount) ? this.sellAmount : 0)
                 .toString();
         },
         price: function() {
@@ -244,7 +301,7 @@ export default {
             return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
-            return !this.marketPrice > 0;
+            return !this.marketPrice > 0 || !this.loggedIn;
         },
         ...mapGetters('makeOrder', [
             'getSellPriceInput',
@@ -292,14 +349,11 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
+        balance: function() {
+            this.immutableBalance = this.balance;
+        },
     },
     mounted: function() {
-        this.immutableBalance = this.balance;
-
-        if (!this.balance) {
-            return;
-        }
-
         this.addMessageHandler((response) => {
             if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.quote.identifier)) {
                 if (!this.isOwner || this.market.quote.identifier.slice(0, 3) !== 'TOK') {
@@ -309,11 +363,13 @@ export default {
 
                 this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
                     .then((res) => this.immutableBalance = res.data ?
-                            new Decimal(response.params[0][this.market.quote.identifier].available).sub(
-                                res.data.frozenAmount
-                            ) : response.params[0][this.market.quote.identifier].available
+                        new Decimal(response.params[0][this.market.quote.identifier].available).sub(
+                            res.data.frozenAmountWithReceived
+                        ) : response.params[0][this.market.quote.identifier].available
                     )
-                    .catch(() => {});
+                    .catch((err) => {
+                        this.sendLogs('error', 'Can not get immutable balance', err);
+                    });
             }
         }, 'trade-sell-order-asset');
     },

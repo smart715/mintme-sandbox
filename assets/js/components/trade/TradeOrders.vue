@@ -1,45 +1,34 @@
 <template>
-    <div class="container">
-        <div class="row px-lg-0 mx-lg-0">
-            <div class="col-12 col-xl-6 col-lg-12 pr-lg-2 pl-lg-0 mt-3">
+    <div class="container p-0 m-0">
+        <div class="row p-0 m-0">
+            <div class="col-12 col-xl-6 pr-xl-2 mt-3">
                 <trade-buy-orders
-                        v-if="ordersLoaded"
-                        @update-data="updateBuyOrders"
-                        :orders-list="filteredBuyOrders"
-                        :token-name="market.base.symbol"
-                        :fields="fields"
-                        :sort-by="fields.price.key"
-                        :sort-desc="true"
-                        :basePrecision="market.base.subunit"
-                        :quotePrecision="market.quote.subunit"
-                        @modal="removeOrderModal"/>
-                <template v-else>
-                    <div class="p-5 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
-                    </div>
-                </template>
+                    @update-data="updateBuyOrders"
+                    :orders-list="filteredBuyOrders"
+                    :orders-loaded="ordersLoaded"
+                    :token-name="market.base.symbol"
+                    :fields="fields"
+                    :basePrecision="market.base.subunit"
+                    :quotePrecision="market.quote.subunit"
+                    :logged-in="loggedIn"
+                    @modal="removeOrderModal"/>
             </div>
-            <div class="col-12 col-xl-6 col-lg-12 pr-lg-0 pl-lg-2 mt-3">
+            <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
-                        v-if="ordersLoaded"
-                        @update-data="updateSellOrders"
-                        :orders-list="filteredSellOrders"
-                        :token-name="market.quote.symbol"
-                        :fields="fields"
-                        :sort-by="fields.price.key"
-                        :sort-desc="false"
-                        :basePrecision="market.base.subunit"
-                        :quotePrecision="market.quote.subunit"
-                        @modal="removeOrderModal"/>
-                <template v-else>
-                    <div class="p-5 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
-                    </div>
-                </template>
+                    @update-data="updateSellOrders"
+                    :orders-list="filteredSellOrders"
+                    :orders-loaded="ordersLoaded"
+                    :market="market"
+                    :fields="fields"
+                    :basePrecision="market.base.subunit"
+                    :quotePrecision="market.quote.subunit"
+                    :logged-in="loggedIn"
+                    @modal="removeOrderModal"/>
             </div>
         </div>
         <confirm-modal
                 :visible="confirmModal"
+                :no-close="false"
                 @close="switchConfirmModal(false)"
                 @confirm="removeOrder"
         >
@@ -60,9 +49,11 @@ import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
+import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 
 export default {
     name: 'TokenTradeOrders',
+    mixins: [RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         TradeBuyOrders,
         TradeSellOrders,
@@ -74,37 +65,41 @@ export default {
         sellOrders: [Array, Object],
         market: Object,
         userId: Number,
+        loggedIn: Boolean,
     },
     data() {
         return {
             removeOrders: [],
             confirmModal: false,
-            fields: {
-                price: {
-                    label: 'Price',
+            fields: [
+                {
                     key: 'price',
+                    label: 'Price',
                     formatter: formatMoney,
                 },
-                amount: {
+                {
+                    key: 'amount',
                     label: 'Amount',
                     formatter: formatMoney,
                 },
-                sum: {
-                    label: 'Sum ' + this.market.base.symbol,
+                {
+                    key: 'sum',
+                    label: 'Sum ' + this.rebrandingFunc(this.market.base.symbol),
                     formatter: formatMoney,
                 },
-                trader: {
+                {
+                    key: 'trader',
                     label: 'Trader',
                 },
-            },
+            ],
         };
     },
     computed: {
         filteredBuyOrders: function() {
-            return this.ordersList(this.groupByPrice(this.buyOrders));
+            return this.buyOrders ? this.ordersList(this.groupByPrice(this.buyOrders)) : [];
         },
         filteredSellOrders: function() {
-            return this.ordersList(this.groupByPrice(this.sellOrders));
+            return this.sellOrders ? this.ordersList(this.groupByPrice(this.sellOrders)) : [];
         },
     },
     methods: {
@@ -124,7 +119,7 @@ export default {
                     amount: toMoney(order.amount, this.market.quote.subunit),
                     sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
                     trader: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? this.truncateFullName(order.maker.profile, order.owner)
+                        ? this.traderFullName(order.maker.profile)
                         : 'Anonymous',
                     traderFullName: order.maker.profile !== null && !order.maker.profile.anonymous
                         ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
@@ -134,24 +129,12 @@ export default {
                         '#',
                     side: order.side,
                     owner: order.owner,
+                    isAnonymous: !order.maker.profile || order.maker.profile.anonymous,
                 };
             });
         },
-        truncateFullName: function(profile, owner) {
-            let first = profile.firstName;
-            let firstLength = first.length;
-            let second = profile.lastName;
-            if ((first + second).length > 5 && owner) {
-                return first.length > 5
-                    ? first.slice(0, 5) + '..'
-                    : first + ' ' +second.slice(0, 5 - firstLength) + '..';
-            } else if (((first + second).length > 7 && !owner)) {
-                return first.length > 7
-                    ? first.slice(0, 7) + '..'
-                    : first + ' ' + second.slice(0, 7 - firstLength) + '..';
-            } else {
-                return first + ' ' + second;
-            }
+        traderFullName: function(profile) {
+            return profile.firstName + ' ' + profile.lastName;
         },
         groupByPrice: function(orders) {
             let filtered = [];
@@ -207,8 +190,9 @@ export default {
                 quote: this.market.quote.symbol,
             });
             this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
-                .catch(() => {
-                    this.$toasted.error('Service unavailable, try again later');
+                .catch((err) => {
+                    this.notifyError('Service unavailable, try again later');
+                    this.sendLogs('error', 'Remove order service unavailable', err);
                 });
         },
         switchConfirmModal: function(val) {
@@ -219,4 +203,5 @@ export default {
         },
     },
 };
+
 </script>

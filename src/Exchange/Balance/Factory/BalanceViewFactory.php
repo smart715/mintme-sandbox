@@ -2,6 +2,8 @@
 
 namespace App\Exchange\Balance\Factory;
 
+use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -9,9 +11,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class BalanceViewFactory implements BalanceViewFactoryInterface
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
     /** @var TokenManagerInterface */
     private $tokenManager;
 
@@ -22,19 +21,17 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     private $tokenSubunit;
 
     public function __construct(
-        TokenStorageInterface $tokenStorage,
         TokenManagerInterface $tokenManager,
         TokenNameConverterInterface $tokenNameConverter,
         int $tokenSubunit
     ) {
-        $this->tokenStorage = $tokenStorage;
         $this->tokenManager = $tokenManager;
         $this->tokenNameConverter = $tokenNameConverter;
         $this->tokenSubunit = $tokenSubunit;
     }
 
     /** {@inheritdoc} */
-    public function create(BalanceResultContainer $container): array
+    public function create(BalanceResultContainer $container, ?User $user = null): array
     {
         $result = [];
 
@@ -49,13 +46,16 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
             $fee = null;
             $subunit = $this->tokenSubunit;
 
+            $owner = !is_null($user) && !is_null($token->getProfile())
+                ? $user->getId() === $token->getProfile()->getUser()->getId()
+                : false;
+
             if ($token->getCrypto()) {
                 $fee = $token->getCrypto()->getFee();
                 $name = $token->getCrypto()->getName();
                 $subunit = $token->getCrypto()->getShowSubunit();
             }
 
-            $securityToken = $this->tokenStorage->getToken();
             $result[$token->getName()] = new BalanceView(
                 $this->tokenNameConverter->convert($token),
                 $this->tokenManager->getRealBalance(
@@ -66,7 +66,10 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $name,
                 $fee,
                 $subunit,
-                $securityToken && $token->getProfile() && $securityToken->getUser() === $token->getProfile()->getUser()
+                $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
+                $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
+                Token::DEPLOYED === $token->getDeploymentStatus(),
+                $owner
             );
         }
 

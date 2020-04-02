@@ -19,5 +19,5 @@ interface MarketFactoryInterface
     public function createUserRelated(User $user): array;
 
     /** @return Market[] */
-    public function createPredefined(): array;
+    public function getCoinMarkets(): array;
 }

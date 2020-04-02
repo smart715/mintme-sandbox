@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
-use App\Validator\Constraints\ProfilePeriodLock;
+use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ZipCodeValidator\Constraints\ZipCode;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
@@ -28,10 +29,10 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
+     * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @ProfilePeriodLock()
+     * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
      */
@@ -40,10 +41,10 @@ class Profile
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
+     * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @ProfilePeriodLock()
+     * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
      * @var string|null
      */
@@ -51,7 +52,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Regex(pattern="/^[A-Za-z\s-]+$/u")
+     * @Assert\Regex(pattern="/^[\p{L}\s-]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @Groups({"Default", "API"})
@@ -109,9 +110,16 @@ class Profile
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
-     * @Groups({"API"})
+     * @Groups({"API", "API_TOK"})
      */
     private $page_url;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     * @AppAssert\ZipCode(getter="getCountry")
+     * @var string|null
+     */
+    protected $zipCode;
 
     public function __construct(User $user)
     {
@@ -256,5 +264,17 @@ class Profile
     public function getToken(): ?Token
     {
         return $this->token;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->zipCode;
+    }
+
+    public function setZipCode(?string $zipCode = null): self
+    {
+        $this->zipCode = $zipCode;
+
+        return $this;
     }
 }

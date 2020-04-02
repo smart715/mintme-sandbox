@@ -3,14 +3,19 @@
         <template v-if="loaded">
             <div class="table-responsive table-restricted" ref="table">
                 <b-table
+                    thead-class="trading-head"
                     ref="btable"
                     v-if="hasOrders"
-                    :items="getHistory"
+                    :items="history"
                     :fields="fields">
-                    <template slot="name" slot-scope="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                    <template v-slot:cell(name)="row">
+                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value.truncate }}
+                            </a>
+                        </div>
                     </template>
-                    <template slot="action" slot-scope="row">
+                    <template v-slot:cell(action)="row">
                         <a @click="removeOrderModal(row.item)">
                             <span class="icon-cancel c-pointer"></span>
                         </a>
@@ -42,15 +47,32 @@
     </div>
 </template>
 <script>
+import moment from 'moment';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
-import {WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    WebSocketMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+    PairNameMixin,
+} from '../../mixins/';
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        LazyScrollTableMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+        PairNameMixin,
+    ],
     components: {
         ConfirmModal,
     },
@@ -68,10 +90,11 @@ export default {
             tokenName: null,
             amount: null,
             price: null,
-            fields: {
-                date: {label: 'Date', sortable: true},
-                type: {label: 'Type', sortable: true},
-                name: {
+            fields: [
+                {key: 'date', label: 'Date', sortable: true},
+                {key: 'type', label: 'Type', sortable: true},
+                {
+                    key: 'name',
                     label: 'Name',
                     sortable: true,
                     formatter: (name) => {
@@ -81,20 +104,22 @@ export default {
                         };
                     },
                 },
-                amount: {label: 'Amount', sortable: true},
-                price: {
+                {key: 'amount', label: 'Amount', sortable: true},
+                {
+                    key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                total: {
+                {
+                    key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
                 },
-                fee: {label: 'Fee', sortable: true},
-                action: {label: 'Action', sortable: false},
-            },
+                {key: 'fee', label: 'Fee', sortable: true},
+                {key: 'action', label: 'Action', sortable: false},
+            ],
         };
     },
     computed: {
@@ -109,6 +134,28 @@ export default {
         },
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
+        },
+        history: function() {
+            return this.tableData.map((order) => {
+                return {
+                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
+                    name: this.pairNameFunc(
+                        this.rebrandingFunc(order.market.base),
+                        this.rebrandingFunc(order.market.quote)
+                    ),
+                    amount: toMoney(order.amount, order.market.base.subunit),
+                    price: toMoney(order.price, order.market.base.subunit),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
+                    fee: order.fee * 100 + '%',
+                    action: this.$routing.generate('orders_сancel', {
+                        base: order.market.base.symbol,
+                        quote: order.market.quote.symbol,
+                    }),
+                    id: order.id,
+                    pairUrl: this.generatePairUrl(order.market),
+                };
+            });
         },
     },
     mounted: function() {
@@ -137,7 +184,10 @@ export default {
                     }
                 }, 'active-tableData-update');
             })
-            .catch(() => this.$toasted.error('Can not update order list now. Try again later'));
+            .catch((err) => {
+                this.notifyError('Can not update order list now. Try again later');
+                this.sendLogs('error', 'Service unavailable. Can not update order list now', err);
+            });
     },
     methods: {
         updateTableData: function() {
@@ -160,29 +210,21 @@ export default {
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
-                        this.$toasted.error('Can not update orders history. Try again later.');
+                    .catch((err) => {
+                        this.notifyError('Can not update orders history. Try again later.');
+                        this.sendLogs('error', 'Service unavailable. Can not update orders history', err);
                         reject([]);
                     });
             });
         },
-        getHistory: function() {
-            return this.tableData.map((order) => {
-                return {
-                    date: new Date(order.timestamp * 1000).toDateString(),
-                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
-                    amount: toMoney(order.amount, order.market.base.subunit),
-                    price: toMoney(order.price, order.market.base.subunit),
-                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
-                    fee: order.fee * 100 + '%',
-                    action: this.$routing.generate('orders_сancel', {
-                        base: order.market.base.symbol,
-                        quote: order.market.quote.symbol,
-                    }),
-                    id: order.id,
-                };
-            });
+        generatePairUrl: function(market) {
+            if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
+                return this.$routing.generate('coin', {
+                    base: this.rebrandingFunc(market.base),
+                    quote: this.rebrandingFunc(market.quote),
+                });
+            }
+            return this.$routing.generate('token_show', {name: market.quote.name});
         },
         removeOrderModal: function(row) {
             this.currentRow = row;
@@ -194,8 +236,9 @@ export default {
         },
         removeOrder: function() {
             this.$axios.single.post(this.actionUrl, {'orderData': [this.currentRow.id]})
-                .catch(() => {
-                    this.$toasted.show('Service unavailable, try again later');
+                .catch((err) => {
+                    this.notifyError('Service unavailable, try again later');
+                    this.sendLogs('error', 'Service unavailable. Can not remove orders', err);
                 });
         },
         getMarketFromName: function(name) {

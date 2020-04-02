@@ -1,4 +1,4 @@
-From 22116/webchaind
+From lukaszmatczak/webchaind
 
 COPY docker-entrypoint.sh /usr/local/bin
 

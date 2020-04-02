@@ -6,6 +6,7 @@ use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
@@ -27,7 +28,6 @@ class ResetRequestType extends AbstractType
                 'label' => false,
                 'constraints' => [new Email(['message' => 'Invalid email address.']) ],
             ])
-
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'attr' => [
                     'options' => [

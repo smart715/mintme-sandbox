@@ -34,9 +34,13 @@ class TwoFactorManager implements TwoFactorManagerInterface
 
     public function checkCode(User $user, string $code): bool
     {
-        $isBackupCode = in_array($code, $user->getGoogleAuthenticatorBackupCodes());
+        if ($user->isBackupCode($code)) {
+            $user->invalidateBackupCode($code);
 
-        return $isBackupCode || $this->authenticator->checkCode($user, $code);
+            return true;
+        }
+
+        return $this->authenticator->checkCode($user, $code);
     }
 
     public function generateBackupCodes(): array
@@ -64,7 +68,7 @@ class TwoFactorManager implements TwoFactorManagerInterface
 
     public function generateUrl(User $user): string
     {
-        return $this->authenticator->getUrl($user);
+        return $this->authenticator->getQRContent($user);
     }
 
     public function getGoogleAuthEntry(int $userId): GoogleAuthenticatorEntry

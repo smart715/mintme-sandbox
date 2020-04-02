@@ -6,9 +6,12 @@ use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Money\Currency;
+use Money\Money;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,10 +25,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Token implements TradebleInterface
 {
+    public const MINTME_SYMBOL = "MINTME";
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
+    public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
+    public const NOT_DEPLOYED = 'not-deployed';
+    public const DEPLOYED = 'deployed';
+    public const PENDING = 'pending';
 
     /**
      * @ORM\Id()
@@ -40,21 +48,36 @@ class Token implements TradebleInterface
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[a-zA-Z0-9\-\s]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
+     * @AppAssert\DashedUniqueName(message="Token name is already exists.")
      * @AppAssert\IsNotBlacklisted(type="token", message="This value is not allowed")
-     * @Groups({"API"})
+     * @Groups({"API", "API_TOK"})
      * @var string
      */
     protected $name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    protected $deployCost;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     */
+    protected $mintDestination;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $websiteUrl;
@@ -62,18 +85,35 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @AppAssert\IsUrlFromDomain("www.facebook.com")
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $facebookUrl;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $youtubeChannelId;
 
     /**
-     * @ORM\Column(type="string", length=10000, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Url()
+     * @var string|null
+     */
+    protected $telegramUrl;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Url()
+     * @var string|null
+     */
+    protected $discordUrl;
+
+    /**
+     * @ORM\Column(type="string", length=60000, nullable=true)
+     * @Groups({"API_TOK"})
      * @var string|null
      */
     protected $description;
@@ -86,6 +126,7 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
+     * @Groups({"API_TOK"})
      * @var Profile|null
      */
     protected $profile;
@@ -106,26 +147,52 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups({"API_TOK"})
      * @var \DateTimeImmutable
      */
     protected $created;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="relatedTokens")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserToken", mappedBy="token")
      * @var ArrayCollection
      */
-    protected $relatedUsers;
+    protected $users;
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable|null
+     */
+    private $deployed;
+
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $withdrawn = '0';
+
+     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string|null
+     */
+    private $mintedAmount;
 
     /** @return User[] */
-    public function getRelatedUsers(): array
+    public function getUsers(): array
     {
-        return $this->relatedUsers->toArray();
+        return array_map(function (UserToken $userToken) {
+            return $userToken->getUser();
+        }, $this->users->toArray());
     }
 
     /** {@inheritdoc} */
     public function getSymbol(): string
     {
         return $this->getName();
+    }
+
+    public function setSymbol(string $symbol): self
+    {
+        return $this->setName($symbol);
     }
 
     public function getCrypto(): ?Crypto
@@ -171,6 +238,51 @@ class Token implements TradebleInterface
         return $this->address;
     }
 
+    public function setPendingDeployment(): self
+    {
+        $this->address = '0x';
+
+        return $this;
+    }
+
+    public function setUpdatingMintDestination(): self
+    {
+        $this->mintDestination = '0x';
+
+        return $this;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function setDeployCost(string $cost): self
+    {
+        $this->deployCost = $cost;
+
+        return $this;
+    }
+
+    public function getDeployCost(): ?string
+    {
+        return $this->deployCost;
+    }
+
+    public function getMintDestination(): ?string
+    {
+        return $this->mintDestination;
+    }
+
+    public function setMintDestination(string $mintDestination): self
+    {
+        $this->mintDestination = $mintDestination;
+
+        return $this;
+    }
+
     public function getWebsiteUrl(): ?string
     {
         return $this->websiteUrl;
@@ -188,7 +300,7 @@ class Token implements TradebleInterface
         return $this->facebookUrl;
     }
 
-    public function setFacebookUrl(string $facebookUrl): self
+    public function setFacebookUrl(?string $facebookUrl): self
     {
         $this->facebookUrl = $facebookUrl;
 
@@ -200,7 +312,7 @@ class Token implements TradebleInterface
         return $this->youtubeChannelId;
     }
 
-    public function setYoutubeChannelId(string $youtubeChannelId): self
+    public function setYoutubeChannelId(?string $youtubeChannelId): self
     {
         $this->youtubeChannelId = $youtubeChannelId;
 
@@ -243,9 +355,31 @@ class Token implements TradebleInterface
         return $this->profile;
     }
 
+    /**
+     * @Groups({"API", "dev"})
+     */
+    public function getDeploymentStatus(): string
+    {
+        return !$this->address
+            ? self::NOT_DEPLOYED
+            : ('0x' === $this->address
+                ? self::PENDING
+                : self::DEPLOYED);
+    }
+
+    public function isDeployed(): bool
+    {
+        return self::DEPLOYED === $this->getDeploymentStatus();
+    }
+
     public static function getFromCrypto(Crypto $crypto): self
     {
         return (new self())->setName($crypto->getSymbol());
+    }
+
+    public static function getFromSymbol(string $symbol): self
+    {
+        return (new self())->setName($symbol);
     }
 
     public function getCreated(): \DateTimeImmutable
@@ -259,5 +393,67 @@ class Token implements TradebleInterface
         $this->created = new \DateTimeImmutable();
 
         return $this;
+    }
+
+    public function getTelegramUrl(): ?string
+    {
+        return $this->telegramUrl;
+    }
+
+    public function setTelegramUrl(?string $url): self
+    {
+        $this->telegramUrl = $url;
+
+        return $this;
+    }
+
+    public function getDiscordUrl(): ?string
+    {
+        return $this->discordUrl;
+    }
+
+    public function setDiscordUrl(?string $url): self
+    {
+        $this->discordUrl = $url;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getDeployed(): ?\DateTimeImmutable
+    {
+        return $this->deployed;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setDeployed(?\DateTimeImmutable $deployed): self
+    {
+        $this->deployed = $deployed;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getWithdrawn(): string
+    {
+        return $this->withdrawn;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setWithdrawn(string $withdrawn): self
+    {
+        $this->withdrawn = $withdrawn;
+
+        return $this;
+    }
+
+    public function getMintedAmount(): Money
+    {
+        return new Money($this->mintedAmount ?? 0, new Currency(self::TOK_SYMBOL));
+    }
+
+    public function setMintedAmount(Money $mintedAmount): void
+    {
+        $this->mintedAmount = $mintedAmount->getAmount();
     }
 }

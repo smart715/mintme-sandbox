@@ -1,13 +1,93 @@
 import '../../js/main';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import {mount} from '../testHelper';
 import Trading from '../../js/components/trading/Trading';
-import bPagination from 'bootstrap-vue/es/components/pagination/pagination';
-import bTable from 'bootstrap-vue/es/components/table/table';
+import {BPagination, BTable} from 'bootstrap-vue';
+import moxios from 'moxios';
+import Axios from '../../js/axios';
 
-Vue.component('b-pagination', bPagination);
-Vue.component('b-table', bTable);
+Vue.component('b-pagination', BPagination);
+Vue.component('b-table', BTable);
 
 describe('Trading', () => {
+    beforeEach(() => {
+        moxios.install();
+    });
+    afterEach(() => {
+        moxios.uninstall();
+    });
+    const $routing = {generate: () => 'URL'};
+
+    const localVue = createLocalVue();
+    localVue.use(Axios);
+
+
+    const wrapper = shallowMount(Trading, {
+        localVue,
+        mocks: {
+            $routing,
+        },
+        propsData: {
+            enableUsd: true,
+        },
+    });
+    it('Show USD in dropdown option if enableUSD is true', () => {
+        expect(wrapper.find('.usdOption').exists()).to.deep.equal(true);
+    });
+
+    describe('marketCapFormatter() function should return ', () => {
+        it('dash(-) if market is for token and monthVolume less than minimumVolumeForMarketcap', () => {
+            const wrapper = shallowMount(Trading, {
+                mocks: {
+                    $routing,
+                },
+                propsData: {
+                    minimumVolumeForMarketcap: 10,
+                },
+            });
+            let item = {
+                base: 'MINTME',
+                monthVolume: 9,
+
+            };
+            expect(wrapper.vm.marketCapFormatter('9', 0, item)).deep.equal('-');
+        });
+
+        it('value if market is not for token', () => {
+            const wrapper = shallowMount(Trading, {
+                mocks: {
+                    $routing,
+                },
+                propsData: {
+                    minimumVolumeForMarketcap: 10,
+                },
+            });
+            let item = {
+                base: 'foo',
+                monthVolume: 10,
+
+            };
+            expect(wrapper.vm.marketCapFormatter('10', 0, item)).deep.equal('10');
+        });
+
+        it('value if monthVolume not less than minimumVolumeForMarketcap', () => {
+            const wrapper = shallowMount(Trading, {
+                mocks: {
+                    $routing,
+                },
+                propsData: {
+                    minimumVolumeForMarketcap: 10,
+                },
+            });
+            let item = {
+                base: 'MINTME',
+                monthVolume: 10,
+
+            };
+            expect(wrapper.vm.marketCapFormatter('9', 0, item)).deep.equal('9');
+        });
+    });
+
     describe('data field', () => {
         describe(':tokens', () => {
             context('when fetch markets from server', () => {

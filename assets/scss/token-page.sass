@@ -1,21 +1,35 @@
+.chat
+  &:nth-child(even)
+    background-color: #00334E
+
+  img
+    height: 22px
+
 #token
+  .deployed-icon, .not-deployed-icon
+    height: 25px
+
+  .not-deployed-icon
+    img
+      filter: grayscale(100%)
+
   .buy-order, .sell-order
     @include media-breakpoint-up('xl')
       flex: 0 0 35%
       max-width: 35%
-      
+
   .chart
     @include media-breakpoint-up('xl')
       flex: 0 0 30%
       max-width: 30%
-      
+
   .fix-height
-    max-height: 20.7rem
+    max-height: 41.4rem
     overflow-y: auto
 
 #token-data-form
   .custom-btn
-    color: $white
+    color: $dark-white
     vertical-align: middle
     width: 100%
     svg
@@ -30,19 +44,12 @@
   width: 1%
 
 .input-group-text
-  background: $white
+  background: $dark-white
   border: none
   padding: 0.5rem 0.2rem
 
 .icon-arrows-down
   height: 18px
-
-.chat
-  &:nth-child(even)
-    background-color: #00334E
-    
-  img
-    height: 22px
 
 .fixed-head-table
   thead
@@ -51,27 +58,36 @@
       width: 100%
       table-layout: fixed
       justify-content: space-between
-      
+
+      th
+        width: 100px
+
   tbody
     max-height: 17.7rem
-    display: inline-block
+    display: block
     width: 100%
     position: relative
-    overflow-y: auto
-    
+    overflow-y: overlay
+
     tr
       width: 100%
       table-layout: fixed
       display: table
-      
-      td:last-child
-        padding-left: 0
-        padding-right: 10px
 
 .token-name-input
   background-color: $card-input-color !important
-  cursor: url('../img/input-cursor.png'), auto
-  color: $white
+  color: $dark-white
   border-radius: 0
   border: none
 
+.token-edit
+  .card
+    border: none
+    a
+      text-decoration: none
+      white-space: normal
+
+.alert-token-name-exists
+  font-size: 14px !important
+  padding: 0 10px !important
+  margin-bottom: 5px

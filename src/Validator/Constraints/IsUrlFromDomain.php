@@ -17,6 +17,8 @@ class IsUrlFromDomain extends Constraint
 
     /**
      * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
      */
     public function getDefaultOption()
     {

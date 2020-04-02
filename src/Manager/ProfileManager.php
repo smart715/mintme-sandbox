@@ -38,6 +38,8 @@ class ProfileManager implements ProfileManagerInterface
 
         return $this->profileRepository->getProfileByUser($user);
     }
+
+    /** @codeCoverageIgnore */
     public function getProfileByPageUrl(string $pageUrl): ?Profile
     {
         return $this->profileRepository->getProfileByPageUrl($pageUrl);
@@ -68,6 +70,7 @@ class ProfileManager implements ProfileManagerInterface
                 : $this->generateUniqueUrl($route);
     }
 
+    /** @codeCoverageIgnore */
     public function createHash(User $user, bool $hash = true, bool $enforceSecurity = true): User
     {
         $user->setHash($hash ?
@@ -81,7 +84,7 @@ class ProfileManager implements ProfileManagerInterface
 
     public function findProfileByHash(?string $hash): ?User
     {
-        if (null == $hash || '' === $hash) {
+        if (null === $hash || '' === $hash) {
             return null;
         }
 

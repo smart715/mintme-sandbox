@@ -12,10 +12,9 @@
                         Everything you should know before you buy {{ name }}.
                     </template>
                 </guide>
-
             </div>
             <div class="card-body">
-                <div class="row fix-height">
+                <div class="row fix-height custom-scrollbar">
                     <div class="col-12">
                         <span class="card-header-icon">
                             <font-awesome-icon
@@ -23,13 +22,14 @@
                                 class="float-right c-pointer icon-edit"
                                 icon="edit"
                                 transform="shrink-4 up-1.5"
-                                @click="editingDescription = true"/>
+                                @click="editingDescription = true"
+                            />
                         </span>
-                        <p v-if="!editingDescription">{{ description }}</p>
+                        <bbcode-view v-if="!editingDescription" :value="description" />
                         <template v-if="editable">
-                            <div  v-if="editingDescription">
+                            <div v-show="editingDescription">
                                 <div class="pb-1">
-                                    About your plan
+                                    About your plan:
                                     <guide>
                                         <template slot="header">
                                             About your plan
@@ -39,24 +39,45 @@
                                             identity and everything that may interest buyers.
                                         </template>
                                     </guide>
+                                    <bbcode-help class="d-inline"/>
                                 </div>
-                                <div class="pb-1 text-xs">Please describe goals milestones plans promises</div>
-
-                                <textarea
+                                <div class="pb-1 text-xs">
+                                    Please describe goals milestones plans promises
+                                </div>
+                                <bbcode-editor
+                                    rows="5"
                                     class="form-control"
-                                    v-model="$v.newDescription.$model"
-                                    :class="{ 'is-invalid': $v.$invalid }"
+                                    :class="{ 'is-invalid': $v.$invalid && newDescription.length > 0 }"
+                                    :value="newDescriptionHtmlDecode"
+                                    @change="onDescriptionChange"
+                                    @input="onDescriptionChange"
+                                />
+                                <div
+                                    v-if="newDescription.length > 0 && !$v.newDescription.minLength"
+                                    class="text-sm text-danger"
                                 >
-                                </textarea>
-                                <div v-if="!$v.newDescription.minLength || !$v.newDescription.required" class="text-sm text-danger">
                                     Token Description must be more than one character
                                 </div>
-                                <div v-if="!$v.newDescription.maxLength" class="text-sm text-danger">
+                                <div
+                                    v-if="!$v.newDescription.maxLength"
+                                    class="text-sm text-danger"
+                                >
                                     Token Description must be less than {{ maxDescriptionLength }} characters
                                 </div>
                                 <div class="text-left pt-3">
-                                    <button class="btn btn-primary" @click="editDescription">Save</button>
-                                    <a class="btn-cancel pl-3 c-pointer" @click="editingDescription = false">Cancel</a>
+                                    <button
+                                        class="btn btn-primary"
+                                        :disabled="$v.$invalid || !readyToSave"
+                                        @click="editDescription"
+                                    >
+                                        Save
+                                    </button>
+                                    <span
+                                        class="btn-cancel pl-3 c-pointer"
+                                        @click="editingDescription = false"
+                                    >
+                                        Cancel
+                                    </span>
                                 </div>
                             </div>
                         </template>
@@ -72,27 +93,27 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
+import BbcodeEditor from '../../bbcode/BbcodeEditor';
+import BbcodeHelp from '../../bbcode/BbcodeHelp';
+import BbcodeView from '../../bbcode/BbcodeView';
 import LimitedTextarea from '../../LimitedTextarea';
-import Toasted from 'vue-toasted';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {LoggerMixin, NotificationMixin} from '../../../mixins';
 
 library.add(faEdit);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
-
-const HTTP_BAD_REQUEST = 400;
 
 export default {
     name: 'TokenIntroductionDescription',
+    mixins: [NotificationMixin, LoggerMixin],
     props: {
-        name: String,
         description: String,
-        updateUrl: String,
         editable: Boolean,
+        name: String,
     },
     components: {
+        BbcodeEditor,
+        BbcodeHelp,
+        BbcodeView,
         FontAwesomeIcon,
         Guide,
         LimitedTextarea,
@@ -100,37 +121,57 @@ export default {
     data() {
         return {
             editingDescription: false,
-            newDescription: this.description,
+            newDescription: this.description || '',
             maxDescriptionLength: 10000,
+            readyToSave: false,
         };
     },
     computed: {
         showEditIcon: function() {
             return !this.editingDescription && this.editable;
         },
+        newDescriptionHtmlDecode: function() {
+            return this.newDescription
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>');
+        },
     },
     methods: {
+        onDescriptionChange: function(val) {
+            this.newDescription = val;
+            this.readyToSave = true;
+        },
         editDescription: function() {
             this.$v.$touch();
+            this.readyToSave = false;
             if (this.$v.$invalid) {
                 if (!this.$v.newDescription.minLength || !this.$v.newDescription.required) {
-                    this.$toasted.error('Token Description must be more than one character');
+                    this.notifyError('Token Description must be more than one character');
                 } else if (!this.$v.newDescription.maxLength) {
-                    this.$toasted.error('Token Description must be less than '+this.maxDescriptionLength+' characters');
+                    this.notifyError(`Token Description must be less than ${this.maxDescriptionLength} characters`);
                 }
                 return;
             }
 
-            this.$axios.single.patch(this.updateUrl, {
+            this.$axios.single.patch(this.$routing.generate('token_update', {
+                name: this.name,
+            }), {
                 description: this.newDescription,
+                needToCheckCode: false,
             })
                 .then((response) => {
                     this.$emit('updated', this.newDescription);
                 }, (error) => {
-                    if (error.response.status === HTTP_BAD_REQUEST) {
-                        this.$toasted.error(error.response.data);
+                    this.readyToSave = true;
+                    if (!error.response) {
+                        this.notifyError('Network error');
+                        this.sendLogs('error', 'Edit description network error', error);
+                    } else if (error.response.data.message) {
+                        this.notifyError(error.response.data.message);
+                        this.sendLogs('error', 'Can not edit description', error);
                     } else {
-                        this.$toasted.error('An error has occurred, please try again later');
+                        this.notifyError('An error has occurred, please try again later');
+                        this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 })
                 .then(() => {
