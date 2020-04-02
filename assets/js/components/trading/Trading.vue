@@ -730,7 +730,7 @@ export default {
         setTokenPositions: function(tokens) {
             let positionIndex = 1;
             return _.map(tokens, (token) => {
-                 if (BTC.symbol != token.base) {
+                 if (BTC.symbol !== token.base) {
                      token.position = positionIndex++;
                  }
                 return token;
