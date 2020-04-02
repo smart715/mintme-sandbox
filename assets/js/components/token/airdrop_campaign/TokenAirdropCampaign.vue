@@ -126,6 +126,7 @@ export default {
         return {
             showModal: false,
             airdropCampaignId: null,
+            airdropCampaignRemoved: false,
             tokenBalance: 0,
             minTokensAmount: '0.01',
             minParticipantsAmount: 100,
@@ -243,6 +244,10 @@ export default {
                     this.loading = false;
                     this.notifySuccess('Your airdrop was created successfully');
 
+                    if (this.airdropCampaignRemoved) {
+                        this.airdropCampaignRemoved = false;
+                    }
+
                     location.reload();
                 })
                 .catch((err) => {
@@ -263,6 +268,7 @@ export default {
                     this.airdropCampaignId = null;
                     this.setDefaultValues(true);
                     this.loading = false;
+                    this.airdropCampaignRemoved = true;
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
@@ -299,6 +305,11 @@ export default {
 
             return true;
         },
+    },
+    beforeDestroy() {
+        if (!this.hasAirdropCampaign && this.airdropCampaignRemoved) {
+            location.reload();
+        }
     },
 };
 </script>
