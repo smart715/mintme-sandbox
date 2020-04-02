@@ -47,7 +47,7 @@ use Throwable;
  * @Rest\Route("/api/tokens")
  * @Security(expression="is_granted('prelaunch')")
  */
-class TokensController extends APIController
+class TokensController extends AbstractFOSRestController
 {
     /** @var EntityManagerInterface */
     private $em;
