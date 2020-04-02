@@ -92,6 +92,7 @@ export default {
     name: 'TokenFacebookAddress',
     props: {
         address: String,
+        appId: String,
         tokenName: String,
     },
     components: {
@@ -100,6 +101,9 @@ export default {
         Modal,
     },
     mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
+    created: function() {
+        this.loadFacebookSdk();
+    },
     data() {
         return {
             pages: [],
@@ -120,6 +124,26 @@ export default {
         this.selectedUrl = this.pages.length ? this.pages[0].link : '';
     },
     methods: {
+        loadFacebookSdk: function() {
+            window.fbAsyncInit = () => {
+                FB.init({
+                    appId: this.appId,
+                    autoLogAppEvents: true,
+                    xfbml: true,
+                    version: 'v3.1',
+                });
+            };
+
+            (function(d, s, id) {
+                let js; let fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {
+                    return;
+                }
+                js = d.createElement(s); js.id = id;
+                js.src = 'https://connect.facebook.net/en_US/sdk.js';
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        },
         addPage: function() {
             FB.login((response) => {
                 if (response.status === 'connected') {
