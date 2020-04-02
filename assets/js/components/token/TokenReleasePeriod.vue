@@ -21,7 +21,7 @@
                             ref="released-slider"
                             :disabled="releasedDisabled"
                             v-model="released"
-                            :min="0" :max="100"
+                            :min="1" :max="100"
                             :interval="1"
                             :tooltip="false"
                             width="100%"
