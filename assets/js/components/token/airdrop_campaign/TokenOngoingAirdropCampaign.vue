@@ -1,25 +1,24 @@
 <template>
     <div
         ref="ongoing-airdrop-campaign"
-        class="card col-12 bg-green px-0">
+        class="airdrop-container card col-12 mb-3 px-0 py-lg-2">
         <div v-if="loaded" class="container">
-            <div class="row">
-                <div class="col-sm-3 align-self-center">
-                    <h4 class="my-0 mx-auto line-height-1">Ongoing airdrop!</h4>
-                </div>
-                <div class="col-sm-7 align-middle">
-                    <p class="m-0 text-white">
-                        For first {{ airdropCampaign.participants }} participants
-                        {{ airdropReward }} {{ tokenName }} for free.
-                        Currently {{ actualParticipants }}/{{ airdropCampaign.participants }} participants.
-                    </p>
-                    <p
+            <div class="row py-2 py-md-2 py-xl-0">
+                <div class="d-inline-block col-lg-10 col-md-12 pr-lg-0 align-self-center">
+                    <span class="message">
+                        <span class="text-bold">Ongoing airdrop!</span>
+                        For first {{ airdropCampaign.participants }} participants {{ airdropReward }}
+                    </span>
+                    <span class="message">
+                        {{ tokenName }} for free. Currently {{ actualParticipants }}/{{ airdropCampaign.participants }} participants.
+                    </span>
+                    <span
                         v-if="showEndDate"
-                        class="m-0 text-white">
-                        Airdrop ends on {{ endsDate }} at {{ endsTime }}
-                    </p>
+                        class="m-0 message">
+                        Airdrop ends on {{ endsDate }} at {{ endsTime }}.
+                    </span>
                 </div>
-                <div class="col-sm-2 text-right align-self-center">
+                <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
                     <button
                         :disabled="btnDisabled"
                         @click="showModal = true"
@@ -27,11 +26,11 @@
                         Participate
                     </button>
                     <confirm-modal
-                            :visible="showModal"
-                            :show-cancel-button="!isOwner && !alreadyClaimed"
-                            @confirm="modalOnConfirm"
-                            @cancel="modalOnCancel"
-                            @close="showModal = false">
+                        :visible="showModal"
+                        :show-cancel-button="!isOwner && !alreadyClaimed"
+                        @confirm="modalOnConfirm"
+                        @cancel="modalOnCancel"
+                        @close="showModal = false">
                         <p v-if="!loggedIn">
                             You have to be logged in to claim {{ airdropReward }} {{ tokenName }}
                         </p>
