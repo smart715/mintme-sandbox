@@ -69,12 +69,6 @@
                 </div>
             </b-col>
         </b-row>
-        <two-factor-modal
-            :visible="showTwoFactorModal"
-            :twofa="twofa"
-            @verify="doSaveReleasePeriod"
-            @close="closeTwoFactorModal"
-        />
     </div>
 </template>
 
@@ -82,9 +76,9 @@
 import Decimal from 'decimal.js';
 import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
-import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenReleasePeriod',
@@ -93,27 +87,25 @@ export default {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
         tokenName: String,
-        twofa: Boolean,
     },
     data() {
         return {
             loading: true,
             released: 0,
             releasePeriod: 0,
-            showTwoFactorModal: false,
+            hasLockin: false,
         };
     },
     components: {
         vueSlider,
         Guide,
-        TwoFactorModal,
     },
     computed: {
         showAreaUnlockedTokens: function() {
             return 100 !== this.released;
         },
         releasedDisabled: function() {
-            return (0 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
+            return (this.hasLockin && 0 !== this.releasePeriod && this.isTokenExchanged) || !this.isTokenNotDeployed;
         },
         releasePeriodDisabled: function() {
             return !this.isTokenNotDeployed;
@@ -125,18 +117,18 @@ export default {
         }))
             .then((res) => {
                 if (HTTP_OK === res.status) {
+                    this.hasLockin = true;
                     this.releasePeriod = res.data.releasePeriod;
 
                     let allTokens = new Decimal(res.data.frozenAmount).add(res.data.releasedAmount);
                     let percent = new Decimal(res.data.releasedAmount).div(allTokens.toString()).mul(100).floor();
                     this.released = percent.toNumber();
-
-                    this.loading = false;
                 } else if (HTTP_NO_CONTENT === res.status) {
                     this.releasePeriod = 10;
                     this.released = 10;
-                    this.loading = false;
                 }
+
+                this.loading = false;
             })
             .catch((err) => {
                 this.notifyError('Can not load statistic data. Try again later');
@@ -144,26 +136,29 @@ export default {
             });
     },
     methods: {
-        closeTwoFactorModal: function() {
-            this.showTwoFactorModal = false;
+        updateTokenStatistics: function(newTokenStatistics) {
+            this.setStats({
+                releasePeriod: newTokenStatistics.releasePeriod,
+                hourlyRate: newTokenStatistics.hourlyRate,
+                releasedAmount: newTokenStatistics.releasedAmount,
+                frozenAmount: newTokenStatistics.frozenAmount,
+            });
+            this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
+            .then((res) => this.setTokenExchangeAmount(res.data))
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err);
+            });
         },
         saveReleasePeriod: function() {
-            if (!this.twofa) {
-                return this.doSaveReleasePeriod();
-            }
-
-            return this.showTwoFactorModal = true;
-        },
-        doSaveReleasePeriod: function(code = '') {
             this.$axios.single.post(this.$routing.generate('lock_in', {
                 name: this.tokenName,
             }), {
                 released: this.released,
                 releasePeriod: !this.showAreaUnlockedTokens ? 0 : this.releasePeriod,
-                code,
             }).then((response) => {
-                this.closeTwoFactorModal();
                 this.$emit('update', response);
+                this.updateTokenStatistics(response.data);
                 this.notifySuccess('Release period updated.');
             }).catch(({response}) => {
                 if (!response) {
@@ -178,6 +173,10 @@ export default {
                 }
             });
         },
+        ...mapMutations('tokenStatistics', [
+            'setStats',
+            'setTokenExchangeAmount',
+        ]),
     },
 };
 </script>

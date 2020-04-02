@@ -8,6 +8,7 @@
     <div id="wallet" class="container">
         <div class="row pt-5 justify-content-center">
             <div class="col-md-12 card-fixed-large px-0 text-white">
+                {{ include('spinners/wallet.html.twig') }}
                 <b-tabs :lazy="true" class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
                     <b-tab title="Wallet" active>
                         <wallet
@@ -17,7 +18,8 @@
                             trading-url="{{ path('trading') }}"
                             withdraw-url="{{ path('withdraw') }}"
                             deposit-more="{{ depositMore }}"
-                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}">
+                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
+                        >
                         </wallet>
                     </b-tab>
                     <b-tab title="Trading history">

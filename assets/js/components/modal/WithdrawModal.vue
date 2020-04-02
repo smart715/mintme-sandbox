@@ -4,8 +4,8 @@
         :no-close="noClose"
         @close="closeModal">
         <template slot="body">
-            <div class="text-center">
-                <h3 class="modal-title">WITHDRAW({{ currency|rebranding }})</h3>
+            <div class="text-center overflow-wrap-break-word">
+                <h3 class="modal-title">WITHDRAW({{ currency | rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
                         Address:
@@ -68,7 +68,9 @@
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="float-right">{{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}</span>
+                    <span class="overflow-wrap-break-word">
+                        {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}
+                    </span>
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
@@ -178,7 +180,7 @@ export default {
             }
 
             if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
-                this.notifyError('You don\'t have enough web to pay fee');
+                this.notifyError('You do not have enough ' + this.rebrandingFunc(this.feeCurrency) + ' to pay the fee');
                 return;
             }
 

@@ -1,9 +1,9 @@
 import '../scss/main.sass';
 import Vue from 'vue';
 import VueBootstrap from 'bootstrap-vue';
-import fontawesome from '@fortawesome/fontawesome';
-import fab from '@fortawesome/fontawesome-free-brands';
-import far from '@fortawesome/fontawesome-free-regular';
+import {library, dom} from '@fortawesome/fontawesome-svg-core';
+import {fab} from '@fortawesome/free-brands-svg-icons';
+import {far} from '@fortawesome/free-regular-svg-icons';
 import {faSearch, faCog, fas} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import VueClipboard from 'vue-clipboard2';
@@ -16,6 +16,7 @@ import TokenSearcher from './components/token/TokenSearcher';
 import AdminMenu from './components/AdminMenu';
 import {directive as onClickaway} from 'vue-clickaway';
 import Notification from './components/Notification';
+import sanitizeHtml from './sanitize_html';
 
 /*
     To enable passive listeners,
@@ -26,7 +27,9 @@ import Notification from './components/Notification';
 
 VueClipboard.config.autoSetContainer = true;
 
-fontawesome.library.add(fas, far, fab, faSearch, faCog);
+library.add(fas, far, fab, faSearch, faCog);
+
+dom.watch();
 
 window.Vue = Vue;
 
@@ -45,6 +48,7 @@ Vue.use(Toasted, {
     className: 'toast',
     iconPack: 'custom-class',
 });
+Vue.use(sanitizeHtml);
 
 Vue.options.delimiters = ['{[', ']}'];
 

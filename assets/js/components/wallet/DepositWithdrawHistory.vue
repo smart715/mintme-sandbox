@@ -1,18 +1,22 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table">
+        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table" v-if="!noHistory">
             <b-table
                 thead-class="trading-head"
-                v-if="!noHistory"
                 :items="sanitizedHistory"
                 :fields="fields"
                 :class="{'empty-table': noHistory}"
             >
                 <template v-slot:cell(symbol)="data">
-                    <a :href="rebrandingFunc(data.item.url)" class="text-white">
+                    <a v-if="data.item.symbol.length > 17" :href="rebrandingFunc(data.item.url)" class="text-white">
                         <span v-b-tooltip="{title: rebrandingFunc(data.item.symbol), boundary:'viewport'}">
-                            {{ data.item.symbol | rebranding | truncate(15) }}
+                            {{ data.item.symbol | rebranding | truncate(17) }}
+                        </span>
+                    </a>
+                    <a v-else :href="rebrandingFunc(data.item.url)" class="text-white">
+                        <span>
+                            {{ data.item.symbol | rebranding }}
                         </span>
                     </a>
                 </template>
@@ -26,12 +30,12 @@
                     </div>
                 </template>
             </b-table>
-            <div v-if="noHistory">
-                <p class="text-center p-5">No transactions were added yet</p>
-            </div>
         </div>
         <div v-if="loading" class="p-1 text-center">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </div>
+        <div v-else-if="noHistory">
+            <p class="text-center p-5">No transactions were added yet</p>
         </div>
         </template>
         <template v-else>

@@ -27,6 +27,7 @@ use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Verify\WebsiteVerifier;
 use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -213,7 +214,7 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"2fa"="optional", "expose"=true})
+     * @Rest\Post("/{name}/lock-in", name="lock_in", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
      * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[0-9][0-9]?$|^100$")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
@@ -221,7 +222,8 @@ class TokensController extends AbstractFOSRestController
     public function setTokenReleasePeriod(
         string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        MoneyWrapperInterface $moneyWrapper
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -260,8 +262,11 @@ class TokensController extends AbstractFOSRestController
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $lock->setAmountToRelease($balance->getAvailable()->subtract($releasedAmount))
-                ->setReleasedAtStart($releasedAmount->getAmount());
+            $tokenQuantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), Token::TOK_SYMBOL);
+            $amountToRelease = $balance->getAvailable()->subtract($releasedAmount);
+
+            $lock->setAmountToRelease($amountToRelease)
+                ->setReleasedAtStart($tokenQuantity->subtract($amountToRelease)->getAmount());
         }
 
         $this->em->persist($lock);
@@ -351,7 +356,9 @@ class TokensController extends AbstractFOSRestController
         )->getAvailable();
 
         if ($token->getLockIn()) {
-            $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
+            $balance = $token->isDeployed()
+                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
         }
 
         return $this->view($balance);
@@ -547,7 +554,7 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"2fa"="optional", "expose"=true})
+     * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
      */
     public function deploy(

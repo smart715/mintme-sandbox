@@ -16,8 +16,6 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
-use Money\Currency;
-use Money\Money;
 
 class MarketHandler implements MarketHandlerInterface
 {
@@ -218,12 +216,11 @@ class MarketHandler implements MarketHandlerInterface
                 ),
                 Order::PENDING_STATUS,
                 $this->moneyWrapper->parse(
-                    self::SELL === $orderData['side'] ?
-                        (string)$orderData['maker_fee'] :
-                        (string)$orderData['taker_fee'],
+                    (string)$orderData['maker_fee'],
                     $this->getSymbol($market->getQuote())
                 ),
-                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null
+                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null,
+                !empty($orderData['ctime']) ? intval($orderData['ctime']) : null
             );
         });
 

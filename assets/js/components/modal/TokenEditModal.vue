@@ -6,7 +6,7 @@
             :without-padding="true"
             @close="$emit('close')"
         >
-            <template slot="header">{{ currentName }}</template>
+            <template slot="header"><p class="word-break-all">{{ currentName }}</p></template>
             <template slot="body">
                 <div class="token-edit p-0">
                     <div class="row faq-block mx-0 border-bottom border-top">
@@ -20,7 +20,6 @@
                                     :is-token-exchanged="isTokenExchanged"
                                     :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
-                                    :twofa="twofa"
                                     @update="releasePeriodUpdated"
                                 />
                             </template>
@@ -35,7 +34,6 @@
                                 <token-deploy
                                     :has-release-period="hasReleasePeriod"
                                     :is-owner="isOwner"
-                                    :twofa="twofa"
                                     :name="currentName"
                                     :precision="precision"
                                     :status-prop="statusProp"
@@ -107,7 +105,6 @@ import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
-import {FiltersMixin} from '../../mixins';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
@@ -136,7 +133,6 @@ export default {
         visible: Boolean,
         websocketUrl: String,
     },
-    mixins: [FiltersMixin],
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,

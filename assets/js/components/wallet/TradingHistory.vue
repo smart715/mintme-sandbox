@@ -1,29 +1,37 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table">
+            <div class="table-responsive table-restricted" ref="table" v-if="hasHistory">
                 <b-table
                     thead-class="trading-head"
-                    v-if="hasHistory"
                     :items="history"
-                    :fields="fields">
+                    :fields="fieldsArray"
+                    :sort-compare="sortCompare"
+                    :sort-by="fields.date.key"
+                    :sort-desc="true"
+                    sort-direction="desc"
+                >
                     <template v-slot:cell(name)="row">
-                        <div
-                            class="truncate-name w-100"
-                            v-b-tooltip="{title: rebrandingFunc(row.value), boundary:'viewport'}"
+                        <div v-if="row.value.full.length > 17"
+                            v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}"
                         >
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value | rebranding }}
+                                {{ row.value.truncate | rebranding }}
+                            </a>
+                        </div>
+                        <div v-else>
+                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
+                                {{ row.value.full | rebranding }}
                             </a>
                         </div>
                     </template>
                 </b-table>
-                <div v-if="!hasHistory">
-                    <p class="text-center p-5">No deal was made yet</p>
-                </div>
             </div>
             <div v-if="loading" class="p-1 text-center">
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
+            <div v-else-if="!hasHistory">
+                <p class="text-center p-5">No deal was made yet</p>
             </div>
         </template>
         <template v-else>
@@ -62,40 +70,60 @@ export default {
         return {
             tableData: null,
             currentPage: 1,
-            fields: [
-                {key: 'date', label: 'Date', sortable: true},
-                {key: 'side', label: 'Type', sortable: true},
-                {
+            fields: {
+                date: {
+                    key: 'date',
+                    label: 'Date',
+                    sortable: true,
+                    type: 'date',
+                },
+                side: {
+                    key: 'side',
+                    label: 'Type',
+                    sortable: true,
+                    type: 'string',
+                },
+                name: {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
                     class: 'pair-cell',
+                    formatter: (name) => {
+                        return {
+                            full: name,
+                            truncate: this.truncateFunc(name, 17),
+                        };
+                    },
                 },
-                {
+                amount: {
                     key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                price: {
                     key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                total: {
                     key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                fee: {
                     key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-            ],
+            },
         };
     },
     computed: {
@@ -118,6 +146,9 @@ export default {
                     pairUrl: this.generatePairUrl(history.market),
                 };
             });
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
     },
     mounted: function() {
@@ -152,6 +183,28 @@ export default {
             }
 
             return this.$routing.generate('token_show', {name: market.quote.name});
+        },
+        sortCompare: function(a, b, key) {
+            switch (this.fields[key].type) {
+                case 'date':
+                    return this.dateCompare(a[key], b[key]);
+                case 'string':
+                    return a[key].localeCompare(b[key]);
+                case 'numeric':
+                    return this.numericCompare(a[key], b[key]);
+            }
+        },
+        numericCompare: function(a, b) {
+            a = parseFloat(a);
+            b = parseFloat(b);
+
+            return a < b ? -1 : (a > b ? 1 : 0);
+        },
+        dateCompare: function(a, b) {
+            a = moment(a, GENERAL.dateFormat).unix();
+            b = moment(b, GENERAL.dateFormat).unix();
+
+            return this.numericCompare(a, b);
         },
     },
 };

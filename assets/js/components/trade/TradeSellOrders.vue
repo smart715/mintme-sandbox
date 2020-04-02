@@ -5,9 +5,12 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
-                    {{ tokenName | rebranding | truncate(7) }}
-                </span>
+                    <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
+                        {{ tokenName | rebranding | truncate(17) }}
+                    </span>
+                    <span v-else>
+                        {{ tokenName | rebranding }}
+                    </span>
                     <guide>
                         <template slot="header">
                             Sell Orders
@@ -31,7 +34,9 @@
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <span
                                         v-if="row.item.isAnonymous"
-                                        class="d-inline-block truncate-name flex-grow-1"
+                                        class="d-inline-block truncate-name flex-grow-1 c-pointer"
+                                        v-b-tooltip="popoverConfig"
+                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
                                     >
                                         {{ row.value }}
                                     </span>
@@ -39,16 +44,15 @@
                                         v-else
                                         :href="row.item.traderUrl"
                                         class="d-flex flex-row flex-nowrap justify-content-between w-100"
+                                        v-b-tooltip="popoverConfig"
+                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
                                     >
-                                        <span
-                                            class="d-inline-block truncate-name flex-grow-1"
-                                            v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}"
-                                        >
+                                        <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
                                             {{ row.value }}
                                         </span>
                                         <img
                                             src="../../../img/avatar.png"
-                                            class="d-block flex-grow-0"
+                                            class="d-block flex-grow-0 pointer-events-none"
                                             alt="avatar">
                                     </a>
                                     <a
@@ -90,12 +94,27 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, FiltersMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin} from '../../mixins/';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    MoneyFilterMixin,
+    OrderClickedMixin,
+    RebrandingFilterMixin,
+    TraderHoveredMixin,
+} from '../../mixins/';
 
 export default {
     name: 'TradeSellOrders',
-    mixins: [FiltersMixin, LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
+    mixins: [
+        FiltersMixin,
+        LazyScrollTableMixin,
+        MoneyFilterMixin,
+        OrderClickedMixin,
+        RebrandingFilterMixin,
+        TraderHoveredMixin,
+    ],
     props: {
+        fullOrdersList: [Array],
         ordersList: [Array],
         tokenName: String,
         fields: Array,
@@ -115,6 +134,9 @@ export default {
         this.startScrollListeningOnce(this.ordersList);
     },
     computed: {
+        shouldTruncate: function() {
+            return this.tokenName.length > 17;
+        },
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
                 new Decimal(order.amount).add(sum), 0), this.quotePrecision
