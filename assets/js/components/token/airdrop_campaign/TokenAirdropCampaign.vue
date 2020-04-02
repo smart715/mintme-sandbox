@@ -250,6 +250,7 @@ export default {
                     }
 
                     location.reload();
+                    return;
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
@@ -310,6 +311,7 @@ export default {
     beforeDestroy() {
         if (!this.hasAirdropCampaign && this.airdropCampaignRemoved) {
             location.reload();
+            return;
         }
     },
 };

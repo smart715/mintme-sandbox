@@ -154,6 +154,7 @@ export default {
         modalOnConfirm: function() {
             if (!this.loggedIn) {
                 window.location.replace(this.loginUrl);
+                return;
             }
 
             if (this.alreadyClaimed) {
@@ -180,6 +181,7 @@ export default {
         modalOnCancel: function() {
             if (!this.loggedIn) {
                 window.location.replace(this.signupUrl);
+                return;
             }
         },
     },
