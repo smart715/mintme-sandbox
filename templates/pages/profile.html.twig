@@ -59,7 +59,8 @@
                                 {% endif %}
                                 {% if token is not empty %}
                                     <div class="pb-1">
-                                        Token: <a class="white-space-nowrap" href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
+                                        <div>Token:</div> 
+                                        <a class="word-break-break-all" href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
                                     </div>
                                 {% endif %}
                             </div>
