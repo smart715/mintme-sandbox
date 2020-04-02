@@ -371,7 +371,7 @@ export default {
                 }
             });
             let numeric = key !== this.fields.pair.key;
-            let position = key == this.fields.position.key;
+            let position = key === this.fields.position.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
@@ -729,7 +729,7 @@ export default {
             return _.map(tokens, (token) => {
                  if (BTC.symbol != token.base) {
                      token.position = positionIndex++;
-                 };
+                 }
                 return token;
             });
         },
