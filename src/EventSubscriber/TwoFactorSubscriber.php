@@ -71,7 +71,7 @@ class TwoFactorSubscriber implements EventSubscriberInterface
 
         if (!in_array($option, self::VALUES)) {
             throw new InvalidArgumentException(
-                "'2fa' option can only cointains: ".(string)json_encode(self::VALUES)
+                "'2fa' option can only cointains: " . (string)json_encode(self::VALUES)
             );
         }
 
