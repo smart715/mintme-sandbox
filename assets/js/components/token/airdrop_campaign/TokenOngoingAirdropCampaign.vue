@@ -157,7 +157,7 @@ export default {
                 return;
             }
 
-            if (this.alreadyClaimed) {
+            if (this.isOwner || this.alreadyClaimed) {
                 return;
             }
 
@@ -174,8 +174,13 @@ export default {
                     this.btnDisabled = false;
                 })
                 .catch((err) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
-                    this.sendLogs('error', 'Can not create API Client', err);
+                    if (err.response.data.message) {
+                        this.notifyError(err.response.data.message);
+                    } else {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                    }
+
+                    this.sendLogs('error', 'Can not claim airdrop campaign.', err);
                 });
         },
         modalOnCancel: function() {

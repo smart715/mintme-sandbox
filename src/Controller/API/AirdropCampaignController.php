@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Token\Token;
+use App\Exception\ApiBadRequestException;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -113,7 +114,7 @@ class AirdropCampaignController extends AbstractFOSRestController
      */
     public function claimAirdropCampaign(string $tokenName): View
     {
-        $token = $this->fetchToken($tokenName);
+        $token = $this->fetchToken($tokenName, false, true);
 
         if (!$token->getActiveAirdrop()) {
             throw $this->createNotFoundException('Token does not have active airdrop campaign.');
@@ -127,8 +128,11 @@ class AirdropCampaignController extends AbstractFOSRestController
         return $this->view(null, Response::HTTP_ACCEPTED);
     }
 
-    private function fetchToken(string $tokenName, bool $checkAccess = false): Token
-    {
+    private function fetchToken(
+        string $tokenName,
+        bool $checkIfOwner = false,
+        bool $checkIfParticipant = false
+    ): Token {
         /** @var Token $token */
         $token = $this->tokenManager->findByName($tokenName);
 
@@ -136,8 +140,12 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw $this->createNotFoundException('Token does not exist.');
         }
 
-        if ($checkAccess && $token !== $this->tokenManager->getOwnToken()) {
+        if ($checkIfOwner && $token !== $this->tokenManager->getOwnToken()) {
             throw $this->createAccessDeniedException();
+        }
+
+        if ($checkIfParticipant && $token === $this->tokenManager->getOwnToken()) {
+            throw new ApiBadRequestException('Sorry, you can\'t participate in your own airdrop.');
         }
 
         return $token;
