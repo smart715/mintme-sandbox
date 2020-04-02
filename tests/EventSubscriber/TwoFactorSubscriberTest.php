@@ -230,7 +230,7 @@ class TwoFactorSubscriberTest extends TestCase
     {
         $event = $this->createMock(FilterControllerEvent::class);
         $event->method('getController')->willReturn(
-            $this->createMock(EventSubscriberInterface::class)
+            [$this->createMock(EventSubscriberInterface::class)]
         );
         $request = $this->createMock(Request::class);
         $request->method('get')->willReturn($code);
