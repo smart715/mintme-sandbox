@@ -111,6 +111,39 @@ describe('TokenOngoingAirdropCampaign', () => {
         expect(wrapper.vm.confirmButtonText).to.equal('OK');
     });
 
+    it('should show confirm modal message properly', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
+            localVue,
+            propsData: {
+                loggedIn: false,
+                isOwner: false,
+                tokenName: 'test77',
+            },
+            data() {
+                return {
+                    loaded: true,
+                    alreadyClaimed: false,
+                    airdropCampaign: {
+                        'amount': '300',
+                        'participants': 100,
+                    },
+                };
+            },
+        });
+
+        expect(wrapper.vm.confirmModalMessage).to.equal('You have to be logged in to claim 3 test77.');
+        wrapper.vm.loggedIn = true;
+        wrapper.vm.isOwner = true;
+        expect(wrapper.vm.confirmModalMessage).to.equal('Sorry, you can\'t participate in your own airdrop.');
+        wrapper.vm.isOwner = false;
+        wrapper.vm.alreadyClaimed = true;
+        expect(wrapper.vm.confirmModalMessage).to.equal('You already claimed tokens from this airdrop.');
+        wrapper.vm.isOwner = false;
+        wrapper.vm.alreadyClaimed = false;
+        expect(wrapper.vm.confirmModalMessage).to.equal('Are you sure you want to claim 3 test77?');
+    });
+
     it('should check airdrop end date', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {

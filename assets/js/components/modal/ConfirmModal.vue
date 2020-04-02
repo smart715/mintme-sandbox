@@ -4,7 +4,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <div>
+                <div v-if="showImage">
                     <img src="../../../img/are-you-sure.png"/>
                 </div>
                 <slot>
@@ -40,6 +40,10 @@ export default {
     props: {
         visible: Boolean,
         showCancelButton: {
+            type: Boolean,
+            default: true,
+        },
+        showImage: {
             type: Boolean,
             default: true,
         },

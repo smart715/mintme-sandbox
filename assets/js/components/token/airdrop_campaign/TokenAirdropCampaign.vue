@@ -21,9 +21,10 @@
                 </span>
                 <confirm-modal
                     :visible="showModal"
+                    :show-image="false"
                     @confirm="deleteAirdropCampaign"
                     @close="showModal = false">
-                    <p class="text-white modal-title pt-2">
+                    <p class="text-white modal-title pt-2 pb-4">
                         Are you sure?
                     </p>
                     <template v-slot:confirm>Yes</template>

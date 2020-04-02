@@ -28,20 +28,12 @@
                     <confirm-modal
                         :visible="showModal"
                         :show-cancel-button="!isOwner && !alreadyClaimed"
+                        :show-image="false"
                         @confirm="modalOnConfirm"
                         @cancel="modalOnCancel"
                         @close="showModal = false">
-                        <p v-if="!loggedIn">
-                            You have to be logged in to claim {{ airdropReward }} {{ tokenName }}
-                        </p>
-                        <p v-else-if="isOwner">
-                            Sorry, you can't participate in your own airdrop.
-                        </p>
-                        <p v-else-if="alreadyClaimed">
-                            You already claimed tokens from this airdrop.
-                        </p>
-                        <p v-else class="text-white modal-title pt-2">
-                            Are you sure you want to claim {{ airdropReward }} {{ tokenName }}?
+                        <p class="text-white modal-title pt-2 pb-4">
+                            {{ confirmModalMessage }}
                         </p>
                         <template v-if="!loggedIn" v-slot:cancel>Sign up</template>
                         <template v-if="!loggedIn || isOwner || alreadyClaimed" v-slot:confirm>
@@ -128,6 +120,21 @@ export default {
             }
 
             return button;
+        },
+        confirmModalMessage: function() {
+            if (!this.loggedIn) {
+                return 'You have to be logged in to claim ' + this.airdropReward + ' ' + this.tokenName + '.';
+            }
+
+            if (this.isOwner) {
+                return 'Sorry, you can\'t participate in your own airdrop.';
+            }
+
+            if (this.alreadyClaimed) {
+                return 'You already claimed tokens from this airdrop.';
+            }
+
+            return 'Are you sure you want to claim ' + this.airdropReward + ' ' + this.tokenName + '?';
         },
     },
     methods: {
