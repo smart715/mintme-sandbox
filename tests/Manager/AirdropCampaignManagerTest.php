@@ -166,8 +166,18 @@ class AirdropCampaignManagerTest extends TestCase
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->expects($this->once())->method('update');
+        /** @var User|MockObject $em */
+        $owner = $this->createMock(User::class);
+        /** @var Profile|MockObject $em */
+        $profile = $this->createMock(Profile::class);
+        $profile
+            ->method('getUser')
+            ->willReturn($owner);
         /** @var Token|MockObject $em */
         $token = $this->createMock(Token::class);
+        $token
+            ->method('getProfile')
+            ->willReturn($profile);
         /** @var User|MockObject $user */
         $user = $this->createMock(User::class);
 
