@@ -8,6 +8,7 @@ use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Model\BalanceResult;
 use App\Manager\AirdropCampaignManager;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Tests\MockMoneyWrapper;
@@ -41,8 +42,17 @@ class AirdropCampaignManagerTest extends TestCase
         $token
             ->method('getProfile')
             ->willReturn($profile);
+        /** @var BalanceResult|MockObject $res */
+        $res = $this->createMock(BalanceResult::class);
+        $res->method('getAvailable')->willReturn(
+            new Money(100000000000, new Currency(Token::TOK_SYMBOL))
+        );
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
+        $bh
+            ->method('balance')
+            ->with($user, $token)
+            ->willReturn($res);
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
         $amount = new Money(500, new Currency(MoneyWrapper::TOK_SYMBOL));
@@ -163,6 +173,11 @@ class AirdropCampaignManagerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->exactly(2))->method('persist');
         $em->expects($this->once())->method('flush');
+        /** @var BalanceResult|MockObject $res */
+        $res = $this->createMock(BalanceResult::class);
+        $res->method('getAvailable')->willReturn(
+            new Money(100000000000, new Currency(Token::TOK_SYMBOL))
+        );
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->expects($this->once())->method('update');
@@ -180,6 +195,10 @@ class AirdropCampaignManagerTest extends TestCase
             ->willReturn($profile);
         /** @var User|MockObject $user */
         $user = $this->createMock(User::class);
+        $bh
+            ->method('balance')
+            ->with($user, $token)
+            ->willReturn($res);
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
 
