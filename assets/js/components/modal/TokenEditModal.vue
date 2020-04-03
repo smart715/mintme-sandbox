@@ -44,8 +44,8 @@
                         </faq-item>
                     </div>
                     <div
-                            v-if="isTokenCreated && isOwner"
-                            class="row faq-block mx-0 border-bottom">
+                        v-if="isTokenCreated && isOwner"
+                        class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
                                 Airdrop campaign

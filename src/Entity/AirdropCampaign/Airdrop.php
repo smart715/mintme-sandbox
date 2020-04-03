@@ -81,7 +81,8 @@ class Airdrop
      * @ORM\OneToMany(
      *     targetEntity="App\Entity\AirdropCampaign\AirdropParticipant",
      *     mappedBy="airdrop",
-     *     orphanRemoval=true
+     *     orphanRemoval=true,
+     *     fetch="EXTRA_LAZY"
      * )
      * @var ArrayCollection
      */

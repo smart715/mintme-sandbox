@@ -53,13 +53,13 @@
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
-import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../../mixins';
 import {TOK} from '../../../utils/constants';
 import {toMoney} from '../../../utils';
 
 export default {
     name: 'TokenOngoingAirdropCampaign',
-    mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     components: {
         ConfirmModal,
     },

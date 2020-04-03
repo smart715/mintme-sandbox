@@ -110,12 +110,12 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
-import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../../mixins';
 import {TOK} from '../../../utils/constants';
 
 export default {
     name: 'TokenAirdropCampaign',
-    mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
+    mixins: [NotificationMixin, LoggerMixin],
     components: {
         datePicker,
         ConfirmModal,
