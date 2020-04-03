@@ -6,6 +6,7 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Wallet\Money\MoneyWrapper;
@@ -48,7 +49,8 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         int $participants,
         ?\DateTimeImmutable $endDate = null
     ): Airdrop {
-        $this->deleteActiveAirdrop($token);
+        $user = $token->getProfile()->getUser();
+        $this->checkUserBalance($user, $token, $amount);
 
         $airdrop = new Airdrop();
         $airdrop->setStatus(Airdrop::STATUS_ACTIVE);
@@ -67,7 +69,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         // Lock tokens for airdrop campaign
         $this->balanceHandler->update(
-            $token->getProfile()->getUser(),
+            $user,
             $token,
             $amount->negative(),
             'airdrop_amount'
@@ -140,6 +142,12 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $activeAirdrop->incrementActualParticipants();
         $airdropReward = $this->getAirdropReward($activeAirdrop);
 
+        $this->checkUserBalance(
+            $token->getProfile()->getUser(),
+            $token,
+            $airdropReward
+        );
+
         $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
 
         $rewardSummary = $airdropReward->multiply((int)$activeAirdrop->getActualParticipants());
@@ -174,8 +182,12 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
             throw new InvalidArgumentException('Airdrop reward calculation failed.');
         }
 
+        $reward = $this->roundAirdropReward(
+            $amount->ratioOf($participants)
+        );
+
         return $this->moneyWrapper->parse(
-            $amount->ratioOf($participants),
+            $reward,
             MoneyWrapper::TOK_SYMBOL
         );
     }
@@ -208,8 +220,23 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         return null;
     }
 
-    private function roundAirdropReward(string $amount): string
+    private function roundAirdropReward(string $amount, int $precision = self::AIRDROP_REWARD_PRECISION): string
     {
-        return (string)round(floatval($amount), self::AIRDROP_REWARD_PRECISION, PHP_ROUND_HALF_DOWN);
+        $dotPosition = intval(strpos($amount, '.'));
+
+        if (0 !== $dotPosition) {
+            $amount = substr($amount, 0, $dotPosition + $precision + 1);
+        }
+
+        return $amount;
+    }
+
+    private function checkUserBalance(User $user, Token $token, Money $amount): void
+    {
+        $balance = $this->balanceHandler->balance($user, $token);
+
+        if ($balance->getAvailable()->lessThan($amount)) {
+            throw new ApiBadRequestException('Insufficient funds.');
+        }
     }
 }
