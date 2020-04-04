@@ -80,10 +80,8 @@ export default {
         LoggerMixin,
         PairNameMixin,
     ],
-    components: { 
-        ConfirmModal,
-    },
-    props: { userId: Number },
+    components: {ConfirmModal},
+    props: {userId: Number},
     data() {
         return {
             markets: null,
