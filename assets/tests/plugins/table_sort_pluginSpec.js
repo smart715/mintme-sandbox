@@ -69,8 +69,7 @@ it('should select and sort the correct type based on the key', () => {
             const b = 11.3;
             expect(localVue.prototype.$sortCompare(a, b)).to.equal(1);
             expect(localVue.prototype.$sortCompare(b, a)).to.equal(-1); 
-            expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);
-        };    
+            expect(localVue.prototype.$sortCompare(a, a)).to.equal(0)};    
     });
 });
 
