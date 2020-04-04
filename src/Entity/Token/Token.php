@@ -3,6 +3,7 @@
 namespace App\Entity\Token;
 
 use App\Entity\Crypto;
+use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -175,6 +176,12 @@ class Token implements TradebleInterface
      * @var string|null
      */
     private $mintedAmount;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
+     * @var ArrayCollection
+     */
+    protected $posts;
 
     /** @return User[] */
     public function getUsers(): array
@@ -455,5 +462,13 @@ class Token implements TradebleInterface
     public function setMintedAmount(Money $mintedAmount): void
     {
         $this->mintedAmount = $mintedAmount->getAmount();
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function getPosts(): array
+    {
+        return $this->posts->toArray();
     }
 }
