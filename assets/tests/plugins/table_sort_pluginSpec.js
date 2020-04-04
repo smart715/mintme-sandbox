@@ -49,7 +49,6 @@ it('should select and sort the correct type based on the key', () => {
         },
         fee: {key: 'fee', type: 'numeric'},
     };
-    
     Object.keys(fields).forEach( (key) => {
         if (key.type == 'date') {
             const a = '24.02.2020 15:48:51';
@@ -64,8 +63,7 @@ it('should select and sort the correct type based on the key', () => {
             const a = 'en';
             const b = 'fr';
 
-            expect(localVue.prototype.$sortCompare(a, b)).to.equal(-1);
-            expect(localVue.prototype.$sortCompare(b, a)).to.equal(1); 
+            expect(localVue.prototype.$sortCompare(a, b)).to.equal(-1);expect(localVue.prototype.$sortCompare(b, a)).to.equal(1); 
             expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);
         };
 
@@ -73,8 +71,7 @@ it('should select and sort the correct type based on the key', () => {
             const a = 12.3;
             const b = 11.3;
 
-            expect(localVue.prototype.$sortCompare(a, b)).to.equal(1);
-            expect(localVue.prototype.$sortCompare(b, a)).to.equal(-1); 
+            expect(localVue.prototype.$sortCompare(a, b)).to.equal(1);expect(localVue.prototype.$sortCompare(b, a)).to.equal(-1); 
             expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);
         };    
     });
