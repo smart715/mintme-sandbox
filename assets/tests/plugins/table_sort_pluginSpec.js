@@ -16,7 +16,7 @@ it('sorts two different dates correctly', () => {
     const b = '03.03.2020 15:33:51';
     expect(localVue.prototype.$dateCompare(a, b)).to.equal(-1);
     expect(localVue.prototype.$dateCompare(b, a)).to.equal(1);
-    expect(localVue.prototype.$dateCompare(a,a)).to.equal(0);
+    expect(localVue.prototype.$dateCompare(a, a)).to.equal(0);
 });
 
 it('should select and sort the correct type based on the key', () => {
@@ -47,32 +47,29 @@ it('should select and sort the correct type based on the key', () => {
             key: 'total',
             type: 'numeric',
         },
-        fee: {
-            key: 'fee', 
-            type: 'numeric',
-        },
+        fee: {key: 'fee', type: 'numeric'},
     };
-    Object.keys(fields).forEach(key => {
-        if(key.type == 'date'){
+    Object.keys(fields).forEach( (key) => {
+        if (key.type == 'date') {
             const a = '24.02.2020 15:48:51';
             const b = '03.03.2020 15:33:51';
             expect(localVue.prototype.$sortCompare(b, a)).to.equal(1);
             expect(localVue.prototype.$sortCompare(a, b)).to.equal(-1);
             expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);
         };
-        if(key.type == 'string'){
+        if (key.type == 'string') {
             const a = 'en';
             const b = 'fr';
             expect(localVue.prototype.$sortCompare(a, b)).to.equal(-1);
             expect(localVue.prototype.$sortCompare(b, a)).to.equal(1); 
-            expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);  
+            expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);
         };
-        if(key.type == 'numeric'){
+        if (key.type == 'numeric') {
             const a = 12.3;
             const b = 11.3;
             expect(localVue.prototype.$sortCompare(a, b)).to.equal(1);
             expect(localVue.prototype.$sortCompare(b, a)).to.equal(-1); 
-            expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);  
+            expect(localVue.prototype.$sortCompare(a, a)).to.equal(0);
         };    
     });
 });
