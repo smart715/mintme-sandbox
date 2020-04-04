@@ -83,9 +83,7 @@ export default {
     components: { 
         ConfirmModal,
     },
-    props: {
-        userId: Number,
-},
+    props: { userId: Number },
     data() {
         return {
             markets: null,
