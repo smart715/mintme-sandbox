@@ -8,7 +8,7 @@
                     v-if="hasOrders"
                     :items="history"
                     :fields="fieldsArray"
-                    :sort-compare="$sortCompare"
+                    :sort-compare="sortCompared"
                     :sort-by="fields.date.key"
                     :sort-desc="true"
                     sort-direction="desc"
@@ -80,7 +80,7 @@ export default {
         LoggerMixin,
         PairNameMixin,
     ],
-    components: {
+    components: { 
         ConfirmModal,
     },
     props: {
@@ -219,6 +219,9 @@ export default {
             });
     },
     methods: {
+        sortCompared: function(a, b, key) {
+            return this.$sortCompare(a, b, key);
+        },
         updateTableData: function() {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('orders', {page: this.currentPage}))
