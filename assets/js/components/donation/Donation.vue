@@ -38,7 +38,7 @@
                                         >
                                             <p class="mb-2">Your balance:</p>
                                             <span v-if="balanceLoaded" class="d-block">
-                                                {{ balance | toMoney(market.base.subunit) | formatMoney }}
+                                                {{ balance | toMoney(currencySubunit) | formatMoney }}
                                             </span>
                                             <font-awesome-icon
                                                 v-else
@@ -357,7 +357,7 @@ export default {
                 });
         },
         all: function() {
-            this.amountToDonate = toMoney(this.balance, this.market.base.subunit);
+            this.amountToDonate = toMoney(this.balance, this.currencySubunit);
             if (!this.insufficientFunds) {
                 this.checkDonation();
             }
