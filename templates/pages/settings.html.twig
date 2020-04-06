@@ -10,8 +10,19 @@
                     <div class="card-header">Account settings</div>
                     <div class="card-body m-0">
                         <div id="settings">
+                        {% if twoFactorAuth %}                
+                            {{ form_start(passwordForm, {'attr': {'v-on:submit.prevent': 'onPrevent'}} ) }}
+                            <two-factor-modal
+                                :visible=twofaVisisble
+                                :twofa=true
+                                @close="twofaVisisble = false"
+                                @verify="doCodeVerify"
+                            >                                
+                            </two-factor-modal>                                     
+                        {% else %}
                             {{ form_start(passwordForm) }}
-                                {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off'}}) }}
+                        {% endif %}    
+                                {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off', 'v-model': 'current_password'}}) }}
                                 <passwordmeter :password="password" @toggle-error="toggleError">
                                     <span @click="togglePassword()" class="show-password">
                                         <i class="far fa-eye"></i>

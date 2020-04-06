@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -59,9 +60,15 @@ class UserController extends AbstractController
 
     /**
      * @Route("/settings", name="settings")
-     * @Route("/settings/update", name="fos_user_profile_show")
+     * @Route(
+     *      "/settings/updatepassword",
+     *      name="updatepassword",
+     *      options={"2fa"="optional", "expose"=true}
+     * )
+     * RequestParam(name="code", nullable=true)
+     * @Route("/settings/update", name="fos_user_profile_show",)
      */
-    public function editUser(Request $request): Response
+    public function editUser(Request $request): ?Response
     {
         $user = $this->getUser();
         $keys = $user
@@ -70,11 +77,16 @@ class UserController extends AbstractController
         $clients = $user
             ? $user->getApiClients()
             : null;
-        $passwordForm = $this->getPasswordForm($request, $keys);
 
+        if ($request->isMethod('patch')) {
+            return $this->changePassOnTwofaActive($request);
+        }
+
+        $passwordForm = $this->getPasswordForm($request, $keys);
+        
         return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys, $clients));
     }
-
+    
     /**
      * @Route("/referral-program", name="referral-program")
      */
@@ -291,5 +303,35 @@ class UserController extends AbstractController
         $time = date("H-i-d-m-Y");
 
         return "backup-codes-{$name}-{$time}.txt";
+    }
+    private function changePassOnTwofaActive(Request $request): Response
+    {
+        $user = $this->getUser();
+        $changePasswordData = json_decode(
+            $request->getContent(),
+            true
+        );
+        $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+        $passwordForm->submit(array_filter($changePasswordData, function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$passwordForm->isValid()) {
+            return new JsonResponse(
+                [
+                    'status' => 'error',
+                    'errors' => 'The entered password is invalid',
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $this->userManager->updatePassword($user);
+        $this->userManager->updateUser($user);
+        
+        return new JsonResponse(['status' => 'OK']);
     }
 }
