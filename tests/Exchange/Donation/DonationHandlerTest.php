@@ -100,8 +100,8 @@ class DonationHandlerTest extends TestCase
             ->method('findAllIndexed')
             ->with('symbol')
             ->willReturn([
-                Token::WEB_SYMBOL => $this->mockCrypto('Webchain', Token::WEB_SYMBOL),
-                Token::BTC_SYMBOL => $this->mockCrypto('Bitcoin', Token::BTC_SYMBOL),
+                Token::WEB_SYMBOL => $this->mockCrypto(),
+                Token::BTC_SYMBOL => $this->mockCrypto(),
             ]);
 
         $donationHandler = new DonationHandler(
