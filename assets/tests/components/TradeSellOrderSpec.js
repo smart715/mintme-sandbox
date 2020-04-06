@@ -96,6 +96,41 @@ describe('TradeSellOrder', () => {
         });
     });
 
+    it('should reset order price and amount properly', () => {
+        wrapper.vm.sellPrice = 3;
+        wrapper.vm.sellAmount = 1;
+        wrapper.vm.useMarketPrice = false;
+        wrapper.vm.resetOrder();
+        expect(wrapper.vm.sellPrice).to.be.equal(0);
+        expect(wrapper.vm.sellAmount).to.be.equal(0);
+
+        wrapper.vm.marketPrice = 1;
+        wrapper.vm.sellAmount = 2;
+        wrapper.vm.useMarketPrice = true;
+        wrapper.vm.resetOrder();
+        expect(wrapper.vm.sellPrice).to.be.equal('1');
+        expect(wrapper.vm.sellAmount).to.be.equal(0);
+    });
+
+    it('should update market price properly', () => {
+        wrapper.vm.sellPrice = 1.5;
+        wrapper.vm.useMarketPrice = false;
+        wrapper.vm.updateMarketPrice();
+        expect(wrapper.vm.sellPrice).to.be.equal(0);
+
+        wrapper.vm.marketPrice = '7.0';
+        wrapper.vm.useMarketPrice = true;
+        wrapper.vm.updateMarketPrice();
+        expect(wrapper.vm.sellPrice).to.be.equal('7');
+
+        wrapper.vm.marketPrice = 0;
+        wrapper.vm.useMarketPrice = true;
+        wrapper.vm.disabledMarketPrice = true;
+        wrapper.vm.updateMarketPrice();
+        expect(wrapper.vm.sellPrice).to.be.equal(0);
+        expect(wrapper.vm.useMarketPrice).to.be.false;
+    });
+
     describe('balanceClicked', () => {
         let event = {
             target: {
