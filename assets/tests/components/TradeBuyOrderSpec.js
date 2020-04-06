@@ -96,6 +96,40 @@ describe('TradeBuyOrder', () => {
         });
     });
 
+    it('should reset order price and amount properly', () => {
+        wrapper.vm.buyPrice = 2;
+        wrapper.vm.buyAmount = 1;
+        wrapper.vm.useMarketPrice = false;
+        wrapper.vm.resetOrder();
+        expect(wrapper.vm.buyPrice).to.be.equal(0);
+        expect(wrapper.vm.buyAmount).to.be.equal(0);
+
+        wrapper.vm.buyPrice = 2;
+        wrapper.vm.buyAmount = 2;
+        wrapper.vm.useMarketPrice = true;
+        wrapper.vm.resetOrder();
+        expect(wrapper.vm.buyPrice).to.be.equal('2');
+        expect(wrapper.vm.buyAmount).to.be.equal(0);
+    });
+
+    it('should update market price properly', () => {
+        wrapper.vm.buyPrice = 2;
+        wrapper.vm.useMarketPrice = false;
+        wrapper.vm.updateMarketPrice();
+        expect(wrapper.vm.buyPrice).to.be.equal(0);
+
+        wrapper.vm.marketPrice = 5;
+        wrapper.vm.useMarketPrice = true;
+        wrapper.vm.updateMarketPrice();
+        expect(wrapper.vm.buyPrice).to.be.equal('5');
+
+        wrapper.vm.marketPrice = 0;
+        wrapper.vm.disabledMarketPrice = true;
+        wrapper.vm.updateMarketPrice();
+        expect(wrapper.vm.buyPrice).to.be.equal(0);
+        expect(wrapper.vm.useMarketPrice).to.be.false;
+    });
+
     describe('balanceClicked', () => {
         let event = {
             target: {

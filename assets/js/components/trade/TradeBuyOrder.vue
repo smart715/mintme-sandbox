@@ -254,14 +254,18 @@ export default {
             }
         },
         resetOrder: function() {
-            this.buyPrice = 0;
+            if (!this.useMarketPrice) {
+                this.buyPrice = 0;
+            }
             this.buyAmount = 0;
-            this.useMarketPrice = false;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.buyPrice = this.price || 0;
+            } else {
+                this.buyPrice = 0;
             }
+
             if (this.disabledMarketPrice) {
                 this.useMarketPrice = false;
             }
