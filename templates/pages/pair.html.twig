@@ -32,7 +32,6 @@
                             <token-introduction-profile
                                     class="col-12 col-lg-6 pr-lg-2"
                                     youtube-client-id="{{ global_youtube_client_id }}"
-                                    facebook-app-id="{{ global_facebook_app_id }}"
                                     profile-name="{{ profile.firstName }} {{ profile.lastName }}"
                                     website-url="{{ token.websiteUrl }}"
                                     facebook-url="{{ token.facebookUrl }}"
@@ -146,4 +145,15 @@
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="{{ asset('build/pair.js') }}"></script>
+    <script>
+        window.fbAsyncInit = () => {
+            FB.init({
+                appId: '{{ global_facebook_app_id }}',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v3.1',
+            });
+        };
+    </script>
+    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
 {% endblock %}
