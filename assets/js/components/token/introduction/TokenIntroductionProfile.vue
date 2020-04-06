@@ -33,7 +33,6 @@
                         />
                         <token-facebook-address
                             :address="currentFacebook"
-                            :app-id="facebookAppId"
                             :editing="editingUrls"
                             :tokenName="tokenName"
                             @saveFacebook="saveFacebook"
@@ -66,7 +65,6 @@
                         <token-facebook-address-view
                             v-if="currentFacebook"
                             :address="currentFacebook"
-                            :app-id="facebookAppId"
                         />
                         <div class="col-12 my-3 text-left d-flex align-items-center">
                             <b-dropdown
@@ -216,7 +214,6 @@ export default {
         discordUrl: String,
         editable: Boolean,
         facebookUrl: String,
-        facebookAppId: String,
         profileName: String,
         profileUrl: String,
         telegramUrl: String,
