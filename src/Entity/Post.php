@@ -3,9 +3,14 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
 
+/**
+ * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
+ */
 class Post
 {
     /**
@@ -36,7 +41,7 @@ class Post
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="posts")
-     * @ORM\JoinColumn(name="quote_token_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="token_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @var Token
      */
     protected $token;
@@ -46,6 +51,16 @@ class Post
      * @var string
      */
     protected $amount;
+
+    public function __construct(
+        string $content,
+        Token $token,
+        Money $amount
+    ) {
+        $this->content = $content;
+        $this->token = $token;
+        $this->amount = $amount->getAmount();
+    }
 
     public function getId(): int
     {
@@ -57,9 +72,25 @@ class Post
         return $this->content;
     }
 
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedAt(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedAt(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
