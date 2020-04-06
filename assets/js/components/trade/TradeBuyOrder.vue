@@ -41,6 +41,7 @@
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
+                                tabindex="3"
                             >
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
@@ -53,6 +54,7 @@
                                             <a
                                                 v-if="showDepositMoreLink"
                                                 :href="depositMoreLink"
+                                                tabindex="1"
                                             >Deposit more</a>
                                             <guide>
                                                 <template slot="header">
@@ -92,6 +94,7 @@
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
+                                tabindex="4"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
                                 <label
@@ -103,6 +106,7 @@
                                         type="checkbox"
                                         id="buy-price"
                                         class="custom-control-input"
+                                        tabindex="2"
                                     >
                                     <label
                                         class="custom-control-label pb-0"
@@ -135,10 +139,13 @@
                         </guide>
                     </div>
                     <div class="col-12 pt-3 text-left">
-                        <button @click="placeOrder"
+                        <button
+                            @click="placeOrder"
                             v-if="loggedIn"
                             class="btn btn-primary"
-                            :disabled="!buttonValid">
+                            :disabled="!buttonValid"
+                            tabindex="5"
+                        >
                             Create buy order
                         </button>
                         <template v-else>
