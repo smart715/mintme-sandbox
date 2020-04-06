@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Entity\AirdropCampaign\Airdrop;
+use App\Repository\AirdropCampaign\AirdropRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,10 +35,9 @@ class UpdateOutdatedAirdropsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
-        $this->em->getConnection()->exec('
-            UPDATE airdrop
-            SET status = 0
-            WHERE status = 1 AND end_date IS NOT NULL AND end_date < CURRENT_TIMESTAMP();');
+        /** @var AirdropRepository $repository */
+        $repository = $this->em->getRepository(Airdrop::class);
+        $repository->updateOutdatedAirdrops();
         $io->success('Airdrops updated.');
     }
 }
