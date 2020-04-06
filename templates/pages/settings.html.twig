@@ -13,9 +13,9 @@
                         {% if twoFactorAuth %}                
                             {{ form_start(passwordForm, {'attr': {'v-on:submit.prevent': 'onPrevent'}} ) }}
                             <two-factor-modal
-                                :visible=twofaVisisble
+                                :visible=twoFaVisisble
                                 :twofa=true
-                                @close="twofaVisisble = false"
+                                @close="twoFaVisisble = false"
                                 @verify="doCodeVerify"
                             >                                
                             </two-factor-modal>                                     

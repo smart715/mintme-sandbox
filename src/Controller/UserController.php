@@ -62,7 +62,7 @@ class UserController extends AbstractController
      * @Route("/settings", name="settings")
      * @Route(
      *      "/settings/updatepassword",
-     *      name="updatepassword",
+     *      name="update-password",
      *      options={"2fa"="optional", "expose"=true}
      * )
      * RequestParam(name="code", nullable=true)
