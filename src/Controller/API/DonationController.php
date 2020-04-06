@@ -61,7 +61,8 @@ class DonationController extends AbstractFOSRestController
 //            $market,
 //            (string)$request->get('amount'),
 //            $this->getDonationFee(),
-//            (string)$request->get('expected_count_to_receive')
+//            (string)$request->get('expected_count_to_receive'),
+//            $this->getUser()
 //        );
 
         return $this->view(null, Response::HTTP_ACCEPTED);

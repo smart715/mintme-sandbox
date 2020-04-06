@@ -4,6 +4,7 @@ namespace App\Exchange\Donation;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Communications\JsonRpcResponse;
 
 class DonationFetcher implements DonationFetcherInterface
 {
@@ -26,9 +27,7 @@ class DonationFetcher implements DonationFetcherInterface
             $fee,
         ]);
 
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
+        $this->checkResponseForError($response);
 
         return $response->getResult();
     }
@@ -42,6 +41,11 @@ class DonationFetcher implements DonationFetcherInterface
             $expectedAmount,
         ]);
 
+        $this->checkResponseForError($response);
+    }
+
+    private function checkResponseForError(JsonRpcResponse $response): void
+    {
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
         }

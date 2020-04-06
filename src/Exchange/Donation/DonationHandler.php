@@ -5,6 +5,8 @@ namespace App\Exchange\Donation;
 use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
@@ -31,18 +33,23 @@ class DonationHandler implements DonationHandlerInterface
     /** @var CryptoManagerInterface */
     protected $cryptoManager;
 
+    /** @var BalanceHandlerInterface */
+    private $balanceHandler;
+
     public function __construct(
         DonationFetcherInterface $donationFetcher,
         MarketNameConverterInterface $marketNameConverter,
         MoneyWrapperInterface $moneyWrapper,
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        BalanceHandlerInterface $balanceHandler
     ) {
         $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
         $this->cryptoManager = $cryptoManager;
+        $this->balanceHandler = $balanceHandler;
     }
 
     public function checkDonation(Market $market, string $amount, string $fee): string
@@ -61,13 +68,32 @@ class DonationHandler implements DonationHandlerInterface
         );
     }
 
-    public function makeDonation(Market $market, string $amount, string $fee, string $expectedAmount): void
-    {
+    public function makeDonation(
+        Market $market,
+        string $amount,
+        string $fee,
+        string $expectedAmount,
+        User $donorUser
+    ): void {
         $amountObj = $this->moneyWrapper->parse($amount, $this->getSymbol($market->getBase()));
         $feeObj = $this->moneyWrapper->parse($fee, $this->getSymbol($market->getQuote()));
 
         if ($this->isBTCMarket($market)) {
-            $amountObj = $this->convertAmountToWeb($amountObj);
+            $amountInWeb = $this->convertAmountToWeb($amountObj);
+            $cryptos = $this->cryptoManager->findAllIndexed('symbol');
+
+            $this->balanceHandler->withdraw(
+                $donorUser,
+                Token::getFromCrypto($cryptos[Token::BTC_SYMBOL]),
+                $amountObj
+            );
+            $this->balanceHandler->deposit(
+                $donorUser,
+                Token::getFromCrypto($cryptos[Token::WEB_SYMBOL]),
+                $amountInWeb
+            );
+
+            $amountObj = $amountInWeb;
         }
 
         $this->donationFetcher->makeDonation(

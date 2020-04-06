@@ -5,6 +5,8 @@ namespace App\Tests\Exchange\Donation;
 use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Donation\DonationFetcherInterface;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\Market;
@@ -42,12 +44,16 @@ class DonationHandlerTest extends TestCase
             ->with('TOK000000000123WEB', '75', '1')
             ->willReturn('5');
 
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+
         $donationHandler = new DonationHandler(
             $fetcher,
             $marketNameConverter,
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
-            $this->mockCryptoManager($base)
+            $this->mockCryptoManager($base),
+            $bh
         );
 
         $this->assertEquals(
@@ -81,15 +87,33 @@ class DonationHandlerTest extends TestCase
             ->method('makeDonation')
             ->with('TOK000000000123BTC', '375000000000', '1', '20000');
 
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+        $bh->expects($this->once())->method('withdraw');
+        $bh->expects($this->once())->method('deposit');
+        /** @var User|MockObject $em */
+        $donorUser = $this->createMock(User::class);
+
+        $cryptoManager = $this->mockCryptoManager($webCrypto);
+        $cryptoManager
+            ->expects($this->once())
+            ->method('findAllIndexed')
+            ->with('symbol')
+            ->willReturn([
+                Token::WEB_SYMBOL => $this->mockCrypto('Webchain', Token::WEB_SYMBOL),
+                Token::BTC_SYMBOL => $this->mockCrypto('Bitcoin', Token::BTC_SYMBOL),
+            ]);
+
         $donationHandler = new DonationHandler(
             $fetcher,
             $marketNameConverter,
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
-            $this->mockCryptoManager($webCrypto)
+            $cryptoManager,
+            $bh
         );
 
-        $donationHandler->makeDonation($market, '30000', '1', '20000');
+        $donationHandler->makeDonation($market, '30000', '1', '20000', $donorUser);
         $this->assertTrue(true);
     }
 
