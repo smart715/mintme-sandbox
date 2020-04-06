@@ -15,7 +15,7 @@ new Vue({
         passwordInput: null,
         isPass: true,
         eyeIcon: null,
-        twofaVisisble: false,
+        twoFaVisisble: false,
         code: '',
     },
     mounted() {
@@ -26,21 +26,21 @@ new Vue({
     methods: {
         onPrevent: function(e) {
             e.preventDefault();
-            this.twofaVisisble = true;
+            this.twoFaVisisble = true;
         },
         clearInputs: function() {
             this.current_password = '';
             this.password = '';
         },
         doCodeVerify: function(code = '') {
-            this.$axios.single.patch(this.$routing.generate('updatepassword'), {
+            this.$axios.single.patch(this.$routing.generate('update-password'), {
                 current_password: this.current_password,
                 plainPassword: this.password,
                 code: code,
             })
             .then(() => {
                 this.clearInputs();
-                this.twofaVisisble = false;
+                this.twoFaVisisble = false;
                 this.notifySuccess('Password was updated successfully.');
             }, (error) => {
                 if (!error.response) {
