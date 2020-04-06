@@ -23,7 +23,7 @@ class LockIn
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\Regex(pattern="/^([0-3]|5|15|[0-5]0)$/")
+     * @Assert\Regex(pattern="/^([1-3]|5|15|[1-5]0)$/")
      * @GreaterThanPrevious(message="Release period can be prolonged only.", groups={"Exchanged"})
      * @var int
      */
