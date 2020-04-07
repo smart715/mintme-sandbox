@@ -5,6 +5,7 @@ namespace App\Admin;
 use App\Admin\Form\PasswordGeneratorButtonType;
 use App\Entity\User;
 use Exception;
+use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -105,7 +106,9 @@ class UserAdmin extends AbstractAdmin
         $this->setUserManager($userManager);
     }
 
-    /** {@inheritdoc} */
+    /**
+     * @param UserInterface $user
+     */
     public function prePersist($user): void
     {
         $this->userManager->updatePassword($user);
