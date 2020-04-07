@@ -4,7 +4,7 @@
         :no-close="noClose"
         @close="closeModal">
         <template slot="body">
-            <div class="text-center overflow-wrap-break-word">
+            <div class="text-center overflow-wrap-break-word word-break-all">
                 <h3 class="modal-title">WITHDRAW({{ currency | rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
@@ -68,7 +68,7 @@
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="overflow-wrap-break-word">
+                    <span class="overflow-wrap-break-word word-break-all">
                         {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}
                     </span>
                 </div>
