@@ -60,7 +60,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/settings", name="settings")
-     * (@Route\Patch)(
+     * @Rest\Patch(
      *      "/settings/update-password",
      *      name="update-password",
      *      options={"2fa"="optional", "expose"=true}
