@@ -18,6 +18,9 @@ const storage = {
         getStats: function(state) {
             return state.stats;
         },
+        getReleasePeriod: function(state) {
+            return state.stats.releasePeriod;
+        },
     },
     mutations: {
         setTokenExchangeAmount: function(state, n) {

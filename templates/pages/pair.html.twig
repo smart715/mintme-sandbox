@@ -45,6 +45,9 @@
                                     token-name="{{ market.quote.name }}"
                                     telegram-url="{{ token.telegramUrl }}"
                                     discord-url="{{ token.discordUrl }}"
+                                    @updated-website="websiteUpdated"
+                                    @updated-facebook="facebookUpdated"
+                                    @updated-youtube="youtubeUpdated"                                                                                                          
                             >
                             </token-introduction-profile>
                             <token-introduction-statistics
@@ -61,7 +64,7 @@
                                     :token-name="{{ market.quote.symbol | json_encode }}">
                             </top-holders>
                         </div>
-                    </b-tab>
+                    </b-tab>                    
                 {% endif %}
                 {% if showTrade %}
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
@@ -92,6 +95,20 @@
                                             :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     />
                                 </div>
+                            </li>
+                            <li class="nav-item-circle-progress">
+                                <token-points-progress
+                                    profile-name="{{ profile.firstName }}"
+                                    profile-lastname="{{ profile.lastname  }}"
+                                    profile-description="{{ profile.description }}"
+                                    profile-anonymously="{{ profile.anonymous }}"
+                                    :token-description="tokenDescription"
+                                    :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
+                                    :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
+                                    :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
+                                    token-status="{{ token.getDeploymentStatus }}"
+                                >
+                                </token-points-progress>
                             </li>
                         {% endif %}
                         <li class="nav-item-token">
