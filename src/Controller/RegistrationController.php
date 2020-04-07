@@ -181,6 +181,8 @@ class RegistrationController extends FOSRegistrationController
                 return $response;
             }
         }
+
+        return null;
     }
 
     public function confirmedAction(Request $request): Response

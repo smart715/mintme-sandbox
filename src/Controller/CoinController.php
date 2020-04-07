@@ -57,12 +57,15 @@ class CoinController extends Controller
 
         $market = $this->marketFactory->create($base, $quote);
 
+        /** @var  User|null $user*/
+        $user = $this->getUser();
+
         return $this->render('pages/pair.html.twig', [
             'market' => $this->normalize($market),
             'isOwner' => false,
             'showTrade' => true,
-            'hash' => $this->getUser() ?
-                $this->getUser()->getHash() :
+            'hash' => $user ?
+                $user->getHash() :
                 '',
             'precision' => $quote->getShowSubunit(),
             'isTokenPage' => false,

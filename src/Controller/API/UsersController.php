@@ -40,7 +40,13 @@ class UsersController extends AbstractFOSRestController
      */
     public function getApiKeys(): ApiKey
     {
-        $keys = $this->getUser()->getApiKey();
+        $curUser = $this->getUser();
+        $keys = null;
+
+        if ($curUser instanceof User) {
+            /** @var User $curUser */
+            $keys = $curUser->getApiKey();
+        }
 
         if (!$keys) {
             throw new ApiNotFoundException("No keys attached to the account");
@@ -55,17 +61,24 @@ class UsersController extends AbstractFOSRestController
      */
     public function createApiKeys(): ApiKey
     {
-        if ($this->getUser()->getApiKey()) {
-            throw new ApiBadRequestException("Keys already created");
+
+        $user = $this->getUser();
+        $keys = null;
+
+        if ($user instanceof User) {
+            /** @var User $user */
+            $keys = $user->getApiKey();
+
+            if ($keys) {
+                throw new ApiBadRequestException("Keys already created");
+            }
+
+            $keys = ApiKey::fromNewUser($user);
+
+            $this->getEm()->persist($keys);
+            $this->getEm()->flush();
         }
 
-        /** @var  \App\Entity\User $user*/
-        $user = $this->getUser();
-
-        $keys = ApiKey::fromNewUser($user);
-
-        $this->getEm()->persist($keys);
-        $this->getEm()->flush();
         $this->userActionLogger->info('Created API keys');
 
         return $keys;

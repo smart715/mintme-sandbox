@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketCapCalculator;
@@ -36,7 +37,12 @@ class MarketsController extends APIController
         MarketFactoryInterface $marketManager
     ): View {
 
-        $markets = $marketManager->createUserRelated($this->getUser());
+        $currentUser = $this->getUser();
+        $markets = null;
+
+        if ($currentUser instanceof User) {
+            $markets = $marketManager->createUserRelated($currentUser);
+        }
 
         return $this->view($markets);
     }
@@ -53,9 +59,13 @@ class MarketsController extends APIController
         MarketStatusManagerInterface $marketStatusManager
     ): View {
         $deployed = !!$request->get('deployed');
+
+        /** @var User $user */
+        $user = $this->getUser();
+
         $markets = $request->get('user') || $deployed
             ? $marketStatusManager->getUserMarketStatus(
-                $this->getUser(),
+                $user,
                 ($page - 1) * self::OFFSET,
                 self::OFFSET,
                 $deployed
