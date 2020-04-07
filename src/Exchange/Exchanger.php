@@ -18,6 +18,7 @@ use App\Manager\TokenManagerInterface;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Brick\Math\BigDecimal;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Throwable;
 
