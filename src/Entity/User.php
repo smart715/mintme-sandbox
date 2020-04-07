@@ -271,10 +271,8 @@ class User extends BaseUser implements
 
     public function isBackupCode(string $code): bool
     {
-        $googleAuth = $this->googleAuthenticatorEntry;
-
-        return null !== $googleAuth
-            ? in_array($code, $googleAuth->getBackupCodes())
+        return null !== $this->googleAuthenticatorEntry
+            ? in_array($code, $this->googleAuthenticatorEntry->getBackupCodes())
             : false;
     }
 
@@ -288,9 +286,7 @@ class User extends BaseUser implements
 
     public function getGoogleAuthenticatorBackupCodes(): array
     {
-        $googleAuth = $this->googleAuthenticatorEntry;
-
-        return null !== $googleAuth ? $googleAuth->getBackupCodes() : [];
+        return null !== $this->googleAuthenticatorEntry ? $$this->googleAuthenticatorEntry->getBackupCodes() : [];
     }
 
     /** @codeCoverageIgnore */
