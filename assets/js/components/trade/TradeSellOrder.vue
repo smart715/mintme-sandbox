@@ -40,19 +40,27 @@
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
+                                tabindex="8"
                             >
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
-                                <span class="c-pointer" @click="balanceClicked">
-                                    {{ market.quote.symbol | rebranding | truncate(7) }}:
+                                <span>
+                                    <span v-if="shouldTruncate" class="c-pointer" @click="balanceClicked"
+                                        v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
+                                        {{ market.quote.symbol | rebranding | truncate(17) }} :
+                                    </span>
+                                    <span v-else class="c-pointer" @click="balanceClicked">
+                                        {{ market.quote.symbol | rebranding }} :
+                                    </span>
                                     <span class="text-white">
-                                        <span class="text-nowrap">
+                                        <span class="text-nowrap p-1">
                                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                         </span>
                                         <span class="text-nowrap">
                                             <a
                                                 v-if="showDepositMoreLink"
                                                 :href="depositMoreLink"
+                                                tabindex="6"
                                             >Deposit more</a>
                                             <guide>
                                                 <template slot="header">
@@ -74,7 +82,12 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol | rebranding }}</span>
+                            <span v-if="shouldTruncate" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding | truncate(17) }}
+                            </span>
+                            <span v-else class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding }}
+                            </span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">
@@ -87,6 +100,7 @@
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
+                                tabindex="9"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
                                 <label
@@ -98,6 +112,7 @@
                                         type="checkbox"
                                         id="sell-price"
                                         class="custom-control-input"
+                                        tabindex="7"
                                     >
                                     <label
                                         class="custom-control-label pb-0"
@@ -135,6 +150,7 @@
                             class="btn btn-primary"
                             :disabled="!buttonValid"
                             @click="placeOrder"
+                            tabindex="10"
                         >
                             Create sell order
                         </button>
@@ -251,13 +267,18 @@ export default {
             }
         },
         resetOrder: function() {
-            this.sellPrice = 0;
+            if (!this.useMarketPrice) {
+                this.sellPrice = 0;
+            }
             this.sellAmount = 0;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.sellPrice = this.price || 0;
+            } else {
+                this.sellPrice = 0;
             }
+
             if (this.disabledMarketPrice) {
                 this.useMarketPrice = false;
             }
@@ -283,6 +304,9 @@ export default {
         ]),
     },
     computed: {
+        shouldTruncate: function() {
+            return this.market.quote.symbol.length > 17;
+        },
         totalPrice: function() {
             return new Decimal(this.sellPrice && !isNaN(this.sellPrice) ? this.sellPrice : 0)
                 .times(this.sellAmount && !isNaN(this.sellAmount) ? this.sellAmount : 0)

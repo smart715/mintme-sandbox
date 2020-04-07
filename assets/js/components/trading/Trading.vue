@@ -104,8 +104,11 @@
                         </guide>
                     </template>
                     <template v-slot:cell(pair)="row">
-                        <div class="truncate-name w-100">
-                            <a :href="row.item.tokenUrl" class="text-white" v-b-tooltip:title="row.value">
+                        <div>
+                            <a v-if="row.value.length > 22" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
+                                {{ row.value | truncate(22) }}
+                            </a>
+                            <a v-else :href="row.item.tokenUrl" class="text-white">
                                 {{ row.value }}
                             </a>
                             <guide

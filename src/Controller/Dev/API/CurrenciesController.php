@@ -10,6 +10,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Security(expression="is_granted('prelaunch')")
@@ -37,9 +38,21 @@ class CurrenciesController extends DevApiController
      *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Сurrency"))
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @Rest\QueryParam(name="offset", requirements="\d+", default="0")
-     * @Rest\QueryParam(name="limit", requirements="\d+", default="100")
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>0]")
+     * @Rest\QueryParam(
+     *     name="offset",
+     *     requirements=@Assert\Range(min="0"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
+     * @Rest\QueryParam(
+     *     name="limit",
+     *     requirements=@Assert\Range(min="1", max="500"),
+     *     nullable=false,
+     *     allowBlank=false,
+     *     strict=true
+     * )
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Currencies")
      */

@@ -41,6 +41,7 @@
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
+                                tabindex="3"
                             >
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
@@ -53,6 +54,7 @@
                                             <a
                                                 v-if="showDepositMoreLink"
                                                 :href="depositMoreLink"
+                                                tabindex="1"
                                             >Deposit more</a>
                                             <guide>
                                                 <template slot="header">
@@ -74,7 +76,12 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote.symbol | rebranding }}</span>
+                            <span v-if="shouldTruncate" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding | truncate(17) }}
+                            </span>
+                            <span v-else class="d-inline-block ml-1">
+                                {{ market.quote.symbol | rebranding }}
+                            </span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">
@@ -87,6 +94,7 @@
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
+                                tabindex="4"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
                                 <label
@@ -98,6 +106,7 @@
                                         type="checkbox"
                                         id="buy-price"
                                         class="custom-control-input"
+                                        tabindex="2"
                                     >
                                     <label
                                         class="custom-control-label pb-0"
@@ -130,10 +139,13 @@
                         </guide>
                     </div>
                     <div class="col-12 pt-3 text-left">
-                        <button @click="placeOrder"
+                        <button
+                            @click="placeOrder"
                             v-if="loggedIn"
                             class="btn btn-primary"
-                            :disabled="!buttonValid">
+                            :disabled="!buttonValid"
+                            tabindex="5"
+                        >
                             Create buy order
                         </button>
                         <template v-else>
@@ -163,6 +175,7 @@ import {
     RebrandingFilterMixin,
     OrderMixin,
     LoggerMixin,
+    FiltersMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -178,6 +191,7 @@ export default {
         RebrandingFilterMixin,
         OrderMixin,
         LoggerMixin,
+        FiltersMixin,
     ],
     components: {
         Guide,
@@ -247,14 +261,18 @@ export default {
             }
         },
         resetOrder: function() {
-            this.buyPrice = 0;
+            if (!this.useMarketPrice) {
+                this.buyPrice = 0;
+            }
             this.buyAmount = 0;
-            this.useMarketPrice = false;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.buyPrice = this.price || 0;
+            } else {
+                this.buyPrice = 0;
             }
+
             if (this.disabledMarketPrice) {
                 this.useMarketPrice = false;
             }
@@ -283,6 +301,9 @@ export default {
         ]),
     },
     computed: {
+        shouldTruncate: function() {
+            return this.market.quote.symbol.length > 17;
+        },
         totalPrice: function() {
             return new Decimal(this.buyPrice && !isNaN(this.buyPrice) ? this.buyPrice : 0)
                 .times(this.buyAmount && !isNaN(this.buyAmount) ? this.buyAmount : 0)

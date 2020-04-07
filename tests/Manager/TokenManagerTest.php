@@ -206,9 +206,9 @@ class TokenManagerTest extends TestCase
     {
         return [
             [$this->mockToken('foo'), true, 1, 1, 1],
-            [$this->mockToken('foo', $this->mockLockIn(1, 1)), true, 0, 2, 1],
-            [$this->mockToken('foo', $this->mockLockIn(1, 1), $this->createMock(User::class)), true, 0, 2, 1],
-            [$this->mockToken('foo', $this->mockLockIn(1, 0), $this->createMock(User::class), true), true, 0, 2, 1],
+            [$this->mockToken('foo', $this->mockLockIn(1)), true, 0, 2, 1],
+            [$this->mockToken('foo', $this->mockLockIn(1), $this->createMock(User::class)), true, 0, 2, 1],
+            [$this->mockToken('foo', $this->mockLockIn(1), $this->createMock(User::class), true), true, 0, 2, 1],
         ];
     }
 
@@ -274,11 +274,11 @@ class TokenManagerTest extends TestCase
         return $tok;
     }
 
-    private function mockLockIn(int $frozen, int $toRelease): LockIn
+    private function mockLockIn(int $frozen): LockIn
     {
         $lockIn = $this->createMock(LockIn::class);
         $lockIn->method('getFrozenAmountWithReceived')->willReturn($this->mockMoney($frozen));
-        $lockIn->method('getAmountToRelease')->willReturn($this->mockMoney($toRelease));
+        $lockIn->method('getFrozenAmount')->willReturn($this->mockMoney($frozen));
 
         return $lockIn;
     }

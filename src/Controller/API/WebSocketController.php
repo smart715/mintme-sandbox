@@ -2,10 +2,8 @@
 
 namespace App\Controller\API;
 
-use App\Entity\User;
 use App\Exchange\Config\Config;
 use App\Manager\ProfileManagerInterface;
-use App\Manager\UserManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -22,16 +20,12 @@ class WebSocketController extends AbstractFOSRestController
     /** @var bool */
     private $isAuth;
 
-    /** @var UserManagerInterface */
-    private $userManager;
-
     /** @var Config */
     private $config;
 
-    public function __construct(bool $isAuth, UserManagerInterface $userManager, Config $config)
+    public function __construct(bool $isAuth, Config $config)
     {
         $this->isAuth = $isAuth;
-        $this->userManager = $userManager;
         $this->config = $config;
     }
 
@@ -59,23 +53,21 @@ class WebSocketController extends AbstractFOSRestController
                 );
             }
 
-            if ($this->isAuth) {
-                // find user by hash
-                $findBy = 'hash';
-                $user = $profileManager->findProfileByHash($token);
-            } else {
-                // find user by id
-                $findBy = 'id';
-                $user = $this->userManager->find((int)$token - $this->config->getOffset());
+            if (!$this->isAuth) {
+                // return provided user id without verifying
+                return $this->confirmed((int)$token);
             }
 
+            // find user by hash
+            $user = $profileManager->findProfileByHash($token);
+
             if (null === $user) {
-                throw new RuntimeException('User with '.$findBy.' '.$token.' could not be found in mintme db', 3);
+                throw new RuntimeException('User with hash '.$token.' could not be found in mintme db', 3);
             }
 
             $profileManager->createHash($user, false);
 
-            return $this->confirmed($user);
+            return $this->confirmed($user->getId() + $this->config->getOffset());
         } catch (RuntimeException $e) {
             return $this->view([
                 "error" => [
@@ -88,12 +80,12 @@ class WebSocketController extends AbstractFOSRestController
         }
     }
 
-    private function confirmed(User $user): View
+    private function confirmed(int $userId): View
     {
         return $this->view([
             "code" => 0,
             "message" => null,
-            "data" => ["user_id" => $user->getId() + $this->config->getOffset()],
+            "data" => ["user_id" => $userId],
         ]);
     }
 }
