@@ -282,18 +282,21 @@ export default {
     methods: {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
+            this.$emit('updated-website', newWebsite);
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;
         },
         saveFacebook: function(newFacebook) {
             this.currentFacebook = newFacebook;
+            this.$emit('updated-facebook', newFacebook);
         },
         saveTelegram: function(newTelegram) {
             this.currentTelegram = newTelegram;
         },
         saveYoutube: function(newChannelId) {
             this.currentYoutube = newChannelId;
+            this.$emit('updated-youtube', newChannelId);
         },
         toggleEdit: function(url = null) {
             this.editingDiscord = 'discord' === url;
