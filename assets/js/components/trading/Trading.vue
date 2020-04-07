@@ -63,8 +63,15 @@
                     sort-icon-left
                 >
                     <template v-slot:[`head(${fields.position.key})`]="data">
-                    <div class="d-lg-none">POS</div>
-                    <div class="d-none d-lg-block">Position</div>
+                        #
+                        <guide>
+                            <template slot="header">
+                                Position
+                            </template>
+                            <template slot=body>
+                                The overall rank position of token.
+                            </template>
+                        </guide>
                     </template>
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
@@ -273,7 +280,6 @@ export default {
                     key: 'position',
                     label: 'Position',
                     sortable: true,
-                    class: 'd-none',
                 },
                 pair: {
                     key: 'pair',
