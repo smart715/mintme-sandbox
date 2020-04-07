@@ -60,7 +60,8 @@ class UpdatePendingWithdrawals extends Command
             ->setHelp('This command deletes all expired withdrawals and do a payment rollback');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger->info('[withdrawals] Update job started..');
 
@@ -85,6 +86,8 @@ class UpdatePendingWithdrawals extends Command
 
                 $this->em->commit();
             }
+
+            return 0;
         }
 
         /** @var PendingTokenWithdraw $item */

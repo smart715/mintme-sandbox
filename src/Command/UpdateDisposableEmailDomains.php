@@ -46,7 +46,8 @@ class UpdateDisposableEmailDomains extends Command
             ->setDescription('Synchronize domains list');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger->info('[blacklist] Update job started..');
         $this->logger->info('[blacklist] Domains from index fetch start..');
@@ -83,6 +84,8 @@ class UpdateDisposableEmailDomains extends Command
 
         $output->writeln('Synchronization completed');
         $this->logger->info('[blacklist] Update job finished..');
+
+        return 0;
     }
 
     /** @param array<Blacklist> $list */
