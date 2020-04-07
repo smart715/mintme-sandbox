@@ -40,6 +40,7 @@
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
+                                tabindex="8"
                             >
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
@@ -59,6 +60,7 @@
                                             <a
                                                 v-if="showDepositMoreLink"
                                                 :href="depositMoreLink"
+                                                tabindex="6"
                                             >Deposit more</a>
                                             <guide>
                                                 <template slot="header">
@@ -98,6 +100,7 @@
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
+                                tabindex="9"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
                                 <label
@@ -109,6 +112,7 @@
                                         type="checkbox"
                                         id="sell-price"
                                         class="custom-control-input"
+                                        tabindex="7"
                                     >
                                     <label
                                         class="custom-control-label pb-0"
@@ -146,6 +150,7 @@
                             class="btn btn-primary"
                             :disabled="!buttonValid"
                             @click="placeOrder"
+                            tabindex="10"
                         >
                             Create sell order
                         </button>
@@ -262,13 +267,18 @@ export default {
             }
         },
         resetOrder: function() {
-            this.sellPrice = 0;
+            if (!this.useMarketPrice) {
+                this.sellPrice = 0;
+            }
             this.sellAmount = 0;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.sellPrice = this.price || 0;
+            } else {
+                this.sellPrice = 0;
             }
+
             if (this.disabledMarketPrice) {
                 this.useMarketPrice = false;
             }
