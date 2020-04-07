@@ -61,7 +61,7 @@ body
 
   @include media-breakpoint-up(xl)
     content: "xl"
-
+      
 .form-control
   height: auto
 
@@ -322,6 +322,21 @@ a
     &:hover
       color: $gold
       background-color: transparent
+
+.circle-progress
+  margin-top: 8.2px
+  div.circle
+    background: none
+    height: auto
+    width: auto
+  
+.percent-text
+  font-size: 8px !important
+  margin-bottom: 4px
+
+.nav-item-circle-progress
+  @include media-breakpoint-up(md)
+    margin-left: 30px
 
 .circle
   background: #51677F
