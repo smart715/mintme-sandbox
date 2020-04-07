@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exception\NotFoundPairException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\CryptoManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class CoinController extends Controller
@@ -57,7 +59,7 @@ class CoinController extends Controller
 
         $market = $this->marketFactory->create($base, $quote);
 
-        /** @var  User|null $user*/
+        /** @var  User|null $user */
         $user = $this->getUser();
 
         return $this->render('pages/pair.html.twig', [

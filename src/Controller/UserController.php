@@ -63,6 +63,7 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
         $keys = $user
             ? $user->getApiKey()
@@ -80,10 +81,13 @@ class UserController extends AbstractController
      */
     public function referralProgram(PrelaunchConfig $prelaunchConfig): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('pages/referral.html.twig', [
-            'referralCode' => $this->getUser()->getReferralCode(),
+            'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $prelaunchConfig->getReferralFee() * 100,
-            'referralsCount' => count($this->getUser()->getReferrals()),
+            'referralsCount' => count($user>getReferrals()),
         ]);
     }
 
@@ -108,7 +112,9 @@ class UserController extends AbstractController
         Request $request,
         TwoFactorManagerInterface $twoFactorManager
     ): Response {
+        /** @var User $user */
         $user = $this->getUser();
+
         $form = $this->createForm(TwoFactorType::class);
         $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
 
@@ -166,8 +172,9 @@ class UserController extends AbstractController
             return $this->redirectToRoute('settings');
         }
 
-        /** @var User */
+        /** @var User $user*/
         $user = $this->getUser();
+
         $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
 
         $content = implode($lineBreak, $backupCodes);
@@ -196,7 +203,10 @@ class UserController extends AbstractController
     public function getBackupCodes(TwoFactorManagerInterface $twoFactorManager): array
     {
         $backupCodes = $twoFactorManager->generateBackupCodes();
+
+        /** @var User $user*/
         $user = $this->getUser();
+
         $user->setGoogleAuthenticatorBackupCodes($backupCodes);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
@@ -249,6 +259,9 @@ class UserController extends AbstractController
 
     private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, ?array $clients): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('pages/settings.html.twig', [
             'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
                 "groups" => ["API"],
@@ -257,7 +270,7 @@ class UserController extends AbstractController
                 "groups" => ["API"],
             ]),
             'passwordForm' => $passwordForm->createView(),
-            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
+            'twoFactorAuth' => $user->isGoogleAuthenticatorEnabled(),
         ]);
     }
 
@@ -273,8 +286,9 @@ class UserController extends AbstractController
 
     private function turnOffAuthenticator(TwoFactorManagerInterface $twoFactorManager): void
     {
-        /** @var User */
+        /** @var User $user*/
         $user = $this->getUser();
+
         $googleAuth = $twoFactorManager->getGoogleAuthEntry($user->getId());
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($googleAuth);
@@ -286,7 +300,10 @@ class UserController extends AbstractController
 
     private function generateBackupCodesFileName(): string
     {
-        $name = $this->getUser()->getUsername();
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $name = $user->getUsername();
         $time = date("H-i-d-m-Y");
 
         return "backup-codes-{$name}-{$time}.txt";
