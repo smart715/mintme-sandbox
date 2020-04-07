@@ -1,5 +1,6 @@
 import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
 import Trade from './components/trade/Trade';
+import TokenPointsProgress from './components/token/TokenPointsProgress';
 import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
@@ -15,6 +16,9 @@ new Vue({
     return {
       tabIndex: 0,
       tokenDescription: null,
+      tokenWebsite: null,
+      tokenFacebook: null,
+      tokenYoutube: null,
       editingName: false,
       tokenName: null,
       tokenPending: null,
@@ -29,6 +33,7 @@ new Vue({
     TokenName,
     TokenDeployIcon,
     TopHolders,
+    TokenPointsProgress,
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -50,6 +55,15 @@ new Vue({
     },
     getTokenStatus: function(status) {
       return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
+    },
+    facebookUpdated: function(val) {
+      this.tokenFacebook = val;
+    },
+    websiteUpdated: function(val) {
+        this.tokenWebsite = val;
+    },
+    youtubeUpdated: function(val) {
+        this.tokenYoutube = val;
     },
   },
   store,
