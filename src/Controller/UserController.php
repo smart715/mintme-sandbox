@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -87,7 +88,7 @@ class UserController extends AbstractController
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $prelaunchConfig->getReferralFee() * 100,
-            'referralsCount' => count($user>getReferrals()),
+            'referralsCount' => count($user->getReferrals()),
         ]);
     }
 
@@ -168,7 +169,10 @@ class UserController extends AbstractController
             ? "\r\n"
             : "\n";
 
-        if (!$this->container->get('session')->getBag('attributes')->remove('download_backup_codes')) {
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        if (!$bag->remove('download_backup_codes')) {
             return $this->redirectToRoute('settings');
         }
 
@@ -193,7 +197,10 @@ class UserController extends AbstractController
 
     private function addDownloadCodesToResponse(Response $response): Response
     {
-        if ($this->container->get('session')->getBag('attributes')->has('download_backup_codes')) {
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        if ($bag->has('download_backup_codes')) {
             $response->headers->set('Refresh', "5;{$this->generateUrl('download_backup_codes', [], UrlGeneratorInterface::ABSOLUTE_URL)}");
         }
 
@@ -211,7 +218,11 @@ class UserController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
-        $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
+
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        $bag->set('download_backup_codes', 'download');
 
         return $backupCodes;
     }

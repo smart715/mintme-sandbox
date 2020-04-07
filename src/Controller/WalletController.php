@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
+use App\Entity\User;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\Converter\RebrandingConverterInterface;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
@@ -49,8 +51,11 @@ class WalletController extends Controller
     {
         $depositMore = $request->get('depositMore') ?? '';
 
+        /** @var  User $user*/
+        $user = $this->getUser();
+
         return $this->render('pages/wallet.html.twig', [
-            'hash' => $this->getUser()->getHash(),
+            'hash' => $user->getHash(),
             'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
         ]);
     }
