@@ -86,8 +86,6 @@ class UpdatePendingWithdrawals extends Command
 
                 $this->em->commit();
             }
-
-            return 0;
         }
 
         /** @var PendingTokenWithdraw $item */
@@ -95,7 +93,7 @@ class UpdatePendingWithdrawals extends Command
             $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
             if (!$crypto) {
-                return;
+                return 0;
             }
 
             if ($item->getDate()->add($expires) < $this->date->now()) {
@@ -123,6 +121,8 @@ class UpdatePendingWithdrawals extends Command
         }
 
         $this->logger->info('[withdrawals] Update job finished..');
+
+        return 0;
     }
 
     private function getPendingWithdrawRepository(): PendingWithdrawRepository

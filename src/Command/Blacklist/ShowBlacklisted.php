@@ -42,7 +42,7 @@ class ShowBlacklisted extends Command
         if (!$list) {
             $style->success("No entries found");
 
-            return;
+            return 0;
         }
 
         $style->table(['type', 'value'], array_map(function (Blacklist $blacklist) {
