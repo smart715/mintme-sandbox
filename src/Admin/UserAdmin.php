@@ -106,11 +106,10 @@ class UserAdmin extends AbstractAdmin
         $this->setUserManager($userManager);
     }
 
-    /**
-     * @param UserInterface $user
-     */
+    /** {@inheritdoc} */
     public function prePersist($user): void
     {
+        /** @var UserInterface $user */
         $this->userManager->updatePassword($user);
     }
 

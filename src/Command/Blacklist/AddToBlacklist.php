@@ -29,7 +29,8 @@ class AddToBlacklist extends Command
             ->addArgument('value', InputArgument::REQUIRED, 'Value to be blocked');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var string */
         $type = $input->getArgument('type');
@@ -39,5 +40,7 @@ class AddToBlacklist extends Command
 
         $this->blacklistManager->addToBlacklist($value, $type);
         (new SymfonyStyle($input, $output))->success("Added successfuly");
+
+        return 0;
     }
 }
