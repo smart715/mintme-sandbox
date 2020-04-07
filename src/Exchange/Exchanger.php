@@ -169,7 +169,7 @@ class Exchanger implements ExchangerInterface
             $market->getQuote();
 
         /** @var string $amount */
-        $amount = BigDecimal::of($amount)->dividedBy('1', $market->isTokenMarket() ?
+        $amount = (string) BigDecimal::of($amount)->dividedBy('1', $market->isTokenMarket() ?
             $this->bag->get('token_precision') :
             $crypto->getShowSubunit());
 
