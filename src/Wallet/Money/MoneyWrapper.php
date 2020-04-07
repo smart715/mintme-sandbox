@@ -3,6 +3,7 @@
 namespace App\Wallet\Money;
 
 use App\Manager\CryptoManagerInterface;
+use Brick\Math\BigDecimal;
 use Money\Converter;
 use Money\Currencies;
 use Money\Currencies\CurrencyList;
@@ -65,7 +66,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
         if (preg_match($regEx, $notation, $matches)) {
             bcscale($this->getRepository()->subunitFor(new Currency($symbol)));
 
-            return bcmul($matches['left'], bcpow('10', $matches['right']));
+            return (string) BigDecimal::of($matches['left'])->multipliedBy(bcpow('10', $matches['right']));
         }
 
         return $notation;
