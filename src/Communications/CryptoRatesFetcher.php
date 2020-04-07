@@ -41,7 +41,7 @@ class CryptoRatesFetcher implements CryptoRatesFetcherInterface
         $response = json_decode($response, true);
 
         $keys = array_map(function ($key) use ($cryptos) {
-            return $cryptos[ucfirst($key)]->getSymbol();
+            return $cryptos[ucfirst((string)$key)]->getSymbol();
         }, array_keys($response));
 
         $values = array_map(function ($value) {
