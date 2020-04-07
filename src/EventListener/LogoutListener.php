@@ -24,16 +24,21 @@ class LogoutListener implements LogoutHandlerInterface
 
     public function __construct(UserActionLogger $userActionLogger, AuthorizationCheckerInterface $authorizationChecker, SessionInterface $session)
     {
-        $this->userActionLogger = $userActionLogger;
+        $this->userActionLogger     = $userActionLogger;
         $this->authorizationChecker = $authorizationChecker;
-        $this->session = $session;
+        $this->session              = $session;
     }
 
-    /** @inheritDoc */
+    /**
+     * @param Request        $request
+     * @param Response       $response
+     * @param TokenInterface $token
+     * @return mixed
+     */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
         $this->userActionLogger->info('Logout');
-        
+
         if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $this->session->set('has_authenticated', true);
         }
