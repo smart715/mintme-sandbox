@@ -7,13 +7,18 @@ use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Form\ChangePasswordType;
 use App\Logger\UserActionLogger;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/users")
@@ -21,14 +26,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
  */
 class UsersController extends AbstractFOSRestController
 {
+    /** @var UserManagerInterface */
+    protected $userManager;
+    
     /** @var UserActionLogger */
     private $userActionLogger;
 
     /** @var ClientManager */
     private $clientManager;
 
-    public function __construct(UserActionLogger $userActionLogger, ClientManager $clientManager)
+    public function __construct(UserManagerInterface $userManager, UserActionLogger $userActionLogger, ClientManager $clientManager)
     {
+        $this->userManager = $userManager;
         $this->userActionLogger = $userActionLogger;
         $this->clientManager = $clientManager;
     }
@@ -128,6 +137,43 @@ class UsersController extends AbstractFOSRestController
         $this->userActionLogger->info('Deleted API Client');
 
         return true;
+    }
+
+    /**
+     * @Rest\Patch(
+     * "/settings/update-password",
+     * name="update-password",
+     * options={"2fa"="optional", "expose"=true})
+     * @Rest\RequestParam(name="current_password", nullable=false)
+     * @Rest\RequestParam(name="plainPassword", nullable=false)
+     * @Rest\RequestParam(name="code", nullable=true)
+     */
+    public function changePassOnTwofaActive(Request $request): Response
+    {
+        $user = $this->getUser();
+        $changePasswordData = $request->request->all();
+        $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+        $passwordForm->submit(array_filter($changePasswordData, function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$passwordForm->isValid()) {
+            return new JsonResponse(
+                [
+                    'status' => 'error',
+                    'errors' => (string)$passwordForm->getErrors(true),
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $this->userManager->updatePassword($user);
+        $this->userManager->updateUser($user);
+
+        return new JsonResponse(['status' => 'OK']);
     }
 
     private function getEm(): ObjectManager
