@@ -18,7 +18,7 @@ class SynchronizeTokenBlacklistTest extends KernelTestCase
         $this->markTestSkipped('Confliction class exists');
 
         return;
-
+        /*
         $kernel = self::bootKernel();
         $app = new Application($kernel);
         $app->add(new SynchronizeTokenBlacklist(
@@ -34,6 +34,7 @@ class SynchronizeTokenBlacklistTest extends KernelTestCase
         $output = $commandTester->getDisplay();
 
         $this->assertContains("Synchronization completed.", $output);
+        */
     }
 
     private function mockEm(): EntityManagerInterface
