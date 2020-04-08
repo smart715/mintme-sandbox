@@ -60,12 +60,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/settings", name="settings")
-     * @Rest\Patch(
-     *      "/settings/update-password",
-     *      name="update-password",
-     *      options={"2fa"="optional", "expose"=true}
-     * )
-     * @Rest\RequestParam(name="code", nullable=true)
      * @Route("/settings/update", name="fos_user_profile_show",)
      */
     public function editUser(Request $request): ?Response
@@ -78,9 +72,9 @@ class UserController extends AbstractController
             ? $user->getApiClients()
             : null;
 
-        if ($request->isMethod('patch')) {
+       /*  if ($request->isMethod('patch')) {
             return $this->changePassOnTwofaActive($request);
-        }
+        } */
 
         $passwordForm = $this->getPasswordForm($request, $keys);
         
@@ -232,6 +226,43 @@ class UserController extends AbstractController
         return $this->redirectToRoute('settings');
     }
 
+    /**
+     * @Rest\Patch(
+     * "/settings/update-password",
+     * name="update-password",
+     * options={"2fa"="optional", "expose"=true})
+     * @Rest\RequestParam(name="current_password", nullable=false)
+     * @Rest\RequestParam(name="plainPassword", nullable=false)
+     * @Rest\RequestParam(name="code", nullable=true)
+     */
+    public function changePassOnTwofaActive(Request $request): Response
+    {
+        $user = $this->getUser();
+        $changePasswordData = $request->request->all();
+        $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+        $passwordForm->submit(array_filter($changePasswordData, function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$passwordForm->isValid()) {
+            return new JsonResponse(
+                [
+                    'status' => 'error',
+                    'errors' => (string)$passwordForm->getErrors(true),
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $this->userManager->updatePassword($user);
+        $this->userManager->updateUser($user);
+
+        return new JsonResponse(['status' => 'OK']);
+    }
+
     private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
     {
         /** @var User $user */
@@ -303,36 +334,5 @@ class UserController extends AbstractController
         $time = date("H-i-d-m-Y");
 
         return "backup-codes-{$name}-{$time}.txt";
-    }
-
-    private function changePassOnTwofaActive(Request $request): Response
-    {
-        $user = $this->getUser();
-        $changePasswordData = json_decode(
-            $request->getContent(),
-            true
-        );
-        $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
-            'csrf_protection' => false,
-            'allow_extra_fields' => true,
-        ]);
-        $passwordForm->submit(array_filter($changePasswordData, function ($value) {
-            return null !== $value;
-        }), false);
-
-        if (!$passwordForm->isValid()) {
-            return new JsonResponse(
-                [
-                    'status' => 'error',
-                    'errors' => (string)$passwordForm->getErrors(true),
-                ],
-                JsonResponse::HTTP_BAD_REQUEST
-            );
-        }
-
-        $this->userManager->updatePassword($user);
-        $this->userManager->updateUser($user);
-
-        return new JsonResponse(['status' => 'OK']);
     }
 }
