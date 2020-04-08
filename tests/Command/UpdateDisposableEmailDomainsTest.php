@@ -18,6 +18,7 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
     {
         $this->markTestSkipped('Confliction class exists');
 
+        /*
         $kernel = self::bootKernel();
         $app = new Application($kernel);
         $app->add(new UpdateDisposableEmailDomains(
@@ -34,6 +35,7 @@ class UpdateDisposableEmailDomainsTest extends KernelTestCase
         $output = $commandTester->getDisplay();
 
         $this->assertContains("Synchronization completed.", $output);
+        */
     }
 
     private function mockEm(): EntityManagerInterface
