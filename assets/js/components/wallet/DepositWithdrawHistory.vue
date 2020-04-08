@@ -9,7 +9,7 @@
                 :sort-compare="sortCompared"
                 :sort-by="fields.date.key"
                 :sort-desc="true"
-                sort-direction="asc"
+                sort-direction="desc"
                 :class="{'empty-table': noHistory}"
                 sort-icon-left
             >
