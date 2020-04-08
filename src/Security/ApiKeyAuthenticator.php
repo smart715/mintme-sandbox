@@ -33,7 +33,10 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
         $this->oauth = new OAuth2($oAuthStorage);
     }
 
-    /** {@inheritdoc} */
+    /** {@inheritdoc}
+     *
+     * @param string $providerKey
+     */
     public function createToken(Request $request, $providerKey): PreAuthenticatedToken
     {
         $public = $request->headers->get('X-API-ID');
@@ -56,7 +59,6 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             throw new BadCredentialsException();
         }
 
-        /** @var string $providerKey */
         return new PreAuthenticatedToken(
             'anon.',
             $credentials,
@@ -64,13 +66,19 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
         );
     }
 
-    /** {@inheritdoc} */
+    /** {@inheritdoc}
+     *
+     * @param string $providerKey
+     */
     public function supportsToken(TokenInterface $token, $providerKey): bool
     {
         return $token instanceof PreAuthenticatedToken && $token->getProviderKey() === $providerKey;
     }
 
-    /** {@inheritdoc} */
+    /** {@inheritdoc}
+     *
+     * @param string $providerKey
+     */
     public function authenticateToken(
         TokenInterface $token,
         UserProviderInterface $userProvider,
