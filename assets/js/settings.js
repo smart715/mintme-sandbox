@@ -45,7 +45,7 @@ new Vue({
             }, (error) => {
                 if (!error.response) {
                     this.notifyError('Network error');
-                } else if (error.response.status === 401) {
+                } else if (401 === error.response.status) {
                     this.notifyError('Invalid 2FA code');
                 } else if (error.response.data.errors) {
                     this.notifyError(error.response.data.errors);

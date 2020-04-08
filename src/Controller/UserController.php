@@ -65,7 +65,7 @@ class UserController extends AbstractController
      *      name="update-password",
      *      options={"2fa"="optional", "expose"=true}
      * )
-     * RequestParam(name="code", nullable=true)
+     * @Rest\RequestParam(name="code", nullable=true)
      * @Route("/settings/update", name="fos_user_profile_show",)
      */
     public function editUser(Request $request): ?Response
@@ -304,6 +304,7 @@ class UserController extends AbstractController
 
         return "backup-codes-{$name}-{$time}.txt";
     }
+
     private function changePassOnTwofaActive(Request $request): Response
     {
         $user = $this->getUser();
@@ -323,7 +324,7 @@ class UserController extends AbstractController
             return new JsonResponse(
                 [
                     'status' => 'error',
-                    'errors' => 'The entered password is invalid',
+                    'errors' => (string)$passwordForm->getErrors(true),
                 ],
                 JsonResponse::HTTP_BAD_REQUEST
             );
@@ -331,7 +332,7 @@ class UserController extends AbstractController
 
         $this->userManager->updatePassword($user);
         $this->userManager->updateUser($user);
-        
+
         return new JsonResponse(['status' => 'OK']);
     }
 }
