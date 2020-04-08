@@ -14,9 +14,10 @@ use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use FOS\RestBundle\View\View;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,7 +29,7 @@ class UsersController extends AbstractFOSRestController
 {
     /** @var UserManagerInterface */
     protected $userManager;
-    
+
     /** @var UserActionLogger */
     private $userActionLogger;
 
@@ -63,11 +64,17 @@ class UsersController extends AbstractFOSRestController
      */
     public function createApiKeys(): ApiKey
     {
-        if ($this->getUser()->getApiKey()) {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
+        if ($user->getApiKey()) {
             throw new ApiBadRequestException("Keys already created");
         }
 
-        $keys = ApiKey::fromNewUser($this->getUser());
+        $keys = ApiKey::fromNewUser($user);
 
         $this->getEm()->persist($keys);
         $this->getEm()->flush();
@@ -101,6 +108,11 @@ class UsersController extends AbstractFOSRestController
     public function createApiClient(): array
     {
         $user = $this->getUser();
+
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
         /** @var Client $client */
         $client = $this->clientManager->createClient();
         $client->setAllowedGrantTypes(['client_credentials']);
@@ -140,40 +152,52 @@ class UsersController extends AbstractFOSRestController
     }
 
     /**
+     * @Rest\View()
      * @Rest\Patch(
-     * "/settings/update-password",
-     * name="update-password",
-     * options={"2fa"="optional", "expose"=true})
+     *      "/settings/update-password",
+     *      name="update-password",
+     *      options={"2fa"="optional", "expose"=true}
+     * )
      * @Rest\RequestParam(name="current_password", nullable=false)
      * @Rest\RequestParam(name="plainPassword", nullable=false)
      * @Rest\RequestParam(name="code", nullable=true)
      */
-    public function changePassOnTwofaActive(Request $request): Response
+    public function changePassOnTwofaActive(Request $request): View
     {
         $user = $this->getUser();
+
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
         $changePasswordData = $request->request->all();
         $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
             'csrf_protection' => false,
             'allow_extra_fields' => true,
         ]);
+            
+        $this->userManager->updatePassword($user);
+        $this->userManager->updateUser($user);
+                            
         $passwordForm->submit(array_filter($changePasswordData, function ($value) {
             return null !== $value;
         }), false);
 
         if (!$passwordForm->isValid()) {
-            return new JsonResponse(
-                [
-                    'status' => 'error',
-                    'errors' => (string)$passwordForm->getErrors(true),
-                ],
-                JsonResponse::HTTP_BAD_REQUEST
-            );
+            foreach ($passwordForm->all() as $childForm) {
+
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $passwordForm->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException('Invalid argument');
         }
 
-        $this->userManager->updatePassword($user);
-        $this->userManager->updateUser($user);
-
-        return new JsonResponse(['status' => 'OK']);
+        return $this->view(Response::HTTP_ACCEPTED);
     }
 
     private function getEm(): ObjectManager
@@ -181,7 +205,7 @@ class UsersController extends AbstractFOSRestController
         return $this->getDoctrine()->getManager();
     }
 
-    protected function getUser(): User
+    protected function getUser(): ?User
     {
         return parent::getUser();
     }
