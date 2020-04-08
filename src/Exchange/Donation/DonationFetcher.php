@@ -21,6 +21,9 @@ class DonationFetcher implements DonationFetcherInterface
 
     public function checkDonation(string $marketName, string $amount, string $fee): string
     {
+        // TODO: Check the logic after viabtc API request will be ready
+        return '5';
+
         $response = $this->jsonRpc->send(self::CHECK_DONATION_METHOD, [
             $marketName,
             $amount,
@@ -34,6 +37,9 @@ class DonationFetcher implements DonationFetcherInterface
 
     public function makeDonation(string $marketName, string $amount, string $fee, string $expectedAmount): void
     {
+        // TODO: Check the logic after viabtc API request will be ready
+        return;
+
         $response = $this->jsonRpc->send(self::MAKE_DONATION_METHOD, [
             $marketName,
             $amount,

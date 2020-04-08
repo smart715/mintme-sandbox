@@ -287,15 +287,18 @@ export default {
         },
         checkDonation: function() {
             this.donationChecking = true;
+
+            // TODO: remove debug code from file after first test.
             console.info(
                 'check_donation API, params:',
-                'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
+                'market: ', this.market.base.symbol + '/' + this.market.quote.symbol,
                 'amount: ', this.amountToDonate
             );
 
             this.$axios.retry.get(this.$routing.generate('check_donation', {
-                base: this.selectedCurrency,
+                base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
+                currency: this.selectedCurrency,
                 amount: this.amountToDonate,
             }))
                 .then((res) => {
@@ -317,15 +320,16 @@ export default {
             this.donationInProgress = true;
             console.info(
                 'make_donation API, params:',
-                'market: ', this.selectedCurrency + '/' + this.market.quote.symbol,
+                'market: ', this.market.base.symbol + '/' + this.market.quote.symbol,
                 'amount: ', this.amountToDonate,
                 'expected_count_to_receive (fake data): ', this.amountToReceive
             );
 
             this.$axios.single.post(this.$routing.generate('make_donation', {
-                base: this.selectedCurrency,
+                base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
             }), {
+                currency: this.selectedCurrency,
                 amount: this.amountToDonate,
                 expected_count_to_receive: this.amountToReceive,
             })

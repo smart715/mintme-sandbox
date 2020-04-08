@@ -27,19 +27,23 @@ class DonationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{base}/{quote}/check/{amount}", name="check_donation", options={"expose"=true})
+     * @Rest\Get("/{base}/{quote}/check/{currency}/{amount}", name="check_donation", options={"expose"=true})
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
+     * @Rest\RequestParam(
+     *     name="currency",
+     *     allowBlank=false,
+     *     requirements="(WEB|BTC)",
+     *     description="Selected currency to donate."
+     * )
      */
-    public function checkDonation(Market $market, string $amount): View
+    public function checkDonation(Market $market, string $currency, string $amount): View
     {
-        // Fake data to avoid exception. Will be removed after viabtc API will done.
-        $amountToReceive = '10';
-
-//        $amountToReceive = $this->donationHandler->checkDonation(
-//            $market,
-//            $amount,
-//            $this->getDonationFee()
-//        );
+        $amountToReceive = $this->donationHandler->checkDonation(
+            $market,
+            $currency,
+            $amount,
+            $this->getDonationFee()
+        );
 
         return $this->view($amountToReceive);
     }
@@ -47,6 +51,12 @@ class DonationController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{base}/{quote}/make", name="make_donation", options={"expose"=true})
+     * @Rest\RequestParam(
+     *     name="currency",
+     *     allowBlank=false,
+     *     requirements="(WEB|BTC)",
+     *     description="Selected currency to donate."
+     * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(
      *     name="expected_count_to_receive",
@@ -56,20 +66,20 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
-        // To avoid exception. Will be removed after viabtc API will done.
-//        $this->donationHandler->makeDonation(
-//            $market,
-//            (string)$request->get('amount'),
-//            $this->getDonationFee(),
-//            (string)$request->get('expected_count_to_receive'),
-//            $this->getUser()
-//        );
+        $this->donationHandler->makeDonation(
+            $market,
+            $request->get('currency'),
+            (string)$request->get('amount'),
+            $this->getDonationFee(),
+            (string)$request->get('expected_count_to_receive'),
+            $this->getUser()
+        );
 
         return $this->view(null, Response::HTTP_ACCEPTED);
     }
 
-//    private function getDonationFee(): string
-//    {
-//        return (string)$this->getParameter('donation')['fee'];
-//    }
+    private function getDonationFee(): string
+    {
+        return (string)$this->getParameter('donation')['fee'];
+    }
 }

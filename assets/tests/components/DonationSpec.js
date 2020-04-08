@@ -321,6 +321,9 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 market: {
+                    base: {
+                        symbol: webSymbol,
+                    },
                     quote: {
                         symbol: 'TOK00011122233',
                     },
@@ -352,6 +355,9 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 market: {
+                    base: {
+                        symbol: webSymbol,
+                    },
                     quote: {
                         symbol: 'TOK00011122233',
                     },

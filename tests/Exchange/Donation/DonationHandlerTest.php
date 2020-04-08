@@ -58,7 +58,7 @@ class DonationHandlerTest extends TestCase
 
         $this->assertEquals(
             '5',
-            $donationHandler->checkDonation($market, '75', '1')
+            $donationHandler->checkDonation($market, Token::WEB_SYMBOL, '75', '1')
         );
     }
 
@@ -68,10 +68,10 @@ class DonationHandlerTest extends TestCase
         $webCrypto->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
 
         $base = $this->mockCrypto();
-        $base->method('getSymbol')->willReturn(Token::BTC_SYMBOL);
+        $base->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
 
         $quote = $this->mockToken();
-        $quote->method('getSymbol')->willReturn('TOK000000000123');
+        $quote->method('getSymbol')->willReturn('TOK000000000567');
 
         $market = new Market($base, $quote);
 
@@ -80,12 +80,12 @@ class DonationHandlerTest extends TestCase
         $marketNameConverter
             ->method('convert')
             ->with($market)
-            ->willReturn('TOK000000000123BTC');
+            ->willReturn('TOK000000000567WEB');
 
         $fetcher = $this->createMock(DonationFetcherInterface::class);
         $fetcher
             ->method('makeDonation')
-            ->with('TOK000000000123BTC', '375000000000', '1', '20000');
+            ->with('TOK000000000567WEB', '375000000000', '1', '20000');
 
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
@@ -113,7 +113,7 @@ class DonationHandlerTest extends TestCase
             $bh
         );
 
-        $donationHandler->makeDonation($market, '30000', '1', '20000', $donorUser);
+        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '1', '20000', $donorUser);
         $this->assertTrue(true);
     }
 

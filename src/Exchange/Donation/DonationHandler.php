@@ -52,12 +52,12 @@ class DonationHandler implements DonationHandlerInterface
         $this->balanceHandler = $balanceHandler;
     }
 
-    public function checkDonation(Market $market, string $amount, string $fee): string
+    public function checkDonation(Market $market, string $currency, string $amount, string $fee): string
     {
-        $amountObj = $this->moneyWrapper->parse($amount, $this->getSymbol($market->getBase()));
-        $feeObj = $this->moneyWrapper->parse($fee, $this->getSymbol($market->getQuote()));
+        $amountObj = $this->moneyWrapper->parse($amount, $currency);
+        $feeObj = $this->moneyWrapper->parse($fee, Token::WEB_SYMBOL);
 
-        if ($this->isBTCMarket($market)) {
+        if (Token::BTC_SYMBOL === $currency) {
             $amountObj = $this->convertAmountToWeb($amountObj);
         }
 
@@ -70,15 +70,16 @@ class DonationHandler implements DonationHandlerInterface
 
     public function makeDonation(
         Market $market,
+        string $currency,
         string $amount,
         string $fee,
         string $expectedAmount,
         User $donorUser
     ): void {
-        $amountObj = $this->moneyWrapper->parse($amount, $this->getSymbol($market->getBase()));
-        $feeObj = $this->moneyWrapper->parse($fee, $this->getSymbol($market->getQuote()));
+        $amountObj = $this->moneyWrapper->parse($amount, $currency);
+        $feeObj = $this->moneyWrapper->parse($fee, Token::WEB_SYMBOL);
 
-        if ($this->isBTCMarket($market)) {
+        if (Token::BTC_SYMBOL === $currency) {
             $amountInWeb = $this->convertAmountToWeb($amountObj);
             $cryptos = $this->cryptoManager->findAllIndexed('symbol');
 
@@ -104,11 +105,6 @@ class DonationHandler implements DonationHandlerInterface
         );
     }
 
-    private function isBTCMarket(Market $market): bool
-    {
-        return Token::BTC_SYMBOL === $market->getBase()->getSymbol();
-    }
-
     private function convertAmountToWeb(Money $amount): Money
     {
         $rates = $this->cryptoRatesFetcher->fetch();
@@ -122,12 +118,5 @@ class DonationHandler implements DonationHandlerInterface
                 ],
             ])
         );
-    }
-
-    private function getSymbol(TradebleInterface $tradeble): string
-    {
-        return $tradeble instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
-            : $tradeble->getSymbol();
     }
 }
