@@ -22,7 +22,7 @@ class MainDocumentsManager implements MainDocumentsManagerInterfaces
 
     public function findDocPathByName(string $name): ?string
     {
-        /** @var MainDocument $document */
+        /** @var MainDocument $media */
         $media = $this->mainDocsRepo->findOneBy(['name' => $name]);
 
         /** @var Media $document */
