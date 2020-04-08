@@ -45,14 +45,6 @@ class WebSocketController extends AbstractFOSRestController
                 throw new RuntimeException('"Authorization" header was not found in HTTP request from via btc server', 1);
             }
 
-            if (is_array($token)) {
-                throw new RuntimeException(
-                    'Array returned in "Authorization" header instead of an integer: '
-                    . implode(', ', $token),
-                    2
-                );
-            }
-
             if (!$this->isAuth) {
                 // return provided user id without verifying
                 return $this->confirmed((int)$token);
