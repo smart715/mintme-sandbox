@@ -252,7 +252,7 @@ class TokensControllerTest extends WebTestCase
             'code' => '123456',
         ]);
 
-        /** @var Token $token */
+        /** @var Token|null $token */
         $token = $this->getToken($tokName);
 
         $this->assertNull($token);

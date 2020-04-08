@@ -32,7 +32,7 @@ class WithdrawStorageTest extends TestCase
 
         /** @var MockObject $rpc */
         $rpc->method('send')->willThrowException(new \Exception());
-        
+
         $this->assertEquals([], $storage->requestHistory(1, 0, 10));
         $this->assertEquals(0, $storage->requestBalance('web'));
     }
