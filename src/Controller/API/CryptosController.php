@@ -5,12 +5,10 @@ namespace App\Controller\API;
 use App\Communications\CryptoRatesFetcherInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/cryptos")
- * @Security(expression="is_granted('prelaunch')")
  */
 class CryptosController extends APIController
 {

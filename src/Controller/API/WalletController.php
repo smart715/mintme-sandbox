@@ -18,13 +18,11 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
  * @Rest\Route("/api/wallet")
- * @Security(expression="is_granted('prelaunch')")
  */
 class WalletController extends AbstractFOSRestController
 {

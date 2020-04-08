@@ -12,7 +12,6 @@ use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
-use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -36,9 +35,6 @@ class Trader implements TraderInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var PrelaunchConfig */
-    private $prelaunchConfig;
-
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
 
@@ -48,24 +44,27 @@ class Trader implements TraderInterface
     /** @var NormalizerInterface */
     private $normalizer;
 
+    /** @var float */
+    private $referralFee;
+
     public function __construct(
         TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
-        PrelaunchConfig $prelaunchConfig,
         MarketNameConverterInterface $marketNameConverter,
         NormalizerInterface $normalizer,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        float $referralFee
     ) {
         $this->fetcher = $fetcher;
         $this->config = $config;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
-        $this->prelaunchConfig = $prelaunchConfig;
         $this->marketNameConverter = $marketNameConverter;
         $this->normalizer = $normalizer;
         $this->logger = $logger;
+        $this->referralFee = $referralFee;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -78,8 +77,8 @@ class Trader implements TraderInterface
             $this->moneyWrapper->format($order->getPrice()),
             (string)$this->config->getTakerFeeRate(),
             (string)$this->config->getMakerFeeRate(),
-            $this->isReferralFeeEnabled() ? $order->getReferralId() : 0,
-            $this->isReferralFeeEnabled() ? (string)$this->prelaunchConfig->getReferralFee() : '0'
+            $order->getReferralId() ?: 0,
+            (string)$this->referralFee
         );
 
         $quote = $order->getMarket()->getQuote();
@@ -165,11 +164,6 @@ class Trader implements TraderInterface
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $records);
-    }
-
-    private function isReferralFeeEnabled(): bool
-    {
-        return !$this->prelaunchConfig->isEnabled();
     }
 
     private function updateUserTokenReferrencer(User $user, Token $token): void

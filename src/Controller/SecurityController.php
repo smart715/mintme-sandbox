@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\CaptchaLoginType;
 use App\Logger\UserActionLogger;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
@@ -81,7 +80,7 @@ class SecurityController extends FOSSecurityController
     }
 
     /** @Route("/login_success", name="login_success") */
-    public function postLoginRedirectAction(PrelaunchConfig $prelaunchConfig): Response
+    public function postLoginRedirectAction(): Response
     {
         $this->userActionLogger->info('Log in');
 
@@ -94,9 +93,7 @@ class SecurityController extends FOSSecurityController
             return $this->redirectToRoute($refererRoute);
         }
 
-        return $prelaunchConfig->isFinished()
-            ? $this->redirectToRoute("trading")
-            : $this->redirectToRoute("referral-program");
+        return $this->redirectToRoute("trading");
     }
 
     /**
