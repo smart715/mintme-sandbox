@@ -11,7 +11,7 @@
                     :sort-compare="sortCompared"
                     :sort-by="fields.date.key"
                     :sort-desc="true"
-                    sort-direction="asc"
+                    sort-direction="desc"
                     sort-icon-left
                     no-sort-reset
                 >
