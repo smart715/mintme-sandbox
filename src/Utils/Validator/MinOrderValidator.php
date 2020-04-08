@@ -66,7 +66,7 @@ class MinOrderValidator implements ValidatorInterface
     private function getCrypto(?TradebleInterface $tradeble): ?Crypto
     {
         if ($tradeble instanceof Token) {
-            /** @var Token $toke */
+            /** @var Token $token */
             $token = $tradeble;
 
             return $token->getCrypto();
