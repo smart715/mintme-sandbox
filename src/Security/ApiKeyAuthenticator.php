@@ -56,6 +56,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             throw new BadCredentialsException();
         }
 
+        /** @var string $providerKey */
         return new PreAuthenticatedToken(
             'anon.',
             $credentials,

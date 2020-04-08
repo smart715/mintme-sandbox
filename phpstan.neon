@@ -23,11 +23,12 @@ parameters:
     excludes_analyse:
         - "%rootDir%/../../../src/Migrations/*"
         - "%rootDir%/../../../src/Validator/Constraints/*"
+        - "%rootDir%/../../../tests/Command/UpdateDisposableEmailDomainsTest.php"
+        - "%rootDir%/../../../tests/Command/Blacklist/SynchronizeTokenBlacklistTest.php"
 
     autoload_files:
         - vendor/bin/.phpunit/phpunit-7.5-0/vendor/autoload.php
 
     ignoreErrors:
-        - '#Cannot call method (.*) on (.*)\|null\.#'
         - '#Method (.*)Repository\(\) should return (.*)Repository but returns (.*).#'
         - '#Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface::section\(\)\.#'
