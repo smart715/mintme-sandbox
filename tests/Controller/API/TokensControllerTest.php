@@ -237,7 +237,7 @@ class TokensControllerTest extends WebTestCase
         $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
-        /** @var Token $tokem */
+        /** @var Token $token */
         $token = $this->getToken($tokName);
 
         $user = $token->getProfile()->getUser();
@@ -252,7 +252,7 @@ class TokensControllerTest extends WebTestCase
             'code' => '123456',
         ]);
 
-        /** @var Token $tokem */
+        /** @var Token $token */
         $token = $this->getToken($tokName);
 
         $this->assertNull($token);
