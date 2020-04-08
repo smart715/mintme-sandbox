@@ -97,7 +97,7 @@ class User extends BaseUser implements
 
     /**
      * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist", "remove"})
-     * @var GoogleAuthenticatorEntry
+     * @var GoogleAuthenticatorEntry|null
      */
     protected $googleAuthenticatorEntry;
 
@@ -271,8 +271,10 @@ class User extends BaseUser implements
 
     public function isBackupCode(string $code): bool
     {
-        return null !== $this->googleAuthenticatorEntry
-            ? in_array($code, $this->googleAuthenticatorEntry->getBackupCodes())
+        $googleAuth = $this->googleAuthenticatorEntry;
+
+        return null !== $googleAuth
+            ? in_array($code, $googleAuth->getBackupCodes())
             : false;
     }
 
@@ -286,7 +288,9 @@ class User extends BaseUser implements
 
     public function getGoogleAuthenticatorBackupCodes(): array
     {
-        return null !== $this->googleAuthenticatorEntry ? $$this->googleAuthenticatorEntry->getBackupCodes() : [];
+        $googleAuth = $this->googleAuthenticatorEntry;
+
+        return null !== $googleAuth ? $googleAuth->getBackupCodes() : [];
     }
 
     /** @codeCoverageIgnore */
