@@ -5,6 +5,7 @@ import TokenIntroductionDescription from './components/token/introduction/TokenI
 import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
+import Posts from './components/token/posts/Posts';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
 
@@ -27,6 +28,7 @@ new Vue({
     TokenName,
     TokenDeployIcon,
     TopHolders,
+    Posts,
   },
   methods: {
     descriptionUpdated: function(val) {
