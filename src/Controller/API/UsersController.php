@@ -14,9 +14,11 @@ use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-use FOS\RestBundle\View\View;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,14 +35,22 @@ class UsersController extends AbstractFOSRestController
     /** @var UserActionLogger */
     private $userActionLogger;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /** @var ClientManager */
     private $clientManager;
 
-    public function __construct(UserManagerInterface $userManager, UserActionLogger $userActionLogger, ClientManager $clientManager)
-    {
+    public function __construct(
+        UserManagerInterface $userManager,
+        UserActionLogger $userActionLogger,
+        ClientManager $clientManager,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->userManager = $userManager;
         $this->userActionLogger = $userActionLogger;
         $this->clientManager = $clientManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -162,7 +172,7 @@ class UsersController extends AbstractFOSRestController
      * @Rest\RequestParam(name="plainPassword", nullable=false)
      * @Rest\RequestParam(name="code", nullable=true)
      */
-    public function changePassOnTwofaActive(Request $request): View
+    public function changePassOnTwofaActive(Request $request): Response
     {
         $user = $this->getUser();
 
@@ -175,10 +185,7 @@ class UsersController extends AbstractFOSRestController
             'csrf_protection' => false,
             'allow_extra_fields' => true,
         ]);
-            
-        $this->userManager->updatePassword($user);
-        $this->userManager->updateUser($user);
-                            
+                                                
         $passwordForm->submit(array_filter($changePasswordData, function ($value) {
             return null !== $value;
         }), false);
@@ -197,7 +204,17 @@ class UsersController extends AbstractFOSRestController
             throw new ApiBadRequestException('Invalid argument');
         }
 
-        return $this->view(Response::HTTP_ACCEPTED);
+        $this->userManager->updatePassword($user);
+        $this->userManager->updateUser($user);
+        $response = new Response(Response::HTTP_ACCEPTED);
+        
+        $event = new FilterUserResponseEvent($user, $request, $response);
+        $this->eventDispatcher->dispatch(
+            FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
+            $event
+        );
+
+        return $response;
     }
 
     private function getEm(): ObjectManager
