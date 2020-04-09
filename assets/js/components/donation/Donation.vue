@@ -177,6 +177,9 @@ export default {
             donationInProgress: false,
         };
     },
+    created: function() {
+        this.debouncedCheck = _.debounce(this.checkDonation, 500);
+    },
     computed: {
         donationCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
@@ -276,16 +279,13 @@ export default {
             return this.checkInput(this.currencySubunit);
         },
         onKeyup: function() {
-            let self = this;
-            _.debounce(function() {
-                if (self.insufficientFunds || !self.isAmountValid) {
-                    return;
-                }
-
-                self.checkDonation();
-            }, 500)();
+            this.debouncedCheck();
         },
         checkDonation: function() {
+            if (this.insufficientFunds || !this.isAmountValid) {
+                return;
+            }
+
             this.donationChecking = true;
 
             // TODO: remove debug code from file after first test.

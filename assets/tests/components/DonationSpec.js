@@ -328,6 +328,10 @@ describe('Donation', () => {
                         symbol: 'TOK00011122233',
                     },
                 },
+                donationParams: {
+                    minBtcAmount: '0.000001',
+                    minWebAmount: '0.0001',
+                },
             },
         });
 
@@ -401,6 +405,10 @@ describe('Donation', () => {
                     quote: {
                         symbol: 'TOK3333322221111',
                     },
+                },
+                donationParams: {
+                    minBtcAmount: '0.000001',
+                    minWebAmount: '0.0001',
                 },
             },
         });
