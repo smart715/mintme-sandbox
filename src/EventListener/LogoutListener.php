@@ -33,7 +33,7 @@ class LogoutListener implements LogoutHandlerInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
-     * @return mixed
+     * @return void
      */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {

@@ -20,11 +20,11 @@ class SonataClassificationContext extends BaseContext
      * // Serializer\Groups(groups={"sonata_api_read", "sonata_api_write", "sonata_search"})
      */
 
-    /** @var string|int */
+    /** @var string */
     protected $id;
 
     /**
-     * @return int|string
+     * @return string
      */
     public function getId()
     {

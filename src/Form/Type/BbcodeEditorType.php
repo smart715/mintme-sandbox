@@ -10,7 +10,7 @@ class BbcodeEditorType extends AbstractType
 {
     /**
      * @param OptionsResolver $resolver
-     * @return mixed
+     * @return void
      */
     public function configureOptions(OptionsResolver $resolver)
     {

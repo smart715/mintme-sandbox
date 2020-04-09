@@ -25,11 +25,11 @@ class Context extends BaseContext
      * @Serializer\SerializedName("id")
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
-     * @var string|null
+     * @var int|null
      */
     protected $id;
 
-    public function getId(): string
+    public function getId(): ?int
     {
         return $this->id;
     }

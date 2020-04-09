@@ -58,8 +58,9 @@ class UsersController extends AbstractFOSRestController
     /**
      * @Rest\View(statusCode=201)
      * @Rest\Post("/keys", name="post_keys", options={"expose"=true})
+     * @return ApiKey|null
      */
-    public function createApiKeys(): ApiKey
+    public function createApiKeys(): ?ApiKey
     {
 
         $user = $this->getUser();

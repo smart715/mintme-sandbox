@@ -69,7 +69,7 @@ class KernelSubscriber implements EventSubscriberInterface
         }
 
         if (is_object($this->tokenStorage->getToken()) &&
-            is_object($this->tokenStorage->getToken()->getUser()) &&
+            ($this->tokenStorage->getToken()->getUser() instanceof User) &&
             !$request->getRequest()->isXmlHttpRequest()
         ) {
             /** @var User $user */
