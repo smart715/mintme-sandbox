@@ -12,14 +12,11 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/airdrop_campaign")
- * @Security(expression="is_granted('prelaunch')")
  */
 class AirdropCampaignController extends AbstractFOSRestController
 {
@@ -114,6 +111,10 @@ class AirdropCampaignController extends AbstractFOSRestController
      */
     public function claimAirdropCampaign(string $tokenName): View
     {
+        if (!$this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         $token = $this->fetchToken($tokenName, false, true);
 
         if (!$token->getActiveAirdrop()) {
@@ -133,10 +134,10 @@ class AirdropCampaignController extends AbstractFOSRestController
         bool $checkIfOwner = false,
         bool $checkIfParticipant = false
     ): Token {
-        /** @var Token $token */
+        /** @var Token|null $token */
         $token = $this->tokenManager->findByName($tokenName);
 
-        if (!$token instanceof Token) {
+        if (!$token) {
             throw $this->createNotFoundException('Token does not exist.');
         }
 

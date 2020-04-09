@@ -296,7 +296,7 @@ export default {
                 ? event.clipboardData.getData('text')
                 : String.fromCharCode(!event.charCode ? event.which : event.charCode);
 
-            if (precision === false) {
+            if (false === precision) {
                 regex = new RegExp(`^[0-9]{0,8}?$`);
             }
 
@@ -311,7 +311,6 @@ export default {
     beforeDestroy() {
         if (!this.hasAirdropCampaign && this.airdropCampaignRemoved) {
             location.reload();
-            return;
         }
     },
 };

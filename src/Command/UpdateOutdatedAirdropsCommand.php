@@ -27,9 +27,7 @@ class UpdateOutdatedAirdropsCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setDescription('Update outdated airdrops status.')
-        ;
+        $this->setDescription('Update outdated airdrops status.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): void

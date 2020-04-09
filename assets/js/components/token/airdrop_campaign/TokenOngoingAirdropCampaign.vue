@@ -85,9 +85,7 @@ export default {
     },
     computed: {
         actualParticipants: function() {
-            return this.airdropCampaign.actualParticipants
-                ? this.airdropCampaign.actualParticipants
-                : 0;
+            return this.airdropCampaign.actualParticipants || 0;
         },
         airdropReward: function() {
             if (this.loaded) {
@@ -186,7 +184,6 @@ export default {
         modalOnCancel: function() {
             if (!this.loggedIn) {
                 window.location.replace(this.signupUrl);
-                return;
             }
         },
     },
