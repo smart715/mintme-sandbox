@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\RefererTrait;
 use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\CaptchaLoginType;
 use App\Logger\UserActionLogger;
@@ -17,6 +18,9 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class SecurityController extends FOSSecurityController
 {
+
+    use RefererTrait;
+
     /** @var ContainerInterface $container */
     protected $container;
 
@@ -56,7 +60,7 @@ class SecurityController extends FOSSecurityController
 
         $refers = $request->headers->get('Referer');
 
-        if (!empty($refers) && $refers !== $this->generateUrl('login', [], UrlGeneratorInterface::ABSOLUTE_URL)) {
+        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
             $this->session->set('login_referer', $refers);
         }
 
@@ -92,6 +96,12 @@ class SecurityController extends FOSSecurityController
             $this->session->remove('login_referer');
 
             return $this->redirectToRoute($refererRoute);
+        }
+
+        if ($referer && $this->isRefererValid($referer)) {
+            $this->session->remove('login_referer');
+
+            return $this->redirect($referer);
         }
 
         return $prelaunchConfig->isFinished()
