@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Exchange\Trade\Config\PrelaunchConfig;
+use App\Controller\Traits\RefererTrait;
 use App\Form\CaptchaLoginType;
 use App\Logger\UserActionLogger;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
@@ -17,9 +17,8 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class SecurityController extends FOSSecurityController
 {
-    public const ALLOWED_REFERER_ROUTES = [
-        'token_show',
-    ];
+
+    use RefererTrait;
 
     /** @var ContainerInterface $container */
     protected $container;
@@ -64,7 +63,7 @@ class SecurityController extends FOSSecurityController
         $refers = $request->headers->get('Referer');
         $this->formContentOnly = $request->get('formContentOnly', false);
 
-        if (!empty($refers) && $refers !== $this->generateUrl('login', [], UrlGeneratorInterface::ABSOLUTE_URL)) {
+        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
             $this->session->set('login_referer', $refers);
         }
 
@@ -89,7 +88,7 @@ class SecurityController extends FOSSecurityController
     }
 
     /** @Route("/login_success", name="login_success") */
-    public function postLoginRedirectAction(PrelaunchConfig $prelaunchConfig): Response
+    public function postLoginRedirectAction(): Response
     {
         $this->userActionLogger->info('Log in');
 
@@ -103,12 +102,12 @@ class SecurityController extends FOSSecurityController
         }
 
         if ($referer && $this->isRefererValid($referer)) {
+            $this->session->remove('login_referer');
+
             return $this->redirect($referer);
         }
 
-        return $prelaunchConfig->isFinished()
-            ? $this->redirectToRoute("trading")
-            : $this->redirectToRoute("referral-program");
+        return $this->redirectToRoute("trading");
     }
 
     /**
@@ -124,16 +123,6 @@ class SecurityController extends FOSSecurityController
         return $this->render($template, array_merge($data, [
             'form' => $this->form->createView(),
         ]));
-    }
-
-    private function isRefererValid(string $pathInfo): bool
-    {
-        $refererRequest = Request::create($pathInfo);
-        $router = $this->get('router');
-        $pathData = $router->match($refererRequest->getPathInfo());
-        $routeName = $pathData['_route'] ?? null;
-
-        return in_array($routeName, self::ALLOWED_REFERER_ROUTES);
     }
 
     private function refererMappings(): array
