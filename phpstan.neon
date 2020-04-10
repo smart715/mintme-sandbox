@@ -30,5 +30,6 @@ parameters:
         - vendor/bin/.phpunit/phpunit-7.5-0/vendor/autoload.php
 
     ignoreErrors:
+        - '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
         - '#Method (.*)Repository\(\) should return (.*)Repository but returns (.*).#'
         - '#Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface::section\(\)\.#'

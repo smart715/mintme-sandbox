@@ -130,7 +130,8 @@ class RegistrationController extends FOSRegistrationController
         $user->setEnabled(true);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch($event);
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_INITIALIZE);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -143,7 +144,8 @@ class RegistrationController extends FOSRegistrationController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 $event = new FormEvent($form, $request);
-                $this->eventDispatcher->dispatch($event);
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
 
                 $this->userManager->updateUser($user);
 
@@ -167,15 +169,18 @@ class RegistrationController extends FOSRegistrationController
                     $response = $event->getResponse();
                 }
 
+                /** @psalm-suppress TooManyArguments */
                 $this->eventDispatcher->dispatch(
-                    new FilterUserResponseEvent($user, $request, $response)
+                    new FilterUserResponseEvent($user, $request, $response),
+                    FOSUserEvents::REGISTRATION_COMPLETED
                 );
 
                 return $response;
             }
 
             $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch($event);
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_FAILURE);
 
             if (null !== $response = $event->getResponse()) {
                 return $response;

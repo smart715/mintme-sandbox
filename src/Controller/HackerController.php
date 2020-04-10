@@ -166,28 +166,35 @@ class HackerController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        $url      = $this->generateUrl('fos_user_registration_confirmed');
+        $url = $this->generateUrl('fos_user_registration_confirmed');
         $response = new RedirectResponse($url);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch($event);
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_INITIALIZE);
 
         $event = new FormEvent($this->createForm(RegistrationType::class, $user), $request);
-        $this->eventDispatcher->dispatch($event);
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
 
+        /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            new FilterUserResponseEvent($user, $request, $response)
+            new FilterUserResponseEvent($user, $request, $response),
+            FOSUserEvents::REGISTRATION_COMPLETED
         );
 
         $user->setEnabled(true);
         $user->setConfirmationToken(null);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch($event);
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_CONFIRM);
         $userManager->updateUser($user);
 
+        /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            new FilterUserResponseEvent($user, $request, $response)
+            new FilterUserResponseEvent($user, $request, $response),
+            FOSUserEvents::REGISTRATION_CONFIRMED
         );
 
         return $response;
