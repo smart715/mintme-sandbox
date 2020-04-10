@@ -23,10 +23,7 @@ class SonataClassificationContext extends BaseContext
     /** @var string */
     protected $id;
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }

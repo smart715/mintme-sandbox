@@ -29,13 +29,7 @@ class LogoutListener implements LogoutHandlerInterface
         $this->session              = $session;
     }
 
-    /**
-     * @param Request        $request
-     * @param Response       $response
-     * @param TokenInterface $token
-     * @return void
-     */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    public function logout(Request $request, Response $response, TokenInterface $token): void
     {
         $this->userActionLogger->info('Logout');
 
