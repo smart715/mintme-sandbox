@@ -47,9 +47,6 @@ class Trader implements TraderInterface
     /** @var float */
     private $referralFee;
 
-    /** @var string */
-    private $prelaunchFinishDatetime;
-
     public function __construct(
         TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
@@ -58,8 +55,7 @@ class Trader implements TraderInterface
         MarketNameConverterInterface $marketNameConverter,
         NormalizerInterface $normalizer,
         LoggerInterface $logger,
-        float $referralFee,
-        string $prelaunchFinishDatetime
+        float $referralFee
     ) {
         $this->fetcher = $fetcher;
         $this->config = $config;
@@ -69,7 +65,6 @@ class Trader implements TraderInterface
         $this->normalizer = $normalizer;
         $this->logger = $logger;
         $this->referralFee = $referralFee;
-        $this->prelaunchFinishDatetime = $prelaunchFinishDatetime;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -82,8 +77,8 @@ class Trader implements TraderInterface
             $this->moneyWrapper->format($order->getPrice()),
             (string)$this->config->getTakerFeeRate(),
             (string)$this->config->getMakerFeeRate(),
-            $this->isReferralFeeEnabled() ? $order->getReferralId() : 0,
-            $this->isReferralFeeEnabled() ? (string)$this->referralFee : '0'
+            $order->getReferralId() ?: 0,
+            (string)$this->referralFee
         );
 
         $quote = $order->getMarket()->getQuote();
@@ -169,14 +164,6 @@ class Trader implements TraderInterface
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $records);
-    }
-
-    private function isReferralFeeEnabled(): bool
-    {
-        /** @var \DateTimeImmutable $prelaunchFinishDate */
-        $prelaunchFinishDate = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $this->prelaunchFinishDatetime);
-
-        return !($prelaunchFinishDate->getTimestamp() > time());
     }
 
     private function updateUserTokenReferrencer(User $user, Token $token): void

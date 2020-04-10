@@ -45,8 +45,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -83,8 +82,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -98,47 +96,6 @@ class TraderTest extends TestCase
 
         $trader->placeOrder(
             $this->mockOrder($user, 1, 100, 50, 2, $this->mockMarket(
-                $this->mockToken('FOO', false),
-                $quote
-            ))
-        );
-    }
-
-    public function testPlaceOrderForTokenAndForUserWithReferencerAndActivePrelaunch(): void
-    {
-        $trader = $this->mockTraderFetcher();
-        $trader->expects($this->once())
-            ->method('placeOrder')
-            ->with(2, 'BARFOO', 1, 100, 50, 2, 1, 0, '0')
-            ->willReturn(
-                $this->mockTradeResult(
-                    TradeResult::SUCCESS
-                )
-            );
-
-        $trader = new Trader(
-            $trader,
-            $this->mockLimitOrderConfig(1, 2),
-            $this->mockEm($this->exactly(2)),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            date('Y-m-d H:i:s', strtotime('+2 months'))
-        );
-
-        $quote = $this->mockToken('BAR', true);
-
-        $referrencer = $this->mockUser(1);
-        $user = $this->mockUser(2);
-        $user->method('getReferrencer')->willReturn($referrencer);
-
-        $user->expects($this->once())->method('addToken');
-        $referrencer->expects($this->once())->method('addToken');
-
-        $trader->placeOrder(
-            $this->mockOrder($user, 1, 100, 50, 25, $this->mockMarket(
                 $this->mockToken('FOO', false),
                 $quote
             ))
@@ -165,8 +122,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $quote = $this->mockToken('BAR', false);
@@ -202,8 +158,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -240,8 +195,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $trader->cancelOrder(
@@ -272,8 +226,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $trader->cancelOrder(
@@ -308,8 +261,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $user = $this->mockUser(2);
@@ -362,8 +314,7 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5,
-            '2019-04-01 10:00:00'
+            0.5
         );
 
         $user = $this->mockUser(2);

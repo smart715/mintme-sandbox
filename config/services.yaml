@@ -279,7 +279,6 @@ services:
         arguments:
             $logger: '@logger'
             $referralFee: '%referral_fee%'
-            $prelaunchFinishDatetime: '%prelaunch_finish_datetime%'
         tags:
             - { name: monolog.logger, channel: exchange }
 
