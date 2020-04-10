@@ -78,7 +78,7 @@ class Trader implements TraderInterface
             (string)$this->config->getTakerFeeRate(),
             (string)$this->config->getMakerFeeRate(),
             $order->getReferralId() ?: 0,
-            (string)$this->referralFee
+            $this->referralFee ? (string)$this->referralFee : '0'
         );
 
         $quote = $order->getMarket()->getQuote();
