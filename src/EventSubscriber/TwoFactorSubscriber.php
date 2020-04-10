@@ -77,6 +77,7 @@ class TwoFactorSubscriber implements EventSubscriberInterface
             throw new UnauthorizedHttpException("2fa", "Invalid user");
         }
 
+        /** @psalm-suppress UndefinedDocblockClass */
         $user = $token->getUser();
 
         if (!$user instanceof User) {

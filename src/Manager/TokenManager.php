@@ -182,6 +182,7 @@ class TokenManager implements TokenManagerInterface
     {
         $token = $this->storage->getToken();
 
+        /** @psalm-suppress UndefinedDocblockClass */
         return $token
             ? $token->getUser()
             : null;
