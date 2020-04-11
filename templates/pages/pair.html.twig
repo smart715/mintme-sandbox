@@ -68,6 +68,11 @@
                         </trade>
                     </b-tab>
                 {% endif %}
+                {% if isTokenPage %}
+                    <b-tab title="Posts" {% if tab == 'posts' %} {{ 'active' }} {% endif %}>
+                        <posts class="col-12 col-lg-8" />
+                    </b-tab>
+                {% endif %}
                 <template slot="tabs-end">
                     {% if isTokenPage %}
                         {% if token is defined %}
