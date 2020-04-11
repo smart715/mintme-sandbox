@@ -171,8 +171,9 @@ class UsersController extends AbstractFOSRestController
      * @Rest\RequestParam(name="current_password", nullable=false)
      * @Rest\RequestParam(name="plainPassword", nullable=false)
      * @Rest\RequestParam(name="code", nullable=true)
+     * @throws ApiBadRequestException
      */
-    public function changePassOnTwofaActive(Request $request): Response
+    public function changePassOnTwoFaActive(Request $request): Response
     {
         $user = $this->getUser();
 
@@ -180,34 +181,16 @@ class UsersController extends AbstractFOSRestController
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
-        $changePasswordData = $request->request->all();
-        $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
-            'csrf_protection' => false,
-            'allow_extra_fields' => true,
-        ]);
-                                                
-        $passwordForm->submit(array_filter($changePasswordData, function ($value) {
-            return null !== $value;
-        }), false);
+        $errorOnPasswordForm = $this->matchPasswords($request, $user);
 
-        if (!$passwordForm->isValid()) {
-            foreach ($passwordForm->all() as $childForm) {
-
-                /** @var FormError[] $fieldErrors */
-                $fieldErrors = $passwordForm->get($childForm->getName())->getErrors();
-
-                if (count($fieldErrors) > 0) {
-                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
-                }
-            }
-
-            throw new ApiBadRequestException('Invalid argument');
+        if ($errorOnPasswordForm) {
+            throw new ApiBadRequestException($errorOnPasswordForm);
         }
 
         $this->userManager->updatePassword($user);
         $this->userManager->updateUser($user);
         $response = new Response(Response::HTTP_ACCEPTED);
-        
+
         $event = new FilterUserResponseEvent($user, $request, $response);
         $this->eventDispatcher->dispatch(
             FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
@@ -215,6 +198,62 @@ class UsersController extends AbstractFOSRestController
         );
 
         return $response;
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch(
+     *      "/settings/match-password",
+     *      name="match-password",
+     *      options={"expose"=true}
+     * )
+     * @Rest\RequestParam(name="current_password", nullable=false)
+     * @Rest\RequestParam(name="plainPassword", nullable=false)
+     * @throws ApiBadRequestException
+     */
+    public function checkMatchPasswords(Request $request): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
+        $errorOnPasswordForm = $this->matchPasswords($request, $user);
+
+        if ($errorOnPasswordForm) {
+            throw new ApiBadRequestException($errorOnPasswordForm);
+        }
+
+        return new Response(Response::HTTP_ACCEPTED);
+    }
+
+    private function matchPasswords(Request $request, User $user): ?string
+    {
+        $changePasswordData = $request->request->all();
+        $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+
+        $passwordForm->submit(array_filter($changePasswordData, function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$passwordForm->isValid()) {
+            foreach ($passwordForm->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $passwordForm->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    return $fieldErrors[0]->getMessage();
+                }
+            }
+
+            return 'Invalid Argument';
+        }
+
+        return null;
     }
 
     private function getEm(): ObjectManager

@@ -26,13 +26,44 @@ new Vue({
     methods: {
         onPrevent: function(e) {
             e.preventDefault();
-            this.twoFaVisisble = true;
+            this.matchPasswords();
         },
         clearInputs: function() {
             this.current_password = '';
             this.password = '';
         },
-        doCodeVerify: function(code = '') {
+        matchPasswords: function () {
+            this.disabled = true;
+            let customError = document.getElementById('custom-error');
+
+            if (customError!== null) {
+                customError.remove();
+            }
+            this.$axios.single.patch(this.$routing.generate('match-password'), {
+                current_password: this.current_password,
+                plainPassword: this.password,
+            })
+                .then(() => {
+                    this.disabled = false;
+                    this.twoFaVisisble = true;
+                }, (error) => {
+                    this.disabled = false;
+                    if (!error.response) {
+                        this.notifyError('Network error');
+                    } else if (error.response.data.message) {
+                        let currentPasswordInput = document.getElementById('app_user_change_password_current_password');
+                        let html_to_insert = '<div id="custom-error" class="py-2 mb-2 bg-danger text-white text-center">' +
+                                                '<ul class="pl-3 pr-3 m-0 list-unstyled">' +
+                                                    '<li>The entered password is invalid.</li>' +
+                                                '</ul>' +
+                                             '</div>';
+                        currentPasswordInput.insertAdjacentHTML('beforebegin', html_to_insert);
+                    } else {
+                        this.notifyError('An error has occurred, please try again later');
+                    }
+                });
+        },
+        doChangePassword: function(code = '') {
             this.$axios.single.patch(this.$routing.generate('update-password'), {
                 current_password: this.current_password,
                 plainPassword: this.password,
