@@ -138,6 +138,9 @@ export default {
         this.updateTableData();
     },
     methods: {
+        sortCompared: function(a, b, key) {
+            return this.$sortCompare(a, b, key);
+        },
         addDetailsForEmptyMessageToHistory: function(historyData) {
             if (0 === historyData.length) {
                 historyData.push({_showDetails: true});
