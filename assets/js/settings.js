@@ -32,7 +32,7 @@ new Vue({
             this.current_password = '';
             this.password = '';
         },
-        matchPasswords: function () {
+        matchPasswords: function() {
             this.disabled = true;
             let customError = document.getElementById('custom-error');
 
@@ -52,12 +52,12 @@ new Vue({
                         this.notifyError('Network error');
                     } else if (error.response.data.message) {
                         let currentPasswordInput = document.getElementById('app_user_change_password_current_password');
-                        let html_to_insert = '<div id="custom-error" class="py-2 mb-2 bg-danger text-white text-center">' +
+                        let error = '<div id="custom-error" class="py-2 mb-2 bg-danger text-white text-center">' +
                                                 '<ul class="pl-3 pr-3 m-0 list-unstyled">' +
                                                     '<li>The entered password is invalid.</li>' +
                                                 '</ul>' +
                                              '</div>';
-                        currentPasswordInput.insertAdjacentHTML('beforebegin', html_to_insert);
+                        currentPasswordInput.insertAdjacentHTML('beforebegin', error);
                     } else {
                         this.notifyError('An error has occurred, please try again later');
                     }
