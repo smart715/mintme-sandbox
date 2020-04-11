@@ -5,8 +5,13 @@
             <b-table
                 thead-class="trading-head"
                 :items="sanitizedHistory"
-                :fields="fields"
+                :fields="fieldsArray"
+                :sort-compare="sortCompared"
+                :sort-by="fields.date.key"
+                :sort-desc="true"
+                sort-direction="desc"
                 :class="{'empty-table': noHistory}"
+                sort-icon-left
             >
                 <template v-slot:cell(symbol)="data">
                     <a v-if="data.item.symbol.length > 17" :href="rebrandingFunc(data.item.url)" class="text-white">
@@ -65,45 +70,52 @@ export default {
     components: {CopyLink},
     data() {
         return {
-            fields: [
-                {
+            fields: {
+                date: {
                     key: 'date',
                     label: 'Date',
                     sortable: true,
+                    type: 'date',
                 },
-                {
+                type: {
                     key: 'type',
                     label: 'Type',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                symbol: {
                     key: 'symbol',
                     label: 'Name',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                toAddress: {
                     key: 'toAddress',
                     label: 'Address',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                amount: {
                     key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                status: {
                     key: 'status',
                     label: 'Status',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                fee: {
                     key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-            ],
+            },
             tableData: null,
             currentPage: 1,
         };
@@ -118,11 +130,17 @@ export default {
         loaded: function() {
             return this.tableData !== null;
         },
+        fieldsArray: function() {
+            return Object.values(this.fields);
+        },
     },
     mounted: function() {
         this.updateTableData();
     },
     methods: {
+        sortCompared: function(a, b, key) {
+            return this.$sortCompare(a, b, key);
+        },
         addDetailsForEmptyMessageToHistory: function(historyData) {
             if (0 === historyData.length) {
                 historyData.push({_showDetails: true});

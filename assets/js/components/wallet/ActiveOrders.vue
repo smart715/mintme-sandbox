@@ -1,22 +1,24 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table" v-if="hasOrders">
+            <div class="table-responsive table-restricted" ref="table">
                 <b-table
                     thead-class="trading-head"
                     ref="btable"
                     v-if="hasOrders"
                     :items="history"
-                    :fields="fields">
+                    :fields="fieldsArray"
+                    :sort-compare="sortCompared"
+                    :sort-by="fields.date.key"
+                    :sort-desc="true"
+                    sort-direction="desc"
+                    sort-icon-left
+                    no-sort-reset
+                >
                     <template v-slot:cell(name)="row">
-                        <div v-if="row.value.full.length > 17" v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
+                        <div v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}">
                             <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.truncate | rebranding }}
-                            </a>
-                        </div>
-                        <div v-else>
-                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.full | rebranding }}
+                                {{ row.value.truncate|rebranding }}
                             </a>
                         </div>
                     </template>
@@ -26,19 +28,19 @@
                         </a>
                     </template>
                 </b-table>
+                <div v-if="!hasOrders">
+                    <p class="text-center p-5">No order was added yet</p>
+                </div>
             </div>
             <div v-if="loading" class="p-1 text-center">
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-            </div>
-            <div v-else-if="!hasOrders">
-                <p class="text-center p-5">No order was added yet</p>
             </div>
             <confirm-modal
                     :visible="confirmModal"
                     @close="switchConfirmModal(false)"
                     @confirm="removeOrder"
             >
-                <div class="pt-2 overflow-wrap-break-word">
+                <div class="pt-2">
                     Are you sure that you want to remove {{ this.currentRow.name }}
                     with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
                 </div>
@@ -78,12 +80,8 @@ export default {
         LoggerMixin,
         PairNameMixin,
     ],
-    components: {
-        ConfirmModal,
-    },
-    props: {
-        userId: Number,
-    },
+    components: {ConfirmModal},
+    props: {userId: Number},
     data() {
         return {
             markets: null,
@@ -95,36 +93,58 @@ export default {
             tokenName: null,
             amount: null,
             price: null,
-            fields: [
-                {key: 'date', label: 'Date', sortable: true},
-                {key: 'type', label: 'Type', sortable: true},
-                {
+            fields: {
+                date: {
+                    key: 'date',
+                    label: 'Date',
+                    sortable: true,
+                    type: 'date',
+                },
+                type: {
+                    key: 'type',
+                    label: 'Type',
+                    sortable: true,
+                    type: 'string',
+                },
+                name: {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
                     formatter: (name) => {
                         return {
                             full: name,
-                            truncate: this.truncateFunc(name, 17),
+                            truncate: this.truncateFunc(name, 7),
                         };
                     },
+                    type: 'string',
                 },
-                {key: 'amount', label: 'Amount', sortable: true},
-                {
+                amount: {
+                    key: 'amount',
+                    label: 'Amount',
+                    sortable: true,
+                    type: 'numeric',
+                },
+                price: {
                     key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                total: {
                     key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {key: 'fee', label: 'Fee', sortable: true},
-                {key: 'action', label: 'Action', sortable: false},
-            ],
+                fee: {key: 'fee', label: 'Fee', sortable: true, type: 'numeric'},
+                action: {
+                    key: 'action',
+                    label: 'Action',
+                    sortable: false,
+                },
+            },
         };
     },
     computed: {
@@ -139,6 +159,9 @@ export default {
         },
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
         history: function() {
             return this.tableData.map((order) => {
@@ -192,6 +215,9 @@ export default {
             });
     },
     methods: {
+        sortCompared: function(a, b, key) {
+            return this.$sortCompare(a, b, key);
+        },
         updateTableData: function() {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('orders', {page: this.currentPage}))
