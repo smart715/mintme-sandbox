@@ -3,7 +3,6 @@ import {GENERAL} from './utils/constants';
 
 const tableSortPlugin = {
     install(Vue, options) {
-<<<<<<< HEAD
         Vue.prototype.$sortCompare = function (fields){
             return function (a, b, key) {
                 switch (fields[key].type) {
@@ -14,16 +13,6 @@ const tableSortPlugin = {
                     case 'numeric':
                         return Vue.prototype.$numericCompare(a[key], b[key]);
                 }
-=======
-        Vue.prototype.$sortCompare = function(a, b, key) {
-            switch (this.fields[key].type) {
-                case 'date':
-                    return Vue.prototype.$dateCompare(a[key], b[key]);
-                case 'string':
-                    return a[key].localeCompare(b[key]);
-                case 'numeric':
-                    return Vue.prototype.$numericCompare(a[key], b[key]);
->>>>>>> 13ef851d8180931ec7c7a6880a193d3525e6b720
             }
         },
         Vue.prototype.$numericCompare = function(a, b) {
