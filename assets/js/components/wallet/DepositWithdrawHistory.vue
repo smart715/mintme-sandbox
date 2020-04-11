@@ -6,7 +6,7 @@
                 thead-class="trading-head"
                 :items="sanitizedHistory"
                 :fields="fieldsArray"
-                :sort-compare="sortCompared"
+                :sort-compare="$sortCompare(fields)"
                 :sort-by="fields.date.key"
                 :sort-desc="true"
                 sort-direction="desc"
@@ -138,9 +138,6 @@ export default {
         this.updateTableData();
     },
     methods: {
-        sortCompared: function(a, b, key) {
-            return this.$sortCompare(a, b, key);
-        },
         addDetailsForEmptyMessageToHistory: function(historyData) {
             if (0 === historyData.length) {
                 historyData.push({_showDetails: true});
