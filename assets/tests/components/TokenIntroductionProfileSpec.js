@@ -80,21 +80,6 @@ describe('TokenIntroductionProfile', () => {
         expect(wrapper.vm.isTokenDeployed).to.be.false;
     });
 
-    it('should watch for editingUrls data', (done) => {
-        const wrapper = shallowMount(TokenIntroductionProfile, objectForTestCorrectlyMouning);
-        wrapper.vm.editingUrls = true;
-        wrapper.vm.editingDiscord = true;
-        wrapper.vm.editingTelegram = true;
-        wrapper.vm.editingWebsite = true;
-
-        Vue.nextTick(() => {
-            expect(wrapper.vm.editingDiscord).to.be.false;
-            expect(wrapper.vm.editingTelegram).to.be.false;
-            expect(wrapper.vm.editingWebsite).to.be.false;
-            done();
-        });
-    });
-
     it('should set currentWebsite correctly when the function saveWebsite() is called', () => {
         const wrapper = shallowMount(TokenIntroductionProfile, objectForTestCorrectlyMouning);
         wrapper.vm.saveWebsite('foo');
