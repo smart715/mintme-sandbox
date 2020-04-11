@@ -23,7 +23,6 @@
                             {{ form_start(passwordForm) }}
                         {% endif %}
                                 {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off', 'v-model': 'current_password'}}) }}
-                                <div v-html="error"></div>
                                 <passwordmeter :password="password" @toggle-error="toggleError">
                                     <span @click="togglePassword()" class="show-password">
                                         <i class="far fa-eye"></i>
