@@ -8,7 +8,7 @@
                     v-if="hasOrders"
                     :items="history"
                     :fields="fieldsArray"
-                    :sort-compare="sortCompared"
+                    :sort-compare="$sortCompare(fields)"
                     :sort-by="fields.date.key"
                     :sort-desc="true"
                     sort-direction="desc"
@@ -215,9 +215,6 @@ export default {
             });
     },
     methods: {
-        sortCompared: function(a, b, key) {
-            return this.$sortCompare(a, b, key);
-        },
         updateTableData: function() {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('orders', {page: this.currentPage}))

@@ -6,7 +6,7 @@
                     thead-class="trading-head"
                     :items="history"
                     :fields="fieldsArray"
-                    :sort-compare="sortCompare"
+                    :sort-compare="$sortCompare(fields)"
                     :sort-by="fields.date.key"
                     :sort-desc="true"
                     sort-direction="desc"
@@ -156,9 +156,6 @@ export default {
         this.updateTableData();
     },
     methods: {
-        sortCompare: function(a, b, key) {
-            return this.$sortCompare(a, b, key);
-        },
         updateTableData: function() {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
