@@ -42,10 +42,15 @@
                     type="text"
                     v-model="tokensAmount"
                     :disabled="hasAirdropCampaign"
-                    class="token-name-input w-100 px-2"
+                    class="form-control token-name-input w-100 px-2"
                     @keypress="checkInput(precision)"
                     @paste="checkInput(precision)"
+                    autocomplete="off"
                 >
+                <div v-show="!isAmountValid" class="w-100 mt-1 text-danger">
+                    Minimum amount of {{ tokenName }} {{ minTokensAmount }}, limit
+                    {{ tokenBalance | toMoney(precision, false) | formatMoney }}.
+                </div>
             </div>
             <div class="col-12 pb-3 px-0">
                 <label for="participantsAmount" class="d-block text-left">
@@ -56,10 +61,14 @@
                     type="text"
                     v-model="participantsAmount"
                     :disabled="hasAirdropCampaign"
-                    class="token-name-input w-100 px-2"
+                    class="form-control token-name-input w-100 px-2"
                     @keypress="checkInput(false)"
                     @paste="checkInput(false)"
+                    autocomplete="off"
                 >
+                <div v-show="!isParticipantsAmountValid" class="w-100 mt-1 text-danger">
+                    Minimum amount of participants {{ minParticipantsAmount }}, limit {{ maxParticipantsAmount }}.
+                </div>
             </div>
             <div v-if="!hasAirdropCampaign" class="col-12 pb-3 px-0">
                 <label class="custom-control custom-checkbox pb-0">
@@ -92,7 +101,9 @@
                 </div>
             </b-collapse>
             <div class="col-12 px-0 clearfix">
-                <p>{{ errorMessage }}</p>
+                <div class="w-100 mb-3 text-danger">
+                    {{ errorMessage }}
+                </div>
                 <button
                     class="btn btn-primary float-left"
                     :disabled="btnDisabled"
@@ -110,12 +121,12 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
-import {LoggerMixin, NotificationMixin} from '../../../mixins';
+import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {TOK} from '../../../utils/constants';
 
 export default {
     name: 'TokenAirdropCampaign',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
     components: {
         datePicker,
         ConfirmModal,
@@ -131,6 +142,7 @@ export default {
             tokenBalance: 0,
             minTokensAmount: '0.01',
             minParticipantsAmount: 100,
+            maxParticipantsAmount: 999999,
             minTokenReward: '0.0001',
             loading: false,
             showEndDate: false,
@@ -162,13 +174,14 @@ export default {
                 let tokensAmount = new Decimal(this.tokensAmount);
 
                 return tokensAmount.greaterThanOrEqualTo(this.minTokensAmount)
-                    && tokensAmount.lessThan(this.tokenBalance);
+                    && tokensAmount.lessThanOrEqualTo(this.tokenBalance);
             }
 
             return false;
         },
         isParticipantsAmountValid: function() {
-            return this.participantsAmount >= this.minParticipantsAmount;
+            return this.participantsAmount >= this.minParticipantsAmount
+                && this.participantsAmount <= this.maxParticipantsAmount;
         },
         isDateEndValid: function() {
             return !this.showEndDate || this.isDateValid;
@@ -312,6 +325,13 @@ export default {
         if (!this.hasAirdropCampaign && this.airdropCampaignRemoved) {
             location.reload();
         }
+    },
+    watch: {
+        isRewardValid: function() {
+            if (this.isRewardValid && this.errorMessage) {
+                this.errorMessage = '';
+            }
+        },
     },
 };
 </script>

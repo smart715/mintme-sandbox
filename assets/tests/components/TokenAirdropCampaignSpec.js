@@ -74,6 +74,7 @@ describe('TokenAirdropCampaign', () => {
         wrapper.vm.tokensAmount = 100;
         expect(wrapper.vm.isAmountValid).to.be.false;
         wrapper.vm.tokenBalance = 101;
+        wrapper.vm.tokensAmount = 101;
         expect(wrapper.vm.isAmountValid).to.be.true;
     });
 
@@ -87,6 +88,10 @@ describe('TokenAirdropCampaign', () => {
         wrapper.vm.participantsAmount = 99;
         expect(wrapper.vm.isParticipantsAmountValid).to.be.false;
         wrapper.vm.participantsAmount = 100;
+        expect(wrapper.vm.isParticipantsAmountValid).to.be.true;
+        wrapper.vm.participantsAmount = 1000000;
+        expect(wrapper.vm.isParticipantsAmountValid).to.be.false;
+        wrapper.vm.participantsAmount = 999999;
         expect(wrapper.vm.isParticipantsAmountValid).to.be.true;
     });
 
