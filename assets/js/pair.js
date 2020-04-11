@@ -6,6 +6,7 @@ import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import Posts from './components/token/posts/Posts';
+import CreatePost from './components/token/posts/CreatePost';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
 
@@ -14,6 +15,7 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
+      tabs: ['intro', 'trade', 'posts'],
       tokenDescription: null,
       editingName: false,
       tokenName: null,
@@ -29,6 +31,7 @@ new Vue({
     TokenDeployIcon,
     TopHolders,
     Posts,
+    CreatePost,
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -40,7 +43,7 @@ new Vue({
         window.history.replaceState(
             {}, document.title, this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: i ? 'trade' : 'intro',
+              tab: this.tabs[i],
             })
         );
       }
