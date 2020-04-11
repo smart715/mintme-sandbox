@@ -8,11 +8,7 @@
                     v-if="hasOrders"
                     :items="history"
                     :fields="fieldsArray"
-<<<<<<< HEAD
                     :sort-compare="$sortCompare(fields)"
-=======
-                    :sort-compare="sortCompared"
->>>>>>> 13ef851d8180931ec7c7a6880a193d3525e6b720
                     :sort-by="fields.date.key"
                     :sort-desc="true"
                     sort-direction="desc"
@@ -121,7 +117,6 @@ export default {
                         };
                     },
                     type: 'string',
-<<<<<<< HEAD
                 },
                 amount: {
                     key: 'amount',
@@ -129,15 +124,6 @@ export default {
                     sortable: true,
                     type: 'numeric',
                 },
-=======
-                },
-                amount: {
-                    key: 'amount',
-                    label: 'Amount',
-                    sortable: true,
-                    type: 'numeric',
-                },
->>>>>>> 13ef851d8180931ec7c7a6880a193d3525e6b720
                 price: {
                     key: 'price',
                     label: 'Price',
@@ -229,9 +215,6 @@ export default {
             });
     },
     methods: {
-        sortCompared: function(a, b, key) {
-            return this.$sortCompare(a, b, key);
-        },
         updateTableData: function() {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('orders', {page: this.currentPage}))
