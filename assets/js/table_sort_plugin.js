@@ -3,8 +3,8 @@ import {GENERAL} from './utils/constants';
 
 const tableSortPlugin = {
     install(Vue, options) {
-        Vue.prototype.$sortCompare = function (fields){
-            return function (a, b, key) {
+        Vue.prototype.$sortCompare = function(fields) {
+            return function(a, b, key) {
                 switch (fields[key].type) {
                     case 'date':
                         return Vue.prototype.$dateCompare(a[key], b[key]);
@@ -13,7 +13,7 @@ const tableSortPlugin = {
                     case 'numeric':
                         return Vue.prototype.$numericCompare(a[key], b[key]);
                 }
-            }
+            };
         },
         Vue.prototype.$numericCompare = function(a, b) {
             a = parseFloat(a);
