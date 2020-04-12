@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UserController extends AbstractController
+class UserController extends AbstractController implements TwoFactorAuthenticatedController
 {
     /** @var UserManagerInterface */
     protected $userManager;
