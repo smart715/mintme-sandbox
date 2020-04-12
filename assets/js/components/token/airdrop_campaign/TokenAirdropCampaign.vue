@@ -246,7 +246,7 @@ export default {
                 };
 
             if (this.isDateValid) {
-                data.endDate = moment(this.endDate).toDate();
+                data.endDate = moment(this.endDate).utc().unix();
             }
 
             this.loading = true;

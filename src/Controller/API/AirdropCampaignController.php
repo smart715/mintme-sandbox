@@ -48,6 +48,22 @@ class AirdropCampaignController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{tokenName}/create", name="create_airdrop_campaign", options={"expose"=true})
+     * @Rest\RequestParam(
+     *     name="amount",
+     *     allowBlank=false,
+     *     description="Amount of tokens."
+     * )
+     * @Rest\RequestParam(
+     *     name="participants",
+     *     allowBlank=false,
+     *     description="Amount of participants."
+     * )
+     * @Rest\RequestParam(
+     *     name="endDate",
+     *     allowBlank=true,
+     *     nullable=true,
+     *     description="Airdrop campaign end date timestamp."
+     * )
      */
     public function createAirdropCampaign(
         string $tokenName,
@@ -70,7 +86,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         $endDate = $request->get('endDate')
-            ? new \DateTimeImmutable($request->get('endDate'))
+            ? (new \DateTimeImmutable())->setTimestamp($request->get('endDate'))
             : null;
 
         $airdrop = $this->airdropCampaignManager->createAirdrop(
