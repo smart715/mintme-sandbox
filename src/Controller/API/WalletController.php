@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Controller\TwoFactorAuthenticatedController;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
@@ -26,7 +27,7 @@ use Throwable;
  * @Rest\Route("/api/wallet")
  * @Security(expression="is_granted('prelaunch')")
  */
-class WalletController extends AbstractFOSRestController
+class WalletController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 100;
 
