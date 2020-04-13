@@ -288,13 +288,6 @@ export default {
 
             this.donationChecking = true;
 
-            // TODO: remove debug code from file after first test.
-            console.info(
-                'check_donation API, params:',
-                'market: ', this.market.base.symbol + '/' + this.market.quote.symbol,
-                'amount: ', this.amountToDonate
-            );
-
             this.$axios.retry.get(this.$routing.generate('check_donation', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
@@ -304,12 +297,6 @@ export default {
                 .then((res) => {
                     this.amountToReceive = res.data;
                     this.donationChecking = false;
-
-                    console.info(
-                        'check_donation API, result:',
-                        'amountToReceive (fake data, should be generated on viabtc side): ',
-                        this.amountToReceive
-                    );
                 })
                 .catch((err) => {
                     this.notifyError('Can not to calculate amount of tokens. Try again later.');
@@ -318,12 +305,6 @@ export default {
         },
         makeDonation: function() {
             this.donationInProgress = true;
-            console.info(
-                'make_donation API, params:',
-                'market: ', this.market.base.symbol + '/' + this.market.quote.symbol,
-                'amount: ', this.amountToDonate,
-                'expected_count_to_receive (fake data): ', this.amountToReceive
-            );
 
             this.$axios.single.post(this.$routing.generate('make_donation', {
                 base: this.market.base.symbol,
@@ -342,8 +323,6 @@ export default {
                         );
 
                         this.resetAmount();
-                        console.info('Load token\'s balance after success donation' +
-                            ' (it should be updated om viabtc side).');
                         this.balanceLoaded = false;
                         this.getTokenBalance();
                     }
