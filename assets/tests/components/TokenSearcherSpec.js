@@ -50,7 +50,7 @@ describe('TokenSearcher', () => {
             expect(wrapper.vm.input).to.deep.equal('TOKEN1');
         });
         it('triggers onItemClicked()', () => {
-            wrapper.vm.onItemClicked('TOKEN2');
+            wrapper.vm.onItemSelected('TOKEN2');
             expect(wrapper.vm.input).to.deep.equal('TOKEN2');
         });
     });
