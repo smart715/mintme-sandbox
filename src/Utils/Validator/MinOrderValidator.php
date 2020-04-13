@@ -61,7 +61,7 @@ class MinOrderValidator implements ValidatorInterface
 
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
-            && (string)BigDecimal::of((float)$this->price)->multipliedBy((float)$this->amount) >= $baseMinimal;
+            && BigDecimal::of((float)$this->price)->multipliedBy((float)$this->amount)->toFloat() >= $baseMinimal;
     }
 
     private function getCrypto(?TradebleInterface $tradeble): ?Crypto
