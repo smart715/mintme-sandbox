@@ -61,9 +61,14 @@ body
 
   @include media-breakpoint-up(xl)
     content: "xl"
-
+      
 .form-control
   height: auto
+
+.tooltip-inner
+  white-space: nowrap
+  width: auto
+  max-width: 100%
 
 .text-white:not(input):not(.bg-danger)
   color: $dark-white !important
@@ -264,6 +269,21 @@ a
   color: $white
   background-color: #007DC0
   border-color: #007DC0
+
+.circle-progress
+  margin-top: 8.2px
+  div.circle
+    background: none
+    height: auto
+    width: auto
+  
+.percent-text
+  font-size: 8px !important
+  margin-bottom: 4px
+
+.nav-item-circle-progress
+  @include media-breakpoint-up(md)
+    margin-left: 30px
 
 .circle
   background: #51677F
