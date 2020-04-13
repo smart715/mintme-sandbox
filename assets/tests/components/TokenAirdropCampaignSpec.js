@@ -60,6 +60,15 @@ describe('TokenAirdropCampaign', () => {
         expect(wrapper.vm.btnDisabled).to.be.true;
         wrapper.vm.participantsAmount = 101;
         expect(wrapper.vm.btnDisabled).to.be.false;
+        wrapper.vm.minTokensAmount = '0.01';
+        wrapper.vm.balanceLoaded = true;
+        wrapper.vm.tokenBalance = 0;
+        expect(wrapper.vm.btnDisabled).to.be.true;
+        expect(wrapper.vm.insufficientBalance).to.be.true;
+        wrapper.vm.tokenBalance = 0.01;
+        wrapper.vm.tokensAmount = 0.01;
+        expect(wrapper.vm.btnDisabled).to.be.false;
+        expect(wrapper.vm.insufficientBalance).to.be.false;
     });
 
     it('check amount of tokens is valid', () => {
@@ -149,11 +158,12 @@ describe('TokenAirdropCampaign', () => {
             status: 200,
             response: 1254.2356,
         });
-
+        expect(wrapper.vm.balanceLoaded).to.be.false;
         wrapper.vm.loadTokenBalance();
 
         moxios.wait(() => {
             expect(wrapper.vm.tokenBalance).to.equal(1254.2356);
+            expect(wrapper.vm.balanceLoaded).to.be.true;
             done();
         });
     });

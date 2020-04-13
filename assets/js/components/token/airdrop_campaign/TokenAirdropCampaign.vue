@@ -47,7 +47,10 @@
                     @paste="checkInput(precision)"
                     autocomplete="off"
                 >
-                <div v-show="!isAmountValid" class="w-100 mt-1 text-danger">
+                <div v-if="balanceLoaded && insufficientBalance" class="w-100 mt-1 text-danger">
+                    Insufficient funds for airdrop campaign.
+                </div>
+                <div v-else-if="balanceLoaded && !isAmountValid" class="w-100 mt-1 text-danger">
                     Minimum amount of {{ tokenName }} {{ minTokensAmount }}, limit
                     {{ tokenBalance | toMoney(precision, false) | formatMoney }}.
                 </div>
@@ -106,7 +109,7 @@
                 </div>
                 <button
                     class="btn btn-primary float-left"
-                    :disabled="btnDisabled"
+                    :disabled="btnDisabled || insufficientBalance"
                     @click="createAirdropCampaign"
                 >
                     Save
@@ -140,6 +143,7 @@ export default {
             airdropCampaignId: null,
             airdropCampaignRemoved: false,
             tokenBalance: 0,
+            balanceLoaded: false,
             minTokensAmount: '0.01',
             minParticipantsAmount: 100,
             maxParticipantsAmount: 999999,
@@ -168,6 +172,15 @@ export default {
         },
         btnDisabled: function() {
             return !(this.isAmountValid && this.isParticipantsAmountValid && this.isDateEndValid);
+        },
+        insufficientBalance: function() {
+            if (this.balanceLoaded) {
+                let balance = new Decimal(this.tokenBalance);
+
+                return balance.lessThan(this.minTokensAmount);
+            }
+
+            return false;
         },
         isAmountValid: function() {
             if (this.tokensAmount > 0) {
@@ -204,7 +217,10 @@ export default {
     methods: {
         loadTokenBalance: function() {
             this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
-                .then((res) => this.tokenBalance = res.data)
+                .then((res) => {
+                    this.tokenBalance = res.data;
+                    this.balanceLoaded = true;
+                })
                 .catch((err) => {
                     this.notifyError('Can not load token balance data. Try again later');
                     this.sendLogs('error', 'Can not load token balance data', err);
@@ -230,7 +246,7 @@ export default {
                 });
         },
         createAirdropCampaign: function() {
-            if (this.btnDisabled) {
+            if (this.btnDisabled || this.insufficientBalance) {
                 return;
             }
 
