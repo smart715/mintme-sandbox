@@ -80,6 +80,9 @@
                                                     >All</button>
                                                 </div>
                                             </div>
+                                            <div v-if="balanceLoaded && !isAmountValid && !insufficientFunds" class="w-100 mt-1 text-danger">
+                                                Minimum amount of {{ donationCurrency }} {{ currencyMinAmount }}.
+                                            </div>
                                             <p class="mt-2 mb-4 text-nowrap">
                                                 You will receive approximately:
                                                 <font-awesome-icon
