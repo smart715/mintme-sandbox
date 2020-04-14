@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/users")
- * @Security(expression="is_granted('prelaunch')")
  */
 class UsersController extends AbstractFOSRestController
 {
