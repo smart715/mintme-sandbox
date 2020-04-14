@@ -35,7 +35,6 @@
                 {% if isTokenPage %}
                     <b-tab title="Introduction" {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
-                           {% if isOwner or tokenDescription %}
                             <token-introduction-description
                                     class="col-12 pb-3"
                                     name="{{ token.name }}"
@@ -43,7 +42,6 @@
                                     :editable="{{ isOwner }}"
                                     @updated="descriptionUpdated"
                             ></token-introduction-description>
-                            {% endif %}
                             <token-introduction-profile
                                     class="col-12 col-lg-6 pr-lg-2"
                                     youtube-client-id="{{ global_youtube_client_id }}"

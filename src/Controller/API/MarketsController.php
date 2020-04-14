@@ -4,25 +4,18 @@ namespace App\Controller\API;
 
 use App\Entity\Token\Token;
 use App\Exchange\Factory\MarketFactoryInterface;
-use App\Exchange\Market;
 use App\Exchange\Market\MarketCapCalculator;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
-use App\Manager\TokenManagerInterface;
-use App\Utils\MarketNameParserInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @Rest\Route("/api/markets")
- * @Security(expression="is_granted('prelaunch')")
  */
 class MarketsController extends APIController
 {

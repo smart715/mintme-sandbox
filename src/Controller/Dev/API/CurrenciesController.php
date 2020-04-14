@@ -8,12 +8,10 @@ use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @Security(expression="is_granted('prelaunch')")
  * @Rest\Route(path="/dev/api/v1/currencies")
  * @Cache(smaxage=15, mustRevalidate=true)
  */
