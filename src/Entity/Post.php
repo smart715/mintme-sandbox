@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -23,9 +25,10 @@ class Post
 
     /**
      * @ORM\Column(type="string", length=60000)
+     * @NotEmptyWithoutBbcodes
      * @var string
      */
-    protected $content;
+    protected $content = '';
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -50,17 +53,7 @@ class Post
      * @ORM\Column(type="string")
      * @var string
      */
-    protected $amount;
-
-    public function __construct(
-        string $content,
-        Token $token,
-        Money $amount
-    ) {
-        $this->content = $content;
-        $this->token = $token;
-        $this->amount = $amount->getAmount();
-    }
+    protected $amount = '0';
 
     public function getId(): int
     {
@@ -98,9 +91,19 @@ class Post
         return $this->updatedAt;
     }
 
+    public function setToken(Token $token): void
+    {
+        $this->token = $token;
+    }
+
     public function getToken(): Token
     {
         return $this->token;
+    }
+
+    public function setAmount(Money $amount): void
+    {
+        $this->amount = $amount->getAmount();
     }
 
     public function getAmount(): Money
