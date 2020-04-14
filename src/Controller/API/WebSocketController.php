@@ -8,12 +8,10 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use RuntimeException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Rest\Route("/api/ws")
- * @Security(expression="is_granted('prelaunch')")
  */
 class WebSocketController extends AbstractFOSRestController
 {

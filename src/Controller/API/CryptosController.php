@@ -7,12 +7,10 @@ use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/cryptos")
- * @Security(expression="is_granted('prelaunch')")
  */
 class CryptosController extends APIController
 {
