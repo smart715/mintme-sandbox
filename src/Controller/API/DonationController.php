@@ -8,12 +8,10 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/donation")
- * @Security(expression="is_granted('prelaunch')")
  */
 class DonationController extends AbstractFOSRestController
 {
