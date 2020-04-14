@@ -12,12 +12,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Request\ParamFetcherInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Rest\Route("/api/users")
- * @Security(expression="is_granted('prelaunch')")
  */
 class UsersController extends AbstractFOSRestController
 {
