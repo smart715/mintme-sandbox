@@ -64,6 +64,12 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
             $airdrop->setEndDate($endDate);
         }
 
+        $reward = $this->getAirdropReward($airdrop);
+        $lockedAmount = $reward->multiply($participants);
+        $airdrop->setLockedAmount(
+            $this->moneyWrapper->format($lockedAmount)
+        );
+
         $this->em->persist($airdrop);
         $this->em->flush();
 
@@ -71,7 +77,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $this->balanceHandler->update(
             $user,
             $token,
-            $amount->negative(),
+            $lockedAmount->negative(),
             'airdrop_amount'
         );
 
@@ -140,7 +146,11 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         /** @var Airdrop $activeAirdrop */
         $activeAirdrop = $token->getActiveAirdrop();
         $activeAirdrop->incrementActualParticipants();
-        $airdropReward = $this->getAirdropReward($activeAirdrop);
+        $lockedAmount = $this->moneyWrapper->parse(
+            $activeAirdrop->getLockedAmount(),
+            MoneyWrapper::TOK_SYMBOL
+        );
+        $airdropReward = $lockedAmount->divide($activeAirdrop->getParticipants());
 
         $this->checkUserBalance(
             $token->getProfile()->getUser(),
@@ -178,7 +188,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
             MoneyWrapper::TOK_SYMBOL
         );
 
-        if ($amount->isZero() || !$airdrop->getActualParticipants()) {
+        if ($amount->isZero() || !$airdrop->getParticipants()) {
             throw new InvalidArgumentException('Airdrop reward calculation failed.');
         }
 
@@ -201,8 +211,8 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     private function getRestOfTokens(Airdrop $airdrop): ?Money
     {
-        $amount = $this->moneyWrapper->parse(
-            $airdrop->getAmount(),
+        $lockedAmount = $this->moneyWrapper->parse(
+            $airdrop->getLockedAmount(),
             MoneyWrapper::TOK_SYMBOL
         );
         $actualAmount = $this->moneyWrapper->parse(
@@ -210,7 +220,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
             MoneyWrapper::TOK_SYMBOL
         );
 
-        $diffAmount = $amount->subtract($actualAmount);
+        $diffAmount = $lockedAmount->subtract($actualAmount);
         $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
 
         if ($diffAmount->greaterThan($zeroValue)) {

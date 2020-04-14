@@ -99,6 +99,7 @@ class AirdropCampaignManagerTest extends TestCase
             ->setToken($token)
             ->setAmount('0')
             ->setActualAmount('0')
+            ->setLockedAmount('0')
             ->setStatus(Airdrop::STATUS_ACTIVE);
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
@@ -119,6 +120,7 @@ class AirdropCampaignManagerTest extends TestCase
         $airdrop
             ->setAmount('0')
             ->setActualAmount('0')
+            ->setLockedAmount('0')
             ->setStatus(Airdrop::STATUS_ACTIVE)
             ->setToken($token);
 
@@ -205,6 +207,7 @@ class AirdropCampaignManagerTest extends TestCase
         $airdrop = new Airdrop();
         $airdrop->setAmount('100');
         $airdrop->setParticipants(100);
+        $airdrop->setLockedAmount('100');
 
         $token->expects($this->once())->method('getActiveAirdrop')->willReturn($airdrop);
 

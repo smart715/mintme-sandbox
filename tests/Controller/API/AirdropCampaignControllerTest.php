@@ -29,7 +29,7 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '200',
             'participants' => 150,
-            'endDate' => $endDate->format('Y-m-d H:i:s'),
+            'endDate' => $endDate->getTimestamp(),
         ]);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
@@ -57,7 +57,7 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '200',
             'participants' => 150,
-            'endDate' => $endDate->format('Y-m-d H:i:s'),
+            'endDate' => $endDate->getTimestamp(),
         ]);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
@@ -75,6 +75,16 @@ class AirdropCampaignControllerTest extends WebTestCase
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertNull($res);
+
+        $this->client->request('GET', '/logout');
+        $this->client->followRedirect();
+
+        $this->register($this->client);
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
+        $this->assertTrue($this->client->getResponse()->isNotFound());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals('Token does not have active airdrop campaign.', $res['message']);
     }
 
     public function testClaimAirdropCampaign(): void

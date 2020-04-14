@@ -22,6 +22,7 @@ final class Version20200316165922 extends AbstractMigration
                                 token_id INT NOT NULL,
                                 status SMALLINT NOT NULL,
                                 amount VARCHAR(100) NOT NULL,
+                                locked_amount VARCHAR(100) NOT NULL,
                                 participants INT NOT NULL,
                                 end_date DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\',
                                 actual_amount VARCHAR(100) DEFAULT \'0\',

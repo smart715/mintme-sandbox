@@ -51,6 +51,13 @@ class Airdrop
     private $amount;
 
     /**
+     * @ORM\Column(name="locked_amount", type="string", length=100)
+     * @Groups({"API"})
+     * @var string
+     */
+    private $lockedAmount;
+
+    /**
      * @ORM\Column(type="integer")
      * @Groups({"API"})
      * @var int
@@ -130,6 +137,18 @@ class Airdrop
     public function setAmount(string $amount): self
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getLockedAmount(): string
+    {
+        return $this->lockedAmount;
+    }
+
+    public function setLockedAmount(string $lockedAmount): self
+    {
+        $this->lockedAmount = $lockedAmount;
 
         return $this;
     }

@@ -54,7 +54,7 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin} from '../../../mixins';
-import {TOK} from '../../../utils/constants';
+import {TOK, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {toMoney} from '../../../utils';
 
 export default {
@@ -172,8 +172,10 @@ export default {
                     this.btnDisabled = false;
                 })
                 .catch((err) => {
-                    if (err.response.data.message) {
+                    this.btnDisabled = false;
+                    if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         this.notifyError(err.response.data.message);
+                        location.reload();
                     } else {
                         this.notifyError('Something went wrong. Try to reload the page.');
                     }
