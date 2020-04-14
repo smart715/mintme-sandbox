@@ -81,7 +81,7 @@ class AirdropCampaignControllerTest extends WebTestCase
 
         $this->register($this->client);
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
-        $this->assertTrue($this->client->getResponse()->isNotFound());
+        $this->assertTrue($this->client->getResponse()->isClientError());
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('Token does not have active airdrop campaign.', $res['message']);
