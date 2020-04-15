@@ -77,7 +77,7 @@ class DeployConsumer implements ConsumerInterface
 
             if (!$clbResult->getAddress()) {
                 if (null !== $token->getDeployCost()) {
-                    $amount = new Money((string)$token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
+                    $amount = new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
 
                     $this->balanceHandler->deposit(
                         $token->getProfile()->getUser(),
