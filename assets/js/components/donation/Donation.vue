@@ -1,8 +1,8 @@
 <template>
     <div class="container-fluid px-0">
         <div class="row justify-content-center">
-            <div class="col-12 col-lg-6 pr-lg-2 mt-3">
-                <div class="h-100">
+            <div class="col-12 col-lg-8 col-xl-6 mt-3">
+                <div class="card h-100">
                     <div class="h-100 donation">
                         <div class="donation-header text-left">
                             <span v-if="loggedIn">Donations</span>
