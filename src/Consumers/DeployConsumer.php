@@ -85,6 +85,7 @@ class DeployConsumer implements ConsumerInterface
                         $amount
                     );
 
+                    $token->setAddress('');
                     $token->setDeployCost('');
                     $token->setDeployed(null);
 
