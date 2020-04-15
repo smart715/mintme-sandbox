@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\ApiKey;
 use App\Entity\User;
-use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
 use App\Logger\UserActionLogger;
@@ -26,7 +25,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UserController extends AbstractController
+class UserController extends AbstractController implements TwoFactorAuthenticatedController
 {
     /** @var UserManagerInterface */
     protected $userManager;
@@ -79,11 +78,11 @@ class UserController extends AbstractController
     /**
      * @Route("/referral-program", name="referral-program")
      */
-    public function referralProgram(PrelaunchConfig $prelaunchConfig): Response
+    public function referralProgram(): Response
     {
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $this->getUser()->getReferralCode(),
-            'referralPercentage' => $prelaunchConfig->getReferralFee() * 100,
+            'referralPercentage' => $this->getParameter('referral_fee') * 100,
             'referralsCount' => count($this->getUser()->getReferrals()),
         ]);
     }
