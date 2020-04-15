@@ -11,67 +11,58 @@ new Vue({
     data: {
         password: '',
         current_password: '',
-        disabled: true,
+        disabled: false,
         passwordInput: null,
         isPass: true,
         eyeIcon: null,
-        twoFaVisisble: false,
+        twoFaVisible: false,
         code: '',
+        showErrorMessage: false,
     },
     mounted() {
         this.passwordInput = document.getElementById('app_user_change_password_plainPassword');
         this.eyeIcon = document.querySelector('.show-password');
-        this.disabled = false;
     },
     methods: {
-        onPrevent: function(e) {
+        submit2FA: function(e) {
             e.preventDefault();
-            this.matchPasswords();
+            this.doCheckStoredUserPassword();
         },
         clearInputs: function() {
             this.current_password = '';
             this.password = '';
         },
-        matchPasswords: function() {
+        doCheckStoredUserPassword: function() {
             this.disabled = true;
-            let customError = document.getElementById('custom-error');
+            this.showErrorMessage = false;
 
-            if (customError!== null) {
-                customError.remove();
-            }
-            this.$axios.single.patch(this.$routing.generate('match-password'), {
+            this.$axios.single.patch(this.$routing.generate('check_user_password'), {
                 current_password: this.current_password,
                 plainPassword: this.password,
             })
                 .then(() => {
                     this.disabled = false;
-                    this.twoFaVisisble = true;
+                    this.twoFaVisible = true;
                 }, (error) => {
                     this.disabled = false;
                     if (!error.response) {
                         this.notifyError('Network error');
                     } else if (error.response.data.message) {
-                        let currentPasswordInput = document.getElementById('app_user_change_password_current_password');
-                        let error = '<div id="custom-error" class="py-2 mb-2 bg-danger text-white text-center">' +
-                                                '<ul class="pl-3 pr-3 m-0 list-unstyled">' +
-                                                    '<li>The entered password is invalid.</li>' +
-                                                '</ul>' +
-                                             '</div>';
-                        currentPasswordInput.insertAdjacentHTML('beforebegin', error);
+                        this.showErrorMessage = true;
                     } else {
                         this.notifyError('An error has occurred, please try again later');
                     }
                 });
         },
         doChangePassword: function(code = '') {
-            this.$axios.single.patch(this.$routing.generate('update-password'), {
+            this.$axios.single.patch(this.$routing.generate('update_password'), {
                 current_password: this.current_password,
                 plainPassword: this.password,
                 code: code,
             })
             .then(() => {
                 this.clearInputs();
-                this.twoFaVisisble = false;
+                this.twoFaVisible = false;
                 this.notifySuccess('Password was updated successfully.');
             }, (error) => {
                 if (!error.response) {

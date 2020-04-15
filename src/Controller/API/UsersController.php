@@ -164,8 +164,8 @@ class UsersController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Patch(
-     *      "/settings/update-password",
-     *      name="update-password",
+     *      "/settings/update_password",
+     *      name="update_password",
      *      options={"2fa"="optional", "expose"=true}
      * )
      * @Rest\RequestParam(name="current_password", nullable=false)
@@ -181,7 +181,7 @@ class UsersController extends AbstractFOSRestController
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
-        $errorOnPasswordForm = $this->matchPasswords($request, $user);
+        $errorOnPasswordForm = $this->checkStoredUserPassword($request, $user);
 
         if ($errorOnPasswordForm) {
             throw new ApiBadRequestException($errorOnPasswordForm);
@@ -203,15 +203,15 @@ class UsersController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Patch(
-     *      "/settings/match-password",
-     *      name="match-password",
+     *      "/settings/check_user_password",
+     *      name="check_user_password",
      *      options={"expose"=true}
      * )
      * @Rest\RequestParam(name="current_password", nullable=false)
      * @Rest\RequestParam(name="plainPassword", nullable=false)
      * @throws ApiBadRequestException
      */
-    public function checkMatchPasswords(Request $request): Response
+    public function checkUserPassword(Request $request): Response
     {
         $user = $this->getUser();
 
@@ -219,7 +219,7 @@ class UsersController extends AbstractFOSRestController
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
-        $errorOnPasswordForm = $this->matchPasswords($request, $user);
+        $errorOnPasswordForm = $this->checkStoredUserPassword($request, $user);
 
         if ($errorOnPasswordForm) {
             throw new ApiBadRequestException($errorOnPasswordForm);
@@ -228,7 +228,7 @@ class UsersController extends AbstractFOSRestController
         return new Response(Response::HTTP_ACCEPTED);
     }
 
-    private function matchPasswords(Request $request, User $user): ?string
+    private function checkStoredUserPassword(Request $request, User $user): ?string
     {
         $changePasswordData = $request->request->all();
         $passwordForm = $this->createForm(ChangePasswordType::class, $user, [

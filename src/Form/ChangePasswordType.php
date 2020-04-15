@@ -25,7 +25,7 @@ class ChangePasswordType extends AbstractType
         $builder
             ->remove('plainPassword')
             ->add('current_password', PasswordType::class, [
-                'label' => 'form.current_password',
+                'label' => false,
                 'translation_domain' => 'FOSUserBundle',
                 'mapped' => false,
                 'constraints' => [
