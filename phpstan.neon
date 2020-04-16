@@ -27,7 +27,7 @@ parameters:
         - "%rootDir%/../../../tests/Command/Blacklist/SynchronizeTokenBlacklistTest.php"
 
     autoload_files:
-        - vendor/bin/.phpunit/phpunit-7.5-0/vendor/autoload.php
+        - vendor/bin/.phpunit/phpunit-8.3-0/vendor/autoload.php
 
     ignoreErrors:
         - '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
