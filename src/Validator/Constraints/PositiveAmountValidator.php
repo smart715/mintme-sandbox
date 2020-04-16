@@ -5,7 +5,7 @@ namespace App\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class NotEmptyWithoutBbcodesValidator extends ConstraintValidator
+class PositiveAmountValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
@@ -14,13 +14,7 @@ class NotEmptyWithoutBbcodesValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
-        $value = trim(preg_replace(
-            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
-            '',
-            $value
-        ));
-
-        if ("" === $value) {
+        if ($value->isNegative()) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
