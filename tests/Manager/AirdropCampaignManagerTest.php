@@ -64,7 +64,7 @@ class AirdropCampaignManagerTest extends TestCase
         );
 
         $this->assertInstanceOf(Airdrop::class, $airdrop);
-        $this->assertEquals('500', $airdrop->getAmount());
+        $this->assertEquals('500', $airdrop->getAmount()->getAmount());
         $this->assertEquals(150, $airdrop->getParticipants());
         $this->assertEquals(null, $airdrop->getEndDate());
 
@@ -78,7 +78,7 @@ class AirdropCampaignManagerTest extends TestCase
         );
 
         $this->assertInstanceOf(Airdrop::class, $airdrop);
-        $this->assertEquals('700', $airdrop->getAmount());
+        $this->assertEquals('700', $airdrop->getAmount()->getAmount());
         $this->assertEquals(300, $airdrop->getParticipants());
         $this->assertEquals($endDate, $airdrop->getEndDate());
     }
@@ -97,9 +97,9 @@ class AirdropCampaignManagerTest extends TestCase
         $airdrop = new Airdrop();
         $airdrop
             ->setToken($token)
-            ->setAmount('0')
-            ->setActualAmount('0')
-            ->setLockedAmount('0')
+            ->setAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setActualAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setLockedAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
             ->setStatus(Airdrop::STATUS_ACTIVE);
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
@@ -118,9 +118,9 @@ class AirdropCampaignManagerTest extends TestCase
         $token = $this->createMock(Token::class);
         $airdrop = new Airdrop();
         $airdrop
-            ->setAmount('0')
-            ->setActualAmount('0')
-            ->setLockedAmount('0')
+            ->setAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setActualAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setLockedAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
             ->setStatus(Airdrop::STATUS_ACTIVE)
             ->setToken($token);
 
@@ -205,15 +205,15 @@ class AirdropCampaignManagerTest extends TestCase
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
 
         $airdrop = new Airdrop();
-        $airdrop->setAmount('100');
+        $airdrop->setAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
         $airdrop->setParticipants(100);
-        $airdrop->setLockedAmount('100');
+        $airdrop->setLockedAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
 
         $token->expects($this->once())->method('getActiveAirdrop')->willReturn($airdrop);
 
         $airdropManager->claimAirdropCampaign($user, $token);
 
-        $this->assertEquals('1', $airdrop->getActualAmount());
+        $this->assertEquals('1', $airdrop->getActualAmount()->getAmount());
         $this->assertEquals(1, $airdrop->getActualParticipants());
     }
 
@@ -227,21 +227,21 @@ class AirdropCampaignManagerTest extends TestCase
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
 
         $airdrop = new Airdrop();
-        $airdrop->setAmount('0');
+        $airdrop->setAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)));
         $airdrop->setParticipants(10);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Airdrop reward calculation failed.');
         $airdropManager->getAirdropReward($airdrop);
 
-        $airdrop->setAmount('100');
+        $airdrop->setAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
         $airdrop->setParticipants(0);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Airdrop reward calculation failed.');
         $airdropManager->getAirdropReward($airdrop);
 
-        $airdrop->setAmount('100');
+        $airdrop->setAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
         $airdrop->setParticipants(100);
 
         $reward = $airdropManager->getAirdropReward($airdrop);

@@ -521,15 +521,15 @@ class Token implements TradebleInterface
     }
 
     /** @codeCoverageIgnore */
-    public function getAirdropsAmount(): string
+    public function getAirdropsAmount(): Money
     {
-        return $this->airdropsAmount;
+        return new Money($this->airdropsAmount, new Currency(self::TOK_SYMBOL));
     }
 
     /** @codeCoverageIgnore */
-    public function setAirdropsAmount(string $airdropsAmount): self
+    public function setAirdropsAmount(Money $airdropsAmount): self
     {
-        $this->airdropsAmount = $airdropsAmount;
+        $this->airdropsAmount = $airdropsAmount->getAmount();
 
         return $this;
     }

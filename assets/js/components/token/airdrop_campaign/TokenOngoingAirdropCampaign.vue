@@ -121,7 +121,7 @@ export default {
         },
         confirmModalMessage: function() {
             if (!this.loggedIn) {
-                return 'You have to be logged in to claim ' + this.airdropReward + ' ' + this.tokenName + '.';
+                return `You have to be logged in to claim ${this.airdropReward} ${this.tokenName}.`;
             }
 
             if (this.isOwner) {
@@ -132,7 +132,7 @@ export default {
                 return 'You already claimed tokens from this airdrop.';
             }
 
-            return 'Are you sure you want to claim ' + this.airdropReward + ' ' + this.tokenName + '?';
+            return `Are you sure you want to claim ${this.airdropReward} ${this.tokenName}?`;
         },
     },
     methods: {

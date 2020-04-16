@@ -48,14 +48,14 @@ class Airdrop
      * @Groups({"API"})
      * @var string
      */
-    private $amount;
+    private $amount = '0';
 
     /**
      * @ORM\Column(name="locked_amount", type="string", length=100)
      * @Groups({"API"})
      * @var string
      */
-    private $lockedAmount;
+    private $lockedAmount = '0';
 
     /**
      * @ORM\Column(type="integer")
@@ -73,7 +73,7 @@ class Airdrop
 
     /**
      * @ORM\Column(name="actual_amount", type="string", length=100, nullable=true)
-     * @var string|null
+     * @var string
      */
     private $actualAmount = '0';
 
@@ -129,26 +129,26 @@ class Airdrop
         return $this;
     }
 
-    public function getAmount(): string
+    public function getAmount(): Money
     {
-        return $this->amount;
+        return new Money($this->amount, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
-    public function setAmount(string $amount): self
+    public function setAmount(Money $amount): self
     {
-        $this->amount = $amount;
+        $this->amount = $amount->getAmount();
 
         return $this;
     }
 
-    public function getLockedAmount(): string
+    public function getLockedAmount(): Money
     {
-        return $this->lockedAmount;
+        return new Money($this->lockedAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
-    public function setLockedAmount(string $lockedAmount): self
+    public function setLockedAmount(Money $lockedAmount): self
     {
-        $this->lockedAmount = $lockedAmount;
+        $this->lockedAmount = $lockedAmount->getAmount();
 
         return $this;
     }
@@ -177,14 +177,14 @@ class Airdrop
         return $this;
     }
 
-    public function getActualAmount(): ?string
+    public function getActualAmount(): Money
     {
-        return $this->actualAmount;
+        return new Money($this->actualAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
     }
 
-    public function setActualAmount(?string $actualAmount): self
+    public function setActualAmount(Money $actualAmount): self
     {
-        $this->actualAmount = $actualAmount;
+        $this->actualAmount = $actualAmount->getAmount();
 
         return $this;
     }

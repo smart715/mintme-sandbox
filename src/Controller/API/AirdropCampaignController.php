@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -112,11 +113,8 @@ class AirdropCampaignController extends AbstractFOSRestController
      */
     public function deleteAirdropCampaign(Airdrop $airdrop): View
     {
+        $this->denyAccessUnlessGranted('edit', $airdrop->getToken());
         $this->airdropCampaignManager->deleteAirdrop($airdrop);
-
-        if ($airdrop->getToken() !== $this->tokenManager->getOwnToken()) {
-            throw $this->createAccessDeniedException();
-        }
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
     }
@@ -127,7 +125,10 @@ class AirdropCampaignController extends AbstractFOSRestController
      */
     public function claimAirdropCampaign(string $tokenName): View
     {
-        if (!$this->getUser()) {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
             throw $this->createAccessDeniedException();
         }
 
@@ -138,7 +139,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         $this->airdropCampaignManager->claimAirdropCampaign(
-            $this->getUser(),
+            $user,
             $token
         );
 
@@ -157,8 +158,8 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw $this->createNotFoundException('Token does not exist.');
         }
 
-        if ($checkIfOwner && $token !== $this->tokenManager->getOwnToken()) {
-            throw $this->createAccessDeniedException();
+        if ($checkIfOwner) {
+            $this->denyAccessUnlessGranted('edit', $token);
         }
 
         if ($checkIfParticipant && $token === $this->tokenManager->getOwnToken()) {
