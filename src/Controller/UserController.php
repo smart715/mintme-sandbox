@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\ApiKey;
 use App\Entity\User;
-use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
 use App\Logger\UserActionLogger;
@@ -21,13 +20,12 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UserController extends AbstractController
+class UserController extends AbstractController implements TwoFactorAuthenticatedController
 {
     /** @var UserManagerInterface */
     protected $userManager;
@@ -80,14 +78,14 @@ class UserController extends AbstractController
     /**
      * @Route("/referral-program", name="referral-program")
      */
-    public function referralProgram(PrelaunchConfig $prelaunchConfig): Response
+    public function referralProgram(): Response
     {
         /** @var User $user */
         $user = $this->getUser();
 
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
-            'referralPercentage' => $prelaunchConfig->getReferralFee() * 100,
+            'referralPercentage' => $this->getParameter('referral_fee') * 100,
             'referralsCount' => count($user->getReferrals()),
         ]);
     }
@@ -115,7 +113,6 @@ class UserController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-
         $form = $this->createForm(TwoFactorType::class);
         $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
 
@@ -178,7 +175,6 @@ class UserController extends AbstractController
 
         /** @var User $user*/
         $user = $this->getUser();
-
         $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
 
         $content = implode($lineBreak, $backupCodes);
@@ -213,7 +209,6 @@ class UserController extends AbstractController
 
         /** @var User $user*/
         $user = $this->getUser();
-
         $user->setGoogleAuthenticatorBackupCodes($backupCodes);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
@@ -301,7 +296,6 @@ class UserController extends AbstractController
     {
         /** @var User $user*/
         $user = $this->getUser();
-
         $googleAuth = $twoFactorManager->getGoogleAuthEntry($user->getId());
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($googleAuth);

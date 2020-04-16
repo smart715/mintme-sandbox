@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Rest\Route("/api/users")
- * @Security(expression="is_granted('prelaunch')")
  */
 class UsersController extends AbstractFOSRestController
 {

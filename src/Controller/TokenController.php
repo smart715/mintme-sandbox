@@ -24,8 +24,6 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +34,6 @@ use Throwable;
 
 /**
  * @Route("/token")
- * @Security(expression="is_granted('prelaunch')")
  */
 class TokenController extends Controller
 {

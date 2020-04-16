@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\RefererTrait;
 use App\Entity\Bonus;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -18,11 +19,11 @@ use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -30,6 +31,9 @@ use Throwable;
 
 class RegistrationController extends FOSRegistrationController
 {
+
+    use RefererTrait;
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -108,6 +112,11 @@ class RegistrationController extends FOSRegistrationController
         $form = $this->formFactory->createForm();
 
         $response = $this->checkForm($form, $request);
+        $refers = $request->headers->get('Referer');
+
+        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
+            $this->get('session')->set('register_referer', $refers);
+        }
 
         if ($response) {
             return $response;
@@ -226,6 +235,16 @@ class RegistrationController extends FOSRegistrationController
             } catch (Throwable $exception) {
                 $this->em->rollback();
             }
+        }
+
+        /** @var Session $session */
+        $session = $this->get('session');
+        $referer = $session->get('register_referer');
+
+        if ($referer && $this->isRefererValid($referer)) {
+            $session->remove('register_referer');
+
+            return $this->redirect($referer);
         }
 
         return parent::confirmedAction($request);
