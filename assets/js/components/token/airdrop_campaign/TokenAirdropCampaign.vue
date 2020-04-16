@@ -251,8 +251,8 @@ export default {
             }
 
             if (!this.isRewardValid) {
-                this.errorMessage = `Reward can't be lower than ${this.minTokenReward} ${this.tokenName}.
-                    Set higher amount of tokens for airdrop or lower amount of participants.`.replace(/\n\s+/g, ' ');
+                this.errorMessage = `Reward can't be lower than ${this.minTokenReward} ${this.tokenName}.`
+                    + ` Set higher amount of tokens for airdrop or lower amount of participants.`;
                 return;
             }
 
