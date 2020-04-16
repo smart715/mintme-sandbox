@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Validator\Constraints\NotEmptyWithoutBbcodes;
+use App\Validator\Constraints\PositiveAmount;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -25,7 +26,12 @@ class Post
 
     /**
      * @ORM\Column(type="string", length=60000)
+     * @Assert\NotNull
      * @NotEmptyWithoutBbcodes
+     * @Assert\Length(
+     *     min = 2,
+     *     max = 500,
+     * )
      * @var string
      */
     protected $content = '';
@@ -58,6 +64,11 @@ class Post
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
     }
 
     public function getContent(): string
@@ -106,6 +117,9 @@ class Post
         $this->amount = $amount->getAmount();
     }
 
+    /**
+     * @PositiveAmount
+     */
     public function getAmount(): Money
     {
         return new Money($this->amount, new Currency(Token::TOK_SYMBOL));
