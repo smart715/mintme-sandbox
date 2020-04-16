@@ -519,3 +519,6 @@ services:
     App\EventSubscriber\AuthenticationListener:
         arguments:
             $firewallName: '%fos_user.firewall_name%'
+
+    App\Form\DataTransformer\MoneyTransformer:
+        shared: false
