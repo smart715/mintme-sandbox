@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "466b5d11b619e53027707c5db59e443b",
+    "content-hash": "5f9cb3e9d7e560d346bf8626b3ba755b",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -5103,32 +5103,33 @@
         },
         {
             "name": "presta/sitemap-bundle",
-            "version": "v1.7.2",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prestaconcept/PrestaSitemapBundle.git",
-                "reference": "04387d54f922386d2ff80a7945df3cdf98ffabde"
+                "reference": "cc8ed9378f7ac713fcd0d6e39836b584aa939614"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prestaconcept/PrestaSitemapBundle/zipball/04387d54f922386d2ff80a7945df3cdf98ffabde",
-                "reference": "04387d54f922386d2ff80a7945df3cdf98ffabde",
+                "url": "https://api.github.com/repos/prestaconcept/PrestaSitemapBundle/zipball/cc8ed9378f7ac713fcd0d6e39836b584aa939614",
+                "reference": "cc8ed9378f7ac713fcd0d6e39836b584aa939614",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0",
-                "symfony/console": "~2.2|~3.0|~4.0",
-                "symfony/framework-bundle": "~2.2|~3.0|~4.0"
+                "php": ">=7.1.0",
+                "symfony/console": "^3.4|~4.0|~5.0",
+                "symfony/framework-bundle": "^3.4|~4.0|~5.0"
             },
             "require-dev": {
                 "doctrine/annotations": "~1.0",
-                "phpunit/phpunit": "5.*",
-                "symfony/browser-kit": "~2.2|~3.0|~4.0",
-                "symfony/form": "~2.2|~3.0|~4.0",
-                "symfony/phpunit-bridge": "~2.7|~3.0|~4.0",
-                "symfony/security-bundle": "~2.2|~3.0|~4.0",
-                "symfony/translation": "~2.2|~3.0|~4.0",
-                "symfony/validator": "~2.2|~3.0|~4.0"
+                "phpunit/phpunit": "7.*",
+                "symfony/browser-kit": "^3.4|~4.0|~5.0",
+                "symfony/form": "^3.4|~4.0|~5.0",
+                "symfony/phpunit-bridge": "^3.4|~4.0|~5.0",
+                "symfony/security-bundle": "^3.4|~4.0|~5.0",
+                "symfony/translation": "^3.4|~4.0|~5.0",
+                "symfony/validator": "^3.4|~4.0|~5.0",
+                "symfony/yaml": "^3.4|~4.0|~5.0"
             },
             "suggest": {
                 "doctrine/doctrine-cache-bundle": "Allows to store sitemaps in cache"
@@ -5143,7 +5144,10 @@
             "autoload": {
                 "psr-4": {
                     "Presta\\SitemapBundle\\": ""
-                }
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5163,7 +5167,7 @@
                 "symfony",
                 "xml"
             ],
-            "time": "2019-10-22T07:14:03+00:00"
+            "time": "2020-03-02T12:08:58+00:00"
         },
         {
             "name": "psr/cache",
@@ -11899,17 +11903,53 @@
             "time": "2018-03-04T11:30:31+00:00"
         },
         {
-            "name": "netresearch/jsonmapper",
-            "version": "v2.0.0",
+            "name": "n98/junit-xml",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/cweiske/jsonmapper.git",
-                "reference": "e245890383c3ed38b6d202ee373c23ccfebc0f54"
+                "url": "https://github.com/cmuench/junit-xml.git",
+                "reference": "7df0dbaf413fcaa1a63ffbcef18654e7a4cceb46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cweiske/jsonmapper/zipball/e245890383c3ed38b6d202ee373c23ccfebc0f54",
-                "reference": "e245890383c3ed38b6d202ee373c23ccfebc0f54",
+                "url": "https://api.github.com/repos/cmuench/junit-xml/zipball/7df0dbaf413fcaa1a63ffbcef18654e7a4cceb46",
+                "reference": "7df0dbaf413fcaa1a63ffbcef18654e7a4cceb46",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "N98\\JUnitXml": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Münch",
+                    "email": "c.muench@netz98.de"
+                }
+            ],
+            "description": "JUnit XML Document generation library",
+            "time": "2013-11-23T13:11:26+00:00"
+        },
+        {
+            "name": "netresearch/jsonmapper",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cweiske/jsonmapper.git",
+                "reference": "e0f1e33a71587aca81be5cffbb9746510e1fe04e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cweiske/jsonmapper/zipball/e0f1e33a71587aca81be5cffbb9746510e1fe04e",
+                "reference": "e0f1e33a71587aca81be5cffbb9746510e1fe04e",
                 "shasum": ""
             },
             "require": {
@@ -11942,7 +11982,7 @@
                 }
             ],
             "description": "Map nested JSON structures onto PHP classes",
-            "time": "2020-03-04T17:23:33+00:00"
+            "time": "2020-04-16T18:48:43+00:00"
         },
         {
             "name": "openlss/lib-array2xml",
@@ -11995,20 +12035,21 @@
         },
         {
             "name": "overtrue/phplint",
-            "version": "1.2.1",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/phplint.git",
-                "reference": "deaee8c3459087ea5d17031206b8722a96dd330b"
+                "reference": "ea8f5ea313c9e5246302a3d6ccbd578e41526551"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/overtrue/phplint/zipball/deaee8c3459087ea5d17031206b8722a96dd330b",
-                "reference": "deaee8c3459087ea5d17031206b8722a96dd330b",
+                "url": "https://api.github.com/repos/overtrue/phplint/zipball/ea8f5ea313c9e5246302a3d6ccbd578e41526551",
+                "reference": "ea8f5ea313c9e5246302a3d6ccbd578e41526551",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
+                "n98/junit-xml": "1.0.0",
                 "php": ">=5.5.9",
                 "symfony/console": "^3.2|^4.0|^5.0",
                 "symfony/finder": "^3.0|^4.0|^5.0",
@@ -12016,12 +12057,24 @@
                 "symfony/yaml": "^3.0|^4.0|^5.0"
             },
             "require-dev": {
+                "brainmaestro/composer-git-hooks": "^2.7",
+                "friendsofphp/php-cs-fixer": "^2.16",
                 "jakub-onderka/php-console-highlighter": "^0.3.2 || ^0.4"
             },
             "bin": [
                 "bin/phplint"
             ],
             "type": "library",
+            "extra": {
+                "hooks": {
+                    "pre-commit": [
+                        "composer fix-style"
+                    ],
+                    "pre-push": [
+                        "composer check-style"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Overtrue\\PHPLint\\": "src/"
@@ -12037,14 +12090,14 @@
                     "email": "anzhengchao@gmail.com"
                 }
             ],
-            "description": "a php syntax check tool.",
+            "description": "`phplint` is a tool that can speed up linting of php files by running several lint processes at once.",
             "keywords": [
                 "check",
                 "lint",
                 "phplint",
                 "syntax"
             ],
-            "time": "2019-12-07T13:46:15+00:00"
+            "time": "2020-04-16T23:11:46+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -12372,16 +12425,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.5.4",
+            "version": "3.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "dceec07328401de6211037abbb18bda423677e26"
+                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/dceec07328401de6211037abbb18bda423677e26",
-                "reference": "dceec07328401de6211037abbb18bda423677e26",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
+                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
                 "shasum": ""
             },
             "require": {
@@ -12419,7 +12472,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2020-01-30T22:20:29+00:00"
+            "time": "2020-04-17T01:09:41+00:00"
         },
         {
             "name": "symfony/browser-kit",
