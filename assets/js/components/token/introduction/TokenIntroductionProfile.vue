@@ -248,7 +248,7 @@ export default {
             currentTelegram: this.telegramUrl,
             currentWebsite: this.websiteUrl,
             currentYoutube: this.youtubeChannelId,
-            reRenderTokenWebsite: false,
+            reRenderTokenWebsite: 0,
             editingDiscord: false,
             editingTelegram: false,
             editingUrls: false,
@@ -285,7 +285,7 @@ export default {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
             this.$emit('updated-website', newWebsite);
-            this.reRenderTokenWebsite = true;
+            this.reRenderTokenWebsite += 1;
             this.editingWebsite = false;
         },
         saveDiscord: function(newDiscord) {
