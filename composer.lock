@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5f9cb3e9d7e560d346bf8626b3ba755b",
+    "content-hash": "1962f29903114d56ab42dfb9e6b83843",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -12035,16 +12035,16 @@
         },
         {
             "name": "overtrue/phplint",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/phplint.git",
-                "reference": "ea8f5ea313c9e5246302a3d6ccbd578e41526551"
+                "reference": "05bef7df401f8e250436bbb008c25d1b344c0e5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/overtrue/phplint/zipball/ea8f5ea313c9e5246302a3d6ccbd578e41526551",
-                "reference": "ea8f5ea313c9e5246302a3d6ccbd578e41526551",
+                "url": "https://api.github.com/repos/overtrue/phplint/zipball/05bef7df401f8e250436bbb008c25d1b344c0e5e",
+                "reference": "05bef7df401f8e250436bbb008c25d1b344c0e5e",
                 "shasum": ""
             },
             "require": {
@@ -12097,7 +12097,7 @@
                 "phplint",
                 "syntax"
             ],
-            "time": "2020-04-16T23:11:46+00:00"
+            "time": "2020-04-17T06:35:56+00:00"
         },
         {
             "name": "phpstan/phpstan",
