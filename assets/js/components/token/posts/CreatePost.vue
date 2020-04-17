@@ -56,7 +56,8 @@ export default {
 		return {
 			content: '',
             amount: 0,
-            maxContentLength: 1000,
+            minContentLength: 2,
+            maxContentLength: 500,
 		};
 	},
     methods: {
@@ -65,6 +66,15 @@ export default {
         },
         savePost() {
             this.$v.$touch();
+
+            if (this.$v.$invalid) {
+                return;
+            }
+
+            this.$axios.single.post(this.$routing.generate('create_post'), {
+                content: this.content,
+                amount: this.amount,
+            }).then(console.log, console.log);
         },
         checkInput: function() {
             let selectionStart = event.target.selectionStart;
@@ -89,6 +99,7 @@ export default {
                 required: (val) => {
                     return required(val.replace(/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/g, '').trim());
                 },
+                minLength: minLength(this.minContentLength),
                 maxLength: maxLength(this.maxContentLength),
             },
             amount: {
