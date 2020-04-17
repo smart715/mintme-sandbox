@@ -26,7 +26,7 @@
                             <template v-if="showErrorMessage">
                                 <div class="p-2 mb-2 bg-danger text-center text-white">The entered password is invalid.</div>
                             </template>
-                            {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off', 'v-model': 'current_password'}}) }}
+                            {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off', 'v-model': 'currentPassword'}}) }}
                             <passwordmeter :password="password" @toggle-error="toggleError">
                                 <span @click="togglePassword()" class="show-password">
                                     <i class="far fa-eye"></i>

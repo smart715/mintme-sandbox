@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Controller\TwoFactorAuthenticatedController;
 use App\Entity\Api\Client;
 use App\Entity\ApiKey;
 use App\Entity\User;
@@ -13,11 +14,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @Rest\Route("/api/users")
  */
-class UsersController extends AbstractFOSRestController
+class UsersController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
 {
     /** @var UserManagerInterface */
     protected $userManager;
@@ -163,11 +162,11 @@ class UsersController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Patch(
-     *      "/settings/update_password",
-     *      name="update_password",
+     *      "/settings/update-password",
+     *      name="update-password",
      *      options={"2fa"="optional", "expose"=true}
      * )
-     * @Rest\RequestParam(name="current_password", nullable=false)
+     * @Rest\RequestParam(name="currentPassword", nullable=false)
      * @Rest\RequestParam(name="plainPassword", nullable=false)
      * @Rest\RequestParam(name="code", nullable=true)
      * @throws ApiBadRequestException
@@ -202,11 +201,11 @@ class UsersController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Patch(
-     *      "/settings/check_user_password",
-     *      name="check_user_password",
+     *      "/settings/check-user-password",
+     *      name="check-user-password",
      *      options={"expose"=true}
      * )
-     * @Rest\RequestParam(name="current_password", nullable=false)
+     * @Rest\RequestParam(name="currentPassword", nullable=false)
      * @Rest\RequestParam(name="plainPassword", nullable=false)
      * @throws ApiBadRequestException
      */

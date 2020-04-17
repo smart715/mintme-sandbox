@@ -3,6 +3,7 @@ import ApiKeys from './components/ApiKeys';
 import ApiClients from './components/ApiClients';
 import TwoFactorModal from './components/modal/TwoFactorModal';
 import {NotificationMixin} from './mixins/';
+import {HTTP_UNAUTHORIZED} from './utils/constants';
 
 new Vue({
     el: '#settings',
@@ -10,7 +11,7 @@ new Vue({
     mixins: [NotificationMixin],
     data: {
         password: '',
-        current_password: '',
+        currentPassword: '',
         disabled: false,
         passwordInput: null,
         isPass: true,
@@ -24,20 +25,19 @@ new Vue({
         this.eyeIcon = document.querySelector('.show-password');
     },
     methods: {
-        submit2FA: function(e) {
-            e.preventDefault();
+        submit2FA: function() {
             this.doCheckStoredUserPassword();
         },
         clearInputs: function() {
-            this.current_password = '';
+            this.currentPassword = '';
             this.password = '';
         },
         doCheckStoredUserPassword: function() {
             this.disabled = true;
             this.showErrorMessage = false;
 
-            this.$axios.single.patch(this.$routing.generate('check_user_password'), {
-                current_password: this.current_password,
+            this.$axios.single.patch(this.$routing.generate('check-user-password'), {
+                current_password: this.currentPassword,
                 plainPassword: this.password,
             })
                 .then(() => {
@@ -55,8 +55,8 @@ new Vue({
                 });
         },
         doChangePassword: function(code = '') {
-            this.$axios.single.patch(this.$routing.generate('update_password'), {
-                current_password: this.current_password,
+            this.$axios.single.patch(this.$routing.generate('update-password'), {
+                current_password: this.currentPassword,
                 plainPassword: this.password,
                 code: code,
             })
@@ -67,7 +67,7 @@ new Vue({
             }, (error) => {
                 if (!error.response) {
                     this.notifyError('Network error');
-                } else if (401 === error.response.status) {
+                } else if (HTTP_UNAUTHORIZED === error.response.status) {
                     this.notifyError('Invalid 2FA code');
                 } else if (error.response.data.message) {
                     this.notifyError(error.response.data.message);
