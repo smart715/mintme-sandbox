@@ -286,6 +286,7 @@ export default {
             this.currentWebsite = newWebsite;
             this.$emit('updated-website', newWebsite);
             this.reRenderTokenWebsite = true;
+            this.editingWebsite = false;
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;
