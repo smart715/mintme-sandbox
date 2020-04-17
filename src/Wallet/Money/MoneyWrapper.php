@@ -68,7 +68,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
 
             $power = $matches['right'] < 0 ?
             BigDecimal::one()->
-            dividedBy(BigDecimal::of(10)->power(-(int)$matches['right']), $scale) :
+                dividedBy(BigDecimal::of(10)->power(-(int)$matches['right']), $scale) :
             BigDecimal::of(10)->power((int)$matches['right']);
 
             return (string) BigDecimal::of($matches['left'])->multipliedBy($power);
