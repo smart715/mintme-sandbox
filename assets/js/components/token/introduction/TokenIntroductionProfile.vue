@@ -21,6 +21,7 @@
                             :currentWebsite="currentWebsite"
                             :editingWebsite="editingWebsite"
                             :tokenName="tokenName"
+                            :key="reRenderTokenWebsite"
                             @saveWebsite="saveWebsite"
                             @toggleEdit="toggleEdit"
                         />
@@ -242,6 +243,7 @@ export default {
     },
     data() {
         return {
+            reRenderTokenWebsite: 0,
             currentDiscord: this.discordUrl,
             currentFacebook: this.facebookUrl,
             currentTelegram: this.telegramUrl,
@@ -283,6 +285,7 @@ export default {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
             this.$emit('updated-website', newWebsite);
+            this.reRenderTokenWebsite += 1;
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;
