@@ -33,7 +33,7 @@ class MoneyTransformer implements DataTransformerInterface
     {
         try {
             return $this->moneyWrapper->parse($value, $this->symbol ?? Token::TOK_SYMBOL);
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             throw new TransformationFailedException();
         }
     }
