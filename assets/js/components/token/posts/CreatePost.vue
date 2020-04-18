@@ -8,30 +8,29 @@
                 <label for="amount">
                     Required amount of tokens to see this post:
                 </label>
-                <input class="form-control form-control-lg h-100"
+                <input class="form-control form-control-lg w-100"
+                    :class="{ 'is-invalid' : invalidAmount }"
                     name="amount"
                     type="text"
-                    step="0.0001"
                     v-model="amount"
                     @keypress="checkInput"
                     @paste="checkInput"
                 >
+                <div class="invalid-feedback">
+                    {{ amountErrorMessage }}
+                </div>
             </div>
             <div class="form-group">
                 <bbcode-help class="float-right mt-2" placement="right" />
                 <bbcode-editor class="form-control w-100"
+                    :class="{ 'is-invalid' : invalidContent }"
                     @change="onContentChange"
                     @input="onContentChange"
                 />
-                <div class="text-sm text-danger"
-                    v-show="content.length > 0 && !$v.content.required"
+                <div class="invalid-feedback"
+                    :class="{ 'd-block' : invalidContent }"
                 >
-                    Content cannot be empty.
-                </div>
-                <div class="text-sm text-danger"
-                    v-show="!$v.content.maxLength"
-                >
-                    Content cannot be more than {{ maxContentLength }} characters.
+                    {{ contentErrorMessage }}
                 </div>
             </div>
             <button class="btn btn-primary"
@@ -47,7 +46,7 @@
 <script>
 import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
-import {required, minLength, maxLength, numeric} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
 export default {
 	name: 'CreatePost',
@@ -58,8 +57,47 @@ export default {
             amount: 0,
             minContentLength: 2,
             maxContentLength: 500,
+            maxDecimals: 4,
+            maxAmount: 999999.9999,
 		};
 	},
+    computed: {
+        invalidContent() {
+            return this.$v.content.$invalid && this.content.length > 0;
+        },
+        contentErrorMessage() {
+            if (!this.$v.content.required) {
+                return 'Content can\'t be empty or contain only bbcodes and whitespaces';
+            }
+            if (!this.$v.content.minLength) {
+                return `Content must be at least ${this.minContentLength} characters long`;
+            }
+            if (!this.$v.content.maxLength) {
+                return `Content can't be more than ${this.maxContentLength} characters long`;
+            }
+
+            return '';
+        },
+        invalidAmount() {
+            return this.$v.amount.$invalid;
+        },
+        amountErrorMessage() {
+            if (!this.$v.amount.required) {
+                return 'Amount is required';
+            }
+            if (!this.$v.amount.decimal) {
+                return 'Amount must be a numeric value';
+            }
+            if (!this.$v.amount.maxDecimals) {
+                return `Amount can only have at most ${this.maxDecimals} decimals`;
+            }
+            if (!this.$v.amount.between) {
+                return `Amount must be between 0 and ${this.maxAmount}`;
+            }
+
+            return '';
+        }
+    },
     methods: {
         onContentChange(content) {
             this.content = content;
@@ -80,7 +118,7 @@ export default {
             let selectionStart = event.target.selectionStart;
             let selectionEnd = event.target.selectionEnd;
             let amount = event.srcElement.value;
-            let regex = new RegExp(`^[0-9]{0,8}(\\.[0-9]{0,4})?$`);
+            let regex = new RegExp(`^[0-9]{0,6}(\\.[0-9]{0,4})?$`);
             let input = event instanceof ClipboardEvent
                 ? event.clipboardData.getData('text')
                 : String.fromCharCode(!event.charCode ? event.which : event.charCode);
@@ -97,13 +135,18 @@ export default {
         return {
             content: {
                 required: (val) => {
-                    return required(val.replace(/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/g, '').trim());
+                    return required(val.replace(/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)\s*\]/g, '').trim());
                 },
                 minLength: minLength(this.minContentLength),
                 maxLength: maxLength(this.maxContentLength),
             },
             amount: {
-                numeric,
+                required,
+                decimal,
+                maxDecimals: (val) => {
+                    return typeof val !== 'string' || (val.split('.')[1] || '').length <= this.maxDecimals;
+                },
+                between: between(0, this.maxAmount),
             },
         }
     }
