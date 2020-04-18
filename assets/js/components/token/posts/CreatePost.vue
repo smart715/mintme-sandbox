@@ -13,8 +13,8 @@
                     name="amount"
                     type="text"
                     v-model="amount"
-                    @keypress="checkInput"
-                    @paste="checkInput"
+                    @keypress="checkInput(4, 6)"
+                    @paste="checkInput(4, 6)"
                 >
                 <div class="invalid-feedback">
                     {{ amountErrorMessage }}
@@ -46,10 +46,14 @@
 <script>
 import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
+import {CheckInputMixin} from '../../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
 export default {
 	name: 'CreatePost',
+    mixins: [
+        CheckInputMixin,
+    ],
 	components: {BbcodeEditor, BbcodeHelp},
 	data() {
 		return {
@@ -113,22 +117,6 @@ export default {
                 content: this.content,
                 amount: this.amount,
             }).then(console.log, console.log);
-        },
-        checkInput: function() {
-            let selectionStart = event.target.selectionStart;
-            let selectionEnd = event.target.selectionEnd;
-            let amount = event.srcElement.value;
-            let regex = new RegExp(`^[0-9]{0,6}(\\.[0-9]{0,4})?$`);
-            let input = event instanceof ClipboardEvent
-                ? event.clipboardData.getData('text')
-                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
-
-            if (!regex.test(amount.slice(0, selectionStart) + input + amount.slice(selectionEnd))) {
-                event.preventDefault();
-                return false;
-            }
-
-            return true;
         },
     },
     validations() {
