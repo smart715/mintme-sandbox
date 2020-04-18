@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
+use App\Controller\TwoFactorAuthenticatedController;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -35,7 +36,6 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -45,9 +45,8 @@ use Throwable;
 
 /**
  * @Rest\Route("/api/tokens")
- * @Security(expression="is_granted('prelaunch')")
  */
-class TokensController extends AbstractFOSRestController
+class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
 {
     /** @var EntityManagerInterface */
     private $em;
