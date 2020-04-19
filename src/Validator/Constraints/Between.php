@@ -23,8 +23,8 @@ class Between extends Constraint
     public function getRequiredOptions()
     {
         return [
-        	'min',
-        	'max',
+            'min',
+            'max',
         ];
     }
 }

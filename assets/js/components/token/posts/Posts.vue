@@ -15,30 +15,11 @@ import Post from './Post';
 export default {
     name: 'Posts',
     components: {Post},
+    props: {
+        posts: Array,
+    },
     data() {
         return {
-            posts: [
-                {
-                    content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum quam eum, odio rem beatae aliquam voluptatem iste consequuntur esse maxime, aspernatur delectus similique amet! Laudantium, quis impedit ipsum tenetur ipsam!',
-                    createdAt: '09.04.2020',
-                    author: 'alejandrojsn',
-                },
-                {
-                    content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum quam eum, odio rem beatae aliquam voluptatem iste consequuntur esse maxime, aspernatur delectus similique amet! Laudantium, quis impedit ipsum tenetur ipsam!',
-                    createdAt: '09.04.2020',
-                    author: 'alejandrojsn',
-                },
-                {
-                    content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum quam eum, odio rem beatae aliquam voluptatem iste consequuntur esse maxime, aspernatur delectus similique amet! Laudantium, quis impedit ipsum tenetur ipsam!',
-                    createdAt: '09.04.2020',
-                    author: 'alejandrojsn',
-                },
-                {
-                    content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum quam eum, odio rem beatae aliquam voluptatem iste consequuntur esse maxime, aspernatur delectus similique amet! Laudantium, quis impedit ipsum tenetur ipsam!',
-                    createdAt: '09.04.2020',
-                    author: 'alejandrojsn',
-                },
-            ],
         };
     },
 };

@@ -159,6 +159,7 @@ class TokenController extends Controller
                 '',
             'precision' => $this->getParameter('token_precision'),
             'isTokenPage' => true,
+            'posts' => $this->normalize($token->getPosts()),
         ]);
     }
 

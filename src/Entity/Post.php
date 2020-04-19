@@ -9,6 +9,7 @@ use App\Validator\Constraints\PositiveAmount;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -72,6 +73,9 @@ class Post
         $this->content = $content;
     }
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getContent(): string
     {
         return $this->content;
@@ -85,6 +89,9 @@ class Post
         $this->createdAt = new \DateTimeImmutable();
     }
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
@@ -108,6 +115,7 @@ class Post
         $this->token = $token;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getToken(): Token
     {
         return $this->token;
@@ -123,9 +131,16 @@ class Post
      *     min = 0,
      *     max = 999999.9999
      * )
+     * @Groups({"Default", "API"});
      */
     public function getAmount(): Money
     {
         return new Money($this->amount, new Currency(Token::TOK_SYMBOL));
+    }
+
+    /** @Groups({"Default", "API"}) */
+    public function getAuthor(): ?Profile
+    {
+        return $this->getToken()->getProfile();
     }
 }

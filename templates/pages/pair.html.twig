@@ -77,7 +77,9 @@
                                 </div>
                             {% endif %}
                             <div class="row mt-3 justify-content-center">
-                                <posts class="col-12 col-lg-8" />
+                                <posts class="col-12 col-lg-8" 
+                                    :posts={{posts | json_encode}}
+                                />
                             </div>
                         </div>
                     </b-tab>
