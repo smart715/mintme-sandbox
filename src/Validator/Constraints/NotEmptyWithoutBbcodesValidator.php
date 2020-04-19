@@ -15,7 +15,7 @@ class NotEmptyWithoutBbcodesValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         $value = trim(preg_replace(
-            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)\s*\]/',
             '',
             $value
         ));

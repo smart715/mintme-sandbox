@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Validator\Constraints\Between;
 use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use App\Validator\Constraints\PositiveAmount;
 use Doctrine\ORM\Mapping as ORM;
@@ -118,7 +119,10 @@ class Post
     }
 
     /**
-     * @PositiveAmount
+     * @Between(
+     *     min = 0,
+     *     max = 999999.9999
+     * )
      */
     public function getAmount(): Money
     {
