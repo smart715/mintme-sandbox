@@ -20,6 +20,7 @@ new Vue({
       editingName: false,
       tokenName: null,
       tokenPending: null,
+      posts: null,
     };
   },
   components: {
