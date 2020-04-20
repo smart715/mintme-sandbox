@@ -1,10 +1,10 @@
 <template>
-	<div class="card h-100">
-		<div class="card-header">
+    <div class="card h-100">
+        <div class="card-header">
             <slot name="title">Create post</slot>
         </div>
         <div class="card-body">
-            <div class="form-group">  
+            <div class="form-group">
                 <label for="amount">
                     Required amount of tokens to see this post:
                 </label>
@@ -40,7 +40,7 @@
                 Save
             </button>
         </div>
-	</div>
+    </div>
 </template>
 
 <script>
@@ -50,21 +50,21 @@ import {CheckInputMixin} from '../../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
 export default {
-	name: 'CreatePost',
+    name: 'CreatePost',
     mixins: [
         CheckInputMixin,
     ],
-	components: {BbcodeEditor, BbcodeHelp},
-	data() {
-		return {
-			content: '',
+    components: {BbcodeEditor, BbcodeHelp},
+    data() {
+        return {
+            content: '',
             amount: 0,
             minContentLength: 2,
             maxContentLength: 500,
             maxDecimals: 4,
             maxAmount: 999999.9999,
-		};
-	},
+        };
+    },
     computed: {
         invalidContent() {
             return this.$v.content.$invalid && this.content.length > 0;
@@ -100,7 +100,7 @@ export default {
             }
 
             return '';
-        }
+        },
     },
     methods: {
         onContentChange(content) {
@@ -136,7 +136,7 @@ export default {
                 },
                 between: between(0, this.maxAmount),
             },
-        }
-    }
-}
+        };
+    },
+};
 </script>

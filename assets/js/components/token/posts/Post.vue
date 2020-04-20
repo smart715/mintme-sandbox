@@ -6,7 +6,7 @@
         <p v-else>
             To see this post you need to have {{post.amount | toMoney | formatMoney}} {{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
         </p>
-        <span><u>{{ date }}</u></span>
+        <span>{{ date }}</span>
         <a :href="$routing.generate('profile-view', {pageUrl: post.author.page_url})">{{ author }}</a>
     </div>
 </template>
@@ -29,7 +29,7 @@ export default {
         },
         date() {
             return moment(this.post.createdAt).format('H:mm, MMM D, YYYY');
-        }
-    }
+        },
+    },
 };
 </script>
