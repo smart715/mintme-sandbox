@@ -353,8 +353,6 @@ export default {
                 .then((res) => {
                     if (Object.keys(this.markets).length === 1 && !this.marketFilters.userSelected) {
                         this.marketFilters.selectedFilter = 'all';
-                        this.fetchData();
-                        return;
                     }
                     this.updateDataWithMarkets();
                     this.loading = false;
