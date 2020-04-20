@@ -179,6 +179,7 @@ class Token implements TradebleInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      * @var ArrayCollection
      */
     protected $posts;
