@@ -17,7 +17,7 @@
                     @paste="checkInput(4, 6)"
                 >
                 <div class="invalid-feedback">
-                    {{ amountErrorMessage }}
+                    {{ invalidAmountMessage }}
                 </div>
             </div>
             <div class="form-group">
@@ -30,7 +30,7 @@
                 <div class="invalid-feedback"
                     :class="{ 'd-block' : invalidContent }"
                 >
-                    {{ contentErrorMessage }}
+                    {{ invalidContentMessage }}
                 </div>
             </div>
             <button class="btn btn-primary"
@@ -63,13 +63,20 @@ export default {
             maxContentLength: 500,
             maxDecimals: 4,
             maxAmount: 999999.9999,
+            contentError: false,
+            contentErrorMessage: '',
+            amountError: false,
+            amountErrorMessage: '',
         };
     },
     computed: {
         invalidContent() {
-            return this.$v.content.$invalid && this.content.length > 0;
+            return this.contentError || (this.$v.content.$invalid && this.content.length > 0);
         },
-        contentErrorMessage() {
+        invalidContentMessage() {
+            if (this.contentError) {
+                return this.contentErrorMessage;
+            }
             if (!this.$v.content.required) {
                 return 'Content can\'t be empty or contain only bbcodes and whitespaces';
             }
@@ -83,9 +90,12 @@ export default {
             return '';
         },
         invalidAmount() {
-            return this.$v.amount.$invalid;
+            return this.amountError || this.$v.amount.$invalid;
         },
-        amountErrorMessage() {
+        invalidAmountMessage() {
+            if (this.amountError) {
+                return this.amountErrorMessage;
+            }
             if (!this.$v.amount.required) {
                 return 'Amount is required';
             }
@@ -116,7 +126,32 @@ export default {
             this.$axios.single.post(this.$routing.generate('create_post'), {
                 content: this.content,
                 amount: this.amount,
-            }).then(console.log, console.log);
+            }).then(() => null, this.savePostErrorHandler.bind(this));
+        },
+        // handles server side validation errors, although it shouldn't happen (because of frontend validation)
+        savePostErrorHandler(data) {
+            let errors = data.response.data.errors;
+            if (errors) {
+                if (errors.children.amount.errors) {
+                    this.amountError = true;
+                    this.amountErrorMessage = errors.children.amount.errors[0];
+                }
+
+                if (errors.children.content.errors) {
+                    this.contentError = true;
+                    this.contentErrorMessage = errors.children.content.errors[0];
+                }
+            }
+        },
+    },
+    watch: {
+        content() {
+            this.contentError = false;
+            this.contentErrorMessage = '';
+        },
+        amount() {
+            this.amountError = false;
+            this.amountErrorMessage = '';
         },
     },
     validations() {
