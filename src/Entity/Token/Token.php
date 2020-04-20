@@ -471,4 +471,13 @@ class Token implements TradebleInterface
     {
         return $this->posts->toArray();
     }
+
+    public function getOwner(): ?User
+    {
+        $profile = $this->getProfile();
+
+        return $profile
+            ? $profile->getUser()
+            : null;
+    }
 }
