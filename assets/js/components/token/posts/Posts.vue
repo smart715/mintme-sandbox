@@ -4,7 +4,12 @@
             <slot name="title">Posts</slot>
         </div>
         <div class="card-body posts">
-            <post v-for="(post, key) in posts" :post="post" :key="key"></post>
+            <template v-if="posts.length > 0">
+                <post v-for="(n, i) in postsCount" :post="posts[i]" :key="i"></post>
+            </template>
+            <div v-else>
+                Nothing's here
+            </div>
         </div>
     </div>
 </template>
@@ -16,11 +21,19 @@ export default {
     name: 'Posts',
     components: {Post},
     props: {
-        posts: Array,
+        posts: {
+            type: Array,
+            default: () => [],
+        },
+        max: {
+            type: Number,
+            default: null,
+        },
     },
-    data() {
-        return {
-        };
+    computed: {
+        postsCount() {
+            return Math.min(this.posts.length, this.max || Infinity);
+        },
     },
 };
 </script>
