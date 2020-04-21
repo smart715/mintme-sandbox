@@ -147,11 +147,9 @@ export default {
                         apply: [0, 1],
                         min,
                         minInterval: min,
-                    },
-                    {
-                        apply: 'all',
                         axisLabel: {
-                            formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit)).toString(),
+                            formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit))
+                                .toFixed(8).toString().replace(/0+$/, ''),
                         },
                     },
                 ],
