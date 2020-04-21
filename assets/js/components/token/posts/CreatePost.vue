@@ -47,6 +47,7 @@
 import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
 import {CheckInputMixin} from '../../../mixins';
+import {HTTP_OK} from '../../../utils/constants';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
 export default {
@@ -54,7 +55,10 @@ export default {
     mixins: [
         CheckInputMixin,
     ],
-    components: {BbcodeEditor, BbcodeHelp},
+    components: {
+        BbcodeEditor,
+        BbcodeHelp
+    },
     data() {
         return {
             content: '',
@@ -126,7 +130,15 @@ export default {
             this.$axios.single.post(this.$routing.generate('create_post'), {
                 content: this.content,
                 amount: this.amount,
-            }).then(() => null, this.savePostErrorHandler.bind(this));
+            }).then(this.savePostSuccessHandler.bind(this), this.savePostErrorHandler.bind(this));
+        },
+        savePostSuccessHandler(res) {
+            if (HTTP_OK !== res.status) {
+                return;
+            }
+
+            this.$emit('update-posts');
+            this.reset();
         },
         // handles server side validation errors, although it shouldn't happen (because of frontend validation)
         savePostErrorHandler(data) {
@@ -143,6 +155,10 @@ export default {
                 }
             }
         },
+        reset() {
+            this.content = '';
+            this.amount= '0';
+        }
     },
     watch: {
         content() {

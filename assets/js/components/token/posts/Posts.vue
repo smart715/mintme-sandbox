@@ -10,6 +10,12 @@
             <div v-else>
                 Nothing's here
             </div>
+            <a v-if="showReadMore"
+                :href="readMoreUrl"
+                @click.prevent="goToPosts"
+            >
+                Read More
+            </a>
         </div>
     </div>
 </template>
@@ -29,11 +35,30 @@ export default {
             type: Number,
             default: null,
         },
+        tokenName: String,
+        tokenPage: Boolean,
+    },
+    data() {
+        return {
+            readMoreUrl: this.$routing.generate('token_show', {name: this.tokenName, tab: 'posts'}),
+        };
     },
     computed: {
         postsCount() {
             return Math.min(this.posts.length, this.max || Infinity);
         },
+        showReadMore() {
+            return this.max && this.posts.length > this.max;
+        }
     },
+    methods: {
+        goToPosts() {
+            if (this.tokenPage){
+                this.$emit('go-to-posts');
+            } else {
+                location.href = this.readMoreUrl;
+            }
+        }
+    }
 };
 </script>

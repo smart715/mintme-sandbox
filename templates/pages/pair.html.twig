@@ -33,6 +33,9 @@
                             <posts class="col-12 col-lg-7 pr-lg-1"
                                 :posts="posts || (posts = {{ posts | json_encode }})"
                                 :max="4"
+                                token-name="{{ token.name }}"
+                                token-page
+                                @go-to-posts="goToPosts"
                             >
                                 <template v-slot:title>Recent posts</template>
                             </posts>
@@ -76,7 +79,9 @@
                         <div class="container-fluid">
                             {% if is_granted('edit', token) %}
                                 <div class="row justify-content-center">
-                                    <create-post class="col-12 col-lg-8" />
+                                    <create-post class="col-12 col-lg-8" 
+                                        @update-posts="updatePosts"
+                                    />
                                 </div>
                             {% endif %}
                             <div class="row mt-3 justify-content-center">

@@ -68,6 +68,21 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->persist($post);
         $this->entityManager->flush();
 
-        return $this->view([], Response::HTTP_ACCEPTED);
+        return $this->view([], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/list/{tokenName}", name="list_posts", options={"expose"=true})
+     */
+    public function list(string $tokenName): View
+    {
+        $token = $this->tokenManager->findByName($tokenName);
+
+        if (!$token) {
+            throw new ApiNotFoundException();
+        }
+
+        return $this->view($token->getPosts(), Response::HTTP_OK);
     }
 }

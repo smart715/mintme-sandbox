@@ -69,6 +69,15 @@ new Vue({
     youtubeUpdated: function(val) {
         this.tokenYoutube = val;
     },
+    updatePosts: function() {
+      this.$axios.single.get(this.$routing.generate('list_posts', {tokenName: this.tokenName}))
+      .then((res) => {
+        this.posts = res.data;
+      });
+    },
+    goToPosts: function() {
+      this.tabIndex = 2;
+    },
   },
   store,
 });
