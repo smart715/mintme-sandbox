@@ -3,6 +3,7 @@
 namespace App\Wallet\Money;
 
 use App\Manager\CryptoManagerInterface;
+use Brick\Math\BigDecimal;
 use Money\Converter;
 use Money\Currencies;
 use Money\Currencies\CurrencyList;
@@ -60,12 +61,17 @@ final class MoneyWrapper implements MoneyWrapperInterface
 
     public function convertToDecimalIfNotation(string $notation, string $symbol): string
     {
-        $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) ) [eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';
+        $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) )[eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';
 
         if (preg_match($regEx, $notation, $matches)) {
-            bcscale($this->getRepository()->subunitFor(new Currency($symbol)));
+            $scale = $this->getRepository()->subunitFor(new Currency($symbol));
 
-            return bcmul($matches['left'], bcpow('10', $matches['right']));
+            $power = $matches['right'] < 0 ?
+            BigDecimal::one()->
+                dividedBy(BigDecimal::of(10)->power(-(int)$matches['right']), $scale) :
+            BigDecimal::of(10)->power((int)$matches['right']);
+
+            return (string) BigDecimal::of($matches['left'])->multipliedBy($power);
         }
 
         return $notation;

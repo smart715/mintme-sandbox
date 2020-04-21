@@ -18,6 +18,7 @@ use App\Manager\TokenManagerInterface;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Brick\Math\BigDecimal;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Throwable;
 
@@ -168,7 +169,7 @@ class Exchanger implements ExchangerInterface
             $market->getQuote();
 
         /** @var string $amount */
-        $amount = bcdiv($amount, '1', $market->isTokenMarket() ?
+        $amount = (string) BigDecimal::of($amount)->dividedBy('1', $market->isTokenMarket() ?
             $this->bag->get('token_precision') :
             $crypto->getShowSubunit());
 
