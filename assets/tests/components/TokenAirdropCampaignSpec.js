@@ -281,6 +281,7 @@ describe('TokenAirdropCampaign', () => {
             expect(wrapper.vm.participantsAmount).to.be.equal(100);
             expect(wrapper.vm.loading).to.be.false;
             expect(wrapper.vm.airdropCampaignRemoved).to.be.true;
+            expect(wrapper.vm.balanceLoaded).to.be.false;
             done();
         });
     });

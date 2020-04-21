@@ -300,6 +300,8 @@ export default {
                     this.setDefaultValues(true);
                     this.loading = false;
                     this.airdropCampaignRemoved = true;
+                    this.balanceLoaded = false;
+                    this.loadTokenBalance();
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
