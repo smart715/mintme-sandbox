@@ -62,7 +62,7 @@ body
 
   @include media-breakpoint-up(xl)
     content: "xl"
-      
+
 .form-control
   height: auto
 
@@ -277,7 +277,7 @@ a
     background: none
     height: auto
     width: auto
-  
+
 .percent-text
   font-size: 8px !important
   margin-bottom: 4px
@@ -471,6 +471,10 @@ a
           height: .125rem
           background-color: unset
           width: calc(100% - 3rem)
+
+    @media (max-width: 480px)
+      .swagger-ui .model
+        font-size: 4px
 
     @media (max-width: 767px)
       .nav-tabs
