@@ -276,12 +276,6 @@ describe('TokenAirdropCampaign', () => {
 
         moxios.wait(() => {
             expect(wrapper.vm.airdropCampaignId).to.be.null;
-            expect(wrapper.vm.hasAirdropCampaign).to.be.false;
-            expect(wrapper.vm.tokensAmount).to.be.equal(100);
-            expect(wrapper.vm.participantsAmount).to.be.equal(100);
-            expect(wrapper.vm.loading).to.be.false;
-            expect(wrapper.vm.airdropCampaignRemoved).to.be.true;
-            expect(wrapper.vm.balanceLoaded).to.be.false;
             done();
         });
     });

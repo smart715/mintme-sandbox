@@ -53,6 +53,7 @@
                             <template slot="body">
                                 <token-airdrop-campaign
                                     :token-name="currentName"
+                                    @close="$emit('close')"
                                 />
                             </template>
                         </faq-item>

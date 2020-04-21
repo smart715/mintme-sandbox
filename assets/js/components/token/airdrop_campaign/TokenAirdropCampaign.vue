@@ -272,7 +272,7 @@ export default {
                 .then((result) => {
                     this.airdropCampaignId = result.data.id;
                     this.loading = false;
-                    this.notifySuccess('Your airdrop was created successfully');
+                    this.notifySuccess('Your airdrop was created successfully.');
 
                     if (this.airdropCampaignRemoved) {
                         this.airdropCampaignRemoved = false;
@@ -297,11 +297,9 @@ export default {
             }))
                 .then(() => {
                     this.airdropCampaignId = null;
-                    this.setDefaultValues(true);
-                    this.loading = false;
-                    this.airdropCampaignRemoved = true;
-                    this.balanceLoaded = false;
-                    this.loadTokenBalance();
+                    this.notifySuccess('Your airdrop was removed successfully.');
+                    this.$emit('close');
+                    location.reload();
                 })
                 .catch((err) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
