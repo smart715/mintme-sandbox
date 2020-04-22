@@ -5,6 +5,7 @@ namespace App\Utils\Validator;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use Brick\Math\BigDecimal;
 
 class MinOrderValidator implements ValidatorInterface
 {
@@ -60,7 +61,7 @@ class MinOrderValidator implements ValidatorInterface
 
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
-            && bcmul($this->price, $this->amount) >= $baseMinimal;
+            && BigDecimal::of((float)$this->price)->multipliedBy((float)$this->amount)->toFloat() >= $baseMinimal;
     }
 
     private function getCrypto(?TradebleInterface $tradeble): ?Crypto
