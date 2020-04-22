@@ -68,10 +68,23 @@ export default {
         BbcodeHelp,
         Guide,
     },
+    props: {
+        edit: {
+            type: Boolean,
+            default: false,
+        },
+        post: {
+            type: Object,
+            default: () => ({
+                content: '',
+                amount: '0',
+            }),
+        }
+    },
     data() {
         return {
-            content: '',
-            amount: 0,
+            content: this.post.content,
+            amount: this.post.amount,
             minContentLength: 2,
             maxContentLength: 500,
             maxDecimals: 4,
@@ -197,7 +210,7 @@ export default {
                 required,
                 decimal,
                 maxDecimals: (val) => {
-                    return typeof val !== 'string' || (val.split('.')[1] || '').length <= this.maxDecimals;
+                    return (val.split('.')[1] || '').length <= this.maxDecimals;
                 },
                 between: between(0, this.maxAmount),
             },

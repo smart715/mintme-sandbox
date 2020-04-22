@@ -14,6 +14,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class PostVoter extends Voter
 {
     private const VIEW = 'view';
+    private const EDIT = 'edit';
+    private const ACTIONS = [
+        self::VIEW,
+        self::EDIT,
+    ];
 
     /** @var TokenManagerInterface */
     private $tokenManager;
@@ -34,7 +39,7 @@ class PostVoter extends Voter
      */
     protected function supports($attribute, $subject): bool
     {
-        return self::VIEW === $attribute && $subject instanceof Post;
+        return in_array($attribute, self::ACTIONS) && $subject instanceof Post;
     }
 
     /**
@@ -51,7 +56,13 @@ class PostVoter extends Voter
         /** @var Post */
         $post = $subject;
 
-        return $this->canView($post, $user);
+        if ($attribute === self::VIEW) {
+            return $this->canView($post, $user);
+        } else if ($attribute === self::EDIT) {
+            return $this->canEdit($post, $user);
+        }
+
+        return false;
     }
 
     private function canView(Post $post, ?User $user): bool
@@ -59,6 +70,13 @@ class PostVoter extends Voter
         return $user
             ? $this->isOwner($user, $post->getToken()) || $this->checkBalance($user, $post->getToken(), $post->getAmount())
             : $post->getAmount()->isZero();
+    }
+
+    private function canEdit(Post $post, ?User $user): bool
+    {
+        return $user
+            ? $post->getAuthor()->getUser() === $user
+            : false;
     }
 
     private function checkBalance(User $user, Token $token, Money $amount): bool

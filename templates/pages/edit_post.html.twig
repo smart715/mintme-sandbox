@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+   Edit post | mintMe
+{% endblock %}
+
+{% block content %}
+    <div id="edit_post" class="container">
+        <create-post edit 
+            class="col-12 col-lg-8"
+            :post="{{ post | json_encode }}"
+        />
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/edit_post.js') }}"></script>
+{% endblock %}
