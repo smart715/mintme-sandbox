@@ -51,6 +51,8 @@ security:
             - ROLE_SONATA_CLASSIFICATION_ADMIN_TAG_ALL
             - ROLE_SONATA_CLASSIFICATION_ADMIN_COLLECTION_ALL
             - ROLE_SONATA_CLASSIFICATION_ADMIN_CONTEXT_ALL
+        ROLE_SUPPORTER: [ROLE_ADMIN_NEWS_ADMIN]
+        ROLE_COPYWRITER: [ROLE_ADMIN_NEWS_ADMIN]
         ROLE_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
 
@@ -73,4 +75,4 @@ security:
         - { path: ^/register,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting,                                      role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/2fa,                                            role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
-        - { path: ^/admin,                                          roles: ROLE_ADMIN }
+        - { path: ^/admin,                                          roles: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN] }
