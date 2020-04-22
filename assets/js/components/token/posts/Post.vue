@@ -1,7 +1,7 @@
 <template>
     <div class="post">
         <p v-if="post.content">
-            {{ post.content }}
+            <bbcode-view :value="post.content" />
         </p>
         <p v-else>
             To see this post you need to have {{post.amount | toMoney | formatMoney}} {{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import BbcodeView from '../../bbcode/BbcodeView';
 import moment from 'moment';
 import {MoneyFilterMixin} from '../../../mixins';
 
@@ -20,6 +21,9 @@ export default {
     mixins: [
         MoneyFilterMixin,
     ],
+    components: {
+        BbcodeView
+    },
     props: {
         post: Object,
     },

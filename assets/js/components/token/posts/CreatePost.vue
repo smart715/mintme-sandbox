@@ -6,8 +6,13 @@
         <div class="card-body">
             <div class="form-group">
                 <label for="amount">
-                    Required amount of tokens to see this post:
+                    Required amount of tokens:
                 </label>
+                <guide>
+                    <template slot="body">
+                        You can restrict view for this post or leave 0. User will need to own required amount of your tokens to see this post.
+                    </template>
+                </guide>
                 <input class="form-control form-control-lg w-100"
                     :class="{ 'is-invalid' : invalidAmount }"
                     name="amount"
@@ -24,6 +29,7 @@
                 <bbcode-help class="float-right mt-2" placement="right" />
                 <bbcode-editor class="form-control w-100"
                     :class="{ 'is-invalid' : invalidContent }"
+                    :value="content"
                     @change="onContentChange"
                     @input="onContentChange"
                 />
@@ -34,7 +40,7 @@
                 </div>
             </div>
             <button class="btn btn-primary"
-                :disabled="$v.$invalid"
+                :disabled="submitting || $v.$invalid"
                 @click="savePost"
             >
                 Save
@@ -46,18 +52,21 @@
 <script>
 import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
-import {CheckInputMixin} from '../../../mixins';
+import Guide from '../../Guide';
 import {HTTP_OK} from '../../../utils/constants';
+import {CheckInputMixin, NotificationMixin} from '../../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
 export default {
     name: 'CreatePost',
     mixins: [
         CheckInputMixin,
+        NotificationMixin,
     ],
     components: {
         BbcodeEditor,
-        BbcodeHelp
+        BbcodeHelp,
+        Guide,
     },
     data() {
         return {
@@ -71,6 +80,7 @@ export default {
             contentErrorMessage: '',
             amountError: false,
             amountErrorMessage: '',
+            submitting: false,
         };
     },
     computed: {
@@ -121,6 +131,7 @@ export default {
             this.content = content;
         },
         savePost() {
+            this.submitting = true;
             this.$v.$touch();
 
             if (this.$v.$invalid) {
@@ -130,7 +141,9 @@ export default {
             this.$axios.single.post(this.$routing.generate('create_post'), {
                 content: this.content,
                 amount: this.amount,
-            }).then(this.savePostSuccessHandler.bind(this), this.savePostErrorHandler.bind(this));
+            })
+            .then(this.savePostSuccessHandler.bind(this), this.savePostErrorHandler.bind(this))
+            .finally(() => this.submitting = false);
         },
         savePostSuccessHandler(res) {
             if (HTTP_OK !== res.status) {
@@ -138,6 +151,7 @@ export default {
             }
 
             this.$emit('update-posts');
+            this.notifySuccess('Post created');
             this.reset();
         },
         // handles server side validation errors, although it shouldn't happen (because of frontend validation)
