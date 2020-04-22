@@ -22,7 +22,7 @@ export default {
         MoneyFilterMixin,
     ],
     components: {
-        BbcodeView
+        BbcodeView,
     },
     props: {
         post: Object,

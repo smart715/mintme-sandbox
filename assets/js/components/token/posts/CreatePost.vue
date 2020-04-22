@@ -172,7 +172,7 @@ export default {
         reset() {
             this.content = '';
             this.amount= '0';
-        }
+        },
     },
     watch: {
         content() {

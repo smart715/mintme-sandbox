@@ -49,16 +49,16 @@ export default {
         },
         showReadMore() {
             return this.max && this.posts.length > this.max;
-        }
+        },
     },
     methods: {
         goToPosts() {
-            if (this.tokenPage){
+            if (this.tokenPage) {
                 this.$emit('go-to-posts');
             } else {
                 location.href = this.readMoreUrl;
             }
-        }
-    }
+        },
+    },
 };
 </script>
