@@ -14,12 +14,12 @@ use Sonata\ClassificationBundle\Entity\BaseCollection;
 class SonataClassificationCollection extends BaseCollection
 {
     /**
+     * @var int
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      * // Serializer\Groups(groups={"sonata_api_read", "sonata_api_write", "sonata_search"})
      */
-    /** @var int */
     protected $id;
 
     /**

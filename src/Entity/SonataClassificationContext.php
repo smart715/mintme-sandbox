@@ -14,13 +14,12 @@ use Sonata\ClassificationBundle\Entity\BaseContext;
 class SonataClassificationContext extends BaseContext
 {
     /**
+     * @var string
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="NONE")
      * // Serializer\Groups(groups={"sonata_api_read", "sonata_api_write", "sonata_search"})
      */
-
-    /** @var string */
     protected $id;
 
     public function getId(): string
