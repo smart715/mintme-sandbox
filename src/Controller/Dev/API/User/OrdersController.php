@@ -93,8 +93,8 @@ class OrdersController extends DevApiController
      *     allowBlank=false,
      *     strict=true
      * )
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0], required=true")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101], required=true")
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -146,8 +146,8 @@ class OrdersController extends DevApiController
      *     allowBlank=false,
      *     strict=true
      * )
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0], required=true")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101], required=true")
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -245,14 +245,14 @@ class OrdersController extends DevApiController
      *
      * @Rest\View()
      * @Rest\Delete("/{id}", requirements={"id"="\d+"})
-     * @SWG\Response(response="204", description="Order succsessfully removed",)
+     * @SWG\Response(response="204", description="Order successfully removed",)
      * @SWG\Response(response="400", description="Invalid request")
      * @SWG\Response(response="404", description="Market not found")
-     * @Rest\QueryParam(name="base", allowBlank=false)
-     * @Rest\QueryParam(name="quote", allowBlank=false)
+     * @Rest\QueryParam(name="base", allowBlank=false, strict=true)
+     * @Rest\QueryParam(name="quote", allowBlank=false, strict=true)
      * @SWG\Parameter(name="base", in="query", description="Base name", type="string", required=true)
      * @SWG\Parameter(name="quote", in="query", description="Quote name", type="string", required=true)
-     * @SWG\Parameter(name="id", in="path", description="Order identifier", type="integer")
+     * @SWG\Parameter(name="id", in="path", description="Order identifier", type="integer", required=true)
      * @SWG\Tag(name="User Orders")
      */
     public function cancelOrder(ParamFetcherInterface $request, int $id): View

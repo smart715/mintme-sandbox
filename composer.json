@@ -10,6 +10,7 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-openssl": "*",
+        "brick/math": "^0.8.14",
         "cron/cron-bundle": "^2.4",
         "doctrine/doctrine-fixtures-bundle": "^3.3",
         "endroid/qr-code-bundle": "^3.4",

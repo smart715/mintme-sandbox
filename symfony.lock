@@ -11,6 +11,9 @@
     "beberlei/assert": {
         "version": "v3.2.7"
     },
+    "brick/math": {
+        "version": "0.8.15"
+    },
     "cocur/slugify": {
         "version": "v4.0.0"
     },
