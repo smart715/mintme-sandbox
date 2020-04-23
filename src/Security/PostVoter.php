@@ -56,9 +56,9 @@ class PostVoter extends Voter
         /** @var Post */
         $post = $subject;
 
-        if ($attribute === self::VIEW) {
+        if (self::VIEW === $attribute) {
             return $this->canView($post, $user);
-        } else if ($attribute === self::EDIT) {
+        } elseif (self::EDIT === $attribute) {
             return $this->canEdit($post, $user);
         }
 

@@ -79,7 +79,7 @@ export default {
                 content: '',
                 amount: '0',
             }),
-        }
+        },
     },
     data() {
         return {
