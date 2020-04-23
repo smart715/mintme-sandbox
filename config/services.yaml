@@ -41,6 +41,14 @@ services:
             $headers:
                 Accept: application/json
 
+    rabbitmq.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%env(RABBITMQ_MANAGMENT_URL)%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q='
+
     disposable_email.json_rpc:
         class: App\Communications\GuzzleRestWrapper
         arguments:
@@ -77,6 +85,10 @@ services:
     App\Communications\CoinmarketcapCommunicator:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\RabbitMQCommunicator:
+        arguments:
+            $rpc: '@rabbitmq.rest_rpc'
 
     App\Communications\DeployCostFetcher:
         arguments:
@@ -513,3 +525,9 @@ services:
     App\EventSubscriber\AuthenticationListener:
         arguments:
             $firewallName: '%fos_user.firewall_name%'
+
+    App\Utils\ServiceInfo\ServiceInfoBuilder:
+        arguments:
+            $depositWorkDir: '%env(DEPOSIT_WORKDIR)%'
+            $withdrawWorkDir: '%env(WITHDRAW_WORKDIR)%'
+            $contractWorkDir: '%env(CONTRACT_WORKDIR)%'

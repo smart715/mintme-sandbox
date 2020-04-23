@@ -1,5 +1,14 @@
 {% set show_links = app.user and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %}
 {% set route = app.request.get('_route') %}
+
+{% if is_hacker_allowed %}
+    <div id="info-bar">
+        <info-bar
+            username="{{ app.user.username|default('') }}"
+            auth-code="{{ app.user.EmailAuthCode|default('') }}"
+        ></info-bar>
+    </div>
+{% endif %}
 <nav class="navbar top-navbar navbar-expand-lg" id="navbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ path('homepage') }}">
