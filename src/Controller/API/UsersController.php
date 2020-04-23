@@ -2,35 +2,54 @@
 
 namespace App\Controller\API;
 
+use App\Controller\TwoFactorAuthenticatedController;
 use App\Entity\Api\Client;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Form\ChangePasswordType;
 use App\Logger\UserActionLogger;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Request\ParamFetcherInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\FOSUserEvents;
+use FOS\UserBundle\Model\UserManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Rest\Route("/api/users")
  */
-class UsersController extends AbstractFOSRestController
+class UsersController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
 {
+    /** @var UserManagerInterface */
+    protected $userManager;
+
     /** @var UserActionLogger */
     private $userActionLogger;
+
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
     /** @var ClientManager */
     private $clientManager;
 
-    public function __construct(UserActionLogger $userActionLogger, ClientManager $clientManager)
-    {
+    public function __construct(
+        UserManagerInterface $userManager,
+        UserActionLogger $userActionLogger,
+        ClientManager $clientManager,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        $this->userManager = $userManager;
         $this->userActionLogger = $userActionLogger;
         $this->clientManager = $clientManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -61,24 +80,20 @@ class UsersController extends AbstractFOSRestController
      */
     public function createApiKeys(): ?ApiKey
     {
-
         $user = $this->getUser();
-        $keys = null;
 
-        if ($user instanceof User) {
-            /** @var User $user */
-            $keys = $user->getApiKey();
-
-            if ($keys) {
-                throw new ApiBadRequestException("Keys already created");
-            }
-
-            $keys = ApiKey::fromNewUser($user);
-
-            $this->getEm()->persist($keys);
-            $this->getEm()->flush();
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+        /** @var User $user */
+        if ($user->getApiKey()) {
+            throw new ApiBadRequestException("Keys already created");
         }
 
+        $keys = ApiKey::fromNewUser($user);
+
+        $this->getEm()->persist($keys);
+        $this->getEm()->flush();
         $this->userActionLogger->info('Created API keys');
 
         return $keys;
@@ -110,8 +125,12 @@ class UsersController extends AbstractFOSRestController
      */
     public function createApiClient(): array
     {
-        /** @var  \App\Entity\User $user*/
+        /** @var  \App\Entity\User|null $user*/
         $user = $this->getUser();
+
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
 
         /** @var Client $client */
         $client = $this->clientManager->createClient();
@@ -149,6 +168,101 @@ class UsersController extends AbstractFOSRestController
         $this->userActionLogger->info('Deleted API Client');
 
         return true;
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch(
+     *      "/settings/update-password",
+     *      name="update-password",
+     *      options={"2fa"="optional", "expose"=true}
+     * )
+     * @Rest\RequestParam(name="currentPassword", nullable=false)
+     * @Rest\RequestParam(name="plainPassword", nullable=false)
+     * @Rest\RequestParam(name="code", nullable=true)
+     * @throws ApiBadRequestException
+     */
+    public function changePassOnTwoFaActive(Request $request): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
+        $errorOnPasswordForm = $this->checkStoredUserPassword($request, $user);
+
+        if ($errorOnPasswordForm) {
+            throw new ApiBadRequestException($errorOnPasswordForm);
+        }
+
+        $this->userManager->updatePassword($user);
+        $this->userManager->updateUser($user);
+        $response = new Response(Response::HTTP_ACCEPTED);
+
+        $event = new FilterUserResponseEvent($user, $request, $response);
+        $this->eventDispatcher->dispatch(
+            $event,
+            FOSUserEvents::CHANGE_PASSWORD_COMPLETED
+        );
+
+        return $response;
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch(
+     *      "/settings/check-user-password",
+     *      name="check-user-password",
+     *      options={"expose"=true}
+     * )
+     * @Rest\RequestParam(name="currentPassword", nullable=false)
+     * @Rest\RequestParam(name="plainPassword", nullable=false)
+     * @throws ApiBadRequestException
+     */
+    public function checkUserPassword(Request $request): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new ApiBadRequestException('Internal error, Please try again later');
+        }
+
+        $errorOnPasswordForm = $this->checkStoredUserPassword($request, $user);
+
+        if ($errorOnPasswordForm) {
+            throw new ApiBadRequestException($errorOnPasswordForm);
+        }
+
+        return new Response(Response::HTTP_ACCEPTED);
+    }
+
+    private function checkStoredUserPassword(Request $request, User $user): ?string
+    {
+        $changePasswordData = $request->request->all();
+        $passwordForm = $this->createForm(ChangePasswordType::class, $user, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+
+        $passwordForm->submit(array_filter($changePasswordData, function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$passwordForm->isValid()) {
+            foreach ($passwordForm->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $passwordForm->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    return $fieldErrors[0]->getMessage();
+                }
+            }
+
+            return 'Invalid Argument';
+        }
+
+        return null;
     }
 
     private function getEm(): ObjectManager
