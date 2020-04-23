@@ -85,6 +85,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         if (!$user) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
+
         /** @var User $user */
         if ($user->getApiKey()) {
             throw new ApiBadRequestException("Keys already created");
@@ -184,6 +185,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function changePassOnTwoFaActive(Request $request): Response
     {
+        /** @var  \App\Entity\User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
@@ -201,6 +203,8 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $response = new Response(Response::HTTP_ACCEPTED);
 
         $event = new FilterUserResponseEvent($user, $request, $response);
+
+        /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
             $event,
             FOSUserEvents::CHANGE_PASSWORD_COMPLETED
@@ -222,6 +226,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function checkUserPassword(Request $request): Response
     {
+        /** @var  \App\Entity\User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
