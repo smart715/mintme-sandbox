@@ -26,6 +26,7 @@ class ContractHandler implements ContractHandlerInterface
     private const DEPOSIT_CREDENTIAL = 'get_deposit_credential';
     private const TRANSFER = 'transfer';
     private const TRANSACTIONS = 'get_transactions';
+    private const PING = 'ping';
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -200,5 +201,12 @@ class ContractHandler implements ContractHandlerInterface
                 Type::fromString($transaction['type'])
             );
         }, $transactions);
+    }
+
+    public function ping(): bool
+    {
+        $response = $this->rpc->send(self::PING, []);
+
+        return 'pong' === $response->getResult();
     }
 }

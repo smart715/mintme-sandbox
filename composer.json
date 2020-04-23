@@ -53,6 +53,7 @@
         "symfony/framework-bundle": "^4.1",
         "symfony/monolog-bundle": "^3.3",
         "symfony/orm-pack": "^1.0",
+        "symfony/process": "^4.1",
         "symfony/security-bundle": "^4.1",
         "symfony/serializer": "^4.1",
         "symfony/swiftmailer-bundle": "^3.2",
