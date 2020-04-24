@@ -5,7 +5,11 @@
         </div>
         <div class="card-body posts">
             <template v-if="posts.length > 0">
-                <post v-for="(n, i) in postsCount" :post="posts[i]" :key="i"></post>
+                <post v-for="(n, i) in postsCount" 
+                    :post="posts[i]"
+                    :key="i"
+                    @delete-post="deletePost"
+                />
             </template>
             <div v-else>
                 Nothing's here
@@ -58,6 +62,9 @@ export default {
             } else {
                 location.href = this.readMoreUrl;
             }
+        },
+        deletePost(index) {
+            this.posts.splice(index, 0);
         },
     },
 };

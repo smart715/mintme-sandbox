@@ -1,4 +1,4 @@
-import CreatePost from './components/posts/EditPost';
+import EditPost from './components/posts/EditPost';
 
 new Vue({
     el: '#edit_post',

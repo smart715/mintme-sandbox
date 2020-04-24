@@ -1,8 +1,10 @@
 <template>
-    <post-form
+    <post-form edit
         :api-url="$routing.generate('edit_post', {id: post.id})"
         :post="post"
-    />
+    >
+        <template v-slot:title>Edit Post</template>
+    </post-form>
 </template>
 
 <script>
@@ -11,13 +13,13 @@ import PostForm from './PostForm';
 export default {
     name: 'EditPost',
     components: {
-        PostForm
+        PostForm,
     },
     props: {
         post: {
             type: Object,
             required: true,
-        }
-    }
-}
+        },
+    },
+};
 </script>

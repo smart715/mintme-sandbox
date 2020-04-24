@@ -25,7 +25,7 @@ class PostController extends Controller
     }
 
     /**
-     * @Route("/edit/{id}")
+     * @Route("/edit/{id}", name="edit_post_page", options={"expose"=true})
      */
     public function edit(int $id): Response
     {

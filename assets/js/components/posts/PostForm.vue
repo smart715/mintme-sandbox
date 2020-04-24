@@ -81,6 +81,10 @@ export default {
                 amount: '0',
             }),
         },
+        edit: {
+            type: Boolean,
+            default: false,
+        }
     },
     data() {
         return {
@@ -164,9 +168,12 @@ export default {
                 return;
             }
 
-            this.$emit('update-posts');
+            this.$emit('save-success');
             this.notifySuccess(res.data.message);
-            this.reset();
+
+            if (!this.edit) {
+                this.reset();
+            }
         },
         // handles server side validation errors, although it shouldn't happen (because of frontend validation)
         savePostErrorHandler(data) {
@@ -185,8 +192,8 @@ export default {
         },
         reset() {
             this.content = '';
-            this.amount= '0';
-        },
+            this.amount = '0';
+        }
     },
     watch: {
         content() {

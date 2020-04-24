@@ -26,7 +26,7 @@ class PostsController extends AbstractFOSRestController
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var PostMangerInterface */
+    /** @var PostManagerInterface */
     private $postManager;
 
     public function __construct(
@@ -42,7 +42,6 @@ class PostsController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/create", name="create_post", options={"expose"=true})
-     * @Rest\Post("/edit/{id}", nme="edit_post", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      * @Rest\RequestParam(name="amount", nullable=false)
      */
@@ -63,12 +62,12 @@ class PostsController extends AbstractFOSRestController
         $post = new Post();
         $post->setToken($token);
 
-        $this->handlePostForm($post, $request, 'Post created.');
+        return $this->handlePostForm($post, $request, 'Post created.');
     }
 
     /**
      * @Rest\View()
-     * @Rest\Post("/edit/{id<\d+>}", nme="edit_post", options={"expose"=true})
+     * @Rest\Post("/edit/{id<\d+>}", name="edit_post", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      * @Rest\RequestParam(name="amount", nullable=false)
      */
@@ -88,7 +87,7 @@ class PostsController extends AbstractFOSRestController
 
         $this->denyAccessUnlessGranted('edit', $post);
 
-        $this->handlePostForm($post, $request, 'Post edited.');
+        return $this->handlePostForm($post, $request, 'Post edited.');
     }
 
     /**
@@ -106,7 +105,7 @@ class PostsController extends AbstractFOSRestController
         return $this->view($token->getPosts(), Response::HTTP_OK);
     }
 
-    private function handlePostForm(Post $post, ParamFetcherInterface $request, $message)
+    private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View
     {
         $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
 
