@@ -55,6 +55,14 @@
                                     <span class="text-white">
                                         <span class="text-nowrap p-1">
                                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    Your {{ market.quote.symbol | rebranding }}
+                                                </template>
+                                                <template slot="body">
+                                                    Your {{ market.quote.symbol | rebranding }} balance.
+                                                </template>
+                                            </guide>
                                         </span>
                                         <span class="text-nowrap">
                                             <a
@@ -62,14 +70,6 @@
                                                 :href="depositMoreLink"
                                                 tabindex="6"
                                             >Deposit more</a>
-                                            <guide>
-                                                <template slot="header">
-                                                    Your Tokens
-                                                </template>
-                                                <template slot="body">
-                                                    Your {{ market.quote.symbol | rebranding }} balance.
-                                                </template>
-                                            </guide>
                                         </span>
                                     </span>
                                 </span>
