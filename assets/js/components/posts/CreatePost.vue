@@ -53,6 +53,7 @@
 import BbcodeEditor from '../bbcode/BbcodeEditor';
 import BbcodeHelp from '../bbcode/BbcodeHelp';
 import Guide from '../Guide';
+import {toMoney} from '../../utils';
 import {HTTP_OK} from '../../utils/constants';
 import {CheckInputMixin, NotificationMixin} from '../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
@@ -84,7 +85,7 @@ export default {
     data() {
         return {
             content: this.post.content,
-            amount: this.post.amount,
+            amount: toMoney(this.post.amount),
             minContentLength: 2,
             maxContentLength: 500,
             maxDecimals: 4,
