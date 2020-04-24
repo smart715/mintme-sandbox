@@ -84,7 +84,7 @@ export default {
         edit: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     data() {
         return {
@@ -193,7 +193,7 @@ export default {
         reset() {
             this.content = '';
             this.amount = '0';
-        }
+        },
     },
     watch: {
         content() {

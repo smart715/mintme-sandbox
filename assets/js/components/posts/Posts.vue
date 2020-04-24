@@ -5,7 +5,7 @@
         </div>
         <div class="card-body posts">
             <template v-if="posts.length > 0">
-                <post v-for="(n, i) in postsCount" 
+                <post v-for="(n, i) in postsCount"
                     :post="posts[i]"
                     :key="i"
                     @delete-post="deletePost"
