@@ -63,6 +63,9 @@ class Post
      */
     protected $amount = '0';
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getId(): int
     {
         return $this->id;
