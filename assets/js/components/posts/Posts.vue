@@ -9,7 +9,7 @@
                     :post="posts[i]"
                     :key="i"
                     :index="i"
-                    @delete-post="deletePost"
+                    @delete-post="$emit('delete-post', $event)"
                     :show-edit="showEdit"
                 />
             </template>
@@ -68,9 +68,6 @@ export default {
             } else {
                 location.href = this.readMoreUrl;
             }
-        },
-        deletePost(index) {
-            this.posts.splice(index, 0);
         },
     },
 };

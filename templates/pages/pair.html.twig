@@ -35,8 +35,10 @@
                                 :max="4"
                                 token-name="{{ token.name }}"
                                 token-page
-                                @go-to-posts="goToPosts"
                                 :show-edit="{{ isOwner ? 'true' : 'false'}}"
+                                @go-to-posts="goToPosts"
+                                @delete-post="deletePost"
+
                             >
                                 <template v-slot:title>Recent posts</template>
                             </posts>
@@ -89,6 +91,7 @@
                                 <posts class="col-12 col-lg-8" 
                                     :posts="posts || (posts = {{posts | json_encode}})"
                                     :show-edit="{{ isOwner ? 'true' : 'false'}}"
+                                    @delete-post="deletePost"
                                 />
                             </div>
                         </div>

@@ -78,6 +78,9 @@ new Vue({
     goToPosts: function() {
       this.tabIndex = 2;
     },
+    deletePost: function(index) {
+      this.posts.splice(index, 1);
+    },
   },
   store,
 });

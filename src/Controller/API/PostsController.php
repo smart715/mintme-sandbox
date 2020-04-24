@@ -105,6 +105,26 @@ class PostsController extends AbstractFOSRestController
         return $this->view($token->getPosts(), Response::HTTP_OK);
     }
 
+    /**
+     * @Rest\View()
+     * @Rest\Post("/delete/{id<\d+>}", name="delete_post", options={"expose"=true})
+     */
+    public function delete(int $id): View
+    {
+        $post = $this->postManager->getById($id);
+
+        if (!$post) {
+            throw new ApiNotFoundException("Post not found");
+        }
+
+        $this->denyAccessUnlessGranted('edit', $post);
+
+        $this->entityManager->remove($post);
+        $this->entityManager->flush();
+
+        return $this->view(['message' => 'Post deleted.'], Response::HTTP_OK);
+    }
+
     private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View
     {
         $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);

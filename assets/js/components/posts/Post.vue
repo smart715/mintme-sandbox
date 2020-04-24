@@ -78,10 +78,10 @@ export default {
     },
     methods: {
         deletePost() {
-            this.$axios.single.post('delete_post', {id: this.post.id})
-            .then(() => {
+            this.$axios.single.post(this.$routing.generate('delete_post', {id: this.post.id}))
+            .then((res) => {
                this.$emit('delete-post', this.index);
-               this.notifySuccess('Post deleted');
+               this.notifySuccess(res.data.message);
             })
             .catch(() => {
                 this.notifyError('Error deleting post.');
