@@ -1,12 +1,12 @@
 <template>
     <div class="input-group">
-        <div ref="tokenSearch" @keyup.enter="redirectToToken">
+        <div ref="tokenSearch" @keyup.enter="onItemSelected">
             <autocomplete
                     :input-class="inputClass"
                     placeholder="Search for the token"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
-                    @item-clicked="onItemClicked"
+                    @item-clicked="onItemSelected"
                     @change="onInputChange"
                     :items="items"
                     :min-len="3"
@@ -71,8 +71,8 @@ export default {
             }
             location.href = this.$routing.generate('token_show', {name: this.input}, true);
         },
-        onItemClicked: function(val) {
-            this.input = val;
+        onItemSelected: function(val) {
+            this.input = val.isTrusted ? val.target.value : val;
             this.redirectToToken();
         },
         onInputChange: function(val) {
