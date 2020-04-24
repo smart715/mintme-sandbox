@@ -6,8 +6,8 @@ import TokenIntroductionDescription from './components/token/introduction/TokenI
 import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
-import Posts from './components/token/posts/Posts';
-import CreatePost from './components/token/posts/CreatePost';
+import Posts from './components/posts/Posts';
+import CreatePost from './components/posts/CreatePost';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
 

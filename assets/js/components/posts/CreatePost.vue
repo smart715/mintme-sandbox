@@ -50,11 +50,11 @@
 </template>
 
 <script>
-import BbcodeEditor from '../../bbcode/BbcodeEditor';
-import BbcodeHelp from '../../bbcode/BbcodeHelp';
-import Guide from '../../Guide';
-import {HTTP_OK} from '../../../utils/constants';
-import {CheckInputMixin, NotificationMixin} from '../../../mixins';
+import BbcodeEditor from '../bbcode/BbcodeEditor';
+import BbcodeHelp from '../bbcode/BbcodeHelp';
+import Guide from '../Guide';
+import {HTTP_OK} from '../../utils/constants';
+import {CheckInputMixin, NotificationMixin} from '../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
 export default {

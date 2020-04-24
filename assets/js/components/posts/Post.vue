@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import BbcodeView from '../../bbcode/BbcodeView';
+import BbcodeView from '../bbcode/BbcodeView';
 import moment from 'moment';
-import {MoneyFilterMixin} from '../../../mixins';
+import {MoneyFilterMixin} from '../../mixins';
 
 export default {
     name: 'Post',
