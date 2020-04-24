@@ -13,17 +13,25 @@
             {{ author }}
         </a>
         <a v-if="post.editable"
-            class="float-right"
-            :href="$routing.generate('edit_post_page', {id: post.id})"
-        >
-            Edit
-        </a>
-        <a v-if="post.editable"
-            class="float-right"
+            class="float-right text-decoration-none text-reset"
             href="#"
             @click.prevent="deletePost"
         >
-            Delete
+            <font-awesome-icon
+                class="icon-edit c-pointer align-middle"
+                icon="trash"
+                transform="shrink-4 up-1.5"
+            />
+        </a>
+        <a v-if="post.editable"
+            class="float-right text-decoration-none text-reset"
+            :href="$routing.generate('edit_post_page', {id: post.id})"
+        >
+            <font-awesome-icon
+                class="icon-edit c-pointer align-middle"
+                icon="edit"
+                transform="shrink-4 up-1.5"
+            />
         </a>
     </div>
 </template>
@@ -31,7 +39,13 @@
 <script>
 import BbcodeView from '../bbcode/BbcodeView';
 import moment from 'moment';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 import {MoneyFilterMixin, NotificationMixin} from '../../mixins';
+
+library.add(faEdit);
+library.add(faTrash);
 
 export default {
     name: 'Post',
@@ -41,10 +55,11 @@ export default {
     ],
     components: {
         BbcodeView,
+        FontAwesomeIcon,
     },
     props: {
         post: Object,
-        key: {
+        index: {
             type: Number,
             default: null,
         },
@@ -59,9 +74,9 @@ export default {
     },
     methods: {
         deletePost() {
-            this.$axios.single.post('delete_post', {id: post.id})
+            this.$axios.single.post('delete_post', {id: this.post.id})
             .then(() => {
-               this.$emit('delete-post', this.key);
+               this.$emit('delete-post', this.index);
                this.notifySuccess('Post deleted');
             })
             .catch(() => {

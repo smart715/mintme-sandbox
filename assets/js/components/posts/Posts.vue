@@ -8,6 +8,7 @@
                 <post v-for="(n, i) in postsCount"
                     :post="posts[i]"
                     :key="i"
+                    :index="i"
                     @delete-post="deletePost"
                 />
             </template>
