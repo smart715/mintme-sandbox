@@ -32,8 +32,6 @@ class PostNormalizer implements NormalizerInterface
             ? $post['content']
             : null;
 
-        $post['editable'] = $this->authorizationChecker->isGranted('edit', $object);
-
         return $post;
     }
 

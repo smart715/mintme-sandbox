@@ -12,7 +12,7 @@
         <a :href="$routing.generate('profile-view', {pageUrl: post.author.page_url})">
             {{ author }}
         </a>
-        <a v-if="post.editable"
+        <a v-if="showEdit"
             class="float-right text-decoration-none text-reset"
             href="#"
             @click.prevent="deletePost"
@@ -23,7 +23,7 @@
                 transform="shrink-4 up-1.5"
             />
         </a>
-        <a v-if="post.editable"
+        <a v-if="showEdit"
             class="float-right text-decoration-none text-reset"
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
@@ -62,6 +62,10 @@ export default {
         index: {
             type: Number,
             default: null,
+        },
+        showEdit: {
+            type: Boolean,
+            default: false,
         },
     },
     computed: {

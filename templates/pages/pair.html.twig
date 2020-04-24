@@ -36,6 +36,7 @@
                                 token-name="{{ token.name }}"
                                 token-page
                                 @go-to-posts="goToPosts"
+                                :show-edit="{{ isOwner ? 'true' : 'false'}}"
                             >
                                 <template v-slot:title>Recent posts</template>
                             </posts>
@@ -87,6 +88,7 @@
                             <div class="row mt-3 justify-content-center">
                                 <posts class="col-12 col-lg-8" 
                                     :posts="posts || (posts = {{posts | json_encode}})"
+                                    :show-edit="{{ isOwner ? 'true' : 'false'}}"
                                 />
                             </div>
                         </div>

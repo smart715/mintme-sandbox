@@ -10,6 +10,7 @@
                     :key="i"
                     :index="i"
                     @delete-post="deletePost"
+                    :show-edit="showEdit"
                 />
             </template>
             <div v-else>
@@ -42,6 +43,10 @@ export default {
         },
         tokenName: String,
         tokenPage: Boolean,
+        showEdit: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
