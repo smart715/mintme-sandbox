@@ -59,7 +59,7 @@ import {CheckInputMixin, NotificationMixin} from '../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
 export default {
-    name: 'CreatePost',
+    name: 'PostForm',
     mixins: [
         CheckInputMixin,
         NotificationMixin,
@@ -70,9 +70,9 @@ export default {
         Guide,
     },
     props: {
-        edit: {
-            type: Boolean,
-            default: false,
+        apiUrl: {
+            type: String,
+            required: true,
         },
         post: {
             type: Object,
@@ -152,7 +152,7 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.$routing.generate('create_post'), {
+            this.$axios.single.post(this.apiUrl, {
                 content: this.content,
                 amount: this.amount,
             })
@@ -165,7 +165,7 @@ export default {
             }
 
             this.$emit('update-posts');
-            this.notifySuccess('Post created');
+            this.notifySuccess(res.data.message);
             this.reset();
         },
         // handles server side validation errors, although it shouldn't happen (because of frontend validation)

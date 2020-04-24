@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Entity\Post;
 use App\Exception\ApiNotFoundException;
 use App\Form\PostType;
+use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -25,17 +26,23 @@ class PostsController extends AbstractFOSRestController
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var PostMangerInterface */
+    private $postManager;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        PostManagerInterface $postManager
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
+        $this->postManager = $postManager;
     }
 
     /**
      * @Rest\View()
      * @Rest\Post("/create", name="create_post", options={"expose"=true})
+     * @Rest\Post("/edit/{id}", nme="edit_post", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      * @Rest\RequestParam(name="amount", nullable=false)
      */
@@ -54,21 +61,34 @@ class PostsController extends AbstractFOSRestController
         }
 
         $post = new Post();
-
-        $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
-
-        $form->submit($request->all());
-
-        if (!$form->isValid()) {
-            return $this->view($form, Response::HTTP_BAD_REQUEST);
-        }
-
         $post->setToken($token);
 
-        $this->entityManager->persist($post);
-        $this->entityManager->flush();
+        $this->handlePostForm($post, $request, 'Post created.');
+    }
 
-        return $this->view([], Response::HTTP_OK);
+    /**
+     * @Rest\View()
+     * @Rest\Post("/edit/{id<\d+>}", nme="edit_post", options={"expose"=true})
+     * @Rest\RequestParam(name="content", nullable=false)
+     * @Rest\RequestParam(name="amount", nullable=false)
+     */
+    public function edit(ParamFetcherInterface $request, int $id): View
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $post = $this->postManager->getById($id);
+
+        if (!$post) {
+            throw new ApiNotFoundException("Post not found");
+        }
+
+        $this->denyAccessUnlessGranted('edit', $post);
+
+        $this->handlePostForm($post, $request, 'Post edited.');
     }
 
     /**
@@ -84,5 +104,21 @@ class PostsController extends AbstractFOSRestController
         }
 
         return $this->view($token->getPosts(), Response::HTTP_OK);
+    }
+
+    private function handlePostForm(Post $post, ParamFetcherInterface $request, $message)
+    {
+        $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
+
+        $form->submit($request->all());
+
+        if (!$form->isValid()) {
+            return $this->view($form, Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->entityManager->persist($post);
+        $this->entityManager->flush();
+
+        return $this->view(["message" => $message], Response::HTTP_OK);
     }
 }
