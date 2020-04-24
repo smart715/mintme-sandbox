@@ -81,7 +81,7 @@ export default {
                 amount: '0',
             }),
         },
-        edit: {
+        resetAfterAction: {
             type: Boolean,
             default: false,
         },
@@ -171,7 +171,7 @@ export default {
             this.$emit('save-success');
             this.notifySuccess(res.data.message);
 
-            if (!this.edit) {
+            if (this.resetAfterAction) {
                 this.reset();
             }
         },

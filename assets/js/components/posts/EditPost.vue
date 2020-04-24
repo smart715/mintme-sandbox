@@ -1,5 +1,5 @@
 <template>
-    <post-form edit
+    <post-form
         :api-url="$routing.generate('edit_post', {id: post.id})"
         :post="post"
     >
