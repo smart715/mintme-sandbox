@@ -7,10 +7,10 @@
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Token name">
                 <b>Token:</b> {{ infoData.tokenName || '-' }}
             </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="MintMe coin rate">
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="MintMe balance">
                 <b>MINTME:</b> {{ mintmeBalance }}
             </span>
-            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin rate">
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
                 <b>BTC:</b> {{ btcBalance }}
             </span>
             <span v-if="authCode" class="pr-2 pr-sm-5" v-b-tooltip.hover title="Current email verification code">
