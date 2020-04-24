@@ -44,6 +44,16 @@ security:
             security:   false
 
     role_hierarchy:
+        ROLE_ADMIN_USER_ADMIN:
+            - ROLE_ADMIN_USER_LIST
+            - ROLE_ADMIN_USER_VIEW
+        ROLE_ADMIN_PROFILE_ADMIN:
+            - ROLE_ADMIN_PROFILE_LIST
+            - ROLE_ADMIN_PROFILE_VIEW
+        ROLE_ADMIN_USER_SUPPORT:
+            - ROLE_ADMIN_USER_LIST
+            - ROLE_ADMIN_USER_VIEW
+            - ROLE_ADMIN_USER_EDIT
         ROLE_ADMIN_NEWS_ADMIN:
             - ROLE_SONATA_NEWS_ADMIN_POST_ALL
             - ROLE_SONATA_NEWS_ADMIN_COMMENT_ALL
@@ -51,10 +61,10 @@ security:
             - ROLE_SONATA_CLASSIFICATION_ADMIN_TAG_ALL
             - ROLE_SONATA_CLASSIFICATION_ADMIN_COLLECTION_ALL
             - ROLE_SONATA_CLASSIFICATION_ADMIN_CONTEXT_ALL
-        ROLE_SUPPORTER: [ROLE_ADMIN_NEWS_ADMIN]
-        ROLE_COPYWRITER: [ROLE_ADMIN_NEWS_ADMIN]
-        ROLE_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
+        ROLE_ADMIN: [ROLE_USER, ROLE_ADMIN_USER_ADMIN, ROLE_ADMIN_PROFILE_ADMIN]
+        ROLE_SUPPORTER: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPPORT]
+        ROLE_COPYWRITER: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_SUPPORTER, ROLE_COPYWRITER]
 
     access_control:
         - { path: ^/dev/api,                                        role: ROLE_API }
@@ -75,4 +85,4 @@ security:
         - { path: ^/register,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting,                                      role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/2fa,                                            role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
-        - { path: ^/admin,                                          roles: [ROLE_ADMIN, ROLE_ADMIN_NEWS_ADMIN] }
+        - { path: ^/admin,                                          role: ROLE_ADMIN }
