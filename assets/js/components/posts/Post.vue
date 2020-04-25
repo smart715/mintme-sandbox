@@ -41,7 +41,7 @@ import BbcodeView from '../bbcode/BbcodeView';
 import moment from 'moment';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {MoneyFilterMixin, NotificationMixin} from '../../mixins';
 
 library.add(faEdit);
