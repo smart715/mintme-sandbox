@@ -91,6 +91,9 @@ export default {
         },
     },
     methods: {
+        normalizeTraders: function(data) {
+            return data.filter((row) => Math.round(row.balance) > 0);
+        },
         scrollDown: function() {
             let parentDiv = this.$refs.table.$el.tBodies[0];
             parentDiv.scrollTop = parentDiv.scrollHeight;
@@ -99,7 +102,7 @@ export default {
             this.$axios.single.get(this.$routing.generate('top_holders', {
                 name: this.tokenName,
             }))
-            .then(({data}) => this.traders = data.map((row) => {
+            .then(({data}) => this.traders = this.normalizeTraders(data).map((row) => {
                 return {
                     trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
                     url: this.$routing.generate('profile-view', {pageUrl: row.user.profile.page_url}),
