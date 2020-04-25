@@ -1,13 +1,14 @@
-import Trade from './components/trade/Trade';
-import TokenPointsProgress from './components/token/TokenPointsProgress';
+import CreatePost from './components/posts/CreatePost';
+import Posts from './components/posts/Posts';
+import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
+import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
-import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenName from './components/token/TokenName';
-import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
+import TokenPointsProgress from './components/token/TokenPointsProgress';
+import TokenSocialMediaIcons from './components/token/introduction/TokenSocialMediaIcons';
 import TopHolders from './components/trade/TopHolders';
-import Posts from './components/posts/Posts';
-import CreatePost from './components/posts/CreatePost';
+import Trade from './components/trade/Trade';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
 
@@ -28,16 +29,17 @@ new Vue({
     };
   },
   components: {
-    Trade,
+    CreatePost,
+    Posts,
+    TokenDeployIcon,
+    TokenIntroductionDescription,
     TokenIntroductionProfile,
     TokenIntroductionStatistics,
-    TokenIntroductionDescription,
     TokenName,
-    TokenDeployIcon,
-    TopHolders,
     TokenPointsProgress,
-    Posts,
-    CreatePost,
+    TokenSocialMediaIcons,
+    TopHolders,
+    Trade,
   },
   methods: {
     descriptionUpdated: function(val) {

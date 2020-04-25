@@ -16,7 +16,19 @@
 {% block content %}
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
-    <div class="row pt-5 justify-content-center">
+    <div class="row pt-5 pb-3">
+        <token-social-media-icons
+            youtube-client-id="{{ global_youtube_client_id }}"
+            facebook-app-id="{{ global_facebook_app_id }}"
+            website-url="{{ token.websiteUrl }}"
+            facebook-url="{{ token.facebookUrl }}"
+            youtube-channel-id="{{ token.youtubeChannelId }}"
+            token-name="{{ market.quote.name }}"
+            telegram-url="{{ token.telegramUrl }}"
+            discord-url="{{ token.discordUrl }}"
+        />
+    </div>
+    <div class="row mt-3 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
             <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
