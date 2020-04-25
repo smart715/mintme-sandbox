@@ -49,8 +49,11 @@
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
                                     twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                     token-created="{{ token.getCreated().format('d M Y') }}"
-                                    :precision="{{ precision }}">
-                            </token-introduction-statistics>
+                                    :precision="{{ precision }}"
+                                    :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                    token-contract-address="{{ token.address }}"
+
+                            />
                             <top-holders
                                     class="col-12 mt-3"
                                     :token-name="{{ market.quote.symbol | json_encode }}">
