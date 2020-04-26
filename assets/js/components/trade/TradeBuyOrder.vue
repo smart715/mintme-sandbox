@@ -49,13 +49,6 @@
                                     <span class="text-white">
                                         <span class="text-nowrap">
                                             {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                        </span>
-                                        <span class="text-nowrap">
-                                            <a
-                                                v-if="showDepositMoreLink"
-                                                :href="depositMoreLink"
-                                                tabindex="1"
-                                            >Deposit more</a>
                                             <guide>
                                                 <template slot="header">
                                                     Your {{ market.base.symbol | rebranding }}
@@ -64,6 +57,13 @@
                                                     Your {{ market.base.symbol | rebranding }} balance.
                                                 </template>
                                             </guide>
+                                        </span>
+                                        <span class="text-nowrap">
+                                            <a
+                                                v-if="showDepositMoreLink"
+                                                :href="depositMoreLink"
+                                                tabindex="1"
+                                            >Deposit more</a>
                                         </span>
                                     </span>
                                 </span>
