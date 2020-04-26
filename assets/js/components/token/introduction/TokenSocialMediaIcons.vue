@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex">
+    <div class="d-flex align-items-center">
         <a
             v-if="currentWebsite"
             :href="currentWebsite"
