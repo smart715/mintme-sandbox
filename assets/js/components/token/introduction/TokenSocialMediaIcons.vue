@@ -95,7 +95,6 @@ import TokenFacebookAddressView from '../facebook/TokenFacebookAddressView';
 import TokenTelegramChannel from '../TokenTelegramChannel';
 import TokenWebsiteAddressView from '../website/TokenWebsiteAddressView';
 import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
-import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 

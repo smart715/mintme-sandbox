@@ -65,7 +65,6 @@ export default {
         websocketUrl: String,
         releaseAddress: String,
         discordUrl: String,
-        editable: Boolean,
         facebookUrl: String,
         facebookAppId: String,
         telegramUrl: String,

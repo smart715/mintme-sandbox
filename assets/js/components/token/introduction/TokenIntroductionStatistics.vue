@@ -184,7 +184,6 @@ import CopyLink from '../../CopyLink';
 import Guide from '../../Guide';
 import {Decimal} from 'decimal.js';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {library} from '@fortawesome/fontawesome-svg-core';
 import {toMoney} from '../../../utils';
 import {tokenDeploymentStatus} from '../../../utils/constants';
 import {mapGetters, mapMutations} from 'vuex';

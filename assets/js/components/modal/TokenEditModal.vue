@@ -27,7 +27,7 @@
                                     :token-name="currentName"
                                     @updated-website="$emit('updated-website', $event)"
                                     @updated-facebook="$emit('updated-facebook', $event)"
-                                    @updated-youtube="$emit('updated-youtube', $event)" 
+                                    @updated-youtube="$emit('updated-youtube', $event)"
                                 />
                             </template>
                         </faq-item>
