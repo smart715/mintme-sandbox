@@ -12,6 +12,29 @@
                     <div class="row faq-block mx-0 border-bottom border-top">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
+                                Add social media
+                            </template>
+                            <template slot="body">
+                                <token-introduction-profile
+                                    :discord-url="discordUrl"
+                                    :editable="editable"
+                                    :facebook-url="facebookUrl"
+                                    :facebook-app-id="facebookAppId"
+                                    :telegram-url="telegramUrl"
+                                    :website-url="websiteUrl"
+                                    :youtube-client-id="youtubeClientId"
+                                    :youtube-channel-id="youtubeChannelId"
+                                    :token-name="currentName"
+                                    @updated-website="$emit('updated-website', $event)"
+                                    @updated-facebook="$emit('updated-facebook', $event)"
+                                    @updated-youtube="$emit('updated-youtube', $event)" 
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0 border-bottom border-top">
+                        <faq-item @switch="refreshSliders">
+                            <template slot="title">
                                 Token release period
                             </template>
                             <template slot="body">
@@ -102,6 +125,7 @@ import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
 import TokenDelete from '../token/TokenDelete';
 import TokenDeploy from '../token/deploy/TokenDeploy';
+import TokenIntroductionProfile from '../token/introduction/TokenIntroductionProfile';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
@@ -119,6 +143,7 @@ export default {
         TokenReleasePeriod,
         TokenReleaseAddress,
         TwoFactorModal,
+        TokenIntroductionProfile,
     },
     props: {
         currentName: String,
@@ -132,6 +157,14 @@ export default {
         twofa: Boolean,
         visible: Boolean,
         websocketUrl: String,
+        discordUrl: String,
+        editable: Boolean,
+        facebookUrl: String,
+        facebookAppId: String,
+        telegramUrl: String,
+        websiteUrl: String,
+        youtubeClientId: String,
+        youtubeChannelId: String,
     },
     data() {
         return {

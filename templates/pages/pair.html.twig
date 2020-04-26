@@ -33,7 +33,7 @@
         </div>
     </div>
     {% endif %}
-    
+
     <div class="row mt-3 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
@@ -147,16 +147,26 @@
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <token-name
-                                        :editable="{{ isOwner ? 'true' : 'false' }}"
-                                        :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
-                                        identifier="{{ market.quote.identifier }}"
-                                        name="{{ market.quote.name }}"
-                                        :precision="{{ precision }}"
-                                        :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                        :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                                        websocket-url="{{ global_websocket_url }}"
-                                        release-address="{{ token.mintDestination }}"
-                                        @token-deploy-pending="setTokenPending"
+                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                                    identifier="{{ market.quote.identifier }}"
+                                    name="{{ market.quote.name }}"
+                                    :precision="{{ precision }}"
+                                    :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                    :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    release-address="{{ token.mintDestination }}"
+                                    discord-url="{{ token.discordUrl }}"
+                                    facebook-url="{{ token.facebookUrl }}"
+                                    facebook-app-id="{{ global_facebook_app_id }}"
+                                    telegram-url="{{ token.telegramUrl }}"
+                                    website-url="{{ token.websiteUrl }}"
+                                    youtube-client-id="{{ global_youtube_client_id }}"
+                                    youtube-channel-id="{{ token.youtubeChannelId }}"
+                                    @token-deploy-pending="setTokenPending"
+                                    @updated-website="websiteUpdated"
+                                    @updated-facebook="facebookUpdated"
+                                    @updated-youtube="youtubeUpdated" 
                                 />
                             </div>
                         </li>

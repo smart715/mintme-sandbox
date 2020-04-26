@@ -14,9 +14,20 @@
                 :visible="showTokenEditModal"
                 :websocket-url="websocketUrl"
                 :release-address="releaseAddress"
+                :discord-url="discordUrl"
+                :editable="editable"
+                :facebook-url="facebookUrl"
+                :facebook-app-id="facebookAppId"
+                :telegram-url="telegramUrl"
+                :website-url="websiteUrl"
+                :youtube-client-id="youtubeClientId"
+                :youtube-channel-id="youtubeChannelId"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
                 @update-release-address="updateReleaseAddress"
+                @updated-website="$emit('updated-website', $event)"
+                @updated-facebook="$emit('updated-facebook', $event)"
+                @updated-youtube="$emit('updated-youtube', $event)"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -53,6 +64,14 @@ export default {
         twofa: Boolean,
         websocketUrl: String,
         releaseAddress: String,
+        discordUrl: String,
+        editable: Boolean,
+        facebookUrl: String,
+        facebookAppId: String,
+        telegramUrl: String,
+        websiteUrl: String,
+        youtubeClientId: String,
+        youtubeChannelId: String,
     },
     components: {
         FontAwesomeIcon,
