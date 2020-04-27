@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
+use App\Entity\User;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\Converter\RebrandingConverterInterface;
@@ -12,6 +13,7 @@ use App\Wallet\WalletInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
@@ -78,6 +80,13 @@ class WalletController extends Controller
                 'danger',
                 'There are no transactions attached to this hashcode'
             );
+        }
+
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user || $user !== $pendingWithdraw->getUser()) {
+            throw new AccessDeniedHttpException();
         }
 
         try {
