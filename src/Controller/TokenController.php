@@ -166,7 +166,6 @@ class TokenController extends Controller
         MoneyWrapperInterface $moneyWrapper,
         MarketStatusManagerInterface $marketStatusManager
     ): Response {
-
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('intro');
         }
