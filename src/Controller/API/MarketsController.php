@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -31,11 +32,12 @@ class MarketsController extends APIController
     ): View {
 
         $currentUser = $this->getUser();
-        $markets = null;
 
-        if ($currentUser instanceof User) {
-            $markets = $marketManager->createUserRelated($currentUser);
+        if (!$currentUser || !$currentUser instanceof User) {
+            throw new AccessDeniedHttpException();
         }
+
+        $markets = $marketManager->createUserRelated($currentUser);
 
         return $this->view($markets);
     }

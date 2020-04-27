@@ -254,7 +254,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         if (!$lock->getId() || $isNotExchanged) {
-            /** @var  \App\Entity\User $user*/
+            /** @var  User $user*/
             $user = $this->getUser();
             $balance = $balanceHandler->balance($user, $token);
 
