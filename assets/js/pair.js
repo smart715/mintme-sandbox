@@ -22,6 +22,8 @@ new Vue({
       tokenWebsite: null,
       tokenFacebook: null,
       tokenYoutube: null,
+      tokenDiscord: null,
+      tokenTelegram: null,
       editingName: false,
       tokenName: null,
       tokenPending: null,
@@ -66,10 +68,16 @@ new Vue({
       this.tokenFacebook = val;
     },
     websiteUpdated: function(val) {
-        this.tokenWebsite = val;
+        his.tokenWebsite = val;
     },
     youtubeUpdated: function(val) {
-        this.tokenYoutube = val;
+      this.tokenYoutube = val;
+    },
+    discordUpdated: function(val) {
+      this.tokenDiscord = val;
+    },
+    telegramUpdated: function(val) {
+      this.tokenTelegram = val;
     },
     updatePosts: function() {
       this.$axios.single.get(this.$routing.generate('list_posts', {tokenName: this.tokenName}))
@@ -82,6 +90,9 @@ new Vue({
     },
     deletePost: function(index) {
       this.posts.splice(index, 1);
+    },
+    coalesce: function(a, b) {
+      return a !== null ? a : b;
     },
   },
   store,

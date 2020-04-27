@@ -28,6 +28,8 @@
                                     @updated-website="$emit('updated-website', $event)"
                                     @updated-facebook="$emit('updated-facebook', $event)"
                                     @updated-youtube="$emit('updated-youtube', $event)"
+                                    @updated-discord="$emit('updated-discord', $event)"
+                                    @updated-telegram="$emit('updated-telegram', $event)"
                                 />
                             </template>
                         </faq-item>

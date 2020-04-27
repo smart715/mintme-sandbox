@@ -85,6 +85,7 @@ export default {
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;
+            this.$emit('updated-discord', newDiscord);
         },
         saveFacebook: function(newFacebook) {
             this.currentFacebook = newFacebook;
@@ -92,6 +93,7 @@ export default {
         },
         saveTelegram: function(newTelegram) {
             this.currentTelegram = newTelegram;
+            this.$emit('updated-telegram', newTelegram);
         },
         saveYoutube: function(newChannelId) {
             this.currentYoutube = newChannelId;

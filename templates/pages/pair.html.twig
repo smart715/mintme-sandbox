@@ -23,12 +23,12 @@
             <token-social-media-icons
                 youtube-client-id="{{ global_youtube_client_id }}"
                 facebook-app-id="{{ global_facebook_app_id }}"
-                website-url="{{ token.websiteUrl }}"
-                facebook-url="{{ token.facebookUrl }}"
-                youtube-channel-id="{{ token.youtubeChannelId }}"
                 token-name="{{ market.quote.name }}"
-                telegram-url="{{ token.telegramUrl }}"
-                discord-url="{{ token.discordUrl }}"
+                :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
+                :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
+                :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
             />
         </div>
     </div>
@@ -156,17 +156,19 @@
                                     :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
                                     websocket-url="{{ global_websocket_url }}"
                                     release-address="{{ token.mintDestination }}"
-                                    discord-url="{{ token.discordUrl }}"
-                                    facebook-url="{{ token.facebookUrl }}"
                                     facebook-app-id="{{ global_facebook_app_id }}"
-                                    telegram-url="{{ token.telegramUrl }}"
-                                    website-url="{{ token.websiteUrl }}"
                                     youtube-client-id="{{ global_youtube_client_id }}"
-                                    youtube-channel-id="{{ token.youtubeChannelId }}"
+                                    :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
+                                    :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
+                                    :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                                    :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                                    :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
                                     @token-deploy-pending="setTokenPending"
                                     @updated-website="websiteUpdated"
                                     @updated-facebook="facebookUpdated"
                                     @updated-youtube="youtubeUpdated" 
+                                    @updated-discord="discordUpdated"
+                                    @updated-telegram="telegramUpdated"
                                 />
                             </div>
                         </li>

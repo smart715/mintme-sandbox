@@ -1,40 +1,40 @@
 <template>
     <div class="d-flex align-items-center">
         <a
-            v-if="currentWebsite"
-            :href="currentWebsite"
+            v-if="websiteUrl"
+            :href="websiteUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon icon="globe" size="lg" />
         </a>
         <a
-            v-if="currentYoutube"
-            :href="currentYoutube"
+            v-if="youtubeChannelId"
+            :href="youtubeChannelId"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon :icon="['fab', 'youtube']" size="lg" />
         </a>
         <a
-            v-if="currentFacebook"
-            :href="currentFacebook"
+            v-if="facebookUrl"
+            :href="facebookUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon :icon="['fab', 'facebook']" size="lg" />
         </a>
         <a
-            v-if="currentDiscord"
-            :href="currentDiscord"
+            v-if="discordUrl"
+            :href="discordUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon :icon="['fab', 'discord']" size="lg" />
         </a>
         <a
-            v-if="currentTelegram"
-            :href="currentTelegram"
+            v-if="telegramUrl"
+            :href="telegramUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
@@ -125,11 +125,6 @@ export default {
     },
     data() {
         return {
-            currentDiscord: this.discordUrl,
-            currentFacebook: this.facebookUrl,
-            currentTelegram: this.telegramUrl,
-            currentWebsite: this.websiteUrl,
-            currentYoutube: this.youtubeChannelId,
             tokenUrl: this.$routing.generate('token_show', {
                 name: this.tokenName,
                 tab: 'intro',
