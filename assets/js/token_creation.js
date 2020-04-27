@@ -71,6 +71,14 @@ new Vue({
             validFirstChars: (value) => !tokenValidFirstChars(value),
             validLastChars: (value) => !tokenValidLastChars(value),
             noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
+            validTokenName: (value) => {
+                let forbiddenWords = ['token', 'coin'];
+                let val = 0;
+                forbiddenWords.forEach(
+                    (x) => val = val + value.toLowerCase().includes(x)
+                );
+                return (val<1);
+            },
             validChars: tokenNameValidChars,
             minLength: minLength(4),
             maxLength: maxLength(255),

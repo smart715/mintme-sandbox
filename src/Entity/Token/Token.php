@@ -50,6 +50,7 @@ class Token implements TradebleInterface
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
      * @AppAssert\DashedUniqueName(message="Token name is already exists.")
      * @AppAssert\IsNotBlacklisted(type="token", message="This value is not allowed")
+     * @AppAssert\DisallowedWord()
      * @Groups({"API", "API_TOK"})
      * @var string
      */
