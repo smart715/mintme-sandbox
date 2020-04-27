@@ -21,6 +21,7 @@
                             :currentWebsite="currentWebsite"
                             :editingWebsite="editingWebsite"
                             :tokenName="tokenName"
+                            :key="reRenderTokenWebsite"
                             @saveWebsite="saveWebsite"
                             @toggleEdit="toggleEdit"
                         />
@@ -247,6 +248,7 @@ export default {
             currentTelegram: this.telegramUrl,
             currentWebsite: this.websiteUrl,
             currentYoutube: this.youtubeChannelId,
+            reRenderTokenWebsite: 0,
             editingDiscord: false,
             editingTelegram: false,
             editingUrls: false,
@@ -283,6 +285,8 @@ export default {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
             this.$emit('updated-website', newWebsite);
+            this.reRenderTokenWebsite++;
+            this.editingWebsite = false;
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;

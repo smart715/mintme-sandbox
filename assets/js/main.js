@@ -17,6 +17,7 @@ import AdminMenu from './components/AdminMenu';
 import {directive as onClickaway} from 'vue-clickaway';
 import Notification from './components/Notification';
 import sanitizeHtml from './sanitize_html';
+import InfoBar from './components/InfoBar';
 
 /*
     To enable passive listeners,
@@ -58,6 +59,13 @@ const imagesContext = require.context(
     /\.(png|jpg|jpeg|gif|ico|svg)$/
 );
 imagesContext.keys().forEach(imagesContext);
+
+new Vue({
+    el: '#info-bar',
+    components: {
+        InfoBar,
+    },
+});
 
 new Vue({
     el: '#navbar',
