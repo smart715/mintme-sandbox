@@ -137,17 +137,18 @@
                     </template>
                 </b-table>
             </div>
-            <template v-if="marketFilters.selectedFilter === 'deployed' && tokens.length < 2">
+            <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
                 <div class="row justify-content-center">
                     <p class="text-center p-5">No one deployed his token yet</p>
                 </div>
             </template>
-            <template v-if="marketFilters.selectedFilter === 'user' && tokens.length < 2">
+            <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
                 <div class="row justify-content-center">
                     <p class="text-center p-5">No any token yet</p>
                 </div>
             </template>
-            <template v-if="userId && (marketFilters.selectedFilter === 'deployed' || marketFilters.selectedFilter === 'user')">
+            <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
+                    || marketFilters.selectedFilter === marketFilters.options.user.key)">
                 <div class="row justify-content-center">
                     <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
                 </div>
@@ -351,8 +352,12 @@ export default {
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
                 .then((res) => {
-                    if (Object.keys(this.markets).length === 1 && !this.marketFilters.userSelected) {
-                        this.marketFilters.selectedFilter = 'all';
+                    if (
+                        Object.keys(this.markets).length === 1
+                        && !this.marketFilters.userSelected
+                        && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                    ) {
+                        this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
                         this.fetchData();
                         return;
                     }
@@ -398,9 +403,11 @@ export default {
         updateData: function(page) {
             return new Promise((resolve, reject) => {
                 let params = {page};
-                if (this.marketFilters.selectedFilter === 'user') {
+                if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
                     params.user = 1;
-                } else if (this.marketFilters.selectedFilter === 'deployed' && this.userId) {
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key && this.userId
+                ) {
                     params.deployed = 1;
                 }
                 this.loading = true;
