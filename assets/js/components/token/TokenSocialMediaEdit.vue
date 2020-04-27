@@ -46,7 +46,7 @@ import TokenWebsiteAddress from '../website/TokenWebsiteAddress';
 import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
 
 export default {
-    name: 'TokenIntroductionProfile',
+    name: 'TokenSocialMediaEdit',
     props: {
         discordUrl: String,
         editable: Boolean,

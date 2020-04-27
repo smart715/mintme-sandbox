@@ -15,7 +15,7 @@
                                 Add social media
                             </template>
                             <template slot="body">
-                                <token-introduction-profile
+                                <token-social-media-edit
                                     :discord-url="discordUrl"
                                     :editable="editable"
                                     :facebook-url="facebookUrl"
@@ -127,7 +127,7 @@ import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
 import TokenDelete from '../token/TokenDelete';
 import TokenDeploy from '../token/deploy/TokenDeploy';
-import TokenIntroductionProfile from '../token/introduction/TokenIntroductionProfile';
+import TokenSocialMediaEdit from '../token/TokenSocialMediaEdit';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
@@ -142,10 +142,10 @@ export default {
         TokenChangeName,
         TokenDelete,
         TokenDeploy,
-        TokenReleasePeriod,
         TokenReleaseAddress,
+        TokenReleasePeriod,
+        TokenSocialMediaEdit,
         TwoFactorModal,
-        TokenIntroductionProfile,
     },
     props: {
         currentName: String,
