@@ -90,20 +90,20 @@
 </template>
 
 <script>
-import TokenDiscordChannel from '../TokenDiscordChannel';
-import TokenFacebookAddressView from '../facebook/TokenFacebookAddressView';
-import TokenTelegramChannel from '../TokenTelegramChannel';
-import TokenWebsiteAddressView from '../website/TokenWebsiteAddressView';
-import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
+import TokenDiscordChannel from './TokenDiscordChannel';
+import TokenFacebookAddressView from './facebook/TokenFacebookAddressView';
+import TokenTelegramChannel from './TokenTelegramChannel';
+import TokenWebsiteAddressView from './website/TokenWebsiteAddressView';
+import TokenYoutubeAddressView from './youtube/TokenYoutubeAddressView';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import Guide from '../../Guide';
+import Guide from '../Guide';
 
 let SocialSharing = require('vue-social-sharing');
 
 Vue.use(SocialSharing);
 
 export default {
-    name: 'TokenIntroductionProfile',
+    name: 'TokenSocialMediaIcons',
     props: {
         discordUrl: String,
         facebookUrl: String,
