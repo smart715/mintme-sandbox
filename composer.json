@@ -15,6 +15,7 @@
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "endroid/qr-code-bundle": "^3.4",
         "excelwebzone/recaptcha-bundle": "^1.5",
+        "ezyang/htmlpurifier": "^4.12",
         "friendsofsymfony/ckeditor-bundle": "^1.1",
         "friendsofsymfony/jsrouting-bundle": "^2.2",
         "friendsofsymfony/oauth-server-bundle": "^1.6",
