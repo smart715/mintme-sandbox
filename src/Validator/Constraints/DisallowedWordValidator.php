@@ -7,7 +7,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class DisallowedWordValidator extends ConstraintValidator
 {
-    private const FORBIDDEN_WORDS = ["token", "coin"];
     /**
      * {@inheritDoc}
      *
@@ -16,14 +15,14 @@ class DisallowedWordValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         // TODO: Implement validate() method.
+        $forbiddenWords = ["token", "coin"];
 
         if (null === $value || '' === $value) {
             return;
         }
 
-        foreach (self::FORBIDDEN_WORDS as $f) {
-            if (preg_match('/(\w*\s'.$f.')(s+\b|\b)/', strtolower($value)) ||
-                preg_match('/(^'.$f.')(s+\b|\b)/', strtolower($value))) {
+        foreach ($forbiddenWords as $f) {
+            if (false !== strpos(strtolower($value), $f)) {
                 $this->context->buildViolation($constraint->message)->addViolation();
             }
         }

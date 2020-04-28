@@ -8,7 +8,7 @@ import {
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
 } from './utils/constants';
-const FORBIDDEN_WORDS = ['token', 'coin'];
+
 new Vue({
     el: '#token',
     mixins: [NotificationMixin],
@@ -38,6 +38,7 @@ new Vue({
             }
 
             this.tokenNameExists = false;
+
             if (!this.$v.tokenName.$invalid && this.tokenName) {
                 this.tokenNameProcessing = true;
                 this.tokenNameTimeout = setTimeout(() => {
@@ -70,17 +71,13 @@ new Vue({
             validFirstChars: (value) => !tokenValidFirstChars(value),
             validLastChars: (value) => !tokenValidLastChars(value),
             noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
-            hasBlockedWords: (value) => {
-                for (const i of FORBIDDEN_WORDS) {
-                    let postFixpattern = '(\w*\\s'+i+')(s+\\b|\\b)';
-                    let singleWordpattern = '(^'+i+')(s+\\b|\\b)';
-                    let postFixRegex = new RegExp(postFixpattern, 'ig');
-                    let singleWordregex = new RegExp(singleWordpattern, 'ig');
-                    if (null !== value.match(postFixRegex) || null !== value.match(singleWordregex)) {
-                        return false;
-                    }
-                }
-                return true;
+            validTokenName: (value) => {
+                let forbiddenWords = ['token', 'coin'];
+                let val = 0;
+                forbiddenWords.forEach(
+                    (x) => val = val + value.toLowerCase().includes(x)
+                );
+                return (val<1);
             },
             validChars: tokenNameValidChars,
             minLength: minLength(4),
