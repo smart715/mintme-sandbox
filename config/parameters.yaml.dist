@@ -115,3 +115,9 @@ parameters:
 
     # max top holders for each token
     top_holders: 10
+
+    airdrop_params:
+        min_tokens_amount: 0.01
+        min_participants_amount: 100
+        max_participants_amount: 999999
+        min_token_reward: 0.0001
