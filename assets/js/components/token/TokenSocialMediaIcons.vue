@@ -10,7 +10,7 @@
         </a>
         <a
             v-if="youtubeChannelId"
-            :href="youtubeChannelId"
+            :href="youtubeUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
@@ -107,11 +107,9 @@ export default {
     props: {
         discordUrl: String,
         facebookUrl: String,
-        facebookAppId: String,
         telegramUrl: String,
         tokenName: String,
         websiteUrl: String,
-        youtubeClientId: String,
         youtubeChannelId: String,
     },
     components: {
@@ -133,8 +131,11 @@ export default {
         };
     },
     computed: {
-        description: function() {
+        description() {
            return this.twitterDescription + this.tokenUrl;
+        },
+        youtubeUrl() {
+            return 'https://www.youtube.com/channel/' + this.youtubeChannelId;
         },
     },
 };
