@@ -39,11 +39,11 @@
 </template>
 
 <script>
-import TokenDiscordChannel from '../TokenDiscordChannel';
-import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
-import TokenTelegramChannel from '../TokenTelegramChannel';
-import TokenWebsiteAddress from '../website/TokenWebsiteAddress';
-import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
+import TokenDiscordChannel from './TokenDiscordChannel';
+import TokenFacebookAddress from './facebook/TokenFacebookAddress';
+import TokenTelegramChannel from './TokenTelegramChannel';
+import TokenWebsiteAddress from './website/TokenWebsiteAddress';
+import TokenYoutubeAddress from './youtube/TokenYoutubeAddress';
 
 export default {
     name: 'TokenSocialMediaEdit',
