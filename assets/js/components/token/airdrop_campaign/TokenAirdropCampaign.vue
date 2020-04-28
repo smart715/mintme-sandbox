@@ -144,10 +144,6 @@ export default {
             airdropCampaignRemoved: false,
             tokenBalance: 0,
             balanceLoaded: false,
-            minTokensAmount: '0.01',
-            minParticipantsAmount: 100,
-            maxParticipantsAmount: 999999,
-            minTokenReward: '0.0001',
             loading: false,
             showEndDate: false,
             tokensAmount: null,
@@ -160,6 +156,7 @@ export default {
             },
             errorMessage: '',
             precision: TOK.subunit,
+            airdropParams: Object,
         };
     },
     mounted: function() {
@@ -167,6 +164,18 @@ export default {
         this.loadAirdropCampaign();
     },
     computed: {
+        minTokensAmount: function() {
+            return this.airdropParams.min_tokens_amount || 0;
+        },
+        minParticipantsAmount: function() {
+            return this.airdropParams.min_participants_amount || 0;
+        },
+        maxParticipantsAmount: function() {
+            return this.airdropParams.max_participants_amount || 0;
+        },
+        minTokenReward: function() {
+            return this.airdropParams.min_token_reward || 0;
+        },
         hasAirdropCampaign: function() {
             return parseInt(this.airdropCampaignId) > 0;
         },
@@ -232,7 +241,8 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    this.airdropCampaignId = result.data.id;
+                    this.airdropCampaignId = result.data.airdrop;
+                    this.airdropParams = result.data.airdropParams;
 
                     if (!this.hasAirdropCampaign) {
                         this.setDefaultValues();

@@ -169,10 +169,8 @@ export default {
                     }
 
                     this.alreadyClaimed = true;
-                    this.btnDisabled = false;
                 })
                 .catch((err) => {
-                    this.btnDisabled = false;
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
                         this.notifyError(err.response.data.message);
                         setTimeout(()=> {
@@ -183,7 +181,8 @@ export default {
                     }
 
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
-                });
+                })
+                .then(() => this.btnDisabled = false);
         },
         modalOnCancel: function() {
             if (!this.loggedIn) {
