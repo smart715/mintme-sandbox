@@ -56,24 +56,24 @@
                                         <span class="text-nowrap p-1">
                                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                             <span v-if="isMintmeToken">
-	                                            <guide>
-	                                                <template slot="header">
-	                                                    Your {{ market.quote.symbol | rebranding }}
-	                                                </template>
-	                                                <template slot="body">
-	                                                    Your {{ market.quote.symbol | rebranding }} balance.
-	                                                </template>
-	                                            </guide>
+                                                <guide>
+                                                    <template slot="header">
+                                                        Your {{ market.quote.symbol | rebranding }}
+                                                    </template>
+                                                    <template slot="body">
+                                                        Your {{ market.quote.symbol | rebranding }} balance.
+                                                    </template>
+                                                </guide>
                                             </span>
                                             <span v-else>
-	                                            <guide>
-	                                                <template slot="header">
-	                                                    Your Token
-	                                                </template>
-	                                                <template slot="body">
-	                                                    Your {{ market.quote.symbol | rebranding }} balance.
-	                                                </template>
-	                                            </guide>
+                                                <guide>
+                                                    <template slot="header">
+                                                        Your Token
+                                                    </template>
+                                                    <template slot="body">
+                                                        Your {{ market.quote.symbol | rebranding }} balance.
+                                                    </template>
+                                                </guide>
                                             </span>
                                         </span>
                                         <span class="text-nowrap">
