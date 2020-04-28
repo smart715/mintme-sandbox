@@ -202,7 +202,7 @@ describe('TokenAirdropCampaign', () => {
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                airdrop: 4,
+                airdrop: {id: 4},
             },
         });
 

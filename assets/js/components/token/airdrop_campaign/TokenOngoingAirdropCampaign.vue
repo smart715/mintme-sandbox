@@ -141,7 +141,7 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    this.airdropCampaign = result.data;
+                    this.airdropCampaign = result.data.airdrop;
                     this.loaded = true;
                 })
                 .catch((err) => {

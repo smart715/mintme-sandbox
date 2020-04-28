@@ -125,7 +125,7 @@ import Decimal from 'decimal.js';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
-import {TOK} from '../../../utils/constants';
+import {TOK, HTTP_BAD_REQUEST} from '../../../utils/constants';
 
 export default {
     name: 'TokenAirdropCampaign',
@@ -241,8 +241,10 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    this.airdropCampaignId = result.data.airdrop;
                     this.airdropParams = result.data.airdropParams;
+                    if (null !== result.data.airdrop) {
+                        this.airdropCampaignId = result.data.airdrop.id;
+                    }
 
                     if (!this.hasAirdropCampaign) {
                         this.setDefaultValues();
@@ -292,8 +294,14 @@ export default {
                     return;
                 })
                 .catch((err) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
-                    this.sendLogs('error', 'Can not create API Client', err);
+                    if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
+                        this.notifyError(err.response.data.message);
+                    } else {
+                        this.notifyError('Something went wrong. Try to reload the page.');
+                    }
+
+                    this.loading = false;
+                    this.sendLogs('error', 'Can not create airdrop campaign.', err);
                 });
         },
         deleteAirdropCampaign: function() {
