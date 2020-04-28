@@ -209,7 +209,7 @@ export default {
         return {
             content: {
                 required: (val) => {
-                    return required(val.replace(/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)\s*\]/g, '').trim());
+                    return required(val.replace(/\[\s*\/?\s*(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)\s*\]/g, '').trim());
                 },
                 minLength: minLength(this.minContentLength),
                 maxLength: maxLength(this.maxContentLength),
