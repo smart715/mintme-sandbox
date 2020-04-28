@@ -19,6 +19,13 @@ function mockVue() {
     return localVue;
 }
 
+const airdropParams = {
+    min_tokens_amount: 0.01,
+    min_participants_amount: 100,
+    max_participants_amount: 999999,
+    min_token_reward: 0.0001,
+};
+
 describe('TokenAirdropCampaign', () => {
     beforeEach(() => {
         moxios.install();
@@ -48,6 +55,11 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
+            data() {
+                return {
+                    airdropParams: airdropParams,
+                };
+            },
         });
 
         expect(wrapper.vm.btnDisabled).to.be.true;
@@ -91,6 +103,11 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
+            data() {
+                return {
+                    airdropParams: airdropParams,
+                };
+            },
         });
 
         expect(wrapper.vm.isParticipantsAmountValid).to.be.false;
@@ -129,6 +146,11 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
+            data() {
+                return {
+                    airdropParams: airdropParams,
+                };
+            },
         });
 
         expect(wrapper.vm.isRewardValid).to.be.false;
@@ -180,7 +202,7 @@ describe('TokenAirdropCampaign', () => {
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                id: 4,
+                airdrop: 4,
             },
         });
 
@@ -209,6 +231,7 @@ describe('TokenAirdropCampaign', () => {
                     tokensAmount: '100',
                     participantsAmount: 100,
                     showEndDate: false,
+                    airdropParams: airdropParams,
                 };
             },
         });
@@ -243,6 +266,7 @@ describe('TokenAirdropCampaign', () => {
                     tokensAmount: '0.015',
                     participantsAmount: 196,
                     showEndDate: false,
+                    airdropParams: airdropParams,
                 };
             },
         });

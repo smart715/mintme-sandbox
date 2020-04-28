@@ -16,7 +16,12 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-        $this->assertNull($res);
+
+        $this->assertNull($res['airdrop']);
+        $this->assertEquals(0.01, $res['airdropParams']['min_tokens_amount']);
+        $this->assertEquals(100, $res['airdropParams']['min_participants_amount']);
+        $this->assertEquals(999999, $res['airdropParams']['max_participants_amount']);
+        $this->assertEquals(0.0001, $res['airdropParams']['min_token_reward']);
     }
 
     public function testCreateAirdropCampaign(): void
@@ -39,12 +44,65 @@ class AirdropCampaignControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertNotNull($res);
 
-        $this->assertArrayHasKey('id', $res);
-        $this->assertGreaterThan(0, $res['id']);
-        $this->assertEquals('200.000000000000', $res['amount']);
-        $this->assertEquals(150, $res['participants']);
-        $this->assertEquals(0, $res['actualParticipants']);
-        $this->assertEquals($endDate->format(\DateTimeImmutable::ATOM), $res['endDate']);
+        $this->assertArrayHasKey('airdrop', $res);
+        $this->assertArrayHasKey('airdropParams', $res);
+        $this->assertGreaterThan(0, $res['airdrop']['id']);
+        $this->assertEquals('200.000000000000', $res['airdrop']['amount']);
+        $this->assertEquals(150, $res['airdrop']['participants']);
+        $this->assertEquals(0, $res['airdrop']['actualParticipants']);
+        $this->assertEquals($endDate->format(\DateTimeImmutable::ATOM), $res['airdrop']['endDate']);
+    }
+
+    public function testCreateAirdropCampaignWithInvalidParams(): void
+    {
+        $this->register($this->client);
+        $this->createProfile($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '0.0099',
+            'participants' => 150,
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid amount.', $res['message']);
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '10000001',
+            'participants' => 200,
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid amount.', $res['message']);
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '0.12',
+            'participants' => 1227,
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals(
+            'Invalid reward. Set higher amount of tokens for airdrop or lower amount of participants.',
+            $res['message']
+        );
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '0.01',
+            'participants' => 99,
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid participants amount.', $res['message']);
+
+        $endDate = new \DateTimeImmutable('-10 minutes');
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '200',
+            'participants' => 150,
+            'endDate' => $endDate->getTimestamp(),
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid end date.', $res['message']);
     }
 
     public function testDeleteAirdropCampaign(): void
@@ -66,15 +124,17 @@ class AirdropCampaignControllerTest extends WebTestCase
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertNotNull($res);
-        $this->assertArrayHasKey('id', $res);
+        $this->assertArrayHasKey('airdrop', $res);
+        $this->assertArrayHasKey('id', $res['airdrop']);
+        $this->assertArrayHasKey('airdropParams', $res);
 
-        $this->client->request('DELETE', '/api/airdrop_campaign/' . $res['id'] . '/delete');
+        $this->client->request('DELETE', '/api/airdrop_campaign/' . $res['airdrop']['id'] . '/delete');
 
         $this->client->request('GET', '/api/airdrop_campaign/' . $tokName);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-        $this->assertNull($res);
+        $this->assertNull($res['airdrop']);
 
         $this->client->request('GET', '/logout');
         $this->client->followRedirect();
@@ -113,6 +173,6 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-        $this->assertEquals(1, $res['actualParticipants']);
+        $this->assertEquals(1, $res['airdrop']['actualParticipants']);
     }
 }
