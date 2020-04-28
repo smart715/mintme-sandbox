@@ -317,7 +317,7 @@ export default {
     },
     computed: {
         isMintmeToken: function() {
-            return this.rebrandingFunc(this.market.quote.symbol) === "MINTME";
+            return this.rebrandingFunc(this.market.quote.symbol) === 'MINTME';
         },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
