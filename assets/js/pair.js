@@ -67,7 +67,7 @@ new Vue({
       this.tokenFacebook = val;
     },
     websiteUpdated: function(val) {
-        his.tokenWebsite = val;
+        this.tokenWebsite = val;
     },
     youtubeUpdated: function(val) {
       this.tokenYoutube = val;
