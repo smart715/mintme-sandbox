@@ -8,5 +8,5 @@ use Symfony\Component\Validator\Constraint;
 class DisallowedWord extends Constraint
 {
     /** @var string */
-    public $message = 'Token name cannot contain "token" or "coin" words.';
+    public $message = 'Token and coin words are not permitted. Those can be used only concatenated';
 }
