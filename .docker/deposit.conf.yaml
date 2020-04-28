@@ -33,6 +33,9 @@ cryptos:
 
     confirmations: 5
 
+    # bitcoin refresh interval in minutes
+    interval_minutes: 5
+
 rabbitmq_url: 'amqp://guest:guest@rabbitmq:5672'
 
 app_server_port: 3000
