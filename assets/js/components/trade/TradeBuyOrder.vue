@@ -49,14 +49,26 @@
                                     <span class="text-white">
                                         <span class="text-nowrap">
                                             {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                            <guide>
-                                                <template slot="header">
-                                                    Your {{ market.base.symbol | rebranding }}
-                                                </template>
-                                                <template slot="body">
-                                                    Your {{ market.base.symbol | rebranding }} balance.
-                                                </template>
-                                            </guide>
+                                            <span v-if="isMintmeToken">
+                                                <guide>
+                                                    <template slot="header">
+                                                        Your {{ market.base.symbol | rebranding }}
+                                                    </template>
+                                                    <template slot="body">
+                                                        Your {{ market.base.symbol | rebranding }} balance.
+                                                    </template>
+                                                </guide>
+                                            </span>
+                                            <span v-else>
+                                                <guide>
+                                                    <template slot="header">
+                                                        Your Token
+                                                    </template>
+                                                    <template slot="body">
+                                                        Your {{ market.base.symbol | rebranding }} balance.
+                                                    </template>
+                                                </guide>
+                                            </span>
                                         </span>
                                         <span class="text-nowrap">
                                             <a
@@ -301,6 +313,9 @@ export default {
         ]),
     },
     computed: {
+        isMintmeToken: function() {
+            return this.rebrandingFunc(this.market.quote.symbol) === "MINTME";
+        },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
         },
