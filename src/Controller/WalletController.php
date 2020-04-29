@@ -82,12 +82,7 @@ class WalletController extends Controller
             );
         }
 
-        /** @var User|null $user */
-        $user = $this->getUser();
-
-        if (!$user || $user !== $pendingWithdraw->getUser()) {
-            throw new AccessDeniedHttpException();
-        }
+        $this->denyAccessUnlessGranted('edit', $pendingWithdraw);
 
         try {
             $wallet->withdrawCommit($pendingWithdraw);
