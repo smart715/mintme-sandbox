@@ -4,7 +4,7 @@
             <bbcode-view :value="post.content" />
         </p>
         <p v-else>
-            To see this post you need to have {{post.amount | toMoney | formatMoney}} {{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
+            To see this post you need to have {{post.amount | toMoney | formatMoney}}{{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
         </p>
         <span>
             {{ date }}
@@ -13,6 +13,7 @@
             {{ author }}
         </a>
         <a v-if="showEdit"
+            id="delete-icon"
             class="float-right text-decoration-none text-reset"
             href="#"
             @click.prevent="deletePost"
@@ -24,6 +25,7 @@
             />
         </a>
         <a v-if="showEdit"
+            id="edit-icon"
             class="float-right text-decoration-none text-reset"
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
