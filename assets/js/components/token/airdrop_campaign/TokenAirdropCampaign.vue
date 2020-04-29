@@ -136,6 +136,7 @@ export default {
     },
     props: {
         tokenName: String,
+        airdropParams: Object,
     },
     data() {
         return {
@@ -156,7 +157,6 @@ export default {
             },
             errorMessage: '',
             precision: TOK.subunit,
-            airdropParams: Object,
         };
     },
     mounted: function() {
@@ -241,9 +241,8 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    this.airdropParams = result.data.airdropParams;
-                    if (null !== result.data.airdrop) {
-                        this.airdropCampaignId = result.data.airdrop.id;
+                    if ('object' === typeof result.data) {
+                        this.airdropCampaignId = result.data.id;
                     }
 
                     if (!this.hasAirdropCampaign) {

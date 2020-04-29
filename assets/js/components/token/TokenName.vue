@@ -18,6 +18,7 @@
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
                 @update-release-address="updateReleaseAddress"
+                :airdrop-params="airdropParams"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -55,6 +56,7 @@ export default {
         twofa: Boolean,
         websocketUrl: String,
         releaseAddress: String,
+        airdropParams: Object,
     },
     components: {
         FontAwesomeIcon,

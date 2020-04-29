@@ -53,6 +53,7 @@
                             <template slot="body">
                                 <token-airdrop-campaign
                                     :token-name="currentName"
+                                    :airdrop-params="airdropParams"
                                     @close="$emit('close')"
                                 />
                             </template>
@@ -150,6 +151,7 @@ export default {
         twofa: Boolean,
         visible: Boolean,
         websocketUrl: String,
+        airdropParams: Object,
     },
     data() {
         return {

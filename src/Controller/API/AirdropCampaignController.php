@@ -51,12 +51,7 @@ class AirdropCampaignController extends AbstractFOSRestController
     {
         $token = $this->fetchToken($tokenName);
 
-        $data = [
-            'airdrop' => $token->getActiveAirdrop(),
-            'airdropParams' => $this->airdropConfig->getAirdropParams(),
-        ];
-
-        return $this->view($data, Response::HTTP_OK);
+        return $this->view($token->getActiveAirdrop(), Response::HTTP_OK);
     }
 
     /**

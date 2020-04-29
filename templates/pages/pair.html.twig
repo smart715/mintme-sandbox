@@ -136,6 +136,7 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         release-address="{{ token.mintDestination }}"
                                         @token-deploy-pending="setTokenPending"
+                                        :airdrop-params="{{ airdrop_params | json_encode }}"
                                 />
                             </div>
                         </li>
