@@ -289,6 +289,7 @@ export default {
                         this.airdropCampaignRemoved = false;
                     }
 
+                    this.closeEditModal();
                     location.reload();
                     return;
                 })
@@ -315,7 +316,7 @@ export default {
                 .then(() => {
                     this.airdropCampaignId = null;
                     this.notifySuccess('Your airdrop was removed successfully.');
-                    this.$emit('close');
+                    this.closeEditModal();
                     location.reload();
                 })
                 .catch((err) => {
@@ -352,6 +353,9 @@ export default {
             }
 
             return true;
+        },
+        closeEditModal: function() {
+            this.$emit('close');
         },
     },
     beforeDestroy() {
