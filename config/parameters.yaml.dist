@@ -115,3 +115,5 @@ parameters:
 
     # max top holders for each token
     top_holders: 10
+
+    contact_email: support@mintme.com
