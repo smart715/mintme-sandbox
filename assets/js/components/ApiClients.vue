@@ -8,7 +8,7 @@
                  :fields="fields">
             <template v-slot:cell(id)="row">
                 <div class="text-center">
-                    <div class="text-left d-inline-block">
+                    <div class="text-left d-inline-block ml-api">
                         ID<br />
                         <span class="text-danger word-break">{{ row.item.id }}</span>
                         <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
