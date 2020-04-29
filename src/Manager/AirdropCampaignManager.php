@@ -121,7 +121,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
     {
         if ($user instanceof User && $token->getActiveAirdrop() instanceof Airdrop) {
             $participant = $this->participantRepository
-                ->getParticipantByUserAndToken($user, $token->getActiveAirdrop());
+                ->getParticipantByUserAndAirdrop($user, $token->getActiveAirdrop());
 
             return $participant instanceof AirdropParticipant;
         }

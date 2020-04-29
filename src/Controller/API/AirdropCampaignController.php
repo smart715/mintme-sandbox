@@ -143,6 +143,10 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException('Token does not have active airdrop campaign.');
         }
 
+        if ($this->airdropCampaignManager->checkIfUserClaimed($user, $token)) {
+            throw new ApiBadRequestException('You already claimed tokens from this airdrop.');
+        }
+
         $this->airdropCampaignManager->claimAirdropCampaign(
             $user,
             $token

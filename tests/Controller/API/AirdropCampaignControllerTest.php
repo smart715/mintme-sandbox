@@ -162,6 +162,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
+        $this->assertTrue($this->client->getResponse()->isClientError());
+
         $this->client->request('GET', '/api/airdrop_campaign/' . $tokName);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 

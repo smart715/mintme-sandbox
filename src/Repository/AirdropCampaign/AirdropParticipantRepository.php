@@ -15,7 +15,7 @@ class AirdropParticipantRepository extends ServiceEntityRepository
         parent::__construct($registry, AirdropParticipant::class);
     }
 
-    public function getParticipantByUserAndToken(User $user, Airdrop $airdrop): ?AirdropParticipant
+    public function getParticipantByUserAndAirdrop(User $user, Airdrop $airdrop): ?AirdropParticipant
     {
         return $this->findOneBy([
             'user' => $user,

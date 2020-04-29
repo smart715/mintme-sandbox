@@ -140,7 +140,7 @@ class AirdropCampaignManagerTest extends TestCase
         $repository = $this->createMock(AirdropParticipantRepository::class);
         $repository
             ->expects($this->once())
-            ->method('getParticipantByUserAndToken')
+            ->method('getParticipantByUserAndAirdrop')
             ->willReturn(new AirdropParticipant());
 
         /** @var EntityManagerInterface|MockObject $em */
