@@ -7,7 +7,7 @@
                  :items="clients"
                  :fields="fields">
             <template v-slot:cell(id)="row">
-                <div class="text-center">
+                <div class="text-left">
                     <div class="text-left d-inline-block ml-api">
                         ID<br />
                         <span class="text-danger word-break">{{ row.item.id }}</span>
