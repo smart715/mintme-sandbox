@@ -49,26 +49,14 @@
                                     <span class="text-white">
                                         <span class="text-nowrap">
                                             {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                            <span v-if="isMintmeToken">
                                                 <guide>
                                                     <template slot="header">
-                                                        Your {{ market.base.symbol | rebranding }}
+                                                        Your {{ tokenSymbol }}
                                                     </template>
                                                     <template slot="body">
                                                         Your {{ market.base.symbol | rebranding }} balance.
                                                     </template>
                                                 </guide>
-                                            </span>
-                                            <span v-else>
-                                                <guide>
-                                                    <template slot="header">
-                                                        Your Token
-                                                    </template>
-                                                    <template slot="body">
-                                                        Your {{ market.base.symbol | rebranding }} balance.
-                                                    </template>
-                                                </guide>
-                                            </span>
                                         </span>
                                         <span class="text-nowrap">
                                             <a
@@ -192,6 +180,7 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
+import {MINTME} from '../../utils/constants';
 
 export default {
     name: 'TradeBuyOrder',
@@ -313,8 +302,8 @@ export default {
         ]),
     },
     computed: {
-        isMintmeToken: function() {
-            return this.rebrandingFunc(this.market.quote.symbol) === 'MINTME';
+        tokenSymbol: function() {
+            return this.rebrandingFunc(this.market.quote.symbol) === MINTME.symbol ? MINTME.symbol : 'Token';
         },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
