@@ -179,11 +179,9 @@ describe('TokenOngoingAirdropCampaign', () => {
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                airdrop: {
-                    'amount': '568',
-                    'participants': 120,
-                    'actualParticipants': 8,
-                },
+                'amount': '568',
+                'participants': 120,
+                'actualParticipants': 8,
             },
         });
 

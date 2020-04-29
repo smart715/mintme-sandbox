@@ -39,6 +39,9 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
+            propsData: {
+                airdropParams: airdropParams,
+            },
             data() {
                 return {
                     airdropCampaignId: null,
@@ -55,10 +58,8 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropParams: airdropParams,
-                };
+            propsData: {
+                airdropParams: airdropParams,
             },
         });
 
@@ -87,6 +88,9 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
+            propsData: {
+                airdropParams: airdropParams,
+            },
         });
 
         expect(wrapper.vm.isAmountValid).to.be.false;
@@ -103,10 +107,8 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropParams: airdropParams,
-                };
+            propsData: {
+                airdropParams: airdropParams,
             },
         });
 
@@ -125,6 +127,9 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
+            propsData: {
+                airdropParams: airdropParams,
+            },
         });
 
         wrapper.vm.showEndDate = true;
@@ -146,10 +151,8 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropParams: airdropParams,
-                };
+            propsData: {
+                airdropParams: airdropParams,
             },
         });
 
@@ -173,6 +176,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
+                airdropParams: airdropParams,
             },
         });
 
@@ -196,13 +200,14 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
+                airdropParams: airdropParams,
             },
         });
 
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                airdrop: {id: 4},
+                id: 4,
             },
         });
 
@@ -223,6 +228,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
+                airdropParams: airdropParams,
             },
             data() {
                 return {
@@ -231,7 +237,6 @@ describe('TokenAirdropCampaign', () => {
                     tokensAmount: '100',
                     participantsAmount: 100,
                     showEndDate: false,
-                    airdropParams: airdropParams,
                 };
             },
         });
@@ -259,6 +264,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test5',
+                airdropParams: airdropParams,
             },
             data() {
                 return {
@@ -266,7 +272,6 @@ describe('TokenAirdropCampaign', () => {
                     tokensAmount: '0.015',
                     participantsAmount: 196,
                     showEndDate: false,
-                    airdropParams: airdropParams,
                 };
             },
         });
@@ -308,6 +313,9 @@ describe('TokenAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
             localVue,
+            propsData: {
+                airdropParams: airdropParams,
+            },
             data() {
                 return {
                     tokensAmount: 500,

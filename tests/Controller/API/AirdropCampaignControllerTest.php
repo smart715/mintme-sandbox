@@ -17,11 +17,7 @@ class AirdropCampaignControllerTest extends WebTestCase
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertNull($res['airdrop']);
-        $this->assertEquals(0.01, $res['airdropParams']['min_tokens_amount']);
-        $this->assertEquals(100, $res['airdropParams']['min_participants_amount']);
-        $this->assertEquals(999999, $res['airdropParams']['max_participants_amount']);
-        $this->assertEquals(0.0001, $res['airdropParams']['min_token_reward']);
+        $this->assertNull($res);
     }
 
     public function testCreateAirdropCampaign(): void
@@ -44,13 +40,12 @@ class AirdropCampaignControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertNotNull($res);
 
-        $this->assertArrayHasKey('airdrop', $res);
-        $this->assertArrayHasKey('airdropParams', $res);
-        $this->assertGreaterThan(0, $res['airdrop']['id']);
-        $this->assertEquals('200.000000000000', $res['airdrop']['amount']);
-        $this->assertEquals(150, $res['airdrop']['participants']);
-        $this->assertEquals(0, $res['airdrop']['actualParticipants']);
-        $this->assertEquals($endDate->format(\DateTimeImmutable::ATOM), $res['airdrop']['endDate']);
+        $this->assertArrayHasKey('id', $res);
+        $this->assertGreaterThan(0, $res['id']);
+        $this->assertEquals('200.000000000000', $res['amount']);
+        $this->assertEquals(150, $res['participants']);
+        $this->assertEquals(0, $res['actualParticipants']);
+        $this->assertEquals($endDate->format(\DateTimeImmutable::ATOM), $res['endDate']);
     }
 
     public function testCreateAirdropCampaignWithInvalidParams(): void
@@ -124,17 +119,15 @@ class AirdropCampaignControllerTest extends WebTestCase
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertNotNull($res);
-        $this->assertArrayHasKey('airdrop', $res);
-        $this->assertArrayHasKey('id', $res['airdrop']);
-        $this->assertArrayHasKey('airdropParams', $res);
+        $this->assertArrayHasKey('id', $res);
 
-        $this->client->request('DELETE', '/api/airdrop_campaign/' . $res['airdrop']['id'] . '/delete');
+        $this->client->request('DELETE', '/api/airdrop_campaign/' . $res['id'] . '/delete');
 
         $this->client->request('GET', '/api/airdrop_campaign/' . $tokName);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-        $this->assertNull($res['airdrop']);
+        $this->assertNull($res);
 
         $this->client->request('GET', '/logout');
         $this->client->followRedirect();
@@ -173,6 +166,6 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-        $this->assertEquals(1, $res['airdrop']['actualParticipants']);
+        $this->assertEquals(1, $res['actualParticipants']);
     }
 }
