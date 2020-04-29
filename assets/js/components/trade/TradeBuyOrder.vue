@@ -180,7 +180,7 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import {MINTME} from '../../utils/constants';
+import {BTC, MINTME} from '../../utils/constants';
 
 export default {
     name: 'TradeBuyOrder',
@@ -303,7 +303,7 @@ export default {
     },
     computed: {
         tokenSymbol: function() {
-            return this.rebrandingFunc(this.market.quote.symbol) === MINTME.symbol ? MINTME.symbol : 'Token';
+            return this.rebrandingFunc(this.market.quote.symbol) === MINTME.symbol ? MINTME.symbol : BTC.symbol;
         },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
