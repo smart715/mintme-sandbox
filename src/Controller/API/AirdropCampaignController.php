@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\AirdropConfig;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -29,12 +30,17 @@ class AirdropCampaignController extends AbstractFOSRestController
     /** @var AirdropCampaignManagerInterface */
     private $airdropCampaignManager;
 
+    /** @var AirdropConfig */
+    private $airdropConfig;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
-        AirdropCampaignManagerInterface $airdropCampaignManager
+        AirdropCampaignManagerInterface $airdropCampaignManager,
+        AirdropConfig $airdropConfig
     ) {
         $this->tokenManager = $tokenManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
+        $this->airdropConfig = $airdropConfig;
     }
 
     /**
@@ -47,7 +53,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $data = [
             'airdrop' => $token->getActiveAirdrop(),
-            'airdropParams' => $this->getParameter('airdrop_params'),
+            'airdropParams' => $this->airdropConfig->getAirdropParams(),
         ];
 
         return $this->view($data, Response::HTTP_OK);
@@ -79,26 +85,16 @@ class AirdropCampaignController extends AbstractFOSRestController
         BalanceHandlerInterface $balanceHandler,
         Request $request
     ): View {
-        $airdropParams = $this->getParameter('airdrop_params');
         $token = $this->fetchToken($tokenName, true);
         $amount = $moneyWrapper->parse((string)$request->get('amount'), MoneyWrapper::TOK_SYMBOL);
-        $minAmount = $moneyWrapper->parse((string)$airdropParams['min_tokens_amount'], MoneyWrapper::TOK_SYMBOL);
-        $minReward = $moneyWrapper->parse((string)$airdropParams['min_token_reward'], MoneyWrapper::TOK_SYMBOL);
+        $participants = (int)$request->get('participants');
+        $endDateTimestamp = $request->get('endDate');
         $balance = $balanceHandler->balance(
             $token->getProfile()->getUser(),
             $token
         )->getAvailable();
-        $participants = (int)$request->get('participants');
-        $endDateTimestamp = $request->get('endDate');
 
-        $this->checkAirdropAmount($amount, $minAmount, $balance);
-        $this->checkAirdropReward($amount, $participants, $minReward);
-        $this->checkAirdropParticipants(
-            $participants,
-            $airdropParams['min_participants_amount'],
-            $airdropParams['max_participants_amount']
-        );
-        $this->checkAirdropEndDate($endDateTimestamp);
+        $this->checkAirdropParams($amount, $participants, $endDateTimestamp, $balance);
 
         $endDate = $endDateTimestamp
             ? (new \DateTimeImmutable())->setTimestamp($endDateTimestamp)
@@ -160,33 +156,26 @@ class AirdropCampaignController extends AbstractFOSRestController
         return $this->view(null, Response::HTTP_ACCEPTED);
     }
 
-    private function checkAirdropAmount(Money $amount, Money $minAmount, Money $balance): void
+    private function checkAirdropParams(Money $amount, int $participants, ?int $endDateTimestamp, Money $balance): void
     {
-        if ($amount->lessThan($minAmount) || $amount->greaterThan($balance)) {
+        if ($amount->lessThan($this->airdropConfig->getMinTokensAmount()) || $amount->greaterThan($balance)) {
             throw new ApiBadRequestException('Invalid amount.');
         }
-    }
 
-    private function checkAirdropReward(Money $amount, int $participants, Money $minReward): void
-    {
         $reward = $amount->divide($participants);
 
-        if ($reward->lessThan($minReward)) {
+        if ($reward->lessThan($this->airdropConfig->getMinTokenReward())) {
             throw new ApiBadRequestException(
                 'Invalid reward. Set higher amount of tokens for airdrop or lower amount of participants.'
             );
         }
-    }
 
-    private function checkAirdropParticipants(int $participants, int $minParticipants, int $maxParticipants): void
-    {
-        if ($participants < $minParticipants || $participants > $maxParticipants) {
+        if ($participants < $this->airdropConfig->getMinParticipantsAmount()
+            || $participants > $this->airdropConfig->getMaxParticipantsAmount()
+        ) {
             throw new ApiBadRequestException('Invalid participants amount.');
         }
-    }
 
-    private function checkAirdropEndDate(?int $endDateTimestamp): void
-    {
         if ($endDateTimestamp && $endDateTimestamp < time()) {
             throw new ApiBadRequestException('Invalid end date.');
         }
