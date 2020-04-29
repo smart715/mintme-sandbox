@@ -121,3 +121,4 @@ parameters:
         min_participants_amount: 100
         max_participants_amount: 999999
         min_token_reward: 0.0001
+    contact_email: support@mintme.com

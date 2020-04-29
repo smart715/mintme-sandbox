@@ -25,3 +25,4 @@ twig:
         minimum_volume_for_marketcap: '%minimum_volume_for_marketcap%'
         landing_web_bonus: '%landing_web_bonus%'
         airdrop_params: '%airdrop_params%'
+        global_contact_email: '%contact_email%'
