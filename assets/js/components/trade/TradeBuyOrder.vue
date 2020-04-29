@@ -303,7 +303,7 @@ export default {
     },
     computed: {
         tokenSymbol: function() {
-            return this.rebrandingFunc(this.market.quote.symbol) === MINTME.symbol ? MINTME.symbol : BTC.symbol;
+            return this.rebrandingFunc(this.market.base.symbol) === MINTME.symbol ? MINTME.symbol : BTC.symbol;
         },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
