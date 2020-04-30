@@ -71,18 +71,10 @@ new Vue({
             validFirstChars: (value) => !tokenValidFirstChars(value),
             validLastChars: (value) => !tokenValidLastChars(value),
             noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
-            hasBlockedWords: (value) => {
-                for (const i of FORBIDDEN_WORDS) {
-                    let postFixpattern = '(\w*\\s'+i+')(s+\\b|\\b)';
-                    let singleWordpattern = '(^'+i+')(s+\\b|\\b)';
-                    let postFixRegex = new RegExp(postFixpattern, 'ig');
-                    let singleWordregex = new RegExp(singleWordpattern, 'ig');
-                    if (null !== value.match(postFixRegex) || null !== value.match(singleWordregex)) {
-                        return false;
-                    }
-                }
-                return true;
-            },
+            hasBlockedWords: (value) => FORBIDDEN_WORDS.some(
+                (blocked) =>
+                new RegExp('\\b' + blocked + 's{0,1}\\b', 'ig').test(value)
+            ),
             validChars: tokenNameValidChars,
             minLength: minLength(4),
             maxLength: maxLength(255),
