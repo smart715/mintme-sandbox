@@ -1,4 +1,4 @@
-import {mount, shallowMount, createLocalVue} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import PostForm from '../../js/components/posts/PostForm';
 import Vuelidate from 'vuelidate';
 
@@ -64,7 +64,7 @@ describe('PostForm', () => {
         wrapper.vm.$v.$touch();
         expect(!wrapper.vm.$v.content.maxLength).to.deep.equal(true);
 
-        wrapper.setData({content: '1',minContentLength: 2});
+        wrapper.setData({content: '1', minContentLength: 2});
         wrapper.vm.$v.$touch();
         expect(!wrapper.vm.$v.content.minLength).to.deep.equal(true);
     });
@@ -134,7 +134,6 @@ describe('PostForm', () => {
         wrapper.setData({amountError: true});
         wrapper.vm.$v.$touch();
         expect(wrapper.vm.invalidAmount).to.be.true;
-
     });
 
     it('displays post if passed', () => {
