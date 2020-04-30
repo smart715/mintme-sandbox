@@ -33,11 +33,11 @@ describe('ConfirmModal', () => {
         expect(wrapper.emitted('confirm').length).to.be.equal(1);
     });
 
-    it('emit "cancel" when clicking on span "Cancel"', () => {
+    it('emit "cancel" when clicking on button "Cancel"', () => {
         const wrapper = mount(ConfirmModal, {
             propsData: {visible: true},
         });
-        wrapper.find('span.btn-cancel.pl-3.c-pointer').trigger('click');
+        wrapper.find('button.btn-cancel.pl-3').trigger('click');
         expect(wrapper.emitted('cancel').length).to.be.equal(1);
     });
 
