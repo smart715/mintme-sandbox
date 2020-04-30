@@ -5,16 +5,19 @@ namespace App\Controller;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Form\ChangePasswordType;
-use App\Form\TwoFactorType;
+use App\Form\QuickRegistrationType;
+use App\Form\UnsuscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
+use App\Utils\Encrypt\HMACSHAOneEncrypt;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -291,4 +294,61 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
         return "backup-codes-{$name}-{$time}.txt";
     }
+    
+    /**
+     * @Route("user/unsuscribe/key/{key}/mail/{mail}", name="unsuscribe")
+     * @Route("user/confirm-unsuscribe", name="confirm-unsuscribe")
+     */
+    public function unsuscribe(Request $request): Response
+    {
+        $form = $this->createForm(UnsuscribeType::class);
+        $form->handleRequest($request);    	
+    	    		
+        if ($form->isSubmitted() && $form->isValid()) {
+        	
+            $email = $form->get('mail')->getData();
+            $content = sprintf("%s %s\n", $email, date('Y-m-d H:i:s'));
+	         
+	         $file = sprintf("%s/%s", dirname(__DIR__). '/../var/log', 'unsubscribers.txt');
+            $fileSystem = new Filesystem();
+            
+				try {
+					if($fileSystem->exists($file)) $fileSystem->appendToFile($file, $content);
+					else $fileSystem->dumpFile($file, $content);
+					
+					$result = true;
+				}
+				catch(Exception $e) {
+					$result = false;
+				}
+                        
+            return $this->render('pages/unsuscribe.html.twig', 
+            ['formHeader' => 'Unsuscribe',
+            'result' => $result,
+            'mail' => $email,
+            'form' => $form->createView()]);
+        }    	
+        else {
+        	
+				$key = $request->attributes->get('key');
+				$mail = $request->attributes->get('mail');
+				        		
+            if(empty($key) || empty($mail)) {
+                return $this->render('pages/404.html.twig');
+            }
+            $unsuscribeKey = $this->getParameter('unsuscribe_key');
+            $encrypt = new HMACSHAOneEncrypt($unsuscribeKey, $mail);
+                        
+            if($key === $encrypt->encrypt()) {
+                return $this->render('pages/unsuscribe.html.twig', 
+                ['formHeader' => 'Unsuscribe',
+                'result' =>null,
+                'mail' => $mail,
+                'form' => $form->createView()]);
+            } 
+            else {
+                return $this->render('pages/404.html.twig');
+            }
+        } 
+    } 
 }
