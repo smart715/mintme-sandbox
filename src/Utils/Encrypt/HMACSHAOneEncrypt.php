@@ -4,10 +4,10 @@ namespace App\Utils\Encrypt;
 
 class HMACSHAOneEncrypt implements EncryptInterface
 {
-    /** @var $key **/
+    /** @var Key used to encrypt **/
     protected $key;
 
-    /** @var $data **/
+    /** @var Data to encrypt **/
     protected $data;
 
     public function __construct(string $key, string $data)
