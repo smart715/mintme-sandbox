@@ -6,6 +6,7 @@ use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Form\ChangePasswordType;
 use App\Form\QuickRegistrationType;
+use App\Form\TwoFactorType;
 use App\Form\UnsuscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
@@ -27,6 +28,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Throwable;
 
 class UserController extends AbstractController implements TwoFactorAuthenticatedController
 {
@@ -319,7 +321,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 }
 
                 $result = true;
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $result = false;
             }
 
