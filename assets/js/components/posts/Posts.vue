@@ -42,7 +42,10 @@ export default {
             default: null,
         },
         tokenName: String,
-        tokenPage: Boolean,
+        tokenPage: {
+            type: Boolean,
+            default: false,
+        },
         showEdit: {
             type: Boolean,
             default: false,
@@ -58,7 +61,7 @@ export default {
             return Math.min(this.posts.length, this.max || Infinity);
         },
         showReadMore() {
-            return this.max && this.posts.length > this.max;
+            return !!(this.max && this.posts.length > this.max);
         },
     },
     methods: {
