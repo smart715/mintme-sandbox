@@ -71,7 +71,7 @@ new Vue({
             validFirstChars: (value) => !tokenValidFirstChars(value),
             validLastChars: (value) => !tokenValidLastChars(value),
             noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
-            hasBlockedWords: (value) => FORBIDDEN_WORDS.some(
+            hasNotBlockedWords: (value) => !FORBIDDEN_WORDS.some(
                 (blocked) =>
                 new RegExp('\\b' + blocked + 's{0,1}\\b', 'ig').test(value)
             ),
