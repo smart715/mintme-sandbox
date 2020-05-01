@@ -268,9 +268,9 @@ export default {
             }
 
             let data = {
-                    amount: this.tokensAmount,
-                    participants: this.participantsAmount,
-                };
+                amount: this.tokensAmount,
+                participants: this.participantsAmount,
+            };
 
             if (this.isDateValid) {
                 data.endDate = moment(this.endDate).utc().unix();

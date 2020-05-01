@@ -145,7 +145,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
 
-        $rewardSummary = $airdropReward->multiply((int)$activeAirdrop->getActualParticipants());
+        $rewardSummary = $airdropReward->multiply($activeAirdrop->getActualParticipants());
         $activeAirdrop->setActualAmount($rewardSummary);
         $participant = $this->createNewParticipant($user, $activeAirdrop);
 

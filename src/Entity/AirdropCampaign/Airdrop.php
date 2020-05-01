@@ -80,7 +80,7 @@ class Airdrop
     /**
      * @ORM\Column(name="actual_participants", type="integer", nullable=true)
      * @Groups({"API"})
-     * @var int|null
+     * @var int
      */
     private $actualParticipants = 0;
 
@@ -100,7 +100,7 @@ class Airdrop
         $this->claimedParticipants = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -189,19 +189,19 @@ class Airdrop
         return $this;
     }
 
-    public function getActualParticipants(): ?int
+    public function getActualParticipants(): int
     {
         return $this->actualParticipants;
     }
 
-    public function setActualParticipants(?int $actualParticipants): self
+    public function setActualParticipants(int $actualParticipants): self
     {
         $this->actualParticipants = $actualParticipants;
 
         return $this;
     }
 
-    public function incrementActualParticipants(): ?int
+    public function incrementActualParticipants(): int
     {
         return $this->actualParticipants += 1;
     }
