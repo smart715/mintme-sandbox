@@ -4,6 +4,7 @@
             :currentWebsite="currentWebsite"
             :editingWebsite="editingWebsite"
             :tokenName="tokenName"
+            :key="reRenderTokenWebsite"
             @saveWebsite="saveWebsite"
             @toggleEdit="toggleEdit"
         />
@@ -76,12 +77,15 @@ export default {
             editingTelegram: false,
             editingUrls: false,
             editingWebsite: false,
+            reRenderTokenWebsite: 0,
         };
     },
     methods: {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
             this.$emit('updated-website', newWebsite);
+            this.reRenderTokenWebsite++;
+            this.editingWebsite = false;
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;
