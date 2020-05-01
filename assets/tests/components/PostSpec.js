@@ -72,8 +72,8 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('#edit-icon').exists()).to.be.true;
-        expect(wrapper.find('#delete-icon').exists()).to.be.true;
+        expect(wrapper.find('.edit-icon').exists()).to.be.true;
+        expect(wrapper.find('.delete-icon').exists()).to.be.true;
     });
 
     it('doesnt show edit and delete icons if showEdit is false', () => {
@@ -86,7 +86,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('#edit-icon').exists()).to.be.false;
-        expect(wrapper.find('#delete-icon').exists()).to.be.false;
+        expect(wrapper.find('.edit-icon').exists()).to.be.false;
+        expect(wrapper.find('.delete-icon').exists()).to.be.false;
     });
 });

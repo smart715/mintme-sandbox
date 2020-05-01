@@ -13,8 +13,7 @@
             {{ author }}
         </a>
         <a v-if="showEdit"
-            id="delete-icon"
-            class="float-right text-decoration-none text-reset"
+            class="delete-icon float-right text-decoration-none text-reset"
             href="#"
             @click.prevent="deletePost"
         >
@@ -25,8 +24,7 @@
             />
         </a>
         <a v-if="showEdit"
-            id="edit-icon"
-            class="float-right text-decoration-none text-reset"
+            class="edit-icon float-right text-decoration-none text-reset"
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
             <font-awesome-icon
