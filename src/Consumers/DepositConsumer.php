@@ -82,7 +82,13 @@ class DepositConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
-        DBConnection::reconnectIfDisconnected($this->em);
+        if (!DBConnection::initConsumerEm(
+            'deposit-consumer',
+            $this->em,
+            $this->logger
+        )) {
+            return false;
+        }
 
         $this->logger->info('[deposit-consumer] Received new message: '.json_encode($msg->body));
 
