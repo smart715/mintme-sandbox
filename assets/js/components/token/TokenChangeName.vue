@@ -31,7 +31,9 @@
             <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
                 Token name can contain only alphabets, numbers, spaces and dashes
             </div>
-            <div v-if="this.newName.length > 0 && (!this.$v.newName.validFirstChars || !this.$v.newName.validLastChars || !this.$v.newName.noSpaceBetweenDashes)" class="text-danger text-center small">
+            <div v-if="this.newName.length > 0 && (!this.$v.newName.validFirstChars || +
+            !this.$v.newName.validLastChars || +
+             !this.$v.newName.noSpaceBetweenDashes)" class="text-danger text-center small">
                 Token name can't start or end with a dash or space, or have spaces between dashes
             </div>
             <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
@@ -103,7 +105,8 @@ export default {
     },
     computed: {
         btnDisabled: function() {
-            return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed || this.$v.$invalid || this.currentName === this.newName;
+            return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged || +
+            !this.isTokenNotDeployed || this.$v.$invalid || this.currentName === this.newName;
         },
         errorMessage: function() {
             let message = '';
@@ -140,7 +143,6 @@ export default {
                         });
                 }, 2000);
             }
-
         },
     },
     methods: {
