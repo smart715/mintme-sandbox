@@ -3,10 +3,23 @@
         <div v-if="isTokenExchanged || !isTokenNotDeployed" id="error-message" class="bg-danger text-white text-center py-2 mb-3">
             {{ errorMessage }}
         </div>
-        <div class="col-12 pb-3 px-0">
-            <label for="tokenName" class="d-block text-left">
-                Edit your token name:
-            </label>
+        <div class="col-12 pt-2 px-0">
+            <div class="col-12 text-left">
+                <div class="clearfix">
+                    <div class="float-left">
+                        Edit your token name:
+                    </div>
+                    <div class="float-right">
+                        <div
+                                v-if="tokenNameExists"
+                                class="alert alert-danger alert-token-name-exists"
+                        >
+                            <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                            Token name is already taken
+                        </div>
+                    </div>
+                </div>
+            </div>
             <input
                 id="tokenName"
                 type="text"
@@ -15,8 +28,24 @@
                 class="token-name-input w-100 px-2"
                 :class="{ 'is-invalid': $v.$invalid }"
             >
+            <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
+                Token name can contain only alphabets, numbers, spaces and dashes
+            </div>
+            <div v-if="this.newName.length > 0 && (!this.$v.newName.validFirstChars || !this.$v.newName.validLastChars || !this.$v.newName.noSpaceBetweenDashes)" class="text-danger text-center small">
+                Token name can't start or end with a dash or space, or have spaces between dashes
+            </div>
+            <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
+                Token name should have at least 4 symbols
+            </div>
+            <div v-if="!this.$v.newName.maxLength" class="text-danger text-center small">
+                Token name can't be longer than 255 characters
+            </div>
+            <div v-if="!this.$v.newName.hasNotBlockedWords" class="text-danger text-center small">
+                Token name can't contain "token" or "coin" words
+            </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
+
             <button
                 class="btn btn-primary float-left"
                 :disabled="btnDisabled"
@@ -42,6 +71,7 @@ import {
     tokenValidFirstChars,
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
+    FORBIDDEN_WORDS, HTTP_OK,
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 
@@ -66,11 +96,14 @@ export default {
             newName: this.currentName,
             showTwoFactorModal: false,
             submitting: false,
+            tokenNameExists: false,
+            tokenNameProcessing: false,
+            tokenNameTimeout: null,
         };
     },
     computed: {
         btnDisabled: function() {
-            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
+            return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed || this.$v.$invalid || this.currentName === this.newName;
         },
         errorMessage: function() {
             let message = '';
@@ -86,9 +119,28 @@ export default {
     },
     watch: {
         newName: function() {
+            clearTimeout(this.tokenNameTimeout);
             if (this.newName.replace(/-|\s/g, '').length === 0) {
                 this.newName = '';
             }
+            this.tokenNameExists = false;
+            if (!this.$v.$invalid && this.newName) {
+                this.tokenNameProcessing = true;
+                this.tokenNameTimeout = setTimeout(() => {
+                    this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                        .then((response) => {
+                            if (HTTP_OK === response.status) {
+                                this.tokenNameExists = response.data.exists;
+                            }
+                        }, (error) => {
+                            this.notifyError('An error has occurred, please try again later');
+                        })
+                        .then(() => {
+                            this.tokenNameProcessing = false;
+                        });
+                }, 2000);
+            }
+
         },
     },
     methods: {
@@ -106,38 +158,6 @@ export default {
         },
         editName: function() {
             this.$v.$touch();
-            if (this.currentName === this.newName) {
-                this.notifyError('You didn\'t change the token name');
-                return;
-            } else if (this.isTokenExchanged) {
-                this.notifyError('You need all your tokens to change token\'s name');
-                return;
-            } else if (!this.isTokenNotDeployed) {
-                this.notifyError('Token is deploying or deployed.');
-                return;
-            } else if (!this.newName) {
-                this.notifyError('Token name shouldn\'t be blank');
-                return;
-            } else if (!this.$v.newName.validFirstChars) {
-                this.notifyError('Token name can not contain spaces or dashes in the beginning');
-                return;
-            } else if (!this.$v.newName.validLastChars) {
-                this.notifyError('Token name can not contain spaces or dashes in the end');
-                return;
-            } else if (!this.$v.newName.noSpaceBetweenDashes) {
-                this.notifyError('Token name can not contain space between dashes');
-                return;
-            } else if (!this.$v.newName.validChars) {
-                this.notifyError('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
-            } else if (!this.$v.newName.minLength) {
-                this.notifyError('Token name should have at least 4 symbols');
-                return;
-            } else if (!this.$v.newName.maxLength) {
-                this.notifyError('Token name can not be longer than 60 characters');
-                return;
-            }
-
             if (this.twofa) {
                 this.showTwoFactorModal = true;
             } else {
@@ -193,6 +213,10 @@ export default {
                 validFirstChars: (value) => !tokenValidFirstChars(value),
                 validLastChars: (value) => !tokenValidLastChars(value),
                 noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
+                hasNotBlockedWords: (value) => !FORBIDDEN_WORDS.some(
+                    (blocked) =>
+                        new RegExp('\\b' + blocked + 's{0,1}\\b', 'ig').test(value)
+                ),
                 validChars: tokenNameValidChars,
                 minLength: minLength(this.minLength),
                 maxLength: maxLength(this.maxLength),

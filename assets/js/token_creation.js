@@ -7,8 +7,8 @@ import {
     tokenValidFirstChars,
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
+    FORBIDDEN_WORDS,
 } from './utils/constants';
-const FORBIDDEN_WORDS = ['token', 'coin'];
 new Vue({
     el: '#token',
     mixins: [NotificationMixin],
