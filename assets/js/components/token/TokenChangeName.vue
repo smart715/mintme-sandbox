@@ -3,12 +3,11 @@
         <div v-if="isTokenExchanged || !isTokenNotDeployed" id="error-message" class="bg-danger text-white text-center py-2 mb-3">
             {{ errorMessage }}
         </div>
-        <div class="col-12 pt-2 px-0">
-            <div class="col-12 text-left">
+        <div class="col-12 pb-3 px-0">
                 <div class="clearfix">
-                    <div class="float-left">
+                    <label for="tokenName" class="float-left">
                         Edit your token name:
-                    </div>
+                    </label>
                     <div class="float-right">
                         <div
                                 v-if="tokenNameExists"
@@ -19,14 +18,13 @@
                         </div>
                     </div>
                 </div>
-            </div>
             <input
-                id="tokenName"
-                type="text"
-                v-model="newName"
-                ref="tokenNameInput"
-                class="token-name-input w-100 px-2"
-                :class="{ 'is-invalid': $v.$invalid }"
+                    id="tokenName"
+                    type="text"
+                    v-model="newName"
+                    ref="tokenNameInput"
+                    class="token-name-input w-100 px-2"
+                    :class="{ 'is-invalid': $v.$invalid }"
             >
             <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
                 Token name can contain only alphabets, numbers, spaces and dashes
@@ -47,184 +45,188 @@
             </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
-
             <button
-                class="btn btn-primary float-left"
-                :disabled="btnDisabled"
-                @click="editName"
+                    class="btn btn-primary float-left"
+                    :disabled="btnDisabled"
+                    @click="editName"
             >
                 Save
             </button>
         </div>
         <two-factor-modal
-            :visible="showTwoFactorModal"
-            :twofa="twofa"
-            @verify="doEditName"
-            @close="closeTwoFactorModal"
+                :visible="showTwoFactorModal"
+                :twofa="twofa"
+                @verify="doEditName"
+                @close="closeTwoFactorModal"
         />
     </div>
 </template>
 
 <script>
-import TwoFactorModal from '../modal/TwoFactorModal';
-import {required, minLength, maxLength} from 'vuelidate/lib/validators';
-import {
-    tokenNameValidChars,
-    tokenValidFirstChars,
-    tokenValidLastChars,
-    tokenNoSpaceBetweenDashes,
-    FORBIDDEN_WORDS, HTTP_OK,
-} from '../../utils/constants';
-import {LoggerMixin, NotificationMixin} from '../../mixins';
+    import TwoFactorModal from '../modal/TwoFactorModal';
+    import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+    import {
+        tokenNameValidChars,
+        tokenValidFirstChars,
+        tokenValidLastChars,
+        tokenNoSpaceBetweenDashes, FORBIDDEN_WORDS, HTTP_OK,
+    } from '../../utils/constants';
+    import {LoggerMixin, NotificationMixin} from '../../mixins';
 
-const HTTP_ACCEPTED = 202;
+    const HTTP_ACCEPTED = 202;
 
-export default {
-    name: 'TokenChangeName',
-    mixins: [NotificationMixin, LoggerMixin],
-    components: {
-        TwoFactorModal,
-    },
-    props: {
-        isTokenExchanged: Boolean,
-        isTokenNotDeployed: Boolean,
-        currentName: String,
-        twofa: Boolean,
-    },
-    data() {
-        return {
-            minLength: 4,
-            maxLength: 60,
-            newName: this.currentName,
-            showTwoFactorModal: false,
-            submitting: false,
-            tokenNameExists: false,
-            tokenNameProcessing: false,
-            tokenNameTimeout: null,
-        };
-    },
-    computed: {
-        btnDisabled: function() {
-            return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged || +
-            !this.isTokenNotDeployed || this.$v.$invalid || this.currentName === this.newName;
+    export default {
+        name: 'TokenChangeName',
+        mixins: [NotificationMixin, LoggerMixin],
+        components: {
+            TwoFactorModal,
         },
-        errorMessage: function() {
-            let message = '';
-
-            if (!this.isTokenNotDeployed) {
-                message = 'The name of a deployed token can\'t be changed';
-            } else if (this.isTokenExchanged) {
-                message = 'You must own all your tokens in order to change the token\'s name';
-            }
-
-            return message;
+        props: {
+            isTokenExchanged: Boolean,
+            isTokenNotDeployed: Boolean,
+            currentName: String,
+            twofa: Boolean,
         },
-    },
-    watch: {
-        newName: function() {
-            clearTimeout(this.tokenNameTimeout);
-            if (this.newName.replace(/-|\s/g, '').length === 0) {
-                this.newName = '';
-            }
-            this.tokenNameExists = false;
-            if (!this.$v.$invalid && this.newName) {
-                this.tokenNameProcessing = true;
-                this.tokenNameTimeout = setTimeout(() => {
-                    this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
-                        .then((response) => {
-                            if (HTTP_OK === response.status) {
-                                this.tokenNameExists = response.data.exists;
-                            }
-                        }, (error) => {
-                            this.notifyError('An error has occurred, please try again later');
-                        })
-                        .then(() => {
-                            this.tokenNameProcessing = false;
-                        });
-                }, 2000);
-            }
+        data() {
+            return {
+                minLength: 4,
+                maxLength: 60,
+                newName: this.currentName,
+                showTwoFactorModal: false,
+                submitting: false,
+                tokenNameExists: false,
+                tokenNameProcessing: false,
+                tokenNameTimeout: null,
+            };
         },
-    },
-    methods: {
-        closeTwoFactorModal: function() {
-            this.showTwoFactorModal = false;
-        },
-        closeModal: function() {
-            this.cancelEditingMode();
-        },
-        cancelEditingMode: function() {
-            if (!this.showTwoFactorModal) {
-                this.$v.$reset();
-                this.newName = this.currentName;
-            }
-        },
-        editName: function() {
-            this.$v.$touch();
-            if (this.twofa) {
-                this.showTwoFactorModal = true;
-            } else {
-                this.doEditName();
-            }
-        },
-        doEditName: function(code = '') {
-            if (this.submitting) {
-                return;
-            }
-
-            this.submitting = true;
-            this.$axios.single.patch(this.$routing.generate('token_update', {
-                name: this.currentName,
-            }), {
-                name: this.newName,
-                code: code,
-            })
-            .then((response) => {
-                if (response.status === HTTP_ACCEPTED) {
-                    this.currentName = response.data['tokenName'];
-                    this.notifySuccess('Token\'s name changed successfully');
-
-                    this.showTwoFactorModal = false;
-                    this.closeModal();
-
-                    // TODO: update name in a related components and link path instead of redirecting
-                    location.href = this.$routing.generate('token_show', {
-                        name: this.currentName,
-                    });
-                }
-            }, (error) => {
-                if (!error.response) {
-                    this.notifyError('Network error');
-                    this.sendLogs('error', 'Edit name network error', error);
-                } else if (error.response.data.message) {
-                    this.notifyError(error.response.data.message);
-                    this.sendLogs('error', 'Can not edit name', error);
-                } else {
-                    this.notifyError('An error has occurred, please try again later');
-                    this.sendLogs('error', 'An error has occurred, please try again later', error);
-                }
-            })
-            .then(() => {
-                this.submitting = false;
-            });
-        },
-    },
-    validations() {
-        return {
-            newName: {
-                required,
-                validFirstChars: (value) => !tokenValidFirstChars(value),
-                validLastChars: (value) => !tokenValidLastChars(value),
-                noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
-                hasNotBlockedWords: (value) => !FORBIDDEN_WORDS.some(
-                    (blocked) =>
-                        new RegExp('\\b' + blocked + 's{0,1}\\b', 'ig').test(value)
-                ),
-                validChars: tokenNameValidChars,
-                minLength: minLength(this.minLength),
-                maxLength: maxLength(this.maxLength),
+        computed: {
+            btnDisabled: function() {
+                return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged || +
+                    !this.isTokenNotDeployed || this.$v.$invalid || this.currentName === this.newName;
             },
-        };
-    },
-};
-</script>
+            errorMessage: function() {
+                let message = '';
 
+                if (!this.isTokenNotDeployed) {
+                    message = 'The name of a deployed token can\'t be changed';
+                } else if (this.isTokenExchanged) {
+                    message = 'You must own all your tokens in order to change the token\'s name';
+                }
+
+                return message;
+            },
+        },
+        watch: {
+            newName: function() {
+                clearTimeout(this.tokenNameTimeout);
+                if (this.newName.replace(/-|\s/g, '').length === 0) {
+                    this.newName = '';
+                }
+                this.tokenNameExists = false;
+                if (!this.$v.$invalid && this.newName) {
+                    this.tokenNameProcessing = true;
+                    this.tokenNameTimeout = setTimeout(() => {
+                        this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                            .then((response) => {
+                                if (HTTP_OK === response.status) {
+                                    this.tokenNameExists = response.data.exists;
+                                }
+                            }, (error) => {
+                                this.notifyError('An error has occurred, please try again later');
+                            })
+                            .then(() => {
+                                this.tokenNameProcessing = false;
+                            });
+                    }, 2000);
+                }
+            },
+        },
+        methods: {
+            closeTwoFactorModal: function() {
+                this.showTwoFactorModal = false;
+            },
+            closeModal: function() {
+                this.cancelEditingMode();
+            },
+            cancelEditingMode: function() {
+                if (!this.showTwoFactorModal) {
+                    this.$v.$reset();
+                    this.newName = this.currentName;
+                }
+            },
+            editName: function() {
+                this.$v.$touch();
+                if (this.currentName === this.newName ||
+                    this.isTokenExchanged || !this.isTokenNotDeployed || !this.newName ||
+                    !this.$v.newName.validFirstChars || !this.$v.newName.validLastChars ||
+                    !this.$v.newName.noSpaceBetweenDashes || !this.$v.newName.validChars ||
+                    !this.$v.newName.minLength || !this.$v.newName.maxLength) {
+                    return;
+                }
+                if (this.twofa) {
+                    this.showTwoFactorModal = true;
+                } else {
+                    this.doEditName();
+                }
+            },
+            doEditName: function(code = '') {
+                if (this.submitting) {
+                    return;
+                }
+
+                this.submitting = true;
+                this.$axios.single.patch(this.$routing.generate('token_update', {
+                    name: this.currentName,
+                }), {
+                    name: this.newName,
+                    code: code,
+                })
+                    .then((response) => {
+                        if (response.status === HTTP_ACCEPTED) {
+                            this.currentName = response.data['tokenName'];
+                            this.notifySuccess('Token\'s name changed successfully');
+
+                            this.showTwoFactorModal = false;
+                            this.closeModal();
+
+                            // TODO: update name in a related components and link path instead of redirecting
+                            location.href = this.$routing.generate('token_show', {
+                                name: this.currentName,
+                            });
+                        }
+                    }, (error) => {
+                        if (!error.response) {
+                            this.notifyError('Network error');
+                            this.sendLogs('error', 'Edit name network error', error);
+                        } else if (error.response.data.message) {
+                            this.notifyError(error.response.data.message);
+                            this.sendLogs('error', 'Can not edit name', error);
+                        } else {
+                            this.notifyError('An error has occurred, please try again later');
+                            this.sendLogs('error', 'An error has occurred, please try again later', error);
+                        }
+                    })
+                    .then(() => {
+                        this.submitting = false;
+                    });
+            },
+        },
+        validations() {
+            return {
+                newName: {
+                    required,
+                    validFirstChars: (value) => !tokenValidFirstChars(value),
+                    validLastChars: (value) => !tokenValidLastChars(value),
+                    noSpaceBetweenDashes: (value) => !tokenNoSpaceBetweenDashes(value),
+                    hasNotBlockedWords: (value) => !FORBIDDEN_WORDS.some(
+                        (blocked) =>
+                            new RegExp('\\b' + blocked + 's{0,1}\\b', 'ig').test(value)
+                    ),
+                    validChars: tokenNameValidChars,
+                    minLength: minLength(this.minLength),
+                    maxLength: maxLength(this.maxLength),
+                },
+            };
+        },
+    };
+</script>

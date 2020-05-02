@@ -44,6 +44,11 @@ describe('TokenChangeName', () => {
 
         wrapper.vm.isTokenExchanged = false;
         wrapper.vm.isTokenNotDeployed = true;
+        wrapper.vm.$v.hasNotBlockedWords = false;
+        wrapper.vm.newName = 'different';
+        wrapper.vm.tokenNameExists = false;
+        wrapper.vm.tokenNameProcessing = false;
+        wrapper.vm.submitting = false;
         expect(wrapper.find('button').attributes('disabled')).to.equal(undefined);
         expect(wrapper.contains('#error-message')).to.equal(false);
     });
