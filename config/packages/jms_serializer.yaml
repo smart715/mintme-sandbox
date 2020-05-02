@@ -1,3 +1,4 @@
 jms_serializer:
-    xml_serialization:
-        format_output: '%kernel.debug%'
+    visitors:
+        xml:
+            format_output: '%kernel.debug%'
