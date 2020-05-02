@@ -20,7 +20,7 @@ use InvalidArgumentException;
 class MarketHandler implements MarketHandlerInterface
 {
     public const SELL = 1;
-    public const BUY = 2;
+    public const BUY  = 2;
 
     private const MONTH_PERIOD = 2592000;
 
@@ -42,9 +42,9 @@ class MarketHandler implements MarketHandlerInterface
         UserManagerInterface $userManager,
         MarketNameConverterInterface $marketNameConverter
     ) {
-        $this->marketFetcher = $marketFetcher;
-        $this->moneyWrapper = $moneyWrapper;
-        $this->userManager = $userManager;
+        $this->marketFetcher       = $marketFetcher;
+        $this->moneyWrapper        = $moneyWrapper;
+        $this->userManager         = $userManager;
         $this->marketNameConverter = $marketNameConverter;
     }
 
@@ -193,36 +193,71 @@ class MarketHandler implements MarketHandlerInterface
 
         $filtered = [];
 
-        array_walk($orders, function (array $orderData) use ($market, &$filtered): void {
-            $user = $this->userManager->find($orderData['user']);
+        /**
+         * array_walk($orders, function (array $orderData) use ($market, &$filtered): void {
+         * $user = $this->userManager->find($orderData['user']);
+         *
+         * if (!$user) {
+         * return;
+         * }
+         *
+         * $filtered[] = new Order(
+         * $orderData['id'],
+         * $user,
+         * null,
+         * $market,
+         * $this->moneyWrapper->parse(
+         * (string)$orderData['left'],
+         * $this->getSymbol($market->getQuote())
+         * ),
+         * $orderData['side'],
+         * $this->moneyWrapper->parse(
+         * (string)$orderData['price'],
+         * $this->getSymbol($market->getQuote())
+         * ),
+         * Order::PENDING_STATUS,
+         * $this->moneyWrapper->parse(
+         * (string)$orderData['maker_fee'],
+         * $this->getSymbol($market->getQuote())
+         * ),
+         * !empty($orderData['mtime']) ? intval($orderData['mtime']) : null,
+         * !empty($orderData['ctime']) ? intval($orderData['ctime']) : null
+         * );
+         * });
+         **/
+
+        foreach ($orders as $order) {
+            $user = $this->userManager->find($order['user']);
 
             if (!$user) {
-                return;
+                continue;
             }
 
-            $filtered[] = new Order(
-                $orderData['id'],
+            $orderObject = new Order(
+                $order['id'],
                 $user,
                 null,
                 $market,
                 $this->moneyWrapper->parse(
-                    (string)$orderData['left'],
+                    (string)$order['left'],
                     $this->getSymbol($market->getQuote())
                 ),
-                $orderData['side'],
+                $order['side'],
                 $this->moneyWrapper->parse(
-                    (string)$orderData['price'],
+                    (string)$order['price'],
                     $this->getSymbol($market->getQuote())
                 ),
                 Order::PENDING_STATUS,
                 $this->moneyWrapper->parse(
-                    (string)$orderData['maker_fee'],
+                    (string)$order['maker_fee'],
                     $this->getSymbol($market->getQuote())
                 ),
-                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null,
-                !empty($orderData['ctime']) ? intval($orderData['ctime']) : null
+                !empty($order['mtime']) ? intval($order['mtime']) : null,
+                !empty($order['ctime']) ? intval($order['ctime']) : null
             );
-        });
+
+            $filtered[] = $orderObject;
+        }
 
         return $filtered;
     }
@@ -304,7 +339,7 @@ class MarketHandler implements MarketHandlerInterface
 
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo
     {
-        $result = $this->marketFetcher->getMarketInfo(
+        $result      = $this->marketFetcher->getMarketInfo(
             $this->marketNameConverter->convert($market),
             $period
         );
