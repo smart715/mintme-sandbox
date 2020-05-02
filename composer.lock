@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6cec6b2301c3c656a345bcf426fbd7f9",
+    "content-hash": "3902c073e29fde953523ae22f7303e6b",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2361,32 +2361,33 @@
         },
         {
             "name": "friendsofsymfony/rest-bundle",
-            "version": "2.7.4",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSRestBundle.git",
-                "reference": "3d8501dbdfa48811ef942f5f93c358c80d5ad8eb"
+                "reference": "a5fc73b84bdb2f0fdf58a717b322ceb6997f7bf3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSRestBundle/zipball/3d8501dbdfa48811ef942f5f93c358c80d5ad8eb",
-                "reference": "3d8501dbdfa48811ef942f5f93c358c80d5ad8eb",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSRestBundle/zipball/a5fc73b84bdb2f0fdf58a717b322ceb6997f7bf3",
+                "reference": "a5fc73b84bdb2f0fdf58a717b322ceb6997f7bf3",
                 "shasum": ""
             },
             "require": {
                 "doctrine/inflector": "^1.0",
-                "php": "^7.1",
+                "php": "^5.5.9|~7.0",
                 "psr/log": "^1.0",
-                "symfony/config": "^3.4|^4.3",
-                "symfony/debug": "^3.4|^4.3",
-                "symfony/dependency-injection": "^3.4|^4.3",
-                "symfony/event-dispatcher": "^3.4|^4.3",
-                "symfony/finder": "^3.4|^4.3",
-                "symfony/framework-bundle": "^3.4|^4.3",
-                "symfony/http-foundation": "^3.4|^4.3",
-                "symfony/http-kernel": "^3.4|^4.3",
-                "symfony/routing": "^3.4|^4.3",
-                "symfony/security-core": "^3.4|^4.3",
+                "symfony/config": "^3.4|^4.0",
+                "symfony/debug": "^3.4|^4.0",
+                "symfony/dependency-injection": "^3.4|^4.0",
+                "symfony/event-dispatcher": "^3.4|^4.0",
+                "symfony/finder": "^3.4|^4.0",
+                "symfony/framework-bundle": "^3.4|^4.0",
+                "symfony/http-foundation": "^3.4|^4.0",
+                "symfony/http-kernel": "^3.4|^4.0",
+                "symfony/routing": "^3.4|^4.0",
+                "symfony/security-core": "^3.4|^4.0",
+                "symfony/templating": "^3.4|^4.0",
                 "willdurand/jsonp-callback-validator": "^1.0",
                 "willdurand/negotiation": "^2.0"
             },
@@ -2396,25 +2397,24 @@
                 "sensio/framework-extra-bundle": "<3.0.13"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.0",
-                "jms/serializer": "^1.13|^2.0|^3.0",
+                "jms/serializer": "^1.13|^2.0",
                 "jms/serializer-bundle": "^2.3.1|^3.0",
                 "phpoption/phpoption": "^1.1",
                 "psr/http-message": "^1.0",
                 "sensio/framework-extra-bundle": "^3.0.13|^4.0|^5.0",
-                "symfony/asset": "^3.4|^4.3",
-                "symfony/browser-kit": "^3.4|^4.3",
-                "symfony/css-selector": "^3.4|^4.3",
-                "symfony/expression-language": "^3.4|^4.3",
-                "symfony/form": "^3.4|^4.3",
+                "symfony/asset": "^3.4|^4.0",
+                "symfony/browser-kit": "^3.4|^4.0",
+                "symfony/css-selector": "^3.4|^4.0",
+                "symfony/dependency-injection": "^2.7.20|^3.0|^4.0",
+                "symfony/expression-language": "~2.7|^3.0|^4.0",
+                "symfony/form": "^3.4|^4.0",
                 "symfony/phpunit-bridge": "^4.1.8",
-                "symfony/security-bundle": "^3.4|^4.3",
-                "symfony/serializer": "^3.4|^4.3",
-                "symfony/templating": "^3.4|^4.3",
-                "symfony/twig-bundle": "^3.4|^4.3",
-                "symfony/validator": "^3.4|^4.3",
-                "symfony/web-profiler-bundle": "^3.4|^4.3",
-                "symfony/yaml": "^3.4|^4.3"
+                "symfony/security-bundle": "^3.4|^4.0",
+                "symfony/serializer": "^2.7.11|^3.0.4|^4.0",
+                "symfony/twig-bundle": "^3.4|^4.0",
+                "symfony/validator": "^3.4|^4.0",
+                "symfony/web-profiler-bundle": "^3.4|^4.0",
+                "symfony/yaml": "^3.4|^4.0"
             },
             "suggest": {
                 "jms/serializer-bundle": "Add support for advanced serialization capabilities, recommended, requires ^2.0|^3.0",
@@ -2426,7 +2426,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.7-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -2434,7 +2434,6 @@
                     "FOS\\RestBundle\\": ""
                 },
                 "exclude-from-classmap": [
-                    "Resources/",
                     "Tests/"
                 ]
             },
@@ -2448,12 +2447,12 @@
                     "email": "smith@pooteeweet.org"
                 },
                 {
-                    "name": "Konstantin Kudryashov",
-                    "email": "ever.zet@gmail.com"
-                },
-                {
                     "name": "FriendsOfSymfony Community",
                     "homepage": "https://github.com/friendsofsymfony/FOSRestBundle/contributors"
+                },
+                {
+                    "name": "Konstantin Kudryashov",
+                    "email": "ever.zet@gmail.com"
                 }
             ],
             "description": "This Bundle provides various tools to rapidly develop RESTful API's with Symfony",
@@ -2461,7 +2460,7 @@
             "keywords": [
                 "rest"
             ],
-            "time": "2020-04-23T17:34:09+00:00"
+            "time": "2019-01-03T13:05:12+00:00"
         },
         {
             "name": "friendsofsymfony/user-bundle",
