@@ -69,11 +69,12 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $clients = $user
             ? $user->getApiClients()
             : null;
-        $passwordForm = $this->getPasswordForm($request, $keys);
 
+        $passwordForm = $this->getPasswordForm($request, $keys);
+        
         return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys, $clients));
     }
-
+    
     /**
      * @Route("/referral-program", name="referral-program")
      */
@@ -218,7 +219,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
         return $this->redirectToRoute('settings');
     }
-
+    
     private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
     {
         /** @var User $user */

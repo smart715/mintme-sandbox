@@ -80,6 +80,8 @@ class WalletController extends Controller
             );
         }
 
+        $this->denyAccessUnlessGranted('edit', $pendingWithdraw);
+
         try {
             $wallet->withdrawCommit($pendingWithdraw);
         } catch (Throwable $exception) {
