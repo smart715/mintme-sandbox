@@ -43,7 +43,7 @@ export default {
           let parentDiv = this.$refs.table.$el.tBodies[0];
           parentDiv.scrollTop = parentDiv.scrollHeight;
           // for firefox
-          parentDivFirefox = this.$refs.table.$el.parentElement;
+          let parentDivFirefox = this.$refs.table.$el.parentElement;
           parentDivFirefox.scrollTop = parentDivFirefox.scrollHeight;
 
         },
