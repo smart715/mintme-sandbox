@@ -40,8 +40,12 @@ export default {
             };
         },
         scrollDown: function() {
-            let parentDiv = this.$refs.table.$el.tBodies[0];
-            parentDiv.scrollTop = parentDiv.scrollHeight;
+          let parentDiv = this.$refs.table.$el.tBodies[0];
+          parentDiv.scrollTop = parentDiv.scrollHeight;
+          // for firefox
+              parentDiv = this.$refs.table.$el.parentElement;
+          parentDiv.scrollTop = parentDiv.scrollHeight;
+
         },
         startScrollListeningOnce: function(val) {
             if (!this._scrollListenerStarted && Array.isArray(val) && val.length) {
