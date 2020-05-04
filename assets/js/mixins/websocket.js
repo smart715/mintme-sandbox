@@ -1,6 +1,5 @@
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
-import {getUserOffset} from '../utils';
 
 const METHOD_AUTH = 12345;
 
@@ -30,7 +29,7 @@ export default {
             if (auth === status.FAILED) {
                 this.sendMessage(JSON.stringify({
                     method: 'server.auth',
-                    params: [(parseFloat(this.hash) + getUserOffset()).toString(), 'auth_api'],
+                    params: [this.hash, 'auth_api'],
                     id: METHOD_AUTH,
                 }));
                 this._loginClient(this.websocketUrl);

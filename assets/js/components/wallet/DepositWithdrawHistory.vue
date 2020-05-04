@@ -14,14 +14,14 @@
                 sort-icon-left
             >
                 <template v-slot:cell(symbol)="data">
-                    <a v-if="data.item.symbol.length > 17" :href="rebrandingFunc(data.item.url)" class="text-white">
-                        <span v-b-tooltip="{title: rebrandingFunc(data.item.symbol), boundary:'viewport'}">
-                            {{ data.item.symbol | rebranding | truncate(17) }}
+                    <a v-if="data.item.symbol.length > 17" :href="data.item.url" class="text-white">
+                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                            {{ data.item.symbol | truncate(17) }}
                         </span>
                     </a>
-                    <a v-else :href="rebrandingFunc(data.item.url)" class="text-white">
+                    <a v-else :href="data.item.url" class="text-white">
                         <span>
-                            {{ data.item.symbol | rebranding }}
+                            {{ data.item.symbol }}
                         </span>
                     </a>
                 </template>
@@ -178,7 +178,7 @@ export default {
                     ? toMoney(item.amount, item.tradable.subunit)
                     : null;
                 item['symbol'] = item.tradable.symbol
-                    ? item.tradable.symbol
+                    ? this.rebrandingFunc(item.tradable)
                     : null;
                 item['status'] = item.status.statusCode
                     ? item.status.statusCode
@@ -194,8 +194,8 @@ export default {
             if (quote.hasOwnProperty('exchangeble')) {
                 /** @TODO In future we need to use another solution and remove hardcoded BTC & MINTME symbols **/
                 let params = {
-                    base: !quote.exchangeble ? quote.symbol : 'BTC',
-                    quote: quote.exchangeble && quote.tradable ? quote.symbol : 'WEB',
+                    base: !quote.exchangeble ? this.rebrandingFunc(quote) : 'BTC',
+                    quote: quote.exchangeble && quote.tradable ? this.rebrandingFunc(quote) : 'MINTME',
                 };
                 return this.$routing.generate('coin', params);
             }

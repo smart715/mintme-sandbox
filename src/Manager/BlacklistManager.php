@@ -40,7 +40,7 @@ class BlacklistManager implements BlacklistManagerInterface
 
     public function addToBlacklist(string $value, string $type, bool $flush = true): void
     {
-        $this->add($value, $type);
+        $this->add(utf8_encode($value), $type);
 
         if ($flush) {
             $this->em->flush();
