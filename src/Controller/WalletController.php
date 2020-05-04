@@ -9,7 +9,6 @@ use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\WalletInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +18,6 @@ use Throwable;
 
 /**
  * @Route("/wallet")
- * @Security(expression="is_granted('prelaunch')")
  */
 class WalletController extends Controller
 {
@@ -81,6 +79,8 @@ class WalletController extends Controller
                 'There are no transactions attached to this hashcode'
             );
         }
+
+        $this->denyAccessUnlessGranted('edit', $pendingWithdraw);
 
         try {
             $wallet->withdrawCommit($pendingWithdraw);

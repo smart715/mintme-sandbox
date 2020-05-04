@@ -13,7 +13,6 @@ twig:
         is_beta_version: '%is_beta_version%'
         global_websocket_url: '%env(WEBSOCKET_URL)%'
         global_coinbase_url: '%coinbase_api_url%'
-        prelaunch: '@App\Exchange\Trade\Config\PrelaunchConfig'
         google_tracking_id: '%google_tracking_id%'
         tawk_api_key: '%tawk_api_key%'
         is_hacker_allowed: '%is_hacker_allowed%'
@@ -25,3 +24,4 @@ twig:
         mintme_coin_link: '%mintme_coin_link%'
         minimum_volume_for_marketcap: '%minimum_volume_for_marketcap%'
         landing_web_bonus: '%landing_web_bonus%'
+        global_contact_email: '%contact_email%'

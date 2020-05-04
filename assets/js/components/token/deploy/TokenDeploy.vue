@@ -14,7 +14,7 @@
                         MINTME spent here will be inaccessible to anyone (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.
                     </p>
                     <p class="bg-info px-2">
-                        This process is irreversible, once confirm payment there is no going back.
+                        This process is irreversible, once you confirm payment there is no going back.
                     </p>
                     <p class="mt-5">
                         Your current balance: {{ balance | toMoney(precision) | formatMoney }} MINTME <br>

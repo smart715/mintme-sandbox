@@ -122,7 +122,7 @@
                                             }) }}
                                         </div>
                                         <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
-                                            City can contain alphabets and -
+                                            City can contain only letters, ` and -
                                         </div>
                                         <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
                                             City must have at least 2 letters

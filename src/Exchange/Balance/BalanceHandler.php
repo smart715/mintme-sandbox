@@ -116,8 +116,16 @@ class BalanceHandler implements BalanceHandlerInterface
             : $tradable->getSymbol();
 
         $balances = $this->balanceFetcher->topBalances($tradableName, $extend);
+        $normalizeBalances = $this->normalizeBalances($balances);
 
-        return $this->createBalanceViewWithExtension($balances, $tradable, $limit, $extend, $incrementer, $max);
+        return $this->createBalanceViewWithExtension(
+            $normalizeBalances,
+            $tradable,
+            $limit,
+            $extend,
+            $incrementer,
+            $max
+        );
     }
 
     public function isNotExchanged(Token $token, int $amount): bool
@@ -213,5 +221,12 @@ class BalanceHandler implements BalanceHandlerInterface
         }
 
         return [];
+    }
+
+    private function normalizeBalances(array $balances): array
+    {
+        return array_filter($balances, static function ($key) {
+            return round($key[1]) > 0;
+        });
     }
 }

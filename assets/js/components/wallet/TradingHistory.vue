@@ -6,22 +6,23 @@
                     thead-class="trading-head"
                     :items="history"
                     :fields="fieldsArray"
-                    :sort-compare="sortCompare"
+                    :sort-compare="$sortCompare(fields)"
                     :sort-by="fields.date.key"
                     :sort-desc="true"
                     sort-direction="desc"
+                    sort-icon-left
                 >
                     <template v-slot:cell(name)="row">
                         <div v-if="row.value.full.length > 17"
-                            v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}"
+                            v-b-tooltip="{title: row.value.full, boundary: 'viewport'}"
                         >
-                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.truncate | rebranding }}
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value.truncate }}
                             </a>
                         </div>
                         <div v-else>
-                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.full | rebranding }}
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value.full }}
                             </a>
                         </div>
                     </template>
@@ -138,7 +139,10 @@ export default {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
                     side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
-                    name: this.pairNameFunc(history.market.base.symbol, history.market.quote.symbol),
+                    name: this.pairNameFunc(
+                        this.rebrandingFunc(history.market.base),
+                        this.rebrandingFunc(history.market.quote)
+                    ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
                     total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
@@ -179,32 +183,13 @@ export default {
         },
         generatePairUrl: function(market) {
             if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
-                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+                return this.$routing.generate('coin', {
+                    base: this.rebrandingFunc(market.base.symbol),
+                    quote: this.rebrandingFunc(market.quote.symbol),
+                });
             }
 
             return this.$routing.generate('token_show', {name: market.quote.name});
-        },
-        sortCompare: function(a, b, key) {
-            switch (this.fields[key].type) {
-                case 'date':
-                    return this.dateCompare(a[key], b[key]);
-                case 'string':
-                    return a[key].localeCompare(b[key]);
-                case 'numeric':
-                    return this.numericCompare(a[key], b[key]);
-            }
-        },
-        numericCompare: function(a, b) {
-            a = parseFloat(a);
-            b = parseFloat(b);
-
-            return a < b ? -1 : (a > b ? 1 : 0);
-        },
-        dateCompare: function(a, b) {
-            a = moment(a, GENERAL.dateFormat).unix();
-            b = moment(b, GENERAL.dateFormat).unix();
-
-            return this.numericCompare(a, b);
         },
     },
 };

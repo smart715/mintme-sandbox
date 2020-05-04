@@ -62,6 +62,17 @@
                     :sort-desc.sync="sortDesc"
                     sort-icon-left
                 >
+                    <template v-slot:[`head(${fields.position.key})`]="data">
+                        #
+                        <guide>
+                            <template slot="header">
+                                Position
+                            </template>
+                            <template slot=body>
+                                The overall rank position of token.
+                            </template>
+                        </guide>
+                    </template>
                     <template v-slot:[`head(${fields.volume.key})`]="data">
                         <b-dropdown
                             id="volume"
@@ -126,17 +137,18 @@
                     </template>
                 </b-table>
             </div>
-            <template v-if="marketFilters.selectedFilter === 'deployed' && tokens.length < 2">
+            <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
                 <div class="row justify-content-center">
                     <p class="text-center p-5">No one deployed his token yet</p>
                 </div>
             </template>
-            <template v-if="marketFilters.selectedFilter === 'user' && tokens.length < 2">
+            <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
                 <div class="row justify-content-center">
                     <p class="text-center p-5">No any token yet</p>
                 </div>
             </template>
-            <template v-if="userId && (marketFilters.selectedFilter === 'deployed' || marketFilters.selectedFilter === 'user')">
+            <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
+                    || marketFilters.selectedFilter === marketFilters.options.user.key)">
                 <div class="row justify-content-center">
                     <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
                 </div>
@@ -165,7 +177,7 @@ import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, N
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import {tokenDeploymentStatus} from '../../utils/constants';
+import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'Trading',
@@ -254,17 +266,25 @@ export default {
             });
             tokens = this.sanitizedMarketsOnTop.concat(tokens);
             tokens = _.map(tokens, (token) => {
-                return _.mapValues(token, (item) => {
-                    return this.rebrandingFunc(item);
+                return _.mapValues(token, (item, key) => {
+                    return cryptoSymbols.includes(token.base) && cryptoSymbols.includes(token.quote)
+                    || 'pair' !== key && 'tokenUrl' !== key
+                        ? this.rebrandingFunc(item)
+                        : item;
                 });
             });
-            return tokens;
+            return this.setTokenPositions(tokens);
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
         },
         fields: function() {
             return {
+                position: {
+                    key: 'position',
+                    label: 'Position',
+                    sortable: true,
+                },
                 pair: {
                     key: 'pair',
                     label: 'Market',
@@ -335,8 +355,12 @@ export default {
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
                 .then((res) => {
-                    if (Object.keys(this.markets).length === 1 && !this.marketFilters.userSelected) {
-                        this.marketFilters.selectedFilter = 'all';
+                    if (
+                        Object.keys(this.markets).length === 1
+                        && !this.marketFilters.userSelected
+                        && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                    ) {
+                        this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
                         this.fetchData();
                         return;
                     }
@@ -364,12 +388,15 @@ export default {
                 }
             });
             let numeric = key !== this.fields.pair.key;
+            let position = key === this.fields.position.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
-                return pair ? 0 : (first < second ? -1 : ( first > second ? 1 : 0));
+                let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
+
+                return position ? -compareResult : (pair ? 0 : compareResult);
             }
 
             // If the value is not numeric, currently only pair column
@@ -379,9 +406,11 @@ export default {
         updateData: function(page) {
             return new Promise((resolve, reject) => {
                 let params = {page};
-                if (this.marketFilters.selectedFilter === 'user') {
+                if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
                     params.user = 1;
-                } else if (this.marketFilters.selectedFilter === 'deployed' && this.userId) {
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key && this.userId
+                ) {
                     params.deployed = 1;
                 }
                 this.loading = true;
@@ -439,6 +468,8 @@ export default {
 
             const tokenized = this.markets[marketName].quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
+            const position = this.markets[marketName].position;
+
             const market = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
@@ -448,7 +479,8 @@ export default {
                 monthVolume,
                 supply,
                 marketPrecision,
-                tokenized
+                tokenized,
+                position
             );
 
             if (marketOnTopIndex > -1) {
@@ -464,13 +496,14 @@ export default {
                 dayVolume: marketInfo.deal,
             };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized, position) {
             let hiddenName = this.findHiddenName(token);
             let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
                 ? 0
                 : Decimal.mul(lastPrice, supply);
 
             return {
+                position: position,
                 pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
@@ -536,7 +569,8 @@ export default {
                         parseFloat(this.markets[market].monthVolume),
                         this.markets[market].supply,
                         this.markets[market].base.subunit,
-                        tokenized
+                        tokenized,
+                        this.markets[market].position
                     );
                     if (marketOnTopIndex > -1) {
                         Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -587,7 +621,8 @@ export default {
                 market.monthVolume = marketInfo.deal,
                 market.supply,
                 market.base.subunit,
-                tokenized
+                tokenized,
+                market.position
                 );
 
             if (marketOnTopIndex > -1) {
@@ -670,7 +705,8 @@ export default {
                 parseFloat(market.monthVolume),
                 market.supply,
                 market.base.subunit,
-                false
+                false,
+                market.position
             );
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
         },
@@ -706,6 +742,15 @@ export default {
             this.activeVolume = volume;
             this.sortBy = this.volumes[this.activeVolume].key;
             this.sortDesc = true;
+        },
+        setTokenPositions: function(tokens) {
+            let positionIndex = 1;
+            return _.map(tokens, (token) => {
+                 if (BTC.symbol !== token.base) {
+                     token.position = positionIndex++;
+                 }
+                return token;
+            });
         },
     },
 };

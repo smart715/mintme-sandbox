@@ -37,25 +37,6 @@
         </div>
     </section>
     <section id="description">
-        {% if prelaunch.isEnabled() %}
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <h3 class="text-center text-white text-uppercase">We are starting in</h3>
-                    </div>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col-auto">
-                        <countdown class="text-center text-white" end-date="{{ prelaunch.getFinishDate|date("Y-m-d H:i:s") }}" current-date="{{ 'now'|date("Y-m-d H:i:s") }}" :disabled="false" v-cloak>
-                            <div slot="content">
-                                <h4>--End--</h4>
-                            </div>
-                        </countdown>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-
         <div class="container px-5">
             <div class="row justify-content-center pt-md-3 pb-3">
                 <div class="col">
@@ -69,7 +50,7 @@
                         Anyone can create a token (coin) that represents themselves or a project that they have created for their fanbase and supporters to support them.<br />
                         It helps content creators to realize their maximum potential through a new innovative way of crowdfunding. It's also a social platform where traders <br />
                         can interact with token creators and other traders. Tokens are created on top of our custom decentralized blockchain called <a href="https://www.mintme.com/coin/">MintMe Coin</a>.<br />
-                        When you create coin/create token, you become an owner of your own financial future. Create a token,create a coin for your project or yourself or just trade other people coins.
+                        When you create coin or create token, you become an owner of your own financial future. Create a token, create a coin for your project or yourself or just trade other people coins.
                     </p>
                 </div>
             </div>
