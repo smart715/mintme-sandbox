@@ -73,7 +73,6 @@
                     <ve-candle
                         class="m-2"
                         :extend="additionalAttributes"
-                        :right-label="rightLabel"
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(market.base.subunit)"
@@ -113,7 +112,6 @@ export default {
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
         return {
-            rightLabel: true,
             chartTheme: VeLineTheme,
             chartSettings: {
                 labelMap: {
@@ -147,6 +145,12 @@ export default {
                         apply: [0, 1],
                         min,
                         minInterval: min,
+                    },
+                    {
+                        apply: [1],
+                        axisLabel: {
+                            show: false,
+                        },
                     },
                     {
                         apply: 'all',
@@ -342,7 +346,7 @@ export default {
             return 0;
         },
         handleRightLabel() {
-            this.rightLabel = ['lg', 'xl'].includes(getBreakPoint());
+            this.additionalAttributes.yAxis[1].axisLabel.show = ['lg', 'xl'].includes(getBreakPoint());
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
