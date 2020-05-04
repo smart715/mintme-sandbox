@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\PaymentTokenStrategy;
 use App\Manager\CryptoManagerInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
@@ -19,7 +20,8 @@ class PaymentTokenStrategyTest extends TestCase
     {
         $strategy = new PaymentTokenStrategy(
             $this->mockBalanceHandler($this->exactly(2)),
-            $this->mockCryptoManager()
+            $this->mockCryptoManager(),
+            $this->mockMoneyWrapper()
         );
 
         $strategy->deposit(
@@ -47,5 +49,13 @@ class PaymentTokenStrategyTest extends TestCase
         $manager->method('findBySymbol')->willReturn($crypto);
 
         return $manager;
+    }
+
+    private function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        $mw = $this->createMock(MoneyWrapperInterface::class);
+        $mw->method("parse")->wilLReturn(new Money("100000000000000", new Currency('TOK')));
+
+        return $mw;
     }
 }
