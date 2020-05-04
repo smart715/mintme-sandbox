@@ -9,7 +9,7 @@
                             Sell Order
                         </template>
                         <template slot="body">
-                            Form used to create  an order so you can sell {{ market.quote.symbol | rebranding }} or make offer.
+                            Form used to create  an order so you can sell {{ market.quote | rebranding }} or make offer.
                         </template>
                     </guide>
                 </span>
@@ -26,7 +26,7 @@
                                     Price in {{ market.base.symbol | rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {{ market.quote.symbol | rebranding }}.
+                                    The price at which you want to sell one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
                         </label>
@@ -46,11 +46,11 @@
                                 Your
                                 <span>
                                     <span v-if="shouldTruncate" class="c-pointer" @click="balanceClicked"
-                                        v-b-tooltip="{title: rebrandingFunc(market.quote.symbol), boundary:'viewport'}">
-                                        {{ market.quote.symbol | rebranding | truncate(17) }} :
+                                        v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
+                                        {{ market.quote | rebranding | truncate(17) }} :
                                     </span>
                                     <span v-else class="c-pointer" @click="balanceClicked">
-                                        {{ market.quote.symbol | rebranding }} :
+                                        {{ market.quote | rebranding }} :
                                     </span>
                                     <span class="text-white">
                                         <span class="text-nowrap p-1">
@@ -83,10 +83,10 @@
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
                             <span v-if="shouldTruncate" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
-                                {{ market.quote.symbol | rebranding | truncate(17) }}
+                                {{ market.quote | rebranding | truncate(17) }}
                             </span>
                             <span v-else class="d-inline-block ml-1">
-                                {{ market.quote.symbol | rebranding }}
+                                {{ market.quote | rebranding }}
                             </span>
                             <span class="d-inline-block">:</span>
                         </label>
@@ -306,7 +306,7 @@ export default {
     },
     computed: {
         tokenSymbol: function() {
-            return this.rebrandingFunc(this.market.quote.symbol) === MINTME.symbol ? MINTME.symbol : 'Token';
+            return this.rebrandingFunc(this.market.quote) === MINTME.symbol ? MINTME.symbol : 'Token';
         },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
@@ -392,7 +392,7 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
                     .then((res) => this.immutableBalance = res.data ?
                         new Decimal(response.params[0][this.market.quote.identifier].available).sub(
-                            res.data.frozenAmount
+                            res.data.frozenAmountWithReceived
                         ) : response.params[0][this.market.quote.identifier].available
                     )
                     .catch((err) => {
