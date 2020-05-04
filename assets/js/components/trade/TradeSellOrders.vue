@@ -5,18 +5,18 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(tokenName), boundary:'viewport'}">
-                        {{ tokenName | rebranding | truncate(17) }}
+                    <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
+                        {{ market.quote | rebranding | truncate(17) }}
                     </span>
                     <span v-else>
-                        {{ tokenName | rebranding }}
+                        {{ market.quote | rebranding }}
                     </span>
                     <guide>
                         <template slot="header">
                             Sell Orders
                         </template>
                         <template slot="body">
-                            List of all active sell orders for {{ tokenName|rebranding }}.
+                            List of all active sell orders for {{ market.quote |rebranding }}.
                         </template>
                     </guide>
                 </span>
@@ -116,7 +116,7 @@ export default {
     props: {
         fullOrdersList: [Array],
         ordersList: [Array],
-        tokenName: String,
+        market: Object,
         fields: Array,
         basePrecision: Number,
         loggedIn: Boolean,
@@ -135,7 +135,7 @@ export default {
     },
     computed: {
         shouldTruncate: function() {
-            return this.tokenName.length > 17;
+            return this.market.quote.symbol.length > 17;
         },
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
