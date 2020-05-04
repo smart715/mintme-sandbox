@@ -273,6 +273,10 @@ a
   background-color: #007DC0
   border-color: #007DC0
 
+  @include media-breakpoint-down(sm)
+    &:hover
+      background-color: #007DC0
+
 .circle-progress
   margin-top: 8.2px
   div.circle
@@ -831,3 +835,13 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
   .airdrop-container
     span.message
       display: block !important
+
+.ml-api
+  @include media-breakpoint-up(sm)
+    margin-left: 0
+
+  @include media-breakpoint-up(md)
+    margin-left: 15%
+
+  @include media-breakpoint-up(lg)
+    margin-left: 25%
