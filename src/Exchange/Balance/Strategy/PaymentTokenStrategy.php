@@ -9,8 +9,7 @@ use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Money\MoneyWrapper;
-use Money\Currency;
-use Money\Money;
+use App\Wallet\Money\MoneyWrapperInterface;
 
 class PaymentTokenStrategy implements BalanceStrategyInterface
 {
@@ -20,12 +19,17 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->cryptoManager = $cryptoManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** @param Token $tradeble */
@@ -40,7 +44,7 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
         $this->balanceHandler->deposit(
             $user,
             $token,
-            new Money($amount, new Currency(MoneyWrapper::TOK_SYMBOL))
+            $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL)
         );
     }
 

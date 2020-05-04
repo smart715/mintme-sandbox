@@ -10,7 +10,6 @@ let objectForTestCorrectlyMouning = {
         discordUrl: 'testDiscordUrl',
         editable: true,
         facebookUrl: 'testFacebookUrl',
-        facebookAppId: 'testFacebookAppId',
         profileName: 'testProfileName',
         profileUrl: 'testProfileUrl',
         telegramUrl: 'testTelegramUrl',
@@ -33,7 +32,6 @@ describe('TokenIntroductionProfile', () => {
         expect(wrapper.find('token-youtube-address-stub').html()).to.contain('testYoutubeClientId');
         expect(wrapper.find('token-youtube-address-stub').html()).to.contain('testTokenName');
         expect(wrapper.find('token-facebook-address-stub').html()).to.contain('testFacebookUrl');
-        expect(wrapper.find('token-facebook-address-stub').html()).to.contain('testFacebookAppId');
         expect(wrapper.find('token-facebook-address-stub').html()).to.contain('testTokenName');
         expect(wrapper.find('token-telegram-channel-stub').html()).to.contain('testTelegramUrl');
         expect(wrapper.find('token-telegram-channel-stub').html()).to.contain('testTokenName');
@@ -43,7 +41,6 @@ describe('TokenIntroductionProfile', () => {
         expect(wrapper.find('token-youtube-address-view-stub').html()).to.contain('testYoutubeChannelId');
         expect(wrapper.find('token-youtube-address-view-stub').html()).to.contain('testYoutubeClientId');
         expect(wrapper.find('token-facebook-address-view-stub').html()).to.contain('testFacebookUrl');
-        expect(wrapper.find('token-facebook-address-view-stub').html()).to.contain('testFacebookAppId');
         expect(wrapper.find('.justify-content-start').html()).to.contain('testDiscordUrl');
         expect(wrapper.find('.truncate-address').html()).to.contain('testTokenContractAddress');
         expect(wrapper.find('copy-link-stub').html()).to.contain('testTokenContractAddress');
