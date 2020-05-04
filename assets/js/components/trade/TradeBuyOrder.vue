@@ -27,7 +27,7 @@
                                     Price in {{ market.base.symbol | rebranding }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to buy one {{ market.quote.symbol | rebranding }}.
+                                    The price at which you want to buy one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
                         </label>
@@ -49,6 +49,14 @@
                                     <span class="text-white">
                                         <span class="text-nowrap">
                                             {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                                <guide>
+                                                    <template slot="header">
+                                                        Your {{ tokenSymbol }}
+                                                    </template>
+                                                    <template slot="body">
+                                                        Your {{ market.base.symbol | rebranding }} balance.
+                                                    </template>
+                                                </guide>
                                         </span>
                                         <span class="text-nowrap">
                                             <a
@@ -56,14 +64,6 @@
                                                 :href="depositMoreLink"
                                                 tabindex="1"
                                             >Deposit more</a>
-                                            <guide>
-                                                <template slot="header">
-                                                    Your {{ market.base.symbol | rebranding }}
-                                                </template>
-                                                <template slot="body">
-                                                    Your {{ market.base.symbol | rebranding }} balance.
-                                                </template>
-                                            </guide>
                                         </span>
                                     </span>
                                 </span>
@@ -77,10 +77,10 @@
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
                             <span v-if="shouldTruncate" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
-                                {{ market.quote.symbol | rebranding | truncate(17) }}
+                                {{ market.quote | rebranding | truncate(17) }}
                             </span>
                             <span v-else class="d-inline-block ml-1">
-                                {{ market.quote.symbol | rebranding }}
+                                {{ market.quote | rebranding }}
                             </span>
                             <span class="d-inline-block">:</span>
                         </label>
@@ -180,6 +180,7 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
+import {BTC, MINTME} from '../../utils/constants';
 
 export default {
     name: 'TradeBuyOrder',
@@ -301,6 +302,9 @@ export default {
         ]),
     },
     computed: {
+        tokenSymbol: function() {
+            return this.rebrandingFunc(this.market.base.symbol) === MINTME.symbol ? MINTME.symbol : BTC.symbol;
+        },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
         },

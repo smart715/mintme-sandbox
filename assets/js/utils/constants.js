@@ -11,6 +11,7 @@ export const tokenNameValidChars = helpers.regex('validChars', /^[-\sA-Za-z0-9]+
 export const HTTP_OK = 200;
 export const HTTP_ACCEPTED = 202;
 export const HTTP_NO_CONTENT = 204;
+export const HTTP_UNAUTHORIZED = 401;
 
 export const GENERAL = {
     precision: 8,
@@ -20,6 +21,11 @@ export const GENERAL = {
 export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const tokSymbol = 'TOK';
+
+export const cryptoSymbols = [
+    webSymbol,
+    btcSymbol,
+];
 
 export const tokenDeploymentStatus = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
 export const addressLength = {
