@@ -144,7 +144,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('foobar');
             wrapper.vm.isTokenExchanged = false;
             wrapper.vm.isTokenNotDeployed = true;
-            expect(wrapper.find('#alert-div1').text()).to.equal(deployedErrorMessage);
+            expect(wrapper.find('.text-danger').find('.text-center').text()).to.equal(deployedErrorMessage);
         });
 
         it('when new token name is not entered and token not deployed or traded', () => {
@@ -155,7 +155,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('');
             wrapper.vm.isTokenExchanged = false;
             wrapper.vm.isTokenNotDeployed = true;
-            expect(wrapper.find('#alert-div2').text()).to.equal(deployedErrorMessage);
+            expect(wrapper.find('.text-danger').find('.text-center').text()).to.equal(deployedErrorMessage);
         });
     });
 });

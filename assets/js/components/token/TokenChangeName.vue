@@ -27,10 +27,10 @@
             <div v-cloak v-if="!$v.newName.maxLength" class="text-danger text-center">
                 Token name can't be longer than 255 characters
             </div>
-            <div id="alert-div1" v-cloak v-if="this.currentName === this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
+            <div v-cloak v-if="this.currentName === this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
                 You didn't change the token name
             </div>
-            <div id="alert-div2" v-cloak v-if="!this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
+            <div v-cloak v-if="!this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
                 Token name shouldn't be blank
             </div>
         </div>
