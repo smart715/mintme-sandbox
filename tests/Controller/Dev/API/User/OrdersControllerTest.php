@@ -41,6 +41,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -98,6 +100,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'buy',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -178,7 +182,7 @@ class OrdersControllerTest extends WebTestCase
 
         $this->assertCount(1, $res1);
         $this->assertCount(1, $res2);
-        $this->assertEquals('2.000000000000', $res1[0]['price']);
+        $this->assertEquals('1.000000000000', $res1[0]['price']);
         $this->assertEquals('3.000000000000', $res2[0]['price']);
     }
 
@@ -241,11 +245,10 @@ class OrdersControllerTest extends WebTestCase
 
         $this->assertCount(1, $res1);
         $this->assertCount(1, $res2);
-        $this->assertEquals('2.000000000000', $res1[0]['price']);
+        $this->assertEquals('1.000000000000', $res1[0]['price']);
         $this->assertEquals('3.000000000000', $res2[0]['price']);
     }
 
-    // todo fix then retest
     public function testGetFinishedOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
@@ -287,29 +290,28 @@ class OrdersControllerTest extends WebTestCase
 
         sleep(10);
 
-        $this->client->request('GET', '/dev/api/v1/orders/finished', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'sell',
+        $this->client->request('GET', '/dev/api/v1/user/orders/finished', [
             'offset' => 0,
             'limit' => 1,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
+        $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->client->request('GET', '/dev/api/v1/orders/finished', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'sell',
+        $this->client->request('GET', '/dev/api/v1/user/orders/finished', [
             'offset' => 1,
             'limit' => 1,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
+        $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertTrue(true);
+        $this->assertCount(1, $res1);
+        $this->assertCount(1, $res2);
+        $this->assertEquals($res1[0]['id'], $res2[0]['id']);
+        $this->assertNotEquals($res1[0]['side'], $res2[0]['side']);
     }
 
     public function testPlaceOrder(): void
@@ -341,6 +343,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -388,6 +392,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -409,6 +415,8 @@ class OrdersControllerTest extends WebTestCase
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),

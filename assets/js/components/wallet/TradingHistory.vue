@@ -14,15 +14,15 @@
                 >
                     <template v-slot:cell(name)="row">
                         <div v-if="row.value.full.length > 17"
-                            v-b-tooltip="{title: rebrandingFunc(row.value.full), boundary: 'viewport'}"
+                            v-b-tooltip="{title: row.value.full, boundary: 'viewport'}"
                         >
-                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.truncate | rebranding }}
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value.truncate }}
                             </a>
                         </div>
                         <div v-else>
-                            <a :href="rebrandingFunc(row.item.pairUrl)" class="text-white">
-                                {{ row.value.full | rebranding }}
+                            <a :href="row.item.pairUrl" class="text-white">
+                                {{ row.value.full }}
                             </a>
                         </div>
                     </template>
@@ -141,7 +141,10 @@ export default {
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
                     side: this.getSideByType(history.side),
-                    name: this.pairNameFunc(history.market.base.symbol, history.market.quote.symbol),
+                    name: this.pairNameFunc(
+                        this.rebrandingFunc(history.market.base),
+                        this.rebrandingFunc(history.market.quote)
+                    ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
                     total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
@@ -182,7 +185,10 @@ export default {
         },
         generatePairUrl: function(market) {
             if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
-                return this.$routing.generate('coin', {base: market.base.symbol, quote: market.quote.symbol});
+                return this.$routing.generate('coin', {
+                    base: this.rebrandingFunc(market.base.symbol),
+                    quote: this.rebrandingFunc(market.quote.symbol),
+                });
             }
 
             return this.$routing.generate('token_show', {name: market.quote.name});

@@ -22,6 +22,11 @@ export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const tokSymbol = 'TOK';
 
+export const cryptoSymbols = [
+    webSymbol,
+    btcSymbol,
+];
+
 export const tokenDeploymentStatus = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
 export const addressLength = {
     WEB: {

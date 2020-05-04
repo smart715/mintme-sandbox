@@ -3,6 +3,9 @@ parameters:
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     locale: 'en'
     sonata.media.admin.media.class: App\Admin\MediaAdmin
+    router.request_context.host: '%mintme_url%'
+    router.request_context.base_url: ''
+    asset.request_context.base_path: '%router.request_context.base_url%'
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
@@ -154,6 +157,7 @@ services:
     App\Utils\Verify\WebsiteVerifier:
         arguments:
             $timeoutSeconds: '%verify_timeout_seconds%'
+            $proxy: '%website_verify_proxy%'
 
     App\Command\UpdateTokenRelease:
         arguments:

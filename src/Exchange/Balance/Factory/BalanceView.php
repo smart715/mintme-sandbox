@@ -35,6 +35,9 @@ class BalanceView
     /** @var bool */
     public $deployed;
 
+    /** @var bool */
+    public $owner;
+
     public function __construct(
         string $identifier,
         Money $available,
@@ -44,7 +47,8 @@ class BalanceView
         int $subunit,
         bool $exchangeble,
         bool $tradable,
-        bool $deployed
+        bool $deployed,
+        bool $owner
     ) {
         $this->identifier = $identifier;
         $this->available = $available;
@@ -55,6 +59,7 @@ class BalanceView
         $this->exchangeble = $exchangeble;
         $this->tradable = $tradable;
         $this->deployed = $deployed;
+        $this->owner = $owner;
     }
 
     /** @Groups({"API"}) */
@@ -109,5 +114,11 @@ class BalanceView
     public function isDeployed(): bool
     {
         return $this->deployed;
+    }
+
+    /** @Groups({"API"}) */
+    public function getOwner(): bool
+    {
+        return $this->owner;
     }
 }
