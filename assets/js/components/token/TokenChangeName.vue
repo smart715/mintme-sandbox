@@ -15,6 +15,24 @@
                 class="token-name-input w-100 px-2"
                 :class="{ 'is-invalid': $v.$invalid }"
             >
+            <div v-cloak v-if="!$v.newName.validChars" class="text-danger text-center">
+                Token name can contain only alphabets, numbers, spaces and dashes
+            </div>
+            <div v-cloak v-if="newName.length > 0 && (!$v.newName.validFirstChars || !$v.newName.validLastChars || !$v.newName.noSpaceBetweenDashes)" class="text-danger text-center">
+                Token name can't start or end with a dash or space, or have spaces between dashes
+            </div>
+            <div v-cloak v-if="!$v.newName.minLength" class="text-danger text-center">
+                Token name should have at least 4 symbols
+            </div>
+            <div v-cloak v-if="!$v.newName.maxLength" class="text-danger text-center">
+                Token name can't be longer than 255 characters
+            </div>
+            <div id="alert-div1" v-cloak v-if="this.currentName === this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
+                You didn't change the token name
+            </div>
+            <div id="alert-div2" v-cloak v-if="!this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
+                Token name shouldn't be blank
+            </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
             <button
@@ -70,7 +88,7 @@ export default {
     },
     computed: {
         btnDisabled: function() {
-            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
+            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed ||this.currentName === this.newName || this.$v.$invalid;
         },
         errorMessage: function() {
             let message = '';
@@ -106,38 +124,14 @@ export default {
         },
         editName: function() {
             this.$v.$touch();
-            if (this.currentName === this.newName) {
-                this.notifyError('You didn\'t change the token name');
-                return;
-            } else if (this.isTokenExchanged) {
+            if (this.isTokenExchanged) {
                 this.notifyError('You need all your tokens to change token\'s name');
                 return;
             } else if (!this.isTokenNotDeployed) {
                 this.notifyError('Token is deploying or deployed.');
                 return;
-            } else if (!this.newName) {
-                this.notifyError('Token name shouldn\'t be blank');
-                return;
-            } else if (!this.$v.newName.validFirstChars) {
-                this.notifyError('Token name can not contain spaces or dashes in the beginning');
-                return;
-            } else if (!this.$v.newName.validLastChars) {
-                this.notifyError('Token name can not contain spaces or dashes in the end');
-                return;
-            } else if (!this.$v.newName.noSpaceBetweenDashes) {
-                this.notifyError('Token name can not contain space between dashes');
-                return;
-            } else if (!this.$v.newName.validChars) {
-                this.notifyError('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
-            } else if (!this.$v.newName.minLength) {
-                this.notifyError('Token name should have at least 4 symbols');
-                return;
-            } else if (!this.$v.newName.maxLength) {
-                this.notifyError('Token name can not be longer than 60 characters');
-                return;
             }
-
+            
             if (this.twofa) {
                 this.showTwoFactorModal = true;
             } else {
