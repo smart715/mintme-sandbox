@@ -33,6 +33,9 @@
             <div v-cloak v-if="!this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
                 Token name shouldn't be blank
             </div>
+            <div v-cloak v-if="newNameExists" class="text-danger text-center">
+                Token name is already taken
+            </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
             <button
@@ -56,6 +59,7 @@
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
+    HTTP_OK,
     tokenNameValidChars,
     tokenValidFirstChars,
     tokenValidLastChars,
@@ -84,11 +88,14 @@ export default {
             newName: this.currentName,
             showTwoFactorModal: false,
             submitting: false,
+            newNameExists: false,
+            newNameProcessing: false,
+            newNameTimeout: null,
         };
     },
     computed: {
         btnDisabled: function() {
-            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed ||this.currentName === this.newName || this.$v.$invalid;
+            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed ||this.currentName === this.newName || this.$v.$invalid || this.newNameProcessing || this.newNameExists;
         },
         errorMessage: function() {
             let message = '';
@@ -104,8 +111,27 @@ export default {
     },
     watch: {
         newName: function() {
+            clearTimeout(this.newNameTimeout);
             if (this.newName.replace(/-|\s/g, '').length === 0) {
                 this.newName = '';
+            }
+            this.newNameExists = false;
+
+            if (!this.$v.$invalid && this.newName) {
+                this.newNameProcessing = true;
+                this.newNameTimeout = setTimeout(() => {
+                    this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                        .then((response) => {
+                            if (HTTP_OK === response.status) {
+                                this.newNameExists = response.data.exists;
+                            }
+                        }, (error) => {
+                            this.notifyError('An error has occurred, please try again later');
+                        })
+                        .then(() => {
+                            this.newNameProcessing = false;
+                        });
+                }, 2000);
             }
         },
     },
