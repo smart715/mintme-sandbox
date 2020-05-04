@@ -131,7 +131,6 @@ export default {
                 this.notifyError('Token is deploying or deployed.');
                 return;
             }
-            
             if (this.twofa) {
                 this.showTwoFactorModal = true;
             } else {
