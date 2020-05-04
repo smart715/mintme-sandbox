@@ -215,7 +215,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
-     * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[0-9][0-9]?$|^100$")
+     * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[1-9][0-9]?$|^100$")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
@@ -311,7 +311,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      */
     public function getTokens(BalanceHandlerInterface $balanceHandler, BalanceViewFactoryInterface $viewFactory): View
     {
-        if (!$this->getUser()) {
+        $user = $this->getUser();
+
+        if (!$user) {
             throw new AccessDeniedHttpException();
         }
 
@@ -337,8 +339,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         );
 
         return $this->view([
-            'common' => $viewFactory->create($common),
-            'predefined' => $viewFactory->create($predefined),
+            'common' => $viewFactory->create($common, $user),
+            'predefined' => $viewFactory->create($predefined, $user),
         ]);
     }
 
@@ -435,6 +437,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
         }
+
+        $this->denyAccessUnlessGranted('delete', $token);
 
         if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
             throw new ApiBadRequestException('Token is deploying or deployed.');
