@@ -43,10 +43,7 @@ body
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
   min-height: 100vh
-
-.content-wrapper
-  min-height: 100vh
-
+  
   @include media-breakpoint-up(xs)
     content: "xs"
 
@@ -61,6 +58,9 @@ body
 
   @include media-breakpoint-up(xl)
     content: "xl"
+
+.content-wrapper
+  min-height: 100vh
 
 .form-control
   height: auto
