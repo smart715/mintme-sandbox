@@ -7,7 +7,20 @@ describe('TradeSellOrders', () => {
         propsData: {
             ordersList: [],
             ordersLoaded: true,
-            tokenName: 'TOK1',
+            market: {
+                base: {
+                    name: 'Webchain',
+                    symbol: 'WEB',
+                    subunit: 4,
+                    identifier: 'BTC',
+                },
+                quote: {
+                    name: 'Token-name',
+                    symbol: 'Token-name',
+                    subunit: 4,
+                    identifier: 'TOK',
+                },
+            },
             fields: {
                 price: {
                     label: 'Price',
