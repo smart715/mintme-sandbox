@@ -92,7 +92,7 @@
                                 :is-owner="{{ isOwner ? 'true' : 'false' }}"
                                 :user-id="{{ app.user ? app.user.id : 0 }}"
                                 :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
-                                :donation-params="{{ donationParams | json_encode }}"
+                                :donation-params="{{ donation_params | json_encode }}"
                             >
                             </donation>
                         </div>
