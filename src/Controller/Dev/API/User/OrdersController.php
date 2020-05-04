@@ -3,6 +3,7 @@
 namespace App\Controller\Dev\API\User;
 
 use App\Controller\Dev\API\DevApiController;
+use App\Exception\ApiNotFoundException;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -178,8 +179,16 @@ class OrdersController extends DevApiController
      * @Rest\Post()
      * @Rest\RequestParam(name="base", allowBlank=false)
      * @Rest\RequestParam(name="quote", allowBlank=false)
-     * @Rest\RequestParam(name="priceInput", allowBlank=false)
-     * @Rest\RequestParam(name="amountInput", allowBlank=false)
+     * @Rest\RequestParam(
+     *     name="priceInput",
+     *     allowBlank=false,
+     *     requirements=@Assert\LessThanOrEqual(99999999.9999)
+     * )
+     * @Rest\RequestParam(
+     *     name="amountInput",
+     *     allowBlank=false,
+     *     requirements=@Assert\LessThanOrEqual(99999999.9999)
+     * )
      * @Rest\RequestParam(name="marketPrice", default=false)
      * @Rest\RequestParam(name="action", allowBlank=false, requirements="(sell|buy)")
      * @SWG\Parameter(
@@ -216,7 +225,7 @@ class OrdersController extends DevApiController
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
         if (is_null($base) || is_null($quote)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+            throw new ApiNotFoundException('Market not found');
         }
 
         $market = new Market($base, $quote);
@@ -261,7 +270,7 @@ class OrdersController extends DevApiController
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
         if (is_null($base) || is_null($quote)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+            throw new ApiNotFoundException('Market not found');
         }
 
         $order = Order::createCancelOrder($id, $this->getUser(), new Market($base, $quote));
