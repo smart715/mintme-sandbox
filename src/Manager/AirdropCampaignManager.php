@@ -212,9 +212,9 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
     private function checkUserBalance(User $user, Token $token, Money $amount): void
     {
-        $balance = $this->balanceHandler->balance($user, $token);
+        $balance = $this->balanceHandler->exchangeBalance($user, $token);
 
-        if ($balance->getAvailable()->lessThan($amount)) {
+        if ($balance->lessThan($amount)) {
             throw new ApiBadRequestException('Insufficient funds.');
         }
     }
