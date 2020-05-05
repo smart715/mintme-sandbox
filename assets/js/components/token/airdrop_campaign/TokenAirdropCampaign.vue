@@ -126,6 +126,7 @@ import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {TOK, HTTP_BAD_REQUEST} from '../../../utils/constants';
+import {mapGetters} from 'vuex';
 
 export default {
     name: 'TokenAirdropCampaign',
@@ -221,6 +222,12 @@ export default {
             }
 
             return false;
+        },
+        ...mapGetters('tokenStatistics', [
+            'getTokenExchangeAmount',
+        ]),
+        tokenExchangeAmount: function() {
+            return this.getTokenExchangeAmount;
         },
     },
     methods: {
@@ -368,6 +375,9 @@ export default {
             if (this.isRewardValid && this.errorMessage) {
                 this.errorMessage = '';
             }
+        },
+        tokenExchangeAmount: function() {
+            this.tokenBalance = this.tokenExchangeAmount;
         },
     },
 };
