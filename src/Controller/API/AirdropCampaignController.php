@@ -89,7 +89,12 @@ class AirdropCampaignController extends AbstractFOSRestController
             $token
         )->getAvailable();
 
-        $this->checkAirdropParams($amount, $participants, $endDateTimestamp, $balance);
+        $this->checkAirdropParams(
+            $amount,
+            $participants,
+            $endDateTimestamp,
+            $this->getTokenExchangeAmount($token, $balance)
+        );
 
         $endDate = $endDateTimestamp
             ? (new \DateTimeImmutable())->setTimestamp($endDateTimestamp)
@@ -153,6 +158,17 @@ class AirdropCampaignController extends AbstractFOSRestController
         );
 
         return $this->view(null, Response::HTTP_ACCEPTED);
+    }
+
+    private function getTokenExchangeAmount(Token $token, Money $balance): Money
+    {
+        if ($token->getLockIn()) {
+            return $token->isDeployed()
+                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
+        }
+
+        return $balance;
     }
 
     private function checkAirdropParams(Money $amount, int $participants, ?int $endDateTimestamp, Money $balance): void
