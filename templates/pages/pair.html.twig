@@ -50,7 +50,7 @@
                             ></token-introduction-description>
                             <posts class="col-12 col-lg-7 pr-lg-1"
                                 :posts="posts || (posts = {{ posts | json_encode }})"
-                                :max="4"
+                                :max="3"
                                 token-name="{{ token.name }}"
                                 token-page
                                 :show-edit="{{ isOwner ? 'true' : 'false'}}"

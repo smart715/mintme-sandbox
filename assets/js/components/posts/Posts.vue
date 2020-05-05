@@ -20,7 +20,7 @@
                 :href="readMoreUrl"
                 @click.prevent="goToPosts"
             >
-                Read More
+                More Posts
             </a>
         </div>
     </div>

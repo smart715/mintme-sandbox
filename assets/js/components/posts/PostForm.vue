@@ -45,6 +45,11 @@
             >
                 Save
             </button>
+            <button v-if="showCancel" class="btn-cancel"
+                @click="reset"
+            >
+                Cancel
+            </button>
         </div>
     </div>
 </template>
@@ -82,6 +87,10 @@ export default {
             }),
         },
         resetAfterAction: {
+            type: Boolean,
+            default: false,
+        },
+        showCancel: {
             type: Boolean,
             default: false,
         },

@@ -21,7 +21,7 @@
                         <div v-if="isTokenDeployed"
                             class="truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto"
                         >
-                            <strong class="mr-2">Token contract address:</strong>
+                            <strong class="mr-2 d-block">Token contract address:</strong>
                             <span>{{ tokenContractAddress }}</span>
                             <copy-link
                                 class="c-pointer"

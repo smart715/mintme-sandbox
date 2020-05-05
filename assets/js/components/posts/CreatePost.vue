@@ -3,6 +3,7 @@
         :api-url="$routing.generate('create_post')"
         @save-success="$emit('update-posts')"
         reset-after-action
+        show-cancel
     />
 </template>
 
