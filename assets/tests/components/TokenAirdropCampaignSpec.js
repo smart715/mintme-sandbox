@@ -2,6 +2,8 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenAirdropCampaign from '../../js/components/token/airdrop_campaign/TokenAirdropCampaign';
 import moxios from 'moxios';
 import axios from 'axios';
+import Vuex from 'vuex';
+import tokenStats from '../../js/storage/modules/token_statistics';
 
 /**
  * @return {Wrapper<Vue>}
@@ -9,6 +11,7 @@ import axios from 'axios';
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(axios);
+    localVue.use(Vuex);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -26,6 +29,10 @@ const airdropParams = {
     min_token_reward: 0.0001,
 };
 
+const store = new Vuex.Store({
+    modules: {tokenStats},
+});
+
 describe('TokenAirdropCampaign', () => {
     beforeEach(() => {
         moxios.install();
@@ -38,6 +45,7 @@ describe('TokenAirdropCampaign', () => {
     it('should check if airdrop campaign exists', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 airdropParams: airdropParams,
@@ -57,6 +65,7 @@ describe('TokenAirdropCampaign', () => {
     it('should check if disable save button', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 airdropParams: airdropParams,
@@ -87,6 +96,7 @@ describe('TokenAirdropCampaign', () => {
     it('check amount of tokens is valid', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 airdropParams: airdropParams,
@@ -106,6 +116,7 @@ describe('TokenAirdropCampaign', () => {
     it('check amount of participants is valid', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 airdropParams: airdropParams,
@@ -126,6 +137,7 @@ describe('TokenAirdropCampaign', () => {
     it('check if end date is valid', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 airdropParams: airdropParams,
@@ -150,6 +162,7 @@ describe('TokenAirdropCampaign', () => {
     it('check if airdrop campaign reward is valid', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 airdropParams: airdropParams,
@@ -173,6 +186,7 @@ describe('TokenAirdropCampaign', () => {
     it('can load token balance', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 tokenName: 'test2',
@@ -197,6 +211,7 @@ describe('TokenAirdropCampaign', () => {
     it('can load token ongoing airdrop campaign', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 tokenName: 'test2',
@@ -225,6 +240,7 @@ describe('TokenAirdropCampaign', () => {
     it('can create new token airdrop campaign', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 tokenName: 'test2',
@@ -261,6 +277,7 @@ describe('TokenAirdropCampaign', () => {
     it('should show error message if airdrop reward less than 0.0001', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 tokenName: 'test5',
@@ -288,6 +305,7 @@ describe('TokenAirdropCampaign', () => {
     it('can delete ongoing airdrop campaign', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             data() {
                 return {
@@ -312,6 +330,7 @@ describe('TokenAirdropCampaign', () => {
     it('should set default amount of tokens and participants', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenAirdropCampaign, {
+            store,
             localVue,
             propsData: {
                 airdropParams: airdropParams,
