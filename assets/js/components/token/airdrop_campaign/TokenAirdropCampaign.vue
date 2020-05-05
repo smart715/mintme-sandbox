@@ -303,6 +303,10 @@ export default {
                 .catch((err) => {
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
                         this.notifyError(err.response.data.message);
+
+                        setTimeout(()=> {
+                            location.reload();
+                        }, 1000);
                     } else {
                         this.notifyError('Something went wrong. Try to reload the page.');
                     }
