@@ -134,7 +134,6 @@ class DepositConsumer implements ConsumerInterface
                 ? new DepositTokenStrategy(
                     $this->balanceHandler,
                     $this->depositCommunicator,
-                    $this->em,
                     $this->moneyWrapper
                 )
                 : new DepositCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
