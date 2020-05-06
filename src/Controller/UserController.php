@@ -339,11 +339,11 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             }
 
             $unsuscribeKey = $this->getParameter('querty');
-            
+
             if (empty($unsuscribeKey)) {
                 return $this->render('pages/404.html.twig');
-            }            
-            
+            }
+
             $encrypt = new HMACSHAOneEncrypt($unsuscribeKey, $mail);
 
             return $encrypt->encrypt() === $key ?
