@@ -164,5 +164,4 @@ describe('TokenChangeName', () => {
             expect(!wrapper.vm.$v.newName.validChars).to.deep.equal(true);
         });
     });
-
 });
