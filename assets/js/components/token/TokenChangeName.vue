@@ -26,22 +26,24 @@
                     class="token-name-input w-100 px-2"
                     :class="{ 'is-invalid': $v.$invalid }"
             >
-            <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
-                Token name can contain only alphabets, numbers, spaces and dashes
-            </div>
-            <div v-if="this.newName.length > 0 && (!this.$v.newName.validFirstChars || +
+            <div class="col-12 pt-2 px-0 clearfix">
+                <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
+                    Token name can contain only alphabets, numbers, spaces and dashes
+                </div>
+                <div v-if="this.newName.length > 0 && (!this.$v.newName.validFirstChars || +
             !this.$v.newName.validLastChars || +
              !this.$v.newName.noSpaceBetweenDashes)" class="text-danger text-center small">
-                Token name can't start or end with a dash or space, or have spaces between dashes
-            </div>
-            <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
-                Token name should have at least 4 symbols
-            </div>
-            <div v-if="!this.$v.newName.maxLength" class="text-danger text-center small">
-                Token name can't be longer than 255 characters
-            </div>
-            <div v-if="!this.$v.newName.hasNotBlockedWords" class="text-danger text-center small">
-                Token name can't contain "token" or "coin" words
+                    Token name can't start or end with a dash or space, or have spaces between dashes
+                </div>
+                <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
+                    Token name should have at least 4 symbols
+                </div>
+                <div v-if="!this.$v.newName.maxLength" class="text-danger text-center small">
+                    Token name can't be longer than 255 characters
+                </div>
+                <div v-if="!this.$v.newName.hasNotBlockedWords" class="text-danger text-center small">
+                    Token name can't contain "token" or "coin" words
+                </div>
             </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
@@ -72,6 +74,7 @@
         tokenNoSpaceBetweenDashes, FORBIDDEN_WORDS, HTTP_OK,
     } from '../../utils/constants';
     import {LoggerMixin, NotificationMixin} from '../../mixins';
+    import axios from 'axios';
 
     const HTTP_ACCEPTED = 202;
 
@@ -125,23 +128,24 @@
                 this.tokenNameExists = false;
                 if (!this.$v.$invalid && this.newName) {
                     this.tokenNameProcessing = true;
-                    this.tokenNameTimeout = setTimeout(() => {
-                        this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
-                            .then((response) => {
-                                if (HTTP_OK === response.status) {
-                                    this.tokenNameExists = response.data.exists;
-                                }
-                            }, (error) => {
-                                this.notifyError('An error has occurred, please try again later');
-                            })
-                            .then(() => {
-                                this.tokenNameProcessing = false;
-                            });
-                    }, 2000);
+                 //   this.checkTokenExistence();
+                    this.tokenNameTimeout = setTimeout(this.checkTokenExistence, 500);
                 }
             },
         },
         methods: {
+            checkTokenExistence: function() {
+                let vm = this;
+                new Promise((res, rej) => res()).then(() => {
+                    axios.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                        .then((response) => {
+                            if (HTTP_OK === response.status) {
+                                vm.tokenNameExists = response.data.exists;
+                                vm.tokenNameProcessing = false;
+                            }
+                        });
+                });
+            },
             closeTwoFactorModal: function() {
                 this.showTwoFactorModal = false;
             },
