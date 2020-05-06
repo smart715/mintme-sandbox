@@ -125,7 +125,7 @@ import Decimal from 'decimal.js';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
-import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
+import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, AIRDROP_CREATED, AIRDROP_DELETED} from '../../../utils/constants';
 import {mapGetters} from 'vuex';
 
 export default {
@@ -296,6 +296,8 @@ export default {
                         this.airdropCampaignRemoved = false;
                     }
 
+                    window.localStorage.removeItem(AIRDROP_CREATED);
+                    window.localStorage.setItem(AIRDROP_CREATED, this.tokenName);
                     this.closeEditModal();
                     location.reload();
                     return;
@@ -330,6 +332,8 @@ export default {
                 .then(() => {
                     this.airdropCampaignId = null;
                     this.notifySuccess('Your airdrop was removed successfully.');
+                    window.localStorage.removeItem(AIRDROP_DELETED);
+                    window.localStorage.setItem(AIRDROP_DELETED, this.tokenName);
                     this.closeEditModal();
                     location.reload();
                 })

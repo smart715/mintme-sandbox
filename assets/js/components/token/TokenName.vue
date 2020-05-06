@@ -40,6 +40,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mixin as clickaway} from 'vue-clickaway';
 import {WebSocketMixin, FiltersMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import TokenEditModal from '../modal/TokenEditModal';
+import {AIRDROP_CREATED, AIRDROP_DELETED, TOKEN_NAME_CHANGED} from '../../utils/constants';
 
 library.add(faEdit);
 
@@ -78,13 +79,22 @@ export default {
 
         window.addEventListener('storage', (event) => {
             // Reload token page in case if token name was changed in another tab
-            if ('tokenName' === event.key && this.currentName === event.oldValue
+            if (TOKEN_NAME_CHANGED === event.key && this.currentName === event.oldValue
                 && this.currentName !== event.newValue
             ) {
                 this.currentName = event.newValue;
+                window.localStorage.removeItem(event.key);
                 location.href = this.$routing.generate('token_show', {
                     name: this.currentName,
                 });
+            }
+
+            // Reload token page in case if new token created/deleted in another tab
+            if ((AIRDROP_CREATED === event.key || AIRDROP_DELETED === event.key)
+                && this.currentName === event.newValue
+            ) {
+                window.localStorage.removeItem(event.key);
+                location.reload();
             }
         });
 

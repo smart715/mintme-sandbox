@@ -42,6 +42,7 @@ import {
     tokenValidFirstChars,
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
+    TOKEN_NAME_CHANGED,
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 
@@ -161,7 +162,8 @@ export default {
                     this.currentName = response.data['tokenName'];
                     this.notifySuccess('Token\'s name changed successfully');
 
-                    window.localStorage.setItem('tokenName', this.currentName);
+                    window.localStorage.removeItem(TOKEN_NAME_CHANGED);
+                    window.localStorage.setItem(TOKEN_NAME_CHANGED, this.currentName);
                     this.showTwoFactorModal = false;
                     this.closeModal();
 
