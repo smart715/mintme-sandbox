@@ -33,8 +33,8 @@ class HMACSHAOneEncrypt implements EncryptInterface
 
         // Xor key with opad & ipad
         for ($i = 0; $i < strlen($this->key); $i++) {
-            $opad[$i] ^= $this->key[$i];
-            $ipad[$i] ^= $this->key[$i];
+            $opad[$i] ^= (int) $this->key[$i];
+            $ipad[$i] ^= (int) $this->key[$i];
         }
 
         return sha1($opad.sha1($ipad.$this->data, true));
