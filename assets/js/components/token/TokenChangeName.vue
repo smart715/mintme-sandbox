@@ -161,6 +161,7 @@ export default {
                     this.currentName = response.data['tokenName'];
                     this.notifySuccess('Token\'s name changed successfully');
 
+                    window.localStorage.setItem('tokenName', this.currentName);
                     this.showTwoFactorModal = false;
                     this.closeModal();
 

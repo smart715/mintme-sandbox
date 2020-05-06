@@ -117,6 +117,11 @@ class Airdrop
         return $this;
     }
 
+    public function isActive(): ?bool
+    {
+        return self::STATUS_ACTIVE === $this->getStatus();
+    }
+
     public function getToken(): Token
     {
         return $this->token;

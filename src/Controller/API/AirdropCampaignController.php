@@ -81,6 +81,11 @@ class AirdropCampaignController extends AbstractFOSRestController
         Request $request
     ): View {
         $token = $this->fetchToken($tokenName, true);
+
+        if ($token->getActiveAirdrop()) {
+            throw new ApiBadRequestException('Token already has active airdrop.');
+        }
+
         $amount = $moneyWrapper->parse((string)$request->get('amount'), MoneyWrapper::TOK_SYMBOL);
         $participants = (int)$request->get('participants');
         $endDateTimestamp = $request->get('endDate');
@@ -119,16 +124,19 @@ class AirdropCampaignController extends AbstractFOSRestController
     public function deleteAirdropCampaign(Airdrop $airdrop): View
     {
         $this->denyAccessUnlessGranted('edit', $airdrop->getToken());
-        $this->airdropCampaignManager->deleteAirdrop($airdrop);
+
+        if ($airdrop->isActive()) {
+            $this->airdropCampaignManager->deleteAirdrop($airdrop);
+        }
 
         return $this->view(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{tokenName}/claim", name="claim_airdrop_campaign", options={"expose"=true})
+     * @Rest\Post("/{tokenName}/{id}/claim", name="claim_airdrop_campaign", options={"expose"=true})
      */
-    public function claimAirdropCampaign(string $tokenName): View
+    public function claimAirdropCampaign(string $tokenName, Airdrop $airdrop): View
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -141,6 +149,10 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         if (!$token->getActiveAirdrop()) {
             throw new ApiBadRequestException('Token does not have active airdrop campaign.');
+        }
+
+        if ($token->getActiveAirdrop()->getId() !== $airdrop->getId()) {
+            throw new ApiBadRequestException('Current airdrop campaign is finished.');
         }
 
         if ($this->airdropCampaignManager->checkIfUserClaimed($user, $token)) {

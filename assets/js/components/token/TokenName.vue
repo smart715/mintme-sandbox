@@ -76,6 +76,18 @@ export default {
             return;
         }
 
+        window.addEventListener('storage', (event) => {
+            // Reload token page in case if token name was changed in another tab
+            if ('tokenName' === event.key && this.currentName === event.oldValue
+                && this.currentName !== event.newValue
+            ) {
+                this.currentName = event.newValue;
+                location.href = this.$routing.generate('token_show', {
+                    name: this.currentName,
+                });
+            }
+        });
+
         this.checkIfTokenExchanged();
 
         this.addMessageHandler((response) => {

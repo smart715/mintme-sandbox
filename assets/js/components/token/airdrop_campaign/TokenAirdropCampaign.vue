@@ -125,7 +125,7 @@ import Decimal from 'decimal.js';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
-import {TOK, HTTP_BAD_REQUEST} from '../../../utils/constants';
+import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {mapGetters} from 'vuex';
 
 export default {
@@ -305,8 +305,11 @@ export default {
                         this.notifyError(err.response.data.message);
 
                         setTimeout(()=> {
+                            this.closeEditModal();
                             location.reload();
-                        }, 1000);
+                        }, 700);
+                    } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
+                        location.href = this.$routing.generate('token_create');
                     } else {
                         this.notifyError('Something went wrong. Try to reload the page.');
                     }

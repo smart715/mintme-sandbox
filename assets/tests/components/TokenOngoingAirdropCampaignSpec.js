@@ -205,6 +205,13 @@ describe('TokenOngoingAirdropCampaign', () => {
                 tokenName: 'test1',
                 userAlreadyClaimed: false,
             },
+            data() {
+                return {
+                    airdropCampaign: {
+                        'id': 5,
+                    },
+                };
+            },
         });
 
         moxios.stubRequest('claim_airdrop_campaign', {

@@ -54,7 +54,7 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin} from '../../../mixins';
-import {TOK, HTTP_BAD_REQUEST} from '../../../utils/constants';
+import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {toMoney} from '../../../utils';
 
 export default {
@@ -162,6 +162,7 @@ export default {
             this.btnDisabled = true;
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
+                id: this.airdropCampaign.id,
             }))
                 .then(() => {
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
@@ -176,6 +177,8 @@ export default {
                         setTimeout(()=> {
                             location.reload();
                         }, 1000);
+                    } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
+                        location.href = this.$routing.generate('trading');
                     } else {
                         this.notifyError('Something went wrong. Try to reload the page.');
                     }

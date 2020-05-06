@@ -165,7 +165,7 @@ class TokenController extends Controller
         ]);
     }
 
-    /** @Route(name="token_create") */
+    /** @Route(name="token_create", options={"expose"=true}) */
     public function create(
         Request $request,
         BalanceHandlerInterface $balanceHandler,

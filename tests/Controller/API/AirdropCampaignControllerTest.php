@@ -34,6 +34,15 @@ class AirdropCampaignControllerTest extends WebTestCase
         ]);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '200',
+            'participants' => 150,
+            'endDate' => $endDate->getTimestamp(),
+        ]);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Token already has active airdrop.', $res['message']);
+
         $this->client->request('GET', '/api/airdrop_campaign/' . $tokName);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
@@ -120,6 +129,7 @@ class AirdropCampaignControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertNotNull($res);
         $this->assertArrayHasKey('id', $res);
+        $airdropId = $res['id'];
 
         $this->client->request('DELETE', '/api/airdrop_campaign/' . $res['id'] . '/delete');
 
@@ -133,7 +143,7 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->followRedirect();
 
         $this->register($this->client);
-        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/' . $airdropId . '/claim');
         $this->assertTrue($this->client->getResponse()->isClientError());
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
@@ -152,17 +162,22 @@ class AirdropCampaignControllerTest extends WebTestCase
         ]);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
-        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
+        $this->client->request('GET', '/api/airdrop_campaign/' . $tokName);
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $airdropId = $res['id'];
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/' . $airdropId . '/claim');
         $this->assertTrue($this->client->getResponse()->isClientError());
 
         $this->client->request('GET', '/logout');
         $this->client->followRedirect();
 
         $this->register($this->client);
-        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/' . $airdropId . '/claim');
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
-        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/claim');
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/' . $airdropId . '/claim');
         $this->assertTrue($this->client->getResponse()->isClientError());
 
         $this->client->request('GET', '/api/airdrop_campaign/' . $tokName);
