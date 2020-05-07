@@ -15,6 +15,27 @@
                 class="token-name-input w-100 px-2"
                 :class="{ 'is-invalid': $v.$invalid }"
             >
+            <div v-cloak v-if="!$v.newName.validChars" class="text-danger text-center">
+                Token name can contain only alphabets, numbers, spaces and dashes
+            </div>
+            <div v-cloak v-if="newName.length > 0 && (!$v.newName.validFirstChars || !$v.newName.validLastChars || !$v.newName.noSpaceBetweenDashes)" class="text-danger text-center">
+                Token name can't start or end with a dash or space, or have spaces between dashes
+            </div>
+            <div v-cloak v-if="!$v.newName.minLength" class="text-danger text-center">
+                Token name should have at least 4 symbols
+            </div>
+            <div v-cloak v-if="!$v.newName.maxLength" class="text-danger text-center">
+                Token name can't be longer than 255 characters
+            </div>
+            <div v-cloak v-if="this.currentName === this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
+                You didn't change the token name
+            </div>
+            <div v-cloak v-if="!this.newName && !this.isTokenExchanged && this.isTokenNotDeployed" class="text-danger text-center">
+                Token name shouldn't be blank
+            </div>
+            <div v-cloak v-if="newNameExists" class="text-danger text-center">
+                Token name is already taken
+            </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
             <button
@@ -38,10 +59,12 @@
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
+    HTTP_OK,
     tokenNameValidChars,
     tokenValidFirstChars,
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
+    TOKEN_NAME_CHANGED,
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 
@@ -66,11 +89,14 @@ export default {
             newName: this.currentName,
             showTwoFactorModal: false,
             submitting: false,
+            newNameExists: false,
+            newNameProcessing: false,
+            newNameTimeout: null,
         };
     },
     computed: {
         btnDisabled: function() {
-            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed;
+            return this.submitting || this.isTokenExchanged || !this.isTokenNotDeployed ||this.currentName === this.newName || this.$v.$invalid || this.newNameProcessing || this.newNameExists;
         },
         errorMessage: function() {
             let message = '';
@@ -86,8 +112,27 @@ export default {
     },
     watch: {
         newName: function() {
+            clearTimeout(this.newNameTimeout);
             if (this.newName.replace(/-|\s/g, '').length === 0) {
                 this.newName = '';
+            }
+            this.newNameExists = false;
+
+            if (!this.$v.$invalid && this.newName) {
+                this.newNameProcessing = true;
+                this.newNameTimeout = setTimeout(() => {
+                    this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                        .then((response) => {
+                            if (HTTP_OK === response.status) {
+                                this.newNameExists = response.data.exists;
+                            }
+                        }, (error) => {
+                            this.notifyError('An error has occurred, please try again later');
+                        })
+                        .then(() => {
+                            this.newNameProcessing = false;
+                        });
+                }, 2000);
             }
         },
     },
@@ -106,38 +151,13 @@ export default {
         },
         editName: function() {
             this.$v.$touch();
-            if (this.currentName === this.newName) {
-                this.notifyError('You didn\'t change the token name');
-                return;
-            } else if (this.isTokenExchanged) {
+            if (this.isTokenExchanged) {
                 this.notifyError('You need all your tokens to change token\'s name');
                 return;
             } else if (!this.isTokenNotDeployed) {
                 this.notifyError('Token is deploying or deployed.');
                 return;
-            } else if (!this.newName) {
-                this.notifyError('Token name shouldn\'t be blank');
-                return;
-            } else if (!this.$v.newName.validFirstChars) {
-                this.notifyError('Token name can not contain spaces or dashes in the beginning');
-                return;
-            } else if (!this.$v.newName.validLastChars) {
-                this.notifyError('Token name can not contain spaces or dashes in the end');
-                return;
-            } else if (!this.$v.newName.noSpaceBetweenDashes) {
-                this.notifyError('Token name can not contain space between dashes');
-                return;
-            } else if (!this.$v.newName.validChars) {
-                this.notifyError('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
-            } else if (!this.$v.newName.minLength) {
-                this.notifyError('Token name should have at least 4 symbols');
-                return;
-            } else if (!this.$v.newName.maxLength) {
-                this.notifyError('Token name can not be longer than 60 characters');
-                return;
             }
-
             if (this.twofa) {
                 this.showTwoFactorModal = true;
             } else {
@@ -161,6 +181,8 @@ export default {
                     this.currentName = response.data['tokenName'];
                     this.notifySuccess('Token\'s name changed successfully');
 
+                    window.localStorage.removeItem(TOKEN_NAME_CHANGED);
+                    window.localStorage.setItem(TOKEN_NAME_CHANGED, this.currentName);
                     this.showTwoFactorModal = false;
                     this.closeModal();
 

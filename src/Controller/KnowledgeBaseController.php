@@ -10,7 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 class KnowledgeBaseController extends Controller
 {
     /**
-     * @Route(path="/kb", name="kb")
+     * @Route(
+     *     path="/kb",
+     *     name="kb",
+     *     options={"expose"=true,
+     *          "sitemap" = true,
+     *          "2fa_progress"=false
+     *     }
+     * )
      */
     public function showAll(KnowledgeBaseManagerInterface $kbManager): Response
     {

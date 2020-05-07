@@ -3,6 +3,9 @@ parameters:
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     locale: 'en'
     sonata.media.admin.media.class: App\Admin\MediaAdmin
+    router.request_context.host: '%mintme_url%'
+    router.request_context.base_url: ''
+    asset.request_context.base_path: '%router.request_context.base_url%'
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
@@ -41,6 +44,14 @@ services:
             $headers:
                 Accept: application/json
 
+    rabbitmq.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%env(RABBITMQ_MANAGMENT_URL)%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q='
+
     disposable_email.json_rpc:
         class: App\Communications\GuzzleRestWrapper
         arguments:
@@ -77,6 +88,10 @@ services:
     App\Communications\CoinmarketcapCommunicator:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\RabbitMQCommunicator:
+        arguments:
+            $rpc: '@rabbitmq.rest_rpc'
 
     App\Communications\DeployCostFetcher:
         arguments:
@@ -138,6 +153,7 @@ services:
     App\Utils\Verify\WebsiteVerifier:
         arguments:
             $timeoutSeconds: '%verify_timeout_seconds%'
+            $proxy: '%website_verify_proxy%'
 
     App\Command\UpdateTokenRelease:
         arguments:
@@ -509,3 +525,13 @@ services:
     App\EventSubscriber\AuthenticationListener:
         arguments:
             $firewallName: '%fos_user.firewall_name%'
+
+    App\Utils\ServiceInfo\ServiceInfoBuilder:
+        arguments:
+            $depositWorkDir: '%env(DEPOSIT_WORKDIR)%'
+            $withdrawWorkDir: '%env(WITHDRAW_WORKDIR)%'
+            $contractWorkDir: '%env(CONTRACT_WORKDIR)%'
+
+    App\Exchange\Config\AirdropConfig:
+        arguments:
+            $airdropParams: '%airdrop_params%'

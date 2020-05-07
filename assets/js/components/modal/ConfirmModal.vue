@@ -4,7 +4,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <div>
+                <div v-if="showImage">
                     <img src="../../../img/are-you-sure.png"/>
                 </div>
                 <slot>
@@ -15,14 +15,17 @@
                 <div class="pt-2">
                     <button
                         class="btn btn-primary"
+                        :tabindex="9"
                         @click="onConfirm">
                         <slot name="confirm">Confirm</slot>
                     </button>
-                    <span
-                        class="btn-cancel pl-3 c-pointer"
+                    <button
+                        v-if="showCancelButton"
+                        class="btn-cancel pl-3 bg-transparent"
+                        :tabindex="10"
                         @click="onCancel">
                         <slot name="cancel">Cancel</slot>
-                    </span>
+                    </button>
                 </div>
             </div>
         </template>
@@ -38,6 +41,14 @@ export default {
     },
     props: {
         visible: Boolean,
+        showCancelButton: {
+            type: Boolean,
+            default: true,
+        },
+        showImage: {
+            type: Boolean,
+            default: true,
+        },
     },
     methods: {
         closeModal: function() {
