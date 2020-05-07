@@ -115,3 +115,6 @@ parameters:
 
     # max top holders for each token
     top_holders: 10
+    
+    #HMAC SHA1 querty key
+    querty: '1dcd5eefd2457e1f04c52c2f747637ec880c4023'
