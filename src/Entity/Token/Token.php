@@ -2,6 +2,7 @@
 
 namespace App\Entity\Token;
 
+use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
 use App\Entity\Post;
 use App\Entity\Profile;
@@ -10,6 +11,7 @@ use App\Entity\User;
 use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -171,18 +173,41 @@ class Token implements TradebleInterface
      */
     protected $withdrawn = '0';
 
-     /**
+    /**
      * @ORM\Column(type="string", nullable=true)
      * @var string|null
      */
     private $mintedAmount;
 
     /**
+<<<<<<< HEAD
      * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
      * @ORM\OrderBy({"createdAt" = "DESC"})
      * @var ArrayCollection
      */
     protected $posts;
+=======
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\AirdropCampaign\Airdrop",
+     *     mappedBy="token",
+     *     orphanRemoval=true,
+     *     fetch="EXTRA_LAZY"
+     * )
+     * @var ArrayCollection
+     */
+    private $airdrops;
+
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $airdropsAmount = '0';
+
+    public function __construct()
+    {
+        $this->airdrops = new ArrayCollection();
+    }
+>>>>>>> v1.2.0
 
     /** @return User[] */
     public function getUsers(): array
@@ -463,6 +488,59 @@ class Token implements TradebleInterface
     public function setMintedAmount(Money $mintedAmount): void
     {
         $this->mintedAmount = $mintedAmount->getAmount();
+    }
+
+    /** @codeCoverageIgnore */
+    public function getAirdrops(): Collection
+    {
+        return $this->airdrops;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getActiveAirdrop(): ?Airdrop
+    {
+        $activeAirdrop = $this->getAirdrops()->filter(function (Airdrop $airdrop) {
+            return Airdrop::STATUS_ACTIVE === $airdrop->getStatus();
+        });
+
+        return $activeAirdrop->isEmpty()
+            ? null
+            : $activeAirdrop->first();
+    }
+
+    /** @codeCoverageIgnore */
+    public function addAirdrop(Airdrop $airdrop): self
+    {
+        if (!$this->airdrops->contains($airdrop)) {
+            $this->airdrops->add($airdrop);
+            $airdrop->setToken($this);
+        }
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function removeAirdrop(Airdrop $airdrop): self
+    {
+        if ($this->airdrops->contains($airdrop)) {
+            $this->airdrops->removeElement($airdrop);
+        }
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getAirdropsAmount(): Money
+    {
+        return new Money($this->airdropsAmount, new Currency(self::TOK_SYMBOL));
+    }
+
+    /** @codeCoverageIgnore */
+    public function setAirdropsAmount(Money $airdropsAmount): self
+    {
+        $this->airdropsAmount = $airdropsAmount->getAmount();
+
+        return $this;
     }
 
     /**
