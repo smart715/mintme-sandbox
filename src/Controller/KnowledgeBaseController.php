@@ -14,7 +14,8 @@ class KnowledgeBaseController extends Controller
      *     path="/kb",
      *     name="kb",
      *     options={"expose"=true,
-     *          "sitemap" = true
+     *          "sitemap" = true,
+     *          "2fa_progress"=false
      *     }
      * )
      */
