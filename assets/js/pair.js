@@ -1,3 +1,4 @@
+import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
 import Trade from './components/trade/Trade';
 import TokenPointsProgress from './components/token/TokenPointsProgress';
 import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
@@ -24,6 +25,7 @@ new Vue({
     };
   },
   components: {
+    TokenOngoingAirdropCampaign,
     Trade,
     TokenIntroductionProfile,
     TokenIntroductionStatistics,

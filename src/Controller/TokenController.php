@@ -10,6 +10,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
+use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
@@ -98,7 +99,8 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
-        TokenNameConverterInterface $tokenNameConverter
+        TokenNameConverterInterface $tokenNameConverter,
+        AirdropCampaignManagerInterface $airdropCampaignManager
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
@@ -152,6 +154,7 @@ class TokenController extends Controller
             'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
+            'isTokenCreated' => $this->isTokenCreated(),
             'tab' => $tab,
             'showTrade' => true,
             'market' => $this->normalize($market),
@@ -160,10 +163,13 @@ class TokenController extends Controller
                 '',
             'precision' => $this->getParameter('token_precision'),
             'isTokenPage' => true,
+            'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
+            'userAlreadyClaimed' => $airdropCampaignManager
+                ->checkIfUserClaimed($this->getUser(), $token),
         ]);
     }
 
-    /** @Route(name="token_create") */
+    /** @Route(name="token_create", options={"expose"=true}) */
     public function create(
         Request $request,
         BalanceHandlerInterface $balanceHandler,
