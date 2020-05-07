@@ -19,7 +19,6 @@
                     </div>
                     <div class="float-right">
                         <div
-                                v-cloak="$v.tokenName"
                                 v-if="tokenNameInBlacklist"
                                 class="alert alert-danger alert-token-name-exists"
                         >
@@ -84,7 +83,6 @@
         tokenNoSpaceBetweenDashes, FORBIDDEN_WORDS, HTTP_OK,
     } from '../../utils/constants';
     import {LoggerMixin, NotificationMixin} from '../../mixins';
-    import axios from 'axios';
 
     const HTTP_ACCEPTED = 202;
 
