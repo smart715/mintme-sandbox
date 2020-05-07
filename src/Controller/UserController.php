@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Form\ChangePasswordType;
 use App\Form\QuickRegistrationType;
 use App\Form\TwoFactorType;
-use App\Form\UnsuscribeType;
+use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
@@ -299,12 +299,11 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     }
 
     /**
-     * @Route("user/unsuscribe/key/{key}/mail/{mail}", name="unsuscribe")
-     * @Route("user/confirm-unsuscribe", name="confirm-unsuscribe")
+     * @Route("user/unsubscribe/{key}/{mail}", name="unsubscribe")
      */
-    public function unsuscribe(Request $request): Response
+    public function unsubscribe(Request $request): Response
     {
-        $form = $this->createForm(UnsuscribeType::class);
+        $form = $this->createForm(UnsubscribeType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -326,7 +325,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 $result = false;
             }
 
-            return $this->render('pages/unsuscribe.html.twig', [
+            return $this->render('pages/unsubscribe.html.twig', [
             'formHeader' => 'Unsuscribe',
             'result' => $result,
             'mail' => $email,
@@ -339,17 +338,17 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 return $this->render('pages/404.html.twig');
             }
 
-            $unsuscribeKey = $this->getParameter('querty');
+            $hmacShaOneKey = $this->getParameter('hmac_sha_one_key');
 
-            if (empty($unsuscribeKey)) {
+            if (empty($hmacShaOneKey)) {
                 return $this->render('pages/404.html.twig');
             }
 
-            $encrypt = new HMACSHAOneEncrypt($unsuscribeKey, $mail);
-
+            $encrypt = new HMACSHAOneEncrypt($hmacShaOneKey, $mail);
+            
             return $encrypt->encrypt() === $key ?
-            $this->render('pages/unsuscribe.html.twig', [
-                'formHeader' => 'Unsuscribe',
+            $this->render('pages/unsubscribe.html.twig', [
+                'formHeader' => 'Unsubscribe',
                 'result' =>null,
                 'mail' => $mail,
                 'form' => $form->createView()]) : $this->render('pages/404.html.twig');
