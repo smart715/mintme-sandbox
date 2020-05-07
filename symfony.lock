@@ -411,10 +411,10 @@
         "version": "2.0.27"
     },
     "phpstan/phpstan": {
-        "version": "0.12.19"
+        "version": "0.12.23"
     },
     "phpstan/phpstan-doctrine": {
-        "version": "0.12.10"
+        "version": "0.12.11"
     },
     "phpstan/phpstan-phpunit": {
         "version": "0.12.8"
@@ -579,7 +579,7 @@
         "version": "3.9.0"
     },
     "sonata-project/user-bundle": {
-        "version": "4.5.2"
+        "version": "4.5.3"
     },
     "spomky-labs/otphp": {
         "version": "v10.0.1"
@@ -945,7 +945,7 @@
         "version": "v4.4.8"
     },
     "thecodingmachine/safe": {
-        "version": "v1.1"
+        "version": "v1.1.1"
     },
     "twig/extensions": {
         "version": "1.0",
