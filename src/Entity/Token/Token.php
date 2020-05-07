@@ -180,13 +180,6 @@ class Token implements TradebleInterface
     private $mintedAmount;
 
     /**
-<<<<<<< HEAD
-     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     * @var ArrayCollection
-     */
-    protected $posts;
-=======
      * @ORM\OneToMany(
      *     targetEntity="App\Entity\AirdropCampaign\Airdrop",
      *     mappedBy="token",
@@ -203,11 +196,17 @@ class Token implements TradebleInterface
      */
     protected $airdropsAmount = '0';
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     * @var ArrayCollection
+     */
+    protected $posts;
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
     }
->>>>>>> v1.2.0
 
     /** @return User[] */
     public function getUsers(): array
