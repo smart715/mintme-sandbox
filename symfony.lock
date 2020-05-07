@@ -947,6 +947,12 @@
     "thecodingmachine/safe": {
         "version": "v1.1.1"
     },
+    "tijsverkoyen/css-to-inline-styles": {
+        "version": "2.2.2"
+    },
+    "twig/cssinliner-extra": {
+        "version": "v2.12.5"
+    },
     "twig/extensions": {
         "version": "1.0",
         "recipe": {
