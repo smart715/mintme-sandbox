@@ -27,7 +27,6 @@ describe('TokenSocialMediaEdit', () => {
         expect(wrapper.find('token-youtube-address-stub').html()).to.contain('testYoutubeClientId');
         expect(wrapper.find('token-youtube-address-stub').html()).to.contain('testTokenName');
         expect(wrapper.find('token-facebook-address-stub').html()).to.contain('testFacebookUrl');
-        expect(wrapper.find('token-facebook-address-stub').html()).to.contain('testFacebookAppId');
         expect(wrapper.find('token-facebook-address-stub').html()).to.contain('testTokenName');
         expect(wrapper.find('token-telegram-channel-stub').html()).to.contain('testTelegramUrl');
         expect(wrapper.find('token-telegram-channel-stub').html()).to.contain('testTokenName');

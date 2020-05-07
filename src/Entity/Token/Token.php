@@ -267,7 +267,7 @@ class Token implements TradebleInterface
         return $this;
     }
 
-    public function setDeployCost(string $cost): self
+    public function setDeployCost(?string $cost): self
     {
         $this->deployCost = $cost;
 

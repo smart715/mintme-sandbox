@@ -46,15 +46,11 @@ export default {
     name: 'TokenFacebookAddressView',
     props: {
         address: String,
-        appId: String,
     },
     components: {
         Guide,
     },
     mixins: [FiltersMixin],
-    created: function() {
-        this.loadFacebookSdk();
-    },
     data() {
         return {
             currentAddress: this.address,
@@ -63,28 +59,6 @@ export default {
     computed: {
         currentAddressEncoded: function() {
             return encodeURIComponent(this.currentAddress);
-        },
-    },
-    methods: {
-        loadFacebookSdk: function() {
-            window.fbAsyncInit = () => {
-                FB.init({
-                    appId: this.appId,
-                    autoLogAppEvents: true,
-                    xfbml: true,
-                    version: 'v3.1',
-                });
-            };
-
-            (function(d, s, id) {
-                let js; let fjs = d.getElementsByTagName(s)[0];
-                if (d.getElementById(id)) {
-                    return;
-                }
-                js = d.createElement(s); js.id = id;
-                js.src = 'https://connect.facebook.net/en_US/sdk.js';
-                fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'facebook-jssdk'));
         },
     },
 };

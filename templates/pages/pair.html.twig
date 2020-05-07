@@ -48,6 +48,8 @@
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     @updated="descriptionUpdated"
                             ></token-introduction-description>
+                        </div>
+                        <div class="row">
                             <posts class="col-12 col-lg-7 pr-lg-1"
                                 :posts="posts || (posts = {{ posts | json_encode }})"
                                 :max="3"
@@ -56,7 +58,6 @@
                                 :show-edit="{{ isOwner ? 'true' : 'false'}}"
                                 @go-to-posts="goToPosts"
                                 @delete-post="deletePost"
-
                             >
                                 <template v-slot:title>Recent posts</template>
                             </posts>
@@ -211,4 +212,15 @@
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="{{ asset('build/pair.js') }}"></script>
+    <script>
+        window.fbAsyncInit = () => {
+            FB.init({
+                appId: '{{ global_facebook_app_id }}',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v3.1',
+            });
+        };
+    </script>
+    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
 {% endblock %}
