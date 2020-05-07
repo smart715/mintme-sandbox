@@ -14,12 +14,24 @@
 {% endblock %}
 
 {% block content %}
+{% set isOwner = isOwner ? 'true' : 'false' %}
+{% set showAirdropCampaign = showAirdropCampaign ? 'true' : 'false' %}
+{% set userAlreadyClaimed = userAlreadyClaimed ? 'true' : 'false' %}
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
     <div class="row pt-5 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
             <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
+                <token-ongoing-airdrop-campaign
+                    v-if="{{ showAirdropCampaign }}"
+                    :logged-in="{{ app.user ? 'true' : 'false' }}"
+                    :is-owner="{{ isOwner }}"
+                    :token-name="'{{ token.name }}'"
+                    :user-already-claimed="{{ userAlreadyClaimed }}"
+                    login-url="{{ absolute_url(path('fos_user_security_login')) }}"
+                    signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
+                ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab title="Introduction" {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}>
                         <div class="row">
@@ -27,7 +39,7 @@
                                     class="col-12 pb-3"
                                     name="{{ token.name }}"
                                     :description="tokenDescription"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :editable="{{ isOwner }}"
                                     @updated="descriptionUpdated"
                             ></token-introduction-description>
                             <token-introduction-profile
@@ -37,7 +49,7 @@
                                     website-url="{{ token.websiteUrl }}"
                                     facebook-url="{{ token.facebookUrl }}"
                                     youtube-channel-id="{{ token.youtubeChannelId }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :editable="{{ isOwner }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
                                     :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     token-contract-address="{{ token.address }}"
@@ -52,7 +64,7 @@
                             <token-introduction-statistics
                                     class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
                                     :market="{{ market | json_encode }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :editable="{{ isOwner }}"
                                     release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
                                     twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                     token-created="{{ token.getCreated().format('d M Y') }}"
@@ -74,9 +86,8 @@
                             signup-url="{{ path('fos_user_registration_register') }}"
                             :market="{{ market | json_encode }}"
                             :logged-in="{{ app.user ? 'true' : 'false' }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                            :is-owner="{{ isOwner }}"
                             :precision="{{ precision }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}"
                             mintme-supply-url="{{ mintme_supply }}"
                             :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
@@ -90,7 +101,7 @@
                             <li class="nav-item">
                                 <div class="nav-link pr-md-0">
                                     <token-deploy-icon
-                                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                                            :is-owner="{{ isOwner }}"
                                             :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     />
                                 </div>
@@ -113,8 +124,9 @@
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <token-name
-                                        :editable="{{ isOwner ? 'true' : 'false' }}"
+                                        :editable="{{ isOwner }}"
                                         :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                                        :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
                                         identifier="{{ market.quote.identifier }}"
                                         name="{{ market.quote.name }}"
                                         :precision="{{ precision }}"
@@ -123,6 +135,7 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         release-address="{{ token.mintDestination }}"
                                         @token-deploy-pending="setTokenPending"
+                                        :airdrop-params="{{ airdrop_params | json_encode }}"
                                 />
                             </div>
                         </li>
