@@ -45,7 +45,7 @@
             >
                 Save
             </button>
-            <button v-if="showCancel" class="btn-cancel"
+            <button v-if="showCancel" class="btn btn-cancel"
                 @click="reset"
             >
                 Cancel

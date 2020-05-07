@@ -17,6 +17,7 @@
                 Nothing's here
             </div>
             <a v-if="showReadMore"
+                class="align-self-start"
                 :href="readMoreUrl"
                 @click.prevent="goToPosts"
             >
