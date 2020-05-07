@@ -130,7 +130,7 @@ function formatMoney(str) {
         currStr.concat(`.`, str.split(`.`)[1]) :
         currStr;
 
-    return `${res.replace(/,/g, ' ')} ${additional}`;
+    return `${res.replace(/,/g, ' ')} ${additional}`.trim();
 }
 
 /**
