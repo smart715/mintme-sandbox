@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header">
                 Statistics
                 <guide class="float-right">
