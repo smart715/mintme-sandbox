@@ -22,11 +22,13 @@ new Vue({
             tokenNameExists: false,
             tokenNameProcessing: false,
             tokenNameTimeout: null,
+            tokenNameInBlacklist: false,
         };
     },
     computed: {
         saveBtnDisabled: function() {
-            return this.$v.$anyError || !this.tokenName || this.tokenNameExists || this.tokenNameProcessing;
+            return this.$v.$anyError || !this.tokenName ||
+                this.tokenNameExists || this.tokenNameProcessing;
         },
     },
     watch: {
@@ -38,22 +40,33 @@ new Vue({
             }
 
             this.tokenNameExists = false;
-
+            this.tokenNameInBlacklist = false;
             if (!this.$v.tokenName.$invalid && this.tokenName) {
                 this.tokenNameProcessing = true;
                 this.tokenNameTimeout = setTimeout(() => {
-                    this.$axios.single.get(this.$routing.generate('check_token_name_exists', {name: this.tokenName}))
+                    this.$axios.single.get(this.$routing.generate('token_name_blacklist_check', {name: this.tokenName}))
                         .then((response) => {
                             if (HTTP_OK === response.status) {
-                                this.tokenNameExists = response.data.exists;
+                                this.tokenNameInBlacklist = response.data.blacklisted;
+                                if (response.data.blacklisted !== true) {
+                                    this.$axios.single.
+                                    get(this.$routing.generate('check_token_name_exists', {name: this.tokenName}))
+                                        .then((response) => {
+                                            if (HTTP_OK === response.status) {
+                                                this.tokenNameExists = response.data.exists;
+                                            }
+                                        }, (error) => {
+                                            this.notifyError('An error has occurred, please try again later');
+                                        })
+                                        .then(() => {
+                                            this.tokenNameProcessing = false;
+                                        });
+                                }
                             }
                         }, (error) => {
                             this.notifyError('An error has occurred, please try again later');
-                        })
-                        .then(() => {
-                            this.tokenNameProcessing = false;
                         });
-                }, 2000);
+                    }, 2000);
             }
         },
     },

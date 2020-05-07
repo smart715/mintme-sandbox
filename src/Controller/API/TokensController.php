@@ -19,6 +19,8 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
+use App\Manager\BlacklistManager;
+use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -66,11 +68,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var int */
     private $expirationTime;
 
+    /** @var BlacklistManagerInterface */
+    protected $blacklistManager;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         UserActionLogger $userActionLogger,
+        BlacklistManager $blacklistManager,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -80,6 +86,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->userActionLogger = $userActionLogger;
         $this->topHolders = $topHolders;
         $this->expirationTime = $expirationTime;
+        $this->blacklistManager = $blacklistManager;
     }
 
     /**
@@ -665,5 +672,24 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         return $this->view(['exists' => null !== $token], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/token-name-blacklist-check", name="token_name_blacklist_check", options={"expose"=true})
+     */
+    public function checkTokenNameBlacklist(string $name): View
+    {
+        $name = trim($name);
+        $blacklist = $this->blacklistManager->getList("token");
+
+        foreach ($blacklist as $blist) {
+            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
+                && (strlen($name) - strlen($blist->getValue())) <= 1) {
+                return $this->view(['blacklisted' => true], Response::HTTP_OK);
+            }
+        }
+
+        return $this->view(['blacklisted' => false], Response::HTTP_OK);
     }
 }

@@ -17,6 +17,16 @@
                             Token name is already taken
                         </div>
                     </div>
+                    <div class="float-right">
+                        <div
+                                v-cloak="$v.tokenName"
+                                v-if="tokenNameInBlacklist"
+                                class="alert alert-danger alert-token-name-exists"
+                        >
+                            <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                            Banned word detected.
+                        </div>
+                    </div>
                 </div>
             <input
                     id="tokenName"
@@ -100,6 +110,7 @@
                 tokenNameExists: false,
                 tokenNameProcessing: false,
                 tokenNameTimeout: null,
+                tokenNameInBlacklist: false,
             };
         },
         computed: {
@@ -126,6 +137,7 @@
                     this.newName = '';
                 }
                 this.tokenNameExists = false;
+                this.tokenNameInBlacklist = false;
                 if (!this.$v.$invalid && this.newName) {
                     this.tokenNameProcessing = true;
                  //   this.checkTokenExistence();
@@ -135,14 +147,28 @@
         },
         methods: {
             checkTokenExistence: function() {
-                let vm = this;
                 new Promise((res, rej) => res()).then(() => {
-                    axios.get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                    this.$axios.single.get(this.$routing.generate('token_name_blacklist_check', {name: this.newName}))
                         .then((response) => {
                             if (HTTP_OK === response.status) {
-                                vm.tokenNameExists = response.data.exists;
-                                vm.tokenNameProcessing = false;
+                                this.tokenNameInBlacklist = response.data.blacklisted;
+                                if (response.data.blacklisted !== true) {
+                                    this.$axios.single.
+                                    get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                                        .then((response) => {
+                                            if (HTTP_OK === response.status) {
+                                                this.tokenNameExists = response.data.exists;
+                                            }
+                                        }, (error) => {
+                                            this.notifyError('An error has occurred, please try again later');
+                                        })
+                                        .then(() => {
+                                            this.tokenNameProcessing = false;
+                                        });
+                                }
                             }
+                        }, (error) => {
+                            this.notifyError('An error has occurred, please try again later');
                         });
                 });
             },
