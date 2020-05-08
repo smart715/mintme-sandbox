@@ -55,6 +55,10 @@ describe('TokenAirdropCampaign', () => {
                     airdropCampaignId: null,
                 };
             },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
+            },
         });
 
         expect(wrapper.vm.hasAirdropCampaign).to.be.false;
@@ -69,6 +73,10 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 airdropParams: airdropParams,
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
             },
         });
 
@@ -101,6 +109,10 @@ describe('TokenAirdropCampaign', () => {
             propsData: {
                 airdropParams: airdropParams,
             },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
+            },
         });
 
         expect(wrapper.vm.isAmountValid).to.be.false;
@@ -120,6 +132,10 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 airdropParams: airdropParams,
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
             },
         });
 
@@ -141,6 +157,10 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 airdropParams: airdropParams,
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
             },
         });
 
@@ -167,6 +187,10 @@ describe('TokenAirdropCampaign', () => {
             propsData: {
                 airdropParams: airdropParams,
             },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
+            },
         });
 
         expect(wrapper.vm.isRewardValid).to.be.false;
@@ -192,6 +216,9 @@ describe('TokenAirdropCampaign', () => {
                 tokenName: 'test2',
                 airdropParams: airdropParams,
             },
+            methods: {
+                loadAirdropCampaign: () => {},
+            },
         });
 
         moxios.stubRequest('token_exchange_amount', {
@@ -199,7 +226,6 @@ describe('TokenAirdropCampaign', () => {
             response: 1254.2356,
         });
         expect(wrapper.vm.balanceLoaded).to.be.false;
-        wrapper.vm.loadTokenBalance();
 
         moxios.wait(() => {
             expect(wrapper.vm.tokenBalance).to.equal(1254.2356);
@@ -217,6 +243,9 @@ describe('TokenAirdropCampaign', () => {
                 tokenName: 'test2',
                 airdropParams: airdropParams,
             },
+            methods: {
+                loadTokenBalance: () => {},
+            },
         });
 
         moxios.stubRequest('get_airdrop_campaign', {
@@ -226,7 +255,6 @@ describe('TokenAirdropCampaign', () => {
             },
         });
 
-        wrapper.vm.loadAirdropCampaign();
         expect(wrapper.vm.loading).to.be.true;
 
         moxios.wait(() => {
@@ -254,6 +282,10 @@ describe('TokenAirdropCampaign', () => {
                     participantsAmount: 100,
                     showEndDate: false,
                 };
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
             },
         });
 
@@ -291,6 +323,10 @@ describe('TokenAirdropCampaign', () => {
                     showEndDate: false,
                 };
             },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
+            },
         });
 
         expect(wrapper.vm.errorMessage).to.be.equal('');
@@ -311,6 +347,10 @@ describe('TokenAirdropCampaign', () => {
                 return {
                     airdropCampaignId: 3,
                 };
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
             },
         });
 
@@ -340,6 +380,10 @@ describe('TokenAirdropCampaign', () => {
                     tokensAmount: 500,
                     participantsAmount: 170,
                 };
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
             },
         });
 
