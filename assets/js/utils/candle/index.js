@@ -5,6 +5,7 @@
             (global.VeCandle = factory(global.echarts));
 }(this, (function(echartsLib) {
     'use strict';
+    const merge = require('lodash/merge');
 
     echartsLib = echartsLib && echartsLib.hasOwnProperty('default') ? echartsLib['default'] : echartsLib;
 
@@ -704,15 +705,13 @@
             });
         }
 
-        if(args.rightLabel){
-            series.push({
-                name: 'extraAxis',
-                type: 'candlestick',
-                yAxisIndex: 1,
-                data: values,
-                itemStyle: style,
-            });
-        }
+        series.push({
+            name: 'extraAxis',
+            type: 'candlestick',
+            yAxisIndex: 1,
+            data: values,
+            itemStyle: style,
+        });
 
         return series;
     }
@@ -733,7 +732,7 @@
         return result;
     }
 
-    let candle = function candle(columns, rows, settings, status, rightLabel) {
+    let candle = function candle(columns, rows, settings, status) {
         let _settings$dimension = settings.dimension;
         let dimension = _settings$dimension === undefined ? columns[0] : _settings$dimension;
         let _settings$metrics = settings.metrics;
@@ -823,7 +822,6 @@
         let xAxis = getCandleXAxis({dims: dims, showVol: showVol});
         let yAxis = getCandleYAxis({dataType: dataType, digit: digit});
         let series = getCandleSeries({
-            rightLabel: rightLabel,
             values: values,
             volumes: volumes,
             upColor: upColor,
@@ -884,7 +882,7 @@
                 if (isArray(options[attr]) && isObject(options[attr][0]) && isObject(value)) {
                     // eg: options: [{ xx: 1 }, { xx: 2 }] value: { xx: 1 }
                     options[attr].forEach(function(option, index) {
-                        options[attr][index] = _extends({}, option, value);
+                        options[attr][index] = merge({}, option, value);
                     });
                 } else if (isArray(options[attr]) && isArray(value) && isObject(options[attr][0]) && isObject(value[0])) {
                     // eg: options: [{ xx: 1 }, { xx: 2 }] value: [{ xx: 1 }, { xx: 2 }]
@@ -894,22 +892,22 @@
                             delete value1.apply;
 
                             options[attr].forEach(function(option, index) {
-                                options[attr][index] = _extends({}, option, value1);
+                                options[attr][index] = merge({}, option, value1);
                             });
                         } else if (isArray(value.apply)) {
                             let value1 = Object.assign({}, value);
                             delete value1.apply;
 
                             value.apply.forEach(function(index) {
-                                options[attr][index] = _extends({}, options[attr][index], value1);
+                                options[attr][index] = merge({}, options[attr][index], value1);
                             });
                         } else {
-                            options[attr][index] = _extends({}, options[attr][index], value);
+                            options[attr][index] = merge({}, options[attr][index], value);
                         }
                     });
                 } else if (isObject(options[attr])) {
                     // eg: { xx: 1, yy: 2 }
-                    options[attr] = _extends({}, options[attr], value);
+                    options[attr] = merge({}, options[attr], value);
                 } else {
                     options[attr] = value;
                 }
@@ -1002,7 +1000,6 @@
             loading: Boolean,
             dataEmpty: Boolean,
             extend: Object,
-            rightLabel: Boolean,
             judgeWidth: {type: Boolean, default: false},
             widthChangeDelay: {type: Number, default: 300},
             tooltipFormatter: {type: Function},
@@ -1103,7 +1100,7 @@
                     data = this.beforeConfig(data);
                 }
 
-                let options = this.chartHandler(columns, rows, this.settings, extra, this.rightLabel);
+                let options = this.chartHandler(columns, rows, this.settings, extra);
                 if (options) {
                     if (typeof options.then === 'function') {
                         options.then(this.optionsHandler);
