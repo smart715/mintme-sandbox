@@ -19,7 +19,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class MarketsController extends APIController
 {
-    private const OFFSET = 50;
+    private const OFFSET = 2;
 
     /**
      * @Rest\View()
@@ -39,6 +39,8 @@ class MarketsController extends APIController
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
      * @Rest\QueryParam(name="deployed")
+     * @Rest\QueryParam(name="sort", default="monthVolume")
+     * @Rest\QueryParam(name="order", default="DESC")
      */
     public function getMarketsInfo(
         int $page,
@@ -49,11 +51,16 @@ class MarketsController extends APIController
         $markets = $request->get('user') || $deployed
             ? $marketStatusManager->getUserMarketStatus(
                 $this->getUser(),
-                ($page - 1) * self::OFFSET,
+                ($page - 1) * (self::OFFSET - 1),
                 self::OFFSET,
                 $deployed
             )
-            : $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
+            : $marketStatusManager->getMarketsInfo(
+                ($page - 1) * (self::OFFSET - 1),
+                self::OFFSET,
+                $request->get('sort'),
+                $request->get('order')
+            );
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,

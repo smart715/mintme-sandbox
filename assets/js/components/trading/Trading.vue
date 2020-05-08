@@ -197,8 +197,8 @@ export default {
         return {
             markets: null,
             currentPage: this.page,
-            perPage: 25,
-            totalRows: 25,
+            perPage: 2,
+            totalRows: 2,
             loading: false,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
@@ -377,7 +377,12 @@ export default {
                     });
                 });
         },
-        sortCompare: function(a, b, key) {
+        sortCompare: function(a, b, key, order) {
+
+            if ('lastPrice' === key) {
+                this.updateData(this.currentPage, key, order ? 'DESC' : 'ASC').then(() => this.loading = false);
+            }
+
             let pair = false;
             this.marketsOnTop.forEach((market)=> {
                 let currency = this.rebrandingFunc(market.currency);
@@ -403,9 +408,13 @@ export default {
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
             return pair ? 0 : b[key].localeCompare(a[key]);
         },
-        updateData: function(page) {
+        updateData: function(page, sort = 'monthVolume', order = 'DESC') {
             return new Promise((resolve, reject) => {
-                let params = {page};
+                let params = {
+                    page,
+                    sort,
+                    order,
+                };
                 if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
                     params.user = 1;
                 } else if (
@@ -413,8 +422,7 @@ export default {
                 ) {
                     params.deployed = 1;
                 }
-                this.loading = true;
-                this.$axios.retry.get(this.$routing.generate('markets_info', params))
+                return this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (null !== this.markets) {
                             this.addOnOpenHandler(() => {
