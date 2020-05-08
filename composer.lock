@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ecc7934d6a8c3c8db7e56a9defa188fe",
+    "content-hash": "65ab8227a2233c8c3674f3ee7903e8c6",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -11853,7 +11853,7 @@
         },
         {
             "name": "twig/cssinliner-extra",
-            "version": "v2.12.5",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/cssinliner-extra.git",

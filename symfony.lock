@@ -951,7 +951,7 @@
         "version": "2.2.2"
     },
     "twig/cssinliner-extra": {
-        "version": "v2.12.5"
+        "version": "v3.0.3"
     },
     "twig/extensions": {
         "version": "1.0",

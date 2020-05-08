@@ -40,7 +40,7 @@
         "sensio/framework-extra-bundle": "^5.2",
         "sensiolabs/security-checker": "^5.0",
         "sirprize/postal-code-validator": "^1.3",
-        "sonata-project/admin-bundle": "^3.64",
+        "sonata-project/admin-bundle": "^3.66",
         "sonata-project/block-bundle": "^3.18",
         "sonata-project/classification-bundle": "^3",
         "sonata-project/doctrine-orm-admin-bundle": "^3",
@@ -62,8 +62,7 @@
         "symfony/translation": "^4.4",
         "symfony/twig-bundle": "^4.4",
         "symfony/yaml": "^4.4",
-        "twig/cssinliner-extra": "^2.12",
-        "twig/extensions": "^1.5",
+        "twig/cssinliner-extra": "^3",
         "vasek-purchart/doctrine-date-time-immutable-types": "^1.0"
     },
     "require-dev": {
