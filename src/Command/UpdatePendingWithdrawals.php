@@ -35,6 +35,9 @@ class UpdatePendingWithdrawals extends Command
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var int */
+    public $expireHours;
+
     public function __construct(
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
@@ -65,7 +68,7 @@ class UpdatePendingWithdrawals extends Command
     {
         $this->logger->info('[withdrawals] Update job started..');
 
-        $expires = new DateInterval('PT'.PendingWithdraw::EXPIRES_HOURS.'H');
+        $expires = new DateInterval('PT'.$this->expireHours.'H');
 
         /** @var PendingWithdraw $item */
         foreach ($this->getPendingWithdrawRepository()->findAll() as $item) {

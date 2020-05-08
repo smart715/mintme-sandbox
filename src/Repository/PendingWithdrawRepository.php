@@ -9,10 +9,13 @@ use Doctrine\ORM\EntityRepository;
 
 class PendingWithdrawRepository extends EntityRepository
 {
+    /** @var int */
+    public $expireHours;
+
     /** @codeCoverageIgnore */
     public function getWithdrawByHash(string $hash): ?PendingWithdrawInterface
     {
-        $datetime = new DateTimeImmutable('now - '.PendingWithdraw::EXPIRES_HOURS.' hours');
+        $datetime = new DateTimeImmutable('now - '.$this->expireHours.' hours');
 
         return $this->createQueryBuilder('t')
             ->where('t.hash = :hash AND t.date > :expire')

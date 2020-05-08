@@ -162,6 +162,8 @@ services:
             - { name: monolog.logger, channel: cron }
 
     App\Command\UpdatePendingWithdrawals:
+        properties:
+            expireHours: '%withdraw_expiration_time%'
         arguments:
             $logger: '@logger'
         tags:
@@ -535,3 +537,7 @@ services:
     App\Exchange\Config\AirdropConfig:
         arguments:
             $airdropParams: '%airdrop_params%'
+
+    App\Repository\PendingWithdrawRepository:
+        properties:
+            expireHours: '%withdraw_expiration_time%'

@@ -127,5 +127,7 @@ parameters:
 
     #host for urls generated on commands
     mintme_url: 'mintme.com'
-
     contact_email: support@mintme.com
+
+    # expiration time for withdraws (in hours)
+    withdraw_expiration_time: 4
