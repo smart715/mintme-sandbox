@@ -90,6 +90,7 @@ services:
     image: nginx:latest
     ports:
       - 80:80
+      - 443:443
       - 16614:16614
       - 8000:8000 # php-withdraw debug
       - 8008:8008
