@@ -1,7 +1,9 @@
+import Vue from 'vue';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {createLocalVue, mount} from '@vue/test-utils';
 import TokenChangeName from '../../js/components/token/TokenChangeName';
+import Axios from '../../js/axios';
 import axios from 'axios';
 import moxios from 'moxios';
 Vue.use(Vuelidate);
@@ -15,9 +17,7 @@ describe('TokenChangeName', () => {
         moxios.uninstall(axios);
     });
     it('renders correctly with assigned props', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenChangeName, {
-            localVue,
+        const wrapper = mount(TokenChangeName, {
             propsData: {
                 currentName: 'foobar',
                 twofa: false,
@@ -65,9 +65,7 @@ describe('TokenChangeName', () => {
         });
     });
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenChangeName, {
-            localVue,
+        const wrapper = mount(TokenChangeName, {
             propsData: {
                 currentName: 'foobar',
                 twofa: true,
@@ -82,8 +80,15 @@ describe('TokenChangeName', () => {
     });
 
     it('do not open TwoFactorModal for saving name when 2fa is disabled', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TokenChangeName, {
+        const localVue = createLocalVue();
+        localVue.use(Axios);
+        localVue.use({
+            install(Vue, options) {
+                Vue.prototype.$axios = {retry: axios, single: axios};
+                Vue.prototype.$routing = {generate: (val) => val};
+            },
+        });
+        const wrapper = mount(TokenChangeName, {
             localVue,
             propsData: {
                 currentName: 'foobar',
@@ -100,89 +105,63 @@ describe('TokenChangeName', () => {
 
     describe('throw error', () => {
         it('when token name has spaces in the beginning', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
+            const wrapper = mount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('  newName');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
         });
 
         it('when token name has dashes in the beginning', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
+            const wrapper = mount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('----newName');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
         });
 
         it('when token name has spaces in the end', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
+            const wrapper = mount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('newName  ');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
         });
 
         it('when token name has dashes in the end', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
+            const wrapper = mount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('newName----');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
         });
 
         it('when token name has spaces between dashes', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
+            const wrapper = mount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('new--- ---Name');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.noSpaceBetweenDashes).to.deep.equal(true);
         });
 
         it('when token name has chars outside of alphabet, numbers, - and spaces', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
+            const wrapper = mount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('new$Name!');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validChars).to.deep.equal(true);
-        });
-
-        it('when new token name is same as old token name and token not deployed or traded', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
-                propsData: {currentName: 'foobar'},
-            });
-            const deployedErrorMessage = 'You didn\'t change the token name';
-            wrapper.find('input').setValue('foobar');
-            wrapper.vm.isTokenExchanged = false;
-            wrapper.vm.isTokenNotDeployed = true;
-            expect(wrapper.find('.text-danger').find('.text-center').text()).to.equal(deployedErrorMessage);
-        });
-
-        it('when new token name is not entered and token not deployed or traded', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(TokenChangeName, {
-                localVue,
-                propsData: {currentName: 'foobar'},
-            });
-            const deployedErrorMessage = 'Token name shouldn\'t be blank';
-            wrapper.find('input').setValue('');
-            wrapper.vm.isTokenExchanged = false;
-            wrapper.vm.isTokenNotDeployed = true;
-            expect(wrapper.find('.text-danger').find('.text-center').text()).to.equal(deployedErrorMessage);
         });
     });
 });
