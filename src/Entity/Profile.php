@@ -6,11 +6,12 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ZipCodeValidator\Constraints\ZipCode;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -279,7 +280,7 @@ class Profile
     /**
      * @Assert\Callback
      */
-    public function validateFirstName(ExecutionContextInterface $context, $payload)
+    public function validateFirstName(ExecutionContextInterface $context, $payload): ?string
     {
         if (preg_match("/^\p{Han}{2,10}+$/u", $this->getFirstName()) !== true ) {
            // if the first name has  any chinese characters nothing happens
@@ -294,7 +295,7 @@ class Profile
     /**
      * @Assert\Callback
      */
-    public function validateLastName(ExecutionContextInterface $context, $payload)
+    public function validateLastName(ExecutionContextInterface $context, $payload): ?string
     {
         if (preg_match("/^\p{Han}{2,10}+$/u", $this->getLastName()) !== true ) {
            // if the first name has  any chinese characters nothing happens
