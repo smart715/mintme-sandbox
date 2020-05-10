@@ -282,14 +282,14 @@ class Profile
     */
     public function validateFirstName(ExecutionContextInterface $context, string $payload): ?string
     {
-        if (preg_match("/^\p{Han}{2,10}+$/u", $this->getFirstName()) == false ) {
+        if (false == preg_match("/^\p{Han}{2,10}+$/u", $this->getFirstName()) ) {
            // if the first name has  any chinese characters nothing happens
             if (strlen($this->getFirstName()) < 2 ) {
                 $context->buildViolation('This value is too short. It should have 2 characters or more.')
                 ->atPath('firstName')
                 ->addViolation();
             }
-         }
+        }
     }
 
    /**
@@ -297,7 +297,7 @@ class Profile
     */
     public function validateLastName(ExecutionContextInterface $context, string $payload): ?string
     {
-        if (preg_match("/^\p{Han}{2,10}+$/u", $this->getLastName()) == false ) {
+        if (false == preg_match("/^\p{Han}{2,10}+$/u", $this->getLastName())) {
            // if the first name has  any chinese characters nothing happens
             if (strlen($this->getLastName()) < 2 ) {
                 $context->buildViolation('This value is too short. It should have 2 characters or more.')
