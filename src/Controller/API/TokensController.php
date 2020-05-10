@@ -358,16 +358,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        $balance = $balanceHandler->balance(
+        $balance = $balanceHandler->exchangeBalance(
             $token->getProfile()->getUser(),
             $token
-        )->getAvailable();
-
-        if ($token->getLockIn()) {
-            $balance = $token->isDeployed()
-                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
-                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
-        }
+        );
 
         return $this->view($balance);
     }

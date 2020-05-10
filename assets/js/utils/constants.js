@@ -11,7 +11,13 @@ export const FORBIDDEN_WORDS = ['token', 'coin'];
 export const HTTP_OK = 200;
 export const HTTP_ACCEPTED = 202;
 export const HTTP_NO_CONTENT = 204;
+export const HTTP_BAD_REQUEST = 400;
 export const HTTP_UNAUTHORIZED = 401;
+export const HTTP_NOT_FOUND = 404;
+
+export const AIRDROP_CREATED = 'airdrop_created';
+export const AIRDROP_DELETED = 'airdrop_deleted';
+export const TOKEN_NAME_CHANGED = 'token_name_changed';
 
 export const GENERAL = {
     precision: 8,
@@ -60,6 +66,11 @@ export const USD = {
 
 export const WEB = {
     symbol: 'WEB',
+    subunit: 4,
+};
+
+export const TOK = {
+    symbol: 'TOK',
     subunit: 4,
 };
 
