@@ -550,5 +550,9 @@ services:
             $accessMap: '@security.access_map'
 
     App\Repository\PendingWithdrawRepository:
-        properties:
-            expireHours: '%withdraw_expiration_time%'
+        arguments:
+            $expireHours: '%withdraw_expiration_time%'
+
+    App\Repository\PendingTokenWithdrawRepository:
+        arguments:
+            $expireHours: '%withdraw_expiration_time%'

@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\PendingWithdrawRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\PendingTokenWithdrawRepository")
  * @ORM\Table(name="pending_token_withdraw")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
