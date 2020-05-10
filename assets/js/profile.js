@@ -74,7 +74,7 @@ new Vue({
 
         lastNameValidation: function(event) {
             const hasChinese = this.lastName.match(REGEX_CHINESE);
-            if (hasChinese) { 
+            if (hasChinese) {
                 // this means only chinese characters are typed, no validation needed here
                 this.lastNameAux = '';
             } else {
