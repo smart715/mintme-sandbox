@@ -9,6 +9,7 @@ import {
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
 } from './utils/constants';
+const HTTP_ACCEPTED = 202;
 new Vue({
     el: '#token',
     mixins: [NotificationMixin],
@@ -74,6 +75,26 @@ new Vue({
         redirectToProfile: function() {
             location.href = this.$routing.generate('profile-view');
         },
+        createToken: function(e) {
+            e.preventDefault();
+            let frm = document.querySelector('form');
+            let frmData = new FormData(frm);
+            this.$axios.single.post(this.$routing.generate('token_create'), frmData)
+                .then((res) => {
+                    if (res.status === HTTP_ACCEPTED) {
+                        this.notifySuccess('Token\'s name changed successfully');
+                        location.href = this.$routing.generate('token_show', {
+                            name: this.tokenName,
+                        });
+                        this.showTwoFactorModal = false;
+                        this.closeModal();
+                }}, (err) => this.notifyError(err.response.data.message))
+                .catch((res)=> {
+                    console.log(res);
+                });
+
+            ;
+        }
     },
     mounted: function() {
         window.onload = () => this.domLoaded = true;

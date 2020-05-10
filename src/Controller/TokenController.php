@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
+use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -23,6 +24,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -159,7 +161,11 @@ class TokenController extends Controller
         ]);
     }
 
-    /** @Route(name="token_create") */
+    /** @Route(name="token_create",
+     *
+     *     options={"expose"=true})
+     * @throws ApiBadRequestException
+     */
     public function create(
         Request $request,
         BalanceHandlerInterface $balanceHandler,
@@ -174,8 +180,30 @@ class TokenController extends Controller
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
 
-        if ($this->blacklistManager->isBlacklisted($token->getName(), 'token')) {
-            $this->addFlash('danger', 'This value is not allowed');
+        $name = trim($token->getName());
+        $blacklist = $this->blacklistManager->getList("token");
+
+        foreach ($blacklist as $blist) {
+            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
+                && (strlen($name) - strlen($blist->getValue())) <= 1) {
+                return $this->json(
+                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+        }
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $form->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException('Invalid argument');
         }
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
@@ -205,10 +233,7 @@ class TokenController extends Controller
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                return $this->redirectToRoute('token_show', [
-                    'name' => $token->getName(),
-                    'tab' => 'intro',
-                ]);
+                return $this->json("success", Response::HTTP_ACCEPTED);
             } catch (Throwable $exception) {
                 if (false !== strpos($exception->getMessage(), 'cURL')) {
                     $this->addFlash('danger', 'Exchanger connection lost. Try again');

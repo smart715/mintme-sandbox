@@ -23,7 +23,7 @@
                                 class="alert alert-danger alert-token-name-exists"
                         >
                             <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
-                            Banned word detected.
+                            Forbidden token name.
                         </div>
                     </div>
                 </div>

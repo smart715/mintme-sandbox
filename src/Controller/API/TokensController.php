@@ -133,6 +133,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }), false);
 
         if (!$form->isValid()) {
+
             foreach ($form->all() as $childForm) {
                 /** @var FormError[] $fieldErrors */
                 $fieldErrors = $form->get($childForm->getName())->getErrors();

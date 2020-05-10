@@ -48,7 +48,7 @@
                                                     class="alert alert-danger alert-token-name-exists"
                                             >
                                                 <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
-                                                Banned word detected.
+                                                Forbidden token name.
                                             </div>
                                         </div>
 
@@ -83,7 +83,7 @@
                         </div>
                         <div class="form-group row mt-3">
                             <div class="col-md-12 text-left">
-                                <input type="submit" :disabled="saveBtnDisabled" class="btn btn-primary" value="Create token" />
+                                <input type="submit" :disabled="saveBtnDisabled" @click="createToken" class="btn btn-primary" value="Create token" />
                                 <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
                             </div>
                         </div>
