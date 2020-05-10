@@ -10,7 +10,7 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ZipCodeValidator\Constraints\ZipCode;
-
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -30,7 +30,6 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
@@ -42,7 +41,6 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
@@ -276,5 +274,35 @@ class Profile
         $this->zipCode = $zipCode;
 
         return $this;
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function validateFirstName(ExecutionContextInterface $context, $payload)
+    {
+      if (preg_match("/^\p{Han}{2,10}+$/u", $this->getFirstName()) !== true ) {
+         // if the first name has  any chinese characters nothing happens
+         if (strlen($this->getFirstName()) < 2 ) {
+           $context->buildViolation('This value is too short. It should have 2 characters or more.')
+           ->atPath('firstName')
+           ->addViolation();
+         }
+      }
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function validateLastName(ExecutionContextInterface $context, $payload)
+    {
+      if (preg_match("/^\p{Han}{2,10}+$/u", $this->getLastName()) !== true ) {
+         // if the first name has  any chinese characters nothing happens
+         if (strlen($this->getLastName()) < 2 ) {
+           $context->buildViolation('This value is too short. It should have 2 characters or more.')
+           ->atPath('lastName')
+           ->addViolation();
+         }
+      }
     }
 }

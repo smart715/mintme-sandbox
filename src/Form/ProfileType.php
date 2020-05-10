@@ -47,14 +47,14 @@ class ProfileType extends AbstractType
             ->add('firstName', TextType::class, [
                 'label' => 'First name:',
                 'attr' => [
-                    'minlength' => 2,
+                    //'minlength' => 2,
                     'maxlength' => 30,
                 ],
             ])
             ->add('lastName', TextType::class, [
                 'label' => 'Last name:',
                 'attr' => [
-                    'minlength' => 2,
+                    //'minlength' => 2,
                     'maxlength' => 30,
                 ],
             ])

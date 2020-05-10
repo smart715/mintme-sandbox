@@ -8,6 +8,7 @@ import {HTTP_ACCEPTED} from './utils/constants.js';
 import xRegExp from 'xregexp';
 
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
+const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
 
 new Vue({
     el: '#profile',
@@ -28,6 +29,8 @@ new Vue({
             zipCodeValid: true,
             zipCodeVaidationPattern: false,
             zipCodeProcessing: false,
+            firstNameAux: '',
+            lastNameAux: '',
         };
     },
     mounted: function() {
@@ -53,6 +56,42 @@ new Vue({
                 this.$refs.zipCode.disabled = state;
             }
         },
+
+        firstNameValidation: function(event) {
+            this.$nextTick(() => {
+              const hasChinese = this.firstName.match(REGEX_CHINESE);
+                if(hasChinese){
+                  // this means only chinese characters are typed, no validation needed here
+                   this.firstNameAux = '';
+                } else {
+                  // this means regular characters are typed, we activate the minLength validation
+                    if (this.firstName.length < 2) {
+                        this.firstNameAux = 'ok';
+                    } else {
+                        this.firstNameAux = '';
+                    }
+                }
+            });
+         },
+
+
+         lastNameValidation: function(event) {
+             this.$nextTick(() => {
+               const hasChinese = this.lastName.match(REGEX_CHINESE);
+                 if(hasChinese){
+                   // this means only chinese characters are typed, no validation needed here
+                    this.lastNameAux = '';
+                 } else {
+                   // this means regular characters are typed, we activate the minLength validation
+                     if (this.lastName.length < 2) {
+                         this.lastNameAux = 'ok';
+                     } else {
+                         this.lastNameAux = '';
+                     }
+                 }
+             });
+          },
+
         countryChanged: function() {
             if (!this.$refs.zipCode) {
                 return;
@@ -103,11 +142,11 @@ new Vue({
     validations: {
         firstName: {
             helpers: names,
-            minLength: minLength(2),
+            // minLength: minLength(2),
         },
         lastName: {
             helpers: names,
-            minLength: minLength(2),
+            //minLength: minLength(2),
         },
         city: {
             helpers: names,
