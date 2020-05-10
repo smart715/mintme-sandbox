@@ -6,9 +6,9 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use ZipCodeValidator\Constraints\ZipCode;
 
@@ -19,7 +19,7 @@ use ZipCodeValidator\Constraints\ZipCode;
  */
 class Profile
 {
-    /**
+   /**
      * @ORM\Id()
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -277,12 +277,12 @@ class Profile
         return $this;
     }
 
-    /**
-     * @Assert\Callback
-     */
-    public function validateFirstName(ExecutionContextInterface $context, $payload): ?string
+   /**
+    * @Assert\Callback
+    */
+    public function validateFirstName(ExecutionContextInterface $context, string $payload): ?string
     {
-        if (preg_match("/^\p{Han}{2,10}+$/u", $this->getFirstName()) !== true ) {
+        if (preg_match("/^\p{Han}{2,10}+$/u", $this->getFirstName()) == false ) {
            // if the first name has  any chinese characters nothing happens
             if (strlen($this->getFirstName()) < 2 ) {
                 $context->buildViolation('This value is too short. It should have 2 characters or more.')
@@ -292,12 +292,12 @@ class Profile
         }
     }
 
-    /**
-     * @Assert\Callback
-     */
-    public function validateLastName(ExecutionContextInterface $context, $payload): ?string
+   /**
+    * @Assert\Callback
+    */
+    public function validateLastName(ExecutionContextInterface $context, string $payload): ?string
     {
-        if (preg_match("/^\p{Han}{2,10}+$/u", $this->getLastName()) !== true ) {
+        if (preg_match("/^\p{Han}{2,10}+$/u", $this->getLastName()) == false ) {
            // if the first name has  any chinese characters nothing happens
             if (strlen($this->getLastName()) < 2 ) {
                 $context->buildViolation('This value is too short. It should have 2 characters or more.')
