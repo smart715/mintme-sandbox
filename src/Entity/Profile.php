@@ -280,7 +280,7 @@ class Profile
    /**
    * @Assert\Callback
    */
-    public function validateFirstName(ExecutionContextInterface $context, string $payload): self
+    public function validateFirstName(ExecutionContextInterface $context, string $payload): void
     {
         if (false == preg_match("/^\p{Han}{2,10}+$/u", strval($this->getFirstName()))) {
             // if the first name has  any chinese characters nothing happens
@@ -290,13 +290,12 @@ class Profile
                 ->addViolation();
             }
         }
-        return $this;
     }
 
   /**
   * @Assert\Callback
   */
-    public function validateLastName(ExecutionContextInterface $context, string $payload): self
+    public function validateLastName(ExecutionContextInterface $context, string $payload): void
     {
         if (false == preg_match("/^\p{Han}{2,10}+$/u", strval($this->getLastName()))) {
             // if the first name has  any chinese characters nothing happens
@@ -306,6 +305,5 @@ class Profile
                 ->addViolation();
             }
         }
-        return $this;
     }
 }
