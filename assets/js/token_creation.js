@@ -88,13 +88,14 @@ new Vue({
                         });
                         this.showTwoFactorModal = false;
                         this.closeModal();
-                }}, (err) => this.notifyError(err.response.data.message))
+                }
+                    }, (err) => this.notifyError(err.response.data.message))
                 .catch((res)=> {
                     console.log(res);
                 });
 
             ;
-        }
+        },
     },
     mounted: function() {
         window.onload = () => this.domLoaded = true;
