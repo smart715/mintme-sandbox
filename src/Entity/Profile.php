@@ -8,8 +8,8 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use ZipCodeValidator\Constraints\ZipCode;
 
 /**
@@ -289,7 +289,7 @@ class Profile
                 ->atPath('firstName')
                 ->addViolation();
             }
-        }
+         }
     }
 
    /**
@@ -304,6 +304,6 @@ class Profile
                 ->atPath('firstName')
                 ->addViolation();
             }
-        }
+         }
     }
 }
