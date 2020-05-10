@@ -59,38 +59,38 @@ new Vue({
 
         firstNameValidation: function(event) {
             this.$nextTick(() => {
-                  const hasChinese = this.firstName.match(REGEX_CHINESE);
-                  if(hasChinese){
+                const hasChinese = this.firstName.match(REGEX_CHINESE);
+                if(hasChinese){
                     // this means only chinese characters are typed, no validation needed here
-                     this.firstNameAux = '';
-                  } else {
+                    this.firstNameAux = '';
+                } else {
                     // this means regular characters are typed, we activate the minLength validation
-                      if (this.firstName.length < 2) {
-                          this.firstNameAux = 'ok';
-                      } else {
+                    if (this.firstName.length < 2) {
+                        this.firstNameAux = 'ok';
+                    } else {
                         this.firstNameAux = '';
-                      }
-                  }
-             });
-         },
+                    }
+                }
+            );
+        },
 
 
-         lastNameValidation: function(event) {
-             this.$nextTick(() => {
-                   const hasChinese = this.lastName.match(REGEX_CHINESE);
-                   if(hasChinese){
-                     // this means only chinese characters are typed, no validation needed here
-                      this.lastNameAux = '';
-                   } else {
-                     // this means regular characters are typed, we activate the minLength validation
-                       if (this.lastName.length < 2) {
-                           this.lastNameAux = 'ok';
-                       } else {
-                         this.lastNameAux = '';
-                       }
-                   }
-              });
-          },
+        lastNameValidation: function(event) {
+            this.$nextTick(() => {
+                const hasChinese = this.lastName.match(REGEX_CHINESE);
+                if(hasChinese){
+                    // this means only chinese characters are typed, no validation needed here
+                    this.lastNameAux = '';
+                } else {
+                    // this means regular characters are typed, we activate the minLength validation
+                    if (this.lastName.length < 2) {
+                        this.lastNameAux = 'ok';
+                    } else {
+                        this.lastNameAux = '';
+                    }
+                }
+            );
+        },
 
         countryChanged: function() {
             if (!this.$refs.zipCode) {
