@@ -71,7 +71,7 @@ new Vue({
                         this.firstNameAux = '';
                     }
                 }
-            );
+            )
         },
 
 
@@ -89,7 +89,7 @@ new Vue({
                         this.lastNameAux = '';
                     }
                 }
-            );
+            )
         },
 
         countryChanged: function() {
