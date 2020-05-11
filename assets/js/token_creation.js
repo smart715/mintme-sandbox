@@ -89,12 +89,7 @@ new Vue({
                         this.showTwoFactorModal = false;
                         this.closeModal();
                 }
-                    }, (err) => this.notifyError(err.response.data.message))
-                .catch((res)=> {
-                    console.log(res);
-                });
-
-            ;
+                    }, (err) => this.notifyError(err.response.data.message));
         },
     },
     mounted: function() {
