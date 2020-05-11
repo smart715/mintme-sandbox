@@ -261,7 +261,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         if (!$lock->getId() || $isNotExchanged) {
-            $balance = $balanceHandler->balance($this->getUser(), $token);
+            /** @var  User $user*/
+            $user = $this->getUser();
+            $balance = $balanceHandler->balance($user, $token);
 
             if ($balance->isFailed()) {
                 return $this->view('Service unavailable now. Try later', Response::HTTP_BAD_REQUEST);
@@ -322,6 +324,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new AccessDeniedHttpException();
         }
 
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
         try {
             $common = $balanceHandler->balances(
                 $user,
@@ -336,7 +341,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $predefined = $balanceHandler->balances(
-            $this->getUser(),
+            $user,
             $this->tokenManager->findAllPredefined()
         );
 
@@ -484,6 +489,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
         $message = null;
 
@@ -542,9 +548,12 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
             $balances = [
                 'balance' => $balanceHandler->balance(
-                    $this->getUser(),
+                    $user,
                     Token::getFromSymbol(Token::WEB_SYMBOL)
                 )->getAvailable(),
                 'webCost' => $costFetcher->getDeployWebCost(),
@@ -584,7 +593,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
-            $deployment->execute($this->getUser(), $token);
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
+            $deployment->execute($user, $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }

@@ -24,6 +24,7 @@ class PendingWithdrawVoter extends Voter
      */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
+        /** @psalm-suppress UndefinedDocblockClass */
         $user = $token->getUser();
 
         if (!$user instanceof User) {

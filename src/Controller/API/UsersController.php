@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Rest\Route("/api/users")
@@ -57,7 +58,13 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function getApiKeys(): ApiKey
     {
-        $keys = $this->getUser()->getApiKey();
+        $curUser = $this->getUser();
+        $keys = null;
+
+        if ($curUser instanceof User) {
+            /** @var User $curUser */
+            $keys = $curUser->getApiKey();
+        }
 
         if (!$keys) {
             throw new ApiNotFoundException("No keys attached to the account");
@@ -69,8 +76,9 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
     /**
      * @Rest\View(statusCode=201)
      * @Rest\Post("/keys", name="post_keys", options={"expose"=true})
+     * @return ApiKey|null
      */
-    public function createApiKeys(): ApiKey
+    public function createApiKeys(): ?ApiKey
     {
         $user = $this->getUser();
 
@@ -78,6 +86,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
 
+        /** @var User $user */
         if ($user->getApiKey()) {
             throw new ApiBadRequestException("Keys already created");
         }
@@ -97,7 +106,9 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function invalidateApiKeys(): void
     {
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
+
         $keys = $user->getApiKey();
 
         if (!$keys) {
@@ -115,6 +126,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function createApiClient(): array
     {
+        /** @var  \App\Entity\User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
@@ -173,6 +185,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function changePassOnTwoFaActive(Request $request): Response
     {
+        /** @var  \App\Entity\User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
@@ -190,9 +203,11 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $response = new Response(Response::HTTP_ACCEPTED);
 
         $event = new FilterUserResponseEvent($user, $request, $response);
+
+        /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
-            $event
+            $event,
+            FOSUserEvents::CHANGE_PASSWORD_COMPLETED
         );
 
         return $response;
@@ -211,6 +226,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function checkUserPassword(Request $request): Response
     {
+        /** @var  \App\Entity\User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
@@ -259,7 +275,10 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         return $this->getDoctrine()->getManager();
     }
 
-    protected function getUser(): ?User
+    /**
+     * @return UserInterface|object|null
+     */
+    protected function getUser()
     {
         return parent::getUser();
     }

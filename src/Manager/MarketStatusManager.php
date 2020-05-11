@@ -43,7 +43,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler
     ) {
-        $this->repository = $em->getRepository(MarketStatus::class);
+        /** @var  MarketStatusRepository $repository */
+        $repository = $em->getRepository(MarketStatus::class);
+        $this->repository = $repository;
         $this->marketNameConverter = $marketNameConverter;
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
@@ -137,7 +139,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $userTokenIds = [];
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
         $markets = $this->marketFactory->createUserRelated($user, $deployed);
-                
+
         foreach ($markets as $market) {
             if ($market->getQuote() instanceof Token) {
                 array_push($userTokenIds, $market->getQuote()->getId());

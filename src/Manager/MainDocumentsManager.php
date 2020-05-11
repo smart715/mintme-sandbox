@@ -14,12 +14,15 @@ class MainDocumentsManager implements MainDocumentsManagerInterfaces
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->mainDocsRepo = $em->getRepository(MainDocument::class);
+        /** @var EntityRepository $repository */
+        $repository = $em->getRepository(MainDocument::class);
+
+        $this->mainDocsRepo = $repository;
     }
 
     public function findDocPathByName(string $name): ?string
     {
-        /** @var MainDocument $document */
+        /** @var MainDocument $media */
         $media = $this->mainDocsRepo->findOneBy(['name' => $name]);
 
         /** @var Media $document */
