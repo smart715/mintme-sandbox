@@ -103,6 +103,7 @@ class SitemapSubscriber implements EventSubscriberInterface
 
         $news = $newsRepository->findAll();
 
+        /** @var Post $new */
         foreach ($news as $new) {
             $urls->addUrl(
                 new UrlConcrete(
@@ -144,6 +145,7 @@ class SitemapSubscriber implements EventSubscriberInterface
 
         $profiles = $profilesRepository->findAll();
 
+        /** @var Profile $profile */
         foreach ($profiles as $profile) {
             $urls->addUrl(
                 new UrlConcrete(

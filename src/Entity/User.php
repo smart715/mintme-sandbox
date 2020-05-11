@@ -97,7 +97,7 @@ class User extends BaseUser implements
 
     /**
      * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist", "remove"})
-     * @var GoogleAuthenticatorEntry
+     * @var GoogleAuthenticatorEntry|null
      */
     protected $googleAuthenticatorEntry;
 

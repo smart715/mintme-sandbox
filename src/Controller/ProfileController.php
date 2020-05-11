@@ -48,12 +48,15 @@ class ProfileController extends Controller
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
             return $this->render('pages/profile.html.twig', [
                 'token' => $profile->getToken(),
                 'profile' => $profileClone,
                 'profileDescription' => substr($profileDescription, 0, 200),
                 'form' =>  $form->createView(),
-                'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
+                'canEdit' => null !== $user && $profile === $user->getProfile(),
                 'editFormShowFirst' => !! $form->getErrors(true)->count(),
             ]);
         }
@@ -84,7 +87,10 @@ class ProfileController extends Controller
             return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
         }
 
-        $profile  = new Profile($this->getUser());
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
+        $profile  = new Profile($user);
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
