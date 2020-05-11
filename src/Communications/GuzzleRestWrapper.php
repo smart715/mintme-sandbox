@@ -63,7 +63,7 @@ class GuzzleRestWrapper implements RestRpcInterface
                 json_encode($requestParams) . " Error: " . $e->getCode() .". ". $e->getMessage()
             );
 
-            throw new FetchException($e->getMessage(), $e->getCode());
+            throw new FetchException($e->getMessage(), (int)$e->getCode());
         }
     }
 
