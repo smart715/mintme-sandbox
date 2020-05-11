@@ -5,7 +5,7 @@ namespace App\Tests\Manager;
 use App\Entity\User;
 use App\Manager\UserManager;
 use App\Repository\UserRepository;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use FOS\UserBundle\Util\CanonicalFieldsUpdater;
 use FOS\UserBundle\Util\PasswordUpdaterInterface;
 use PHPUnit\Framework\TestCase;

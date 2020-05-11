@@ -6,11 +6,11 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 class AirdropParticipantRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AirdropParticipant::class);
     }

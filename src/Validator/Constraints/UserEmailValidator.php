@@ -19,6 +19,7 @@ class UserEmailValidator extends ConstraintValidator
         UserManagerInterface $userManager,
         TokenStorageInterface $token
     ) {
+        /** @psalm-suppress UndefinedDocblockClass */
         $this->user = $token->getToken()->getUser();
         $this->userManager = $userManager;
     }

@@ -39,7 +39,7 @@ class UpdateTokenRelease extends Command
     }
 
     /** {@inheritdoc} */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger->info('[release] Update job started..');
 
@@ -59,6 +59,8 @@ class UpdateTokenRelease extends Command
         $this->em->flush();
 
         $this->logger->info('[release] Finished.');
+
+        return 0;
     }
 
     private function getLockInTokenRepository(): LockInRepository

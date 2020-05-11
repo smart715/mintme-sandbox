@@ -28,6 +28,7 @@ class MarketNormalizer implements NormalizerInterface
      */
     public function normalize($market, $format = null, array $context = array())
     {
+        /** @var array $normalized */
         $normalized = $this->normalizer->normalize($market, $format, $context);
 
         if ($context['groups'] &&
