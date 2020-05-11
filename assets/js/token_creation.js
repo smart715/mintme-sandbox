@@ -82,7 +82,7 @@ new Vue({
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
                 .then((res) => {
                     if (res.status === HTTP_ACCEPTED) {
-                        this.notifySuccess('Token\'s name changed successfully');
+                        this.notifySuccess('Token has been created successfully');
                         location.href = this.$routing.generate('token_show', {
                             name: this.tokenName,
                         });
