@@ -20,7 +20,7 @@
                     :full-orders-list="sellOrders"
                     :orders-list="filteredSellOrders"
                     :orders-loaded="ordersLoaded"
-                    :token-name="market.quote.symbol"
+                    :market="market"
                     :fields="fields"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"

@@ -2,6 +2,7 @@
 @import 'mixins'
 @import '~bootstrap/scss/bootstrap'
 @import '~bootstrap-vue/src/index.scss'
+@import '~pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build'
 @import '~vue-range-slider/dist/vue-range-slider'
 @import url('https://fonts.googleapis.com/css?family=Lato')
 @import '../fonts/AlphaCloud/AlphaCloud.css'
@@ -43,9 +44,8 @@ body
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
   min-height: 100vh
-
-.content-wrapper
-  min-height: 100vh
+  &.modal-open
+    padding-right: 0 !important
 
   @include media-breakpoint-up(xs)
     content: "xs"
@@ -61,6 +61,9 @@ body
 
   @include media-breakpoint-up(xl)
     content: "xl"
+
+.content-wrapper
+  min-height: 100vh
 
 .form-control
   height: auto
@@ -269,6 +272,10 @@ a
   color: $white
   background-color: #007DC0
   border-color: #007DC0
+
+  @include media-breakpoint-down(sm)
+    &:hover
+      background-color: #007DC0
 
 .circle-progress
   margin-top: 8.2px
@@ -513,7 +520,7 @@ a
 
     .tab-content
       flex: initial
-      padding: 1.25rem 0
+      padding: 1rem 0
       background: none
 
 .modal-content
@@ -694,6 +701,14 @@ nav.top-navbar
   -webkit-transform: none !important
   transform: none !important
 
+.airdrop-container
+  background: #152d47 !important
+  font-size: 18px
+  button
+    &.btn-primary
+      padding: 0 0.5rem !important
+      font-size: 17px
+
 meter
   width: 100%
   height: .5em
@@ -806,3 +821,27 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
   .card-two-divs-fixed-large
     width: 100%
     max-width: calc(981px / 2)
+  .airdrop-container
+    text-align: left !important
+
+@include media-breakpoint-down(md)
+  .airdrop-container
+    text-align: center !important
+    font-size: 17px
+    button
+      margin-top: .5rem !important
+
+@include media-breakpoint-only(xs)
+  .airdrop-container
+    span.message
+      display: block !important
+
+.ml-api
+  @include media-breakpoint-up(sm)
+    margin-left: 0
+
+  @include media-breakpoint-up(md)
+    margin-left: 15%
+
+  @include media-breakpoint-up(lg)
+    margin-left: 25%
