@@ -30,12 +30,17 @@ class UpdateOutdatedAirdropsCommand extends Command
         $this->setDescription('Update outdated airdrops status.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /**
+     * @inheritDoc
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
         /** @var AirdropRepository $repository */
         $repository = $this->em->getRepository(Airdrop::class);
         $repository->updateOutdatedAirdrops();
         $io->success('Airdrops updated.');
+
+        return 0;
     }
 }

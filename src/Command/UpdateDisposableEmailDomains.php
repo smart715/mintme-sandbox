@@ -47,7 +47,8 @@ class UpdateDisposableEmailDomains extends Command
             ->setDescription('Synchronize domains list');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -86,6 +87,8 @@ class UpdateDisposableEmailDomains extends Command
 
         $io->success('Synchronization completed');
         $this->logger->info('[blacklist] Update job finished..');
+
+        return 0;
     }
 
     /** @param array<Blacklist> $list */

@@ -25,18 +25,18 @@ class AirdropCampaignManagerTest extends TestCase
 
     public function testCreateAirdrop(): void
     {
-        /** @var EntityManagerInterface|MockObject $em */
+        /** @var EntityManagerInterface|MockObject */
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->exactly(2))->method('persist');
         $em->expects($this->exactly(2))->method('flush');
-        /** @var User|MockObject $em */
+        /** @var User|MockObject */
         $user = $this->createMock(User::class);
-        /** @var Profile|MockObject $em */
+        /** @var Profile|MockObject */
         $profile = $this->createMock(Profile::class);
         $profile
             ->method('getUser')
             ->willReturn($user);
-        /** @var Token|MockObject $em */
+        /** @var Token|MockObject */
         $token = $this->createMock(Token::class);
         $token
             ->method('getProfile')
@@ -79,13 +79,13 @@ class AirdropCampaignManagerTest extends TestCase
 
     public function testDeleteAirdrop(): void
     {
-        /** @var EntityManagerInterface|MockObject $em */
+        /** @var EntityManagerInterface|MockObject */
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())->method('persist');
         $em->expects($this->once())->method('flush');
-        /** @var BalanceHandlerInterface|MockObject $bh */
+        /** @var BalanceHandlerInterface|MockObject */
         $bh = $this->createMock(BalanceHandlerInterface::class);
-        /** @var Token|MockObject $em */
+        /** @var Token|MockObject */
         $token = $this->createMock(Token::class);
 
         $airdrop = new Airdrop();
@@ -104,11 +104,11 @@ class AirdropCampaignManagerTest extends TestCase
 
     public function testDeleteActiveAirdrop(): void
     {
-        /** @var EntityManagerInterface|MockObject $em */
+        /** @var EntityManagerInterface|MockObject */
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())->method('persist');
         $em->expects($this->once())->method('flush');
-        /** @var Token|MockObject $em */
+        /** @var Token|MockObject */
         $token = $this->createMock(Token::class);
         $airdrop = new Airdrop();
         $airdrop
@@ -137,20 +137,21 @@ class AirdropCampaignManagerTest extends TestCase
             ->method('getParticipantByUserAndAirdrop')
             ->willReturn(new AirdropParticipant());
 
-        /** @var EntityManagerInterface|MockObject $em */
+        /** @var EntityManagerInterface|MockObject */
         $em = $this->createMock(EntityManagerInterface::class);
         $em
             ->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);
 
-        /** @var Token|MockObject $em */
+        /** @var Token|MockObject */
         $token = $this->createMock(Token::class);
         /** @var User|MockObject $user */
         $user = $this->createMock(User::class);
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
 
+        /** @psalm-suppress InvalidArgument */
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
 
         $this->assertFalse($airdropManager->checkIfUserClaimed(null, $token));
@@ -165,21 +166,21 @@ class AirdropCampaignManagerTest extends TestCase
 
     public function testClaimAirdropCampaign(): void
     {
-        /** @var EntityManagerInterface|MockObject $em */
+        /** @var EntityManagerInterface|MockObject */
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->exactly(2))->method('persist');
         $em->expects($this->once())->method('flush');
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->expects($this->once())->method('update');
-        /** @var User|MockObject $em */
+        /** @var User|MockObject */
         $owner = $this->createMock(User::class);
-        /** @var Profile|MockObject $em */
+        /** @var Profile|MockObject */
         $profile = $this->createMock(Profile::class);
         $profile
             ->method('getUser')
             ->willReturn($owner);
-        /** @var Token|MockObject $em */
+        /** @var Token|MockObject */
         $token = $this->createMock(Token::class);
         $token
             ->method('getProfile')
