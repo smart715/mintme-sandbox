@@ -67,7 +67,7 @@
                                 :max="3"
                                 token-name="{{ token.name }}"
                                 token-page
-                                :show-edit="{{ isOwner ? 'true' : 'false'}}"
+                                :show-edit="{{ isOwner }}"
                                 @go-to-posts="goToPosts"
                                 @delete-post="deletePost"
                             >
@@ -125,7 +125,7 @@
                             <div class="row mt-3 justify-content-center">
                                 <posts class="col-12 col-lg-8" 
                                     :posts="posts || (posts = {{posts | json_encode}})"
-                                    :show-edit="{{ isOwner ? 'true' : 'false'}}"
+                                    :show-edit="{{ isOwner }}"
                                     @delete-post="deletePost"
                                 />
                             </div>
@@ -161,7 +161,7 @@
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <token-name
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
+                                    :editable="{{ isOwner }}"
                                     :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
                                     :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
                                     identifier="{{ market.quote.identifier }}"

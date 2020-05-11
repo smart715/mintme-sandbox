@@ -22,8 +22,7 @@ export default {
                 .process(this.value, {render})
                 .html
                 .replace(/<img src="/g, '<img style="max-width: 100%;" src="')
-                .replace(/<a href="(http(s)?:\/\/)?/g, '<a rel="nofollow" target="_blank" href="https://')
-                .replace('\n', '<br>');
+                .replace(/<a href="(http(s)?:\/\/)?/g, '<a rel="nofollow" target="_blank" href="https://');
         },
     },
 };
