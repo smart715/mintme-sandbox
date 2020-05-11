@@ -40,7 +40,10 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $this->em = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->balanceHandler = $balanceHandler;
-        $this->participantRepository = $entityManager->getRepository(AirdropParticipant::class);
+
+        /** @var AirdropParticipantRepository */
+        $objRepository = $entityManager->getRepository(AirdropParticipant::class);
+        $this->participantRepository = $objRepository;
     }
 
     public function createAirdrop(

@@ -78,7 +78,8 @@ class ResettingController extends FOSResettingController
         }
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_INITIALIZE, $event);
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::RESETTING_RESET_INITIALIZE);
 
         $resettingForm = $this->createForm(ResettingType::class, $user);
         $resettingForm->handleRequest($request);
@@ -91,16 +92,18 @@ class ResettingController extends FOSResettingController
 
         if ($resettingForm->isSubmitted() && $resettingForm->isValid()) {
             $event = new FormEvent($resettingForm, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch($event, FOSUserEvents::RESETTING_RESET_SUCCESS);
 
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
 
             $response = $this->redirectToRoute('fos_user_security_login', [], 301);
 
+            /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(
-                FOSUserEvents::RESETTING_RESET_COMPLETED,
-                new FilterUserResponseEvent($user, $request, $response)
+                new FilterUserResponseEvent($user, $request, $response),
+                FOSUserEvents::RESETTING_RESET_COMPLETED
             );
 
             return $response;
