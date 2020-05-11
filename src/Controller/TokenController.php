@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
-use App\Exception\ApiBadRequestException;
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
