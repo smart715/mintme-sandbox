@@ -66,9 +66,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
         $supportedSorts = ['lastPrice', 'monthVolume', 'volume'];
-        $sort = in_array($sort, $supportedSorts) ? $sort : 'monthVolume';
+        $sort = in_array($sort, $supportedSorts)
+            ? $sort
+            : 'monthVolume';
         $sort = "ms.".$sort;
-        $order = "ASC" === $order ? "ASC" : "DESC";
+        $order = "ASC" === $order
+            ? "ASC"
+            : "DESC";
         
         return $this->parseMarketStatuses(
             array_merge(

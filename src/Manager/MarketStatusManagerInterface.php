@@ -11,7 +11,12 @@ interface MarketStatusManagerInterface
     public function getMarketsCount(): int;
 
     /** @return array<MarketStatus> */
-    public function getMarketsInfo(int $offset, int $limit): array;
+    public function getMarketsInfo(
+        int $offset,
+        int $limit,
+        string $sort = "monthVolume",
+        string $order = "DESC"
+    ): array;
 
     /** @return array<MarketStatus> */
     public function getAllMarketsInfo(): array;
