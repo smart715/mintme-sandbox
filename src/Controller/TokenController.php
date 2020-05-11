@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -143,11 +144,14 @@ class TokenController extends Controller
         );
         $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
 
+        /** @var  User|null $user */
+        $user = $this->getUser();
+
         return $this->render('pages/pair.html.twig', [
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
-            'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
+            'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'isTokenCreated' => $this->isTokenCreated(),
@@ -161,7 +165,7 @@ class TokenController extends Controller
             'isTokenPage' => true,
             'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
             'userAlreadyClaimed' => $airdropCampaignManager
-                ->checkIfUserClaimed($this->getUser(), $token),
+                ->checkIfUserClaimed($user, $token),
         ]);
     }
 
@@ -196,15 +200,18 @@ class TokenController extends Controller
             }
 
             try {
+                /** @var  \App\Entity\User $user*/
+                $user = $this->getUser();
+
                 $balanceHandler->deposit(
-                    $this->getUser(),
+                    $user,
                     $token,
                     $moneyWrapper->parse(
                         (string)$this->getParameter('token_quantity'),
                         MoneyWrapper::TOK_SYMBOL
                     )
                 );
-                $market = $this->marketManager->createUserRelated($this->getUser());
+                $market = $this->marketManager->createUserRelated($user);
 
                 $marketStatusManager->createMarketStatus($market);
 

@@ -33,6 +33,7 @@ class TradableNormalizer implements NormalizerInterface
     /** {@inheritdoc} */
     public function normalize($object, $format = null, array $context = array())
     {
+        /** @var array $tradable */
         $tradable = $this->normalizer->normalize($object, $format, $context);
 
         if ($context['groups'] &&

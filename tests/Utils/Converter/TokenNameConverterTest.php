@@ -15,14 +15,14 @@ class TokenNameConverterTest extends TestCase
     /**
      * @dataProvider convertProvider
      */
-    public function testConvert(string $tokenId, int $offset, string $tokenName): void
+    public function testConvert(int $tokenId, int $offset, string $tokenName): void
     {
         $converter = new TokenNameConverter(
             $this->mockCryptoManager($this->mockCrypto('WEB')),
             $this->mockConfig($offset)
         );
 
-        $this->assertEquals($tokenName, $converter->convert($this->mockToken($tokenId)));
+        $this->assertEquals($tokenName, $converter->convert($this->mockToken($tokenId, $tokenName)));
     }
 
     public function convertProvider(): array
@@ -33,7 +33,7 @@ class TokenNameConverterTest extends TestCase
             [ 321, 0, 'TOK000000000321' ],
             [ 99999999999999, 0, 'TOK99999999999999' ],
             [ -1, 0, 'TOK0000000000-1' ],
-            [ 'WEB', 0, 'WEB' ],
+            [ 777, 0, 'WEB' ],
             [ 1, 5, 'TOK000000000006' ],
         ];
     }
@@ -78,12 +78,12 @@ class TokenNameConverterTest extends TestCase
     /**
      * @return Token|MockObject
      */
-    private function mockToken(string $value): Token
+    private function mockToken(int $value, string $name): Token
     {
         $token = $this->createMock(Token::class);
 
         $token->method('getId')->willReturn($value);
-        $token->method('getName')->willReturn($value);
+        $token->method('getName')->willReturn($name);
 
         return $token;
     }
