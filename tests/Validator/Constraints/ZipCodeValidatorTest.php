@@ -44,8 +44,8 @@ class ZipCodeValidatorTest extends TestCase
     {
         return [
             ['CH', '3007'],
-            ['HK', 999077],
-            ['KE', 12345],
+            ['HK', '999077'],
+            ['KE', '12345'],
             ['RU', '153251'],
             ['NL', '1234AB'],
             ['NL', '1234 AB'],

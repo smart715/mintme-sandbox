@@ -68,11 +68,15 @@ class KernelSubscriber implements EventSubscriberInterface
             throw new AccessDeniedHttpException("Invalid token given");
         }
 
+        /** @psalm-suppress UndefinedDocblockClass */
         if (is_object($this->tokenStorage->getToken()) &&
             is_object($this->tokenStorage->getToken()->getUser()) &&
             !$request->getRequest()->isXmlHttpRequest()
         ) {
-            /** @var User $user */
+            /**
+             * @var User $user
+             * @psalm-suppress UndefinedDocblockClass
+             */
             $user = $this->tokenStorage->getToken()->getUser();
             $this->profileManager->createHash($user, true, $this->isAuth);
         }

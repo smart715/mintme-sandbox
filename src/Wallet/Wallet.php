@@ -93,7 +93,7 @@ class Wallet implements WalletInterface
 
         $history = array_merge($depositHistory, $withdrawHistory, $tokenTransactionHistory);
 
-        usort($history, function (Transaction $first, Transaction $second): bool {
+        usort($history, function (Transaction $first, Transaction $second) {
             return $first->getDate()->getTimestamp() < $second->getDate()->getTimestamp();
         });
 
