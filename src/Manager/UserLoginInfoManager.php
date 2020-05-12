@@ -30,24 +30,35 @@ class UserLoginInfoManager implements UserLoginInfoInterface
 
     public function updateUserDeviceLoginInfo(InteractiveLoginEvent $event): void
     {
-        /** @var User $user */
-        $user = $event->getAuthenticationToken()->getUser();
+
         $request = $event->getRequest();
         $userAgent = $_SERVER['HTTP_USER_AGENT'];
         $deviceDetector = new DeviceDetector($userAgent);
         $deviceDetector->parse();
-        $clientInfo = $deviceDetector->getClient();
-        $osInfo = $deviceDetector->getOs();
-        $deviceType = $deviceDetector->getDeviceName();
 
-        $deviceIp= 'unknown' === $request->getClientIp() ?
+        /** @var array $clientInfo */
+        $clientInfo = $deviceDetector->getClient();
+        $clientName = $clientInfo['name'] ?? 'Unknown';
+        $clientVersion = $clientInfo['version'] ?? 'Unknown';
+
+        $deviceType = $deviceDetector->getDeviceName();
+        $deviceIp = 'unknown' === $request->getClientIp() ?
             $_SERVER['REMOTE_ADDR'] :
             $request->getClientIp();
-        $deviceInfo = ucwords($deviceType).' - '.$clientInfo['name'].'V'.$clientInfo['version'];
-        $deviceOs = $osInfo['name'];
+
+        /** @var array $osInfo */
+        $osInfo = $deviceDetector->getOs();
+        $deviceInfo = ucwords($deviceType).' - '.$clientName.'V'.$clientVersion;
+        $deviceOs = $osInfo['name'] ?? 'Unknown';
 
         /** @var UserLoginInfoRepository */
         $repository = $this->em->getRepository(UserLoginInfo::class);
+
+        /**
+         * @var User $user
+         * @psalm-suppress UndefinedDocblockClass
+         */
+        $user = $event->getAuthenticationToken()->getUser();
 
         if (!$repository->getStoreUserDeviceInfo($user, $deviceIp)) {
             $userLoginInfo = new UserLoginInfo($user);
@@ -57,6 +68,7 @@ class UserLoginInfoManager implements UserLoginInfoInterface
             $this->em->persist($userLoginInfo);
             $this->em->flush();
 
+            /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(
                 new NewDeviceDetectedEvent($user, $userLoginInfo),
                 NewDeviceDetectedEvent::NAME
