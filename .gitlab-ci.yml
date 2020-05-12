@@ -32,6 +32,7 @@ tests_php:
     - export $(grep -v '^#' .env.dist | xargs)
     - composer install
     - make phpunit
+    - - rm -Rf /tmp/psalm/*
     - make syntax_check
   cache:
     key: "$CI_COMMIT_REF_SLUG"
@@ -54,7 +55,7 @@ tests_assets:
       - vendor/
   tags:
     - mintme.abchosting.org
-    
+
 phpfunctional_tests:
   stage: tests
   script:
@@ -65,7 +66,7 @@ phpfunctional_tests:
   only:
     # this job only will be executed for branches
     - update-functional-tests
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/  
+    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
 
 build_mintme_sites:
   stage: build-sites

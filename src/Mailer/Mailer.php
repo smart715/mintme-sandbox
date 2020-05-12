@@ -6,6 +6,7 @@ use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Entity\UserLoginInfo;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Swift_Mailer;
@@ -172,6 +173,38 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         ]);
 
         $msg = (new Swift_Message("Token Deleted"))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendNewDeviceDetectedMail(user $user, UserLoginInfo $userDeviceInfo): void
+    {
+        $userTwoFa = $user->isGoogleAuthenticatorEnabled();
+        $message = $userTwoFa ?
+            'Our system has detected a new login attempt from new IP address.' :
+            'Our system has detected a new successful login from new IP address.';
+
+        $body = $this->twigEngine->render('mail/new_device_detected.html.twig', [
+            'message' => $message,
+            'username' => $user->getUsername(),
+            'user_device_info' => $userDeviceInfo,
+        ]);
+
+        $textBody = $this->twigEngine->render('mail/new_device_detected.txt.twig', [
+            'twoFa' => $message,
+            'username' => $user->getUsername(),
+            'user_device_info' => $userDeviceInfo,
+        ]);
+
+        $subjectMsg = $userTwoFa ?
+            'New login attempt from new IP address' :
+            'New successful login from new IP address';
+
+        $msg = (new Swift_Message($subjectMsg))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
