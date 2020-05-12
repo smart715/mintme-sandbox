@@ -8,8 +8,8 @@ import {
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
+    HTTP_ACCEPTED,
 } from './utils/constants';
-const HTTP_ACCEPTED = 202;
 new Vue({
     el: '#token',
     mixins: [NotificationMixin],
