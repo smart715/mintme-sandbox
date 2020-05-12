@@ -20,7 +20,7 @@ final class Version20200511143157 extends AbstractMigration
 CREATE FUNCTION to_number (val VARCHAR(255)) RETURNS BIGINT SIGNED DETERMINISTIC
 BEGIN
     DECLARE len INT;
-    SELECT CHAR_LENGTH(val) - 8 INTO len;
+    SELECT CHAR_LENGTH(val) - 14 INTO len;
     RETURN CASE WHEN len <= 0
         THEN 0
         ELSE CAST(LEFT(val, len) AS SIGNED)
