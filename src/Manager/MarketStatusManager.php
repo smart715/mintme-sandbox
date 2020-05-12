@@ -65,11 +65,15 @@ class MarketStatusManager implements MarketStatusManagerInterface
     ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
-        $supportedSorts = ['lastPrice', 'monthVolume', 'volume'];
-        $sort = in_array($sort, $supportedSorts)
-            ? $sort
-            : 'monthVolume';
-        $sort = "ms.".$sort;
+        $sorts = [
+            'lastPrice' => 'to_number(ms.lastPrice)',
+            'monthVolume' => 'to_number(ms.monthVolume)',
+            'volume' => 'to_number(ms.volume)',
+            'change' => 'change',
+            'marketCap' => 'to_number(ms.lastPrice)',
+            'name' => 'qt.name',
+        ];
+        $sort = $sorts[$sort] ?? $sorts['monthVolume'];
         $order = "ASC" === $order
             ? "ASC"
             : "DESC";
@@ -79,6 +83,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $predefinedMarketStatus,
                 $this->repository->createQueryBuilder('ms')
                     ->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
+                    ->addSelect("change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change")
                     ->join('ms.quoteToken', 'qt')
                     ->where('qt IS NOT NULL')
                     ->orderBy('deployed', 'DESC')
