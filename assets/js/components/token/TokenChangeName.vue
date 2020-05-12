@@ -40,9 +40,12 @@
                 <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
                     Token name can contain only alphabets, numbers, spaces and dashes
                 </div>
-                <div v-if="this.newName.length > 0 && (!this.$v.newName.validFirstChars || +
-            !this.$v.newName.validLastChars || +
-             !this.$v.newName.noSpaceBetweenDashes)" class="text-danger text-center small">
+                <div
+                        v-if="this.newName.length > 0
+                        &&(!this.$v.newName.validFirstChars
+                        || !this.$v.newName.validLastChars
+                        || !this.$v.newName.noSpaceBetweenDashes)"
+                        class="text-danger text-center small">
                     Token name can't start or end with a dash or space, or have spaces between dashes
                 </div>
                 <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
@@ -81,11 +84,12 @@ import {
     tokenNameValidChars,
     tokenValidFirstChars,
     tokenValidLastChars,
-    tokenNoSpaceBetweenDashes, FORBIDDEN_WORDS, HTTP_OK,
+    tokenNoSpaceBetweenDashes,
+    FORBIDDEN_WORDS,
+    HTTP_OK,
+    HTTP_ACCEPTED,
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
-
-const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenChangeName',
@@ -114,7 +118,7 @@ export default {
     },
     computed: {
         btnDisabled: function() {
-            return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged || +
+            return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged ||
                 !this.isTokenNotDeployed || this.$v.$invalid || this.currentName === this.newName;
         },
         errorMessage: function() {
@@ -139,7 +143,6 @@ export default {
             this.tokenNameInBlacklist = false;
             if (!this.$v.$invalid && this.newName) {
                 this.tokenNameProcessing = true;
-             //   this.checkTokenExistence();
                 this.tokenNameTimeout = setTimeout(this.checkTokenExistence, 500);
             }
         },
@@ -147,13 +150,16 @@ export default {
     methods: {
         checkTokenExistence: function() {
             new Promise((res) => res()).then(() => {
-                this.$axios.single.get(this.$routing.generate('token_name_blacklist_check', {name: this.newName}))
+                this.$axios.single.get(
+                    this.$routing.generate('token_name_blacklist_check',
+                        {name: this.newName}))
                     .then((response) => {
                         if (HTTP_OK === response.status) {
                             this.tokenNameInBlacklist = response.data.blacklisted;
-                            if (response.data.blacklisted !== true) {
-                                this.$axios.single.
-                                get(this.$routing.generate('check_token_name_exists', {name: this.newName}))
+                            if (!this.tokenNameInBlacklist) {
+                                this.$axios.single.get(
+                                    this.$routing.generate('check_token_name_exists',
+                                        {name: this.newName}))
                                     .then((response) => {
                                         if (HTTP_OK === response.status) {
                                             this.tokenNameExists = response.data.exists;

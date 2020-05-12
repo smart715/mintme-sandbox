@@ -49,7 +49,7 @@ new Vue({
                         .then((response) => {
                             if (HTTP_OK === response.status) {
                                 this.tokenNameInBlacklist = response.data.blacklisted;
-                                if (response.data.blacklisted !== true) {
+                                if (!this.tokenNameInBlacklist) {
                                     this.$axios.single.
                                     get(this.$routing.generate('check_token_name_exists', {name: this.tokenName}))
                                         .then((response) => {

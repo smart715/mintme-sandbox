@@ -171,7 +171,8 @@ class TokenController extends Controller
         ]);
     }
 
-    /** @Route(name="token_create", options={"expose"=true})
+    /**
+     * @Route(name="token_create", options={"expose"=true})
      * @throws ApiBadRequestException
      */
     public function create(

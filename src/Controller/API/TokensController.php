@@ -688,14 +688,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     {
         $name = trim($name);
         $blacklist = $this->blacklistManager->getList("token");
+        $isBlackListed = false;
 
         foreach ($blacklist as $blist) {
             if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
                 && (strlen($name) - strlen($blist->getValue())) <= 1) {
-                return $this->view(['blacklisted' => true], Response::HTTP_OK);
+                $isBlackListed = true;
             }
         }
 
-        return $this->view(['blacklisted' => false], Response::HTTP_OK);
+        return $this->view(['blacklisted' => $isBlackListed], Response::HTTP_OK);
     }
 }
