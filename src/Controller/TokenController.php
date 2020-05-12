@@ -165,7 +165,7 @@ class TokenController extends Controller
             'isTokenPage' => true,
             'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
             'userAlreadyClaimed' => $airdropCampaignManager
-                ->checkIfUserClaimed($this->getUser(), $token),
+                ->checkIfUserClaimed($user, $token),
             'posts' => $this->normalize($token->getPosts()),
         ]);
     }

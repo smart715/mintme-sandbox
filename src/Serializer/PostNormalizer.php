@@ -26,6 +26,7 @@ class PostNormalizer implements NormalizerInterface
     /** {@inheritdoc} */
     public function normalize($object, $format = null, array $context = array())
     {
+        /** @var array $post */
         $post = $this->normalizer->normalize($object, $format, $context);
 
         $post['content'] = $this->authorizationChecker->isGranted('view', $object)

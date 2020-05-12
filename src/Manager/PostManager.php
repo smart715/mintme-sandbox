@@ -13,7 +13,9 @@ class PostManager implements PostManagerInterface
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->repository = $em->getRepository(Post::class);
+        /** @var PostRepository $repository */
+        $repository = $em->getRepository(Post::class);
+        $this->repository = $repository;
     }
 
     public function getById(int $id): ?Post
