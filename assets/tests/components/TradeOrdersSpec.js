@@ -84,6 +84,7 @@ describe('TradeOrders', () => {
                     isAnonymous: true,
                     orderId: 1,
                     ownerId: 1,
+                    highlightClass: '',
                 },
             ]);
         });
