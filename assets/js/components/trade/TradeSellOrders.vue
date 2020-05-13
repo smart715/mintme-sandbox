@@ -29,6 +29,7 @@
                             @row-clicked="orderClicked"
                             :items="tableData"
                             :fields="fields"
+                            :tbody-tr-class="rowClass"
                         >
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
@@ -121,6 +122,10 @@ export default {
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
+        ordersUpdated: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -155,10 +160,55 @@ export default {
                 this.$emit('update-data', {attach, resolve});
             });
         },
+        rowClass: function(item, type) {
+            return 'row' === type && item.highlightClass
+                ? item.highlightClass
+                : '';
+        },
     },
     watch: {
-        ordersList: function(val) {
-            this.tableData = val;
+        ordersList: function(newOrders) {
+            let orders = this.tableData;
+
+            if (this.ordersUpdated && orders.length < newOrders.length) {
+                let newOrder = newOrders.filter((order) => {
+                    return !orders.some((order2) => order.price === order2.price);
+                });
+
+                if (newOrder.length) {
+                    newOrder[0].highlightClass = 'success-highlight';
+                }
+            }
+
+            if (this.ordersUpdated && orders.length === newOrders.length) {
+                let newOrder = newOrders.filter((order) => {
+                    return !orders.some((order2) => order.price === order2.price && order.amount === order2.amount);
+                });
+
+                if (newOrder.length) {
+                    newOrder = newOrder[0];
+                    let oldOrder = orders.find((order) => order.id === newOrder.id);
+                    let newAmount = new Decimal(newOrder.amount);
+
+                    newAmount.greaterThanOrEqualTo(oldOrder.amount)
+                        ? newOrder.highlightClass = 'success-highlight'
+                        : newOrder.highlightClass = 'error-highlight';
+                }
+            }
+
+            if (this.tableData.length > 0 && this.tableData.length > newOrders.length) {
+                let removedOrder = this.tableData.filter((order) => {
+                    return !newOrders.some((order2) => order.price === order2.price);
+                });
+
+                if (removedOrder.length) {
+                    removedOrder[0].highlightClass = 'error-highlight';
+                    setTimeout(()=> this.tableData = newOrders, 1000);
+                }
+            } else {
+                this.tableData = newOrders;
+                setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
+            }
         },
     },
 };

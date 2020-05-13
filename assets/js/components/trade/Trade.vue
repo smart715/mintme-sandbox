@@ -44,6 +44,7 @@
             <trade-orders
                 @update-data="updateOrders"
                 :orders-loaded="ordersLoaded"
+                :orders-updated="ordersUpdated"
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
                 :market="market"
@@ -105,6 +106,7 @@ export default {
             balances: null,
             sellPage: 2,
             buyPage: 2,
+            ordersUpdated: false,
         };
     },
     computed: {
@@ -275,6 +277,7 @@ export default {
                         orders.push(res.data);
                         orders = this.sortOrders(orders, isSell);
                         this.saveOrders(orders, isSell);
+                        this.ordersUpdated = true;
                     })
                     .catch((err) => {
                         this.notifyError('Something went wrong. Can not update orders.');
@@ -295,12 +298,14 @@ export default {
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
+                    this.ordersUpdated = true;
                     break;
                 case WSAPI.order.status.FINISH:
                     if (typeof order === 'undefined') {
                         return;
                     }
 
+                    this.ordersUpdated = false;
                     orders.splice(orders.indexOf(order), 1);
                     break;
             }
