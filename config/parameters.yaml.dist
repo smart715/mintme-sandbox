@@ -132,4 +132,3 @@ parameters:
 
     #HMAC SHA1 key
     hmac_sha_one_key: 'querty'
-    
