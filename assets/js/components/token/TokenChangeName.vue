@@ -5,29 +5,29 @@
             {{ errorMessage }}
         </div>
         <div class="col-12 pb-3 px-0">
-                <div class="clearfix">
-                    <label for="tokenName" class="float-left">
-                        Edit your token name:
-                    </label>
-                    <div class="float-right">
-                        <div
-                                v-if="tokenNameExists"
-                                class="alert alert-danger alert-token-name-exists"
-                        >
-                            <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
-                            Token name is already taken
-                        </div>
-                    </div>
-                    <div class="float-right">
-                        <div
-                                v-if="tokenNameInBlacklist"
-                                class="alert alert-danger alert-token-name-exists"
-                        >
-                            <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
-                            Forbidden token name.
-                        </div>
+            <div class="clearfix">
+                <label for="tokenName" class="float-left">
+                    Edit your token name:
+                </label>
+                <div class="float-right">
+                    <div
+                        v-if="tokenNameExists"
+                        class="alert alert-danger alert-token-name-exists"
+                    >
+                        <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                        Token name is already taken
                     </div>
                 </div>
+                <div class="float-right">
+                    <div
+                        v-if="tokenNameInBlacklist"
+                        class="alert alert-danger alert-token-name-exists"
+                    >
+                        <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                        Forbidden token name.
+                    </div>
+                </div>
+            </div>
             <input
                 id="tokenName"
                 type="text"
@@ -41,11 +41,11 @@
                     Token name can contain only alphabets, numbers, spaces and dashes
                 </div>
                 <div
-                        v-if="this.newName.length > 0
-                        &&(!this.$v.newName.validFirstChars
-                        || !this.$v.newName.validLastChars
-                        || !this.$v.newName.noSpaceBetweenDashes)"
-                        class="text-danger text-center small">
+                    v-if="this.newName.length > 0
+                    &&(!this.$v.newName.validFirstChars
+                    || !this.$v.newName.validLastChars
+                    || !this.$v.newName.noSpaceBetweenDashes)"
+                    class="text-danger text-center small">
                     Token name can't start or end with a dash or space, or have spaces between dashes
                 </div>
                 <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
@@ -61,18 +61,18 @@
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
             <button
-                    class="btn btn-primary float-left"
-                    :disabled="btnDisabled"
-                    @click="editName"
+                class="btn btn-primary float-left"
+                :disabled="btnDisabled"
+                @click="editName"
             >
                 Save
             </button>
         </div>
         <two-factor-modal
-                :visible="showTwoFactorModal"
-                :twofa="twofa"
-                @verify="doEditName"
-                @close="closeTwoFactorModal"
+            :visible="showTwoFactorModal"
+            :twofa="twofa"
+            @verify="doEditName"
+            @close="closeTwoFactorModal"
         />
     </div>
 </template>
