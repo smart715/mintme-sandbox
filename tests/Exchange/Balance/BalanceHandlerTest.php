@@ -310,7 +310,7 @@ class BalanceHandlerTest extends TestCase
 
         $this->assertEquals(
             $handler->soldOnMarket($this->mockToken('foo'), 5, $ownPendingOrders)->getAmount(),
-            '2'
+            '1'
         );
     }
 
