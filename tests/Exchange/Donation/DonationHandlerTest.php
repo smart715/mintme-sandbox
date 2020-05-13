@@ -91,7 +91,7 @@ class DonationHandlerTest extends TestCase
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->expects($this->once())->method('withdraw');
         $bh->expects($this->once())->method('deposit');
-        /** @var User|MockObject $em */
+        /** @var User|MockObject $donorUser */
         $donorUser = $this->createMock(User::class);
 
         $cryptoManager = $this->mockCryptoManager($webCrypto);

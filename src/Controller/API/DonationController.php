@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Entity\User;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -64,13 +65,20 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
         $this->donationHandler->makeDonation(
             $market,
             $request->get('currency'),
             (string)$request->get('amount'),
             $this->getDonationFee(),
             (string)$request->get('expected_count_to_receive'),
-            $this->getUser()
+            $user
         );
 
         return $this->view(null, Response::HTTP_ACCEPTED);

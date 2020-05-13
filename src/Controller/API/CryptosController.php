@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -42,9 +43,16 @@ class CryptosController extends APIController
         string $symbol,
         BalanceHandlerInterface $balanceHandler
     ): View {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->view(
             $balanceHandler->balance(
-                $this->getUser(),
+                $user,
                 Token::getFromSymbol($symbol)
             )->getAvailable()
         );
