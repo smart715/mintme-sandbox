@@ -18,6 +18,17 @@ use InvalidArgumentException;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
+    private const SORTS = [
+        'lastPrice' => 'to_number(ms.lastPrice)',
+        'monthVolume' => 'to_number(ms.monthVolume)',
+        'volume' => 'to_number(ms.volume)',
+        'change' => 'change',
+        'marketCap' => 'to_number(ms.lastPrice)',
+        'name' => 'qt.name',
+    ];
+
+    private const SORT_BY_CHANGE = 'change';
+
     /** @var MarketStatusRepository */
     protected $repository;
 
@@ -61,37 +72,37 @@ class MarketStatusManager implements MarketStatusManagerInterface
         int $offset,
         int $limit,
         string $sort = "monthVolume",
-        string $order = "DESC"
+        string $order = "DESC",
+        bool $deployedFirst = true
     ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
-        $sorts = [
-            'lastPrice' => 'to_number(ms.lastPrice)',
-            'monthVolume' => 'to_number(ms.monthVolume)',
-            'volume' => 'to_number(ms.volume)',
-            'change' => 'change',
-            'marketCap' => 'to_number(ms.lastPrice)',
-            'name' => 'qt.name',
-        ];
-        $sort = $sorts[$sort] ?? $sorts['monthVolume'];
+        $queryBuilder = $this->repository->createQueryBuilder('ms')
+            ->join('ms.quoteToken', 'qt')
+            ->where('qt IS NOT NULL')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit - count($predefinedMarketStatus));
+
+        if ($deployedFirst) {
+            $queryBuilder->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
+                ->orderBy('deployed', 'DESC');
+        }
+
+        if (self::SORT_BY_CHANGE === $sort) {
+            $queryBuilder->addSelect("change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change");
+        }
+
+        $sort = self::SORTS[$sort] ?? self::SORTS['monthVolume'];
         $order = "ASC" === $order
             ? "ASC"
             : "DESC";
+
+        $queryBuilder->addOrderBy($sort, $order);
         
         return $this->parseMarketStatuses(
             array_merge(
                 $predefinedMarketStatus,
-                $this->repository->createQueryBuilder('ms')
-                    ->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
-                    ->addSelect("change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change")
-                    ->join('ms.quoteToken', 'qt')
-                    ->where('qt IS NOT NULL')
-                    ->orderBy('deployed', 'DESC')
-                    ->addOrderBy($sort, $order)
-                    ->setFirstResult($offset)
-                    ->setMaxResults($limit - count($predefinedMarketStatus))
-                    ->getQuery()
-                    ->getResult()
+                $queryBuilder->getQuery()->getResult()
             )
         );
     }
