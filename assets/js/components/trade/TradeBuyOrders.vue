@@ -154,6 +154,7 @@ export default {
     watch: {
         ordersList: function(newOrders) {
             let orders = this.tableData;
+            let skipOrdersUpdating = false;
 
             if (this.ordersUpdated && orders.length < newOrders.length) {
                 let newOrder = newOrders.filter((order) => {
@@ -188,9 +189,12 @@ export default {
 
                 if (removedOrder.length) {
                     removedOrder[0].highlightClass = 'error-highlight';
+                    skipOrdersUpdating = true;
                     setTimeout(()=> this.tableData = newOrders, 1000);
                 }
-            } else {
+            }
+
+            if (!skipOrdersUpdating) {
                 this.tableData = newOrders;
                 setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
             }
