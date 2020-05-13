@@ -26,17 +26,16 @@ class DonationFetcherTest extends TestCase
             ])
             ->willReturn($jsonResponse);
 
-        // TODO: Adjust tests after viabtc API will be ready
-//        $donationFetcher = new DonationFetcher($jsonRpc);
+        $donationFetcher = new DonationFetcher($jsonRpc);
 
-//        if ($hasError) {
-//            $this->expectException(FetchException::class);
-//        }
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
 
-//        $this->assertEquals(
-//            $expectedToReceive,
-//            $donationFetcher->checkDonation('TOK000000000123WEB', '75', '1')
-//        );
+        $this->assertEquals(
+            $expectedToReceive,
+            $donationFetcher->checkDonation('TOK000000000123WEB', '75', '1')
+        );
     }
 
     public function getCheckDonationProvider(): array
@@ -66,9 +65,9 @@ class DonationFetcherTest extends TestCase
 
         $donationFetcher = new DonationFetcher($jsonRpc);
 
-//        if ($hasError) {
-//            $this->expectException(FetchException::class);
-//        }
+        if ($hasError) {
+            $this->expectException(FetchException::class);
+        }
 
         $donationFetcher->makeDonation('TOK000000000123BTC', '375000000000', '1', '20000');
         $this->assertTrue(true);
