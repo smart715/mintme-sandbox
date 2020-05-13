@@ -4,6 +4,7 @@ namespace App\Tests\Exchange\Donation;
 
 use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -26,8 +27,16 @@ class DonationHandlerTest extends TestCase
         $base = $this->mockCrypto();
         $base->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
 
+        /** @var User|MockObject $ownerUser */
+        $ownerUser = $this->createMock(User::class);
+        $ownerUser->method('getId')->willReturn(2);
+        /** @var Profile|MockObject $profile */
+        $profile = $this->createMock(User::class);
+        $profile->method('getUser')->willReturn($ownerUser);
+
         $quote = $this->mockToken();
         $quote->method('getSymbol')->willReturn('TOK000000000123');
+        $quote->method('getProfile')->willReturn($profile);
 
         $market = new Market($base, $quote);
 
@@ -70,8 +79,16 @@ class DonationHandlerTest extends TestCase
         $base = $this->mockCrypto();
         $base->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
 
+        /** @var User|MockObject $ownerUser */
+        $ownerUser = $this->createMock(User::class);
+        $ownerUser->method('getId')->willReturn(2);
+        /** @var Profile|MockObject $profile */
+        $profile = $this->createMock(User::class);
+        $profile->method('getUser')->willReturn($ownerUser);
+
         $quote = $this->mockToken();
         $quote->method('getSymbol')->willReturn('TOK000000000567');
+        $quote->method('getProfile')->willReturn($profile);
 
         $market = new Market($base, $quote);
 
