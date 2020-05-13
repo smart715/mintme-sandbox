@@ -471,6 +471,7 @@ class BalanceHandlerTest extends TestCase
         $tok = $this->createMock(Token::class);
         $tok->method('getName')->willReturn($name);
         $tok->method('getId')->willReturn(1);
+        $tok->method('getWithdrawn')->willReturn(1);
 
         $profile = $this->createMock(Profile::class);
         $profile->method('getUser')->willReturn($this->mockUser(5));
