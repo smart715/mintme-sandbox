@@ -52,7 +52,8 @@ class Token implements TradebleInterface
      * @Assert\Regex(pattern="/^[a-zA-Z0-9\-\s]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
      * @AppAssert\DashedUniqueName(message="Token name is already exists.")
-     * @AppAssert\IsNotBlacklisted(type="token", message="This value is not allowed")
+     * @AppAssert\IsNotBlacklisted(type="token", message="Forbidden token name, please try another")
+     * @AppAssert\DisallowedWord()
      * @Groups({"API", "API_TOK"})
      * @var string
      */
