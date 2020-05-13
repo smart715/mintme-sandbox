@@ -19,7 +19,7 @@ class DonationFetcher implements DonationFetcherInterface
         $this->jsonRpc = $jsonRpc;
     }
 
-    public function checkDonation(string $marketName, string $amount, string $fee): string
+    public function checkDonation(string $marketName, string $amount, string $fee, int $tokenCreatorId): array
     {
         $response = $this->jsonRpc->send(self::CHECK_DONATION_METHOD, [
             $marketName,
@@ -32,8 +32,13 @@ class DonationFetcher implements DonationFetcherInterface
         return $response->getResult();
     }
 
-    public function makeDonation(string $marketName, string $amount, string $fee, string $expectedAmount): void
-    {
+    public function makeDonation(
+        string $marketName,
+        string $amount,
+        string $fee,
+        string $expectedAmount,
+        int $tokenCreatorId
+    ): void {
         $response = $this->jsonRpc->send(self::MAKE_DONATION_METHOD, [
             $marketName,
             $amount,
