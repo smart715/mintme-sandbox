@@ -141,7 +141,7 @@ class BalanceHandler implements BalanceHandlerInterface
         $available = $this->balance($token->getProfile()->getUser(), $token)->getAvailable();
         $currencyCode = $available->getCurrency()->getCode();
         $init = $this->moneyWrapper->parse((string)$initAmount, $currencyCode);
-        $withdrawn = $this->moneyWrapper->parse((string)$token->getWithdrawn(), $currencyCode);
+        $withdrawn = $this->moneyWrapper->parse($token->getWithdrawn(), $currencyCode);
 
         foreach ($ownPendingOrders as $order) {
             if (Order::SELL_SIDE === $order->getSide()) {
