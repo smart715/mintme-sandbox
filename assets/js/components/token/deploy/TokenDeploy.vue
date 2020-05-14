@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="deployed || deployComplete"
+                v-else-if="deployed"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -83,7 +83,7 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol, HTTP_OK} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol, HTTP_ACCEPTED} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
@@ -101,8 +101,6 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
-            deployTimeout: null,
-            deployComplete: false,
         };
     },
     computed: {
@@ -126,33 +124,6 @@ export default {
         },
         costExceed: function() {
             return new Decimal(this.webCost).greaterThan(this.balance);
-        },
-    },
-    watch: {
-        status: function() {
-            clearTimeout(this.deployTimeout);
-            if (deployed) {
-                return;
-            }
-            this.deployComplete = false;
-            if (this.pending) {
-                this.deploying = true;
-                this.deployTimeout = setTimeout(() => {
-                    this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
-                    .then((response) => {
-                        if (HTTP_OK === response.status) {
-                            console.log(response);
-                            this.deployComplete = response.data.deployed;
-                        }
-                        }, (error) => {
-                            this.notifyError('An error has occurred, please try again later');
-                    })
-                    .then(() => {
-                        this.deploying = false;
-                    });
-                }, 900000);
-                console.log(this.deployComplete);
-            }
         },
     },
     methods: {
@@ -181,6 +152,13 @@ export default {
                 this.$emit('pending');
                 this.notifySuccess('Process in pending status and it will take some minutes to be done.');
             })
+            .then((response) => {
+                if (response.status === HTTP_ACCEPTED) {
+                this.status = tokenDeploymentStatus.deployed;
+                this.$emit('deployed');
+                this.notifySuccess('Token has been successfully deployed');
+                }
+            })
             .catch(({response}) => {
                 if (!response) {
                     this.notifyError('Network error');
@@ -193,7 +171,9 @@ export default {
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             })
-            .then(() => this.deploying = false);
+            .then(() => {
+                this.deploying = false;
+            });
         },
     },
     mounted() {

@@ -39,6 +39,7 @@
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
+                                    @deployed="$emit('token-deployed')"
                                 />
                             </template>
                         </faq-item>

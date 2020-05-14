@@ -21,6 +21,7 @@ new Vue({
       editingName: false,
       tokenName: null,
       tokenPending: null,
+      tokenDeployed: null,
     };
   },
   components: {
@@ -50,6 +51,9 @@ new Vue({
     },
     setTokenPending: function() {
       this.tokenPending = true;
+    },
+    setTokenDeployed: function() {
+      this.tokenDeployed = true;
     },
     getTokenStatus: function(status) {
       return true === this.tokenPending ? tokenDeploymentStatus.pending : status;

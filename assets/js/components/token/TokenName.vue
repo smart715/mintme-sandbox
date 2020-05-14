@@ -16,6 +16,7 @@
                 :release-address="releaseAddress"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
+                @token-deployed="$emit('token-deployed')"
                 @update-release-address="updateReleaseAddress"
             />
             <font-awesome-icon
