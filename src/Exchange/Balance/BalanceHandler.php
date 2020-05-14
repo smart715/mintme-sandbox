@@ -139,9 +139,8 @@ class BalanceHandler implements BalanceHandlerInterface
     public function soldOnMarket(Token $token, int $initAmount, array $ownPendingOrders): Money
     {
         $available = $this->balance($token->getProfile()->getUser(), $token)->getAvailable();
-        $currencyCode = $available->getCurrency()->getCode();
-        $init = $this->moneyWrapper->parse((string)$initAmount, $currencyCode);
-        $withdrawn = $this->moneyWrapper->parse($token->getWithdrawn(), $currencyCode);
+        $init = $this->moneyWrapper->parse((string)$initAmount, $available->getCurrency()->getCode());
+        $withdrawn = new Money($token->getWithdrawn(), $available->getCurrency());
 
         foreach ($ownPendingOrders as $order) {
             if (Order::SELL_SIDE === $order->getSide()) {
