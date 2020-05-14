@@ -46,7 +46,7 @@
                 </div>
             </template>
             <div
-                v-else-if="showPending"
+                v-else-if="showPending && deployProcessing"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="deployed"
+                v-else-if="deployed && deployComplete"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -102,6 +102,8 @@ export default {
             status: this.statusProp,
             webCost: null,
             deployTimeout: null,
+            deployComplete: false,
+            deployProcessing: false,
         };
     },
     computed: {
@@ -130,27 +132,27 @@ export default {
     watch: {
         status: function() {
             clearTimeout(this.deployTimeout);
-            if (this.deployed) {
+            if (deployed) {
                 return;
             }
-            this.deployed = false;
+            this.deployComplete = false;
             if (this.pending) {
-                this.showPending = true;
+                this.deployProcessing = true;
                 this.deployTimeout = setTimeout(() => {
                     this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                     .then((response) => {
                         if (HTTP_OK === response.status) {
                             console.log(response);
-                            this.deployed = response.data.deployed;
+                            this.deployComplete = response.data.deployed;
                         }
                         }, (error) => {
                             this.notifyError('An error has occurred, please try again later');
                     })
                     .then(() => {
-                        this.showPending = false;
+                        this.deployProcessing = false;
                     });
                 }, 900000);
-                console.log(this.deployed);
+                console.log(this.deployComplete);
             }
         },
     },
