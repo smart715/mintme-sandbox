@@ -411,11 +411,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             Token::NOT_DEPLOYED === $token->getDeploymentStatus()
         );
     }
-
     
-	/**
+    /**
      * @Rest\View()
-     * @Rest\Get("/{name}/is-deployed", name="is_token_deployed", options={"expose"=true})
+     * @Rest\Get("/{name}/is_deployed", name="is_token_deployed", options={"expose"=true})
      */
     public function isTokenDeployed(string $name): View
     {
@@ -427,6 +426,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         return $this->view(['deployed' => Token::DEPLOYED === $token->getDeploymentStatus()], Response::HTTP_OK);
     }
+
 
     /**
      * @Rest\View()
