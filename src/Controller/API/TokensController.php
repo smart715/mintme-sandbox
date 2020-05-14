@@ -412,6 +412,22 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         );
     }
 
+    
+	/**
+     * @Rest\View()
+     * @Rest\Get("/{name}/is-deployed", name="is_token_deployed", options={"expose"=true})
+     */
+    public function isTokenDeployed(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(['deployed' => Token::DEPLOYED === $token->getDeploymentStatus()], Response::HTTP_OK);
+    }
+
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})

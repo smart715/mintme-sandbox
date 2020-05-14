@@ -50,7 +50,13 @@
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
-                    Deploy is pending.
+                    <font-awesome-icon
+                        icon="circle-notch"
+                        spin
+                        class="loading-spinner"
+                        fixed-width
+                    />
+                    Deployment is pending. It might take a few moments.
                 </p>
             </div>
             <div
@@ -77,7 +83,7 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol, HTTP_OK} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
@@ -95,6 +101,7 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
+            deployTimeout: null,
         };
     },
     computed: {
@@ -118,6 +125,33 @@ export default {
         },
         costExceed: function() {
             return new Decimal(this.webCost).greaterThan(this.balance);
+        },
+    },
+    watch: {
+        status: function() {
+            clearTimeout(this.deployTimeout);
+            if (this.deployed) {
+                return;
+            }
+            this.deployed = false;
+            if (this.pending) {
+                this.showPending = true;
+                this.deployTimeout = setTimeout(() => {
+                    this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
+                    .then((response) => {
+                        if (HTTP_OK === response.status) {
+                            console.log(response);
+                            this.deployed = response.data.deployed;
+                        }
+                        }, (error) => {
+                            this.notifyError('An error has occurred, please try again later');
+                    })
+                    .then(() => {
+                        this.showPending = false;
+                    });
+                }, 900000);
+                console.log(this.deployed);
+            }
         },
     },
     methods: {
