@@ -46,7 +46,7 @@
                 </div>
             </template>
             <div
-                v-else-if="showPending && deployProcessing"
+                v-else-if="showPending"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="deployed && deployComplete"
+                v-else-if="deployed || deployComplete"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -103,7 +103,6 @@ export default {
             webCost: null,
             deployTimeout: null,
             deployComplete: false,
-            deployProcessing: false,
         };
     },
     computed: {
@@ -137,7 +136,7 @@ export default {
             }
             this.deployComplete = false;
             if (this.pending) {
-                this.deployProcessing = true;
+                this.deploying = true;
                 this.deployTimeout = setTimeout(() => {
                     this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                     .then((response) => {
@@ -149,7 +148,7 @@ export default {
                             this.notifyError('An error has occurred, please try again later');
                     })
                     .then(() => {
-                        this.deployProcessing = false;
+                        this.deploying = false;
                     });
                 }, 900000);
                 console.log(this.deployComplete);
