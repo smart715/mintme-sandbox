@@ -19,6 +19,8 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
+use App\Manager\BlacklistManager;
+use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -66,11 +68,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var int */
     private $expirationTime;
 
+    /** @var BlacklistManagerInterface */
+    protected $blacklistManager;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         UserActionLogger $userActionLogger,
+        BlacklistManager $blacklistManager,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -80,6 +86,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->userActionLogger = $userActionLogger;
         $this->topHolders = $topHolders;
         $this->expirationTime = $expirationTime;
+        $this->blacklistManager = $blacklistManager;
     }
 
     /**
@@ -254,7 +261,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         if (!$lock->getId() || $isNotExchanged) {
-            $balance = $balanceHandler->balance($this->getUser(), $token);
+            /** @var  User $user*/
+            $user = $this->getUser();
+            $balance = $balanceHandler->balance($user, $token);
 
             if ($balance->isFailed()) {
                 return $this->view('Service unavailable now. Try later', Response::HTTP_BAD_REQUEST);
@@ -315,6 +324,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new AccessDeniedHttpException();
         }
 
+        /** @var  \App\Entity\User $user*/
+        $user = $this->getUser();
+
         try {
             $common = $balanceHandler->balances(
                 $user,
@@ -329,7 +341,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $predefined = $balanceHandler->balances(
-            $this->getUser(),
+            $user,
             $this->tokenManager->findAllPredefined()
         );
 
@@ -351,16 +363,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        $balance = $balanceHandler->balance(
+        $balance = $balanceHandler->exchangeBalance(
             $token->getProfile()->getUser(),
             $token
-        )->getAvailable();
-
-        if ($token->getLockIn()) {
-            $balance = $token->isDeployed()
-                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
-                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
-        }
+        );
 
         return $this->view($balance);
     }
@@ -498,6 +504,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
         $message = null;
 
@@ -556,9 +563,12 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
             $balances = [
                 'balance' => $balanceHandler->balance(
-                    $this->getUser(),
+                    $user,
                     Token::getFromSymbol(Token::WEB_SYMBOL)
                 )->getAvailable(),
                 'webCost' => $costFetcher->getDeployWebCost(),
@@ -598,7 +608,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
-            $deployment->execute($this->getUser(), $token);
+            /** @var  \App\Entity\User $user*/
+            $user = $this->getUser();
+
+            $deployment->execute($user, $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
@@ -680,5 +693,25 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         return $this->view(['exists' => null !== $token], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/token-name-blacklist-check", name="token_name_blacklist_check", options={"expose"=true})
+     */
+    public function checkTokenNameBlacklist(string $name): View
+    {
+        $name = trim($name);
+        $blacklist = $this->blacklistManager->getList("token");
+        $isBlackListed = false;
+
+        foreach ($blacklist as $blist) {
+            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
+                && (strlen($name) - strlen($blist->getValue())) <= 1) {
+                $isBlackListed = true;
+            }
+        }
+
+        return $this->view(['blacklisted' => $isBlackListed], Response::HTTP_OK);
     }
 }

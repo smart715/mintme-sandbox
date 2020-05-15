@@ -105,7 +105,7 @@ class TokenManagerTest extends TestCase
     }
 
     /** @dataProvider findByHiddenNameDataProvider */
-    public function testFindByHiddenName(string $expected, string $origin): void
+    public function testFindByHiddenName(int $expected, string $origin): void
     {
         $repo = $this->createMock(TokenRepository::class);
         $repo->expects($this->once())

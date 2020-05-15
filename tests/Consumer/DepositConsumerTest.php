@@ -294,7 +294,7 @@ class DepositConsumerTest extends TestCase
     private function mockMoneyWrapper(): MoneyWrapperInterface
     {
         $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('parse')->willReturnCallback(function (int $amount, string $symbol): Money {
+        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
             return new Money($amount, new Currency($symbol));
         });
 

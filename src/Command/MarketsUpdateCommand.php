@@ -40,10 +40,11 @@ class MarketsUpdateCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         $markets = $this->marketFactory->createAll();
         $io->progressStart(count($markets));
 
@@ -54,5 +55,7 @@ class MarketsUpdateCommand extends Command
 
         $io->progressFinish();
         $io->success('Markets updated');
+
+        return 0;
     }
 }
