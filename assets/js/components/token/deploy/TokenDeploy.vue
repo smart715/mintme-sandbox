@@ -169,10 +169,12 @@ export default {
                 return setTimeout(() => {
                     this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}));
                     }, 600000);
+                    console.log(this.status);
             })
             .then((response) => {
                 if (response.status === HTTP_OK) {
-                this.status = response.data.deployed;
+                this.status = tokenDeploymentStatus.deployed;
+                console.log(this.status);
                 this.$emit('deployed');
                 this.notifySuccess('Token has been successfully deployed');
                 }
