@@ -167,11 +167,11 @@ export default {
             .then(() => {
                 this.deploying = false;
             })
-            .then(() => {
+            .then(setTimeout(() => {
                 this.status = tokenDeploymentStatus.deployed;
                 this.$emit('deployed');
                 this.notifySuccess('Token has been successfully deployed');
-            });
+            }),720000);
         },
     },
     mounted() {
