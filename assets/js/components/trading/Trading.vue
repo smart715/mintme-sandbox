@@ -29,14 +29,21 @@
         </div>
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
             <div class="col-6">
-                <b-form-select v-model="sort">
+                <b-form-select v-model="sortBy">
                     <b-form-select-option v-for="field in fields" :key="field.key"
                         :value="field.key"
                     >
                         {{ field.label }}
                     </b-form-select-option>
                 </b-form-select>
-                <b-form-select v-model="order" :options="['desc', 'asc']"></b-form-select>
+                <b-form-select v-model="sortDesc">
+                    <b-form-select-option :value="true">
+                        DESC
+                    </b-form-select-option>
+                    <b-form-select-option :value="false">
+                        ASC
+                    </b-form-select-option>
+                </b-form-select>
                 <button class="btn btn-primary" @click="updateMarkets(1)">Sort</button>
             </div>
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
@@ -68,11 +75,12 @@
                     :items="tokens"
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"
-                    :sort-direction="order"
-                    :sort-by.sync="sort"
+                    sort-direction="desc"
+                    :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
                     sort-icon-left
                     :busy="tableLoading"
+                    @sort-changed="sortChanged"
                 >
                     <template v-slot:[`head(${fields.position.key})`]="data">
                         #
@@ -149,21 +157,23 @@
                     </template>
                 </b-table>
             </div>
-            <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
-                <div class="row justify-content-center">
-                    <p class="text-center p-5">No one deployed his token yet</p>
-                </div>
-            </template>
-            <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
-                <div class="row justify-content-center">
-                    <p class="text-center p-5">No any token yet</p>
-                </div>
-            </template>
-            <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
-                    || marketFilters.selectedFilter === marketFilters.options.user.key)">
-                <div class="row justify-content-center">
-                    <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
-                </div>
+            <template v-if="!tableLoading">
+                <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
+                    <div class="row justify-content-center">
+                        <p class="text-center p-5">No one deployed his token yet</p>
+                    </div>
+                </template>
+                <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
+                    <div class="row justify-content-center">
+                        <p class="text-center p-5">No any token yet</p>
+                    </div>
+                </template>
+                <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
+                        || marketFilters.selectedFilter === marketFilters.options.user.key)">
+                    <div class="row justify-content-center">
+                        <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
+                    </div>
+                </template>
             </template>
             <div class="row justify-content-center">
                 <b-pagination
@@ -208,8 +218,6 @@ export default {
     data() {
         return {
             tableLoading: false,
-            sort: 'monthVolume',
-            order: 'desc',
             markets: null,
             currentPage: this.page,
             perPage: 2,
@@ -224,7 +232,7 @@ export default {
             enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
-            sortBy: '',
+            sortBy: 'monthVolume',
             sortDesc: true,
             globalMarketCaps: {
                 BTC: 0,
@@ -251,7 +259,7 @@ export default {
             },
             volumes: {
                 day: {
-                    key: 'volume',
+                    key: 'dayVolume',
                     label: '24H Volume',
                     help: 'The amount of crypto that has been traded in the last 24 hours.',
                 },
@@ -380,7 +388,7 @@ export default {
                     });
                 });
         },
-        sortCompare: function(a, b, key, order) {
+        sortCompare: function(a, b, key) {
 
             let pair = false;
             this.marketsOnTop.forEach((market)=> {
@@ -413,8 +421,8 @@ export default {
 
                 let params = {
                     page,
-                    sort: this.sort,
-                    order: this.order.toUpperCase(),
+                    sort: this.sortBy,
+                    order: this.sortDesc ? 'DESC' : 'ASC',
                 };
 
                 if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
@@ -518,7 +526,7 @@ export default {
                 dayVolume: marketInfo.deal,
             };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized, position) {
+        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, dayVolume, monthVolume, supply, subunit, tokenized, position) {
             let hiddenName = this.findHiddenName(token);
             let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
                 ? 0
@@ -529,13 +537,13 @@ export default {
                 pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
-                volume: this.toMoney(volume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
+                dayVolume: this.toMoney(dayVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
                 monthVolume: this.toMoney(monthVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
                 tokenUrl: hiddenName && hiddenName.indexOf('TOK') !== -1 ?
                     this.$routing.generate('token_show', {name: token}) :
                     this.$routing.generate('coin', {base: currency, quote: token}),
                 lastPriceUSD: this.toUSD(lastPrice, currency, true),
-                volumeUSD: this.toUSD(volume, currency),
+                dayVolumeUSD: this.toUSD(dayVolume, currency),
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
                 marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
@@ -780,6 +788,11 @@ export default {
                 .then(() => this.updateSanitizedMarkets())
                 .then(() => this.tableLoading = false);
         },
+        sortChanged: function(ctx) {
+            this.sortBy = ctx.sortBy;
+            this.sortDesc = ctx.sortDesc;
+            this.updateMarkets();
+        }
     },
 };
 </script>

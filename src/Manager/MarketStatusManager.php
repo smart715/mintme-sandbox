@@ -21,10 +21,10 @@ class MarketStatusManager implements MarketStatusManagerInterface
     private const SORTS = [
         'lastPrice' => 'to_number(ms.lastPrice)',
         'monthVolume' => 'to_number(ms.monthVolume)',
-        'volume' => 'to_number(ms.volume)',
+        'dayVolume' => 'to_number(ms.dayVolume)',
         'change' => 'change',
         'marketCap' => 'to_number(ms.lastPrice)',
-        'name' => 'qt.name',
+        'pair' => 'qt.name',
     ];
 
     private const SORT_BY_CHANGE = 'change';
