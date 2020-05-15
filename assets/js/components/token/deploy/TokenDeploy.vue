@@ -83,7 +83,7 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol, HTTP_ACCEPTED} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
@@ -152,13 +152,6 @@ export default {
                 this.$emit('pending');
                 this.notifySuccess('Process in pending status and it will take some minutes to be done.');
             })
-            .then((response) => {
-                if (response.status === HTTP_ACCEPTED) {
-                this.status = tokenDeploymentStatus.deployed;
-                this.$emit('deployed');
-                this.notifySuccess('Token has been successfully deployed');
-                }
-            })
             .catch(({response}) => {
                 if (!response) {
                     this.notifyError('Network error');
@@ -173,6 +166,11 @@ export default {
             })
             .then(() => {
                 this.deploying = false;
+            })
+            .then(() => {
+                this.status = tokenDeploymentStatus.deployed;
+                this.$emit('deployed');
+                this.notifySuccess('Token has been successfully deployed');
             });
         },
     },
