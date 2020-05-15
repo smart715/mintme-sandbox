@@ -59,11 +59,11 @@ class ProfilePeriodLockValidatorTest extends TestCase
     public function validateProvider(): array
     {
         return [
-            [1, 3, null, new DateTimeImmutable('now - 1 day'), true],
-            [3, 3, new DateTimeImmutable(), new DateTimeImmutable('now - 1 day'), true],
-            [3, 4, new DateTimeImmutable(), new DateTimeImmutable('now + 1 day'), true],
-            [4, 3, new DateTimeImmutable(), new DateTimeImmutable('now - 1 day'), false],
-            [5, 3, new DateTimeImmutable(), new DateTimeImmutable('now - 1 day'), false],
+            ['1', '3', null, new DateTimeImmutable('now - 1 day'), true],
+            ['3', '3', new DateTimeImmutable(), new DateTimeImmutable('now - 1 day'), true],
+            ['3', '4', new DateTimeImmutable(), new DateTimeImmutable('now + 1 day'), true],
+            ['4', '3', new DateTimeImmutable(), new DateTimeImmutable('now - 1 day'), false],
+            ['5', '3', new DateTimeImmutable(), new DateTimeImmutable('now - 1 day'), false],
         ];
     }
 

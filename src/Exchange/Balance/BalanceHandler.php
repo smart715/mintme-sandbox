@@ -103,6 +103,19 @@ class BalanceHandler implements BalanceHandlerInterface
             ->get($this->converter->convert($token));
     }
 
+    public function exchangeBalance(User $user, Token $token): Money
+    {
+        $balance = $this->balance($user, $token)->getAvailable();
+
+        if ($token->getLockIn()) {
+            return $token->isDeployed()
+                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
+        }
+
+        return $balance;
+    }
+
     /** @inheritDoc */
     public function topHolders(
         TradebleInterface $tradable,
@@ -155,7 +168,7 @@ class BalanceHandler implements BalanceHandlerInterface
      * @throws FetchException
      * @throws BalanceException
      */
-    private function update(User $user, Token $token, Money $amount, string $type): void
+    public function update(User $user, Token $token, Money $amount, string $type): void
     {
         try {
             $this->balanceFetcher->update(
