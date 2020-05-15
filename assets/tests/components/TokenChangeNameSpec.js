@@ -5,10 +5,17 @@ import {createLocalVue, mount} from '@vue/test-utils';
 import TokenChangeName from '../../js/components/token/TokenChangeName';
 import Axios from '../../js/axios';
 import axios from 'axios';
+import moxios from 'moxios';
 Vue.use(Vuelidate);
 Vue.use(Toasted);
 
 describe('TokenChangeName', () => {
+    beforeEach(() => {
+        moxios.install(axios);
+    });
+    afterEach(() => {
+        moxios.uninstall(axios);
+    });
     it('renders correctly with assigned props', () => {
         const wrapper = mount(TokenChangeName, {
             propsData: {
@@ -16,10 +23,8 @@ describe('TokenChangeName', () => {
                 twofa: false,
             },
         });
-
         const deployedErrorMessage = 'The name of a deployed token can\'t be changed';
         const exchangedErrorMessage = 'You must own all your tokens in order to change the token\'s name';
-
         expect(wrapper.vm.currentName).to.equal('foobar');
         expect(wrapper.vm.newName).to.equal('foobar');
         expect(wrapper.find('input').element.value).to.equal('foobar');
@@ -44,10 +49,21 @@ describe('TokenChangeName', () => {
 
         wrapper.vm.isTokenExchanged = false;
         wrapper.vm.isTokenNotDeployed = true;
-        expect(wrapper.find('button').attributes('disabled')).to.equal('disabled');
+        wrapper.vm.$v.hasNotBlockedWords = false;
+        wrapper.vm.newName = 'different';
+        wrapper.vm.tokenNameExists = false;
+        wrapper.vm.tokenNameProcessing = false;
+        wrapper.vm.submitting = false;
+        expect(wrapper.find('button').attributes('disabled')).to.equal(undefined);
         expect(wrapper.contains('#error-message')).to.equal(false);
-    });
 
+        moxios.stubRequest('check_token_name_exists', {
+            exists: false,
+        });
+        moxios.wait(() => {
+            expect(wrapper.vm.tokenNameExists).to.equal(false);
+        });
+    });
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
         const wrapper = mount(TokenChangeName, {
             propsData: {
@@ -93,6 +109,8 @@ describe('TokenChangeName', () => {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('  newName');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
         });
 
@@ -101,6 +119,8 @@ describe('TokenChangeName', () => {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('----newName');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validFirstChars).to.deep.equal(true);
         });
 
@@ -109,6 +129,8 @@ describe('TokenChangeName', () => {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('newName  ');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
         });
 
@@ -117,6 +139,8 @@ describe('TokenChangeName', () => {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('newName----');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validLastChars).to.deep.equal(true);
         });
 
@@ -125,6 +149,8 @@ describe('TokenChangeName', () => {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('new--- ---Name');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.noSpaceBetweenDashes).to.deep.equal(true);
         });
 
@@ -133,29 +159,9 @@ describe('TokenChangeName', () => {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('new$Name!');
+            wrapper.vm.editName();
+            wrapper.vm.$v.$touch();
             expect(!wrapper.vm.$v.newName.validChars).to.deep.equal(true);
-        });
-
-        it('when new token name is same as old token name and token not deployed or traded', () => {
-            const wrapper = mount(TokenChangeName, {
-                propsData: {currentName: 'foobar'},
-            });
-            const deployedErrorMessage = 'You didn\'t change the token name';
-            wrapper.find('input').setValue('foobar');
-            wrapper.vm.isTokenExchanged = false;
-            wrapper.vm.isTokenNotDeployed = true;
-            expect(wrapper.find('.text-danger').find('.text-center').text()).to.equal(deployedErrorMessage);
-        });
-
-        it('when new token name is not entered and token not deployed or traded', () => {
-            const wrapper = mount(TokenChangeName, {
-                propsData: {currentName: 'foobar'},
-            });
-            const deployedErrorMessage = 'Token name shouldn\'t be blank';
-            wrapper.find('input').setValue('');
-            wrapper.vm.isTokenExchanged = false;
-            wrapper.vm.isTokenNotDeployed = true;
-            expect(wrapper.find('.text-danger').find('.text-center').text()).to.equal(deployedErrorMessage);
         });
     });
 });

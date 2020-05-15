@@ -62,6 +62,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
      */
     public function editUser(Request $request): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
         $keys = $user
             ? $user->getApiKey()
@@ -80,10 +81,13 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
      */
     public function referralProgram(): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('pages/referral.html.twig', [
-            'referralCode' => $this->getUser()->getReferralCode(),
+            'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
-            'referralsCount' => count($this->getUser()->getReferrals()),
+            'referralsCount' => count($user->getReferrals()),
         ]);
     }
 
@@ -108,6 +112,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         Request $request,
         TwoFactorManagerInterface $twoFactorManager
     ): Response {
+        /** @var User $user */
         $user = $this->getUser();
         $form = $this->createForm(TwoFactorType::class);
         $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
@@ -162,11 +167,14 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             ? "\r\n"
             : "\n";
 
-        if (!$this->container->get('session')->getBag('attributes')->remove('download_backup_codes')) {
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        if (!$bag->remove('download_backup_codes')) {
             return $this->redirectToRoute('settings');
         }
 
-        /** @var User */
+        /** @var User $user*/
         $user = $this->getUser();
         $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
 
@@ -186,7 +194,10 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
     private function addDownloadCodesToResponse(Response $response): Response
     {
-        if ($this->container->get('session')->getBag('attributes')->has('download_backup_codes')) {
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        if ($bag->has('download_backup_codes')) {
             $response->headers->set('Refresh', "5;{$this->generateUrl('download_backup_codes', [], UrlGeneratorInterface::ABSOLUTE_URL)}");
         }
 
@@ -196,12 +207,18 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     public function getBackupCodes(TwoFactorManagerInterface $twoFactorManager): array
     {
         $backupCodes = $twoFactorManager->generateBackupCodes();
+
+        /** @var User $user*/
         $user = $this->getUser();
         $user->setGoogleAuthenticatorBackupCodes($backupCodes);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
-        $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
+
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        $bag->set('download_backup_codes', 'download');
 
         return $backupCodes;
     }
@@ -231,8 +248,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
             $this->addFlash('success', 'Password was updated successfully');
+            /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(
-                FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
                 new FilterUserResponseEvent(
                     $user,
                     $request,
@@ -241,7 +258,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                         $apiKey,
                         $user->GetApiClients()
                     )
-                )
+                ),
+                FOSUserEvents::CHANGE_PASSWORD_COMPLETED
             );
         }
 
@@ -250,6 +268,9 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
     private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, ?array $clients): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('pages/settings.html.twig', [
             'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
                 "groups" => ["API"],
@@ -258,7 +279,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 "groups" => ["API"],
             ]),
             'passwordForm' => $passwordForm->createView(),
-            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
+            'twoFactorAuth' => $user->isGoogleAuthenticatorEnabled(),
         ]);
     }
 
@@ -274,7 +295,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
     private function turnOffAuthenticator(TwoFactorManagerInterface $twoFactorManager): void
     {
-        /** @var User */
+        /** @var User $user*/
         $user = $this->getUser();
         $googleAuth = $twoFactorManager->getGoogleAuthEntry($user->getId());
         $entityManager = $this->getDoctrine()->getManager();
@@ -287,7 +308,10 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
     private function generateBackupCodesFileName(): string
     {
-        $name = $this->getUser()->getUsername();
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $name = $user->getUsername();
         $time = date("H-i-d-m-Y");
 
         return "backup-codes-{$name}-{$time}.txt";

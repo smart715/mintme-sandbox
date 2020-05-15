@@ -28,6 +28,16 @@ class IsNotBlacklistedValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
+        $name = trim($value);
+        $blacklist = $this->blacklistManager->getList("token");
+
+        foreach ($blacklist as $blist) {
+            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
+                && (strlen($name) - strlen($blist->getValue())) <= 1) {
+                $this->context->buildViolation($constraint->message)->addViolation();
+            }
+        }
+
         if ($this->blacklistManager->isBlacklisted($value, $constraint->type, $constraint->caseSensetive)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
