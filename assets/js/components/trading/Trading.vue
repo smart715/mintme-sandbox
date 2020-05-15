@@ -28,6 +28,17 @@
             </b-dropdown>
         </div>
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
+            <div class="col-6">
+                <b-form-select v-model="sort">
+                    <b-form-select-option v-for="field in fields" :key="field.key"
+                        :value="field.key"
+                    >
+                        {{ field.label }}
+                    </b-form-select-option>
+                </b-form-select>
+                <b-form-select v-model="order" :options="['desc', 'asc']"></b-form-select>
+                <button class="btn btn-primary" @click="updateMarkets(1)">Sort</button>
+            </div>
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <b-dropdown
                 v-if="userId" class="float-right pr-3"
@@ -57,10 +68,11 @@
                     :items="tokens"
                     :fields="fieldsArray"
                     :sort-compare="sortCompare"
-                    sort-direction="desc"
-                    :sort-by.sync="sortBy"
+                    :sort-direction="order"
+                    :sort-by.sync="sort"
                     :sort-desc.sync="sortDesc"
                     sort-icon-left
+                    :busy="tableLoading"
                 >
                     <template v-slot:[`head(${fields.position.key})`]="data">
                         #
@@ -155,7 +167,7 @@
             </template>
             <div class="row justify-content-center">
                 <b-pagination
-                    @change="fetchData"
+                    @change="updateMarkets"
                     :total-rows="totalRows"
                     :per-page="perPage"
                     v-model="currentPage"
@@ -195,6 +207,9 @@ export default {
     },
     data() {
         return {
+            tableLoading: false,
+            sort: 'monthVolume',
+            order: 'desc',
             markets: null,
             currentPage: this.page,
             perPage: 2,
@@ -327,7 +342,7 @@ export default {
         },
     },
     mounted() {
-        this.fetchData();
+        this.initialLoad();
     },
     methods: {
         toggleFilter: function(value) {
@@ -335,7 +350,7 @@ export default {
             this.marketFilters.selectedFilter = value;
             this.sortBy = '';
             this.sortDesc = true;
-            this.fetchData(1);
+            this.updateMarkets(1);
         },
         toggleUsd: function(show) {
             this.showUsd = show;
@@ -344,27 +359,15 @@ export default {
             this.showUsd = false;
             this.enableUsd = false;
         },
-        fetchData: function(page = false) {
-            if (page) {
-                this.currentPage = page;
-            }
-
-            let updateDataPromise = this.updateData(this.currentPage, this.marketFilters.selectedFilter);
-            let conversionRatesPromise = this.fetchConversionRates();
+        initialLoad: function() {
+            this.loading = true;
             this.fetchGlobalMarketCap();
+            let updateDataPromise = this.updateRawMarkets();
+            let conversionRatesPromise = this.fetchConversionRates();
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
                 .then((res) => {
-                    if (
-                        Object.keys(this.markets).length === 1
-                        && !this.marketFilters.userSelected
-                        && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
-                    ) {
-                        this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
-                        this.fetchData();
-                        return;
-                    }
-                    this.updateDataWithMarkets();
+                    this.updateSanitizedMarkets();
                     this.loading = false;
 
                     this.addMessageHandler((result) => {
@@ -378,10 +381,6 @@ export default {
                 });
         },
         sortCompare: function(a, b, key, order) {
-
-            if ('lastPrice' === key) {
-                this.updateData(this.currentPage, key, order ? 'DESC' : 'ASC').then(() => this.loading = false);
-            }
 
             let pair = false;
             this.marketsOnTop.forEach((market)=> {
@@ -408,13 +407,16 @@ export default {
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
             return pair ? 0 : b[key].localeCompare(a[key]);
         },
-        updateData: function(page, sort = 'monthVolume', order = 'DESC') {
+        updateRawMarkets: function(page = null) {
             return new Promise((resolve, reject) => {
+                page = page === null ? this.currentPage : page;
+
                 let params = {
                     page,
-                    sort,
-                    order,
+                    sort: this.sort,
+                    order: this.order.toUpperCase(),
                 };
+
                 if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
                     params.user = 1;
                 } else if (
@@ -422,8 +424,19 @@ export default {
                 ) {
                     params.deployed = 1;
                 }
-                return this.$axios.retry.get(this.$routing.generate('markets_info', params))
+
+                this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
+                        if (
+                            Object.keys(res.data.markets).length === 1
+                            && !this.marketFilters.userSelected
+                            && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                        ) {
+                            console.log("HOLA");
+                            this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
+                            return this.updateRawMarkets().then(resolve, reject);
+                        }
+
                         if (null !== this.markets) {
                             this.addOnOpenHandler(() => {
                                 const request = JSON.stringify({
@@ -434,6 +447,7 @@ export default {
                                 this.sendMessage(request);
                             });
                         }
+
                         this.currentPage = page;
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
@@ -542,7 +556,7 @@ export default {
         getPercentage: function(lastPrice, openPrice) {
             return openPrice ? (lastPrice - openPrice) * 100 / openPrice : 0;
         },
-        updateDataWithMarkets: function() {
+        updateSanitizedMarkets: function() {
             this.sanitizedMarkets = {};
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
@@ -759,6 +773,12 @@ export default {
                  }
                 return token;
             });
+        },
+        updateMarkets: function(page = null) {
+            this.tableLoading = true;
+            return this.updateRawMarkets(page)
+                .then(() => this.updateSanitizedMarkets())
+                .then(() => this.tableLoading = false);
         },
     },
 };
