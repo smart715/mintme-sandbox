@@ -38,6 +38,7 @@
                                     youtube-channel-id="{{ token.youtubeChannelId }}"
                                     :editable="{{ isOwner ? 'true' : 'false' }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
+                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
                                     :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     token-contract-address="{{ token.address }}"
                                     token-name="{{ market.quote.name }}"
@@ -113,7 +114,7 @@
                             <div class="nav-link-token">
                                 <div class="truncate-token">
                                     {% if(market.quote.name | rebranding is same as(mintme_coin)) %}
-                                        <a href="{{ mintme_coin_link }}" target="_blank"> 
+                                        <a href="{{ mintme_coin_link }}" target="_blank">
                                             <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
                                                 {{ market.quote.name | rebranding }}
                                             </span>

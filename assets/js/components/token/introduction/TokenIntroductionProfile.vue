@@ -216,6 +216,7 @@ export default {
         facebookUrl: String,
         profileName: String,
         profileUrl: String,
+        tokenUrl: String,
         telegramUrl: String,
         tokenContractAddress: String,
         tokenName: String,
@@ -250,10 +251,6 @@ export default {
             editingWebsite: false,
             showWebsiteError: false,
             submitting: false,
-            tokenUrl: this.$routing.generate('token_show', {
-                name: this.tokenName,
-                tab: 'intro',
-            }),
             twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
         };
     },
