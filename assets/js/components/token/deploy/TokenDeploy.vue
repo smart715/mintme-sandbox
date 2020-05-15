@@ -166,12 +166,17 @@ export default {
             })
             .then(() => {
                 this.deploying = false;
+                return setTimeout(() => {
+                    this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}));
+                    }, 720000);
             })
-            .then(setTimeout(() => {
-                this.status = tokenDeploymentStatus.deployed;
+            .then((response) => {
+                if (response.status === HTTP_OK) {
+                this.status = response.data.deployed;
                 this.$emit('deployed');
                 this.notifySuccess('Token has been successfully deployed');
-            }), 720000);
+                }
+            });
         },
     },
     mounted() {
