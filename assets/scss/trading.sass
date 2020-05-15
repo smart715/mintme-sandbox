@@ -24,3 +24,11 @@
         tr
           td:first-child
             display: table-cell !important
+
+.top-holders
+  td:not(:first-child)
+    white-space: nowrap
+
+  .holder-name
+    width: calc(100% - 2em)
+    min-width: 70px
