@@ -171,7 +171,7 @@ export default {
                 this.status = tokenDeploymentStatus.deployed;
                 this.$emit('deployed');
                 this.notifySuccess('Token has been successfully deployed');
-            }),720000);
+            }), 720000);
         },
     },
     mounted() {
