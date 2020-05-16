@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="showDeployed"
+                v-else-if="deployed"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -119,9 +119,6 @@ export default {
         showPending: function() {
             return this.isOwner && this.pending;
         },
-        showDeployed: function() {
-            return this.deployComplete;
-        },
         btnDisabled: function() {
             return this.costExceed || this.deploying;
         },
@@ -132,15 +129,24 @@ export default {
             return new Decimal(this.webCost).greaterThan(this.balance);
         },
     },
+    mounted: function() {
+        console.log(this.notDeployed);
+        console.log(this.pending);
+        console.log(this.deployed);
+    },
+    updated: function() {
+        console.log(this.notDeployed);
+        console.log(this.pending);
+        console.log(this.deployed);
+    },
     watch: {
-        deployComplete: function() {
+        notDeployed: function() {
             clearTimeout(this.deployTimeout);
             this.deployProcessing = true;
             this.deployTimeout = setTimeout(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
                     if (HTTP_OK === response.status) {
-                        resolve();
                         this.deployComplete = response.data.deployed;
                         this.status = tokenDeploymentStatus.deployed;
                         this.$emit('deployed');
