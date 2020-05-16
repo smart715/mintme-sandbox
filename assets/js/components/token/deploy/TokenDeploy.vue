@@ -148,7 +148,7 @@ export default {
                 .then((response) => {
                     if (HTTP_OK === response.status) {
                         this.deployComplete = response.data.deployed;
-                        this.status = tokenDeploymentStatus.deployed;
+                        // this.status = tokenDeploymentStatus.deployed;
                         this.$emit('deployed');
                         this.notifySuccess('Token has been successfully deployed');
                         console.log(this.status);

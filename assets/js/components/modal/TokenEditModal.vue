@@ -38,24 +38,9 @@
                                     :precision="precision"
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
+                                    :key="refreshAfterDeploy"
                                     @pending="$emit('token-deploy-pending')"
-                                    @deployed="$emit('token-deployed')"
-                                />
-                            </template>
-                        </faq-item>
-                    </div>
-                    <div
-                        v-if="isTokenCreated && isOwner"
-                        class="row faq-block mx-0 border-bottom">
-                        <faq-item>
-                            <template slot="title">
-                                Airdrop campaign
-                            </template>
-                            <template slot="body">
-                                <token-airdrop-campaign
-                                    :token-name="currentName"
-                                    :airdrop-params="airdropParams"
-                                    @close="$emit('close')"
+                                    @deployed="refreshAfterDeployMethod"
                                 />
                             </template>
                         </faq-item>
@@ -117,7 +102,6 @@ import FaqItem from '../FaqItem';
 import Guide from '../Guide';
 import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
-import TokenAirdropCampaign from '../token/airdrop_campaign/TokenAirdropCampaign';
 import TokenDelete from '../token/TokenDelete';
 import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
@@ -132,7 +116,6 @@ export default {
         Guide,
         Modal,
         TokenChangeName,
-        TokenAirdropCampaign,
         TokenDelete,
         TokenDeploy,
         TokenReleasePeriod,
@@ -143,7 +126,6 @@ export default {
         currentName: String,
         hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
-        isTokenCreated: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
         precision: Number,
@@ -152,11 +134,11 @@ export default {
         twofa: Boolean,
         visible: Boolean,
         websocketUrl: String,
-        airdropParams: Object,
     },
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
+            refreshAfterDeploy: 0,
         };
     },
     computed: {
@@ -174,6 +156,10 @@ export default {
         refreshSliders: function() {
             this.$refs['token-release-period-component'].$refs['released-slider'].refresh();
             this.$refs['token-release-period-component'].$refs['release-period-slider'].refresh();
+        },
+        refreshAfterDeployMethod: function() {
+            this.refreshAfterDeploy++;
+            this.$emit('token-deployed', key);
         },
     },
 };
