@@ -25,6 +25,7 @@ class DonationFetcher implements DonationFetcherInterface
             $marketName,
             $amount,
             $fee,
+            $tokenCreatorId,
         ]);
 
         $this->checkResponseForError($response);
@@ -44,6 +45,7 @@ class DonationFetcher implements DonationFetcherInterface
             $amount,
             $fee,
             $expectedAmount,
+            $tokenCreatorId,
         ]);
 
         $this->checkResponseForError($response);
