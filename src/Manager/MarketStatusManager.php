@@ -29,6 +29,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     private const SORT_BY_CHANGE = 'change';
 
+    private const DEPLOYED_FIRST = 1;
+    private const DEPLOYED_ONLY = 2;
+
     /** @var MarketStatusRepository */
     protected $repository;
 
@@ -73,7 +76,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
         int $limit,
         string $sort = "monthVolume",
         string $order = "DESC",
-        bool $deployedFirst = true
+        int $deployed = 0,
+        ?int $userId = null
     ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
@@ -83,9 +87,16 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->setFirstResult($offset)
             ->setMaxResults($limit - count($predefinedMarketStatus));
 
-        if ($deployedFirst) {
+        if (!is_null($userId)) {
+            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.id = :id')
+                ->setParameter('id', $userId);
+        }
+
+        if (self::DEPLOYED_FIRST === $deployed) {
             $queryBuilder->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
                 ->orderBy('deployed', 'DESC');
+        } elseif (self::DEPLOYED_ONLY === $deployed) {
+            $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
         }
 
         if (self::SORT_BY_CHANGE === $sort) {

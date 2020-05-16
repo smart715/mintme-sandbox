@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketCapCalculator;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -38,7 +39,7 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
-     * @Rest\QueryParam(name="deployed")
+     * @Rest\QueryParam(name="deployed", default=0)
      * @Rest\QueryParam(name="sort", default="monthVolume")
      * @Rest\QueryParam(name="order", default="DESC")
      */
@@ -47,20 +48,19 @@ class MarketsController extends APIController
         ParamFetcherInterface $request,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-        $deployed = !!$request->get('deployed');
-        $markets = $request->get('user') || $deployed
-            ? $marketStatusManager->getUserMarketStatus(
-                $this->getUser(),
-                ($page - 1) * (self::OFFSET - 1),
-                self::OFFSET,
-                $deployed
-            )
-            : $marketStatusManager->getMarketsInfo(
-                ($page - 1) * (self::OFFSET - 1),
-                self::OFFSET,
-                $request->get('sort'),
-                $request->get('order')
-            );
+        $user = $this->getUser();
+        $user = $user instanceof User && $request->get('user')
+            ? $user->getId()
+            : null;
+
+        $markets = $marketStatusManager->getMarketsInfo(
+            ($page - 1) * (self::OFFSET - 1),
+            self::OFFSET,
+            $request->get('sort'),
+            $request->get('order'),
+            (int)$request->get('deployed'),
+            $user
+        );
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,

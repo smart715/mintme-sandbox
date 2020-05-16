@@ -15,7 +15,9 @@ interface MarketStatusManagerInterface
         int $offset,
         int $limit,
         string $sort = "monthVolume",
-        string $order = "DESC"
+        string $order = "DESC",
+        int $deployed = 0,
+        ?int $userId = null
     ): array;
 
     /** @return array<MarketStatus> */
