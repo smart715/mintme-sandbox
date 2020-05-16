@@ -120,7 +120,7 @@ export default {
             return this.isOwner && this.pending;
         },
         showDeployed: function() {
-            return this.deployed || this.deployComplete;
+            return this.deployComplete;
         },
         btnDisabled: function() {
             return this.costExceed || this.deploying;
@@ -133,15 +133,16 @@ export default {
         },
     },
     watch: {
-        status: function() {
+        deployComplete: function() {
             clearTimeout(this.deployTimeout);
-            this.deployComplete = false;
             this.deployProcessing = true;
             this.deployTimeout = setTimeout(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
                     if (HTTP_OK === response.status) {
+                        resolve();
                         this.deployComplete = response.data.deployed;
+                        this.status = tokenDeploymentStatus.deployed;
                         this.$emit('deployed');
                         this.notifySuccess('Token has been successfully deployed');
                         console.log(this.status);
