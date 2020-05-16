@@ -102,6 +102,7 @@ export default {
             status: this.statusProp,
             webCost: null,
             deployTimeout: null,
+            deployProcessing: false,
         };
     },
     computed: {
@@ -130,24 +131,29 @@ export default {
     watch: {
         status: function() {
             clearTimeout(this.deployTimeout);
-            this.status = tokenDeploymentStatus.notDeployed;
-
-            if (this.status = tokenDeploymentStatus.pending) {
-                this.deployTimeout = setTimeout(() => {
-                    this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
-                    .then((response) => {
-                        if (HTTP_OK === response.status) {
-                            console.log(response);
-                            this.status = tokenDeploymentStatus.deployed;
-                            this.$emit('deployed');
-                            this.notifySuccess('Token has been successfully deployed');
-                            console.log(this.deployed);
-                        }
-                        }, (error) => {
-                            this.notifyError('An error has occurred, please try again later');
-                    });
-                }, 600000);
-            }
+            // if (this.status = tokenDeploymentStatus.deployed) {
+            //     return;
+            // };
+            this.status = tokenDeploymentStatus.pending;
+            this.deployProcessing = true;
+            this.deployTimeout = setTimeout(() => {
+                this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
+                .then((response) => {
+                    if (HTTP_OK === response.status) {
+                        console.log(response);
+                        this.status = tokenDeploymentStatus.deployed;
+                        this.$emit('deployed');
+                        this.notifySuccess('Token has been successfully deployed');
+                        console.log(this.status);
+                    }
+                    }, (error) => {
+                        this.notifyError('An error has occurred, please try again later');
+                })
+                .then(() => {
+                    this.deployProcessing = false;
+                    console.log(this.status);
+                });
+            }, 600000);
         },
     },
     methods: {
