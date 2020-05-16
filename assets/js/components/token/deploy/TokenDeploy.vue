@@ -83,7 +83,7 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol, HTTP_OK} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
@@ -101,6 +101,7 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
+            deployTimeout: null,
         };
     },
     computed: {
@@ -124,6 +125,29 @@ export default {
         },
         costExceed: function() {
             return new Decimal(this.webCost).greaterThan(this.balance);
+        },
+    },
+    watch: {
+        status: function() {
+            clearTimeout(this.deployTimeout);
+            this.status = tokenDeploymentStatus.notDeployed;
+
+            if (this.status = tokenDeploymentStatus.pending) {
+                this.deployTimeout = setTimeout(() => {
+                    this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
+                    .then((response) => {
+                        if (HTTP_OK === response.status) {
+                            console.log(response);
+                            this.status = tokenDeploymentStatus.deployed;
+                            this.$emit('deployed');
+                            this.notifySuccess('Token has been successfully deployed');
+                            console.log(this.deployed);
+                        }
+                        }, (error) => {
+                            this.notifyError('An error has occurred, please try again later');
+                    });
+                }, 600000);
+            }
         },
     },
     methods: {
@@ -163,17 +187,6 @@ export default {
                     this.notifyError('An error has occurred, please try again later');
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
-            })
-            .then(() => {
-                new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve();
-                        this.status = tokenDeploymentStatus.deployed;
-                        console.log(this.status);
-                        this.$emit('deployed');
-                        this.notifySuccess('Token has been successfully deployed');
-                    }, 600000);
-                });
             })
             .then(() => {
                 this.deploying = false;
