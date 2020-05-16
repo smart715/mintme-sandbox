@@ -83,7 +83,7 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol, HTTP_OK} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
@@ -165,19 +165,18 @@ export default {
                 }
             })
             .then(() => {
-                this.deploying = false;
-                return setTimeout(() => {
-                    this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}));
+                new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                        this.status = tokenDeploymentStatus.deployed;
+                        console.log(this.status);
+                        this.$emit('deployed');
+                        this.notifySuccess('Token has been successfully deployed');
                     }, 600000);
-                    console.log(this.status);
+                });
             })
-            .then((response) => {
-                if (response.status === HTTP_OK) {
-                this.status = tokenDeploymentStatus.deployed;
-                console.log(this.status);
-                this.$emit('deployed');
-                this.notifySuccess('Token has been successfully deployed');
-                }
+            .then(() => {
+                this.deploying = false;
             });
         },
     },
