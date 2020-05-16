@@ -7,12 +7,11 @@ use App\Exchange\Market;
 
 interface DonationHandlerInterface
 {
-    public function checkDonation(Market $market, string $currency, string $amount, string $fee): array;
+    public function checkDonation(Market $market, string $currency, string $amount): array;
     public function makeDonation(
         Market $market,
         string $currency,
         string $amount,
-        string $fee,
         string $expectedAmountUser,
         User $donorUser
     ): void;

@@ -5,6 +5,7 @@ namespace App\Exchange\Donation;
 use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
@@ -34,13 +35,17 @@ class DonationHandler implements DonationHandlerInterface
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
+    /** @var array<int|float> */
+    private $donationParams;
+
     public function __construct(
         DonationFetcherInterface $donationFetcher,
         MarketNameConverterInterface $marketNameConverter,
         MoneyWrapperInterface $moneyWrapper,
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
         CryptoManagerInterface $cryptoManager,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        array $donationParams
     ) {
         $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
@@ -50,12 +55,19 @@ class DonationHandler implements DonationHandlerInterface
         $this->balanceHandler = $balanceHandler;
     }
 
-    public function checkDonation(Market $market, string $currency, string $amount, string $fee): array
+    public function checkDonation(Market $market, string $currency, string $amount): array
     {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
-        $feeObj = $this->moneyWrapper->parse($fee, Token::WEB_SYMBOL);
+        $feeObj = $this->moneyWrapper->parse(
+            (string)$this->donationParams['fee'],
+            Token::WEB_SYMBOL
+        );
         /** @var Token $token */
         $token = $market->getQuote();
+        /** @var User $user */
+        $user = $token->getProfile()->getUser();
+
+        $this->checkAmount($user, $amountObj, $currency);
 
         if (Token::BTC_SYMBOL === $currency) {
             $amountObj = $this->convertAmountToWeb($amountObj);
@@ -65,7 +77,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->marketNameConverter->convert($market),
             $amountObj->getAmount(),
             $feeObj->getAmount(),
-            $token->getProfile()->getUser()->getId()
+            $user->getId()
         );
     }
 
@@ -73,14 +85,20 @@ class DonationHandler implements DonationHandlerInterface
         Market $market,
         string $currency,
         string $amount,
-        string $fee,
         string $expectedAmount,
         User $donorUser
     ): void {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
-        $feeObj = $this->moneyWrapper->parse($fee, Token::WEB_SYMBOL);
+        $feeObj = $this->moneyWrapper->parse(
+            (string)$this->donationParams['fee'],
+            Token::WEB_SYMBOL
+        );
         /** @var Token $token */
         $token = $market->getQuote();
+        /** @var User $user */
+        $user = $token->getProfile()->getUser();
+
+        $this->checkAmount($user, $amountObj, $currency);
 
         if (Token::BTC_SYMBOL === $currency) {
             $amountInWeb = $this->convertAmountToWeb($amountObj);
@@ -105,7 +123,7 @@ class DonationHandler implements DonationHandlerInterface
             $amountObj->getAmount(),
             $feeObj->getAmount(),
             $expectedAmount,
-            $token->getProfile()->getUser()->getId()
+            $user->getId()
         );
     }
 
@@ -122,5 +140,27 @@ class DonationHandler implements DonationHandlerInterface
                 ],
             ])
         );
+    }
+
+    private function checkAmount(User $user, Money $amount, string $currency): void
+    {
+        $balance = $this->balanceHandler->balance(
+            $user,
+            Token::getFromSymbol($currency)
+        )->getAvailable();
+
+        if (Token::BTC_SYMBOL === $currency) {
+            $minBtcAmount = $this->moneyWrapper->parse((string)$this->donationParams['minBtcAmount'], $currency);
+
+            if ($amount->lessThan($minBtcAmount) || $amount->greaterThan($balance)) {
+                throw new ApiBadRequestException('Invalid donation amount.');
+            }
+        } else {
+            $minWebAmount = $this->moneyWrapper->parse((string)$this->donationParams['minWebAmount'], $currency);
+
+            if ($amount->lessThan($minWebAmount) || $amount->greaterThan($balance)) {
+                throw new ApiBadRequestException('Invalid donation amount.');
+            }
+        }
     }
 }

@@ -40,8 +40,7 @@ class DonationController extends AbstractFOSRestController
         $amountToReceive = $this->donationHandler->checkDonation(
             $market,
             $currency,
-            $amount,
-            $this->getDonationFee()
+            $amount
         );
 
         return $this->view($amountToReceive);
@@ -76,16 +75,10 @@ class DonationController extends AbstractFOSRestController
             $market,
             $request->get('currency'),
             (string)$request->get('amount'),
-            $this->getDonationFee(),
             (string)$request->get('expected_count_to_receive'),
             $user
         );
 
         return $this->view(null, Response::HTTP_ACCEPTED);
-    }
-
-    private function getDonationFee(): string
-    {
-        return (string)$this->getParameter('donation')['fee'];
     }
 }

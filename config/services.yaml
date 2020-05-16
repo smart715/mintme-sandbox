@@ -539,3 +539,7 @@ services:
     App\Exchange\Config\AirdropConfig:
         arguments:
             $airdropParams: '%airdrop_params%'
+
+    App\Exchange\Donation\DonationHandler:
+        arguments:
+            $donationParams: '%donation%'
