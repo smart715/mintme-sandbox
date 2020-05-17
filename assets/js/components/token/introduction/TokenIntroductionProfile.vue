@@ -151,6 +151,7 @@
                                             src="../../../../img/icon-telegram-group.png"
                                             class="align-self-center text-center"
                                             width="45"
+                                            height="45"
                                             alt="telegram group"
                                         />
                                     </a>
