@@ -94,7 +94,6 @@ export default {
         name: String,
         precision: Number,
         statusProp: String,
-        key: Number,
     },
     data() {
         return {
