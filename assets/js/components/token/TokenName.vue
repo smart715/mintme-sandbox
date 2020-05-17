@@ -129,7 +129,6 @@ export default {
             }
 
             this.showTokenEditModal = true;
-            this.$forceUpdate();
         },
         updateReleaseAddress: function() {
             this.releaseAddress = '0x';
