@@ -58,7 +58,7 @@
                                     discord-url="{{ token.discordUrl }}"
                                     @updated-website="websiteUpdated"
                                     @updated-facebook="facebookUpdated"
-                                    @updated-youtube="youtubeUpdated"                                                                                                          
+                                    @updated-youtube="youtubeUpdated"
                             >
                             </token-introduction-profile>
                             <token-introduction-statistics
@@ -75,7 +75,7 @@
                                     :token-name="{{ market.quote.symbol | json_encode }}">
                             </top-holders>
                         </div>
-                    </b-tab>                    
+                    </b-tab>
                 {% endif %}
                 {% if showTrade %}
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
@@ -135,7 +135,6 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         release-address="{{ token.mintDestination }}"
                                         @token-deploy-pending="setTokenPending"
-                                        @token-deployed="setTokenDeployed"
                                 />
                             </div>
                         </li>
