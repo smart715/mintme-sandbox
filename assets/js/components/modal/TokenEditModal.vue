@@ -38,9 +38,8 @@
                                     :precision="precision"
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
-                                    :key="refreshAfterDeploy"
                                     @pending="$emit('token-deploy-pending')"
-                                    @deployed="refreshAfterDeployMethod"
+                                    @deployed="$emit('token-deployed')"
                                 />
                             </template>
                         </faq-item>
@@ -138,7 +137,6 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
-            refreshAfterDeploy: 0,
         };
     },
     computed: {
@@ -156,10 +154,6 @@ export default {
         refreshSliders: function() {
             this.$refs['token-release-period-component'].$refs['released-slider'].refresh();
             this.$refs['token-release-period-component'].$refs['release-period-slider'].refresh();
-        },
-        refreshAfterDeployMethod: function() {
-            this.refreshAfterDeploy++;
-            this.$emit('token-deployed');
         },
     },
 };

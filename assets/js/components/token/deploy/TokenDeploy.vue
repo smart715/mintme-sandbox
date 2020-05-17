@@ -156,6 +156,7 @@ export default {
                 })
                 .then(() => {
                     this.deployProcessing = false;
+                    this.deployed = true;
                 });
             }, 600000);
         },
