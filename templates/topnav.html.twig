@@ -71,7 +71,7 @@
                 {% if show_links %}
                     <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">
                         <a href="{{ path('token_create') }}" class="nav-link">
-                            <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline"></span>
+                            <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token' ? 'icon-token-active' : '' }}"></span>
                             <span>My Token</span>
                         </a>
                     </li>
