@@ -69,7 +69,7 @@
                     </div>
                 </li>
                 {% if show_links %}
-                    <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route == 'token' ? 'active' : '' }}">
+                    <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route == 'token' ? 'active' : route }}">
                         <a href="{{ path('token_create') }}" class="nav-link">
                             <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline"></span>
                             <span>My Token</span>
@@ -88,7 +88,7 @@
                     <a href="{{ path('sonata_news_archive') }}" class="nav-link">News</a>
                 </li>
                 {% if show_links %}
-                    <li class="nav-item align-self-center {{ route == 'referral' ? 'active' : '' }}">
+                    <li class="nav-item align-self-center {{ route == 'referral-program' ? 'active' : '' }}">
                         <a href="{{ path('referral-program') }}" class="nav-link">Referrals</a>
                     </li>
                 {% endif %}
