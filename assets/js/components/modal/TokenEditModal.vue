@@ -159,7 +159,7 @@ export default {
         },
         refreshAfterDeployMethod: function() {
             this.refreshAfterDeploy++;
-            this.$emit('token-deployed', key);
+            this.$emit('token-deployed');
         },
     },
 };
