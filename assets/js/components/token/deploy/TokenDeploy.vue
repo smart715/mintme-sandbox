@@ -146,7 +146,7 @@ export default {
         notDeployed: function() {
             clearTimeout(this.deployTimeout);
             this.setPending++;
-            this.setDeployed++
+            this.setDeployed++;
             this.deployTimeout = setTimeout(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
