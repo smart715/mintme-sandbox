@@ -102,7 +102,6 @@ export default {
             status: this.statusProp,
             webCost: null,
             deployTimeout: null,
-            deployProcessing: false,
         };
     },
     computed: {
@@ -141,7 +140,8 @@ export default {
     watch: {
         notDeployed: function() {
             clearTimeout(this.deployTimeout);
-            this.deployProcessing = true;
+            this.pending = true;
+            this.deployed = false;
             this.deployTimeout = setTimeout(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
@@ -155,7 +155,7 @@ export default {
                         this.notifyError('An error has occurred, please try again later');
                 })
                 .then(() => {
-                    this.deployProcessing = false;
+                    this.pending = false;
                     this.deployed = true;
                 });
             }, 600000);
