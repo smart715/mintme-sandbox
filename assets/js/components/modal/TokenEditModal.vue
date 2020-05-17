@@ -139,6 +139,12 @@ export default {
             hasReleasePeriod: this.hasReleasePeriodProp,
         };
     },
+    mounted: function() {
+        console.log(this.isTokenDeployed + 'mounted');
+    },
+    updated: function() {
+        console.log(this.isTokenDeployed + 'updated');
+    },
     computed: {
         isTokenNotDeployed: function() {
             return tokenDeploymentStatus.notDeployed === this.statusProp;

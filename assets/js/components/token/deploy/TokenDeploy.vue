@@ -102,6 +102,8 @@ export default {
             status: this.statusProp,
             webCost: null,
             deployTimeout: null,
+            setPending: 0,
+            setDeployed: 0,
         };
     },
     computed: {
@@ -109,9 +111,11 @@ export default {
             return tokenDeploymentStatus.notDeployed === this.status;
         },
         pending: function() {
+            this.setPending;
             return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
+            this.setDeployed;
             return tokenDeploymentStatus.deployed === this.status;
         },
         showPending: function() {
@@ -133,6 +137,7 @@ export default {
         console.log(this.deployed);
     },
     updated: function() {
+        console.log('dom updated!');
         console.log(this.notDeployed);
         console.log(this.pending);
         console.log(this.deployed);
@@ -140,8 +145,8 @@ export default {
     watch: {
         notDeployed: function() {
             clearTimeout(this.deployTimeout);
-            this.pending = true;
-            this.deployed = false;
+            this.setPending++;
+            this.setDeployed++
             this.deployTimeout = setTimeout(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
@@ -155,8 +160,8 @@ export default {
                         this.notifyError('An error has occurred, please try again later');
                 })
                 .then(() => {
-                    this.pending = false;
-                    this.deployed = true;
+                    this.setPending++;
+                    this.setDeployed++;
                 });
             }, 600000);
         },
