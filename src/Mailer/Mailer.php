@@ -184,8 +184,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     public function sendNewDeviceDetectedMail(user $user, UserLoginInfo $userDeviceInfo): void
     {
         $userTwoFa = $user->isGoogleAuthenticatorEnabled();
-        $userMailCode = $user->isEmailAuthEnabled();
-        $message = $userTwoFa || $userMailCode ?
+        $message = $userTwoFa ?
             'Our system has detected a new login attempt from new IP address.' :
             'Our system has detected a new successful login from new IP address.';
 
@@ -201,7 +200,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'user_device_info' => $userDeviceInfo,
         ]);
 
-        $subjectMsg = $userTwoFa || $userMailCode ?
+        $subjectMsg = $userTwoFa ?
             'New login attempt from new IP address' :
             'New successful login from new IP address';
 
