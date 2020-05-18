@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="deployed"
+                v-else-if="deployed || isTokenDeployed"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -90,6 +90,7 @@ export default {
     mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     props: {
         hasReleasePeriod: Boolean,
+        isTokenDeployed: Boolean,
         isOwner: Boolean,
         name: String,
         precision: Number,
@@ -102,8 +103,8 @@ export default {
             status: this.statusProp,
             webCost: null,
             deployTimeout: null,
-            setPending: 0,
-            setDeployed: 0,
+            setDeployed: false,
+            setShowPending: false,
         };
     },
     computed: {
@@ -111,15 +112,13 @@ export default {
             return tokenDeploymentStatus.notDeployed === this.status;
         },
         pending: function() {
-            this.setPending;
             return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
-            this.setDeployed;
-            return tokenDeploymentStatus.deployed === this.status;
+            return this.setDeployed && tokenDeploymentStatus.deployed === this.status;
         },
         showPending: function() {
-            return this.isOwner && this.pending;
+            return this.setShowPending && this.isOwner && this.pending;
         },
         btnDisabled: function() {
             return this.costExceed || this.deploying;
@@ -133,25 +132,26 @@ export default {
     },
     mounted: function() {
         console.log(this.notDeployed);
-        console.log(this.pending);
+        console.log(this.showPending);
         console.log(this.deployed);
     },
     updated: function() {
-        console.log('dom updated!');
-        console.log(this.notDeployed);
-        console.log(this.pending);
-        console.log(this.deployed);
+        console.log('token deploy updated!');
+        console.log('not deployed is' + this.notDeployed);
+        console.log('show pending is' + this.showPending);
+        console.log('deployed is' + this.deployed);
     },
-    watch: {
+     watch: {
         notDeployed: function() {
             clearTimeout(this.deployTimeout);
-            this.setPending++;
-            this.setDeployed++;
+            this.setShowPending = true;
+            this.setDeployed = false;
             this.deployTimeout = setTimeout(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
                     if (response.data.deployed === true) {
                         this.status = tokenDeploymentStatus.deployed;
+                        this.setDeployed = true;
                         this.$emit('deployed');
                         this.notifySuccess('Token has been successfully deployed');
                         console.log(this.status);
@@ -160,12 +160,13 @@ export default {
                         this.notifyError('An error has occurred, please try again later');
                 })
                 .then(() => {
-                    this.setPending++;
-                    this.setDeployed++;
-                })
-                .then(()=> {
-                    location.reload();
+                    this.setShowPending = false;
                 });
+                // .then(()=> {
+                //     setTimeout(() => {
+                //         location.reload();
+                //     },2000)
+                // });
             }, 600000);
         },
     },
