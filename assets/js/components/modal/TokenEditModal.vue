@@ -33,13 +33,13 @@
                             <template slot="body">
                                 <token-deploy
                                     :has-release-period="hasReleasePeriod"
-                                    :is-token-deployed="isTokenDeployed"
                                     :is-owner="isOwner"
                                     :name="currentName"
                                     :precision="precision"
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
+                                    @deployed="$emit(token-deployed)"
                                 />
                             </template>
                         </faq-item>
@@ -140,10 +140,10 @@ export default {
         };
     },
     mounted: function() {
-        console.log(this.isTokenDeployed + 'mounted');
+        console.log(this.isTokenDeployed + ' modal mounted');
     },
     updated: function() {
-        console.log(this.isTokenDeployed + 'updated');
+        console.log(this.isTokenDeployed + ' modal updated');
     },
     computed: {
         isTokenNotDeployed: function() {

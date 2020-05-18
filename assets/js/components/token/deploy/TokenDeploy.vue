@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="deployed || isTokenDeployed"
+                v-else-if="deployed"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -90,7 +90,6 @@ export default {
     mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     props: {
         hasReleasePeriod: Boolean,
-        isTokenDeployed: Boolean,
         isOwner: Boolean,
         name: String,
         precision: Number,
@@ -115,7 +114,7 @@ export default {
             return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
-            return this.setDeployed && tokenDeploymentStatus.deployed === this.status;
+            return this.setDeployed || tokenDeploymentStatus.deployed === this.status;
         },
         showPending: function() {
             return this.setShowPending && this.isOwner && this.pending;
