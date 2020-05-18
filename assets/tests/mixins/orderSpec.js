@@ -88,5 +88,7 @@ describe('OrderMixin', function() {
         expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY)).equal('Buy');
         expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL)).equal('Sell');
         expect(wrapper.vm.getSideByType(WSAPI.order.type.DONATION)).equal('Donation');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY, true)).equal('Buy (donation)');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL, true)).equal('Sell (donation)');
     });
 });

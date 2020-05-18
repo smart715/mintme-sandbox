@@ -3,6 +3,7 @@
 namespace App\Exchange;
 
 use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /** @codeCoverageIgnore */
 class Deal extends AbstractOrder
@@ -53,6 +54,7 @@ class Deal extends AbstractOrder
         return $this->deal;
     }
 
+    /** @Groups({"Default", "API", "dev"}) */
     public function getDealOrderId(): ?int
     {
         return $this->dealOrderId;

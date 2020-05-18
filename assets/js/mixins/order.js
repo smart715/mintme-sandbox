@@ -40,12 +40,12 @@ export default {
         },
     },
     methods: {
-        getSideByType: function(orderType) {
+        getSideByType: function(orderType, isDonationOrder) {
             switch (orderType) {
                 case WSAPI.order.type.BUY:
-                    return 'Buy';
+                    return isDonationOrder ? 'Buy (donation)' : 'Buy';
                 case WSAPI.order.type.SELL:
-                    return 'Sell';
+                    return isDonationOrder ? 'Sell (donation)' : 'Sell';
                 case WSAPI.order.type.DONATION:
                     return 'Donation';
             }

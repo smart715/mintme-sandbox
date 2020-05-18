@@ -138,9 +138,11 @@ export default {
         },
         history: function() {
             return this.tableData.map((history) => {
+                let isDonationOrder = 0 === history.id || 0 === history.dealOrderId;
+
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
-                    side: this.getSideByType(history.side),
+                    side: this.getSideByType(history.side, isDonationOrder),
                     name: this.pairNameFunc(
                         this.rebrandingFunc(history.market.base),
                         this.rebrandingFunc(history.market.quote)
