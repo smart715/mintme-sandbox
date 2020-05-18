@@ -9,16 +9,50 @@ class DonationControllerTest extends WebTestCase
 {
     public function testCheckDonation(): void
     {
-        $this->register($this->client);
+        $email = $this->register($this->client);
         $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request(
             'GET',
-            '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/check/' . Token::BTC_SYMBOL . '/50.50'
+            '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/check/' . Token::WEB_SYMBOL . '/0.000099'
+        );
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid donation amount.', $res['message']);
+
+        $this->client->request(
+            'GET',
+            '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/check/' . Token::BTC_SYMBOL . '/0.00000099'
+        );
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid donation amount.', $res['message']);
+
+        $this->client->request(
+            'GET',
+            '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/check/' . Token::WEB_SYMBOL . '/20'
+        );
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid donation amount.', $res['message']);
+
+        $this->sendWeb($email);
+        $this->client->request(
+            'GET',
+            '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/check/' . Token::WEB_SYMBOL . '/20'
         );
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
+        $this->client->request(
+            'GET',
+            '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/check/' . Token::BTC_SYMBOL . '/0.00055'
+        );
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid donation amount.', $res['message']);
+
+        $this->deposit($email, '150000', Token::BTC_SYMBOL);
         $this->client->request(
             'GET',
             '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/check/' . Token::BTC_SYMBOL . '/0.00055'
@@ -34,7 +68,35 @@ class DonationControllerTest extends WebTestCase
 
         $this->client->request('POST', '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/make', [
             'currency' => Token::WEB_SYMBOL,
-            'amount' => '1000',
+            'amount' => '0.00001',
+            'expected_count_to_receive' => 3,
+        ]);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid donation amount.', $res['message']);
+
+        $this->client->request('POST', '/api/donation/' . Token::BTC_SYMBOL . '/' . $tokName . '/make', [
+            'currency' => Token::WEB_SYMBOL,
+            'amount' => '0.0000001',
+            'expected_count_to_receive' => 2,
+        ]);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid donation amount.', $res['message']);
+
+        $this->client->request('POST', '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/make', [
+            'currency' => Token::WEB_SYMBOL,
+            'amount' => '100',
+            'expected_count_to_receive' => 10,
+        ]);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertEquals('Invalid donation amount.', $res['message']);
+
+        $this->sendWeb($email);
+        $this->client->request('POST', '/api/donation/' . Token::WEB_SYMBOL . '/' . $tokName . '/make', [
+            'currency' => Token::WEB_SYMBOL,
+            'amount' => '40',
             'expected_count_to_receive' => 10,
         ]);
         $this->assertTrue($this->client->getResponse()->isSuccessful());

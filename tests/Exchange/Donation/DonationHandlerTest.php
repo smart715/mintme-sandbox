@@ -22,6 +22,15 @@ class DonationHandlerTest extends TestCase
 
     use MockMoneyWrapper;
 
+    /** @var array<string, array<string, float|int>> */
+    private $donationParams = [
+        'donation' => [
+            'fee' => 1,
+            'minBtcAmount' => 0.000001,
+            'minWebAmount' => 0.0001,
+        ],
+    ];
+
     public function testCheckDonation(): void
     {
         $base = $this->mockCrypto();
@@ -30,6 +39,9 @@ class DonationHandlerTest extends TestCase
         /** @var User|MockObject $ownerUser */
         $ownerUser = $this->createMock(User::class);
         $ownerUser->method('getId')->willReturn(2);
+        /** @var User|MockObject $donorUser */
+        $donorUser = $this->createMock(User::class);
+        $donorUser->method('getId')->willReturn(5);
         /** @var Profile|MockObject $profile */
         $profile = $this->createMock(User::class);
         $profile->method('getUser')->willReturn($ownerUser);
@@ -50,7 +62,7 @@ class DonationHandlerTest extends TestCase
         $fetcher = $this->createMock(DonationFetcherInterface::class);
         $fetcher
             ->method('checkDonation')
-            ->with('TOK000000000123WEB', '75', '1')
+            ->with('TOK000000000123WEB', '75', '1', 2)
             ->willReturn('5');
 
         /** @var BalanceHandlerInterface|MockObject $bh */
@@ -62,12 +74,13 @@ class DonationHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
             $this->mockCryptoManager($base),
-            $bh
+            $bh,
+            $this->donationParams
         );
 
         $this->assertEquals(
             '5',
-            $donationHandler->checkDonation($market, Token::WEB_SYMBOL, '75', '1')
+            $donationHandler->checkDonation($market, Token::WEB_SYMBOL, '75', $donorUser)
         );
     }
 
@@ -102,7 +115,7 @@ class DonationHandlerTest extends TestCase
         $fetcher = $this->createMock(DonationFetcherInterface::class);
         $fetcher
             ->method('makeDonation')
-            ->with('TOK000000000567WEB', '375000000000', '1', '20000');
+            ->with('TOK000000000567WEB', '375000000000', '1', '20000', 3);
 
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
@@ -127,10 +140,11 @@ class DonationHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
             $cryptoManager,
-            $bh
+            $bh,
+            $this->donationParams
         );
 
-        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '1', '20000', $donorUser);
+        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser);
         $this->assertTrue(true);
     }
 
