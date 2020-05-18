@@ -114,10 +114,12 @@ export default {
             return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
-            return this.setDeployed || tokenDeploymentStatus.deployed === this.status;
+            this.setDeployed;
+            return tokenDeploymentStatus.deployed === this.status;
         },
         showPending: function() {
-            return this.setShowPending && this.isOwner && this.pending;
+            this.setShowPending;
+            return this.isOwner && this.pending;
         },
         btnDisabled: function() {
             return this.costExceed || this.deploying;

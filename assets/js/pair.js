@@ -55,6 +55,7 @@ new Vue({
       this.tokenPending = true;
     },
     setTokenDeployed: function() {
+      this.tokenPending = false;
       this.tokenDeployed = true;
     },
     getTokenStatus: function(status) {
