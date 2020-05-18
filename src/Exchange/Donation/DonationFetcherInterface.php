@@ -6,6 +6,7 @@ interface DonationFetcherInterface
 {
     public function checkDonation(string $marketName, string $amount, string $fee, int $tokenCreatorId): array;
     public function makeDonation(
+        int $donorUserId,
         string $marketName,
         string $amount,
         string $fee,

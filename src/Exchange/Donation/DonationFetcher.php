@@ -34,6 +34,7 @@ class DonationFetcher implements DonationFetcherInterface
     }
 
     public function makeDonation(
+        int $donorUserId,
         string $marketName,
         string $amount,
         string $fee,
@@ -41,6 +42,7 @@ class DonationFetcher implements DonationFetcherInterface
         int $tokenCreatorId
     ): void {
         $response = $this->jsonRpc->send(self::MAKE_DONATION_METHOD, [
+            $donorUserId,
             $marketName,
             $amount,
             $fee,

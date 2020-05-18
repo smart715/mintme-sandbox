@@ -10,6 +10,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
@@ -53,32 +54,36 @@ class DonationHandler implements DonationHandlerInterface
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
         $this->cryptoManager = $cryptoManager;
         $this->balanceHandler = $balanceHandler;
+        $this->donationParams = $donationParams;
     }
 
-    public function checkDonation(Market $market, string $currency, string $amount): array
+    public function checkDonation(Market $market, string $currency, string $amount, User $donorUser): string
     {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
-        $feeObj = $this->moneyWrapper->parse(
-            (string)$this->donationParams['fee'],
-            Token::WEB_SYMBOL
-        );
         /** @var Token $token */
         $token = $market->getQuote();
-        /** @var User $user */
-        $user = $token->getProfile()->getUser();
 
-        $this->checkAmount($user, $amountObj, $currency);
+        $this->checkAmount($donorUser, $amountObj, $currency);
 
         if (Token::BTC_SYMBOL === $currency) {
             $amountObj = $this->convertAmountToWeb($amountObj);
         }
 
-        return $this->donationFetcher->checkDonation(
+        $expectedData = $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
-            $amountObj->getAmount(),
-            $feeObj->getAmount(),
-            $user->getId()
+            $this->moneyWrapper->format($amountObj),
+            $this->getFee(),
+            $token->getProfile()->getUser()->getId()
         );
+
+        // TODO: check expected money to spend
+//        $expectedMoneyToSpend = $this->moneyWrapper->parse(
+//            $expectedData[1] ?? '0',
+//            Token::WEB_SYMBOL
+//        );
+//        $this->checkAmount($donorUser, $expectedMoneyToSpend, Token::WEB_SYMBOL);
+
+        return $expectedData[0] ?? '0';
     }
 
     public function makeDonation(
@@ -89,16 +94,10 @@ class DonationHandler implements DonationHandlerInterface
         User $donorUser
     ): void {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
-        $feeObj = $this->moneyWrapper->parse(
-            (string)$this->donationParams['fee'],
-            Token::WEB_SYMBOL
-        );
         /** @var Token $token */
         $token = $market->getQuote();
-        /** @var User $user */
-        $user = $token->getProfile()->getUser();
 
-        $this->checkAmount($user, $amountObj, $currency);
+        $this->checkAmount($donorUser, $amountObj, $currency);
 
         if (Token::BTC_SYMBOL === $currency) {
             $amountInWeb = $this->convertAmountToWeb($amountObj);
@@ -119,11 +118,12 @@ class DonationHandler implements DonationHandlerInterface
         }
 
         $this->donationFetcher->makeDonation(
+            $donorUser->getId(),
             $this->marketNameConverter->convert($market),
-            $amountObj->getAmount(),
-            $feeObj->getAmount(),
+            $this->moneyWrapper->format($amountObj),
+            $this->getFee(),
             $expectedAmount,
-            $user->getId()
+            $token->getProfile()->getUser()->getId()
         );
     }
 
@@ -140,6 +140,13 @@ class DonationHandler implements DonationHandlerInterface
                 ],
             ])
         );
+    }
+
+    private function getFee(): string
+    {
+        $fee = $this->donationParams['fee'] / 100;
+
+        return (string)$fee;
     }
 
     private function checkAmount(User $user, Money $amount, string $currency): void

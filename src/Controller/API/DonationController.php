@@ -40,7 +40,8 @@ class DonationController extends AbstractFOSRestController
         $amountToReceive = $this->donationHandler->checkDonation(
             $market,
             $currency,
-            $amount
+            $amount,
+            $this->getCurrentUser()
         );
 
         return $this->view($amountToReceive);
@@ -64,6 +65,19 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
+        $this->donationHandler->makeDonation(
+            $market,
+            $request->get('currency'),
+            (string)$request->get('amount'),
+            (string)$request->get('expected_count_to_receive'),
+            $this->getCurrentUser()
+        );
+
+        return $this->view(null, Response::HTTP_ACCEPTED);
+    }
+
+    private function getCurrentUser(): User
+    {
         /** @var User|null $user */
         $user = $this->getUser();
 
@@ -71,14 +85,6 @@ class DonationController extends AbstractFOSRestController
             throw $this->createAccessDeniedException();
         }
 
-        $this->donationHandler->makeDonation(
-            $market,
-            $request->get('currency'),
-            (string)$request->get('amount'),
-            (string)$request->get('expected_count_to_receive'),
-            $user
-        );
-
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $user;
     }
 }
