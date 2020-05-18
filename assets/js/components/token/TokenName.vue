@@ -26,6 +26,7 @@
                 icon="edit"
                 transform="shrink-4 up-1.5"
                 @click="editToken"
+                :key="reRenderTokenDeploy"
             />
         </template>
         <span>
@@ -71,6 +72,7 @@ export default {
             isTokenExchanged: true,
             isTokenNotDeployed: false,
             showTokenEditModal: false,
+            reRenderTokenDeploy: 0,
         };
     },
     mounted: function() {
@@ -130,6 +132,7 @@ export default {
             }
 
             this.showTokenEditModal = true;
+            this.reRenderTokenDeploy++;
         },
         updateReleaseAddress: function() {
             this.releaseAddress = '0x';
