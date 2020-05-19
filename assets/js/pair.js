@@ -60,7 +60,9 @@ new Vue({
       console.log('emit deploy pending ' + this.tokenPending);
     },
     setTokenDeployed: function() {
+      this.tokenPending = null;
       this.tokenDeployed = true;
+      console.log('emit deploy pending after deploy ' + this.tokenPending);
       console.log('emit deploy complete ' + this.tokenDeployed);
     },
     getTokenStatus: function(status) {

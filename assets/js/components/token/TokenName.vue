@@ -17,9 +17,10 @@
                 :release-address="releaseAddress"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
-                @token-deployed="$emit('token-deployed')"
+                @token-deployed="emitTokenDeployed"
                 @update-release-address="updateReleaseAddress"
                 :airdrop-params="airdropParams"
+                :key="reRenderModal"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -71,6 +72,7 @@ export default {
             isTokenExchanged: true,
             isTokenNotDeployed: false,
             showTokenEditModal: false,
+            reRenderModal: 0,
         };
     },
     mounted: function() {
@@ -110,6 +112,10 @@ export default {
             }
         }, 'token-name-asset-update');
     },
+    updated: function() {
+        console.log('token name comp : not deployed is ' + this.isTokenNotDeployed);
+        console.log('reRenderModal is ' + this.reRenderModal);
+    },
     methods: {
         closeTokenEditModal: function() {
             this.showTokenEditModal = false;
@@ -133,6 +139,10 @@ export default {
         },
         updateReleaseAddress: function() {
             this.releaseAddress = '0x';
+        },
+        emitTokenDeployed: function() {
+            this.$emit('token-deployed');
+            this.reRenderModal++;
         },
     },
 };

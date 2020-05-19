@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="showDeployed"
+                v-else-if="deployed"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -115,9 +115,6 @@ export default {
         },
         showPending: function() {
             return this.isOwner && this.pending;
-        },
-        showDeployed: function() {
-            return this.isOwner && this.deployed;
         },
         btnDisabled: function() {
             return this.costExceed || this.deploying;
@@ -192,7 +189,6 @@ export default {
             })
             .then(() => {
                 this.deploying = false;
-                console.log('at end of real deploy, status is ' + this.status);
             });
         },
     },
