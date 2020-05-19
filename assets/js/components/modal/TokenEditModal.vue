@@ -39,7 +39,7 @@
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
-                                    @deployed="emitTokenDeployed"
+                                    @deployed="$emit('token-deployed')"
                                 />
                             </template>
                         </faq-item>
@@ -160,10 +160,6 @@ export default {
         refreshSliders: function() {
             this.$refs['token-release-period-component'].$refs['released-slider'].refresh();
             this.$refs['token-release-period-component'].$refs['release-period-slider'].refresh();
-        },
-        emitTokenDeployed: function() {
-            this.isTokenDeployed = true;
-            this.$emit('token-deployed');
         },
     },
 };

@@ -23,6 +23,8 @@ new Vue({
       tokenName: null,
       tokenPending: null,
       tokenDeployed: null,
+      reRenderTokenName: 0,
+      reRenderTokenDeployIcon: 0,
     };
   },
   components: {
@@ -57,6 +59,8 @@ new Vue({
     setTokenDeployed: function() {
       this.tokenPending = null;
       this.tokenDeployed = true;
+      this.reRenderTokenName++;
+      this.reRenderTokenDeployIcon++;
     },
     getTokenStatus: function(status) {
       return true === this.tokenPending ? tokenDeploymentStatus.pending : status;

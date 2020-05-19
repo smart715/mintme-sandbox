@@ -163,11 +163,6 @@ export default {
                 .then(() => {
                     this.setShowPending = false;
                 });
-                // .then(()=> {
-                //     setTimeout(() => {
-                //         location.reload();
-                //     },2000)
-                // });
             }, 600000);
         },
     },
