@@ -60,7 +60,7 @@
                 </p>
             </div>
             <div
-                v-else-if="deployed"
+                v-else-if="showDeployed"
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
@@ -116,6 +116,9 @@ export default {
         showPending: function() {
             return this.isOwner && this.pending;
         },
+        showDeployed: function() {
+            return this.isOwner && this.deployed;
+        },
         btnDisabled: function() {
             return this.costExceed || this.deploying;
         },
@@ -158,7 +161,8 @@ export default {
             this.$axios.single.post(this.$routing.generate('token_deploy', {
                 name: this.name,
             }))
-            .then(() => {
+            .then((response) => {
+                console.log(response);
                 this.status = tokenDeploymentStatus.pending;
                 this.$emit('pending');
                 this.notifySuccess('Process in pending status and it will take some minutes to be done.');
@@ -175,19 +179,20 @@ export default {
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             })
-            .then(() => {
+            .then((response) => {
                 new Promise((resolve) => {
                     setTimeout(() => {
-                        resolve();
-                        this.status = tokenDeploymentStatus.deployed;
+                        resolve(response);
+                        this.status = tokenDeploymentStatus.deployed
                         this.$emit('deployed');
                         this.notifySuccess('Token has been successfully deployed');
+                        console.log('at end of promise deploy, status is ' + this.status);
                     }, 600000);
                 });
             })
             .then(() => {
                 this.deploying = false;
-                console.log('at end of deploy, status is ' + this.status);
+                console.log('at end of real deploy, status is ' + this.status);
             });
         },
     },

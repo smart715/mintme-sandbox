@@ -23,8 +23,6 @@ new Vue({
       tokenName: null,
       tokenPending: null,
       tokenDeployed: null,
-      reRenderTokenName: 0,
-      reRenderTokenDeployIcon: 0,
     };
   },
   components: {
@@ -39,6 +37,7 @@ new Vue({
     TokenPointsProgress,
   },
   updated: function() {
+    console.log('pair comp updated ' + this.tokenPending);
     console.log('pair comp updated ' + this.tokenDeployed);
   },
   methods: {
@@ -58,15 +57,14 @@ new Vue({
     },
     setTokenPending: function() {
       this.tokenPending = true;
+      console.log('emit deploy pending ' + this.tokenPending);
     },
     setTokenDeployed: function() {
       this.tokenDeployed = true;
       console.log('emit deploy complete ' + this.tokenDeployed);
-      this.reRenderTokenName++;
-      this.reRenderTokenDeployIcon++;
     },
     getTokenStatus: function(status) {
-      return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
+      return true === this.tokenPending ? tokenDeploymentStatus.pending : true === this.tokenDeployed ? tokenDeploymentStatus.deployed : status;
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;

@@ -139,9 +139,6 @@ export default {
             hasReleasePeriod: this.hasReleasePeriodProp,
         };
     },
-    mounted: function() {
-        console.log(this.isTokenDeployed + ' modal mounted');
-    },
     updated: function() {
         console.log(this.isTokenDeployed + ' modal updated');
     },
