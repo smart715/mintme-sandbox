@@ -67,8 +67,13 @@ class UpdatePendingWithdrawals extends Command
 
         $expires = new DateInterval('PT'.PendingWithdraw::EXPIRES_HOURS.'H');
 
+        $items = $this->getPendingWithdrawRepository()->findAll();
+
+        $itemsCount = count($items);
+        $pendingCount = 0;
+
         /** @var PendingWithdraw $item */
-        foreach ($this->getPendingWithdrawRepository()->findAll() as $item) {
+        foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $this->em->beginTransaction();
 
@@ -80,16 +85,25 @@ class UpdatePendingWithdrawals extends Command
                         Token::getFromCrypto($item->getCrypto()),
                         $item->getAmount()->getAmount()->add($item->getCrypto()->getFee())
                     );
+                    $this->em->commit();
+                    $pendingCount++;
                 } catch (Throwable $exception) {
+                    $message = $exception->getMessage();
+                    $this->logger->info("[withdrawals] Pending withdraval error: $message ...");
                     $this->em->rollback();
                 }
-
-                $this->em->commit();
             }
         }
 
+        $this->logger->info("[withdrawals] Pending withdraval total: $itemsCount, deleted: $pendingCount ..");
+
+        $items = $this->getPendingTokenWithdrawRepository()->findAll();
+
+        $itemsCount = count($items);
+        $pendingCount = 0;
+
         /** @var PendingTokenWithdraw $item */
-        foreach ($this->getPendingTokenWithdrawRepository()->findAll() as $item) {
+        foreach ($items as $item) {
             $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
             if (!$crypto) {
@@ -112,13 +126,17 @@ class UpdatePendingWithdrawals extends Command
                         Token::getFromCrypto($crypto),
                         $crypto->getFee()
                     );
+                    $this->em->commit();
+                    $pendingCount++;
                 } catch (Throwable $exception) {
+                    $message = $exception->getMessage();
+                    $this->logger->info("[withdrawals] Pending token withdraval error: $message ...");
                     $this->em->rollback();
                 }
-
-                $this->em->commit();
             }
         }
+
+        $this->logger->info("[withdrawals] Pending token withdraval total: $itemsCount, deleted: $pendingCount ..");
 
         $this->logger->info('[withdrawals] Update job finished..');
 
