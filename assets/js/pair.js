@@ -38,6 +38,9 @@ new Vue({
     TopHolders,
     TokenPointsProgress,
   },
+  updated: function() {
+    console.log('pair comp updated ' + this.tokenDeployed);
+  },
   methods: {
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
@@ -57,7 +60,6 @@ new Vue({
       this.tokenPending = true;
     },
     setTokenDeployed: function() {
-      this.tokenPending = null;
       this.tokenDeployed = true;
       this.reRenderTokenName++;
       this.reRenderTokenDeployIcon++;
