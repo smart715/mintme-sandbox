@@ -37,8 +37,8 @@ new Vue({
     TokenPointsProgress,
   },
   updated: function() {
-    console.log('pair comp updated ' + this.tokenPending);
-    console.log('pair comp updated ' + this.tokenDeployed);
+    console.log('pair comp upd pen is ' + this.tokenPending);
+    console.log('pair comp upd de is' + this.tokenDeployed);
   },
   methods: {
     descriptionUpdated: function(val) {
