@@ -98,7 +98,6 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
-
         if (99999999<(string)$request->get('priceInput')) {
             return $this->view([
                 'result' => 2,
