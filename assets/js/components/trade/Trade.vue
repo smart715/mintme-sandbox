@@ -305,7 +305,7 @@ export default {
                         return;
                     }
 
-                    this.ordersUpdated = false;
+                    this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
                     break;
             }
