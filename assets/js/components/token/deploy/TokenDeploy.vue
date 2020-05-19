@@ -101,6 +101,9 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
+            deployTimeout: null,
+            setDeployed: false,
+            setShowPending: false,
         };
     },
     computed: {
@@ -111,9 +114,11 @@ export default {
             return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
+            this.setDeployed;
             return tokenDeploymentStatus.deployed === this.status;
         },
         showPending: function() {
+            this.setShowPending;
             return this.isOwner && this.pending;
         },
         btnDisabled: function() {
@@ -126,16 +131,34 @@ export default {
             return new Decimal(this.webCost).greaterThan(this.balance);
         },
     },
-    mounted: function() {
-        console.log(this.notDeployed);
-        console.log(this.showPending);
-        console.log(this.deployed);
-    },
-    updated: function() {
-        console.log('token deploy updated!');
-        console.log('not deployed is' + this.notDeployed);
-        console.log('shw pending is ' + this.showPending);
-        console.log('deployed is' + this.deployed);
+    watch: {
+        notDeployed: function() {
+            clearTimeout(this.deployTimeout);
+            this.setShowPending = true;
+            this.setDeployed = false;
+            this.deployTimeout = setTimeout(() => {
+                this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
+                .then((response) => {
+                    if (response.data.deployed === true) {
+                        this.status = tokenDeploymentStatus.deployed;
+                        this.setDeployed = true;
+                        this.$emit('deployed');
+                        this.notifySuccess('Token has been successfully deployed');
+                        console.log(this.status);
+                    }
+                    }, (error) => {
+                        this.notifyError('An error has occurred, please try again later');
+                })
+                .then(() => {
+                    this.setShowPending = false;
+                })
+                .then(() => {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                });
+            }, 600000);
+        },
     },
     methods: {
         fetchBalances: function() {
@@ -158,8 +181,7 @@ export default {
             this.$axios.single.post(this.$routing.generate('token_deploy', {
                 name: this.name,
             }))
-            .then((response) => {
-                console.log(response);
+            .then(() => {
                 this.status = tokenDeploymentStatus.pending;
                 this.$emit('pending');
                 this.notifySuccess('Process in pending status and it will take some minutes to be done.');
@@ -175,17 +197,6 @@ export default {
                     this.notifyError('An error has occurred, please try again later');
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
-            })
-            .then((response) => {
-                new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve(response);
-                        this.status = tokenDeploymentStatus.deployed;
-                        this.$emit('deployed');
-                        this.notifySuccess('Token has been successfully deployed');
-                        console.log('at end of promise deploy, status is ' + this.status);
-                    }, 600000);
-                });
             })
             .then(() => {
                 this.deploying = false;

@@ -139,9 +139,6 @@ export default {
             hasReleasePeriod: this.hasReleasePeriodProp,
         };
     },
-    updated: function() {
-        console.log(this.isTokenDeployed + ' modal updated');
-    },
     computed: {
         isTokenNotDeployed: function() {
             return tokenDeploymentStatus.notDeployed === this.statusProp;

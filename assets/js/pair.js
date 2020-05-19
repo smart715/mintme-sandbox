@@ -36,10 +36,6 @@ new Vue({
     TopHolders,
     TokenPointsProgress,
   },
-  updated: function() {
-    console.log('pair comp upd pen is ' + this.tokenPending);
-    console.log('pair comp upd de is' + this.tokenDeployed);
-  },
   methods: {
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
@@ -57,13 +53,9 @@ new Vue({
     },
     setTokenPending: function() {
       this.tokenPending = true;
-      console.log('emit deploy pending ' + this.tokenPending);
     },
     setTokenDeployed: function() {
-      this.tokenPending = null;
       this.tokenDeployed = true;
-      console.log('emit deploy pending after deploy ' + this.tokenPending);
-      console.log('emit deploy complete ' + this.tokenDeployed);
     },
     getTokenStatus: function(status) {
       return true === this.tokenPending ? tokenDeploymentStatus.pending : true === this.tokenDeployed ? tokenDeploymentStatus.deployed : status;

@@ -110,9 +110,6 @@ export default {
             }
         }, 'token-name-asset-update');
     },
-    updated: function() {
-        console.log('token name comp : not deployed is ' + this.isTokenNotDeployed);
-    },
     methods: {
         closeTokenEditModal: function() {
             this.showTokenEditModal = false;
