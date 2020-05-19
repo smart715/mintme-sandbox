@@ -182,8 +182,8 @@ export default {
                 }
             }
 
-            if (this.tableData.length > 0 && this.tableData.length > newOrders.length) {
-                let removedOrder = this.tableData.filter((order) => {
+            if (orders.length > 0 && orders.length > newOrders.length) {
+                let removedOrder = orders.filter((order) => {
                     return !newOrders.some((order2) => order.price === order2.price);
                 });
 
