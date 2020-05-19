@@ -61,6 +61,7 @@ new Vue({
     },
     setTokenDeployed: function() {
       this.tokenDeployed = true;
+      console.log('emit deploy complete ' + this.tokenDeployed);
       this.reRenderTokenName++;
       this.reRenderTokenDeployIcon++;
     },
