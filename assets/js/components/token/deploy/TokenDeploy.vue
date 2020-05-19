@@ -183,7 +183,7 @@ export default {
                 new Promise((resolve) => {
                     setTimeout(() => {
                         resolve(response);
-                        this.status = tokenDeploymentStatus.deployed
+                        this.status = tokenDeploymentStatus.deployed;
                         this.$emit('deployed');
                         this.notifySuccess('Token has been successfully deployed');
                         console.log('at end of promise deploy, status is ' + this.status);
