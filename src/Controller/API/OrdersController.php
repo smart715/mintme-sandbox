@@ -98,12 +98,14 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
-      if (99999999<(string)$request->get('priceInput')) {
-          return $this->view([
-              'result' => 2,
-              'message' => 'The Price Over Exceeds The Maximum',
-          ], Response::HTTP_ACCEPTED);
-      }       
+
+        if (99999999<(string)$request->get('priceInput')) {
+            return $this->view([
+                'result' => 2,
+                'message' => 'The Price Over Exceeds The Maximum',
+            ], Response::HTTP_ACCEPTED);
+        }
+
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
 
