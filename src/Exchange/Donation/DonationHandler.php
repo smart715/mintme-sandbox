@@ -76,12 +76,11 @@ class DonationHandler implements DonationHandlerInterface
             $token->getProfile()->getUser()->getId()
         );
 
-        // TODO: check expected money to spend
-//        $expectedMoneyToSpend = $this->moneyWrapper->parse(
-//            $expectedData[1] ?? '0',
-//            Token::WEB_SYMBOL
-//        );
-//        $this->checkAmount($donorUser, $expectedMoneyToSpend, Token::WEB_SYMBOL);
+        $expectedMoneyToSpend = $this->moneyWrapper->parse(
+            $expectedData[1] ?? '0',
+            Token::WEB_SYMBOL
+        );
+        $this->checkAmount($donorUser, $expectedMoneyToSpend, Token::WEB_SYMBOL);
 
         return $expectedData[0] ?? '0';
     }
@@ -103,15 +102,17 @@ class DonationHandler implements DonationHandlerInterface
             $amountInWeb = $this->convertAmountToWeb($amountObj);
             $cryptos = $this->cryptoManager->findAllIndexed('symbol');
 
-            $this->balanceHandler->withdraw(
+            $this->balanceHandler->update(
                 $donorUser,
                 Token::getFromCrypto($cryptos[Token::BTC_SYMBOL]),
-                $amountObj
+                $amountObj->negative(),
+                'donation'
             );
-            $this->balanceHandler->deposit(
+            $this->balanceHandler->update(
                 $donorUser,
                 Token::getFromCrypto($cryptos[Token::WEB_SYMBOL]),
-                $amountInWeb
+                $amountInWeb,
+                'donation'
             );
 
             $amountObj = $amountInWeb;
