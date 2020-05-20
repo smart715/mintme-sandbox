@@ -63,7 +63,8 @@ describe('WithdrawModal', () => {
         moxios.uninstall();
     });
 
-    const addressOk = 'abcd12345678901234567890123456789';
+    const addressOk = '0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359';
+    const addressNotOk = '00fB6916095ca1df60bB79Ce92cE3Ea74c37c5d359';
     const amountOk = 100;
     const subunitOk = 0;
     const maxAmountOk = '1000';
@@ -300,5 +301,15 @@ describe('WithdrawModal', () => {
             expect(wrapper.vm.withdrawing).to.be.false;
             done();
         });
+    });
+
+    it('provide address without "0x" for web currencies', () => {
+        propsForTestCorrectlyRenders.currency = 'WEB';
+        const wrapper = shallowMount(WithdrawModal, {
+            propsData: propsForTestCorrectlyRenders,
+        });
+        wrapper.vm.address = addressNotOk;
+        wrapper.vm.$v.$touch();
+        expect(wrapper.vm.$v.address.$error).to.be.true;
     });
 });
