@@ -136,6 +136,7 @@
                                         release-address="{{ token.mintDestination }}"
                                         @token-deploy-pending="setTokenPending"
                                         @token-deployed="setTokenDeployed"
+                                        :airdrop-params="{{ airdrop_params | json_encode }}"
                                 />
                             </div>
                         </li>

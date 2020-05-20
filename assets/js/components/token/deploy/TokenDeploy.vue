@@ -56,7 +56,7 @@
                         class="loading-spinner"
                         fixed-width
                     />
-                    Deployment is pending. It might take a few moments.
+                    Deployment is pending. It may take a few moments.
                 </p>
             </div>
             <div
@@ -102,8 +102,6 @@ export default {
             status: this.statusProp,
             webCost: null,
             deployTimeout: null,
-            setDeployed: false,
-            setShowPending: false,
         };
     },
     computed: {
@@ -114,11 +112,9 @@ export default {
             return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
-            this.setDeployed;
             return tokenDeploymentStatus.deployed === this.status;
         },
         showPending: function() {
-            this.setShowPending;
             return this.isOwner && this.pending;
         },
         btnDisabled: function() {
@@ -131,26 +127,25 @@ export default {
             return new Decimal(this.webCost).greaterThan(this.balance);
         },
     },
-    watch: {
+watch: {
         notDeployed: function() {
             clearTimeout(this.deployTimeout);
-            this.setShowPending = true;
-            this.setDeployed = false;
+            this.showPending = true;
+            this.deployed = false;
             this.deployTimeout = setTimeout(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
                     if (response.data.deployed === true) {
                         this.status = tokenDeploymentStatus.deployed;
-                        this.setDeployed = true;
+                        this.deployed = true;
                         this.$emit('deployed');
                         this.notifySuccess('Token has been successfully deployed');
-                        console.log(this.status);
                     }
                     }, (error) => {
                         this.notifyError('An error has occurred, please try again later');
                 })
                 .then(() => {
-                    this.setShowPending = false;
+                    this.showPending = false;
                 })
                 .then(() => {
                     setTimeout(() => {
@@ -198,9 +193,7 @@ export default {
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             })
-            .then(() => {
-                this.deploying = false;
-            });
+            .then(() => this.deploying = false);
         },
     },
     mounted() {

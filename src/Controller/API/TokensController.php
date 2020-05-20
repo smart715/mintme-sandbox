@@ -417,7 +417,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             Token::NOT_DEPLOYED === $token->getDeploymentStatus()
         );
     }
-    
+
     /**
      * @Rest\View()
      * @Rest\Get("/{name}/is_deployed", name="is_token_deployed", options={"expose"=true})
@@ -426,7 +426,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     {
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (!$token) {
             throw $this->createNotFoundException('Token does not exist');
         }
 
