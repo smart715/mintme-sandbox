@@ -2,6 +2,10 @@ import {helpers} from 'vuelidate/lib/validators';
 
 // validation for address
 export const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
+export const addressFirstSymbol = {
+    'WEB': (address) => address.startsWith('0x'),
+    'BTC': () => true,
+};
 export const zipCodeContain = helpers.regex('zipCode', /^[a-zA-Z0-9-\s]+$/u);
 export const tokenValidFirstChars = helpers.regex('firstChars', /^[-\s]+/u);
 export const tokenValidLastChars = helpers.regex('lastChars', /[-\s]+$/u);
