@@ -1,4 +1,4 @@
-version: "2.2"
+version: "2.4"
 services:
   # APP
   panel:
@@ -119,7 +119,7 @@ services:
     volumes:
       - .docker/sql:/docker-entrypoint-initdb.d
       - .docker/my.cnf:/etc/mysql/my.cnf
-      - .docker/db:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
 
   rabbitmq:
     build: .docker/rabbitmq
@@ -215,7 +215,7 @@ services:
   mq:
     container_name: btc-kafka
     image: wurstmeister/kafka
-    restart: on-failure:5
+    restart: on-failure
     ports:
       - 19092:9092
     environment:
@@ -229,7 +229,8 @@ services:
       - backend
 
 volumes:
-  webchaind_root: ~
+  webchaind_root:
+  mariadb-data:
 
 networks:
   backward:
