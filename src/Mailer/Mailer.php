@@ -183,11 +183,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
     public function sendNewDeviceDetectedMail(user $user, UserLoginInfo $userDeviceInfo): void
     {
-        $userTwoFa = $user->isGoogleAuthenticatorEnabled();
-        $message = $userTwoFa ?
-            'Our system has detected a new login attempt from new IP address.' :
-            'Our system has detected a new successful login from new IP address.';
-
+        $message = 'Our system has detected a new login attempt from new IP address.';
         $body = $this->twigEngine->render('mail/new_device_detected.html.twig', [
             'message' => $message,
             'username' => $user->getUsername(),
@@ -200,10 +196,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'user_device_info' => $userDeviceInfo,
         ]);
 
-        $subjectMsg = $userTwoFa ?
-            'New login attempt from new IP address' :
-            'New successful login from new IP address';
-
+        $subjectMsg = 'New login attempt from new IP address';
         $msg = (new Swift_Message($subjectMsg))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
