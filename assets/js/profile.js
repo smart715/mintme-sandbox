@@ -29,8 +29,10 @@ new Vue({
             zipCodeValid: true,
             zipCodeVaidationPattern: false,
             zipCodeProcessing: false,
-            firstNameAux: '',
-            lastNameAux: '',
+            firstNameAux : false,
+            lastNameAux : false,
+            firstNameMin : false,
+            lastNameMin : false,
         };
     },
     mounted: function() {
@@ -53,21 +55,21 @@ new Vue({
     methods: {
         toggleZipCodeInputDisabled: function(state) {
             if (this.$refs.zipCode) {
-                this.$refs.zipCode.disabled = state;
+            this.$refs.zipCode.disabled = state;
             }
         },
 
         firstNameValidation: function(event) {
             const hasChinese = this.firstName.match(REGEX_CHINESE);
             if (hasChinese) {
-                // this means only chinese characters are typed, no validation needed here
-                this.firstNameAux = '';
+                // this means only chinese characters are typed
+                this.firstNameAux = false;
             } else {
-                // this means regular characters are typed, we activate the minLength validation
+                // this means regular characters are typed
                 if (this.firstName.length < 2) {
-                    this.firstNameAux = 'ok';
+                    this.firstNameAux = true;
                 } else {
-                    this.firstNameAux = '';
+                    this.firstNameAux = false;
                 }
             }
         },
@@ -75,14 +77,14 @@ new Vue({
         lastNameValidation: function(event) {
             const hasChinese = this.lastName.match(REGEX_CHINESE);
             if (hasChinese) {
-                // this means only chinese characters are typed, no validation needed here
-                this.lastNameAux = '';
+                // this means only chinese characters are typed
+                this.lastNameAux = false;
             } else {
-                // this means regular characters are typed, we activate the minLength validation
+                // this means regular characters are typed
                 if (this.lastName.length < 2) {
-                    this.lastNameAux = 'ok';
+                    this.lastNameAux = true;
                 } else {
-                    this.lastNameAux = '';
+                    this.lastNameAux = false;
                 }
             }
         },
@@ -137,11 +139,11 @@ new Vue({
     validations: {
         firstName: {
             helpers: names,
-            // minLength: minLength(2),
+            //minLength: minLength(2),
         },
         lastName: {
             helpers: names,
-            // minLength: minLength(2),
+            //minLength: minLength(2),
         },
         city: {
             helpers: names,
