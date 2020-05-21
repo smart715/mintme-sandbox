@@ -72,9 +72,11 @@ class Post
         return $this->id;
     }
 
-    public function setContent(string $content): void
+    public function setContent(string $content): self
     {
         $this->content = $content;
+
+        return $this;
     }
 
     /**
@@ -88,9 +90,11 @@ class Post
     /**
      * @ORM\PrePersist
      */
-    public function setCreatedAt(): void
+    public function setCreatedAt(): self
     {
         $this->createdAt = new \DateTimeImmutable();
+
+        return $this;
     }
 
     /**
@@ -104,9 +108,11 @@ class Post
     /**
      * @ORM\PreUpdate
      */
-    public function setUpdatedAt(): void
+    public function setUpdatedAt(): self
     {
         $this->updatedAt = new \DateTimeImmutable();
+
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
@@ -114,9 +120,11 @@ class Post
         return $this->updatedAt;
     }
 
-    public function setToken(Token $token): void
+    public function setToken(Token $token): self
     {
         $this->token = $token;
+
+        return $this;
     }
 
     /** @Groups({"Default", "API"}) */
@@ -125,9 +133,11 @@ class Post
         return $this->token;
     }
 
-    public function setAmount(Money $amount): void
+    public function setAmount(Money $amount): self
     {
         $this->amount = $amount->getAmount();
+
+        return $this;
     }
 
     /**

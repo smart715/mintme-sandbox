@@ -74,9 +74,7 @@ class PostVoter extends Voter
 
     private function canEdit(Post $post, ?User $user): bool
     {
-        return $user
-            ? $post->getAuthor()->getUser() === $user
-            : false;
+        return $post->getAuthor()->getUser() === $user;
     }
 
     private function checkBalance(User $user, Token $token, Money $amount): bool
