@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class TokenVoter extends Voter
 {
     private const EDIT = 'edit';
+    private const DELETE = 'delete';
 
     /** @var TokenManagerInterface $tokenManager */
     private $tokenManager;
@@ -25,7 +26,7 @@ class TokenVoter extends Voter
      */
     protected function supports($attribute, $subject): bool
     {
-        return self::EDIT === $attribute && $subject instanceof Token;
+        return in_array($attribute, [self::EDIT, self::DELETE], true) && $subject instanceof Token;
     }
 
     /**
@@ -33,6 +34,7 @@ class TokenVoter extends Voter
      */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
+        /** @psalm-suppress UndefinedDocblockClass */
         $user = $token->getUser();
 
         if (!$user instanceof User) {
@@ -43,10 +45,17 @@ class TokenVoter extends Voter
         /** @var Token $tokenEntity */
         $tokenEntity = $subject;
 
-        return $this->canEdit($tokenEntity);
+        switch ($attribute) {
+            case self::EDIT:
+                return $this->ownToken($tokenEntity);
+            case self::DELETE:
+                return $this->ownToken($tokenEntity);
+        }
+
+        return false;
     }
 
-    private function canEdit(Token $token): bool
+    private function ownToken(Token $token): bool
     {
         return $this->tokenManager->getOwnToken() === $token;
     }

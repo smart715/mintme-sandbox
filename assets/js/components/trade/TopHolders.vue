@@ -1,29 +1,17 @@
 <template>
-    <div class="card h-100">
+    <div class="card h-100 top-holders">
         <div class="card-header">
             Top Holders
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive fixed-head-table">
+            <div class="table-responsive">
                 <template v-if="loaded">
                     <b-table v-if="hasTraders"
                      ref="table"
                     :items="traders"
                     :fields="fields">
                     <template v-slot:cell(trader)="row">
-                        <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                            <a
-                                :href="row.item.url"
-                                class="d-inline-block truncate-name w-100 mr-1"
-                                v-b-tooltip="{title: row.value, boundary:'viewport'}"
-                            >
-                                {{ row.value }}
-                            </a>
-                            <img
-                                src="../../../img/avatar.png"
-                                class="d-block"
-                                alt="avatar">
-                        </div>
+                        <holder-name :value="row.value" :url="row.item.url"/>
                     </template>
                 </b-table>
                     <div v-else>
@@ -52,10 +40,14 @@ import moment from 'moment';
 import {formatMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins';
+import HolderName from './HolderName';
 
 export default {
     name: 'TopHolders',
     mixins: [FiltersMixin, LoggerMixin, NotificationMixin],
+    components: {
+        HolderName,
+    },
     props: {
       tokenName: String,
     },

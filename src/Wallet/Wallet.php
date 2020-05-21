@@ -16,6 +16,7 @@ use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
+use App\Wallet\Exception\IncorrectAddressException;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
@@ -93,7 +94,7 @@ class Wallet implements WalletInterface
 
         $history = array_merge($depositHistory, $withdrawHistory, $tokenTransactionHistory);
 
-        usort($history, function (Transaction $first, Transaction $second): bool {
+        usort($history, function (Transaction $first, Transaction $second) {
             return $first->getDate()->getTimestamp() < $second->getDate()->getTimestamp();
         });
 
@@ -124,19 +125,25 @@ class Wallet implements WalletInterface
             throw new NotFoundTokenException();
         }
 
+        if (Token::WEB_SYMBOL === $crypto->getSymbol()) {
+            if (!$this->validateEtheriumAddress($address->getAddress())) {
+                throw new IncorrectAddressException();
+            }
+        }
+        
         $available = $this->tokenManager->getRealBalance(
             $token,
             $this->balanceHandler->balance($user, $token)
         )->getAvailable();
 
         $this->logger->info(
-            "Created a new withdraw request for '{$user->getEmail()}' to 
+            "Created a new withdraw request for '{$user->getEmail()}' to
             send {$amount->getAmount()->getAmount()} {$tradable->getSymbol()} on {$address->getAddress()}"
         );
 
         if ($available->lessThan($amount->getAmount()->add($fee))) {
             $this->logger->warning(
-                "Requested balance for user '{$user->getEmail()}'. 
+                "Requested balance for user '{$user->getEmail()}'.
                 Not enough amount to pay {$amount->getAmount()->getAmount()} {$tradable->getSymbol()}
                 Available amount: {$available->getAmount()} {$tradable->getSymbol()}"
             );
@@ -269,5 +276,15 @@ class Wallet implements WalletInterface
         }
 
         return true;
+    }
+    
+    private function validateEtheriumAddress(string $address): bool
+    {
+        return $this->startsWith($address, '0x') && 42 === strlen($address);
+    }
+    
+    private function startsWith(string $haystack, string $needle): bool
+    {
+        return substr($haystack, 0, strlen($needle)) === $needle;
     }
 }

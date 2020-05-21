@@ -63,10 +63,13 @@ class OrdersController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
+        /** @var  \App\Entity\User $currentUser */
+        $currentUser = $this->getUser();
+
         foreach ($request->get('orderData') as $id) {
             $order = new Order(
                 $id,
-                $this->getUser(),
+                $currentUser,
                 null,
                 $market,
                 new Money('0', new Currency($market->getQuote()->getSymbol())),
@@ -95,8 +98,11 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
+        /** @var  \App\Entity\User $currentUser */
+        $currentUser = $this->getUser();
+
         $tradeResult = $exchanger->placeOrder(
-            $this->getUser(),
+            $currentUser,
             $market,
             (string)$request->get('amountInput'),
             (string)$request->get('priceInput'),
@@ -157,7 +163,9 @@ class OrdersController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
+        /** @var  \App\Entity\User $user*/
         $user = $this->getUser();
+
         $markets = $this->marketManager->createUserRelated($user);
 
         if (!$markets) {

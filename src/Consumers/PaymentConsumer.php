@@ -118,7 +118,11 @@ class PaymentConsumer implements ConsumerInterface
         if (self::STATUS_FAIL === $clbResult->getStatus()) {
             try {
                 $strategy = $tradable instanceof Token
-                    ? new PaymentTokenStrategy($this->balanceHandler, $this->cryptoManager)
+                    ? new PaymentTokenStrategy(
+                        $this->balanceHandler,
+                        $this->cryptoManager,
+                        $this->moneyWrapper
+                    )
                     : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
                 $balanceContext = new BalanceContext($strategy);
@@ -136,9 +140,10 @@ class PaymentConsumer implements ConsumerInterface
                 return false;
             }
         } elseif (self::STATUS_OK === $clbResult->getStatus()) {
+            /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(
-                WithdrawCompletedEvent::NAME,
-                new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount())
+                new WithdrawCompletedEvent($tradable, $user, $clbResult->getAmount()),
+                WithdrawCompletedEvent::NAME
             );
         }
 

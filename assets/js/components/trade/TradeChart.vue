@@ -9,7 +9,7 @@
                             Last price
                         </template>
                         <template slot="body">
-                            Price per one {{ market.quote.symbol|rebranding }} for last transaction.
+                            Price per one {{ market.quote|rebranding }} for last transaction.
                         </template>
                     </guide>
                     <br>
@@ -35,7 +35,7 @@
                             24h/30d volume
                         </template>
                         <template slot="body">
-                            The amount of {{ market.quote.symbol|rebranding }} that has been traded in the last 24 hours and the last 30 days.
+                            The amount of {{ market.quote |rebranding }} that has been traded in the last 24 hours and the last 30 days.
                         </template>
                     </guide>
                     <br>
@@ -61,7 +61,7 @@
                             Market Cap
                         </template>
                         <template slot="body">
-                            Market cap of {{ market.quote.symbol|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created. Marketcap is not shown if 30d volume is lower than {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
+                            Market cap of {{ market.quote|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created. Marketcap is not shown if 30d volume is lower than {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
                         </template>
                     </guide>
                     <br>
@@ -73,7 +73,6 @@
                     <ve-candle
                         class="m-2"
                         :extend="additionalAttributes"
-                        :right-label="rightLabel"
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(market.base.subunit)"
@@ -113,7 +112,6 @@ export default {
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
         return {
-            rightLabel: true,
             chartTheme: VeLineTheme,
             chartSettings: {
                 labelMap: {
@@ -147,11 +145,15 @@ export default {
                         apply: [0, 1],
                         min,
                         minInterval: min,
+                        axisLabel: {
+                            formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit))
+                                .toFixed(8).toString().replace(/0+$/, ''),
+                        },
                     },
                     {
-                        apply: 'all',
+                        apply: [1],
                         axisLabel: {
-                            formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit)).toString(),
+                            show: false,
                         },
                     },
                 ],
@@ -342,7 +344,7 @@ export default {
             return 0;
         },
         handleRightLabel() {
-            this.rightLabel = ['lg', 'xl'].includes(getBreakPoint());
+            this.additionalAttributes.yAxis[1].axisLabel.show = ['lg', 'xl'].includes(getBreakPoint());
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {

@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketCapCalculator;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -11,6 +12,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -29,7 +31,13 @@ class MarketsController extends APIController
         MarketFactoryInterface $marketManager
     ): View {
 
-        $markets = $marketManager->createUserRelated($this->getUser());
+        $currentUser = $this->getUser();
+
+        if (!$currentUser || !$currentUser instanceof User) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $markets = $marketManager->createUserRelated($currentUser);
 
         return $this->view($markets);
     }
@@ -46,9 +54,13 @@ class MarketsController extends APIController
         MarketStatusManagerInterface $marketStatusManager
     ): View {
         $deployed = !!$request->get('deployed');
+
+        /** @var User $user */
+        $user = $this->getUser();
+
         $markets = $request->get('user') || $deployed
             ? $marketStatusManager->getUserMarketStatus(
-                $this->getUser(),
+                $user,
                 ($page - 1) * self::OFFSET,
                 self::OFFSET,
                 $deployed

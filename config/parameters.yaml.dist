@@ -65,7 +65,6 @@ parameters:
     deploy_cost: 99
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
-    mintme_address: '0xf69a0cf26ac7cc8b516bfb1e7038f6756710e70f'
 
     # Expiration time for token deletion confirm code (minutes)
     # Accepts an integer value:
@@ -115,5 +114,18 @@ parameters:
 
     # max top holders for each token
     top_holders: 10
+
+    airdrop_params:
+        min_tokens_amount: 0.01
+        min_participants_amount: 100
+        max_participants_amount: 999999
+        min_token_reward: 0.0001
+    # forward proxy for hiding real mintme server IP when verifying token owner's website
+    # see guzzlephp docs for syntax: http://docs.guzzlephp.org/en/stable/request-options.html?highlight=proxy#proxy
+    # to disable the proxy, set empty string ''
+    website_verify_proxy: 'http://mintme:Iw87wqelIwsced823FXuswL9@212.32.255.5:38425'
+
+    #host for urls generated on commands
+    mintme_url: 'mintme.com'
 
     contact_email: support@mintme.com

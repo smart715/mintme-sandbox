@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /* Cron job added to DB. */
 class UpdateDisposableEmailDomains extends Command
@@ -46,8 +47,11 @@ class UpdateDisposableEmailDomains extends Command
             ->setDescription('Synchronize domains list');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         $this->logger->info('[blacklist] Update job started..');
         $this->logger->info('[blacklist] Domains from index fetch start..');
 
@@ -81,8 +85,10 @@ class UpdateDisposableEmailDomains extends Command
 
         $this->em->flush();
 
-        $output->writeln('Synchronization completed');
+        $io->success('Synchronization completed');
         $this->logger->info('[blacklist] Update job finished..');
+
+        return 0;
     }
 
     /** @param array<Blacklist> $list */

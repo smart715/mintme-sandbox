@@ -29,7 +29,8 @@ class ShowBlacklisted extends Command
             ->addArgument('type', InputArgument::OPTIONAL, 'Blacklist type, e.g. "token"');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var string|null $type */
         $type = $input->getArgument('type');
@@ -41,11 +42,13 @@ class ShowBlacklisted extends Command
         if (!$list) {
             $style->success("No entries found");
 
-            return;
+            return 0;
         }
 
         $style->table(['type', 'value'], array_map(function (Blacklist $blacklist) {
             return [$blacklist->getType(), $blacklist->getValue()];
         }, $list));
+
+        return 0;
     }
 }
