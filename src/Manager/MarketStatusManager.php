@@ -19,12 +19,24 @@ use InvalidArgumentException;
 class MarketStatusManager implements MarketStatusManagerInterface
 {
     private const SORTS = [
-        'lastPrice' => 'to_number(ms.lastPrice)',
-        'monthVolume' => 'to_number(ms.monthVolume)',
-        'dayVolume' => 'to_number(ms.dayVolume)',
-        'change' => 'change',
-        'marketCap' => 'to_number(ms.lastPrice)',
-        'pair' => 'qt.name',
+        'to_number(ms.lastPrice)',
+        'to_number(ms.monthVolume)',
+        'to_number(ms.dayVolume)',
+        'change',
+        'qt.name',
+    ];
+
+    private const SORTS_MAP = [
+        'lastPrice' => 0,
+        'lastPriceUSD' => 0,
+        'marketCap' => 0,
+        'marketCapUSD' => 0,
+        'monthVolume' => 1,
+        'monthVolumeUSD' => 1,
+        'dayVolume' => 2,
+        'dayVolumeUSD' => 2,
+        'change' => 3,
+        'pair' => 4,
     ];
 
     private const SORT_BY_CHANGE = 'change';
@@ -103,7 +115,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $queryBuilder->addSelect("change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change");
         }
 
-        $sort = self::SORTS[$sort] ?? self::SORTS['monthVolume'];
+        $sort = isset(self::SORTS_MAP[$sort])
+            ? self::SORTS[self::SORTS_MAP[$sort]]
+            : self::SORTS[self::SORTS_MAP['monthVolume']];
         $order = "ASC" === $order
             ? "ASC"
             : "DESC";

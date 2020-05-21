@@ -28,24 +28,6 @@
             </b-dropdown>
         </div>
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-            <div class="col-6">
-                <b-form-select v-model="sortBy">
-                    <b-form-select-option v-for="field in fields" :key="field.key"
-                        :value="field.key"
-                    >
-                        {{ field.label }}
-                    </b-form-select-option>
-                </b-form-select>
-                <b-form-select v-model="sortDesc">
-                    <b-form-select-option :value="true">
-                        DESC
-                    </b-form-select-option>
-                    <b-form-select-option :value="false">
-                        ASC
-                    </b-form-select-option>
-                </b-form-select>
-                <button class="btn btn-primary" @click="updateMarkets(1)">Sort</button>
-            </div>
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <b-dropdown
                 v-if="userId" class="float-right pr-3"
@@ -177,7 +159,7 @@
             </template>
             <div class="row justify-content-center">
                 <b-pagination
-                    @change="updateMarkets"
+                    @change="updateMarkets($event, deployedFirst)"
                     :total-rows="totalRows"
                     :per-page="perPage"
                     v-model="currentPage"
@@ -201,6 +183,9 @@ import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
 
+const DEPLOYED_FIRST = 1;
+const DEPLOYED_ONLY = 2;
+
 export default {
     name: 'Trading',
     mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
@@ -217,6 +202,7 @@ export default {
     },
     data() {
         return {
+            deployedFirst: true,
             tableLoading: false,
             markets: null,
             currentPage: this.page,
@@ -232,7 +218,7 @@ export default {
             enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
-            sortBy: 'monthVolume',
+            sortBy: '',
             sortDesc: true,
             globalMarketCaps: {
                 BTC: 0,
@@ -358,7 +344,7 @@ export default {
             this.marketFilters.selectedFilter = value;
             this.sortBy = '';
             this.sortDesc = true;
-            this.updateMarkets(1);
+            this.updateMarkets(1, true);
         },
         toggleUsd: function(show) {
             this.showUsd = show;
@@ -370,7 +356,7 @@ export default {
         initialLoad: function() {
             this.loading = true;
             this.fetchGlobalMarketCap();
-            let updateDataPromise = this.updateRawMarkets();
+            let updateDataPromise = this.updateRawMarkets(this.currentPage, true);
             let conversionRatesPromise = this.fetchConversionRates();
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
@@ -415,14 +401,17 @@ export default {
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
             return pair ? 0 : b[key].localeCompare(a[key]);
         },
-        updateRawMarkets: function(page = null) {
+        updateRawMarkets: function(page = null, deployedFirst = null) {
             return new Promise((resolve, reject) => {
                 page = page === null ? this.currentPage : page;
+                deployedFirst = deployedFirst === null ? this.deployedFirst : deployedFirst;
 
+                // So that 'pair' column will be sorted A-Z on first click (which is DESC and would be Z-A)
+                let order = this.sortBy === this.fields.pair.key ? !this.sortDesc : this.sortDesc;
                 let params = {
                     page,
                     sort: this.sortBy,
-                    order: this.sortDesc ? 'DESC' : 'ASC',
+                    order: order ? 'DESC' : 'ASC',
                 };
 
                 if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
@@ -430,7 +419,9 @@ export default {
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key && this.userId
                 ) {
-                    params.deployed = 1;
+                    params.deployed = DEPLOYED_ONLY;
+                } else if(deployedFirst) {
+                    params.deployed = DEPLOYED_FIRST;
                 }
 
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
@@ -442,7 +433,7 @@ export default {
                         ) {
                             console.log("HOLA");
                             this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
-                            return this.updateRawMarkets().then(resolve, reject);
+                            return this.updateRawMarkets(page, deployedFirst).then(resolve, reject);
                         }
 
                         if (null !== this.markets) {
@@ -456,6 +447,7 @@ export default {
                             });
                         }
 
+                        this.deployedFirst = deployedFirst;
                         this.currentPage = page;
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
@@ -782,16 +774,16 @@ export default {
                 return token;
             });
         },
-        updateMarkets: function(page = null) {
+        updateMarkets: function(page = null, deployedFirst = null) {
             this.tableLoading = true;
-            return this.updateRawMarkets(page)
+            return this.updateRawMarkets(page, deployedFirst)
                 .then(() => this.updateSanitizedMarkets())
                 .then(() => this.tableLoading = false);
         },
         sortChanged: function(ctx) {
             this.sortBy = ctx.sortBy;
             this.sortDesc = ctx.sortDesc;
-            this.updateMarkets();
+            this.updateMarkets(1, false);
         }
     },
 };
