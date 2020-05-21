@@ -144,7 +144,7 @@ import {
 import Guide from '../Guide';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {webSymbol, btcSymbol, HTTP_ACCEPTED, BTC, MINTME} from '../../utils/constants';
+import {webSymbol, btcSymbol, HTTP_ACCEPTED, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
 
 export default {
     name: 'Donation',
@@ -304,7 +304,13 @@ export default {
                     this.donationChecking = false;
                 })
                 .catch((err) => {
-                    this.notifyError('Can not to calculate amount of tokens. Try again later.');
+                    if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
+                        this.notifyError(err.response.data.message);
+                    } else {
+                        this.notifyError('Can not to calculate amount of tokens. Try again later.');
+                    }
+
+                    this.donationChecking = false;
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', err);
                 });
         },

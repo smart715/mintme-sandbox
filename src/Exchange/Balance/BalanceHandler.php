@@ -186,6 +186,11 @@ class BalanceHandler implements BalanceHandlerInterface
             throw $exception;
         }
 
+        $this->updateUserTokenRelation($user, $token);
+    }
+
+    public function updateUserTokenRelation(User $user, Token $token): void
+    {
         if (!in_array($token, $user->getTokens()) && $token->getId()) {
             $userToken = (new UserToken())->setToken($token)->setUser($user);
             $this->entityManager->persist($userToken);

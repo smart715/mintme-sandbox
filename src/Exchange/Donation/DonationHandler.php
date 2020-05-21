@@ -10,7 +10,6 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
@@ -76,12 +75,6 @@ class DonationHandler implements DonationHandlerInterface
             $token->getProfile()->getUser()->getId()
         );
 
-        $expectedMoneyToSpend = $this->moneyWrapper->parse(
-            $expectedData[1] ?? '0',
-            Token::WEB_SYMBOL
-        );
-        $this->checkAmount($donorUser, $expectedMoneyToSpend, Token::WEB_SYMBOL);
-
         return $expectedData[0] ?? '0';
     }
 
@@ -126,6 +119,8 @@ class DonationHandler implements DonationHandlerInterface
             $expectedAmount,
             $token->getProfile()->getUser()->getId()
         );
+
+        $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
     }
 
     private function convertAmountToWeb(Money $amount): Money
