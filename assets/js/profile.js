@@ -29,10 +29,10 @@ new Vue({
             zipCodeValid: true,
             zipCodeVaidationPattern: false,
             zipCodeProcessing: false,
-            firstNameAux : false,
-            lastNameAux : false,
-            firstNameMin : false,
-            lastNameMin : false,
+            firstNameAux: false,
+            lastNameAux: false,
+            firstNameMin: false,
+            lastNameMin: false,
         };
     },
     mounted: function() {
@@ -139,11 +139,11 @@ new Vue({
     validations: {
         firstName: {
             helpers: names,
-            //minLength: minLength(2),
+            // minLength: minLength(2),
         },
         lastName: {
             helpers: names,
-            //minLength: minLength(2),
+            // minLength: minLength(2),
         },
         city: {
             helpers: names,
