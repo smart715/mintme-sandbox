@@ -61,8 +61,11 @@
       justify-content: space-between
 
       th
-        width: 100px
+        width: auto
 
+        @include media-breakpoint-down(md)
+          width: 100px;
+        
   tbody
     max-height: 17.7rem
     display: block
