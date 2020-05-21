@@ -58,24 +58,26 @@
                                     discord-url="{{ token.discordUrl }}"
                                     @updated-website="websiteUpdated"
                                     @updated-facebook="facebookUpdated"
-                                    @updated-youtube="youtubeUpdated"                                                                                                          
+                                    @updated-youtube="youtubeUpdated"
                             >
                             </token-introduction-profile>
                             <token-introduction-statistics
-                                    class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
-                                    :market="{{ market | json_encode }}"
-                                    :editable="{{ isOwner }}"
-                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
-                                    twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
-                                    token-created="{{ token.getCreated().format('d M Y') }}"
-                                    :precision="{{ precision }}">
+                                class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
+                                :market="{{ market | json_encode }}"
+                                :editable="{{ isOwner }}"
+                                release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
+                                token-created="{{ token.getCreated().format('d M Y') }}"
+                                :precision="{{ precision }}"
+                                websocket-url="{{ global_websocket_url }}"
+                            >
                             </token-introduction-statistics>
                             <top-holders
                                     class="col-12 mt-3"
                                     :token-name="{{ market.quote.symbol | json_encode }}">
                             </top-holders>
                         </div>
-                    </b-tab>                    
+                    </b-tab>
                 {% endif %}
                 {% if showTrade %}
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>

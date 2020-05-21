@@ -71,6 +71,10 @@
                                     </template>
                                 </guide>
                             </div>
+                            <div class="pb-1">
+                                Donation volume: <br />
+                                {{ tokeDonationVolume }}
+                            </div>
                         </div>
                         <div class="col px-1">
                             <div class="font-weight-bold pb-4">
@@ -161,15 +165,14 @@
 import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
-import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
+import {LoggerMixin, MoneyFilterMixin, NotificationMixin, WebSocketMixin} from '../../../mixins';
 import {mapGetters, mapMutations} from 'vuex';
-
 
 const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
-    mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin, WebSocketMixin],
     components: {
         Guide,
     },
@@ -177,6 +180,7 @@ export default {
         tokenCreated: String,
         market: Object,
         precision: Number,
+        websocketUrl: String,
     },
     data() {
         return {
@@ -185,6 +189,7 @@ export default {
             isTokenExchanged: true,
             defaultValue: defaultValue,
             tokenWithdrawn: 0,
+            donationVolume: 0,
         };
     },
     mounted: function() {
@@ -234,6 +239,18 @@ export default {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
+
+        this.sendMessage(JSON.stringify({
+            method: 'kline.subscribe',
+            params: [this.market.identifier, 24 * 60 * 60],
+            id: parseInt(Math.random().toString().replace('0.', '')),
+        }));
+
+        this.addMessageHandler((result) => {
+            if ('kline.update' === result.method) {
+                this.donationVolume = result.params[0][8] || 0;
+            }
+        });
     },
     methods: {
         ...mapMutations('tokenStatistics', [
@@ -247,6 +264,9 @@ export default {
         },
         walletBalance: function() {
             return this.stats.releasedAmount !== '-' ? toMoney(this.stats.releasedAmount) : toMoney(this.tokenExchangeAmount);
+        },
+        tokeDonationVolume: function() {
+            return this.donationVolume;
         },
         activeOrdersSum: function() {
             let sum = new Decimal(0);
