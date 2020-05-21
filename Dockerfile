@@ -37,11 +37,6 @@ COPY docker-entrypoint.sh /usr/local/bin/app-docker-entrypoint.sh
 
 RUN chmod 755 /usr/local/bin/app-docker-entrypoint.sh
 
-# Set permissions
-RUN chown -R :www-data /var/www/html/panel/
-RUN chmod -R g+w /var/www/html/panel/var/
-RUN chmod -R g+s /var/www/html/panel/
-
 WORKDIR /var/www/html/panel
 
 ENTRYPOINT ["app-docker-entrypoint.sh"]
