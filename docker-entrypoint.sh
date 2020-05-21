@@ -33,9 +33,9 @@ npm run dev
 composer install
 
 # Set permissions
-RUN chown -R :www-data /var/www/html/panel/
-RUN chmod -R g+w /var/www/html/panel/var/
-RUN chmod -R g+s /var/www/html/panel/
+chown -R :www-data /var/www/html/panel/
+chmod -R g+w /var/www/html/panel/var/
+chmod -R g+s /var/www/html/panel/
 
 # Prepare database env
 php bin/console doctrine:database:create --if-not-exists
