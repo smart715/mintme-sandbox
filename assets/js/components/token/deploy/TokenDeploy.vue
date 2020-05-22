@@ -148,12 +148,12 @@ watch: {
                 })
                 .then(() => {
                     this.showPending = false;
+                })
+                .then(() => {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
                 });
-                // .then(() => {
-                //     setTimeout(() => {
-                //         location.reload();
-                //     }, 2000);
-                // });
             }, 60000);
         },
     },
