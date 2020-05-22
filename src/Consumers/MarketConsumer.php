@@ -46,7 +46,13 @@ class MarketConsumer implements ConsumerInterface
 
     public function execute(AMQPMessage $msg): bool
     {
-        DBConnection::reconnectIfDisconnected($this->em);
+        if (!DBConnection::initConsumerEm(
+            'market-consumer',
+            $this->em,
+            $this->logger
+        )) {
+            return false;
+        }
 
         try {
             /** @var ?Market $market */

@@ -21,7 +21,6 @@ class DepositTokenStrategyTest extends TestCase
         $strategy = new DepositTokenStrategy(
             $this->mockBalanceHandler($this->once(), $this->once()),
             $this->mockWallet(),
-            $this->mockEM($this->once()),
             $this->mockMoneyWrapper()
         );
 
@@ -48,14 +47,6 @@ class DepositTokenStrategyTest extends TestCase
             ->willReturn(new Money('1000000000000000', new Currency('WEB')));
 
         return $wallet;
-    }
-
-    private function mockEm(Invocation $invocation): EntityManagerInterface
-    {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($invocation)->method('flush');
-
-        return $em;
     }
 
     private function mockMoneyWrapper(): MoneyWrapperInterface
