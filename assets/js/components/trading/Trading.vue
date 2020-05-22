@@ -375,7 +375,6 @@ export default {
                 });
         },
         sortCompare: function(a, b, key) {
-
             let pair = false;
             this.marketsOnTop.forEach((market)=> {
                 let currency = this.rebrandingFunc(market.currency);
@@ -420,7 +419,7 @@ export default {
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key && this.userId
                 ) {
                     params.deployed = DEPLOYED_ONLY;
-                } else if(deployedFirst) {
+                } else if (deployedFirst) {
                     params.deployed = DEPLOYED_FIRST;
                 }
 
@@ -431,7 +430,6 @@ export default {
                             && !this.marketFilters.userSelected
                             && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                         ) {
-                            console.log("HOLA");
                             this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
                             return this.updateRawMarkets(page, deployedFirst).then(resolve, reject);
                         }
@@ -784,7 +782,7 @@ export default {
             this.sortBy = ctx.sortBy;
             this.sortDesc = ctx.sortDesc;
             this.updateMarkets(1, false);
-        }
+        },
     },
 };
 </script>
