@@ -12,14 +12,14 @@ class WithdrawStorageTest extends TestCase
 {
     public function testRequest(): void
     {
-        /** @var JsonRpcInterface|MockObject $rpc */
+
         $rpc = $this->createMock(JsonRpcInterface::class);
-        /** @var JsonRpcResponse|MockObject $rpc */
         $response = $this->createMock(JsonRpcResponse::class);
         $response->method('getResult')->willReturn(['balance' => '99']);
 
         $rpc->method('send')->willReturn($response);
 
+        /** @var JsonRpcInterface $rpc */
         $storage = new WithdrawStorage($rpc, 'mintme');
 
         $this->assertEquals(['balance' => 99], $storage->requestHistory(1, 0, 10));
@@ -30,7 +30,9 @@ class WithdrawStorageTest extends TestCase
         $storage->requestHistory(1, 0, 10);
         $this->assertEquals(0, $storage->requestBalance('web'));
 
+        /** @var MockObject $rpc */
         $rpc->method('send')->willThrowException(new \Exception());
+
         $this->assertEquals([], $storage->requestHistory(1, 0, 10));
         $this->assertEquals(0, $storage->requestBalance('web'));
     }

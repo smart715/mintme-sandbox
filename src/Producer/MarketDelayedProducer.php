@@ -18,8 +18,8 @@ class MarketDelayedProducer extends Producer
     private const QUEUE_IS_AUTO_DELETE  = false;
     private const QUEUE_IS_NOWAIT       = false;
 
-    /** {@inheritDoc} */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = [], ?array $headers = null)
+    /** @inheritDoc */
+    public function publish($msgBody, $routingKey = '', $additionalProperties = [], ?array $headers = null): void
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();

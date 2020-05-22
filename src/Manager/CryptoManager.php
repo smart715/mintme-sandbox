@@ -13,7 +13,10 @@ class CryptoManager implements CryptoManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->repository = $entityManager->getRepository(Crypto::class);
+        /** @var CryptoRepository $repository */
+        $repository = $entityManager->getRepository(Crypto::class);
+
+        $this->repository = $repository;
     }
 
     public function findBySymbol(string $symbol): ?Crypto

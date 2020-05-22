@@ -6,6 +6,7 @@
                 :current-name="currentName"
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
+                :is-token-created="isTokenCreated"
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
@@ -17,6 +18,7 @@
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
                 @update-release-address="updateReleaseAddress"
+                :airdrop-params="airdropParams"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -38,6 +40,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mixin as clickaway} from 'vue-clickaway';
 import {WebSocketMixin, FiltersMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import TokenEditModal from '../modal/TokenEditModal';
+import {AIRDROP_CREATED, AIRDROP_DELETED, TOKEN_NAME_CHANGED} from '../../utils/constants';
 
 library.add(faEdit);
 
@@ -46,6 +49,7 @@ export default {
     props: {
         editable: Boolean,
         hasReleasePeriodProp: Boolean,
+        isTokenCreated: Boolean,
         identifier: String,
         name: String,
         precision: Number,
@@ -53,6 +57,7 @@ export default {
         twofa: Boolean,
         websocketUrl: String,
         releaseAddress: String,
+        airdropParams: Object,
     },
     components: {
         FontAwesomeIcon,
@@ -71,6 +76,27 @@ export default {
         if (!this.editable) {
             return;
         }
+
+        window.addEventListener('storage', (event) => {
+            // Reload token page in case if token name was changed in another tab
+            if (TOKEN_NAME_CHANGED === event.key && this.currentName === event.oldValue
+                && this.currentName !== event.newValue
+            ) {
+                this.currentName = event.newValue;
+                window.localStorage.removeItem(event.key);
+                location.href = this.$routing.generate('token_show', {
+                    name: this.currentName,
+                });
+            }
+
+            // Reload token page in case if new token created/deleted in another tab
+            if ((AIRDROP_CREATED === event.key || AIRDROP_DELETED === event.key)
+                && this.currentName === event.newValue
+            ) {
+                window.localStorage.removeItem(event.key);
+                location.reload();
+            }
+        });
 
         this.checkIfTokenExchanged();
 

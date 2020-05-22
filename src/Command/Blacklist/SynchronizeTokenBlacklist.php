@@ -47,7 +47,8 @@ class SynchronizeTokenBlacklist extends Command
             ->setDescription('Synchronize coin list with coinmarketcap');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var ConsoleSectionOutput $section */
         /** @var ConsoleOutput $output */
@@ -73,6 +74,8 @@ class SynchronizeTokenBlacklist extends Command
 
         $section->clear();
         $style->success('Synchronization completed.');
+
+        return 0;
     }
 
     /** @param array<Blacklist> $list */
