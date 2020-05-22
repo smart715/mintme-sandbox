@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class PendingTokenWithdraw implements PendingWithdrawInterface
 {
-    public const EXPIRES_HOURS = 1;
+    public const EXPIRES_HOURS = 4;
 
     /**
      * @ORM\Id()
