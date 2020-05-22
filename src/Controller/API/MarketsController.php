@@ -21,7 +21,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class MarketsController extends APIController
 {
-    private const OFFSET = 2;
+    private const OFFSET = 50;
 
     /**
      * @Rest\View()
