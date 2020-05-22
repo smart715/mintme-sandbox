@@ -135,10 +135,11 @@ watch: {
             this.showPending = true;
             this.deployed = false;
 
-            this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
-            .then((response) => {
-                return new Promise((resolve, reject) => {
-                    this.deployInterval = setInterval(() => {
+            clearInterval(this.deployInterval);
+            this.deployInterval = setInterval(() => {
+                this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
+                .then((response) => {
+                    return new Promise((resolve) => {
                         if (response.data.deployed === true) {
                             clearInterval(this.deployInterval);
                             resolve();
@@ -146,26 +147,25 @@ watch: {
                             this.deployed = true;
                             this.$emit('deployed');
                             this.notifySuccess('Token has been successfully deployed');
-                            return;
                         }
                         this.retryCount++;
                         if (this.retryCount >= this.retryCountLimit) {
                             clearInterval(this.deployInterval);
                             reject();
                         }
-                    }, 60000);
-                });
+                    });
                 }, (error) => {
                     this.notifyError('An error has occurred, please try again later');
-            })
-            .then(() => {
-                this.showPending = false;
-            })
-            .then(() => {
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
-            });
+                })
+                .then(() => {
+                    this.showPending = false;
+                })
+                .then(() => {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                });
+            },60000)
         },
     },
     methods: {
