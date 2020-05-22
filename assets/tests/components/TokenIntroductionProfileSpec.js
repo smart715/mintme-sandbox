@@ -18,6 +18,7 @@ let objectForTestCorrectlyMouning = {
         websiteUrl: 'testWebsiteUrl',
         youtubeClientId: 'testYoutubeClientId',
         youtubeChannelId: 'testYoutubeChannelId',
+        tokenUrl: 'http://localhost/token/testTokenName',
     },
  };
 
@@ -48,8 +49,8 @@ describe('TokenIntroductionProfile', () => {
 
     it('should compute description correctly', () => {
         const wrapper = shallowMount(TokenIntroductionProfile, objectForTestCorrectlyMouning);
-        wrapper.vm.twitterDescription = 'foo';
-        expect(wrapper.vm.description).to.be.equal('footoken_show');
+        wrapper.vm.twitterDescription = 'foo ';
+        expect(wrapper.vm.description).to.be.equal('foo http://localhost/token/testTokenName');
     });
 
     it('should compute editingUrlsIcon correctly', () => {
