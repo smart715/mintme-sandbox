@@ -129,7 +129,6 @@ export default {
     },
 watch: {
         notDeployed: function() {
-            clearInterval(this.deployInterval);
             this.showPending = true;
             this.deployed = false;
             this.deployInterval = setInterval(() => {
