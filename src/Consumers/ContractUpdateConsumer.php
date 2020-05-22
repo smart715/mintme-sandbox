@@ -40,7 +40,13 @@ class ContractUpdateConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
-        DBConnection::reconnectIfDisconnected($this->em);
+        if (!DBConnection::initConsumerEm(
+            'contract-update-consumer',
+            $this->em,
+            $this->logger
+        )) {
+            return false;
+        }
 
         /** @var string $body */
         $body = $msg->body ?? '';
