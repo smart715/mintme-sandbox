@@ -10,7 +10,6 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 
@@ -22,21 +21,16 @@ class DepositTokenStrategy implements BalanceStrategyInterface
     /** @var WalletInterface */
     private $wallet;
 
-    /** @var EntityManagerInterface */
-    private $em;
-
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         WalletInterface $wallet,
-        EntityManagerInterface $em,
         MoneyWrapperInterface $moneyWrapper
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->wallet = $wallet;
-        $this->em = $em;
         $this->moneyWrapper = $moneyWrapper;
     }
 
@@ -65,13 +59,5 @@ class DepositTokenStrategy implements BalanceStrategyInterface
                 Token::getFromSymbol(Token::WEB_SYMBOL)
             )
         );
-
-        if (!in_array($user, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($user);
-            $this->em->persist($userToken);
-            $user->addToken($userToken);
-            $this->em->persist($user);
-            $this->em->flush();
-        }
     }
 }
