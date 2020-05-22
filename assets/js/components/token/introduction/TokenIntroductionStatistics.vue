@@ -165,14 +165,24 @@
 import {Decimal} from 'decimal.js';
 import Guide from '../../Guide';
 import {toMoney} from '../../../utils';
-import {LoggerMixin, MoneyFilterMixin, NotificationMixin, WebSocketMixin} from '../../../mixins';
+import {
+    LoggerMixin,
+    MoneyFilterMixin,
+    NotificationMixin,
+    WebSocketMixin,
+} from '../../../mixins';
 import {mapGetters, mapMutations} from 'vuex';
 
 const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
-    mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin, WebSocketMixin],
+    mixins: [
+        MoneyFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+        WebSocketMixin,
+    ],
     components: {
         Guide,
     },

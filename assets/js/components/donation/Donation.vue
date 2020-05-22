@@ -161,8 +161,6 @@ export default {
     props: {
         market: Object,
         loggedIn: Boolean,
-        isOwner: Boolean,
-        userId: Number,
         googleRecaptchaSiteKey: String,
         donationParams: Object,
     },

@@ -103,8 +103,6 @@
                             <donation
                                 :market="{{ market | json_encode }}"
                                 :logged-in="{{ app.user ? 'true' : 'false' }}"
-                                :is-owner="{{ isOwner }}"
-                                :user-id="{{ app.user ? app.user.id : 0 }}"
                                 :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
                                 :donation-params="{{ donation_params | json_encode }}"
                             >
