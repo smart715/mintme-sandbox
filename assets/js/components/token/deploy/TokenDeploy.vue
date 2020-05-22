@@ -165,7 +165,7 @@ watch: {
                         location.reload();
                     }, 2000);
                 });
-            },60000)
+            }, 60000);
         },
     },
     methods: {
