@@ -102,6 +102,9 @@ export default {
             status: this.statusProp,
             webCost: null,
             deployInterval: null,
+            retryCount: 0,
+            retryCountLimit: 10,
+
         };
     },
     computed: {
@@ -131,29 +134,38 @@ watch: {
         notDeployed: function() {
             this.showPending = true;
             this.deployed = false;
-            this.deployInterval = setInterval(() => {
-                this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
-                .then((response) => {
-                    if (response.data.deployed === false) return;
-                    if (response.data.deployed === true) {
-                        clearInterval(this.deployInterval);
-                        this.status = tokenDeploymentStatus.deployed;
-                        this.deployed = true;
-                        this.$emit('deployed');
-                        this.notifySuccess('Token has been successfully deployed');
-                    }
-                    }, (error) => {
-                        this.notifyError('An error has occurred, please try again later');
-                })
-                .then(() => {
-                    this.showPending = false;
-                })
-                .then(() => {
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
+
+            this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
+            .then((response) => {
+                return new Promise((resolve, reject) => {
+                    this.deployInterval = setInterval(() => {
+                        if (response.data.deployed === true) {
+                            clearInterval(this.deployInterval);
+                            resolve();
+                            this.status = tokenDeploymentStatus.deployed;
+                            this.deployed = true;
+                            this.$emit('deployed');
+                            this.notifySuccess('Token has been successfully deployed');
+                            return;
+                        }
+                        this.retryCount++;
+                        if(this.retryCount >= this.retryCountLimit) {
+                            clearInterval(this.deployInterval);
+                            reject();
+                        }
+                    }, 60000);
                 });
-            }, 60000);
+                }, (error) => {
+                    this.notifyError('An error has occurred, please try again later');
+            })
+            .then(() => {
+                this.showPending = false;
+            })
+            .then(() => {
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            });
         },
     },
     methods: {
