@@ -149,7 +149,7 @@ watch: {
                             return;
                         }
                         this.retryCount++;
-                        if(this.retryCount >= this.retryCountLimit) {
+                        if (this.retryCount >= this.retryCountLimit) {
                             clearInterval(this.deployInterval);
                             reject();
                         }
