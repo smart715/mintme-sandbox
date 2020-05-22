@@ -3,16 +3,32 @@
 namespace App\Consumers\Helpers;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class DBConnection
 {
-    public static function reconnectIfDisconnected(EntityManagerInterface $em): void
+    public static function reconnectIfDisconnected(EntityManagerInterface &$em): void
     {
-        try {
-            $em->getConnection()->executeQuery('SELECT 1')->closeCursor();
-        } catch (\Throwable $e) {
+        if (false === $em->getConnection()->ping()) {
             $em->getConnection()->close();
             $em->getConnection()->connect();
+        }
+    }
+
+    public static function initConsumerEm(
+        string $consumerName,
+        EntityManagerInterface &$em,
+        LoggerInterface $logger
+    ): bool {
+        try {
+            self::reconnectIfDisconnected($em);
+
+            return true;
+        } catch (\Throwable $exception) {
+            sleep(5);
+            $logger->error("[{$consumerName}] couldn't connect to DB : {$exception}");
+
+            return false;
         }
     }
 }
