@@ -101,7 +101,7 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
-            deployTimeout: null,
+            deployInterval: null,
         };
     },
     computed: {
@@ -129,10 +129,10 @@ export default {
     },
 watch: {
         notDeployed: function() {
-            clearTimeout(this.deployTimeout);
+            clearInterval(this.deployInterval);
             this.showPending = true;
             this.deployed = false;
-            this.deployTimeout = setTimeout(() => {
+            this.deployInterval = setInterval(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
                     if (response.data.deployed === true) {
@@ -152,7 +152,7 @@ watch: {
                         location.reload();
                     }, 2000);
                 });
-            }, 600000);
+            }, 60000);
         },
     },
     methods: {
