@@ -18,7 +18,7 @@ use Money\Currency;
 use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @Rest\Route("/api/orders")
  */
@@ -88,7 +88,7 @@ class OrdersController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{base}/{quote}/place-order", name="token_place_order", options={"expose"=true})
-     * @Rest\RequestParam(name="priceInput", allowBlank=false)
+     * @Rest\RequestParam(name="priceInput", allowBlank=false, requirements=@Assert\LessThanOrEqual(99999999.9999))
      * @Rest\RequestParam(name="amountInput", allowBlank=false)
      * @Rest\RequestParam(name="marketPrice", default="0")
      * @Rest\RequestParam(name="action", allowBlank=false, requirements="(sell|buy)")
@@ -98,13 +98,6 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
-        if (99999999<(string)$request->get('priceInput')) {
-            return $this->view([
-                'result' => 2,
-                'message' => 'The Price Over Exceeds The Maximum',
-            ], Response::HTTP_ACCEPTED);
-        }
-
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
 
