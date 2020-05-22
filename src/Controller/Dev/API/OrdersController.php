@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dev\API;
 
+use App\Exception\ApiNotFoundException;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -101,7 +102,7 @@ class OrdersController extends DevApiController
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
         if (is_null($base) || is_null($quote)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+            throw new ApiNotFoundException('Market not found');
         }
 
         $market = new Market($base, $quote);
@@ -160,7 +161,7 @@ class OrdersController extends DevApiController
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
         if (is_null($base) || is_null($quote)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+            throw new ApiNotFoundException('Market not found');
         }
 
         return array_map(function ($order) {
