@@ -186,12 +186,18 @@ class BalanceHandler implements BalanceHandlerInterface
             throw $exception;
         }
 
-        if (!in_array($token, $user->getTokens()) && $token->getId()) {
-            $userToken = (new UserToken())->setToken($token)->setUser($user);
-            $this->entityManager->persist($userToken);
-            $user->addToken($userToken);
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+        if ($token->getId()) {
+            $tokenExist = array_filter($user->getTokens(), function (Token $userToken) use ($token) {
+                return $userToken->getId() === $token->getId();
+            });
+
+            if (!$tokenExist) {
+                $userToken = (new UserToken())->setToken($token)->setUser($user);
+                $this->entityManager->persist($userToken);
+                $user->addToken($userToken);
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
+            }
         }
     }
 
