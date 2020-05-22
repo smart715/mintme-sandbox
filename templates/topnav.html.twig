@@ -142,13 +142,13 @@
                                     :class="{ 'show': showProfileMenu }"
                                 >
                                     <a
-                                        class="dropdown-item"
+                                        class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
                                         href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}"
                                     >
                                         <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Profile
                                     </a>
-                                    <a class="dropdown-item" href="{{ path('settings') }}">
+                                    <a class="dropdown-item {{ route == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Settings
                                     </a>
