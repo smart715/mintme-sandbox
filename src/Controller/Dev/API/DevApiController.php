@@ -3,6 +3,7 @@
 namespace App\Controller\Dev\API;
 
 use App\Entity\Token\Token;
+use App\Exception\ApiNotFoundException;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,7 @@ abstract class DevApiController extends AbstractFOSRestController
     {
         if (in_array(mb_strtoupper($base), self::DISALLOWED_VALUES)
             || in_array(mb_strtoupper($quote), self::DISALLOWED_VALUES)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+            throw new ApiNotFoundException('Market not found');
         }
     }
 }
