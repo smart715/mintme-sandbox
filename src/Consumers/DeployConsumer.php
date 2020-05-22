@@ -43,7 +43,13 @@ class DeployConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
-        DBConnection::reconnectIfDisconnected($this->em);
+        if (!DBConnection::initConsumerEm(
+            'deploy-consumer',
+            $this->em,
+            $this->logger
+        )) {
+            return false;
+        }
 
         /** @var string $body */
         $body = $msg->body ?? '';

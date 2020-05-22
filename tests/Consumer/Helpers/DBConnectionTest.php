@@ -14,12 +14,14 @@ class DBConnectionTest extends TestCase
 {
     public function testReconnectIfDisconnected(): void
     {
-        DBConnection::reconnectIfDisconnected($this->mockEM(true, $this->never(), $this->never()));
+        $em = $this->mockEM(true, $this->never(), $this->never());
+        DBConnection::reconnectIfDisconnected($em);
     }
 
     public function testReconnectIfDisconnectedIfNotConnected(): void
     {
-        DBConnection::reconnectIfDisconnected($this->mockEM(false, $this->once(), $this->once()));
+        $em = $this->mockEM(false, $this->once(), $this->once());
+        DBConnection::reconnectIfDisconnected($em);
     }
 
     private function mockEM(
@@ -29,16 +31,9 @@ class DBConnectionTest extends TestCase
     ): EntityManagerInterface {
         $connection = $this->createMock(Connection::class);
 
-        if ($isConnected) {
-            $connection->method('executeQuery')->willReturn(
-                $this->createMock(ResultStatement::class)
-            );
-        } else {
-            $connection->method('executeQuery')->willThrowException(new DBALException());
-        }
-
         $connection->expects($closeInv)->method('close');
         $connection->expects($connectInv)->method('connect');
+        $connection->expects($this->once())->method('ping')->willReturn($isConnected);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getConnection')->willReturn($connection);
