@@ -135,23 +135,25 @@ watch: {
             this.deployInterval = setInterval(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
-                    if (response.data.deployed === true) {
+                    if (response.data.deployed === false) return;
+                    else if (response.data.deployed === true) {
                         this.status = tokenDeploymentStatus.deployed;
                         this.deployed = true;
                         this.$emit('deployed');
                         this.notifySuccess('Token has been successfully deployed');
+                        clearInterval(this.deployInterval);
                     }
                     }, (error) => {
                         this.notifyError('An error has occurred, please try again later');
                 })
                 .then(() => {
                     this.showPending = false;
-                })
-                .then(() => {
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
                 });
+                // .then(() => {
+                //     setTimeout(() => {
+                //         location.reload();
+                //     }, 2000);
+                // });
             }, 60000);
         },
     },
