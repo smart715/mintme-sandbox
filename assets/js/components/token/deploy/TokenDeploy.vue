@@ -159,7 +159,7 @@ watch: {
                 })
                 .then(() => {
                     this.showPending = false;
-                });
+                })
                 .then(() => {
                     setTimeout(() => {
                         location.reload();
