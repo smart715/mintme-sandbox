@@ -139,7 +139,7 @@ watch: {
             this.deployInterval = setInterval(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
-                    return new Promise((resolve) => {
+                    return new Promise((resolve, reject) => {
                         if (response.data.deployed === true) {
                             clearInterval(this.deployInterval);
                             resolve();
@@ -159,7 +159,7 @@ watch: {
                 })
                 .then(() => {
                     this.showPending = false;
-                })
+                });
                 .then(() => {
                     setTimeout(() => {
                         location.reload();
