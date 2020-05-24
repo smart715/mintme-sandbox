@@ -123,6 +123,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
+        if ($request->get('name') && $this->checkTokenNameBlacklist($request->get('name'))) {
+            throw new ApiBadRequestException('Invalid token name');
+        }
+
         $form = $this->createForm(TokenType::class, $token, [
             'csrf_protection' => false,
             'allow_extra_fields' => true,
@@ -684,19 +688,36 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Get("/{name}/token-name-blacklist-check", name="token_name_blacklist_check", options={"expose"=true})
      */
-    public function checkTokenNameBlacklist(string $name): View
+    public function checkTokenNameBlacklistAction(string $name): View
+    {
+        return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
+    }
+
+    private function checkTokenNameBlacklist(string $name): bool
     {
         $name = trim($name);
+
+        $matches = [];
+        preg_match("/(\w+)[-\s]+(\w+)/", $name, $matches);
+        array_shift($matches);
+
         $blacklist = $this->blacklistManager->getList("token");
-        $isBlackListed = false;
 
         foreach ($blacklist as $blist) {
-            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
-                && (strlen($name) - strlen($blist->getValue())) <= 1) {
-                $isBlackListed = true;
+            if ($this->nameMatches($name, $blist->getValue())
+                || (isset($matches[0]) && $this->nameMatches($matches[0], $blist->getValue()))
+                || (isset($matches[1]) && $this->nameMatches($matches[1], $blist->getValue()))
+            ) {
+                return true;
             }
         }
 
-        return $this->view(['blacklisted' => $isBlackListed], Response::HTTP_OK);
+        return false;
+    }
+
+    private function nameMatches(string $name, string $val): bool
+    {
+        return false !== strpos(strtolower($name), strtolower($val))
+            && (strlen($name) - strlen($val)) <= 1;
     }
 }

@@ -189,20 +189,28 @@ class TokenController extends Controller
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
 
-        $name = trim($token->getName());
-        $blacklist = $this->blacklistManager->getList("token");
-
-        foreach ($blacklist as $blist) {
-            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
-                && (strlen($name) - strlen($blist->getValue())) <= 1) {
-                return $this->json(
-                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-        }
-
         if ($form->isSubmitted() && !$form->isValid()) {
+
+            $name = trim($token->getName());
+            $matches = [];
+            preg_match("/(\w+)[-\s]+(\w+)/", $name, $matches);
+            array_shift($matches);
+
+            $blacklist = $this->blacklistManager->getList("token");
+            $isBlackListed = false;
+
+            foreach ($blacklist as $blist) {
+                if ($this->nameMatches($name, $blist->getValue())
+                    || (isset($matches[0]) && $this->nameMatches($matches[0], $blist->getValue()))
+                    || (isset($matches[1]) && $this->nameMatches($matches[1], $blist->getValue()))
+                ) {
+                    return $this->json(
+                        ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
+                        Response::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+
             foreach ($form->all() as $childForm) {
                 /** @var FormError[] $fieldErrors */
                 $fieldErrors = $form->get($childForm->getName())->getErrors();
@@ -328,5 +336,11 @@ class TokenController extends Controller
     private function isProfileCreated(): bool
     {
         return null !== $this->profileManager->getProfile($this->getUser());
+    }
+
+    private function nameMatches(string $name, string $val): bool
+    {
+        return false !== strpos(strtolower($name), strtolower($val))
+            && (strlen($name) - strlen($val)) <= 1;
     }
 }
