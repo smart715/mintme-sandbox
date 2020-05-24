@@ -95,8 +95,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
-     * @Rest\RequestParam(name="telegramUrl", nullable=true)
-     * @Rest\RequestParam(name="discordUrl", nullable=true)
+     * @Rest\RequestParam(name="telegramUrl", nullable=true, requirements="^https:\/\/t\.me\/joinchat\/([-\w]{1,})$")
+     * @Rest\RequestParam(name="discordUrl", nullable=true, requirements="^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\w]{1,})$")
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */
