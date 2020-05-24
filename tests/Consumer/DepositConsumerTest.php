@@ -137,7 +137,7 @@ class DepositConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
-            $this->mockEntityManager($this->once()),
+            $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher()
         );
 

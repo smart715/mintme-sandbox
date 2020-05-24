@@ -15,6 +15,7 @@ let objectForTestCorrectlyMouning = {
         websiteUrl: 'testWebsiteUrl',
         youtubeClientId: 'testYoutubeClientId',
         youtubeChannelId: 'testYoutubeChannelId',
+        tokenUrl: 'http://localhost/token/testTokenName',
     },
  };
 
