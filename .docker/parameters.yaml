@@ -21,7 +21,7 @@ parameters:
         - user
         - pass
         - basic
-    websocket_url: 'ws://localhost:18364'
+    websocket_url: 'wss://localhost/ws'
     taker_fee_rate: 0.002
     maker_fee_rate: 0.001
     verify_timeout_seconds: 10
