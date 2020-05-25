@@ -140,7 +140,7 @@ watch: {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
                     return new Promise((resolve, reject) => {
-                        if (response.data.deployed === true) {
+                        if (true === response.data.deployed) {
                             clearInterval(this.deployInterval);
                             resolve();
                             this.status = tokenDeploymentStatus.deployed;
