@@ -9,7 +9,7 @@
             <template v-slot:cell(id)="row">
                 <div class="text-left">
                     <div class="text-left d-inline-block ml-api">
-                        ID<br />
+                        ID:<br />
                         <span class="text-danger word-break">{{ row.item.id }}</span>
                         <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
                             <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
@@ -17,7 +17,7 @@
                         <a @click="setInvalidateModal(true, row.item.id)">
                             <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
                         </a><br />
-                        Secret<br />
+                        Secret:<br />
                         <template v-if="row.item.secret">
                             <span class="text-danger word-break">{{ row.item.secret }}</span>
                             <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">

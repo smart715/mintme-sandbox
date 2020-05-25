@@ -1,25 +1,35 @@
 <template>
     <div>
         <template v-if="existed">
-            <p>
-                Your public key: <span class="text-danger word-break">{{ keys.publicKey }}</span>
-                <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
-                    <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                </copy-link>
-            </p>
-            <template v-if="keys.plainPrivateKey">
-                <p>
-                    Your private key: <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
-                    <copy-link
-                            class="code-copy c-pointer ml-2"
-                            id="private-copy-btn"
-                            :content-to-copy="keys.plainPrivateKey">
-                        <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                    </copy-link>
-                    <br />
-                    (Copy this key, you will not able to see it again after reload)
-                </p>
-            </template>
+            <div class="text-left">
+                <div class="text-left d-inline-block ml-api">
+                    Your public key:<br />
+                    <p>
+                        <span class="text-danger word-break">{{ keys.publicKey }}</span>
+                        <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
+                            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                        </copy-link>
+                    </p>
+                    Your private key:<br />
+                    <template v-if="keys.plainPrivateKey">
+                        <p>
+                            <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
+                            <copy-link
+                                    class="code-copy c-pointer ml-2"
+                                    id="private-copy-btn"
+                                    :content-to-copy="keys.plainPrivateKey">
+                                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                            </copy-link>
+                            <div class="text-center small">
+                                (Copy this key, you will not able to see it again after reload)
+                            </div>
+                        </p>
+                    </template>
+                    <template v-else>
+                        <span class="text-white-50">** hidden **</span>
+                    </template>
+                </div>
+            </div>
             <p>Invalidate your API keys:</p>
             <div class="btn btn-primary c-pointer" @click="toggleInvalidateModal(true)">Invalidate</div>
         </template>
