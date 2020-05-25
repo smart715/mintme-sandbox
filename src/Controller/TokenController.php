@@ -190,14 +190,12 @@ class TokenController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !$form->isValid()) {
-
             $name = trim($token->getName());
             $matches = [];
             preg_match("/(\w+)[-\s]+(\w+)/", $name, $matches);
             array_shift($matches);
 
             $blacklist = $this->blacklistManager->getList("token");
-            $isBlackListed = false;
 
             foreach ($blacklist as $blist) {
                 if ($this->nameMatches($name, $blist->getValue())
