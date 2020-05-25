@@ -32,7 +32,6 @@ tests_php:
     - export $(grep -v '^#' .env.dist | xargs)
     - composer install
     - make phpunit
-    - - rm -Rf /tmp/psalm/*
     - make syntax_check
   cache:
     key: "$CI_COMMIT_REF_SLUG"
