@@ -7,7 +7,7 @@
                         <span class="text-danger word-break">{{ keys.publicKey }}</span>
                         <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
                             <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                        </copy-link>
+                        </copy-link><br />
                     Your private key:<br />
                     <template v-if="keys.plainPrivateKey">
                         <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
