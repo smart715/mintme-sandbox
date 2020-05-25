@@ -343,8 +343,7 @@ export default {
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
-            // TODO: Get rid of hardcoded WEB
-            this.deposit.min = currency === 'WEB' ? toMoney(1, subunit) : undefined;
+            this.deposit.min = webSymbol === currency ? toMoney(1, subunit) : undefined;
             this.showDepositModal = true;
         },
         closeDeposit: function() {
@@ -357,6 +356,12 @@ export default {
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
                 this.depositAddresses.hasOwnProperty(this.depositMore)
             ) {
+                if (window.history.replaceState) {
+                    window.history.replaceState(
+                        {}, '', location.href.split('?')[0]
+                    );
+                }
+
                 this.openDeposit(
                     this.depositMore,
                     this.predefinedTokens[this.depositMore].subunit
