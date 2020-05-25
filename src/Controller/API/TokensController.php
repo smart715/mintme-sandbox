@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
+use App\Controller\Traits\CheckTokenNameBlacklistTrait;
 use App\Controller\TwoFactorAuthenticatedController;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
@@ -50,6 +51,10 @@ use Throwable;
  */
 class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
 {
+
+    use CheckTokenNameBlacklistTrait;
+
+    
     /** @var EntityManagerInterface */
     private $em;
 
@@ -691,33 +696,5 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     public function checkTokenNameBlacklistAction(string $name): View
     {
         return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
-    }
-
-    private function checkTokenNameBlacklist(string $name): bool
-    {
-        $name = trim($name);
-
-        $matches = [];
-        preg_match("/(\w+)[-\s]+(\w+)/", $name, $matches);
-        array_shift($matches);
-
-        $blacklist = $this->blacklistManager->getList("token");
-
-        foreach ($blacklist as $blist) {
-            if ($this->nameMatches($name, $blist->getValue())
-                || (isset($matches[0]) && $this->nameMatches($matches[0], $blist->getValue()))
-                || (isset($matches[1]) && $this->nameMatches($matches[1], $blist->getValue()))
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function nameMatches(string $name, string $val): bool
-    {
-        return false !== strpos(strtolower($name), strtolower($val))
-            && (strlen($name) - strlen($val)) <= 1;
     }
 }

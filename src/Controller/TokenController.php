@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\CheckTokenNameBlacklistTrait;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
@@ -40,6 +41,9 @@ use Throwable;
  */
 class TokenController extends Controller
 {
+
+    use CheckTokenNameBlacklistTrait;
+
     /** @var EntityManagerInterface */
     protected $em;
 
@@ -191,22 +195,12 @@ class TokenController extends Controller
 
         if ($form->isSubmitted() && !$form->isValid()) {
             $name = trim($token->getName());
-            $matches = [];
-            preg_match("/(\w+)[-\s]+(\w+)/", $name, $matches);
-            array_shift($matches);
 
-            $blacklist = $this->blacklistManager->getList("token");
-
-            foreach ($blacklist as $blist) {
-                if ($this->nameMatches($name, $blist->getValue())
-                    || (isset($matches[0]) && $this->nameMatches($matches[0], $blist->getValue()))
-                    || (isset($matches[1]) && $this->nameMatches($matches[1], $blist->getValue()))
-                ) {
-                    return $this->json(
-                        ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
-                        Response::HTTP_BAD_REQUEST
-                    );
-                }
+            if ($this->checkTokenNameBlacklist($name)) {
+                return $this->json(
+                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
+                    Response::HTTP_BAD_REQUEST
+                );
             }
 
             foreach ($form->all() as $childForm) {
@@ -334,11 +328,5 @@ class TokenController extends Controller
     private function isProfileCreated(): bool
     {
         return null !== $this->profileManager->getProfile($this->getUser());
-    }
-
-    private function nameMatches(string $name, string $val): bool
-    {
-        return false !== strpos(strtolower($name), strtolower($val))
-            && (strlen($name) - strlen($val)) <= 1;
     }
 }
