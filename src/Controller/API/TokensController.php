@@ -53,7 +53,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 {
 
     use CheckTokenNameBlacklistTrait;
-
     
     /** @var EntityManagerInterface */
     private $em;
@@ -120,17 +119,20 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to change token\'s name');
+        if ($request->get('name')) {
+            if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+                throw new ApiBadRequestException('You need all your tokens to change token\'s name');
+            }
+
+            if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+                throw new ApiBadRequestException('Token is deploying or deployed.');
+            }
+
+            if ($this->checkTokenNameBlacklist($request->get('name'))) {
+                throw new ApiBadRequestException('Invalid token name');
+            }
         }
 
-        if ($request->get('name') && Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-            throw new ApiBadRequestException('Token is deploying or deployed.');
-        }
-
-        if ($request->get('name') && $this->checkTokenNameBlacklist($request->get('name'))) {
-            throw new ApiBadRequestException('Invalid token name');
-        }
 
         $form = $this->createForm(TokenType::class, $token, [
             'csrf_protection' => false,

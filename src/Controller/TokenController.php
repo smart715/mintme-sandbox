@@ -194,15 +194,6 @@ class TokenController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !$form->isValid()) {
-            $name = trim($token->getName());
-
-            if ($this->checkTokenNameBlacklist($name)) {
-                return $this->json(
-                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-
             foreach ($form->all() as $childForm) {
                 /** @var FormError[] $fieldErrors */
                 $fieldErrors = $form->get($childForm->getName())->getErrors();
@@ -216,6 +207,13 @@ class TokenController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
+            if ($this->checkTokenNameBlacklist($token->getName())) {
+                return $this->json(
+                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
             $profile = $this->profileManager->getProfile($this->getUser());
 
             $this->em->beginTransaction();
