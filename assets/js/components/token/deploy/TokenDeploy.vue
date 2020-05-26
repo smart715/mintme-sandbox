@@ -130,7 +130,7 @@ export default {
             return new Decimal(this.webCost).greaterThan(this.balance);
         },
     },
-watch: {
+    watch: {
         notDeployed: function() {
             this.showPending = true;
             this.deployed = false;
