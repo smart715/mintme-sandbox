@@ -77,7 +77,7 @@ class WalletController extends Controller
 
         /** @var PendingWithdrawInterface|null */
         $pendingWithdraw = $withdrawRepo->getWithdrawByHash($hash) ?? $withdrawTokenRepo->getWithdrawByHash($hash);
-
+        dd($pendingWithdraw);
         if (!$pendingWithdraw) {
             return $this->createWalletRedirection(
                 'danger',
