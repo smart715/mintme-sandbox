@@ -55,36 +55,37 @@ new Vue({
     methods: {
         toggleZipCodeInputDisabled: function(state) {
             if (this.$refs.zipCode) {
-            this.$refs.zipCode.disabled = state;
+                this.$refs.zipCode.disabled = state;
             }
         },
 
-        firstNameValidation: function(event) {
-            const hasChinese = this.firstName.match(REGEX_CHINESE);
-            if (hasChinese) {
-                // this means only chinese characters are typed
-                this.firstNameAux = false;
-            } else {
-                // this means regular characters are typed
-                if (this.firstName.length < 2) {
-                    this.firstNameAux = true;
-                } else {
+        validation: function (event) {
+            if (event.target.id =='profile_firstName') {
+                let hasChinese = this.firstName.match(REGEX_CHINESE);
+                if (hasChinese) {
+                  // this means only chinese characters are typed
                     this.firstNameAux = false;
+                } else {
+                    // this means regular characters are typed
+                    if (this.firstName.length < 2) {
+                        this.firstNameAux = true;
+                    } else {
+                        this.firstNameAux = false;
+                    }
                 }
             }
-        },
-
-        lastNameValidation: function(event) {
-            const hasChinese = this.lastName.match(REGEX_CHINESE);
-            if (hasChinese) {
-                // this means only chinese characters are typed
-                this.lastNameAux = false;
-            } else {
-                // this means regular characters are typed
-                if (this.lastName.length < 2) {
-                    this.lastNameAux = true;
-                } else {
+            if (event.target.id =='profile_lastName') {
+                let hasChinese = this.lastName.match(REGEX_CHINESE);
+                if (hasChinese) {
+                    // this means only chinese characters are typed
                     this.lastNameAux = false;
+                } else {
+                    // this means regular characters are typed
+                    if (this.lastName.length < 2) {
+                        this.lastNameAux = true;
+                    } else {
+                        this.lastNameAux = false;
+                    }
                 }
             }
         },
