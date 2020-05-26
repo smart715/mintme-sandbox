@@ -59,7 +59,7 @@ new Vue({
             }
         },
 
-        validation: function (event) {
+        validation: function(event) {
             if (event.target.id =='profile_firstName') {
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
