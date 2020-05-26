@@ -53,6 +53,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 {
 
     use CheckTokenNameBlacklistTrait;
+
     
     /** @var EntityManagerInterface */
     private $em;
@@ -132,7 +133,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
                 throw new ApiBadRequestException('Invalid token name');
             }
         }
-
 
         $form = $this->createForm(TokenType::class, $token, [
             'csrf_protection' => false,

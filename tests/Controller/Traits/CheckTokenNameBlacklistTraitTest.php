@@ -32,7 +32,7 @@ class CheckTokenNameBlacklistTraitTest extends TestCase
             ['ethereum-ethereum', true],
             ['ethereum-foo', false],
             ['foo-bar', false],
-            ['foobar', false]
+            ['foobar', false],
         ];
     }
 }
