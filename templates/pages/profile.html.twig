@@ -77,7 +77,7 @@
                                         {{ form_row(form.firstName, {'attr':
                                             {
                                                 'v-model.trim': '$v.firstName.$model',
-                                                'v-on:keyup': 'firstNameValidation',
+                                                'v-on:keyup': 'validation',
                                                 'class': 'form-control',
                                                 'ref': 'firstName'
                                             }
@@ -93,7 +93,7 @@
                                         {{ form_row(form.lastName, {'attr':
                                             {
                                                 'v-model.trim': '$v.lastName.$model',
-                                                'v-on:keyup': 'lastNameValidation',
+                                                'v-on:keyup': 'validation',
                                                 'class': 'form-control',
                                                 'ref': 'lastName'
                                             }
