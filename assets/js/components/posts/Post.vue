@@ -12,19 +12,20 @@
         <a :href="$routing.generate('profile-view', {pageUrl: post.author.page_url})">
             {{ author }}
         </a>
-        <a v-if="showEdit"
-            class="delete-icon float-right text-decoration-none text-reset"
-            href="#"
-            @click.prevent="deletePost"
+        <button v-if="showEdit"
+            class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+            :disabled="deleteDisabled"
+            @click="deletePost"
         >
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
                 icon="trash"
                 transform="shrink-4 up-1.5"
             />
-        </a>
-        <a v-if="showEdit"
-            class="edit-icon float-right text-decoration-none text-reset"
+        </button>
+        <button v-if="showEdit"
+            class="btn btn-link p-0 edit-icon float-right text-decoration-none text-reset"
+            :disabled="editDisabled"
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
             <font-awesome-icon
@@ -32,7 +33,7 @@
                 icon="edit"
                 transform="shrink-4 up-1.5"
             />
-        </a>
+        </button>
     </div>
 </template>
 
@@ -68,6 +69,12 @@ export default {
             default: false,
         },
     },
+    data() {
+        return {
+            deleteDisabled: false,
+            editDisabled: false,
+        };
+    },
     computed: {
         author() {
             return `${this.post.author.firstName} ${this.post.author.lastName}`;
@@ -78,10 +85,12 @@ export default {
     },
     methods: {
         deletePost() {
+            this.deleteDisabled = true;
             this.$axios.single.post(this.$routing.generate('delete_post', {id: this.post.id}))
             .then((res) => {
                this.$emit('delete-post', this.index);
                this.notifySuccess(res.data.message);
+               this.deleteDisabled = false;
             })
             .catch(() => {
                 this.notifyError('Error deleting post.');
