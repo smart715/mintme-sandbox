@@ -196,6 +196,8 @@ export default {
         coinbaseUrl: String,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        sort: String,
+        order: Boolean,
     },
     components: {
         Guide,
@@ -218,8 +220,8 @@ export default {
             enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
-            sortBy: '',
-            sortDesc: true,
+            sortBy: this.sort,
+            sortDesc: this.order,
             globalMarketCaps: {
                 BTC: 0,
                 USD: 0,
@@ -454,7 +456,11 @@ export default {
                         if (window.history.replaceState) {
                             // prevents browser from storing history with each change:
                             window.history.replaceState(
-                                {page}, document.title, this.$routing.generate('trading', {page})
+                                {page}, document.title, this.$routing.generate('trading', {
+                                    page,
+                                    sort: this.sortBy,
+                                    order: (this.sortDesc ? 'DESC' : 'ASC'),
+                                })
                             );
                         }
 
