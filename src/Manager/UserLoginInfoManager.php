@@ -30,7 +30,6 @@ class UserLoginInfoManager implements UserLoginInfoInterface
 
     public function updateUserDeviceLoginInfo(InteractiveLoginEvent $event): void
     {
-
         $request = $event->getRequest();
         $userAgent = $_SERVER['HTTP_USER_AGENT'];
         $deviceDetector = new DeviceDetector($userAgent);

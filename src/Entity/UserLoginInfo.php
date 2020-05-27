@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserLoginInfoRepository")

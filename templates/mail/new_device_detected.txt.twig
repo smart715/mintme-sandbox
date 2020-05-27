@@ -1,7 +1,7 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
 Hello
-{{username}}
+{{ username }}
 Our system has detected a new login attempt from new a IP address.
 Device: {{ user_device_info.deviceInfo }} ({{ user_device_info.osInfo }}
 Date: {{ user_device_info.date|date('Y-m-d H:i:s') }} (UTC)

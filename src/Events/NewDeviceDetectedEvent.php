@@ -8,8 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class NewDeviceDetectedEvent extends Event implements NewDeviceDetectedInterface
 {
-    public const NAME = 'newDevice.detected';
-    public const TYPE = 'newDevice';
+    public const NAME = 'newdevice.detected';
 
     /** @var User */
     protected $user;

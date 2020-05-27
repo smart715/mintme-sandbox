@@ -181,7 +181,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendNewDeviceDetectedMail(user $user, UserLoginInfo $userDeviceInfo): void
+    public function sendNewDeviceDetectedMail(User $user, UserLoginInfo $userDeviceInfo): void
     {
         $message = 'Our system has detected a new login attempt from a new IP address.';
         $body = $this->twigEngine->render('mail/new_device_detected.html.twig', [
@@ -191,7 +191,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         ]);
 
         $textBody = $this->twigEngine->render('mail/new_device_detected.txt.twig', [
-            'twoFa' => $message,
+            'message' => $message,
             'username' => $user->getUsername(),
             'user_device_info' => $userDeviceInfo,
         ]);

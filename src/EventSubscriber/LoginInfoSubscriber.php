@@ -31,7 +31,6 @@ class LoginInfoSubscriber implements EventSubscriberInterface
         return [
             SecurityEvents::INTERACTIVE_LOGIN => 'updateLoginDeviceInfo',
             NewDeviceDetectedEvent::NAME => 'sendNewDeviceDetectedMail',
-
         ];
     }
 
