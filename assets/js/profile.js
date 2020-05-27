@@ -60,7 +60,7 @@ new Vue({
         },
 
         validation: function(event) {
-            if (event.target.id =='profile_firstName') {
+            if (event.target.id ==='profile_firstName') {
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
                   // this means only chinese characters are typed
@@ -74,7 +74,7 @@ new Vue({
                     }
                 }
             }
-            if (event.target.id =='profile_lastName') {
+            if (event.target.id ==='profile_lastName') {
                 let hasChinese = this.lastName.match(REGEX_CHINESE);
                 if (hasChinese) {
                     // this means only chinese characters are typed
