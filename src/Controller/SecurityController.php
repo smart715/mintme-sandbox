@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Controller\Traits\RefererTrait;
 use App\Form\CaptchaLoginType;
 use App\Logger\UserActionLogger;
+use App\Security\PathRoles;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
@@ -73,10 +74,18 @@ class SecurityController extends FOSSecurityController
     }
 
     /** @Route("/logout_success", name="logout_success") */
-    public function postLogoutRedirectAction(): Response
+    public function postLogoutRedirectAction(PathRoles $pathRoles): Response
     {
         $hasAuthenticated = $this->session->get('has_authenticated');
+        $referer = $this->session->get('logout_referer');
         $this->session->clear();
+
+        if ($referer) {
+            $roles = $pathRoles->getRoles(Request::create($referer));
+            if (null === $roles) {
+                return $this->redirect($referer);                
+            } 
+        }
 
         return $hasAuthenticated
             ? $this->redirectToRoute("homepage")
