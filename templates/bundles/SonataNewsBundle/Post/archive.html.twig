@@ -9,7 +9,8 @@
     <div class="container pt-5 text-white news">
         <div class="row justify-content-center">
             <div class="col-md-12 card-fixed-large px-0">
-                <div>
+                <div id="news-selector">
+                    {% set i = 0 %}
                     {% for post in pager.getResults() %}
                         <div class="news-box p-4 mb-5">
                             <header>
@@ -22,7 +23,8 @@
 
                             <div class="row">
                                 <div class="center-block text-center col-12">
-                                    {% media post.image, 'wide' with {'class': 'img-fluid'} %}
+                                        <news-image src="{{ url('homepage') }}{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
+                                    {% set i = i+1 %}
                                 </div>
                                 <p class="mt-4 mb-1 col-12 word-break">
                                     {{ post.abstract }}
@@ -62,4 +64,7 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+<script src="{{ asset('build/news.js') }}"></script>
 {% endblock %}
