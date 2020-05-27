@@ -147,7 +147,7 @@ export default {
                         minInterval: min,
                         axisLabel: {
                             formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit))
-                                .toFixed(8).toString().replace(/0+$/, ''),
+                                .toFixed(8).toString().replace(/0+$/, '').replace(/\.$/, ''),
                         },
                     },
                     {
