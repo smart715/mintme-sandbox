@@ -89,7 +89,7 @@ class OrdersController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{base}/{quote}/place-order", name="token_place_order", options={"expose"=true})
-     * @Rest\RequestParam(name="priceInput", allowBlank=false, requirements=@Assert\LessThanOrEqual(99999999.9999))
+     * @Rest\RequestParam(name="priceInput", allowBlank=false)
      * @Rest\RequestParam(name="amountInput", allowBlank=false)
      * @Rest\RequestParam(name="marketPrice", default="0")
      * @Rest\RequestParam(name="action", allowBlank=false, requirements="(sell|buy)")
@@ -101,7 +101,25 @@ class OrdersController extends AbstractFOSRestController
     ): View {
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
+        // convert "," to "."
+        $s = str_replace(',', '.', (string)$request->get('priceInput'));
 
+        // remove everything except numbers and dot "."
+        $s = preg_replace("/[^0-9\.]/", "", $s);
+
+        // remove all seperators from first part and keep the end
+        $s = str_replace('.', '',substr($s, 0, -3)) . substr($s, -3);
+
+        // return float
+        $priceInput = (float) $s;
+
+        if (99999999.9999 <= $priceInput) {
+            return $this->view([
+                'result' => 2,
+                'message' => 'The Price exceeds the maximum',
+            ], Response::HTTP_ACCEPTED);
+        }
+        
         $tradeResult = $exchanger->placeOrder(
             $currentUser,
             $market,
