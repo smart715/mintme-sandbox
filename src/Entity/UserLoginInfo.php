@@ -13,11 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class UserLoginInfo
 {
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -56,6 +51,11 @@ class UserLoginInfo
      * @var DateTimeImmutable
      */
     protected $date;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
 
     public function getId(): ?int
     {

@@ -5,7 +5,7 @@ namespace App\Events;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
 
-interface NewDeviceDetectedInterface
+interface NewDeviceDetectedEventInterface
 {
     public function getUser(): User;
     public function getUserDeviceLoginInfo(): UserLoginInfo;

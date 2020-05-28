@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
-class UserLoginInfoManager implements UserLoginInfoInterface
+class UserLoginInfoManager implements UserLoginInfoManagerInterface
 {
 
     /** @var EntityManagerInterface */

@@ -15,12 +15,12 @@ class LoginInfoSubscriber implements EventSubscriberInterface
     private $mailer;
 
     /** @var UserLoginInfoInterface */
-    private $userLoginInfo;
+    private $userLoginInfoManager;
 
-    public function __construct(MailerInterface $mailer, UserLoginInfoInterface $userLoginInfo)
+    public function __construct(MailerInterface $mailer, UserLoginInfoInterface $userLoginInfoManager)
     {
         $this->mailer = $mailer;
-        $this->userLoginInfo = $userLoginInfo;
+        $this->userLoginInfoManager = $userLoginInfoManager;
     }
 
     /**
@@ -36,7 +36,7 @@ class LoginInfoSubscriber implements EventSubscriberInterface
 
     public function updateLoginDeviceInfo(InteractiveLoginEvent $event): void
     {
-        $this->userLoginInfo->updateUserDeviceLoginInfo($event);
+        $this->userLoginInfoManager->updateUserDeviceLoginInfo($event);
     }
 
     public function sendNewDeviceDetectedMail(NewDeviceDetectedEvent $event): void

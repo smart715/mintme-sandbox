@@ -4,7 +4,7 @@ namespace App\Manager;
 
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
-interface UserLoginInfoInterface
+interface UserLoginInfoManagerInterface
 {
     public function updateUserDeviceLoginInfo(InteractiveLoginEvent $event): void;
 }
