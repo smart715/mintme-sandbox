@@ -69,9 +69,9 @@
             </form>
             <ul class="navbar-nav ml-auto">
                 {% if show_links %}
-                    <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route == 'token' ? 'active' : '' }}">
+                    <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">
                         <a href="{{ path('token_create') }}" class="nav-link">
-                            <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline"></span>
+                            <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token' ? 'icon-token-active' : '' }}"></span>
                             <span>My Token</span>
                         </a>
                     </li>
@@ -106,7 +106,7 @@
                     </li>
                 {% else %}
                     {% if show_links %}
-                        <li class="nav-item align-self-center d-lg-none {{ route == 'profile' ? 'active' : '' }}">
+                        <li class="nav-item align-self-center d-lg-none {{ route starts with 'profile' ? 'active' : '' }}">
                                 <a
                                     href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}"
                                     class="nav-link"
@@ -140,13 +140,13 @@
                                     :class="{ 'show': showProfileMenu }"
                                 >
                                     <a
-                                        class="dropdown-item"
+                                        class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
                                         href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}"
                                     >
                                         <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Profile
                                     </a>
-                                    <a class="dropdown-item" href="{{ path('settings') }}">
+                                    <a class="dropdown-item {{ route == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Settings
                                     </a>
