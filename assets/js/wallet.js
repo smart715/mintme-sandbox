@@ -22,11 +22,18 @@ new Vue({
       depositWithdrawHistory: null,
       markets: null,
       orders: null,
+      depositMore: '',
     };
+  },
+  mounted: function() {
+    this.depositMore = this.$refs.depositMore.getAttribute('value');
   },
   computed: {
     expandedTab: function() {
       return this.tabIndexsWithoutPadding.indexOf(this.tabIndex) > -1;
+    },
+    depositMoreCurrency: function() {
+      return this.depositMore;
     },
   },
   components: {
@@ -34,6 +41,11 @@ new Vue({
     TradingHistory,
     ActiveOrders,
     DepositWithdrawHistory,
+  },
+  methods: {
+    tabUpdated: function() {
+      this.depositMore = '';
+    },
   },
   store,
 });
