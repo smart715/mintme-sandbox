@@ -34,8 +34,6 @@ trait RefererTrait
 
     public function isRedirectToMainPage(string $referer): bool
     {
-        return false === strpos($referer, '/token/')
-            ? false
-            : true;
+        return !false === strpos($referer, '/token/');
     }
 }
