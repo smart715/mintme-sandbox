@@ -5,7 +5,9 @@ namespace App\Tests\Exchange\Donation;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
+use App\Exchange\Config\Config;
 use App\Exchange\Donation\DonationFetcher;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DonationFetcherTest extends TestCase
@@ -27,7 +29,7 @@ class DonationFetcherTest extends TestCase
             ])
             ->willReturn($jsonResponse);
 
-        $donationFetcher = new DonationFetcher($jsonRpc);
+        $donationFetcher = new DonationFetcher($jsonRpc, $this->mockConfig(0));
 
         if ($hasError) {
             $this->expectException(FetchException::class);
@@ -72,7 +74,7 @@ class DonationFetcherTest extends TestCase
             ])
             ->willReturn($jsonResponse);
 
-        $donationFetcher = new DonationFetcher($jsonRpc);
+        $donationFetcher = new DonationFetcher($jsonRpc, $this->mockConfig(0));
 
         if ($hasError) {
             $this->expectException(FetchException::class);
@@ -88,5 +90,15 @@ class DonationFetcherTest extends TestCase
             [false],
             [true],
         ];
+    }
+
+    /** @return Config|MockObject */
+    private function mockConfig(int $offset): Config
+    {
+        $config = $this->createMock(Config::class);
+
+        $config->method('getOffset')->willReturn($offset);
+
+        return $config;
     }
 }
