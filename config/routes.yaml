@@ -85,6 +85,6 @@ PrestaSitemapBundle:
 
 pageNotFound:
     pattern:  /{path}
-    controller: App\Controller\SecurityController:pageNotFound, path: ''
+    controller: App\Controller\SecurityController:pageNotFoundAction
     requirements:
         path: .*
