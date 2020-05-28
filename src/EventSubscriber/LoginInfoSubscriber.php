@@ -4,7 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Events\NewDeviceDetectedEvent;
 use App\Mailer\MailerInterface;
-use App\Manager\UserLoginInfoInterface;
+use App\Manager\UserLoginInfoManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -14,10 +14,10 @@ class LoginInfoSubscriber implements EventSubscriberInterface
     /** @var MailerInterface */
     private $mailer;
 
-    /** @var UserLoginInfoInterface */
+    /** @var UserLoginInfoManagerInterface */
     private $userLoginInfoManager;
 
-    public function __construct(MailerInterface $mailer, UserLoginInfoInterface $userLoginInfoManager)
+    public function __construct(MailerInterface $mailer, UserLoginInfoManagerInterface $userLoginInfoManager)
     {
         $this->mailer = $mailer;
         $this->userLoginInfoManager = $userLoginInfoManager;
