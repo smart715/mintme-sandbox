@@ -456,6 +456,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new ApiBadRequestException('You need all your tokens to delete token');
+        }
+
         /** @var User $user */
         $user = $this->getUser();
 
@@ -465,10 +469,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             if (!$response->getResult()) {
                 throw new ApiUnauthorizedException($response->getMessage());
             }
-        }
 
-        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to delete token');
+            $user->setEmailAuthCode('');
+            $this->em->persist($user);
         }
 
         $this->em->remove($token);
