@@ -88,7 +88,7 @@ export default {
             this.input = val;
             this.items = [];
         },
-        clearSearch: function () {
+        clearSearch: function() {
             this.input = '';
             this.searchValue = '';
             this.items = [];
