@@ -103,6 +103,7 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
+     * @Assert\Regex(pattern="^https:\/\/t\.me\/joinchat\/([-\w]{1,})$")
      * @var string|null
      */
     protected $telegramUrl;
@@ -110,6 +111,7 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
+     * @Assert\Regex(pattern="^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\w]{1,})$")
      * @var string|null
      */
     protected $discordUrl;
