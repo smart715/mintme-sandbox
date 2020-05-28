@@ -3,6 +3,7 @@
         <div ref="tokenSearch" @keyup.enter="onItemSelected">
             <autocomplete
                     ref="searchInput"
+                    :value="searchValue"
                     :input-class="inputClass"
                     placeholder="Search for the token"
                     :auto-select-one-item="false"
@@ -47,6 +48,7 @@ export default {
         return {
             validName: true,
             input: '',
+            searchValue: undefined,
             items: [],
             inputAttrs: {
                 maxlength: 60,
@@ -85,6 +87,14 @@ export default {
             this.validName = tokenRegEx.test(val);
             this.input = val;
             this.items = [];
+        },
+        clearSearch: function () {
+            this.input = '';
+            this.searchValue = '';
+            this.items = [];
+            this.$nextTick(() => {
+                this.searchValue = undefined;
+            });
         },
     },
     computed: {
