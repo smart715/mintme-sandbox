@@ -9,21 +9,25 @@
                             <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                         </copy-link><br />
                     Your private key:<br />
-                    <template v-if="keys.plainPrivateKey">
-                        <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
-                        <copy-link
-                                class="code-copy c-pointer ml-2"
-                                id="private-copy-btn"
-                                :content-to-copy="keys.plainPrivateKey">
-                            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                        </copy-link>
-                        <div class="text-center small">
-                            (Copy this key, you will not able to see it again after reload)
+                        <div v-if="keys.plainPrivateKey" class="text-left">
+                            <template>
+                                    <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
+                                    <copy-link
+                                            class="code-copy c-pointer ml-2"
+                                            id="private-copy-btn"
+                                            :content-to-copy="keys.plainPrivateKey">
+                                        <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                                    </copy-link>
+                                <div class="ml-apicopy small">
+                                    (Copy this key, you will not able to see it again after reload)
+                                </div>
+                            </template>
                         </div>
-                    </template>
-                    <template v-else>
-                        <span class="text-white-50">** hidden **</span>
-                    </template>
+                        <div v-else>
+                            <template>
+                                <span class="text-white-50">** hidden **</span>
+                            </template>
+                        </div>
                 </div>
             </div>
             <p>Invalidate your API keys:</p>

@@ -18,18 +18,24 @@
                             <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
                         </a><br />
                         Secret:<br />
-                        <template v-if="row.item.secret">
-                            <span class="text-danger word-break">{{ row.item.secret }}</span>
-                            <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">
-                                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                            </copy-link>
-                            <div class="text-center small">
-                                (Copy this secret, you will not able to see it again after reload)
-                            </div>
-                        </template>
-                        <template v-else>
+                        <div v-if="row.item.secret" class="text-center">
+                            <template>
+                                <div class="text-left">
+                                    <span class="text-danger word-break">{{ row.item.secret }}</span>
+                                    <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">
+                                        <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                                    </copy-link>
+                                </div>
+                                <div class="small">
+                                    (Copy this secret, you will not able to see it again after reload)
+                                </div>
+                            </template>
+                        </div>
+                        <div v-else>
+                            <template>
                             <span class="text-white-50">** hidden **</span>
-                        </template>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </template>
