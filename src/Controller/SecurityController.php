@@ -83,7 +83,7 @@ class SecurityController extends FOSSecurityController
         if ($referer) {
             $roles = $pathRoles->getRoles(Request::create($referer));
 
-            if (null === $roles) {
+            if (null === $roles && !$this->isRedirectToMainPage($referer)) {
                 return $this->redirect($referer);
             }
         }

@@ -19,6 +19,6 @@ class PathRoles
     {
         $patterns = $this->accessMap->getPatterns($request);
 
-        return $patterns[0];
+        return !empty($patterns) ? $patterns[0] : null;
     }
 }

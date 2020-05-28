@@ -31,4 +31,9 @@ trait RefererTrait
             'token_show',
         ];
     }
+
+    public function isRedirectToMainPage(string $referer): bool
+    {
+        return (false === strpos($referer, '/token/')) ? false : true;
+    }
 }
