@@ -149,19 +149,19 @@ class BalanceHandler implements BalanceHandlerInterface
         return $available->equals($balance);
     }
 
-    /** @inheritDoc */
-    public function soldOnMarket(Token $token, int $amount, array $ownPendingOrders): Money
+    public function soldOnMarket(Token $token, int $initAmount, array $ownPendingOrders): Money
     {
         $available = $this->balance($token->getProfile()->getUser(), $token)->getAvailable();
-        $balance = $this->moneyWrapper->parse((string)$amount, $available->getCurrency()->getCode());
+        $init = $this->moneyWrapper->parse((string)$initAmount, $available->getCurrency()->getCode());
+        $withdrawn = new Money($token->getWithdrawn(), $available->getCurrency());
 
         foreach ($ownPendingOrders as $order) {
             if (Order::SELL_SIDE === $order->getSide()) {
-                $balance = $balance->subtract($order->getAmount());
+                $available = $available->add($order->getAmount());
             }
         }
 
-        return $balance->subtract($available);
+        return $init->subtract($withdrawn)->subtract($available);
     }
 
     /**
