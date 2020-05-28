@@ -82,3 +82,9 @@ media:
 PrestaSitemapBundle:
     resource: "@PrestaSitemapBundle/Resources/config/routing.yml"
     prefix: /
+
+pageNotFound:
+    pattern:  /{path}
+    controller: App\Controller\SecurityController:pageNotFound, path: ''
+    requirements:
+        path: .*

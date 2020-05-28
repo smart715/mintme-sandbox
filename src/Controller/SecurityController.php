@@ -123,4 +123,9 @@ class SecurityController extends FOSSecurityController
             $this->generateUrl('nelmio_api_doc.swagger_ui', [], UrlGeneratorInterface::ABSOLUTE_URL) => 'settings',
         ];
     }
+
+    public function pageNotFoundAction(): void
+    {
+        throw new NotFoundHttpException();
+    }
 }
