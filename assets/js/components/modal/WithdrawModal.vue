@@ -5,7 +5,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center overflow-wrap-break-word word-break-all">
-                <h3 class="modal-title">WITHDRAW({{ currency | rebranding }})</h3>
+                <h3 class="modal-title">WITHDRAW ({{ currency | rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
                         Address:
@@ -14,10 +14,11 @@
                         v-model="$v.address.$model"
                         type="text"
                         id="address"
+                        @change="setFirstTimeOpen"
                         :class="{ 'is-invalid': $v.address.$error }"
                         class="form-control">
                     <div v-if="$v.address.$error" class="invalid-feedback">
-                        Wrong address
+                        {{ 'WEB' === currency || true === isToken ? 'Wallet address has to be 42 characters long with leading 0x' : 'Invalid wallet address'}}
                     </div>
                 </div>
                 <div class="col-12 pt-2 pb-5 withdraw-amount">
@@ -28,6 +29,7 @@
                             id="wamount"
                             v-model="$v.amount.$model"
                             type="text"
+                            @change="setFirstTimeOpen"
                             @keypress="checkAmount"
                             @paste="checkAmount"
                             :class="{ 'is-invalid': $v.amount.$error }"
@@ -75,7 +77,7 @@
                 <div class="col-12 pt-2 text-center">
                     <button
                         class="btn btn-primary"
-                        :disabled="withdrawing"
+                        :disabled="$v.$anyError || withdrawing"
                         @click="onWithdraw">
                         Withdraw
                     </button>
@@ -96,7 +98,7 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import {addressLength, webSymbol, addressContain} from '../../utils/constants';
+import {addressLength, webSymbol, addressContain, addressFirstSymbol} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
@@ -119,10 +121,11 @@ export default {
     },
     data() {
         return {
-            withdrawing: false,
             code: '',
             amount: 0,
             address: '',
+            withdrawing: true,
+            flag: true,
         };
     },
     computed: {
@@ -213,6 +216,12 @@ export default {
             this.amount = amount.greaterThan(this.fee) ?
                 toMoney(amount.sub(this.fee).toString(), this.subunit) : toMoney(0, this.subunit);
         },
+        setFirstTimeOpen: function() {
+            if (this.flag) {
+                this.withdrawing = false;
+            }
+            this.flag = false;
+        },
     },
     validations() {
         return {
@@ -233,6 +242,8 @@ export default {
                 maxLength: maxLength(
                     addressLength[this.currency] ? addressLength[this.currency].max : addressLength.WEB.max
                 ),
+                addressFirstSymbol:
+                    addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
             },
         };
     },

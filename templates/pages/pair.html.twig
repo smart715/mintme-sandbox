@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block title %}
-    {% if token|default %} {{ token.name }} token{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
+    {% if token|default %} Information about {{ token.name }} token{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
 {% endblock %}
 
 {% block content %}
@@ -51,6 +51,7 @@
                                     youtube-channel-id="{{ token.youtubeChannelId }}"
                                     :editable="{{ isOwner }}"
                                     profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
+                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
                                     :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     token-contract-address="{{ token.address }}"
                                     token-name="{{ market.quote.name }}"

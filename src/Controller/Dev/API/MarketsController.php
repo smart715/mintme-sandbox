@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dev\API;
 
+use App\Exception\ApiNotFoundException;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\MarketInfo;
@@ -133,7 +134,7 @@ class MarketsController extends DevApiController
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
         if (is_null($base) || is_null($quote)) {
-            throw new \Exception('Market not found', Response::HTTP_NOT_FOUND);
+            throw new ApiNotFoundException('Market not found');
         }
 
         return $this->rebrandingConverter->convertMarketInfo($this->marketHandler->getMarketInfo(

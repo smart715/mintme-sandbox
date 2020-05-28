@@ -82,7 +82,15 @@ class DepositConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg)
     {
-        DBConnection::reconnectIfDisconnected($this->em);
+        if (!DBConnection::initConsumerEm(
+            'deposit-consumer',
+            $this->em,
+            $this->logger
+        )) {
+            return false;
+        }
+        
+        $this->em->clear();
 
         $this->logger->info('[deposit-consumer] Received new message: '.json_encode($msg->body));
 
@@ -128,7 +136,6 @@ class DepositConsumer implements ConsumerInterface
                 ? new DepositTokenStrategy(
                     $this->balanceHandler,
                     $this->depositCommunicator,
-                    $this->em,
                     $this->moneyWrapper
                 )
                 : new DepositCryptoStrategy($this->balanceHandler, $this->moneyWrapper);

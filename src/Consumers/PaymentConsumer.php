@@ -80,7 +80,15 @@ class PaymentConsumer implements ConsumerInterface
     /** {@inheritdoc} */
     public function execute(AMQPMessage $msg): bool
     {
-        DBConnection::reconnectIfDisconnected($this->em);
+        if (!DBConnection::initConsumerEm(
+            'payment-consumer',
+            $this->em,
+            $this->logger
+        )) {
+            return false;
+        }
+        
+        $this->em->clear();
 
         $this->logger->info('[payment-consumer] Received new message: '.json_encode($msg->body));
 
