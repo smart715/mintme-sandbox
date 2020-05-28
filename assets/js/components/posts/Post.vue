@@ -23,9 +23,8 @@
                 transform="shrink-4 up-1.5"
             />
         </button>
-        <button v-if="showEdit"
+        <a v-if="showEdit"
             class="btn btn-link p-0 edit-icon float-right text-decoration-none text-reset"
-            :disabled="editDisabled"
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
             <font-awesome-icon
@@ -33,7 +32,7 @@
                 icon="edit"
                 transform="shrink-4 up-1.5"
             />
-        </button>
+        </a>
     </div>
 </template>
 
@@ -72,7 +71,6 @@ export default {
     data() {
         return {
             deleteDisabled: false,
-            editDisabled: false,
         };
     },
     computed: {
