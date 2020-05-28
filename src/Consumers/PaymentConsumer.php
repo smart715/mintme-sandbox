@@ -87,6 +87,8 @@ class PaymentConsumer implements ConsumerInterface
         )) {
             return false;
         }
+        
+        $this->em->clear();
 
         $this->logger->info('[payment-consumer] Received new message: '.json_encode($msg->body));
 
