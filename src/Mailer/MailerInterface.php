@@ -6,6 +6,7 @@ use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Entity\UserLoginInfo;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 
 interface MailerInterface
@@ -16,4 +17,5 @@ interface MailerInterface
     public function checkConnection(): void;
     public function sendTokenDeletedMail(Token $token): void;
     public function sendPasswordResetMail(User $user, bool $resetting): void;
+    public function sendNewDeviceDetectedMail(User $user, UserLoginInfo $userLoginInfo): void;
 }
