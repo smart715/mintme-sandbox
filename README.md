@@ -134,7 +134,7 @@ panel_webchaind_1      docker-entrypoint.sh             Up      31440/tcp, 31440
 panel_withdraw_1       app-docker-entrypoint.sh         Up      9000/tcp                                                                                                 
 ```
 5. To stop services if they are running in foreground mode type `ctrl+c` or `sudo docker-compose stop` for background mode
-6. Databases stored in `.docker/db` ,also you can connect to mysql server with `mysql -u root -p --protocol=tcp`
+6. You can connect to mysql server with `mysql -u root -p --protocol=tcp`
 
 ### PS:
 
