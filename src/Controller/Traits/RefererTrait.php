@@ -38,7 +38,7 @@ trait RefererTrait
 
         foreach ($this->refererRoutesForRedirectToMainPage() as $refererRoute) {
             if (false !== strpos($referer, $refererRoute)) {
-                $noRedirect =  false;
+                $noRedirect = false;
 
                 break;
             }
