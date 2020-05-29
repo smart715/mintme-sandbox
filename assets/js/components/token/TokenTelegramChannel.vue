@@ -145,8 +145,8 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        if ("edit"=== aux && "Invalid telegram link" === response.data.message) {
-                            this.notifyError("Invalid telegram link");
+                        if ('edit'=== aux && 'Invalid telegram link' === response.data.message) {
+                            this.notifyError('Invalid telegram link');
                             this.sendLogs('error', 'Can not save telegram', response);
                         } else {
                             let state = this.newTelegram ? 'added' : 'removed';

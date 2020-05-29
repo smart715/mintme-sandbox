@@ -144,8 +144,8 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        if ("edit"=== aux && "Invalid discord link" === response.data.message) {
-                            this.notifyError("Invalid discord link");
+                        if ('edit'=== aux && 'Invalid discord link' === response.data.message) {
+                            this.notifyError('Invalid discord link');
                             this.sendLogs('error', 'Can not save discord', response);
                         } else {
                             let state = this.newDiscord ? 'added' : 'removed';
