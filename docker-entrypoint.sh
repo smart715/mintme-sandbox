@@ -32,6 +32,11 @@ npm run dev
 # Install composer deps
 composer install
 
+# Set permissions
+chown -R :www-data /var/www/html/panel/
+chmod -R g+w /var/www/html/panel/var/
+chmod -R g+s /var/www/html/panel/
+
 # Prepare database env
 php bin/console doctrine:database:create --if-not-exists
 php bin/console doctrine:migrations:migrate --allow-no-migration -n
