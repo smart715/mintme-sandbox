@@ -103,7 +103,7 @@ class WalletController extends Controller
 
         return $this->createWalletRedirection(
             'success',
-            'Your transaction has been successfully sent.'
+            'Your transaction has been successfully confirmed and queued to be sent.'
         );
     }
 
