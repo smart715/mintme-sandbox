@@ -89,7 +89,7 @@ class OrdersController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post("/{base}/{quote}/place-order", name="token_place_order", options={"expose"=true})
-     * @Rest\RequestParam(name="priceInput", allowBlank=false, requirements=@Assert\LessThanOrEqual(99999999.9999))
+     * @Rest\RequestParam(name="priceInput", allowBlank=false)
      * @Rest\RequestParam(name="amountInput", allowBlank=false)
      * @Rest\RequestParam(name="marketPrice", default="0")
      * @Rest\RequestParam(name="action", allowBlank=false, requirements="(sell|buy)")
