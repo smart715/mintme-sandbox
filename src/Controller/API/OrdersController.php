@@ -7,6 +7,8 @@ use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
@@ -18,7 +20,6 @@ use Money\Currency;
 use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route("/api/orders")
@@ -96,30 +97,22 @@ class OrdersController extends AbstractFOSRestController
      */
     public function placeOrder(
         Market $market,
+        MoneyWrapperInterface $moneyWrapper,
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
-        // convert "," to "."
-        $s = str_replace(',', '.', (string)$request->get('priceInput'));
+        $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);
+        $maximum = $moneyWrapper->parse((string)99999999.9999, MoneyWrapper::TOK_SYMBOL);
 
-        // remove everything except numbers and dot "."
-        $s = preg_replace("/[^0-9\.]/", "", $s);
-
-        // remove all seperators from first part and keep the end
-        $s = str_replace('.', '',substr($s, 0, -3)) . substr($s, -3);
-
-        // return float
-        $priceInput = (float) $s;
-
-        if (99999999.9999 <= $priceInput) {
+        if ($priceInput->greaterThanOrEqual($maximum)) {
             return $this->view([
                 'result' => 2,
-                'message' => 'The Price exceeds the maximum',
+                'message' => 'Invalid price',
             ], Response::HTTP_ACCEPTED);
         }
-        
+
         $tradeResult = $exchanger->placeOrder(
             $currentUser,
             $market,
