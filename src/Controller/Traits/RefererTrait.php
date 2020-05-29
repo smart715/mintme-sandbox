@@ -34,6 +34,23 @@ trait RefererTrait
 
     public function noRedirectToMainPage(string $referer): bool
     {
-        return false === strpos($referer, '/token/');
+        $noRedirect = true;
+
+        foreach ($this->refererRoutesForRedirectToMainPage() as $refererRoute) {
+            if (false !== strpos($referer, $refererRoute)) {
+                $noRedirect =  false;
+                break;
+            }
+        }
+
+        return $noRedirect;
+    }
+
+    public function refererRoutesForRedirectToMainPage(): array
+    {
+        return [
+            '/token/',
+            '/profile/',
+        ];
     }
 }
