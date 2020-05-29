@@ -116,7 +116,6 @@ export default {
     },
     methods: {
         editTelegram: function() {
-
             if (this.newTelegram.length && this.newTelegram !== this.currentTelegram) {
                 this.checkTelegramUrl();
             }
@@ -146,7 +145,7 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        if('edit'=== aux && "Invalid telegram link" === response.data.message) {
+                        if ("edit"=== aux && "Invalid telegram link" === response.data.message) {
                             this.notifyError("Invalid telegram link");
                             this.sendLogs('error', 'Can not save telegram', response);
                         } else {

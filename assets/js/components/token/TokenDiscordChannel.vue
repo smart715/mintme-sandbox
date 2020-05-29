@@ -116,7 +116,6 @@ export default {
     },
     methods: {
         editDiscord: function() {
-
             if (this.newDiscord.length && this.newDiscord !== this.currentDiscord) {
                 this.checkDiscordUrl();
             }
@@ -145,7 +144,7 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        if('edit'=== aux && "Invalid discord link" === response.data.message) {
+                        if ("edit"=== aux && "Invalid discord link" === response.data.message) {
                             this.notifyError("Invalid discord link");
                             this.sendLogs('error', 'Can not save discord', response);
                         } else {
