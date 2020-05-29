@@ -1,16 +1,17 @@
 <template>
     <div>
         <template v-if="existed">
-            <div class="text-left">
-                <div class="text-left d-inline-block ml-api">
-                    Your public key:<br />
-                        <span class="text-danger word-break">{{ keys.publicKey }}</span>
-                        <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
-                            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
-                        </copy-link><br />
-                    Your private key:<br />
-                        <div v-if="keys.plainPrivateKey" class="text-left">
-                            <template>
+            <div class="text-center">
+                <div class="text-left">
+                    <div class="text-left d-inline-block ml-api">
+                        Your public key:<br />
+                            <span class="text-danger word-break">{{ keys.publicKey }}</span>
+                            <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
+                                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                            </copy-link><br />
+                        Your private key:<br />
+                            <div v-if="keys.plainPrivateKey">
+                                <template>
                                     <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
                                     <copy-link
                                             class="code-copy c-pointer ml-2"
@@ -18,17 +19,18 @@
                                             :content-to-copy="keys.plainPrivateKey">
                                         <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                                     </copy-link>
-                                <div class="ml-apicopy small">
-                                    (Copy this key, you will not able to see it again after reload)
-                                </div>
-                            </template>
-                        </div>
-                        <div v-else>
-                            <template>
-                                <span class="text-white-50">** hidden **</span>
-                            </template>
-                        </div>
+                                </template>
+                            </div>
+                            <div v-else>
+                                <template>
+                                    <span class="text-white-50">** hidden **</span>
+                                </template>
+                            </div>
+                    </div>
                 </div>
+               <span v-show="keys.plainPrivateKey" class="small">
+                    (Copy this key, you will not able to see it again after reload)
+                </span>
             </div>
             <p>Invalidate your API keys:</p>
             <div class="btn btn-primary c-pointer" @click="toggleInvalidateModal(true)">Invalidate</div>
