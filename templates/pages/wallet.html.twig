@@ -9,7 +9,13 @@
         <div class="row pt-5 justify-content-center">
             <div class="col-md-12 card-fixed-large px-0 text-white">
                 {{ include('spinners/wallet.html.twig') }}
-                <b-tabs :lazy="true" class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
+                <b-tabs
+                    @input="tabUpdated"
+                    :lazy="true"
+                    class="tabs-theme"
+                    v-model="tabIndex"
+                    :class="{'no-padding': expandedTab}"
+                >
                     <b-tab title="Wallet" active>
                         <wallet
                             hash="{{ hash }}"
@@ -17,7 +23,7 @@
                             create-token-url="{{ path('token_create') }}"
                             trading-url="{{ path('trading') }}"
                             withdraw-url="{{ path('withdraw') }}"
-                            deposit-more="{{ depositMore }}"
+                            :deposit-more="depositMoreCurrency"
                             twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
                         >
                         </wallet>
@@ -36,6 +42,7 @@
                         </active-orders>
                     </b-tab>
                 </b-tabs>
+                <input type="hidden" ref="depositMore" value="{{ depositMore }}"/>
             </div>
         </div>
     </div>
