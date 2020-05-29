@@ -116,11 +116,12 @@ export default {
     },
     methods: {
         editTelegram: function() {
+
             if (this.newTelegram.length && this.newTelegram !== this.currentTelegram) {
                 this.checkTelegramUrl();
             }
 
-            if (this.showTelegramError) {
+            if (this.telegramError) {
                 return;
             }
 
@@ -145,11 +146,16 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        let state = this.newTelegram ? 'added' : 'removed';
-                        this.$emit('saveTelegram', this.newTelegram);
-                        this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
-                        this.notifySuccess(`Telegram invitation link ${state} successfully`);
-                        this.editing = false;
+                        if('edit'=== aux && "Invalid telegram link" === response.data.message) {
+                            this.notifyError("Invalid telegram link");
+                            this.sendLogs('error', 'Can not save telegram', response);
+                        } else {
+                            let state = this.newTelegram ? 'added' : 'removed';
+                            this.$emit('saveTelegram', this.newTelegram);
+                            this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
+                            this.notifySuccess(`Telegram invitation link ${state} successfully`);
+                            this.editing = false;
+                        }
                     } else {
                         this.notifyError(response.data.message || 'Network error');
                         this.sendLogs('error', 'Can not save telegram', response);

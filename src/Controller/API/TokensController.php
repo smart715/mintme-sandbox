@@ -95,8 +95,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
-     * @Rest\RequestParam(name="telegramUrl", nullable=true, requirements="^https:\/\/t\.me\/joinchat\/([-\w]{1,})$")
-     * @Rest\RequestParam(name="discordUrl", nullable=true, requirements="^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\w]{1,})$")
+     * @Rest\RequestParam(name="telegramUrl", nullable=true)
+     * @Rest\RequestParam(name="discordUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
      */
@@ -111,6 +111,22 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
+        }
+
+        if ($request->get('discordUrl') != null) {
+            if (!preg_match('/^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\w]{1,})$/', $request->get('discordUrl'))) {
+                return $this->view([
+                    'message' => 'Invalid discord link',
+                ], Response::HTTP_ACCEPTED);
+            }
+        }
+
+        if ($request->get('telegramUrl') != null) {
+            if (!preg_match('/^https:\/\/t\.me\/joinchat\/([-\w]{1,})$/', $request->get('telegramUrl'))) {
+                return $this->view([
+                    'message' => 'Invalid telegram link',
+                ], Response::HTTP_ACCEPTED);
+            }
         }
 
         $this->denyAccessUnlessGranted('edit', $token);

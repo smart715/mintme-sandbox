@@ -116,6 +116,7 @@ export default {
     },
     methods: {
         editDiscord: function() {
+
             if (this.newDiscord.length && this.newDiscord !== this.currentDiscord) {
                 this.checkDiscordUrl();
             }
@@ -123,17 +124,16 @@ export default {
             if (this.showDiscordError) {
                 return;
             }
-
-            this.saveDiscord();
+            this.saveDiscord('edit');
         },
         checkDiscordUrl: function() {
             this.showDiscordError = !isValidDiscordUrl(this.newDiscord);
         },
         deleteDiscord: function() {
             this.newDiscord = '';
-            this.saveDiscord();
+            this.saveDiscord('delete');
         },
-        saveDiscord: function() {
+        saveDiscord: function(aux) {
             if (this.submitting) {
                 return;
             }
@@ -145,14 +145,19 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        let state = this.newDiscord ? 'added' : 'removed';
-                        this.$emit('saveDiscord', this.newDiscord);
-                        this.newDiscord = this.newDiscord || 'https://discord.gg/';
-                        this.notifySuccess(`Discord invitation link ${state} successfully`);
-                        this.editing = false;
+                        if('edit'=== aux && "Invalid discord link" === response.data.message) {
+                            this.notifyError("Invalid discord link");
+                            this.sendLogs('error', 'Can not save discord', response);
+                        } else {
+                            let state = this.newDiscord ? 'added' : 'removed';
+                            this.$emit('saveDiscord', this.newDiscord);
+                            this.newDiscord = this.newDiscord || 'https://discord.gg/';
+                            this.notifySuccess(`Discord invitation link ${state} successfully`);
+                            this.editing = false;
+                        }
                     } else {
-                        this.notifyError(response.data.message || 'Network error');
-                        this.sendLogs('error', 'Save discord network error', response);
+                        this.notifyError(response.data.message);
+                        this.sendLogs('error', 'Can not save discord', response);
                     }
                     this.submitting = false;
                 });
