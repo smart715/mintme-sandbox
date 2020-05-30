@@ -7,6 +7,7 @@ use App\Form\DataTransformer\NameTransformer;
 use App\Form\DataTransformer\XSSProtectionTransformer;
 use App\Form\DataTransformer\ZipCodeTransformer;
 use App\Form\Type\BbcodeEditorType;
+use App\Form\Type\NicknameType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
@@ -44,8 +45,10 @@ class ProfileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('nickname', NicknameType::class)
             ->add('firstName', TextType::class, [
                 'label' => 'First name:',
+                'required' => false,
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -53,6 +56,7 @@ class ProfileType extends AbstractType
             ])
             ->add('lastName', TextType::class, [
                 'label' => 'Last name:',
+                'required' => false,
                 'attr' => [
                     'minlength' => 2,
                     'maxlength' => 30,
@@ -71,7 +75,7 @@ class ProfileType extends AbstractType
                 ],
             ])
             ->add('anonymous', CheckboxType::class, [
-                'label' => 'Trade anonymously',
+                'label' => 'Hide my personal data',
                 'required' => false,
                 'attr' => [
                   'class' => 'custom-control-input',
