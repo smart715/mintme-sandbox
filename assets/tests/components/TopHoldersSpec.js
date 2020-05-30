@@ -49,12 +49,12 @@ describe('TopHolders', () => {
 
         moxios.stubRequest('top_holders', {status: 200, response: [
             {
-                user: {profile: {firstName: 'foo', lastName: 'bar'}},
+                user: {profile: {nickname: 'foo'}},
                 timestamp: 1563550710,
                 balance: '999',
             },
             {
-                user: {profile: {firstName: 'foo', lastName: 'baz'}},
+                user: {profile: {nickname: 'foo'}},
                 timestamp: 1563550710,
                 balance: '99',
             },

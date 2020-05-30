@@ -45,9 +45,9 @@ class ProfileManager implements ProfileManagerInterface
     }
 
     /** @codeCoverageIgnore */
-    public function getProfileByPageUrl(string $pageUrl): ?Profile
+    public function getProfileByNickname(string $nickname): ?Profile
     {
-        return $this->profileRepository->getProfileByPageUrl($pageUrl);
+        return $this->profileRepository->getProfileByNickname($nickname);
     }
 
     public function findByEmail(string $email): ?Profile
@@ -59,20 +59,11 @@ class ProfileManager implements ProfileManagerInterface
             : $this->getProfile($user);
     }
 
-    public function generatePageUrl(Profile $profile): string
+    public function findByNickname(string $nickname): ?Profile
     {
-        $route = $profile->getFirstName() . '.' . $profile->getLastName();
-        $route = str_replace(' ', '-', $route);
-
-        if ('.' === substr($route, 0, 1)) {
-            throw new \Exception('Can\'t generate profile link for empty profile');
-        }
-
-        $existedProfile = $this->profileRepository->getProfileByPageUrl($route);
-
-        return null === $existedProfile || $profile === $existedProfile
-                ? strtolower($route)
-                : $this->generateUniqueUrl($route);
+        return $this->profileRepository->findOneBy([
+            'nickname' => $nickname,
+        ]);
     }
 
     /** @codeCoverageIgnore */
@@ -94,16 +85,5 @@ class ProfileManager implements ProfileManagerInterface
         }
 
         return $this->userRepository->findByHash($hash);
-    }
-
-    private function generateUniqueUrl(string $prefix): string
-    {
-        $str = strtolower($prefix . "." . bin2hex(openssl_random_pseudo_bytes(3) ?: uniqid()));
-
-        if ($this->profileRepository->getProfileByPageUrl($str)) {
-            return $this->generateUniqueUrl($prefix);
-        }
-
-        return $str;
     }
 }
