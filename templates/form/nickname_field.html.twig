@@ -1,0 +1,17 @@
+{{ form_label(form.nickname) }}
+<guide>
+    <template slot="header">
+        Nickname
+    </template>
+    <template slot="body">
+        Name used in our service, visible for everyone.
+    </template>
+</guide>
+{{ form_errors(form.nickname) }}
+{{ form_widget(form.nickname, {'attr':
+    {
+        'v-model.trim': '$v.nickname.$model',
+        'ref': 'nickname'
+    }
+}) }}
+{{ form_help(form.nickname) }}
