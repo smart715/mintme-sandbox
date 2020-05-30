@@ -28,7 +28,7 @@ class Profile
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, nullable=true)
      * @Groups({"API", "Default"})
      * @var string
      */
