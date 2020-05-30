@@ -252,13 +252,12 @@ export default {
                             this.resetOrder();
                         }
                         this.showNotification(data);
-                        this.placingOrder = false;
                     })
                     .catch((error) => {
                         this.handleOrderError(error);
                         this.sendLogs('error', 'Can not get place order', error);
                     })
-                    .then(() => this.hasOrderPlaced = false);
+                    .then(() => this.placingOrder = false);
             }
         },
         resetOrder: function() {

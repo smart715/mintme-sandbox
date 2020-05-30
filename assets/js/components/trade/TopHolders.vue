@@ -93,8 +93,8 @@ export default {
             }))
             .then(({data}) => this.traders = data.map((row) => {
                 return {
-                    trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
-                    url: this.$routing.generate('profile-view', {pageUrl: row.user.profile.page_url}),
+                    trader: row.user.profile.nickname,
+                    url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
                     date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
                     amount: Math.round(row.balance),
                 };
