@@ -372,6 +372,10 @@ services:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 
+    App\EventSubscriber\LoginInfoSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }
+
     App\EventListener\BruteForceListener:
         arguments:
             $session: '@session'
