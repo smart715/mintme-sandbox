@@ -122,13 +122,9 @@ class TokenManager implements TokenManagerInterface
 
     public function getOwnToken(): ?Token
     {
-        $profile = $this->getProfile();
-
-        if (null === $profile) {
-            return null;
-        }
-
-        return $profile->getToken();
+        return $this->getProfile()
+            ? $this->getProfile()->getToken()
+            : null;
     }
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult

@@ -16,8 +16,8 @@ class ProfileRepository extends EntityRepository
     }
 
     /** @codeCoverageIgnore */
-    public function getProfileByPageUrl(string $pageUrl): ?Profile
+    public function getProfileByNickname(string $nickname): ?Profile
     {
-        return $this->findOneBy(['page_url' => $pageUrl]);
+        return $this->findOneBy(['nickname' => $nickname]);
     }
 }

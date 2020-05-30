@@ -15,26 +15,6 @@ use stdClass;
 
 class ProfileManagerTest extends TestCase
 {
-    public function testGeneratePageUrl(): void
-    {
-        $profile = $this->mockProfile('foo', 'bar');
-        $emptyProfile = $this->mockProfile();
-
-        $manager = new ProfileManager($this->mockEntityManager(null));
-
-        $this->assertEquals('foo.bar', $manager->generatePageUrl($profile));
-
-        $manager = new ProfileManager($this->mockEntityManager($profile));
-
-        $this->assertRegExp('/^foo\.baz\..+/', $manager->generatePageUrl($this->mockProfile('foo', 'baz')));
-        $this->assertEquals('foo.bar', $manager->generatePageUrl($profile));
-        $this->assertEquals('foo-bar.baz', $manager->generatePageUrl($this->mockProfile('foo bar', 'baz')));
-        $this->assertEquals('foo-bar.baz', $manager->generatePageUrl($this->mockProfile('foo-bar', 'baz')));
-        $this->expectException(\Throwable::class);
-
-        $manager->generatePageUrl($emptyProfile);
-    }
-
     public function testFindProfileByHash(): void
     {
         $profile = $this->mockProfile();
@@ -117,7 +97,7 @@ class ProfileManagerTest extends TestCase
         if ($hasMethods) {
             $repo
                 ->expects($this->at(0))
-                ->method('getProfileByPageUrl')
+                ->method('getProfileByNickname')
                 ->willReturn($profile);
         }
 
