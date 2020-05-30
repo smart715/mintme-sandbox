@@ -67,17 +67,27 @@ let propsForTestCorrectlyRenders = {
 
 const tableData = [
     {
-        'timestamp': 1551876719.890195,
-        'side': 2,
-        'amount': '5.000000000000000000',
-        'price': '1.000000000000000000',
-        'fee': '0.500000000000000000',
-        'market': {
-            'token': {
-                'name': 'user110token',
+        timestamp: 1551876719.890195,
+        side: 2,
+        amount: '5.000000000000000000',
+        price: '1.000000000000000000',
+        fee: '0.500000000000000000',
+        market: {
+            token: {
+                name: 'user110token',
             },
-            'currencySymbol': 'WEB',
-            'hiddenName': 'TOK000000000010WEB',
+            currencySymbol: 'WEB',
+            hiddenName: 'TOK000000000010WEB',
+        },
+        maker: {
+            profile: {
+                nickname: 'foo',
+            },
+        },
+        taker: {
+            profile: {
+                nickname: 'foo',
+            },
         },
     },
 ];
@@ -204,15 +214,6 @@ describe('TradeTradeHistory', () => {
                 done();
             });
         });
-    });
-
-    it('should return correctly value when the function traderFullName() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(TradeTradeHistory, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        expect(wrapper.vm.traderFullName({firstName: 'foo', lastName: 'bar'})).to.be.equal('foo bar');
     });
 
     it('renders correctly with assigned props', () => {

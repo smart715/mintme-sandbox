@@ -59,7 +59,6 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
                 ->add('where', $qb->expr()->in('ut.user', $userIds))
                 ->andWhere('ut.token = ?1')
                 ->andWhere('ut.user != ?2')
-                ->andWhere('p.anonymous = 0')
                 ->setParameter(1, $token->getId())
                 ->setParameter(2, $token->getProfile()->getUser()->getId())
                 ->getQuery()
