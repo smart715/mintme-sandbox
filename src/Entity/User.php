@@ -91,7 +91,7 @@ class User extends BaseUser implements
 
     /**
      * @ORM\OneToOne(targetEntity="Profile", mappedBy="user", cascade={"persist", "remove"})
-     * @var Profile
+     * @var Profile|null
      */
     protected $profile;
 
@@ -224,9 +224,9 @@ class User extends BaseUser implements
      * @codeCoverageIgnore
      * @Groups({"API"})
      */
-    public function getProfile(): ?Profile
+    public function getProfile(): Profile
     {
-        return $this->profile;
+        return $this->profile ?? new Profile($this);
     }
 
     /** @codeCoverageIgnore */
@@ -346,6 +346,32 @@ class User extends BaseUser implements
     public function getReferralCode(): string
     {
         return $this->referralCode ?? '';
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @var string
+     * @return string
+     */
+    public function getNickname(): string
+    {
+        return $this->getProfile()->getNickname();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @param string $nickname
+     * @return self
+     */
+    public function setNickname(?string $nickname): self
+    {
+        if (!$this->profile) {
+            $this->profile = new Profile($this);
+        }
+
+        $this->profile->setNickname($nickname ?? '');
+
+        return $this;
     }
 
     /** @codeCoverageIgnore */

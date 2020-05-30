@@ -88,22 +88,6 @@ class TokenManagerTest extends TestCase
         $this->assertEquals($token, $tokenManager->getOwnToken());
     }
 
-    public function testGetOwnTokenWhenProfileNotCreated(): void
-    {
-        /** @var MockObject|ProfileFetcherInterface $profileFetcher */
-        $profileFetcher = $this->createMock(ProfileFetcherInterface::class);
-        $profileFetcher->method('fetchProfile')->willReturn(null);
-
-        $tokenManager = new TokenManager(
-            $this->createMock(EntityManagerInterface::class),
-            $profileFetcher,
-            $this->mockTokenStorage(),
-            $this->mockCryptoManager([]),
-            $this->mockConfig(0)
-        );
-        $this->assertEquals(null, $tokenManager->getOwnToken());
-    }
-
     /** @dataProvider findByHiddenNameDataProvider */
     public function testFindByHiddenName(int $expected, string $origin): void
     {
