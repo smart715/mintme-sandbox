@@ -109,7 +109,7 @@
                         <div class="d-lg-none align-self-center">
                             <li class="text-center {{ route starts with 'profile' ? 'active' : '' }}">
                                 <a
-                                    href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}"
+                                    href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
                                     class="nav-link"
                                 >
                                     <span>Profile</span>
@@ -143,7 +143,7 @@
                                 >
                                     <a
                                         class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
-                                        href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}"
+                                        href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
                                     >
                                         <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Profile

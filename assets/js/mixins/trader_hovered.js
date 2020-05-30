@@ -53,16 +53,15 @@ export default {
             this.tooltipData = content;
         },
         createTraderLinkFromOrder: function(order) {
-            if (!order || order.maker.profile === null || order.maker.profile.anonymous) {
+            if (!order) {
                 return 'Anonymous';
             }
 
-            let traderFullName = order.maker.profile.firstName + ' ' + order.maker.profile.lastName;
             let link = this.$routing.generate('profile-view', {
-                'pageUrl': order.maker.profile.page_url,
+                nickname: order.maker.profile.nickname,
             });
 
-            return '<a href="' + link + '">' + traderFullName + '</a>';
+            return '<a href="' + link + '">' + order.maker.profile.nickname + '</a>';
         },
     },
 };
