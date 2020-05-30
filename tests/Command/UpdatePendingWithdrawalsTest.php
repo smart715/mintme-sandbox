@@ -34,13 +34,17 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $handler->expects($this->exactly($lockCount))
             ->method('deposit');
 
-        $application->add(new UpdatePendingWithdrawals(
+        $upw = new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
             $this->mockEm($lockCount),
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $this->createMock(CryptoManagerInterface::class)
-        ));
+        );
+
+        $upw->expireHours = 1;
+
+        $application->add($upw);
 
         $command = $application->find('app:update-pending-withdrawals');
         $commandTester = new CommandTester($command);
@@ -63,13 +67,17 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $em = $this->mockEm($lockCount);
         $em->expects($this->exactly($lockCount))->method('rollback');
 
-        $application->add(new UpdatePendingWithdrawals(
+        $upw = new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
             $em,
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $this->createMock(CryptoManagerInterface::class)
-        ));
+        );
+
+        $upw->expireHours = 1;
+
+        $application->add($upw);
 
         $command = $application->find('app:update-pending-withdrawals');
         $commandTester = new CommandTester($command);
