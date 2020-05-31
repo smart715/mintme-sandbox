@@ -9,6 +9,7 @@ use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
+use App\Exchange\Trade\TradeResult;
 use App\Logger\UserActionLogger;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -108,8 +109,8 @@ class OrdersController extends AbstractFOSRestController
 
         if ($priceInput->greaterThanOrEqual($maximum)) {
             return $this->view([
-                'result' => 2,
-                'message' => 'Invalid price',
+                'result' => TradeResult::FAILED,
+                'message' => 'Invalid price quantity',
             ], Response::HTTP_ACCEPTED);
         }
 
