@@ -92,18 +92,6 @@
                 </div>
             </div>
         </div>
-        <modal
-            :no-close="false"
-            @close="redirectToProfile"
-            :visible="domLoaded && {{ profileCreated ? 'false' : 'true' }}">
-            <template slot="close"> &nbsp; </template>
-            <template slot="body">
-                <div class="text-center">
-                    <p class="text-white">You need to create a profile, only then you'll be able to create a token</p>
-                    <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
-                </div>
-            </template>
-        </modal>
     </div>
 {% endblock %}
 

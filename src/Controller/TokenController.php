@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Controller\Traits\CheckTokenNameBlacklistTrait;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
@@ -206,7 +207,7 @@ class TokenController extends Controller
             throw new ApiBadRequestException('Invalid argument');
         }
 
-        if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             if ($this->checkTokenNameBlacklist($token->getName())) {
                 return $this->json(
                     ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
@@ -218,11 +219,13 @@ class TokenController extends Controller
 
             $this->em->beginTransaction();
 
-            if (null !== $profile) {
-                $token->setProfile($profile);
-                $this->em->persist($token);
-                $this->em->flush();
-            }
+            /** @var User $user */
+            $user = $this->getUser();
+            $token->setProfile(
+                $this->profileManager->getProfile($this->getUser()) ?? new Profile($user)
+            );
+            $this->em->persist($token);
+            $this->em->flush();
 
             try {
                 /** @var  \App\Entity\User $user*/
@@ -267,7 +270,6 @@ class TokenController extends Controller
         return $this->render('pages/token_creation.html.twig', [
             'formHeader' => 'Create your own token',
             'form' => $form->createView(),
-            'profileCreated' => $this->isProfileCreated(),
         ]);
     }
 
@@ -321,10 +323,5 @@ class TokenController extends Controller
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();
-    }
-
-    private function isProfileCreated(): bool
-    {
-        return null !== $this->profileManager->getProfile($this->getUser());
     }
 }
