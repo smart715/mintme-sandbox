@@ -215,8 +215,6 @@ class TokenController extends Controller
                 );
             }
 
-            $profile = $this->profileManager->getProfile($this->getUser());
-
             $this->em->beginTransaction();
 
             /** @var User $user */
