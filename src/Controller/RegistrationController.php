@@ -111,7 +111,16 @@ class RegistrationController extends FOSRegistrationController
     {
         $form = $this->formFactory->createForm();
 
-        $response = $this->checkForm($form, $request);
+        try {
+            $response = $this->checkForm($form, $request);
+        } catch (\Throwable $exception) {
+            $this->addFlash('danger', 'an error occurred please try again!');
+
+            return $this->render('@FOSUser/Registration/register.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
         $refers = $request->headers->get('Referer');
 
         if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
@@ -153,10 +162,11 @@ class RegistrationController extends FOSRegistrationController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 $event = new FormEvent($form, $request);
-                /** @psalm-suppress TooManyArguments */
-                $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
 
                 $this->userManager->updateUser($user);
+
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
 
                 if ($this->generateUrl('sign_up', [], UrlGeneratorInterface::ABSOLUTE_URL)
                     === $request->headers->get('referer')) {

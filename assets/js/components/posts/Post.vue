@@ -9,7 +9,7 @@
         <span>
             {{ date }}
         </span>
-        <a :href="$routing.generate('profile-view', {pageUrl: post.author.page_url})">
+        <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})">
             {{ author }}
         </a>
         <button v-if="showEdit"
