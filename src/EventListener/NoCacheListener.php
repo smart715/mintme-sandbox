@@ -13,5 +13,7 @@ class NoCacheListener
         $response->headers->addCacheControlDirective('max-age', 0);
         $response->headers->addCacheControlDirective('must-revalidate', true);
         $response->headers->addCacheControlDirective('no-store', true);
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', 0);
     }
 }
