@@ -151,7 +151,7 @@ export default {
                        this.editing = false;
                     }
                     this.submitting = false;
-                }).catch(error) => {
+                }).(catch(error) => {
                     this.notifyError(error.response.data.message);
                     this.sendLogs('error', 'Can not save discord', response);
             });
