@@ -14,6 +14,6 @@ class NoCacheListener
         $response->headers->addCacheControlDirective('must-revalidate', true);
         $response->headers->addCacheControlDirective('no-store', true);
         $response->headers->set('Pragma', 'no-cache');
-        $response->headers->set('Expires', 0);
+        $response->headers->set('Expires', '0');
     }
 }
