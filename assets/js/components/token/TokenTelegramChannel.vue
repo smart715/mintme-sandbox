@@ -152,9 +152,9 @@ export default {
                         this.editing = false;
                     }
                     this.submitting = false;
-                }).catch(error => {
+                }).catch(error) => {
                     this.notifyError(error.response.data.message);
-                    this.sendLogs('error', 'Can not save telegram', response);;
+                    this.sendLogs('error', 'Can not save telegram', response);
             });
         },
         toggleEdit: function() {
