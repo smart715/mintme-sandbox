@@ -18,7 +18,6 @@ use Money\Currency;
 use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route("/api/orders")
