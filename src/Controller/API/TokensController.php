@@ -113,21 +113,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        if (null != $request->get('discordUrl')) {
-            if (!preg_match('/^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\w]{1,})$/', $request->get('discordUrl'))) {
-                return $this->view([
-                    'message' => 'Invalid discord link',
-                ], Response::HTTP_ACCEPTED);
-            }
-        }
-
-        if (null != $request->get('telegramUrl')) {
-            if (!preg_match('/^https:\/\/t\.me\/joinchat\/([-\w]{1,})$/', $request->get('telegramUrl'))) {
-                return $this->view([
-                    'message' => 'Invalid telegram link',
-                ], Response::HTTP_ACCEPTED);
-            }
-        }
 
         $this->denyAccessUnlessGranted('edit', $token);
 

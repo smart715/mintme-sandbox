@@ -116,13 +116,8 @@ export default {
     },
     methods: {
         editDiscord: function() {
-            if (this.newDiscord.length && this.newDiscord !== this.currentDiscord) {
-                this.checkDiscordUrl();
-            }
 
-            if (this.showDiscordError) {
-                return;
-            }
+
             this.saveDiscord('edit');
         },
         checkDiscordUrl: function() {
@@ -144,22 +139,17 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        if ('edit'=== aux && 'Invalid discord link' === response.data.message) {
-                            this.notifyError('Invalid discord link');
-                            this.sendLogs('error', 'Can not save discord', response);
-                        } else {
-                            let state = this.newDiscord ? 'added' : 'removed';
-                            this.$emit('saveDiscord', this.newDiscord);
-                            this.newDiscord = this.newDiscord || 'https://discord.gg/';
-                            this.notifySuccess(`Discord invitation link ${state} successfully`);
-                            this.editing = false;
-                        }
-                    } else {
-                        this.notifyError(response.data.message);
-                        this.sendLogs('error', 'Can not save discord', response);
+                       let state = this.newDiscord ? 'added' : 'removed';
+                       this.$emit('saveDiscord', this.newDiscord);
+                       this.newDiscord = this.newDiscord || 'https://discord.gg/';
+                       this.notifySuccess(`Discord invitation link ${state} successfully`);
+                       this.editing = false;
                     }
                     this.submitting = false;
-                });
+                }).catch(error => {
+                    this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not save discord', response);
+            });
         },
         toggleEdit: function() {
             this.editing = !this.editing;

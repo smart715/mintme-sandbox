@@ -116,13 +116,7 @@ export default {
     },
     methods: {
         editTelegram: function() {
-            if (this.newTelegram.length && this.newTelegram !== this.currentTelegram) {
-                this.checkTelegramUrl();
-            }
 
-            if (this.telegramError) {
-                return;
-            }
 
             this.saveTelegram();
         },
@@ -145,22 +139,17 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        if ('edit'=== aux && 'Invalid telegram link' === response.data.message) {
-                            this.notifyError('Invalid telegram link');
-                            this.sendLogs('error', 'Can not save telegram', response);
-                        } else {
-                            let state = this.newTelegram ? 'added' : 'removed';
-                            this.$emit('saveTelegram', this.newTelegram);
-                            this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
-                            this.notifySuccess(`Telegram invitation link ${state} successfully`);
-                            this.editing = false;
-                        }
-                    } else {
-                        this.notifyError(response.data.message || 'Network error');
-                        this.sendLogs('error', 'Can not save telegram', response);
+                        let state = this.newTelegram ? 'added' : 'removed';
+                        this.$emit('saveTelegram', this.newTelegram);
+                        this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
+                        this.notifySuccess(`Telegram invitation link ${state} successfully`);
+                        this.editing = false;
                     }
                     this.submitting = false;
-                });
+                }).catch(error => {
+                    this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not save telegram', response);;
+            });
         },
         toggleEdit: function() {
             this.editing = !this.editing;
