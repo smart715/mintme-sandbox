@@ -117,7 +117,13 @@ export default {
     methods: {
         editDiscord: function() {
 
+        if (this.newDiscord.length && this.newDiscord !== this.currentDiscord) {
+            this.checkDiscordUrl();
+        }
 
+        if (this.discordError) {
+            return;
+        }
             this.saveDiscord('edit');
         },
         checkDiscordUrl: function() {

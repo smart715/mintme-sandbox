@@ -116,7 +116,13 @@ export default {
     },
     methods: {
         editTelegram: function() {
+            if (this.newTelegram.length && this.newTelegram !== this.currentTelegram) {
+                this.checkTelegramUrl();
+            }
 
+            if (this.telegramError) {
+                return;
+            }
 
             this.saveTelegram();
         },
