@@ -116,11 +116,11 @@ export default {
     },
     methods: {
         editDiscord: function() {
-        if (this.newTelegram.length && this.newTelegram !== this.currentTelegram) {
-            this.checkTelegramUrl();
+        if (this.newDiscord.length && this.newDiscord !== this.currentDiscord) {
+            this.checkDiscordUrl();
         }
 
-        if (this.telegramError) {
+        if (this.discordError) {
             return;
         }
             this.saveDiscord('edit');
