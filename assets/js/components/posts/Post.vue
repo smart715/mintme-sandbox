@@ -10,7 +10,7 @@
             {{ date }}
         </span>
         <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})">
-            {{ author }}
+            {{ post.author.nickname }}
         </a>
         <button v-if="showEdit"
             class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
@@ -74,9 +74,6 @@ export default {
         };
     },
     computed: {
-        author() {
-            return `${this.post.author.firstName} ${this.post.author.lastName}`;
-        },
         date() {
             return moment(this.post.createdAt).format('H:mm, MMM D, YYYY');
         },
