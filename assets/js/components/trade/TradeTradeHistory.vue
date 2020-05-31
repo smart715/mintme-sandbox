@@ -44,10 +44,7 @@
 
                             <template v-slot:cell(orderMaker)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <span v-if="row.item.isMakerAnonymous" class="d-inline-block truncate-name flex-grow-1">
-                                        {{ row.value }}
-                                    </span>
-                                    <a v-else :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <a :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                         <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                             {{ row.value }}
                                         </span>
@@ -63,10 +60,7 @@
                             </template>
                             <template v-slot:cell(orderTrader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <span v-if="row.item.isTakerAnonymous" class="d-inline-block truncate-name flex-grow-1">
-                                        {{ row.value }}
-                                    </span>
-                                    <a v-else :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <a :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                         <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                             {{ row.value }}
                                         </span>
@@ -186,18 +180,10 @@ export default {
             return this.tableData !== false ? this.tableData.map((order) => {
                 return {
                     dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
-                    orderMaker: order.maker && order.maker.profile && !order.maker.profile.anonymous
-                        ? this.traderFullName(order.maker.profile)
-                        : 'Anonymous',
-                    orderTrader: order.taker && order.taker.profile && !order.taker.profile.anonymous
-                        ? this.traderFullName(order.taker.profile)
-                        : 'Anonymous',
-                    makerUrl: order.maker && order.maker.profile && !order.maker.profile.anonymous
-                        ? this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url})
-                        : '',
-                    takerUrl: order.taker && order.taker.profile && !order.taker.profile.anonymous
-                        ? this.$routing.generate('profile-view', {pageUrl: order.taker.profile.page_url})
-                        : '',
+                    orderMaker: order.maker.profile.nickname,
+                    orderTrader: order.taker.profile.nickname,
+                    makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
+                    takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
                     type: this.getSideByType(order.side),
                     pricePerQuote: toMoney(order.price, this.market.base.subunit),
                     quoteAmount: toMoney(order.amount, this.market.quote.subunit),
@@ -205,8 +191,6 @@ export default {
                         new Decimal(order.price).mul(order.amount).toString(),
                         this.market.base.subunit
                     ),
-                    isMakerAnonymous: !order.maker || !order.maker.profile || order.maker.profile.anonymous,
-                    isTakerAnonymous: !order.taker || !order.taker.profile || order.taker.profile.anonymous,
                 };
             }) : [];
         },
@@ -280,9 +264,6 @@ export default {
                     resolve(result.data);
                 }).catch(reject);
             });
-        },
-        traderFullName: function(profile) {
-            return profile.firstName + ' ' + profile.lastName;
         },
     },
 };
