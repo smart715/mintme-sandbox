@@ -116,7 +116,6 @@ export default {
     },
     methods: {
         editDiscord: function() {
-
         if (this.newTelegram.length && this.newTelegram !== this.currentTelegram) {
             this.checkTelegramUrl();
         }
@@ -155,7 +154,7 @@ export default {
                 }, (error) => {
                     this.notifyError(error.response.data.message);
                     this.sendLogs('error', 'Can not save discord', response);
-            })
+            });
         },
         toggleEdit: function() {
             this.editing = !this.editing;
