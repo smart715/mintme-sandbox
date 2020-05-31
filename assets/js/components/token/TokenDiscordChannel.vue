@@ -116,11 +116,12 @@ export default {
     },
     methods: {
         editDiscord: function() {
-        if (this.newDiscord.length && this.newDiscord !== this.currentDiscord) {
-            this.checkDiscordUrl();
+
+        if (this.newTelegram.length && this.newTelegram !== this.currentTelegram) {
+            this.checkTelegramUrl();
         }
 
-        if (this.discordError) {
+        if (this.telegramError) {
             return;
         }
             this.saveDiscord('edit');
@@ -151,10 +152,10 @@ export default {
                        this.editing = false;
                     }
                     this.submitting = false;
-                }) catch(error) {
+                }, (error) => {
                     this.notifyError(error.response.data.message);
                     this.sendLogs('error', 'Can not save discord', response);
-            };
+            })
         },
         toggleEdit: function() {
             this.editing = !this.editing;
