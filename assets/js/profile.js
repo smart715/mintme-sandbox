@@ -152,12 +152,12 @@ new Vue({
             firstName: {
                 required: (val) => !nameRequired(val, this.lastName),
                 helpers: names,
-                //minLength: minLength(2),
+                // minLength: minLength(2),
             },
             lastName: {
                 required: (val) => !nameRequired(val, this.firstName),
                 helpers: names,
-                //minLength: minLength(2),
+                // minLength: minLength(2),
             },
             city: {
                 helpers: names,
