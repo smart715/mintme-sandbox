@@ -118,8 +118,9 @@ export default {
     },
     computed: {
         btnDisabled: function() {
-            return this.tokenNameExists || this.tokenNameProcessing || this.submitting || this.isTokenExchanged ||
-                !this.isTokenNotDeployed || this.$v.$invalid || this.currentName === this.newName;
+            return this.tokenNameExists || this.tokenNameProcessing || this.submitting
+                || this.isTokenExchanged || !this.isTokenNotDeployed || this.$v.$invalid
+                || this.currentName === this.newName || this.tokenNameInBlacklist;
         },
         errorMessage: function() {
             let message = '';
@@ -149,7 +150,7 @@ export default {
     },
     methods: {
         checkTokenExistence: function() {
-            new Promise((res) => res()).then(() => {
+            new Promise((resolve, reject) => {
                 this.$axios.single.get(
                     this.$routing.generate('token_name_blacklist_check',
                         {name: this.newName}))

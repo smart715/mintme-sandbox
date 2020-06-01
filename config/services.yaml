@@ -546,3 +546,11 @@ services:
     App\Exchange\Donation\DonationHandler:
         arguments:
             $donationParams: '%donation%'
+
+    App\EventListener\NoCacheListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.response' }
+
+    App\Security\PathRoles:
+        arguments:
+            $accessMap: '@security.access_map'
