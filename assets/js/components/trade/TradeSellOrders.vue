@@ -160,7 +160,7 @@ export default {
     watch: {
         ordersList: function(newOrders) {
             let orders = this.tableData;
-            let skipOrdersUpdating = false;
+            let delayOrdersUpdating = false;
 
             if (this.ordersUpdated && orders.length < newOrders.length) {
                 let newOrder = newOrders.filter((order) => {
@@ -182,9 +182,12 @@ export default {
                     let oldOrder = orders.find((order) => order.id === newOrder.id);
                     let newAmount = new Decimal(newOrder.amount);
 
-                    newAmount.greaterThanOrEqualTo(oldOrder.amount)
-                        ? newOrder.highlightClass = 'success-highlight'
-                        : newOrder.highlightClass = 'error-highlight';
+                    if (newAmount.greaterThanOrEqualTo(oldOrder.amount)) {
+                        newOrder.highlightClass = 'success-highlight';
+                    } else {
+                        oldOrder.highlightClass = 'error-highlight';
+                        delayOrdersUpdating = true;
+                    }
                 }
             }
 
@@ -195,15 +198,18 @@ export default {
 
                 if (removedOrder.length) {
                     removedOrder[0].highlightClass = 'error-highlight';
-                    skipOrdersUpdating = true;
-                    setTimeout(()=> this.tableData = newOrders, 1000);
+                    delayOrdersUpdating = true;
                 }
             }
 
-            if (!skipOrdersUpdating) {
+            if (delayOrdersUpdating) {
+                setTimeout(()=> this.tableData = newOrders, 1000);
+                delayOrdersUpdating = false;
+            } else {
                 this.tableData = newOrders;
-                setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
             }
+
+            setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
         },
     },
 };
