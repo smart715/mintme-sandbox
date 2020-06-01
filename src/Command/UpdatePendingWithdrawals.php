@@ -75,16 +75,22 @@ class UpdatePendingWithdrawals extends Command
         /** @var PendingWithdraw $item */
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
+                $crypto = $item->getCrypto();
+
+                if (!$crypto) {
+                    continue;
+                }
+                $fee = $crypto->getFee();
                 $this->em->beginTransaction();
 
                 try {
-                    $this->em->remove($item);
-                    $this->em->flush();
                     $this->balanceHandler->deposit(
                         $item->getUser(),
-                        Token::getFromCrypto($item->getCrypto()),
-                        $item->getAmount()->getAmount()->add($item->getCrypto()->getFee())
+                        Token::getFromCrypto($crypto),
+                        $item->getAmount()->getAmount()->add($fee)
                     );
+                    $this->em->remove($item);
+                    $this->em->flush();
                     $this->em->commit();
                     $pendingCount++;
                 } catch (Throwable $exception) {
@@ -104,18 +110,19 @@ class UpdatePendingWithdrawals extends Command
 
         /** @var PendingTokenWithdraw $item */
         foreach ($items as $item) {
-            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
-            if (!$crypto) {
-                return 0;
-            }
-
             if ($item->getDate()->add($expires) < $this->date->now()) {
+                $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+
+                if (!$crypto) {
+                    continue;
+                }
+
+                $fee = $crypto->getFee();
+                $this->em->beginTransaction();
+
                 $this->em->beginTransaction();
 
                 try {
-                    $this->em->remove($item);
-                    $this->em->flush();
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $item->getToken(),
@@ -126,6 +133,8 @@ class UpdatePendingWithdrawals extends Command
                         Token::getFromCrypto($crypto),
                         $crypto->getFee()
                     );
+                    $this->em->remove($item);
+                    $this->em->flush();
                     $this->em->commit();
                     $pendingCount++;
                 } catch (Throwable $exception) {
