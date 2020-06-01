@@ -144,13 +144,14 @@
                                     <a
                                         v-if="currentTelegram"
                                         :href="currentTelegram"
-                                        class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+                                        class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia icon-with-badge p-0 mx-1"
                                         target="_blank"
                                     >
                                         <img
                                             src="../../../../img/icon-telegram-group.png"
                                             class="align-self-center text-center"
                                             width="45"
+                                            height="48.5"
                                             alt="telegram group"
                                         />
                                     </a>
@@ -217,6 +218,7 @@ export default {
         facebookUrl: String,
         profileName: String,
         profileUrl: String,
+        tokenUrl: String,
         telegramUrl: String,
         tokenContractAddress: String,
         tokenName: String,
@@ -252,10 +254,6 @@ export default {
             editingWebsite: false,
             showWebsiteError: false,
             submitting: false,
-            tokenUrl: this.$routing.generate('token_show', {
-                name: this.tokenName,
-                tab: 'intro',
-            }),
             twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
         };
     },

@@ -149,19 +149,19 @@ class BalanceHandler implements BalanceHandlerInterface
         return $available->equals($balance);
     }
 
-    /** @inheritDoc */
-    public function soldOnMarket(Token $token, int $amount, array $ownPendingOrders): Money
+    public function soldOnMarket(Token $token, int $initAmount, array $ownPendingOrders): Money
     {
         $available = $this->balance($token->getProfile()->getUser(), $token)->getAvailable();
-        $balance = $this->moneyWrapper->parse((string)$amount, $available->getCurrency()->getCode());
+        $init = $this->moneyWrapper->parse((string)$initAmount, $available->getCurrency()->getCode());
+        $withdrawn = new Money($token->getWithdrawn(), $available->getCurrency());
 
         foreach ($ownPendingOrders as $order) {
             if (Order::SELL_SIDE === $order->getSide()) {
-                $balance = $balance->subtract($order->getAmount());
+                $available = $available->add($order->getAmount());
             }
         }
 
-        return $balance->subtract($available);
+        return $init->subtract($withdrawn)->subtract($available);
     }
 
     /**
@@ -186,12 +186,18 @@ class BalanceHandler implements BalanceHandlerInterface
             throw $exception;
         }
 
-        if (!in_array($token, $user->getTokens()) && $token->getId()) {
-            $userToken = (new UserToken())->setToken($token)->setUser($user);
-            $this->entityManager->persist($userToken);
-            $user->addToken($userToken);
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+        if ($token->getId()) {
+            $tokenExist = array_filter($user->getTokens(), function (Token $userToken) use ($token) {
+                return $userToken->getId() === $token->getId();
+            });
+
+            if (!$tokenExist) {
+                $userToken = (new UserToken())->setToken($token)->setUser($user);
+                $this->entityManager->persist($userToken);
+                $user->addToken($userToken);
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
+            }
         }
     }
 

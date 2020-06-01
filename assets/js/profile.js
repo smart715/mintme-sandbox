@@ -55,12 +55,17 @@ new Vue({
     methods: {
         toggleZipCodeInputDisabled: function(state) {
             if (this.$refs.zipCode) {
-            this.$refs.zipCode.disabled = state;
+                this.$refs.zipCode.disabled = state;
             }
         },
 
+<<<<<<< HEAD
         validation: function (event) {
             if (event.target.id =='profile_firstName') {
+=======
+        validation: function(event) {
+            if (event.target.id ==='profile_firstName') {
+>>>>>>> 2b28bc6b13c6287c5128455f56358b7aa98ad7c6
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
                   // this means only chinese characters are typed
@@ -74,7 +79,11 @@ new Vue({
                     }
                 }
             }
+<<<<<<< HEAD
             if (event.target.id =='profile_lastName') {
+=======
+            if (event.target.id ==='profile_lastName') {
+>>>>>>> 2b28bc6b13c6287c5128455f56358b7aa98ad7c6
                 let hasChinese = this.lastName.match(REGEX_CHINESE);
                 if (hasChinese) {
                     // this means only chinese characters are typed
