@@ -149,8 +149,8 @@ export default {
                     ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
-                    total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
-                    fee: toMoney(history.fee, history.market.base.subunit),
+                    total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), GENERAL.precision),
+                    fee: toMoney(history.fee, GENERAL.precision),
                     pairUrl: this.generatePairUrl(history.market),
                 };
             });

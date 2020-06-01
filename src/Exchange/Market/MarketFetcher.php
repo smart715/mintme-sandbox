@@ -80,11 +80,7 @@ class MarketFetcher implements MarketFetcherInterface
             throw new FetchException($response->getError()['message'] ?? '');
         }
 
-        return array_map(function (array $order) {
-            $order['id'] -= $this->config->getOffset();
-
-            return $order;
-        }, $response->getResult()['records']);
+        return $response->getResult()['records'];
     }
 
     public function getPendingOrdersByUser(int $userId, string $market, int $offset = 0, int $limit = 100): array
