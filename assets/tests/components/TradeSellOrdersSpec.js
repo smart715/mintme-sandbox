@@ -47,7 +47,6 @@ describe('TradeSellOrders', () => {
         amount: toMoney(2),
         sum: 4,
         trader: 'first..',
-        traderFullName: 'firstName lastName',
         traderUrl: 'traderUrl',
         side: 1,
         owner: true,

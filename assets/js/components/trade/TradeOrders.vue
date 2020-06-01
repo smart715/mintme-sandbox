@@ -127,26 +127,15 @@ export default {
                     price: toMoney(order.price, this.market.base.subunit),
                     amount: toMoney(order.amount, this.market.quote.subunit),
                     sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
-                    trader: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? this.traderFullName(order.maker.profile)
-                        : 'Anonymous',
-                    traderFullName: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
-                        : 'Anonymous',
-                    traderUrl: order.maker.profile && !order.maker.profile.anonymous ?
-                        this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url}) :
-                        '#',
+                    trader: order.maker.profile.nickname,
+                    traderUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
                     side: order.side,
                     owner: order.owner,
-                    isAnonymous: !order.maker.profile || order.maker.profile.anonymous,
                     orderId: order.id,
                     ownerId: order.maker.id,
                     highlightClass: '',
                 };
             });
-        },
-        traderFullName: function(profile) {
-            return profile.firstName + ' ' + profile.lastName;
         },
         groupByPrice: function(orders) {
             let filtered = [];

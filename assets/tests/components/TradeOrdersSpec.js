@@ -42,7 +42,6 @@ describe('TradeOrders', () => {
                 },
             },
             userId: 1,
-            isAnonymous: false,
         },
     });
 
@@ -52,41 +51,12 @@ describe('TradeOrders', () => {
         amount: toMoney(2),
         maker: {
             id: 1,
-            profile: {
-                firstName: 'foo',
-                lastName: 'bar',
-                anonymous: false,
-            },
         },
         side: 1,
         owner: false,
     };
-    describe('truncate FullName correctly', function() {
+    describe('nickname', function() {
         wrapper.vm.sellOrders = Array(2).fill(order);
         wrapper.vm.ordersLoaded = true;
-
-        it('should add  Anonymous if the profile is null', function() {
-            let newOrder = JSON.parse(JSON.stringify(order));
-            newOrder.maker.profile = null;
-            wrapper.vm.isAnonymous = true;
-            wrapper.vm.sellOrders = [newOrder];
-
-            expect(wrapper.vm.filteredSellOrders).to.deep.equal([
-                {
-                    price: toMoney(2),
-                    amount: toMoney(2),
-                    sum: toMoney(4),
-                    trader: 'Anonymous',
-                    traderFullName: 'Anonymous',
-                    traderUrl: '#',
-                    side: 1,
-                    owner: true,
-                    isAnonymous: true,
-                    orderId: 1,
-                    ownerId: 1,
-                    highlightClass: '',
-                },
-            ]);
-        });
     });
 });
