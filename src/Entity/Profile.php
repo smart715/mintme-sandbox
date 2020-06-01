@@ -6,7 +6,6 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -29,15 +28,8 @@ class Profile
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Groups({"API", "Default"})
-     * @var string
-     */
-    protected $nickname;
-
-    /**
      * @ORM\Column(type="string", nullable=true)
-     * @AppAssert\ProfileNameRequired()
+     * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
@@ -48,7 +40,7 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @AppAssert\ProfileNameRequired()
+     * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
@@ -115,6 +107,13 @@ class Profile
     private $isChangesLocked = false;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string|null
+     * @Groups({"API", "API_TOK"})
+     */
+    private $page_url;
+
+    /**
      * @ORM\Column(type="string", length=30, nullable=true)
      * @AppAssert\ZipCode(getter="getCountry")
      * @var string|null
@@ -146,7 +145,7 @@ class Profile
     /** @ORM\PreUpdate() */
     public function updateNameChangedDate(PreUpdateEventArgs $args): self
     {
-        if ($this->keyChanged($args, 'firstName') || $this->keyChanged($args, 'lastName')) {
+        if ($args->hasChangedField('firstName') || $args->hasChangedField('lastName')) {
             $this->nameChangedDate = new \DateTimeImmutable('+1 month');
         }
 
@@ -161,11 +160,6 @@ class Profile
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function getNickname(): string
-    {
-        return $this->nickname ?? '';
     }
 
     public function getFirstName(): ?string
@@ -235,13 +229,6 @@ class Profile
         return $this;
     }
 
-    public function setNickname(string $nickname): self
-    {
-        $this->nickname = $nickname;
-
-        return $this;
-    }
-
     public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
@@ -252,6 +239,18 @@ class Profile
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getPageUrl(): ?string
+    {
+        return $this->page_url;
+    }
+
+    public function setPageUrl(?string $page_url): self
+    {
+        $this->page_url = $page_url;
 
         return $this;
     }
@@ -278,7 +277,6 @@ class Profile
         return $this;
     }
 
-<<<<<<< HEAD
    /**
    * @Assert\Callback
    */
@@ -301,12 +299,5 @@ class Profile
                 ->addViolation();
             }
         }
-=======
-    private function keyChanged(PreUpdateEventArgs $args, string $name): bool
-    {
-        return $args->hasChangedField($name)
-            && null !== $args->getOldValue($name)
-            && ($args->getOldValue($name) || $args->getNewValue($name));
->>>>>>> f66ebaeea6656d419b508ec9d30b42f0c18617a3
     }
 }

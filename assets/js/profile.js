@@ -8,14 +8,12 @@ import {HTTP_ACCEPTED} from './utils/constants.js';
 import Guide from './components/Guide';
 import {names, nickname} from './utils/constants';
 
-<<<<<<< HEAD
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
-=======
+
 const nameRequired = function(val, other) {
     return !val && other;
 };
->>>>>>> f66ebaeea6656d419b508ec9d30b42f0c18617a3
 
 new Vue({
     el: '#profile',
@@ -69,13 +67,8 @@ new Vue({
             }
         },
 
-<<<<<<< HEAD
-        validation: function (event) {
-            if (event.target.id =='profile_firstName') {
-=======
         validation: function(event) {
             if (event.target.id ==='profile_firstName') {
->>>>>>> 2b28bc6b13c6287c5128455f56358b7aa98ad7c6
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
                   // this means only chinese characters are typed
@@ -89,11 +82,7 @@ new Vue({
                     }
                 }
             }
-<<<<<<< HEAD
-            if (event.target.id =='profile_lastName') {
-=======
             if (event.target.id ==='profile_lastName') {
->>>>>>> 2b28bc6b13c6287c5128455f56358b7aa98ad7c6
                 let hasChinese = this.lastName.match(REGEX_CHINESE);
                 if (hasChinese) {
                     // this means only chinese characters are typed
@@ -156,7 +145,6 @@ new Vue({
             }
         },
     },
-<<<<<<< HEAD
     validations: {
         firstName: {
             helpers: names,
@@ -176,7 +164,6 @@ new Vue({
                 if (!zipCode) {
                     return true;
                 }
-=======
     computed: {
         disableSave: function() {
             return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing;
@@ -208,8 +195,6 @@ new Vue({
                     if (!zipCode) {
                         return true;
                     }
->>>>>>> f66ebaeea6656d419b508ec9d30b42f0c18617a3
-
                     return zipCode.replace(/\s/g, '').length > 0;
                 },
             },
