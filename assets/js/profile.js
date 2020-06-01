@@ -2,13 +2,20 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
-import {minLength, helpers} from 'vuelidate/lib/validators';
+import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
-import xRegExp from 'xregexp';
+import Guide from './components/Guide';
+import {names, nickname} from './utils/constants';
 
+<<<<<<< HEAD
 const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
+=======
+const nameRequired = function(val, other) {
+    return !val && other;
+};
+>>>>>>> f66ebaeea6656d419b508ec9d30b42f0c18617a3
 
 new Vue({
     el: '#profile',
@@ -17,10 +24,12 @@ new Vue({
         BbcodeHelp,
         BbcodeView,
         LimitedTextarea,
+        Guide,
     },
     data() {
         return {
             showEditForm: false,
+            nickname: '',
             firstName: '',
             lastName: '',
             country: '',
@@ -36,6 +45,7 @@ new Vue({
         };
     },
     mounted: function() {
+        this.nickname = this.$refs.nickname.getAttribute('value');
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.country = this.$refs.country.value;
@@ -146,6 +156,7 @@ new Vue({
             }
         },
     },
+<<<<<<< HEAD
     validations: {
         firstName: {
             helpers: names,
@@ -165,9 +176,43 @@ new Vue({
                 if (!zipCode) {
                     return true;
                 }
-
-                return zipCode.replace(/\s/g, '').length > 0;
-            },
+=======
+    computed: {
+        disableSave: function() {
+            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing;
         },
+    },
+    validations() {
+        return {
+            nickname: {
+                helpers: nickname,
+                minLength: minLength(2),
+            },
+            firstName: {
+                required: (val) => !nameRequired(val, this.lastName),
+                helpers: names,
+                minLength: minLength(2),
+            },
+            lastName: {
+                required: (val) => !nameRequired(val, this.firstName),
+                helpers: names,
+                minLength: minLength(2),
+            },
+            city: {
+                helpers: names,
+                minLength: minLength(2),
+            },
+            zipCode: {
+                zipCodeContain,
+                zipCodeWrongChars: function(zipCode) {
+                    if (!zipCode) {
+                        return true;
+                    }
+>>>>>>> f66ebaeea6656d419b508ec9d30b42f0c18617a3
+
+                    return zipCode.replace(/\s/g, '').length > 0;
+                },
+            },
+        };
     },
 });

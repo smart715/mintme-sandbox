@@ -517,7 +517,6 @@ services:
         arguments:
             $quickRegistrationPassword: '%quick_registration_password%'
 
-
     App\Controller\API\UsersController:
          arguments:
             $clientManager: '@fos_oauth_server.client_manager.default'
@@ -539,3 +538,11 @@ services:
     App\Exchange\Config\AirdropConfig:
         arguments:
             $airdropParams: '%airdrop_params%'
+
+    App\EventListener\NoCacheListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.response' }
+
+    App\Security\PathRoles:
+        arguments: 
+            $accessMap: '@security.access_map'

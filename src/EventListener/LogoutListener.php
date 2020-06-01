@@ -36,5 +36,11 @@ class LogoutListener implements LogoutHandlerInterface
         if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $this->session->set('has_authenticated', true);
         }
+
+        $refers = $request->headers->get('Referer');
+
+        if ($refers) {
+            $this->session->set('logout_referer', $refers);
+        }
     }
 }
