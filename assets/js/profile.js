@@ -8,9 +8,7 @@ import {HTTP_ACCEPTED} from './utils/constants.js';
 import Guide from './components/Guide';
 import {names, nickname} from './utils/constants';
 
-const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
 const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
-
 const nameRequired = function(val, other) {
     return !val && other;
 };
@@ -36,10 +34,6 @@ new Vue({
             zipCodeValid: true,
             zipCodeVaidationPattern: false,
             zipCodeProcessing: false,
-            firstNameAux: false,
-            lastNameAux: false,
-            firstNameMin: false,
-            lastNameMin: false,
         };
     },
     mounted: function() {
@@ -97,7 +91,6 @@ new Vue({
                 }
             }
         },
-
         countryChanged: function() {
             if (!this.$refs.zipCode) {
                 return;
@@ -145,25 +138,6 @@ new Vue({
             }
         },
     },
-    validations: {
-        firstName: {
-            helpers: names,
-            // minLength: minLength(2),
-        },
-        lastName: {
-            helpers: names,
-            // minLength: minLength(2),
-        },
-        city: {
-            helpers: names,
-            minLength: minLength(2),
-        },
-        zipCode: {
-            zipCodeContain,
-            zipCodeWrongChars: function(zipCode) {
-                if (!zipCode) {
-                    return true;
-                }
     computed: {
         disableSave: function() {
             return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing;
@@ -178,12 +152,12 @@ new Vue({
             firstName: {
                 required: (val) => !nameRequired(val, this.lastName),
                 helpers: names,
-                minLength: minLength(2),
+                //minLength: minLength(2),
             },
             lastName: {
                 required: (val) => !nameRequired(val, this.firstName),
                 helpers: names,
-                minLength: minLength(2),
+                //minLength: minLength(2),
             },
             city: {
                 helpers: names,
@@ -195,6 +169,7 @@ new Vue({
                     if (!zipCode) {
                         return true;
                     }
+
                     return zipCode.replace(/\s/g, '').length > 0;
                 },
             },
