@@ -6,12 +6,12 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use ZipCodeValidator\Constraints\ZipCode;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
