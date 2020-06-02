@@ -42,13 +42,13 @@ Vue.use(Routing);
 Vue.use(VueBootstrap);
 Vue.use(VueClipboard);
 Vue.use(VueTippy, {
-    directive: "tippy",
+    directive: 'tippy',
     flipDuration: 0,
     popperOptions: {
         modifiers: {
             preventOverflow: {
                 boundariesElement: 'window',
-            }
+            },
         },
     },
 });
