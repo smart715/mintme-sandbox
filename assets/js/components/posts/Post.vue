@@ -24,7 +24,7 @@
             />
         </button>
         <a v-if="showEdit"
-            class="btn btn-link p-0 edit-icon float-right text-decoration-none text-reset"
+            class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
             <font-awesome-icon

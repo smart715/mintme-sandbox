@@ -73,7 +73,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('.edit-icon').exists()).to.be.true;
+        expect(wrapper.find('.post-edit-icon').exists()).to.be.true;
         expect(wrapper.find('.delete-icon').exists()).to.be.true;
     });
 
@@ -87,7 +87,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('.edit-icon').exists()).to.be.false;
+        expect(wrapper.find('.post-edit-icon').exists()).to.be.false;
         expect(wrapper.find('.delete-icon').exists()).to.be.false;
     });
 });
