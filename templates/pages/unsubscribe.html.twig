@@ -8,31 +8,30 @@
       <div class="col-12">
          <div class="card card-fixed-small mx-auto">
             <div class="card-header">
-               {{ formHeader }}
+               Unsubscribe
             </div>
             <div class="card-body py-3">
-               {% if result is not empty %}
+               {% if result %}
                <div class="row">
                   <div class="col-12">
-                     {% if result == true %}
-                     <span>{{ mail }} was unsubscribed successfully.</span>
+                     {% if result %}
+                        <span>{{ mail }} was unsubscribed successfully.</span>
                      {% else %}
-                     <span>Error when unsubscribing {{ mail }}. 
+                        <span>Error when unsubscribing {{ mail }}. 
                      {% endif %}
                   </div>
                </div>
                {% else %}
                {{ form_start(form) }}
-               {{ form_widget(form.mail, { value: mail }) }}
                <div class="row">
                   <div class="col-12 mb-3">
-                     <span>Do you want to unsubscribe to {{ mail }}?</span>
+                     <span>Do you want to unsubscribe {{ mail }} from our mailing list?</span>
                   </div>
                </div>
                <div class="row">
                   <div class="col-12">
                      <div class="float-left mr-2">{{ form_widget(form.confirm, { label: 'Yes' }) }}</div>
-                     <div class="float-left"><a href="{{ path('homepage') }}" class="btn btn-primary">No</a></div>
+                     <div class="float-left"><a href="{{ path('homepage') }}" class="btn btn-cancel">No</a></div>
                   </div>
                </div>
                {{ form_end(form) }}

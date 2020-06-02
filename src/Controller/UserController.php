@@ -28,7 +28,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Throwable;
 
 class UserController extends AbstractController implements TwoFactorAuthenticatedController
 {
@@ -323,16 +322,15 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     }
 
     /**
-     * @Route("user/unsubscribe/{key}/{mail}", name="unsubscribe")
+     * @Route("user/unsubscribe/key/{key}/mail/{mail}", name="unsubscribe")
      */
-    public function unsubscribe(Request $request): Response
+    public function unsubscribe(Request $request, string $key, string $mail): Response
     {
         $form = $this->createForm(UnsubscribeType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $email = $form->get('mail')->getData();
-            $content = sprintf("%s %s\n", $email, date('Y-m-d H:i:s'));
+            $content = sprintf("%s %s\n", $mail, date('Y-m-d H:i:s'));
 
             $file = sprintf("%s/%s", dirname(__DIR__). '/../var/log', 'unsubscribers.txt');
             $fileSystem = new Filesystem();
@@ -345,37 +343,25 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 }
 
                 $result = true;
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $result = false;
             }
 
             return $this->render('pages/unsubscribe.html.twig', [
-            'formHeader' => 'Unsuscribe',
             'result' => $result,
-            'mail' => $email,
+            'mail' => $mail,
             'form' => $form->createView()]);
         } else {
-            $key = $request->attributes->get('key');
-            $mail = $request->attributes->get('mail');
-
-            if (empty($key) || empty($mail)) {
-                return $this->render('pages/404.html.twig');
-            }
-
             $hmacShaOneKey = $this->getParameter('hmac_sha_one_key');
 
-            if (empty($hmacShaOneKey)) {
-                return $this->render('pages/404.html.twig');
-            }
-
-            $encrypt = new HMACSHAOneEncrypt($hmacShaOneKey, $mail);
+            $encryptor = new HMACSHAOneEncrypt($hmacShaOneKey, $mail);
             
-            return $encrypt->encrypt() === $key ?
-            $this->render('pages/unsubscribe.html.twig', [
-                'formHeader' => 'Unsubscribe',
-                'result' =>null,
+            return $encryptor->encrypt() === $key
+            ? $this->render('pages/unsubscribe.html.twig', [
+                'result' => null,
                 'mail' => $mail,
-                'form' => $form->createView()]) : $this->render('pages/404.html.twig');
+                'form' => $form->createView()])
+            : $this->render('pages/404.html.twig');
         }
     }
 }

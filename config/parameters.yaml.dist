@@ -131,4 +131,4 @@ parameters:
     contact_email: support@mintme.com
 
     #HMAC SHA1 key
-    hmac_sha_one_key: 'querty'
+    hmac_sha_one_key: 'qwerty'

@@ -12,12 +12,11 @@ class UnsubscribeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('mail', HiddenType::class, [])
         ->add('confirm', SubmitType::class, [
-                'attr' => [
-                    'class' => 'btn btn-primary',
-                    'type' => 'submit',
-                ],
-            ]);
+            'attr' => [
+                'class' => 'btn btn-primary',
+                'type' => 'submit',
+            ],
+        ]);
     }
 }
