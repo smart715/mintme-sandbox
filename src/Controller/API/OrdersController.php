@@ -8,8 +8,11 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -95,11 +98,21 @@ class OrdersController extends AbstractFOSRestController
      */
     public function placeOrder(
         Market $market,
+        MoneyWrapperInterface $moneyWrapper,
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
         /** @var  \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
+        $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);
+        $maximum = $moneyWrapper->parse((string)99999999.9999, MoneyWrapper::TOK_SYMBOL);
+
+        if ($priceInput->greaterThanOrEqual($maximum)) {
+            return $this->view([
+                'result' => TradeResult::FAILED,
+                'message' => 'Invalid price quantity',
+            ], Response::HTTP_ACCEPTED);
+        }
 
         $tradeResult = $exchanger->placeOrder(
             $currentUser,
