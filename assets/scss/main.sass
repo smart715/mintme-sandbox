@@ -878,6 +878,10 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
     span.message
       display: block !important
 
+.width-100
+  @include media-breakpoint-down(xs)
+    max-width: 100% !important
+
 .ml-api
   @include media-breakpoint-up(sm)
     margin-left: 0

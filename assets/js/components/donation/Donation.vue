@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid px-0">
         <div class="row justify-content-center">
-            <div class="col-12 col-sm-10 col-md-9 col-lg-7 col-xl-6 mt-3">
+            <div class="width-100 col-11 col-md-9 col-lg-7 col-xl-6 mt-3">
                 <div class="card h-100">
                     <div class="h-100 donation">
                         <div class="donation-header text-left">
