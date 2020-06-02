@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\CheckTokenNameBlacklistTrait;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -41,6 +42,9 @@ use Throwable;
  */
 class TokenController extends Controller
 {
+
+    use CheckTokenNameBlacklistTrait;
+
     /** @var EntityManagerInterface */
     protected $em;
 
@@ -191,19 +195,6 @@ class TokenController extends Controller
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
 
-        $name = trim($token->getName());
-        $blacklist = $this->blacklistManager->getList("token");
-
-        foreach ($blacklist as $blist) {
-            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
-                && (strlen($name) - strlen($blist->getValue())) <= 1) {
-                return $this->json(
-                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-        }
-
         if ($form->isSubmitted() && !$form->isValid()) {
             foreach ($form->all() as $childForm) {
                 /** @var FormError[] $fieldErrors */
@@ -218,6 +209,13 @@ class TokenController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->checkTokenNameBlacklist($token->getName())) {
+                return $this->json(
+                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
             $this->em->beginTransaction();
 
             /** @var User $user */
