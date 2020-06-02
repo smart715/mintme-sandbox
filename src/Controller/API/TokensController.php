@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
+use App\Exception\InvalidAddressException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
@@ -642,13 +643,21 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
+            if (!$this->validateEthereumAddress($request->get('address'))) {
+                throw new InvalidAddressException();
+            }
+            
             $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            if ($ex instanceof  InvalidAddressException) {
+                throw new ApiBadRequestException('Invalid Address');
+            } else {
+                throw new ApiBadRequestException('Internal error, Please try again later');
+            }
         }
 
         $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
@@ -701,5 +710,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     public function checkTokenNameBlacklistAction(string $name): View
     {
         return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
+    }
+    
+    private function validateEthereumAddress(string $address): bool
+    {
+        return $this->startsWith($address, '0x') && 42 === strlen($address);
+    }
+    
+    private function startsWith(string $haystack, string $needle): bool
+    {
+        return substr($haystack, 0, strlen($needle)) === $needle;
     }
 }
