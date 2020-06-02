@@ -541,6 +541,14 @@ services:
         arguments:
             $airdropParams: '%airdrop_params%'
 
+    App\EventListener\NoCacheListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.response' }
+
+    App\Security\PathRoles:
+        arguments: 
+            $accessMap: '@security.access_map'
+
     App\Repository\PendingWithdrawRepository:
-        properties:
-            expireHours: '%withdraw_expiration_time%'
+    properties:
+        expireHours: '%withdraw_expiration_time%'
