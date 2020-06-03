@@ -10,6 +10,7 @@ import OrderMixin from './order';
 import LoggerMixin from './logger';
 import PairNameMixin from './pair_name';
 import InputValidationMixin from './input_validation';
+import OrderHighlights from './order_highlights';
 
 export {
     FiltersMixin,
@@ -26,4 +27,5 @@ export {
     LoggerMixin,
     PairNameMixin,
     InputValidationMixin,
+    OrderHighlights,
 };
