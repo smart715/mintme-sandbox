@@ -86,8 +86,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     /** {@inheritDoc} */
     public function getMarketsInfo(
+        int $page,
         int $offset,
-        int $limit,
         string $sort = "monthVolume",
         string $order = "DESC",
         int $deployed = 0,
@@ -95,11 +95,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
     ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
+        $firstResult = ($offset - count($predefinedMarketStatus)) * ($page - 1);
+
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
             ->where('qt IS NOT NULL')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit - count($predefinedMarketStatus));
+            ->setFirstResult($firstResult)
+            ->setMaxResults($offset - count($predefinedMarketStatus));
 
         if (!is_null($userId)) {
             $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.id = :id')

@@ -62,7 +62,7 @@ class MarketsController extends APIController
             : null;
 
         $markets = $marketStatusManager->getMarketsInfo(
-            ($page - 1) * (self::OFFSET - 1),
+            $page,
             self::OFFSET,
             $request->get('sort'),
             $request->get('order'),
