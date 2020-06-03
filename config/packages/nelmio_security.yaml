@@ -1,0 +1,9 @@
+nelmio_security:
+    csp:
+        hosts: []
+        content_types: []
+        enforce:
+            default-src:
+                - 'self'
+            script-src:
+                - 'strict-dynamic'
