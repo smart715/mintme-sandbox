@@ -163,10 +163,10 @@ class RegistrationController extends FOSRegistrationController
             if ($form->isValid()) {
                 $event = new FormEvent($form, $request);
 
-                $this->userManager->updateUser($user);
-
                 /** @psalm-suppress TooManyArguments */
                 $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
+
+                $this->userManager->updateUser($user);
 
                 if ($this->generateUrl('sign_up', [], UrlGeneratorInterface::ABSOLUTE_URL)
                     === $request->headers->get('referer')) {
