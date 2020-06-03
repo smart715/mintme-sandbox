@@ -3,6 +3,7 @@ import LazyScrollTableMixin from './lazy_scroll_table';
 import LoggerMixin from './logger';
 import NotificationMixin from './notification';
 import OrderClickedMixin from './order_clicked';
+import OrderHighlights from './order_highlights';
 import OrderMixin from './order';
 import PairNameMixin from './pair_name';
 import PricePositionMixin from './price_position';
@@ -20,6 +21,7 @@ export {
     NotificationMixin,
     OrderClickedMixin,
     OrderMixin,
+    OrderHighlights,
     PairNameMixin,
     PlaceOrder,
     PricePositionMixin,

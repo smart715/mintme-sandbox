@@ -29,7 +29,7 @@ describe('TradeSellOrders', () => {
                 amount: {
                     label: 'Amount',
                 },
-                sumWeb: {
+                sum: {
                     label: 'Sum WEB',
                 },
                 trader: {
@@ -38,14 +38,14 @@ describe('TradeSellOrders', () => {
             },
             sortBy: 'name',
             sortDesc: true,
-            precision: 8,
+            basePrecision: 8,
         },
     });
 
     let order = {
         price: toMoney(2),
         amount: toMoney(2),
-        sumWeb: 4,
+        sum: 4,
         trader: 'first..',
         traderUrl: 'traderUrl',
         side: 1,
