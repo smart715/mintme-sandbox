@@ -3,7 +3,7 @@
 {% block title %}Links | mintMe{% endblock %}
 
 {% block pagestyles %}
-    <style>
+    <style nonce="{{ csp_nonce('style') }}">
         #links a, #links a:hover {
             color: #fff;
             display:block;

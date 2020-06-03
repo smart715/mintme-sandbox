@@ -96,5 +96,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/token_creation.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/token_creation.js') }}"></script>
 {% endblock %}

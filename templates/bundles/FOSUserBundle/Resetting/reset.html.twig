@@ -7,5 +7,5 @@
 {% endblock fos_user_content %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/reset.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/reset.js') }}"></script>
 {% endblock %}

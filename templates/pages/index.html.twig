@@ -253,5 +253,5 @@
 {% block messageClass %}d-none{% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/home.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/home.js') }}"></script>
 {% endblock %}

@@ -10,15 +10,15 @@
                     <div class="card-header">Account settings</div>
                     <div class="card-body m-0">
                         <div id="settings">
-                        {% if twoFactorAuth %}                
+                        {% if twoFactorAuth %}
                             {{ form_start(passwordForm, {'attr': {'v-on:submit.prevent': 'submit2FA'}} ) }}
                             <two-factor-modal
                                 :visible=twoFaVisible
                                 :twofa=true
                                 @close="twoFaVisible = false"
                                 @verify="doChangePassword"
-                            >                                
-                            </two-factor-modal>                                     
+                            >
+                            </two-factor-modal>
                         {% else %}
                             {{ form_start(passwordForm) }}
                         {% endif %}
@@ -97,5 +97,5 @@
     </div>
 {% endblock %}
 {% block pagescripts %}
-    <script src="{{ asset('build/settings.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/settings.js') }}"></script>
 {% endblock %}

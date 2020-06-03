@@ -66,5 +66,5 @@
     </div>
 {% endblock %}
 {% block javascripts %}
-<script src="{{ asset('build/news.js') }}"></script>
+<script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/news.js') }}"></script>
 {% endblock %}
