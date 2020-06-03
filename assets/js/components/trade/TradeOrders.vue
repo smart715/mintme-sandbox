@@ -7,6 +7,7 @@
                     :full-orders-list="buyOrders"
                     :orders-list="filteredBuyOrders"
                     :orders-loaded="ordersLoaded"
+                    :orders-updated="ordersUpdated"
                     :token-name="market.base.symbol"
                     :fields="fields"
                     :basePrecision="market.base.subunit"
@@ -20,6 +21,7 @@
                     :full-orders-list="sellOrders"
                     :orders-list="filteredSellOrders"
                     :orders-loaded="ordersLoaded"
+                    :orders-updated="ordersUpdated"
                     :market="market"
                     :fields="fields"
                     :basePrecision="market.base.subunit"
@@ -51,6 +53,7 @@ import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
+import {WSAPI} from '../../utils/constants';
 import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 
 export default {
@@ -63,6 +66,10 @@ export default {
     },
     props: {
         ordersLoaded: Boolean,
+        ordersUpdated: {
+            type: Boolean,
+            default: false,
+        },
         buyOrders: [Array, Object],
         sellOrders: [Array, Object],
         market: Object,
@@ -126,6 +133,7 @@ export default {
                     owner: order.owner,
                     orderId: order.id,
                     ownerId: order.maker.id,
+                    highlightClass: '',
                 };
             });
         },
@@ -166,7 +174,7 @@ export default {
             return filtered;
         },
         removeOrderModal: function(row) {
-            let isSellSide = row.side === 1;
+            let isSellSide = WSAPI.order.type.SELL === row.side;
             let orders = isSellSide ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
 
@@ -198,5 +206,4 @@ export default {
         },
     },
 };
-
 </script>
