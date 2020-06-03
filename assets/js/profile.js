@@ -6,7 +6,7 @@ import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
 import Guide from './components/Guide';
-import {names, nickname} from './utils/constants';
+import {names, allNames, nickname} from './utils/constants';
 
 const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
 const nameRequired = function(val, other) {
@@ -34,6 +34,8 @@ new Vue({
             zipCodeValid: true,
             zipCodeVaidationPattern: false,
             zipCodeProcessing: false,
+            firstNameAux: false,
+            lastNameAux: false,
         };
     },
     mounted: function() {
@@ -151,12 +153,12 @@ new Vue({
             },
             firstName: {
                 required: (val) => !nameRequired(val, this.lastName),
-                helpers: names,
+                helpers: allNames,
                 // minLength: minLength(2),
             },
             lastName: {
                 required: (val) => !nameRequired(val, this.firstName),
-                helpers: names,
+                helpers: allNames,
                 // minLength: minLength(2),
             },
             city: {
