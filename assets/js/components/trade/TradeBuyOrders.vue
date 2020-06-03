@@ -82,6 +82,7 @@ import {
     OrderClickedMixin,
     RebrandingFilterMixin,
     TraderHoveredMixin,
+    OrderHighlights,
 } from '../../mixins/';
 
 export default {
@@ -92,6 +93,7 @@ export default {
         OrderClickedMixin,
         RebrandingFilterMixin,
         TraderHoveredMixin,
+        OrderHighlights,
     ],
     props: {
         fullOrdersList: [Array],
@@ -144,52 +146,12 @@ export default {
     },
     watch: {
         ordersList: function(newOrders) {
-            let orders = this.tableData;
-            let delayOrdersUpdating = false;
-
-            if (this.ordersUpdated && orders.length < newOrders.length) {
-                let newOrder = newOrders.filter((order) => {
-                    return !orders.some((order2) => order.price === order2.price);
-                });
-
-                if (newOrder.length) {
-                    newOrder[0].highlightClass = 'success-highlight';
-                }
-            }
-
-            if (this.ordersUpdated && orders.length === newOrders.length) {
-                let newOrder = newOrders.filter((order) => {
-                    return !orders.some((order2) => order.price === order2.price && order.amount === order2.amount);
-                });
-
-                if (newOrder.length) {
-                    newOrder = newOrder[0];
-                    let oldOrder = orders.find((order) => order.id === newOrder.id);
-                    let newAmount = new Decimal(newOrder.amount);
-
-                    if (newAmount.greaterThanOrEqualTo(oldOrder.amount)) {
-                        newOrder.highlightClass = 'success-highlight';
-                    } else {
-                        oldOrder.highlightClass = 'error-highlight';
-                        delayOrdersUpdating = true;
-                    }
-                }
-            }
-
-            if (orders.length > 0 && orders.length > newOrders.length) {
-                let removedOrder = orders.filter((order) => {
-                    return !newOrders.some((order2) => order.price === order2.price);
-                });
-
-                if (removedOrder.length) {
-                    removedOrder[0].highlightClass = 'error-highlight';
-                    delayOrdersUpdating = true;
-                }
-            }
+            let delayOrdersUpdating = this.ordersUpdated
+                ? this.handleOrderHighlights(this.tableData, newOrders)
+                : false;
 
             if (delayOrdersUpdating) {
                 setTimeout(()=> this.tableData = newOrders, 1000);
-                delayOrdersUpdating = false;
             } else {
                 this.tableData = newOrders;
             }
