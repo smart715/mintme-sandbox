@@ -120,7 +120,7 @@ export default {
                 this.checkTelegramUrl();
             }
 
-            if (this.showTelegramError) {
+            if (this.telegramError) {
                 return;
             }
 
@@ -150,12 +150,12 @@ export default {
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
                         this.notifySuccess(`Telegram invitation link ${state} successfully`);
                         this.editing = false;
-                    } else {
-                        this.notifyError(response.data.message || 'Network error');
-                        this.sendLogs('error', 'Can not save telegram', response);
                     }
                     this.submitting = false;
-                });
+                }, (error) => {
+                    this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not save telegram', response);
+            });
         },
         toggleEdit: function() {
             this.editing = !this.editing;

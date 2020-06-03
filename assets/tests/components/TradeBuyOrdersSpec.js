@@ -25,7 +25,7 @@ describe('TradeBuyOrders', () => {
             },
             sortBy: 'name',
             sortDesc: true,
-            precision: 8,
+            basePrecision: 8,
         },
     });
 
