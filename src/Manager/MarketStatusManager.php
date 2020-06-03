@@ -126,7 +126,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ? "ASC"
             : "DESC";
 
-        $queryBuilder->addOrderBy($sort, $order);
+        $queryBuilder->addOrderBy($sort, $order)
+            ->addOrderBy('ms.id', 'DESC');
         
         return $this->parseMarketStatuses(
             array_merge(
