@@ -20,7 +20,6 @@ Encore
     .addEntry('admin', './assets/js/admin/admin.js')
     .addEntry('mail', './assets/scss/mail.sass')
     .addEntry('news', './assets/js/news.js')
-    .addEntry('documentation', './assets/scss/documentation.sass')
 
     .enablePostCssLoader()
 
