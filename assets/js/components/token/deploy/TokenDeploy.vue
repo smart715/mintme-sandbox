@@ -104,7 +104,6 @@ export default {
             deployInterval: null,
             retryCount: 0,
             retryCountLimit: 10,
-
         };
     },
     computed: {
@@ -139,32 +138,21 @@ export default {
             this.deployInterval = setInterval(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
-                    return new Promise((resolve, reject) => {
                         if (true === response.data.deployed) {
                             clearInterval(this.deployInterval);
-                            resolve();
                             this.status = tokenDeploymentStatus.deployed;
                             this.deployed = true;
+                            this.showPending = false;
                             this.$emit('deployed');
                             this.notifySuccess('Token has been successfully deployed');
                         }
                         this.retryCount++;
                         if (this.retryCount >= this.retryCountLimit) {
                             clearInterval(this.deployInterval);
-                            reject();
                         }
-                    });
                 }, (error) => {
                     this.notifyError('An error has occurred, please try again later');
-                })
-                .then(() => {
-                    this.showPending = false;
                 });
-                // .then(() => {
-                //     setTimeout(() => {
-                //         location.reload();
-                //     }, 2000);
-                // });
             }, 60000);
         },
     },

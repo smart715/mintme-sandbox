@@ -58,7 +58,9 @@ new Vue({
       this.tokenDeployed = true;
     },
     getTokenStatus: function(status) {
-      return true === this.tokenDeployed ? tokenDeploymentStatus.deployed : true === this.tokenPending ? tokenDeploymentStatus.pending : status;
+      return true === this.tokenDeployed ? tokenDeploymentStatus.deployed :
+             true === this.tokenPending ? tokenDeploymentStatus.pending :
+             status;
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
