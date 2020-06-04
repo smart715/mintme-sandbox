@@ -142,7 +142,7 @@ new Vue({
     },
     computed: {
         disableSave: function() {
-            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing;
+            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing || this.firstNameAux || this.lastNameAux;
         },
     },
     validations() {
