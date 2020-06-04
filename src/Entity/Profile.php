@@ -38,7 +38,6 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @AppAssert\ProfileNameRequired()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
@@ -50,7 +49,6 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @AppAssert\ProfileNameRequired()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
@@ -290,7 +288,7 @@ class Profile
     */
     public function validateNames(ExecutionContextInterface $context, ?string $payload): void
     {
-        if (false === preg_match("/^\p{Han}{2,10}+$/u", strval($this->getFirstName()))) {
+        if (preg_match("/[A-Za-zÄÖÜäöüß -]/", strval($this->getFirstName()))) {
            // if the first name has  any chinese characters nothing happens
             if (2 > strlen(strval($this->getFirstName()))) {
                 $context->buildViolation('This value is too short. It should have 2 characters or more.')
@@ -299,7 +297,7 @@ class Profile
             }
         }
 
-        if (false === preg_match("/^\p{Han}{2,10}+$/u", strval($this->getLastName()))) {
+        if (preg_match("/[A-Za-zÄÖÜäöüß -]/", strval($this->getLastName()))) {
             // if the first name has  any chinese characters nothing happens
             if (2 > strlen(strval($this->getLastName()))) {
                 $context->buildViolation('This value is too short. It should have 2 characters or more.')
