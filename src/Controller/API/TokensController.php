@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
+use App\Controller\Traits\CheckTokenNameBlacklistTrait;
 use App\Controller\TwoFactorAuthenticatedController;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
@@ -10,6 +11,7 @@ use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
+use App\Exception\InvalidAddressException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
@@ -50,6 +52,10 @@ use Throwable;
  */
 class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
 {
+
+    use CheckTokenNameBlacklistTrait;
+
+    
     /** @var EntityManagerInterface */
     private $em;
 
@@ -115,12 +121,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to change token\'s name');
-        }
+        if ($request->get('name')) {
+            if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+                throw new ApiBadRequestException('You need all your tokens to change token\'s name');
+            }
 
-        if ($request->get('name') && Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-            throw new ApiBadRequestException('Token is deploying or deployed.');
+            if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+                throw new ApiBadRequestException('Token is deploying or deployed.');
+            }
+
+            if ($this->checkTokenNameBlacklist($request->get('name'))) {
+                throw new ApiBadRequestException('Invalid token name');
+            }
         }
 
         $form = $this->createForm(TokenType::class, $token, [
@@ -631,13 +643,21 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
+            if (!$this->validateEthereumAddress($request->get('address'))) {
+                throw new InvalidAddressException();
+            }
+            
             $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            if ($ex instanceof  InvalidAddressException) {
+                throw new ApiBadRequestException('Invalid Address');
+            } else {
+                throw new ApiBadRequestException('Internal error, Please try again later');
+            }
         }
 
         $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
@@ -687,19 +707,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Get("/{name}/token-name-blacklist-check", name="token_name_blacklist_check", options={"expose"=true})
      */
-    public function checkTokenNameBlacklist(string $name): View
+    public function checkTokenNameBlacklistAction(string $name): View
     {
-        $name = trim($name);
-        $blacklist = $this->blacklistManager->getList("token");
-        $isBlackListed = false;
-
-        foreach ($blacklist as $blist) {
-            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
-                && (strlen($name) - strlen($blist->getValue())) <= 1) {
-                $isBlackListed = true;
-            }
-        }
-
-        return $this->view(['blacklisted' => $isBlackListed], Response::HTTP_OK);
+        return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
+    }
+    
+    private function validateEthereumAddress(string $address): bool
+    {
+        return $this->startsWith($address, '0x') && 42 === strlen($address);
+    }
+    
+    private function startsWith(string $haystack, string $needle): bool
+    {
+        return substr($haystack, 0, strlen($needle)) === $needle;
     }
 }
