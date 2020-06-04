@@ -12,17 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends Controller
 {
-
-    /**
-     * @Route("/test")
-     */
-    public function test(): Response
-    {
-        $encrypt = new \App\Utils\Encrypt\HMACSHAOneEncrypt($this->getParameter('hmac_sha_one_key'), 'ale_salazar@outlook.com');
-
-        return new Response($encrypt->encrypt());
-    }
-
     /**
      * @Route("/",
      *     name="homepage",
